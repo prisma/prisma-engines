@@ -1,269 +1,357 @@
 use crate::common::*;
-use datamodel::ast::Span;
-use datamodel::diagnostics::DatamodelError;
 
 #[test]
 fn nice_error_for_missing_model_keyword() {
-    let dml = r#"
-    User {
-        id Int @id
-    }
-    "#;
+    let dml = indoc! {r#"
+        User {
+          id Int @id
+        }
+    "#};
 
-    let error = parse_error(dml);
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
-    error.assert_is(DatamodelError::new_validation_error(
-        "This block is invalid. It does not start with any known Prisma schema keyword. Valid keywords include 'model', 'enum', 'datasource' and 'generator'.",
-        Span::new(5, 36),
-    ));
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError validating: This block is invalid. It does not start with any known Prisma schema keyword. Valid keywords include 'model', 'enum', 'datasource' and 'generator'.[0m
+          [1;94m-->[0m  [4mschema.prisma:1[0m
+        [1;94m   | [0m
+        [1;94m   | [0m
+        [1;94m 1 | [0m[1;91mUser {[0m
+        [1;94m 2 | [0m  id Int @id
+        [1;94m 3 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
 }
 
 #[test]
 fn nice_error_for_missing_model_keyword_2() {
-    let dml = r#"
-    model User {
-        id Int @id
-    }
-    Todo {
-        id
-    }
-    "#;
+    let dml = indoc! {r#"
+        model User {
+          id Int @id
+        }
 
-    let error = parse_error(dml);
+        Todo {
+          id
+        }
+    "#};
 
-    error.assert_is(DatamodelError::new_validation_error(
-        "This block is invalid. It does not start with any known Prisma schema keyword. Valid keywords include 'model', 'enum', 'datasource' and 'generator'.",
-        Span::new(47, 70),
-    ));
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError validating: This block is invalid. It does not start with any known Prisma schema keyword. Valid keywords include 'model', 'enum', 'datasource' and 'generator'.[0m
+          [1;94m-->[0m  [4mschema.prisma:5[0m
+        [1;94m   | [0m
+        [1;94m 4 | [0m
+        [1;94m 5 | [0m[1;91mTodo {[0m
+        [1;94m 6 | [0m  id
+        [1;94m 7 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
 }
 
 #[test]
 fn nice_error_on_incorrect_enum_field() {
-    let dml = r#"
-    enum Role {
-        A-dmin
-        User
-    }
-    "#;
+    let dml = indoc! {r#"
+        enum Role {
+          A-dmin
+          User
+        }
+    "#};
 
-    let error = parse_error(dml);
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
-    error.assert_is(DatamodelError::new_validation_error(
-        "The character `-` is not allowed in Enum Value names.",
-        Span::new(25, 31),
-    ));
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError validating: The character `-` is not allowed in Enum Value names.[0m
+          [1;94m-->[0m  [4mschema.prisma:2[0m
+        [1;94m   | [0m
+        [1;94m 1 | [0menum Role {
+        [1;94m 2 | [0m  [1;91mA-dmin[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
 }
 
 #[test]
 fn nice_error_missing_type() {
-    let dml = r#"
-    model User {
-        id Int @id
-        name
-    }
-    "#;
+    let dml = indoc! {r#"
+        model User {
+          id Int @id
+          name
+        }
+    "#};
 
-    let error = parse_error(dml);
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
-    error.assert_is(DatamodelError::new_model_validation_error(
-        "This field declaration is invalid. It is either missing a name or a type.",
-        "User",
-        Span::new(45, 50),
-    ));
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError validating model "User": This field declaration is invalid. It is either missing a name or a type.[0m
+          [1;94m-->[0m  [4mschema.prisma:3[0m
+        [1;94m   | [0m
+        [1;94m 2 | [0m  id Int @id
+        [1;94m 3 | [0m  [1;91mname[0m
+        [1;94m 4 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
 }
 
 #[test]
 fn nice_error_missing_attribute_name() {
-    let dml = r#"
-    model User {
-        id Int @id @
-    }
-    "#;
+    let dml = indoc! {r#"
+        model User {
+          id Int @id @
+        }
+    "#};
 
-    let error = parse_error(dml);
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
-    error.assert_is(DatamodelError::new_validation_error(
-        "The name of a Attribute must not be empty.",
-        Span::new(38, 38),
-    ));
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError validating: The name of a Attribute must not be empty.[0m
+          [1;94m-->[0m  [4mschema.prisma:2[0m
+        [1;94m   | [0m
+        [1;94m 1 | [0mmodel User {
+        [1;94m 2 | [0m  id Int @id @[1;91m[0m
+        [1;94m   | [0m              [1;91m^ Unexpected token.[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
 }
 
 #[test]
 fn nice_error_missing_braces() {
-    let dml = r#"
-    model User
-        id Int @id
-    "#;
+    let dml = indoc! {r#"
+        model User
+          id Int @id
+    "#};
 
-    let error = parse_error(dml);
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
-    error.assert_length(2);
-    error.assert_is_at(
-        0,
-        DatamodelError::new_validation_error(
-            "This line is invalid. It does not start with any known Prisma schema keyword.",
-            Span::new(5, 16),
-        ),
-    );
-    error.assert_is_at(
-        1,
-        DatamodelError::new_validation_error(
-            "This line is invalid. It does not start with any known Prisma schema keyword.",
-            Span::new(24, 35),
-        ),
-    );
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+          [1;94m-->[0m  [4mschema.prisma:1[0m
+        [1;94m   | [0m
+        [1;94m   | [0m
+        [1;94m 1 | [0m[1;91mmodel User[0m
+        [1;94m 2 | [0m  id Int @id
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+          [1;94m-->[0m  [4mschema.prisma:2[0m
+        [1;94m   | [0m
+        [1;94m 1 | [0mmodel User
+        [1;94m 2 | [0m  [1;91mid Int @id[0m
+        [1;94m 3 | [0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
 }
 
 #[test]
 fn nice_error_broken_field_type_legacy_list() {
-    let dml = r#"
-    model User {
-        id [Int] @id
-    }"#;
+    let dml = indoc! {r#"
+        model User {
+          id [Int] @id
+        }
+    "#};
 
-    let error = parse_error(dml);
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
-    error.assert_is(DatamodelError::new_legacy_parser_error(
-        "To specify a list, please use `Type[]` instead of `[Type]`.",
-        Span::new(29, 34),
-    ));
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mTo specify a list, please use `Type[]` instead of `[Type]`.[0m
+          [1;94m-->[0m  [4mschema.prisma:2[0m
+        [1;94m   | [0m
+        [1;94m 1 | [0mmodel User {
+        [1;94m 2 | [0m  id [1;91m[Int][0m @id
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
 }
 
 #[test]
 fn nice_error_broken_field_type_legacy_colon() {
-    let dml = r#"
-    model User {
-        id: Int @id
-    }"#;
+    let dml = indoc! {r#"
+        model User {
+          id: Int @id
+        }
+    "#};
 
-    let error = parse_error(dml);
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
-    error.assert_is(DatamodelError::new_legacy_parser_error(
-        "Field declarations don't require a `:`.",
-        Span::new(28, 29),
-    ));
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mField declarations don't require a `:`.[0m
+          [1;94m-->[0m  [4mschema.prisma:2[0m
+        [1;94m   | [0m
+        [1;94m 1 | [0mmodel User {
+        [1;94m 2 | [0m  id[1;91m:[0m Int @id
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
 }
 
 #[test]
 fn nice_error_broken_field_type_legacy_required() {
-    let dml = r#"
-    model User {
-        id Int! @id
-    }"#;
+    let dml = indoc! {r#"
+        model User {
+          id Int! @id
+        }
+    "#};
 
-    let error = parse_error(dml);
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
-    error.assert_is(DatamodelError::new_legacy_parser_error(
-        "Fields are required by default, `!` is no longer required.",
-        Span::new(29, 33),
-    ));
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mFields are required by default, `!` is no longer required.[0m
+          [1;94m-->[0m  [4mschema.prisma:2[0m
+        [1;94m   | [0m
+        [1;94m 1 | [0mmodel User {
+        [1;94m 2 | [0m  id [1;91mInt![0m @id
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
 }
 
 #[test]
 fn nice_error_legacy_model_decl() {
-    let dml = r#"
-    type User {
-        id Int @id
-    }"#;
+    let dml = indoc! {r#"
+        type User {
+          id Int @id
+        }
+    "#};
 
-    let error = parse_error(dml);
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
-    error.assert_is(DatamodelError::new_legacy_parser_error(
-        "Model declarations have to be indicated with the `model` keyword.",
-        Span::new(5, 9),
-    ));
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mModel declarations have to be indicated with the `model` keyword.[0m
+          [1;94m-->[0m  [4mschema.prisma:1[0m
+        [1;94m   | [0m
+        [1;94m   | [0m
+        [1;94m 1 | [0m[1;91mtype[0m User {
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
 }
 
 #[test]
 fn nice_error_in_case_of_literal_type_in_env_var() {
-    let source = r#"
-    datasource ds {
-      provider = "postgresql"
-      url = env(DATABASE_URL)
-    }
-    "#;
+    let source = indoc! {r#"
+        datasource ds {
+          provider = "postgresql"
+          url = env(DATABASE_URL)
+        }
+    "#};
 
-    let error = parse_error(source);
+    let error = datamodel::parse_schema(source).map(drop).unwrap_err();
 
-    error.assert_is(DatamodelError::new_type_mismatch_error(
-        "String",
-        "literal",
-        "DATABASE_URL",
-        Span::new(67, 79),
-    ));
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mExpected a String value, but received literal value `DATABASE_URL`.[0m
+          [1;94m-->[0m  [4mschema.prisma:3[0m
+        [1;94m   | [0m
+        [1;94m 2 | [0m  provider = "postgresql"
+        [1;94m 3 | [0m  url = env([1;91mDATABASE_URL[0m)
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
 }
 
 #[test]
 fn nice_error_in_case_of_bool_type_in_env_var() {
-    let source = r#"
-    datasource ds {
-      provider = "postgresql"
-      url = env(true)
-    }
-    "#;
+    let source = indoc! {r#"
+        datasource ds {
+          provider = "postgresql"
+          url = env(true)
+        }
+    "#};
 
-    let error = parse_error(source);
+    let error = datamodel::parse_schema(source).map(drop).unwrap_err();
 
-    error.assert_is(DatamodelError::new_type_mismatch_error(
-        "String",
-        "boolean",
-        "true",
-        Span::new(67, 71),
-    ));
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mExpected a String value, but received boolean value `true`.[0m
+          [1;94m-->[0m  [4mschema.prisma:3[0m
+        [1;94m   | [0m
+        [1;94m 2 | [0m  provider = "postgresql"
+        [1;94m 3 | [0m  url = env([1;91mtrue[0m)
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
 }
 
 #[test]
 fn nice_error_in_case_of_numeric_type_in_env_var() {
-    let source = r#"
-    datasource ds {
-      provider = "postgresql"
-      url = env(4)
-    }
-    "#;
+    let source = indoc! {r#"
+        datasource ds {
+          provider = "postgresql"
+          url = env(4)
+        }
+    "#};
 
-    let error = parse_error(source);
+    let error = datamodel::parse_schema(source).map(drop).unwrap_err();
 
-    error.assert_is(DatamodelError::new_type_mismatch_error(
-        "String",
-        "numeric",
-        "4",
-        Span::new(67, 68),
-    ));
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mExpected a String value, but received numeric value `4`.[0m
+          [1;94m-->[0m  [4mschema.prisma:3[0m
+        [1;94m   | [0m
+        [1;94m 2 | [0m  provider = "postgresql"
+        [1;94m 3 | [0m  url = env([1;91m4[0m)
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
 }
 
 #[test]
 fn nice_error_in_case_of_array_type_in_env_var() {
-    let source = r#"
-    datasource ds {
-      provider = "postgresql"
-      url = env([DATABASE_URL])
-    }
-    "#;
+    let source = indoc! {r#"
+        datasource ds {
+          provider = "postgresql"
+          url = env([DATABASE_URL])
+        }
+    "#};
 
-    let error = parse_error(source);
+    let error = datamodel::parse_schema(source).map(drop).unwrap_err();
 
-    error.assert_is(DatamodelError::new_type_mismatch_error(
-        "String",
-        "array",
-        "(array)",
-        Span::new(67, 81),
-    ));
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mExpected a String value, but received array value `[DATABASE_URL]`.[0m
+          [1;94m-->[0m  [4mschema.prisma:3[0m
+        [1;94m   | [0m
+        [1;94m 2 | [0m  provider = "postgresql"
+        [1;94m 3 | [0m  url = env([1;91m[DATABASE_URL][0m)
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
 }
 
 #[test]
 fn optional_list_fields_must_error() {
-    let dml = r#"
-    model User {
-        id Int @id
-        names String[]?
-    }"#;
+    let dml = indoc! {r#"
+        model User {
+          id Int @id
+          names String[]?
+        }
+    "#};
 
-    let error = parse_error(dml);
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
-    error.assert_is(DatamodelError::new_legacy_parser_error(
-        "Optional lists are not supported. Use either `Type[]` or `Type?`.",
-        Span::new(51, 60),
-    ));
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mOptional lists are not supported. Use either `Type[]` or `Type?`.[0m
+          [1;94m-->[0m  [4mschema.prisma:3[0m
+        [1;94m   | [0m
+        [1;94m 2 | [0m  id Int @id
+        [1;94m 3 | [0m  names [1;91mString[]?[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
 }
 
 #[test]
@@ -271,54 +359,77 @@ fn invalid_lines_at_the_top_level_must_render_nicely() {
     // https://github.com/prisma/vscode/issues/140
     // If a user types on the very last line we did not error nicely.
     // a new line fixed the problem but this is not nice.
-    let dml = r#"model User {
-        id Int @id
-        names String
-    }
+    let dml = indoc! {r#"
+        model User {
+          id Int @id
+          names String
+        }
 
-    model Bl"#;
+        model Bl
+    "#};
 
-    let error = parse_error(dml);
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
-    error.assert_is(DatamodelError::new_validation_error(
-        "This line is invalid. It does not start with any known Prisma schema keyword.",
-        Span::new(64, 72),
-    ));
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+          [1;94m-->[0m  [4mschema.prisma:6[0m
+        [1;94m   | [0m
+        [1;94m 5 | [0m
+        [1;94m 6 | [0m[1;91mmodel Bl[0m
+        [1;94m 7 | [0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
 }
 
 #[test]
 fn invalid_lines_in_datasources_must_render_nicely() {
-    let dml = r#"
-    datasource mydb {
-        provider = "postgres"
-        url = "postgresql://localhost"
-        this is an invalid line
-    }
-    "#;
+    let dml = indoc! {r#"
+        datasource mydb {
+          provider = "postgres"
+          url = "postgresql://localhost"
+          this is an invalid line
+        }
+    "#};
 
-    let error = parse_error(dml);
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
-    error.assert_is(DatamodelError::new_validation_error(
-        "This line is not a valid definition within a datasource.",
-        Span::new(100, 124),
-    ));
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError validating: This line is not a valid definition within a datasource.[0m
+          [1;94m-->[0m  [4mschema.prisma:4[0m
+        [1;94m   | [0m
+        [1;94m 3 | [0m  url = "postgresql://localhost"
+        [1;94m 4 | [0m  [1;91mthis is an invalid line[0m
+        [1;94m 5 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
 }
 
 #[test]
 fn invalid_lines_in_generators_must_render_nicely() {
-    let dml = r#"
-    generator js {
-        provider = "js"
-        this is an invalid line
-    }
-    "#;
+    let dml = indoc! {r#"
+        generator js {
+          provider = "js"
+          this is an invalid line
+        }
+    "#};
 
-    let error = parse_error(dml);
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
-    error.assert_is(DatamodelError::new_validation_error(
-        "This line is not a valid definition within a generator.",
-        Span::new(52, 76),
-    ));
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError validating: This line is not a valid definition within a generator.[0m
+          [1;94m-->[0m  [4mschema.prisma:3[0m
+        [1;94m   | [0m
+        [1;94m 2 | [0m  provider = "js"
+        [1;94m 3 | [0m  [1;91mthis is an invalid line[0m
+        [1;94m 4 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
 }
 
 #[test]
@@ -326,15 +437,24 @@ fn invalid_field_line_must_error_nicely() {
     // https://github.com/prisma/vscode/issues/140
     // If a user types on the very last line we did not error nicely.
     // a new line fixed the problem but this is not nice.
-    let dml = r#"model User {
-        id    Int @id
-        foo   Bar Bla
-    }"#;
+    let dml = indoc! {r#"
+        model User {
+          id    Int @id
+          foo   Bar Bla
+        }
+    "#};
 
-    let error = parse_error(dml);
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
-    error.assert_is(DatamodelError::new_validation_error(
-        "This line is not a valid field or attribute definition.",
-        Span::new(43, 57),
-    ));
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError validating: This line is not a valid field or attribute definition.[0m
+          [1;94m-->[0m  [4mschema.prisma:3[0m
+        [1;94m   | [0m
+        [1;94m 2 | [0m  id    Int @id
+        [1;94m 3 | [0m  [1;91mfoo   Bar Bla[0m
+        [1;94m 4 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
 }

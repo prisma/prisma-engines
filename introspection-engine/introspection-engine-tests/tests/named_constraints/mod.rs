@@ -1,6 +1,6 @@
 use barrel::types;
 use enumflags2::BitFlags;
-use indoc::indoc;
+use expect_test::expect;
 use introspection_engine_tests::test_api::TestApi;
 use introspection_engine_tests::test_api::*;
 
@@ -25,22 +25,21 @@ async fn introspecting_non_default_pkey_names_works(api: &TestApi) -> TestResult
         })
         .await?;
 
-    let dm = indoc! {r##"
+    let expected = expect![[r#"
         model Compound {
           a Int
           b Int
-            
+
           @@id([a, b], map: "SomethingCustomCompound")
         }
-              
+
         model Single {
           id Int @id(map: "SomethingCustom") @default(autoincrement())
         }
-    "##};
+    "#]];
 
-    let result = &api.introspect().await?;
+    expected.assert_eq(&api.introspect_dml().await?);
 
-    api.assert_eq_datamodels(dm, result);
     Ok(())
 }
 
@@ -61,22 +60,21 @@ async fn introspecting_default_pkey_names_works(api: &TestApi) -> TestResult {
         })
         .await?;
 
-    let dm = indoc! {r##"
+    let expected = expect![[r#"
         model Compound {
           a Int
           b Int
-            
+
           @@id([a, b])
         }
-              
+
         model Single {
           id Int @id @default(autoincrement())
         }
-    "##};
+    "#]];
 
-    let result = &api.introspect().await?;
+    expected.assert_eq(&api.introspect_dml().await?);
 
-    api.assert_eq_datamodels(dm, result);
     Ok(())
 }
 
@@ -97,22 +95,21 @@ async fn introspecting_non_default_unique_constraint_names_works(api: &TestApi) 
         })
         .await?;
 
-    let dm = indoc! {r##"
+    let expected = expect![[r#"
         model Compound {
           a Int
           b Int
-            
+
           @@unique([a, b], map: "SomethingCustomCompound")
         }
-              
+
         model Single {
           id Int @unique(map: "SomethingCustom") @default(autoincrement())
         }
-    "##};
+    "#]];
 
-    let result = &api.introspect().await?;
+    expected.assert_eq(&api.introspect_dml().await?);
 
-    api.assert_eq_datamodels(dm, result);
     Ok(())
 }
 
@@ -133,22 +130,21 @@ async fn introspecting_default_unique_names_works(api: &TestApi) -> TestResult {
         })
         .await?;
 
-    let dm = indoc! {r##"
+    let expected = expect![[r#"
         model Compound {
           a Int
           b Int
-            
+
           @@unique([a, b])
         }
-              
+
         model Single {
           id Int @unique @default(autoincrement())
         }
-    "##};
+    "#]];
 
-    let result = &api.introspect().await?;
+    expected.assert_eq(&api.introspect_dml().await?);
 
-    api.assert_eq_datamodels(dm, result);
     Ok(())
 }
 
@@ -169,27 +165,27 @@ async fn introspecting_non_default_index_names_works(api: &TestApi) -> TestResul
         })
         .await?;
 
-    let dm = indoc! {r##"
+    let expected = expect![[r#"
         /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
         model Compound {
           a Int
           b Int
-            
+
           @@index([a, b], map: "SomethingCustomCompound")
           @@ignore
         }
-        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.      
+
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
         model Single {
           id Int @default(autoincrement())
-          
+
           @@index([id], map: "SomethingCustom")
           @@ignore
         }
-    "##};
+    "#]];
 
-    let result = &api.introspect().await?;
+    expected.assert_eq(&api.introspect_dml().await?);
 
-    api.assert_eq_datamodels(dm, result);
     Ok(())
 }
 
@@ -210,28 +206,27 @@ async fn introspecting_default_index_names_works(api: &TestApi) -> TestResult {
         })
         .await?;
 
-    let dm = indoc! {r##"
-        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.    
+    let expected = expect![[r#"
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
         model Compound {
           a Int
           b Int
-            
+
           @@index([a, b])
-          @@ignore  
+          @@ignore
         }
-        
-        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.      
+
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
         model Single {
           id Int @default(autoincrement())
-          
+
           @@index([id])
           @@ignore
         }
-    "##};
+    "#]];
 
-    let result = &api.introspect().await?;
+    expected.assert_eq(&api.introspect_dml().await?);
 
-    api.assert_eq_datamodels(dm, result);
     Ok(())
 }
 
@@ -257,22 +252,22 @@ async fn introspecting_default_fk_names_works(api: &TestApi) -> TestResult {
         })
         .await?;
 
-    let dm = r#"
+    let expected = expect![[r#"
         model Post {
-            id       Int @id @default(autoincrement())
-            user_id  Int  
-            User     User @relation(fields: [user_id], references: [id])
-            
-            @@index([user_id])
+          id      Int  @id @default(autoincrement())
+          user_id Int
+          User    User @relation(fields: [user_id], references: [id])
+
+          @@index([user_id])
         }
 
         model User {
-            id      Int @id @default(autoincrement())
-            Post    Post[]
+          id   Int    @id @default(autoincrement())
+          Post Post[]
         }
-    "#;
+    "#]];
 
-    api.assert_eq_datamodels(&dm, &api.introspect().await?);
+    expected.assert_eq(&api.introspect_dml().await?);
 
     Ok(())
 }
@@ -299,22 +294,22 @@ async fn introspecting_custom_fk_names_works(api: &TestApi) -> TestResult {
         })
         .await?;
 
-    let dm = r#"
+    let expected = expect![[r#"
         model Post {
-            id       Int @id @default(autoincrement())
-            user_id  Int
-            User     User @relation(fields: [user_id], references: [id], map: "CustomFKName")
-            
-            @@index([user_id])
+          id      Int  @id @default(autoincrement())
+          user_id Int
+          User    User @relation(fields: [user_id], references: [id], map: "CustomFKName")
+
+          @@index([user_id])
         }
 
         model User {
-            id      Int @id @default(autoincrement())
-            Post    Post[]
+          id   Int    @id @default(autoincrement())
+          Post Post[]
         }
-    "#;
+    "#]];
 
-    api.assert_eq_datamodels(&dm, &api.introspect().await?);
+    expected.assert_eq(&api.introspect_dml().await?);
 
     Ok(())
 }
@@ -341,22 +336,22 @@ async fn introspecting_custom_fk_names_does_not_return_them_on_sqlite(api: &Test
         })
         .await?;
 
-    let dm = r#"
+    let expected = expect![[r#"
         model Post {
-            id       Int @id @default(autoincrement())
-            user_id  Int
-            User     User @relation(fields: [user_id], references: [id])
-            
-            @@index([user_id])
+          id      Int  @id @default(autoincrement())
+          user_id Int
+          User    User @relation(fields: [user_id], references: [id])
+
+          @@index([user_id])
         }
 
         model User {
-            id      Int @id @default(autoincrement())
-            Post    Post[]
+          id   Int    @id @default(autoincrement())
+          Post Post[]
         }
-    "#;
+    "#]];
 
-    api.assert_eq_datamodels(&dm, &api.introspect().await?);
+    expected.assert_eq(&api.introspect_dml().await?);
 
     Ok(())
 }
@@ -370,14 +365,14 @@ async fn introspecting_custom_default_names_should_output_to_dml(api: &TestApi) 
 
     api.database().raw_cmd(&create_table).await?;
 
-    let dm = r#"
+    let expected = expect![[r#"
         model custom_defaults_test {
-            id   Int     @id(map: "pk_meow")
-            data String? @default("foo", map: "meow") @db.NVarChar(255)
+          id   Int     @id(map: "pk_meow")
+          data String? @default("foo", map: "meow") @db.NVarChar(255)
         }
-    "#;
+    "#]];
 
-    api.assert_eq_datamodels(&dm, &api.introspect().await?);
+    expected.assert_eq(&api.introspect_dml().await?);
 
     Ok(())
 }
@@ -391,14 +386,14 @@ async fn introspecting_default_default_names_should_not_output_to_dml(api: &Test
 
     api.database().raw_cmd(&create_table).await?;
 
-    let dm = indoc! {r#"
+    let expected = expect![[r#"
         model custom_defaults_test {
           id   Int     @id(map: "pk_meow")
           data String? @default("foo") @db.NVarChar(255)
         }
-    "#};
+    "#]];
 
-    api.assert_eq_datamodels(&dm, &api.introspect().await?);
+    expected.assert_eq(&api.introspect_dml().await?);
 
     Ok(())
 }

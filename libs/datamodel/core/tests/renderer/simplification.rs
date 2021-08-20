@@ -17,7 +17,7 @@ model User {
 
     let dml = parse(input);
     println!("{:?}", dml);
-    let rendered = datamodel::render_datamodel_to_string(&dml);
+    let rendered = datamodel::render_datamodel_to_string(&dml, None);
 
     print!("{}", rendered);
 
@@ -52,7 +52,7 @@ model User {
 "#;
 
     let dml = parse(input);
-    let rendered = datamodel::render_datamodel_to_string(&dml);
+    let rendered = datamodel::render_datamodel_to_string(&dml, None);
 
     print!("{}", rendered);
 
@@ -72,7 +72,7 @@ fn test_render_relation_name_on_self_relations() {
 "#;
 
     let dml = parse(input);
-    let rendered = datamodel::render_datamodel_to_string(&dml);
+    let rendered = datamodel::render_datamodel_to_string(&dml, None);
 
     print!("{}", rendered);
 

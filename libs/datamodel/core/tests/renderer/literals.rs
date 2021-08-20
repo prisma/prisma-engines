@@ -27,7 +27,7 @@ fn strings_with_quotes_render_as_escaped_literals() {
     let name = cat.scalar_fields_mut().find(|f| f.name == "name").unwrap();
     name.default_value = Some(DefaultValue::new_single(PrismaValue::String("a \" b\"c d".into())));
 
-    let rendered = datamodel::render_datamodel_to_string(&dml);
+    let rendered = datamodel::render_datamodel_to_string(&dml, None);
 
     assert_eq!(rendered, expected);
 }
@@ -44,7 +44,7 @@ fn strings_with_quotes_roundtrip() {
     );
 
     let dml = datamodel::parse_datamodel(input).unwrap().subject;
-    let rendered = datamodel::render_datamodel_to_string(&dml);
+    let rendered = datamodel::render_datamodel_to_string(&dml, None);
 
     assert_eq!(input, rendered);
 }
@@ -75,7 +75,7 @@ fn strings_with_newlines_render_as_escaped_literals() {
         "Jean\nClaude\nVan\nDamme".into(),
     )));
 
-    let rendered = datamodel::render_datamodel_to_string(&dml);
+    let rendered = datamodel::render_datamodel_to_string(&dml, None);
 
     assert_eq!(rendered, expected);
 }
@@ -92,7 +92,7 @@ fn strings_with_newlines_roundtrip() {
     );
 
     let dml = datamodel::parse_datamodel(input).unwrap().subject;
-    let rendered = datamodel::render_datamodel_to_string(&dml);
+    let rendered = datamodel::render_datamodel_to_string(&dml, None);
 
     assert_eq!(input, rendered);
 }
@@ -109,7 +109,7 @@ fn strings_with_backslashes_roundtrip() {
     );
 
     let dml = datamodel::parse_datamodel(input).unwrap().subject;
-    let rendered = datamodel::render_datamodel_to_string(&dml);
+    let rendered = datamodel::render_datamodel_to_string(&dml, None);
 
     assert_eq!(input, rendered);
 }
@@ -126,7 +126,7 @@ fn strings_with_multiple_escaped_characters_roundtrip() {
     );
 
     let dml = datamodel::parse_datamodel(dm).unwrap().subject;
-    let rendered = datamodel::render_datamodel_to_string(&dml);
+    let rendered = datamodel::render_datamodel_to_string(&dml, None);
 
     assert_eq!(dm, rendered);
 }
@@ -156,7 +156,7 @@ fn internal_escaped_values_are_rendered_correctly() {
         "xyz\\Datasource\\Model".to_string(),
     )));
 
-    let rendered = datamodel::render_datamodel_to_string(&dml);
+    let rendered = datamodel::render_datamodel_to_string(&dml, None);
 
     assert_eq!(expected_dm, rendered);
 }

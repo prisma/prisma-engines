@@ -220,7 +220,7 @@ fn unique_attributes_must_serialize_to_valid_dml() {
     "#;
     let schema = parse(dml);
 
-    assert!(datamodel::parse_datamodel(&render_datamodel_to_string(&schema)).is_ok());
+    assert!(datamodel::parse_datamodel(&render_datamodel_to_string(&schema, None)).is_ok());
 }
 
 #[test]

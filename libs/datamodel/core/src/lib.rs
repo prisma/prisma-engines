@@ -201,9 +201,9 @@ fn load_sources(
 //
 
 /// Renders to a return string.
-pub fn render_datamodel_to_string(datamodel: &dml::Datamodel) -> String {
+pub fn render_datamodel_to_string(datamodel: &dml::Datamodel, configuration: Option<&Configuration>) -> String {
     let mut writable_string = String::with_capacity(datamodel.models.len() * 20);
-    render_datamodel_to(&mut writable_string, datamodel, None);
+    render_datamodel_to(&mut writable_string, datamodel, configuration);
     writable_string
 }
 
@@ -220,9 +220,16 @@ pub fn render_schema_ast_to_string(schema: &SchemaAst) -> String {
 pub fn render_datamodel_to(
     stream: &mut dyn std::fmt::Write,
     datamodel: &dml::Datamodel,
-    datasource: Option<&Datasource>,
+    configuration: Option<&Configuration>,
 ) {
-    let lowered = LowerDmlToAst::new(datasource, BitFlags::empty()).lower(datamodel);
+    let datasource = configuration.and_then(|c| c.datasources.first());
+
+    let preview_features = configuration
+        .map(|c| c.preview_features().copied().collect())
+        .unwrap_or_else(BitFlags::empty);
+
+    let lowered = LowerDmlToAst::new(datasource, preview_features).lower(datamodel);
+
     render_schema_ast_to(stream, &lowered, 2);
 }
 

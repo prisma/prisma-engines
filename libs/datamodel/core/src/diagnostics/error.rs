@@ -104,7 +104,7 @@ pub enum DatamodelError {
   #[error("Environment variable not found: {}.", var_name)]
   EnvironmentFunctionalEvaluationError { var_name: String, span: Span },
 
-  #[error("Expected a {} value, but received {} value \"{}\".", expected_type, received_type, raw)]
+  #[error("Expected a {} value, but received {} value `{}`.", expected_type, received_type, raw)]
   TypeMismatchError { expected_type: String, received_type: String, raw: String, span: Span },
 
   #[error("Expected a {} value, but failed while parsing \"{}\": {}.", expected_type, raw, parser_error)]
