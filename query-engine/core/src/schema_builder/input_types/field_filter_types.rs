@@ -1,3 +1,5 @@
+use crate::constants::json_null;
+
 use super::*;
 use constants::{aggregations, deprecation, filters};
 use datamodel_connector::ConnectorCapability;
@@ -139,6 +141,7 @@ fn full_scalar_filter_type(
         scalar_filter_name(typ, list, nullable, nested, include_aggregates),
         PRISMA_NAMESPACE,
     );
+
     return_cached_input!(ctx, &ident);
 
     let object = Arc::new(init_input_object_type(ident.clone()));
@@ -168,12 +171,12 @@ fn full_scalar_filter_type(
                 && (ctx.capabilities.contains(ConnectorCapability::JsonFilteringJsonPath)
                     || ctx.capabilities.contains(ConnectorCapability::JsonFilteringArrayPath))
             {
-                equality_filters(mapped_scalar_type.clone(), nullable)
+                json_equality_filters(mapped_scalar_type.clone())
                     .chain(alphanumeric_filters(mapped_scalar_type.clone()))
                     .chain(json_filters(ctx))
                     .collect()
             } else {
-                equality_filters(mapped_scalar_type.clone(), nullable).collect()
+                json_equality_filters(mapped_scalar_type.clone()).collect()
             }
         }
 
@@ -184,27 +187,36 @@ fn full_scalar_filter_type(
         TypeIdentifier::Enum(_) => equality_filters(mapped_scalar_type.clone(), nullable)
             .chain(inclusion_filters(mapped_scalar_type.clone(), nullable))
             .collect(),
+
         TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
     };
 
     // Shorthand `not equals` filter, skips the nested object filter.
-    let mut not_types = vec![mapped_scalar_type];
-
-    if typ != &TypeIdentifier::Json {
+    let not_field = if typ == &TypeIdentifier::Json {
+        // Json is never nullable, only by proxy through an enum.
+        let enum_type = json_null_filter_enum();
+        input_field(
+            filters::NOT_LOWERCASE,
+            vec![InputType::Enum(enum_type), mapped_scalar_type],
+            None,
+        )
+        .optional()
+    } else {
         // Full nested filter. Only available on non-JSON fields.
-        not_types.push(InputType::object(full_scalar_filter_type(
+        let shorthand = InputType::object(full_scalar_filter_type(
             ctx,
             typ,
             list,
             nullable,
             true,
             include_aggregates,
-        )));
-    }
+        ));
 
-    let not_field = input_field(filters::NOT_LOWERCASE, not_types, None)
-        .optional()
-        .nullable_if(nullable);
+        input_field(filters::NOT_LOWERCASE, vec![mapped_scalar_type, shorthand], None)
+            .optional()
+            .nullable_if(nullable)
+    };
+
     fields.push(not_field);
 
     if include_aggregates {
@@ -301,6 +313,22 @@ fn equality_filters(mapped_type: InputType, nullable: bool) -> impl Iterator<Ite
         .optional()
         .nullable_if(nullable)]
     .into_iter()
+}
+
+fn json_equality_filters(mapped_type: InputType) -> impl Iterator<Item = InputField> {
+    let enum_type = json_null_filter_enum();
+    std::iter::once(input_field(filters::EQUALS, vec![InputType::Enum(enum_type), mapped_type], None).optional())
+}
+
+fn json_null_filter_enum() -> EnumTypeRef {
+    Arc::new(string_enum_type(
+        json_null::FILTER_ENUM_NAME,
+        vec![
+            json_null::DB_NULL.to_owned(),
+            json_null::JSON_NULL.to_owned(),
+            json_null::ANY_NULL.to_owned(),
+        ],
+    ))
 }
 
 fn inclusion_filters(mapped_type: InputType, nullable: bool) -> impl Iterator<Item = InputField> {
