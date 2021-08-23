@@ -11,21 +11,23 @@ pub fn run_with_tokio<O, F: std::future::Future<Output = O>>(fut: F) -> O {
         .block_on(fut)
 }
 
-fn connector_names() -> Vec<(&'static str, Tags)> {
+fn connector_names() -> Vec<(&'static str, &'static str, Tags)> {
     vec![
-        ("mssql", Tags::MSSQL),
-        ("mysql", Tags::MYSQL),
-        ("mysql8", Tags::MYSQL8),
-        ("postgresql", Tags::POSTGRES),
-        ("sqlite", Tags::SQLITE),
+        ("mssql", "mssql", Tags::MSSQL),
+        ("mysql5_7", "mysql", Tags::MYSQL5_7),
+        ("mysql8", "mysql", Tags::MYSQL8),
+        ("mysql_mariadb", "mysql", Tags::MYSQL_MARIADB),
+        ("postgresql", "postgresql", Tags::POSTGRES),
+        ("sqlite", "sqlite", Tags::SQLITE),
     ]
 }
 
 pub static CONNECTORS: Lazy<Connectors> = Lazy::new(|| {
     let connectors: Vec<ConnectorDefinition> = connector_names()
         .iter()
-        .map(|(name, tags)| ConnectorDefinition {
+        .map(|(name, feature_name, tags)| ConnectorDefinition {
             name: (*name).to_owned(),
+            feature_name: (*feature_name).to_owned(),
             test_api_factory_name: format!("{}_test_api", name),
             tags: *tags,
         })
@@ -60,6 +62,7 @@ impl Connectors {
 #[derive(Debug)]
 pub struct ConnectorDefinition {
     name: String,
+    feature_name: String,
     test_api_factory_name: String,
     pub tags: Tags,
 }
@@ -68,6 +71,11 @@ impl ConnectorDefinition {
     /// The name of the connector.
     pub fn name(&self) -> &str {
         &self.name
+    }
+
+    /// The feature name of the connector.
+    pub fn feature_name(&self) -> &str {
+        &self.feature_name
     }
 
     /// The name of the API factory function for that connector.

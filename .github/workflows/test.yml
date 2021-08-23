@@ -57,6 +57,7 @@ jobs:
     env:
       TEST_MYSQL: "mysql://root:prisma@localhost:3306/prisma"
       TEST_MYSQL8: "mysql://root:prisma@localhost:3307/prisma"
+      TEST_MYSQL_MARIADB: "mysql://root:prisma@localhost:3308/prisma"
       TEST_PSQL: "postgres://postgres:prisma@localhost:5432/postgres"
       TEST_MSSQL: "jdbc:sqlserver://localhost:1433;database=master;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true"
       RUSTFLAGS: "-Dwarnings"

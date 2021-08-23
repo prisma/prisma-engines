@@ -6,13 +6,23 @@ use std::env;
 
 pub static CONN_STR: Lazy<String> = Lazy::new(|| env::var("TEST_MYSQL").expect("TEST_MYSQL env var"));
 pub static CONN_STR8: Lazy<String> = Lazy::new(|| env::var("TEST_MYSQL8").expect("TEST_MYSQL8 env var"));
+pub static CONN_STR_MARIADB: Lazy<String> =
+    Lazy::new(|| env::var("TEST_MYSQL_MARIADB").expect("TEST_MYSQL_MARIADB env var"));
 
 pub(crate) async fn mysql_test_api<'a>() -> crate::Result<MySql<'a>> {
     MySql::new(CONN_STR.as_str()).await
 }
 
+pub(crate) async fn mysql5_7_test_api<'a>() -> crate::Result<MySql<'a>> {
+    MySql::new(CONN_STR.as_str()).await
+}
+
 pub(crate) async fn mysql8_test_api<'a>() -> crate::Result<MySql<'a>> {
     MySql::new(CONN_STR8.as_str()).await
+}
+
+pub(crate) async fn mysql_mariadb_test_api<'a>() -> crate::Result<MySql<'a>> {
+    MySql::new(CONN_STR_MARIADB.as_str()).await
 }
 
 pub struct MySql<'a> {

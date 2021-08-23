@@ -32,16 +32,47 @@ impl<'a> Mysql<'a> {
     }
 
     fn visit_numeric_comparison(&mut self, left: Expression<'a>, right: Expression<'a>, sign: &str) -> visitor::Result {
+        #[cfg(feature = "json")]
+        fn json_to_quaint_value<'a>(json: serde_json::Value) -> crate::Result<Value<'a>> {
+            match json {
+                serde_json::Value::String(str) => Ok(Value::text(str)),
+                serde_json::Value::Number(number) => {
+                    if let Some(int) = number.as_i64() {
+                        Ok(Value::integer(int))
+                    } else if let Some(float) = number.as_f64() {
+                        Ok(Value::double(float))
+                    } else {
+                        unreachable!()
+                    }
+                }
+                x => {
+                    let msg = format!("Expected JSON string or number, found: {}", x);
+                    let kind = ErrorKind::conversion(msg.clone());
+
+                    let mut builder = Error::builder(kind);
+                    builder.set_original_message(msg);
+
+                    Err(builder.build())
+                }
+            }
+        }
+
         match (left, right) {
+            #[cfg(feature = "json")]
             (left, right) if left.is_json_value() && right.is_json_extract_fun() => {
-                self.surround_with("CAST(", " AS JSON)", |s| s.visit_expression(left))?;
+                let quaint_value = json_to_quaint_value(left.into_json_value().unwrap())?;
+
+                self.visit_parameterized(quaint_value)?;
                 self.write(format!(" {} ", sign))?;
                 self.visit_expression(right)?;
             }
+            #[cfg(feature = "json")]
             (left, right) if left.is_json_extract_fun() && right.is_json_value() => {
+                let quaint_value = json_to_quaint_value(right.into_json_value().unwrap())?;
+
                 self.visit_expression(left)?;
                 self.write(format!(" {} ", sign))?;
-                self.surround_with("CAST(", " AS JSON)", |s| s.visit_expression(right))?;
+                self.visit_parameterized(quaint_value)?;
             }
             (left, right) => {
                 self.visit_expression(left)?;

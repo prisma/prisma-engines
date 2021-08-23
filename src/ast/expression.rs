@@ -55,6 +55,18 @@ impl<'a> Expression<'a> {
     }
 
     #[allow(dead_code)]
+    #[cfg(feature = "json")]
+    pub(crate) fn into_json_value(self) -> Option<serde_json::Value> {
+        match self.kind {
+            #[cfg(feature = "json")]
+            ExpressionKind::Parameterized(Value::Json(json_val)) => json_val,
+            #[cfg(feature = "json")]
+            ExpressionKind::Value(expr) => expr.into_json_value(),
+            _ => None,
+        }
+    }
+
+    #[allow(dead_code)]
     pub(crate) fn is_json_extract_fun(&self) -> bool {
         match &self.kind {
             ExpressionKind::Function(f) => match &f.typ_ {

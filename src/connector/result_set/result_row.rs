@@ -6,7 +6,7 @@ use std::sync::Arc;
 
 /// An owned version of a `Row` in a `ResultSet`. See
 /// [ResultRowRef](struct.ResultRowRef.html) for documentation on data access.
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct ResultRow {
     pub(crate) columns: Arc<Vec<String>>,
     pub(crate) values: Vec<Value<'static>>,
