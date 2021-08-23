@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schemas::json), only(Postgres, MySql))]
+#[test_suite(schema(schemas::json), only(Postgres, MySql(5.7, 8, "mariadb")))]
 mod json_path {
     use query_engine_tests::{assert_error, run_query, ConnectorTag};
 
@@ -64,7 +64,8 @@ mod json_path {
         Ok(())
     }
 
-    #[connector_test]
+    // TODO: MariaDB is excluded because it produces different results than MySQL and Postgres
+    #[connector_test(only(Postgres, MySql(5.7, 8)))]
     async fn array_contains(runner: Runner) -> TestResult<()> {
         create_row(&runner, 1, r#"[1, 2, 3]"#, true).await?;
         create_row(&runner, 2, r#"[3, 4, 5]"#, true).await?;
@@ -100,7 +101,8 @@ mod json_path {
         Ok(())
     }
 
-    #[connector_test]
+    // TODO: MariaDB is excluded because it doesn't support array_starts_with yet
+    #[connector_test(only(Postgres, MySql(5.7, 8)))]
     async fn array_starts_with(runner: Runner) -> TestResult<()> {
         create_row(&runner, 1, r#"[1, 2, 3]"#, true).await?;
         create_row(&runner, 2, r#"[3, 4, 5]"#, true).await?;
@@ -136,7 +138,8 @@ mod json_path {
         Ok(())
     }
 
-    #[connector_test]
+    // TODO: MariaDB is excluded because array_ends_with doesn't work yet
+    #[connector_test(only(Postgres, MySql(5.7, 8)))]
     async fn array_ends_with(runner: Runner) -> TestResult<()> {
         create_row(&runner, 1, r#"[1, 2, 3]"#, true).await?;
         create_row(&runner, 2, r#"[3, 4, 5]"#, true).await?;
@@ -308,7 +311,8 @@ mod json_path {
         Ok(())
     }
 
-    #[connector_test]
+    // TODO: MariaDB is excluded because array_starts_with doesn't work yet
+    #[connector_test(only(Postgres, MySql(5.7, 8)))]
     async fn multi_filtering(runner: Runner) -> TestResult<()> {
         create_row(&runner, 1, r#"[1, 2, 3]"#, true).await?;
         create_row(&runner, 2, r#"[3, 4, 5]"#, true).await?;
