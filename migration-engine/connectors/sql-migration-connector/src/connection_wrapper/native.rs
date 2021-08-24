@@ -2,7 +2,7 @@ use super::{SqlError, SqlResult};
 use migration_connector::{ConnectorError, ConnectorResult};
 use quaint::{
     connector::{Mysql, MysqlUrl, PostgreSql, PostgresUrl},
-    error::{Error as QuaintError, ErrorKind as QuaintKind},
+    error::Error as QuaintError,
     prelude::{ConnectionInfo, Query, Queryable, ResultSet},
     single::Quaint,
 };
@@ -39,7 +39,23 @@ pub(crate) async fn connect(connection_string: &str) -> ConnectorResult<Connecti
 pub(crate) fn quaint_error_to_connector_error(error: QuaintError, connection_info: &ConnectionInfo) -> ConnectorError {
     match user_facing_errors::quaint::render_quaint_error(error.kind(), connection_info) {
         Some(user_facing_error) => user_facing_error.into(),
-        None => ConnectorError::from_source(error, "Database error"),
+        None => {
+            let msg = error
+                .original_message()
+                .map(String::from)
+                .unwrap_or_else(|| error.to_string());
+            ConnectorError::from_msg(msg)
+        }
+    }
+}
+
+fn sql_error(quaint_error: QuaintError, connection_info: &ConnectionInfo) -> SqlError {
+    let error_code = quaint_error.original_code().map(String::from);
+    super::SqlError {
+        connector_error: quaint_error_to_connector_error(quaint_error, connection_info),
+        src_position: None,
+        src_statement: None,
+        error_code,
     }
 }
 
@@ -54,46 +70,6 @@ enum ConnectionInner {
     Postgres(Arc<(quaint::connector::PostgreSql, PostgresUrl)>),
     Mysql(Arc<(quaint::connector::Mysql, MysqlUrl)>),
     Generic(Quaint),
-}
-
-#[derive(Debug)]
-pub(crate) struct ConnectionError {
-    quaint_error: QuaintError,
-    connection_info: ConnectionInfo,
-}
-
-impl From<ConnectionError> for super::SqlError {
-    fn from(err: ConnectionError) -> Self {
-        let error_code = err.quaint_error.original_code().map(String::from);
-        super::SqlError {
-            connector_error: quaint_error_to_connector_error(err.quaint_error, &err.connection_info),
-            src_position: None,
-            src_statement: None,
-            error_code,
-        }
-    }
-}
-
-type ConnectionResult<T> = Result<T, ConnectionError>;
-
-impl ConnectionError {
-    pub(crate) fn kind(&self) -> &QuaintKind {
-        self.quaint_error.kind()
-    }
-
-    pub(crate) fn original_code(&self) -> Option<&str> {
-        self.quaint_error.original_code()
-    }
-
-    pub(crate) fn original_message(&self) -> Option<&str> {
-        self.quaint_error.original_message()
-    }
-}
-
-impl From<ConnectionError> for ConnectorError {
-    fn from(err: ConnectionError) -> Self {
-        quaint_error_to_connector_error(err.quaint_error, &err.connection_info)
-    }
 }
 
 impl Connection {
@@ -121,11 +97,7 @@ impl Connection {
         self.queryable()
             .execute(query.into())
             .await
-            .map_err(|quaint_error| ConnectionError {
-                quaint_error,
-                connection_info: self.connection_info(),
-            })
-            .map_err(SqlError::from)
+            .map_err(|quaint_error| sql_error(quaint_error, &self.connection_info()))
     }
 
     pub(crate) fn queryable(&self) -> &dyn Queryable {
@@ -136,35 +108,25 @@ impl Connection {
         }
     }
 
-    pub(crate) async fn query(&self, query: impl Into<Query<'_>>) -> ConnectionResult<ResultSet> {
+    pub(crate) async fn query(&self, query: impl Into<Query<'_>>) -> SqlResult<ResultSet> {
         self.queryable()
             .query(query.into())
             .await
-            .map_err(|quaint_error| ConnectionError {
-                quaint_error,
-                connection_info: self.connection_info(),
-            })
+            .map_err(|quaint_error| sql_error(quaint_error, &self.connection_info()))
     }
 
-    pub(crate) async fn query_raw(&self, sql: &str, params: &[quaint::Value<'_>]) -> ConnectionResult<ResultSet> {
+    pub(crate) async fn query_raw(&self, sql: &str, params: &[quaint::Value<'_>]) -> SqlResult<ResultSet> {
         self.queryable()
             .query_raw(sql, params)
             .await
-            .map_err(|quaint_error| ConnectionError {
-                quaint_error,
-                connection_info: self.connection_info(),
-            })
+            .map_err(|quaint_error| sql_error(quaint_error, &self.connection_info()))
     }
 
     pub(crate) async fn raw_cmd(&self, sql: &str) -> SqlResult<()> {
         self.queryable()
             .raw_cmd(sql)
             .await
-            .map_err(|quaint_error| ConnectionError {
-                quaint_error,
-                connection_info: self.connection_info(),
-            })
-            .map_err(SqlError::from)
+            .map_err(|quaint_error| sql_error(quaint_error, &self.connection_info()))
     }
 
     pub(crate) fn schema_name(&self) -> &str {
@@ -175,14 +137,11 @@ impl Connection {
         }
     }
 
-    pub(crate) async fn version(&self) -> ConnectionResult<Option<String>> {
+    pub(crate) async fn version(&self) -> SqlResult<Option<String>> {
         self.queryable()
             .version()
             .await
-            .map_err(|quaint_error| ConnectionError {
-                quaint_error,
-                connection_info: self.connection_info(),
-            })
+            .map_err(|quaint_error| sql_error(quaint_error, &self.connection_info()))
     }
 
     /// Render a table name with the required prefixing for use with quaint query building.
