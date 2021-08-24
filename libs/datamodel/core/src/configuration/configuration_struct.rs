@@ -4,6 +4,7 @@ use crate::{
     diagnostics::{DatamodelError, Diagnostics},
 };
 
+#[derive(Debug)]
 pub struct Configuration {
     pub generators: Vec<Generator>,
     pub datasources: Vec<Datasource>,
