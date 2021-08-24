@@ -1,5 +1,6 @@
 use crate::{
-    connect, connection_wrapper::Connection, error::quaint_error_to_connector_error, flavour::SqlFlavour,
+    connection_wrapper::{connect, quaint_error_to_connector_error, Connection},
+    flavour::SqlFlavour,
     SqlMigrationConnector,
 };
 use datamodel::common::preview_features::PreviewFeature;
