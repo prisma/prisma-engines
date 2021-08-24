@@ -1,5 +1,3 @@
-use crate::constants::json_null;
-
 use super::*;
 use prisma_models::dml::DefaultValue;
 
@@ -56,20 +54,7 @@ fn checked_create_input_type(
     let mut fields = input_fields::scalar_input_fields(
         ctx,
         scalar_fields,
-        |ctx, f: ScalarFieldRef, default: Option<DefaultValue>| {
-            let typ = map_scalar_input_type_for_field(ctx, &f);
-
-            if &f.type_identifier == &TypeIdentifier::Json {
-                let enum_type = json_null_input_enum(!f.is_required);
-
-                input_field(f.name.clone(), vec![InputType::Enum(enum_type), typ], default)
-                    .optional_if(!f.is_required || f.default_value.is_some() || f.is_created_at() || f.is_updated_at())
-            } else {
-                input_field(f.name.clone(), typ, default)
-                    .optional_if(!f.is_required || f.default_value.is_some() || f.is_created_at() || f.is_updated_at())
-                    .nullable_if(!f.is_required)
-            }
-        },
+        field_create_input,
         |ctx, f, _| input_fields::scalar_list_input_field_mapper(ctx, model.name.clone(), "Create", f, true),
         true,
     );
@@ -199,19 +184,7 @@ fn unchecked_create_input_type(
     let mut fields = input_fields::scalar_input_fields(
         ctx,
         scalar_fields,
-        |ctx, f: ScalarFieldRef, default: Option<DefaultValue>| {
-            let typ = map_scalar_input_type_for_field(ctx, &f);
-            if &f.type_identifier == &TypeIdentifier::Json {
-                let enum_type = json_null_input_enum(!f.is_required);
-
-                input_field(f.name.clone(), vec![InputType::Enum(enum_type), typ], default)
-                    .optional_if(!f.is_required || f.default_value.is_some() || f.is_created_at() || f.is_updated_at())
-            } else {
-                input_field(f.name.clone(), typ, default)
-                    .optional_if(!f.is_required || f.default_value.is_some() || f.is_created_at() || f.is_updated_at())
-                    .nullable_if(!f.is_required)
-            }
-        },
+        field_create_input,
         |ctx, f, _| input_fields::scalar_list_input_field_mapper(ctx, model.name.clone(), "Create", f, true),
         true,
     );
@@ -290,16 +263,21 @@ fn relation_input_fields_for_unchecked_create(
         .collect()
 }
 
-fn json_null_input_enum(nullable: bool) -> EnumTypeRef {
-    if nullable {
-        Arc::new(string_enum_type(
-            json_null::NULLABLE_INPUT_ENUM_NAME,
-            vec![json_null::DB_NULL.to_owned(), json_null::JSON_NULL.to_owned()],
-        ))
+pub(crate) fn field_create_input(
+    ctx: &mut BuilderContext,
+    f: ScalarFieldRef,
+    default: Option<DefaultValue>,
+) -> InputField {
+    let typ = map_scalar_input_type_for_field(ctx, &f);
+
+    if &f.type_identifier == &TypeIdentifier::Json {
+        let enum_type = json_null_input_enum(!f.is_required);
+
+        input_field(f.name.clone(), vec![InputType::Enum(enum_type), typ], default)
+            .optional_if(!f.is_required || f.default_value.is_some() || f.is_created_at() || f.is_updated_at())
     } else {
-        Arc::new(string_enum_type(
-            json_null::INPUT_ENUM_NAME,
-            vec![json_null::JSON_NULL.to_owned()],
-        ))
+        input_field(f.name.clone(), typ, default)
+            .optional_if(!f.is_required || f.default_value.is_some() || f.is_created_at() || f.is_updated_at())
+            .nullable_if(!f.is_required)
     }
 }

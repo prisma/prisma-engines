@@ -289,3 +289,60 @@ mod create {
         Ok(())
     }
 }
+
+#[test_suite(schema(json_opt), capabilities(Json))]
+mod json_create {
+    use query_engine_tests::{assert_error, run_query};
+
+    #[connector_test]
+    async fn create_json(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 1, json: "{}" }) { json }}"#),
+          @r###"{"data":{"createOneTestModel":{"json":"{}"}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 2, json: JsonNull }) { json }}"#),
+          @r###"{"data":{"createOneTestModel":{"json":"null"}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 3, json: DbNull }) { json }}"#),
+          @r###"{"data":{"createOneTestModel":{"json":null}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 4 }) { json }}"#),
+          @r###"{"data":{"createOneTestModel":{"json":null}}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn create_json_errors(runner: Runner) -> TestResult<()> {
+        assert_error!(
+            &runner,
+            r#"mutation {
+                  createOneTestModel(data: { id: 1, json: null }) {
+                    json
+                  }
+                }"#,
+            2009,
+            "A value is required but not set."
+        );
+
+        assert_error!(
+            &runner,
+            r#"mutation {
+                createOneTestModel(data: { id: 1, json: AnyNull }) {
+                  id
+                }
+              }"#,
+            2009,
+            "Value types mismatch. Have: Enum(\"AnyNull\")"
+        );
+
+        Ok(())
+    }
+}
