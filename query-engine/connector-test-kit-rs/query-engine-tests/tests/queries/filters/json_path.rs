@@ -2,7 +2,7 @@ use query_engine_tests::*;
 
 #[test_suite(schema(schemas::json), capabilities(JsonFilteringJsonPath, JsonFilteringArrayPath))]
 mod json_path {
-    use query_engine_tests::ConnectorTag;
+    use query_engine_tests::{assert_error, run_query, ConnectorTag};
 
     #[connector_test]
     async fn no_path_without_filter(runner: Runner) -> TestResult<()> {

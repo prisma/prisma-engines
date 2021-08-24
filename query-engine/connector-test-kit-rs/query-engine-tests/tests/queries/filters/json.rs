@@ -1,10 +1,11 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(json_opt), capabilities(Json), exclude(MySQL(5.6)))]
+#[test_suite(capabilities(Json), exclude(MySQL(5.6)))]
 mod json {
     use query_engine_tests::{assert_error, run_query};
+    use query_tests_setup::Runner;
 
-    #[connector_test]
+    #[connector_test(schema(json_opt))]
     async fn basic(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, json: "{}" }"#).await?;
         create_row(&runner, r#"{ id: 2, json: "{\"a\":\"b\"}" }"#).await?;
@@ -22,17 +23,14 @@ mod json {
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { json: { not: null }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { json: { not: DbNull }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
         Ok(())
     }
 
-    // defaults
-    // omission
-
-    #[connector_test]
+    #[connector_test(schema(json_opt))]
     async fn basic_null_eq(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, json: JsonNull }"#).await?;
         create_row(&runner, r#"{ id: 2, json: "{\"a\":\"b\"}" }"#).await?;
@@ -58,7 +56,89 @@ mod json {
         Ok(())
     }
 
-    #[connector_test]
+    #[connector_test(schema(json_opt))]
+    async fn basic_not_null_eq(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, json: JsonNull }"#).await?;
+        create_row(&runner, r#"{ id: 2, json: "{\"a\":\"b\"}" }"#).await?;
+        create_row(&runner, r#"{ id: 3, json: DbNull }"#).await?;
+        create_row(&runner, r#"{ id: 4, json: "\"null\"" }"#).await?;
+        create_row(&runner, r#"{ id: 5, json: "null" }"#).await?;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: [{ json: { equals: DbNull } }]}) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":4},{"id":5}]}}"###
+        );
+
+        // DB NULLs are not included, in line with our other filters.
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: [{ json: { equals: JsonNull } }]}) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":2},{"id":4}]}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: [{ json: { equals: AnyNull } }]}) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":2},{"id":4}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(schema(json))]
+    async fn req_json_null_filters(runner: Runner) -> TestResult<()> {
+        runner
+            .query("mutation { createOneTestModel(data: { id: 1, json: DbNull}) { id }}")
+            .await?
+            .assert_failure(
+                2009,
+                Some("Enum value 'DbNull' is invalid for enum type JsonNullValueInput".to_owned()),
+            );
+
+        create_row(&runner, r#"{ id: 1, json: JsonNull }"#).await?;
+        create_row(&runner, r#"{ id: 2, json: "{\"a\":\"b\"}" }"#).await?;
+
+        create_row(&runner, r#"{ id: 4, json: "\"null\"" }"#).await?;
+        create_row(&runner, r#"{ id: 5, json: "null" }"#).await?;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: [{ json: { equals: DbNull } }]}) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":4},{"id":5}]}}"###
+        );
+
+        // DB NULLs are not included, in line with our other filters.
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: [{ json: { equals: JsonNull } }]}) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":2},{"id":4}]}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: [{ json: { equals: AnyNull } }]}) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":2},{"id":4}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(schema(json_default))]
+    async fn basic_null_eq_defaults(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, json: "{\"a\":\"b\"}" }"#).await?;
+        create_row(&runner, r#"{ id: 2 }"#).await?;
+        create_row(&runner, r#"{ id: 3, json: JsonNull }"#).await?;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { json: { equals: JsonNull }}) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":2},{"id":3}]}}"###
+        );
+
+        // Should work, but not useful with req. fields.
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { json: { equals: AnyNull }}) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":2},{"id":3}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(schema(json_opt))]
     async fn no_shorthands(runner: Runner) -> TestResult<()> {
         assert_error!(
             &runner,
@@ -77,7 +157,7 @@ mod json {
         Ok(())
     }
 
-    #[connector_test]
+    #[connector_test(schema(json_opt))]
     async fn nested_not_shorthand(runner: Runner) -> TestResult<()> {
         assert_error!(
             &runner,

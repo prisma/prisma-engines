@@ -37,6 +37,23 @@ pub fn parse(
     Ok(filters)
 }
 
+// fn transform_nullability() -> Vec<Filter> {
+//     let filter = match as_prisma_value(input)? {
+//         PrismaValue::Enum(e) => match e.as_str() {
+//             json_null::DB_NULL => field.json_equals(PrismaValue::Null, json_path),
+//             json_null::JSON_NULL => field.json_equals(PrismaValue::Json("null".to_owned()), json_path),
+//             json_null::ANY_NULL => Filter::Or(vec![
+//                 field.json_equals(PrismaValue::Json("null".to_owned()), json_path),
+//                 field.json_equals(PrismaValue::Null, json_path),
+//             ]),
+//             _ => unreachable!(), // Validation guarantees correct enum values.
+//         },
+//         val => field.json_equals(val, json_path),
+//     };
+
+//     Ok(vec![filter])
+// }
+
 fn parse_internal_json(
     filter_key: &str,
     input: ParsedInputValue,
@@ -48,7 +65,24 @@ fn parse_internal_json(
         filters::NOT_LOWERCASE => {
             match input {
                 // Support for syntax `{ scalarField: { not: <value> } }` and `{ scalarField: { not: <value> } }`
-                ParsedInputValue::Single(value) => Ok(vec![field.json_not_equals(value, json_path)]),
+                ParsedInputValue::Single(value) => {
+                    let filter = match value {
+                        PrismaValue::Enum(e) => match e.as_str() {
+                            json_null::DB_NULL => field.json_not_equals(PrismaValue::Null, json_path),
+                            json_null::JSON_NULL => {
+                                field.json_not_equals(PrismaValue::Json("null".to_owned()), json_path)
+                            }
+                            json_null::ANY_NULL => Filter::And(vec![
+                                field.json_not_equals(PrismaValue::Json("null".to_owned()), json_path.clone()),
+                                field.json_not_equals(PrismaValue::Null, json_path),
+                            ]),
+                            _ => unreachable!(), // Validation guarantees correct enum values.
+                        },
+                        val => field.json_not_equals(val, json_path),
+                    };
+
+                    Ok(vec![filter])
+                }
                 _ => {
                     let inner_object: ParsedInputMap = input.try_into()?;
 
@@ -57,26 +91,36 @@ fn parse_internal_json(
             }
         }
 
-        filters::EQUALS if reverse => Ok(vec![field.json_not_equals(as_prisma_value(input)?, json_path)]),
+        filters::EQUALS if reverse => {
+            let filter = match as_prisma_value(input)? {
+                PrismaValue::Enum(e) => match e.as_str() {
+                    json_null::DB_NULL => field.json_not_equals(PrismaValue::Null, json_path),
+                    json_null::JSON_NULL => field.json_not_equals(PrismaValue::Json("null".to_owned()), json_path),
+                    json_null::ANY_NULL => Filter::And(vec![
+                        field.json_not_equals(PrismaValue::Json("null".to_owned()), json_path.clone()),
+                        field.json_not_equals(PrismaValue::Null, json_path),
+                    ]),
+                    _ => unreachable!(), // Validation guarantees correct enum values.
+                },
+                val => field.json_not_equals(val, json_path),
+            };
+
+            Ok(vec![filter])
+        }
 
         filters::EQUALS => {
-            let pv = as_prisma_value(input)?;
-            dbg!(&pv);
-
-            let filter = match pv {
+            let filter = match as_prisma_value(input)? {
                 PrismaValue::Enum(e) => match e.as_str() {
-                    json_null::DB_NULL => field.equals(PrismaValue::Null),
+                    json_null::DB_NULL => field.json_equals(PrismaValue::Null, json_path),
                     json_null::JSON_NULL => field.json_equals(PrismaValue::Json("null".to_owned()), json_path),
                     json_null::ANY_NULL => Filter::Or(vec![
-                        field.json_equals(PrismaValue::Json("null".to_owned()), json_path),
-                        field.equals(PrismaValue::Null),
+                        field.json_equals(PrismaValue::Json("null".to_owned()), json_path.clone()),
+                        field.json_equals(PrismaValue::Null, json_path),
                     ]),
                     _ => unreachable!(), // Validation guarantees correct enum values.
                 },
                 val => field.json_equals(val, json_path),
             };
-
-            dbg!(&filter);
 
             Ok(vec![filter])
         }
