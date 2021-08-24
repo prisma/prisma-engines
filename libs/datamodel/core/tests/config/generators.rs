@@ -7,6 +7,7 @@ fn serialize_generators_to_cmf() {
         generator js1 {
           provider = "javascript"
           output = "../../js"
+          engineType = "binary"
         }
 
         generator go {
@@ -27,7 +28,9 @@ fn serialize_generators_to_cmf() {
               "fromEnvVar": null,
               "value": "../../js"
             },
-            "config": {},
+            "config": {
+              "engineType": "binary"
+            },
             "binaryTargets": [],
             "previewFeatures": []
           },

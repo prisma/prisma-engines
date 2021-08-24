@@ -115,7 +115,16 @@ impl GeneratorLoader {
                 continue;
             }
 
-            properties.insert(prop.name.name.clone(), prop.value.to_string());
+            let value = match &prop.value {
+                ast::Expression::NumericValue(val, _) => val.clone(),
+                ast::Expression::BooleanValue(val, _) => val.clone(),
+                ast::Expression::StringValue(val, _) => val.clone(),
+                ast::Expression::ConstantValue(val, _) => val.clone(),
+                ast::Expression::Function(_, _, _) => String::from("(function)"),
+                ast::Expression::Array(_, _) => String::from("(array)"),
+            };
+
+            properties.insert(prop.name.name.clone(), value);
         }
 
         Some(Generator {
