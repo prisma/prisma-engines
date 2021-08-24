@@ -1,43 +1,52 @@
 use crate::common::*;
-use datamodel::{ast::Span, diagnostics::DatamodelError};
 
 #[test]
 fn should_fail_if_field_type_is_string() {
-    let dml = r#"
-    model User {
-        id Int @id
-        lastSeen String @updatedAt
-    }
-    "#;
+    let dml = indoc! {r#"
+        model User {
+          id Int @id
+          lastSeen String @updatedAt
+        }
+    "#};
 
-    let errors = parse_error(dml);
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
-    errors.assert_is(DatamodelError::new_attribute_validation_error(
-        "Fields that are marked with @updatedAt must be of type DateTime.",
-        "updatedAt",
-        Span::new(62, 71),
-    ));
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@updatedAt": Fields that are marked with @updatedAt must be of type DateTime.[0m
+          [1;94m-->[0m  [4mschema.prisma:3[0m
+        [1;94m   | [0m
+        [1;94m 2 | [0m  id Int @id
+        [1;94m 3 | [0m  lastSeen String @[1;91mupdatedAt[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
 }
 
 #[test]
 fn should_fail_if_field_arity_is_list() {
-    let dml = r#"
-    datasource db {
-        provider = "postgres"
-        url = "postgres://"
-    }
+    let dml = indoc! {r#"
+        datasource db {
+          provider = "postgres"
+          url = "postgres://"
+        }
 
-    model User {
-        id Int @id
-        lastSeen DateTime[] @updatedAt
-    }
-    "#;
+        model User {
+          id Int @id
+          lastSeen DateTime[] @updatedAt
+        }
+    "#};
 
-    let errors = parse_error(dml);
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
-    errors.assert_is(DatamodelError::new_attribute_validation_error(
-        "Fields that are marked with @updatedAt cannot be lists.",
-        "updatedAt",
-        Span::new(151, 160),
-    ));
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@updatedAt": Fields that are marked with @updatedAt cannot be lists.[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
+        [1;94m   | [0m
+        [1;94m 7 | [0m  id Int @id
+        [1;94m 8 | [0m  lastSeen DateTime[] @[1;91mupdatedAt[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
 }

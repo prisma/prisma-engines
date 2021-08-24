@@ -1,5 +1,4 @@
 use crate::common::*;
-use expect_test::expect;
 
 #[test]
 fn serialize_generators_to_cmf() {
