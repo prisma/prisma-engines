@@ -23,11 +23,6 @@ static POSTGIS_TABLES_OR_VIEWS: Lazy<RegexSet> = Lazy::new(|| {
 // https://www.postgresql.org/docs/12/pgbuffercache.html
 static EXTENSION_VIEWS: Lazy<RegexSet> = Lazy::new(|| RegexSet::new(&["(?i)^pg_buffercache$"]).unwrap());
 
-/// The maximum length of postgres identifiers, in bytes.
-///
-/// Reference: https://www.postgresql.org/docs/12/limits.html
-const POSTGRES_IDENTIFIER_SIZE_LIMIT: usize = 63;
-
 impl SqlSchemaDifferFlavour for PostgresFlavour {
     fn push_enum_steps(&self, differ: &SqlSchemaDiffer<'_>, steps: &mut Vec<SqlMigrationStep>) {
         for enum_differ in differ.enum_pairs() {
