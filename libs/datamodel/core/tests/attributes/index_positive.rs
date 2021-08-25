@@ -19,7 +19,7 @@ fn basic_index_must_work() {
     let user_model = schema.assert_has_model("User");
     user_model.assert_has_index(IndexDefinition {
         name: None,
-        db_name: Some("User.firstName_lastName_index".to_string()),
+        db_name: Some("User_firstName_lastName_idx".to_string()),
         fields: vec!["firstName".to_string(), "lastName".to_string()],
         tpe: IndexType::Normal,
         defined_on_field: false,
@@ -53,6 +53,7 @@ fn indexes_on_enum_fields_must_work() {
     });
 }
 
+// Illustrates the @@index compatibility hack.
 #[test]
 fn the_name_argument_must_work() {
     let dml = r#"
@@ -77,26 +78,21 @@ fn the_name_argument_must_work() {
 }
 
 #[test]
-fn the_map_argument_must_work_with_preview_flag() {
+fn the_map_argument_must_work() {
     let dml = r#"
-     datasource test {
-        provider = "postgres"
-        url = "postgresql://..."
-     }
-        
-     generator js {
-        provider = "prisma-client-js"
-        previewFeatures = ["NamedConstraints"]
-     }
-    
-     model User {
-         id        Int    @id
-         firstName String
-         lastName  String
+        datasource test {
+            provider = "postgres"
+            url = "postgresql://"
+        }
 
-         @@index([firstName,lastName], map: "MyIndexName")
-     }
-     "#;
+        model User {
+            id        Int    @id
+            firstName String
+            lastName  String
+
+            @@index([firstName,lastName], map: "MyIndexName")
+        }
+    "#;
 
     let schema = parse(dml);
     let user_model = schema.assert_has_model("User");

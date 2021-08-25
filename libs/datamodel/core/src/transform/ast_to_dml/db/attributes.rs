@@ -698,42 +698,45 @@ fn model_index<'ast>(
     let field_db_names = get_field_db_names(model_id, &index_data.fields, ctx);
     let name = get_name_argument(args, ctx);
 
-    let (name, db_name) = {
-        let generated_name = ConstraintNames::index_name(
-            model_db_name,
-            &field_db_names,
-            IndexType::Normal,
-            ctx.db.active_connector(),
-        );
+    let generated_name = ConstraintNames::index_name(
+        model_db_name,
+        &field_db_names,
+        IndexType::Normal,
+        ctx.db.active_connector(),
+    );
 
-        let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
-            Some(Ok("")) => error_on_empty_string_cow(args, ctx),
-            Some(Ok(name)) => Some(name.into()),
-            Some(Err(err)) => push_error_cow(err, ctx),
-            None => None,
-        };
-
-        validate_db_name(ast_model, args, &db_name, "@@index", ctx);
-
-        //We do not want to break existing datamodels for client purposes that use the old `@@index([field], name: "onlydbname")`
-        //This would strictly speaking be invalid now since `name` in the index definition translates to the client name
-        //(which non-unique indexes do not have) and `map` translates to the db constraint name.
-        //To prevent existing datamodels from failing to parse after an upgrade we will keep accepting the `name` property on @@index.
-        //If it is present we will interpret it as the `map` property and populate it accordingly. If the datamodel gets freshly rendered
-        //it will then be rendered correctly as `map`. We will however error if both `map` and `name` are being used.
-        let db_name = match (name, db_name) {
-            (Some(_), Some(_)) => error_usage_of_both_map_and_name(args, ctx),
-            //backwards compatibility, accept name arg on normal indexes and use it as map arg
-            (Some(name), None) => Some(name.into()),
-            (None, Some(map)) => Some(map),
-            (None, None) => Some(generated_name.into()),
-        };
-
-        (None, db_name)
+    let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
+        Some(Ok("")) => error_on_empty_string_cow(args, ctx),
+        Some(Ok(name)) => Some(name.into()),
+        Some(Err(err)) => push_error_cow(err, ctx),
+        None => None,
     };
 
-    index_data.name = name;
-    index_data.db_name = db_name;
+    validate_db_name(ast_model, args, &db_name, "@@index", ctx);
+
+    // We do not want to break existing datamodels for client purposes that
+    // use the old `@@index([field], name: "onlydbname")` This would
+    // strictly speaking be invalid now since `name` in the index definition
+    // translates to the client name (which non-unique indexes do not have)
+    // and `map` translates to the db constraint name.
+    //
+    // To prevent existing datamodels from failing to parse after an upgrade
+    // we will keep accepting the `name` property on @@index. If it is
+    // present we will interpret it as the `map` property and populate it
+    // accordingly. If the datamodel gets freshly rendered it will then be
+    // rendered correctly as `map`. We will however error if both `map` and
+    // `name` are being used.
+    index_data.db_name = match (name, db_name) {
+        (Some(_), Some(_)) => {
+            let error = args.new_attribute_validation_error("The `@@index` attribute accepts the `name` argument as an alias for the `map` argument for legacy reasons. It does not accept both though. Please use the `map` argument to specify the database name of the index.");
+            ctx.push_error(error);
+            None
+        }
+        // backwards compatibility, accept name arg on normal indexes and use it as map arg.
+        (Some(name), None) => Some(name.into()),
+        (None, Some(map)) => Some(map),
+        (None, None) => Some(generated_name.into()),
+    };
 
     data.indexes.push((args.attribute(), index_data));
 }
@@ -1119,16 +1122,6 @@ fn push_error_cow<'ast>(err: DatamodelError, ctx: &mut Context<'ast>) -> Option<
 
 fn error_on_empty_string_cow<'ast>(args: &mut Arguments<'ast>, ctx: &mut Context<'ast>) -> Option<Cow<'ast, str>> {
     ctx.push_error(args.new_attribute_validation_error("The `map` argument cannot be an empty string."));
-    None
-}
-
-fn error_usage_of_both_map_and_name<'ast>(
-    args: &mut Arguments<'ast>,
-    ctx: &mut Context<'ast>,
-) -> Option<Cow<'ast, str>> {
-    ctx.push_error(
-        args.new_attribute_validation_error("The `@@index` attribute accepts the `name` argument as an alias for the `map` argument for legacy reasons. It does not accept both though. Please use the `map` argument to specify the database name of the index."),
-    );
     None
 }
 
