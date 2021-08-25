@@ -35,37 +35,4 @@ mod json {
 
         Ok(())
     }
-
-    // "Using a json field" should "work"
-    #[connector_test(exclude(MySql(5.6)))]
-    async fn using_json_field(runner: Runner) -> TestResult<()> {
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation {
-            createOneModel(
-              data: {
-                id: "A"
-              }
-            ) {
-              field
-            }
-          }"#),
-          @r###"{"data":{"createOneModel":{"field":"{}"}}}"###
-        );
-
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation {
-            updateOneModel(
-              where: { id: "A" }
-              data: {
-                field: "{\\"a\\":\\"b\\"}"
-              }
-            ) {
-              field
-            }
-          }"#),
-          @r###"{"data":{"updateOneModel":{"field":"{\"a\":\"b\"}"}}}"###
-        );
-
-        Ok(())
-    }
 }
