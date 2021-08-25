@@ -6,6 +6,9 @@ import util._
 
 // RS: Ported
 class JsonFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
+  // Ported tests are taking over
+  override def doNotRun: Boolean = true
+
   val project = SchemaDsl.fromStringV11() {
     s"""model Model {
        |   id   Int   @id
