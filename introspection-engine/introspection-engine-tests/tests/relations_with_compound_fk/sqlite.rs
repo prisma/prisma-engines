@@ -43,7 +43,7 @@ async fn compound_foreign_keys_for_duplicate_one_to_many_relations(api: &TestApi
           Post_Post_other_user_id_other_user_ageToUser Post[] @relation("Post_other_user_id_other_user_ageToUser")
           Post_Post_user_id_user_ageToUser             Post[] @relation("Post_user_id_user_ageToUser")
 
-          @@unique([id, age], name: "sqlite_autoindex_User_1")
+          @@unique([id, age], map: "sqlite_autoindex_User_1")
         }
     "#]];
 
@@ -86,7 +86,7 @@ async fn compound_foreign_keys_for_one_to_many_relations_with_non_unique_index(a
           age  Int
           Post Post[]
 
-          @@unique([id, age], name: "sqlite_autoindex_User_1")
+          @@unique([id, age], map: "sqlite_autoindex_User_1")
         }
     "#]];
 
@@ -128,7 +128,7 @@ async fn compound_foreign_keys_for_one_to_one_relations(api: &TestApi) -> TestRe
           user_age Int?
           User     User? @relation(fields: [user_id, user_age], references: [id, age], onDelete: NoAction, onUpdate: NoAction)
 
-          @@unique([user_id, user_age], name: "sqlite_autoindex_Post_1")
+          @@unique([user_id, user_age], map: "sqlite_autoindex_Post_1")
         }
 
         model User {
@@ -136,7 +136,7 @@ async fn compound_foreign_keys_for_one_to_one_relations(api: &TestApi) -> TestRe
           age  Int
           Post Post?
 
-          @@unique([id, age], name: "user_unique")
+          @@unique([id, age], map: "user_unique")
         }
     "#]];
 
@@ -178,7 +178,7 @@ async fn compound_foreign_keys_for_required_one_to_one_relations(api: &TestApi) 
           user_age Int
           User     User @relation(fields: [user_id, user_age], references: [id, age], onDelete: NoAction, onUpdate: NoAction)
 
-          @@unique([user_id, user_age], name: "sqlite_autoindex_Post_1")
+          @@unique([user_id, user_age], map: "sqlite_autoindex_Post_1")
         }
 
         model User {
@@ -186,7 +186,7 @@ async fn compound_foreign_keys_for_required_one_to_one_relations(api: &TestApi) 
           age  Int
           Post Post?
 
-          @@unique([id, age], name: "user_unique")
+          @@unique([id, age], map: "user_unique")
         }
     "#]];
 
@@ -220,7 +220,7 @@ async fn compound_foreign_keys_for_required_self_relations(api: &TestApi) -> Tes
           Person       Person   @relation("PersonToPerson_partner_id_partner_age", fields: [partner_id, partner_age], references: [id, age], onDelete: NoAction, onUpdate: NoAction)
           other_Person Person[] @relation("PersonToPerson_partner_id_partner_age")
 
-          @@unique([id, age], name: "sqlite_autoindex_Person_1")
+          @@unique([id, age], map: "sqlite_autoindex_Person_1")
         }
     "#]];
 
@@ -254,7 +254,7 @@ async fn compound_foreign_keys_for_self_relations(api: &TestApi) -> TestResult {
           Person       Person?  @relation("PersonToPerson_partner_id_partner_age", fields: [partner_id, partner_age], references: [id, age], onDelete: NoAction, onUpdate: NoAction)
           other_Person Person[] @relation("PersonToPerson_partner_id_partner_age")
 
-          @@unique([id, age], name: "sqlite_autoindex_Person_1")
+          @@unique([id, age], map: "sqlite_autoindex_Person_1")
         }
     "#]];
 
@@ -288,7 +288,7 @@ async fn compound_foreign_keys_with_defaults(api: &TestApi) -> TestResult {
           Person       Person   @relation("PersonToPerson_partner_id_partner_age", fields: [partner_id, partner_age], references: [id, age], onDelete: NoAction, onUpdate: NoAction)
           other_Person Person[] @relation("PersonToPerson_partner_id_partner_age")
 
-          @@unique([id, age], name: "sqlite_autoindex_Person_1")
+          @@unique([id, age], map: "sqlite_autoindex_Person_1")
         }
     "#]];
 

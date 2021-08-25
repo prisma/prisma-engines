@@ -58,7 +58,7 @@ pub fn introspect(
         }
 
         for index in &table.indices {
-            model.add_index(calculate_index(index, ctx));
+            model.add_index(calculate_index(index));
         }
 
         if let Some(pk) = &table.primary_key {

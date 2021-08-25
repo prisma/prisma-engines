@@ -1,5 +1,6 @@
 mod mssql;
 mod mysql;
+mod sqlite;
 
 use barrel::types;
 use expect_test::expect;
@@ -15,11 +16,13 @@ async fn mapped_model_name(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("_User", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("_User_pkey", types::primary_constraint(vec!["id"]));
             });
 
             migration.create_table("Unrelated", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("Unrelated_pkey", types::primary_constraint(vec!["id"]));
             });
         })
         .await?;
@@ -64,12 +67,15 @@ async fn manually_overwritten_mapped_field_name(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
                 t.add_column("_test", types::integer());
+
+                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
             });
 
             migration.create_table("Unrelated", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("Unrelated_pkey", types::primary_constraint(&["id"]));
             });
         })
         .await?;
@@ -256,11 +262,12 @@ async fn mapped_field_name(api: &TestApi) -> TestResult {
 
                 t.add_index("test2", types::index(vec!["index"]));
 
-                t.set_primary_key(&["id_1", "id_2"]);
+                t.add_constraint("User_pkey", types::primary_constraint(&["id_1", "id_2"]));
             });
 
             migration.create_table("Unrelated", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("Unrelated_pkey", types::primary_constraint(vec!["id"]));
             });
         })
         .await?;
@@ -275,7 +282,7 @@ async fn mapped_field_name(api: &TestApi) -> TestResult {
 
             @@id([c_id_1, id_2])
             @@index([c_index], name: "test2")
-            @@unique([c_unique_1, unique_2], name: "sqlite_autoindex_User_1")
+            @@unique([c_unique_1, unique_2], map: "sqlite_autoindex_User_1")
         }
     "#};
 
@@ -289,7 +296,7 @@ async fn mapped_field_name(api: &TestApi) -> TestResult {
 
             @@id([c_id_1, id_2])
             @@index([c_index], name: "test2")
-            @@unique([c_unique_1, unique_2], name: "sqlite_autoindex_User_1")
+            @@unique([c_unique_1, unique_2], map: "sqlite_autoindex_User_1")
         }
 
         model Unrelated {
@@ -832,25 +839,32 @@ async fn custom_model_order(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("A", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("A_pkey", types::primary_constraint(vec!["id"]));
             });
             migration.create_table("B", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("B_pkey", types::primary_constraint(vec!["id"]));
             });
             migration.create_table("J", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("J_pkey", types::primary_constraint(vec!["id"]));
             });
             migration.create_table("F", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("F_pkey", types::primary_constraint(vec!["id"]));
             });
             migration.create_table("Z", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("Z_pkey", types::primary_constraint(vec!["id"]));
             });
             migration.create_table("M", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("M_pkey", types::primary_constraint(vec!["id"]));
             });
             migration.create_table("L", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("L_pkey", types::primary_constraint(vec!["id"]));
             });
         })
         .await?;
@@ -1008,7 +1022,7 @@ async fn custom_enum_order(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(exclude(Mssql, Mysql))]
+#[test_connector(exclude(Mssql, Mysql, Sqlite))]
 async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -1198,7 +1212,7 @@ async fn comments_should_be_kept(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(exclude(Mssql))]
 async fn updated_at(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
@@ -1249,61 +1263,18 @@ async fn updated_at(api: &TestApi) {
     api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await.unwrap());
 }
 
-#[test_connector(tags(Mssql))]
-async fn updated_at_with_native_types_on(api: &TestApi) {
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("User", move |t| {
-                t.add_column("id", types::integer().primary(true));
-                t.add_column("lastupdated", types::datetime().nullable(true));
-                t.inject_custom("lastupdated2 DATETIME");
-            });
-
-            migration.create_table("Unrelated", |t| {
-                t.add_column("id", types::primary());
-            });
-        })
-        .await
-        .unwrap();
-
-    let input_dm = indoc! {r#"
-        datasource db {
-            provider = "sqlserver"
-            url = env("TEST_DATABASE_URL")
-        }
-
-        model User {
-            id           Int    @id
-            lastupdated  DateTime? @updatedAt
-            lastupdated2 DateTime? @db.DateTime @updatedAt
-        }
-    "#};
-
-    let final_dm = indoc! {r#"
-        model User {
-            id           Int    @id
-            lastupdated  DateTime? @updatedAt
-            lastupdated2 DateTime? @db.DateTime @updatedAt
-        }
-
-        model Unrelated {
-            id               Int @id @default(autoincrement())
-        }
-    "#};
-
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await.unwrap());
-}
-
 #[test_connector]
 async fn multiple_many_to_many_on_same_model(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("A", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("A_pkey", types::primary_constraint(vec!["id"]));
             });
 
             migration.create_table("B", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("B_pkey", types::primary_constraint(vec!["id"]));
             });
 
             migration.create_table("_AToB", |t| {
@@ -1329,7 +1300,8 @@ async fn multiple_many_to_many_on_same_model(api: &TestApi) -> TestResult {
             });
 
             migration.create_table("Unrelated", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("Unrelated_pkey", types::primary_constraint(vec!["id"]));
             });
         })
         .await?;
@@ -1549,17 +1521,22 @@ async fn re_introspecting_ignore(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", move |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
                 t.add_column("test", types::integer().nullable(true));
+
+                t.add_constraint("User_pkey", types::primary_constraint(vec!["id"]));
             });
 
             migration.create_table("Ignored", move |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
                 t.add_column("test", types::integer().nullable(true));
+
+                t.add_constraint("Ignored_pkey", types::primary_constraint(vec!["id"]));
             });
 
             migration.create_table("Unrelated", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("Unrelated_pkey", types::primary_constraint(vec!["id"]));
             });
         })
         .await?;
@@ -1612,7 +1589,8 @@ async fn do_not_try_to_keep_custom_many_to_many_self_relation_names(api: &TestAp
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", move |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
             });
 
             migration.create_table("_FollowRelation", |t| {

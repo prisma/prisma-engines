@@ -1,4 +1,6 @@
 pub use super::TestResult;
+pub use expect_test::expect;
+pub use test_macros::test_connector;
 pub use test_setup::{BitFlags, Capabilities, Tags};
 
 use crate::{BarrelMigrationExecutor, Result};
@@ -301,8 +303,8 @@ impl TestApi {
     }
 
     #[track_caller]
-    pub async fn raw_cmd(&self, sql: &str) {
-        self.api.quaint().raw_cmd(sql).await.unwrap()
+    pub async fn raw_cmd(&self, query: &str) {
+        self.api.quaint().raw_cmd(query).await.unwrap()
     }
 }
 

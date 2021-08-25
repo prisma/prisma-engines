@@ -41,7 +41,7 @@ async fn a_compound_fk_pk_with_overlapping_primary_key(api: &TestApi) -> TestRes
           a     a   @relation(fields: [one, two], references: [one, two])
 
           @@id([dummy, one, two])
-          @@index([one, two], name: "one")
+          @@index([one, two], map: "one")
         }
     "#]];
 
@@ -88,8 +88,8 @@ async fn compound_foreign_keys_for_duplicate_one_to_many_relations(api: &TestApi
           User_Post_other_user_id_other_user_ageToUser User? @relation("Post_other_user_id_other_user_ageToUser", fields: [other_user_id, other_user_age], references: [id, age])
           User_Post_user_id_user_ageToUser             User? @relation("Post_user_id_user_ageToUser", fields: [user_id, user_age], references: [id, age])
 
-          @@index([other_user_id, other_user_age], name: "other_user_id")
-          @@index([user_id, user_age], name: "user_id")
+          @@index([other_user_id, other_user_age], map: "other_user_id")
+          @@index([user_id, user_age], map: "user_id")
         }
 
         model User {
@@ -98,7 +98,7 @@ async fn compound_foreign_keys_for_duplicate_one_to_many_relations(api: &TestApi
           Post_Post_other_user_id_other_user_ageToUser Post[] @relation("Post_other_user_id_other_user_ageToUser")
           Post_Post_user_id_user_ageToUser             Post[] @relation("Post_user_id_user_ageToUser")
 
-          @@unique([id, age], name: "user_unique")
+          @@unique([id, age], map: "user_unique")
         }
     "#]];
 
@@ -137,7 +137,7 @@ async fn compound_foreign_keys_for_one_to_many_relations(api: &TestApi) -> TestR
           user_age Int?
           User     User? @relation(fields: [user_id, user_age], references: [id, age])
 
-          @@index([user_id, user_age], name: "user_id")
+          @@index([user_id, user_age], map: "user_id")
         }
 
         model User {
@@ -145,7 +145,7 @@ async fn compound_foreign_keys_for_one_to_many_relations(api: &TestApi) -> TestR
           age  Int
           Post Post[]
 
-          @@unique([id, age], name: "user_unique")
+          @@unique([id, age], map: "user_unique")
         }
     "#]];
 
@@ -184,7 +184,7 @@ async fn compound_foreign_keys_for_one_to_many_relations_with_mixed_requiredness
           user_age Int?
           User     User? @relation(fields: [user_id, user_age], references: [id, age])
 
-          @@index([user_id, user_age], name: "user_id")
+          @@index([user_id, user_age], map: "user_id")
         }
 
         model User {
@@ -192,7 +192,7 @@ async fn compound_foreign_keys_for_one_to_many_relations_with_mixed_requiredness
           age  Int
           Post Post[]
 
-          @@unique([id, age], name: "user_unique")
+          @@unique([id, age], map: "user_unique")
         }
     "#]];
 
@@ -231,7 +231,7 @@ async fn compound_foreign_keys_for_one_to_many_relations_with_non_unique_index(a
           user_age Int
           User     User @relation(fields: [user_id, user_age], references: [id, age])
 
-          @@index([user_id, user_age], name: "user_id")
+          @@index([user_id, user_age], map: "user_id")
         }
 
         model User {
@@ -239,7 +239,7 @@ async fn compound_foreign_keys_for_one_to_many_relations_with_non_unique_index(a
           age  Int
           Post Post[]
 
-          @@unique([id, age], name: "post_user_unique")
+          @@unique([id, age], map: "post_user_unique")
         }
     "#]];
 
@@ -283,7 +283,7 @@ async fn compound_foreign_keys_for_one_to_one_relations(api: &TestApi) -> TestRe
           user_age Int?
           User     User? @relation(fields: [user_id, user_age], references: [id, age])
 
-          @@unique([user_id, user_age], name: "post_user_unique")
+          @@unique([user_id, user_age], map: "post_user_unique")
         }
 
         model User {
@@ -291,7 +291,7 @@ async fn compound_foreign_keys_for_one_to_one_relations(api: &TestApi) -> TestRe
           age  Int
           Post Post?
 
-          @@unique([id, age], name: "user_unique")
+          @@unique([id, age], map: "user_unique")
         }
     "#]];
 
@@ -335,7 +335,7 @@ async fn compound_foreign_keys_for_required_one_to_one_relations(api: &TestApi) 
           user_age Int
           User     User @relation(fields: [user_id, user_age], references: [id, age])
 
-          @@unique([user_id, user_age], name: "post_user_unique")
+          @@unique([user_id, user_age], map: "post_user_unique")
         }
 
         model User {
@@ -343,7 +343,7 @@ async fn compound_foreign_keys_for_required_one_to_one_relations(api: &TestApi) 
           age  Int
           Post Post?
 
-          @@unique([id, age], name: "user_unique")
+          @@unique([id, age], map: "user_unique")
         }
     "#]];
 
@@ -382,7 +382,7 @@ async fn compound_foreign_keys_for_required_one_to_many_relations(api: &TestApi)
           user_age Int
           User     User @relation(fields: [user_id, user_age], references: [id, age])
 
-          @@index([user_id, user_age], name: "user_id")
+          @@index([user_id, user_age], map: "user_id")
         }
 
         model User {
@@ -390,7 +390,7 @@ async fn compound_foreign_keys_for_required_one_to_many_relations(api: &TestApi)
           age  Int
           Post Post[]
 
-          @@unique([id, age], name: "user_unique")
+          @@unique([id, age], map: "user_unique")
         }
     "#]];
 
@@ -427,8 +427,8 @@ async fn compound_foreign_keys_for_required_self_relations(api: &TestApi) -> Tes
           Person       Person   @relation("PersonToPerson_partner_id_partner_age", fields: [partner_id, partner_age], references: [id, age])
           other_Person Person[] @relation("PersonToPerson_partner_id_partner_age")
 
-          @@unique([id, age], name: "post_user_unique")
-          @@index([partner_id, partner_age], name: "partner_id")
+          @@unique([id, age], map: "post_user_unique")
+          @@index([partner_id, partner_age], map: "partner_id")
         }
     "#]];
 
@@ -465,8 +465,8 @@ async fn compound_foreign_keys_for_self_relations(api: &TestApi) -> TestResult {
           Person       Person?  @relation("PersonToPerson_partner_id_partner_age", fields: [partner_id, partner_age], references: [id, age])
           other_Person Person[] @relation("PersonToPerson_partner_id_partner_age")
 
-          @@unique([id, age], name: "post_user_unique")
-          @@index([partner_id, partner_age], name: "partner_id")
+          @@unique([id, age], map: "post_user_unique")
+          @@index([partner_id, partner_age], map: "partner_id")
         }
     "#]];
 
@@ -503,8 +503,8 @@ async fn compound_foreign_keys_with_defaults(api: &TestApi) -> TestResult {
           Person       Person   @relation("PersonToPerson_partner_id_partner_age", fields: [partner_id, partner_age], references: [id, age])
           other_Person Person[] @relation("PersonToPerson_partner_id_partner_age")
 
-          @@unique([id, age], name: "post_user_unique")
-          @@index([partner_id, partner_age], name: "partner_id")
+          @@unique([id, age], map: "post_user_unique")
+          @@index([partner_id, partner_age], map: "partner_id")
         }
     "#]];
 
@@ -550,7 +550,7 @@ async fn repro_matt_references_on_wrong_side(api: &TestApi) -> TestResult {
           two Int
           a   a   @relation(fields: [one, two], references: [one, two])
 
-          @@index([one, two], name: "one")
+          @@index([one, two], map: "one")
         }
     "#]];
 

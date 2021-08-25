@@ -1,14 +1,13 @@
 use barrel::types;
-use expect_test::expect;
-use introspection_engine_tests::{test_api::*, TestResult};
-use test_macros::test_connector;
+use introspection_engine_tests::test_api::*;
 
 #[test_connector(tags(Mssql))]
 async fn a_table_without_uniques_should_ignore(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer());
+                t.add_constraint("User_pkey", types::primary_constraint(vec!["id"]));
             });
             migration.create_table("Post", |t| {
                 t.add_column("id", types::integer());
@@ -26,12 +25,12 @@ async fn a_table_without_uniques_should_ignore(api: &TestApi) -> TestResult {
           user_id Int
           User    User @relation(fields: [user_id], references: [id], onUpdate: NoAction)
 
-          @@index([user_id], name: "Post_user_id_idx")
+          @@index([user_id])
           @@ignore
         }
 
         model User {
-          id   Int    @id @default(autoincrement())
+          id   Int    @id
           Post Post[] @ignore
         }
     "#]];

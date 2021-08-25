@@ -43,8 +43,8 @@ async fn a_many_to_many_relation_with_an_id(api: &TestApi) -> TestResult {
           Post    Post @relation(fields: [post_id], references: [id])
           User    User @relation(fields: [user_id], references: [id])
 
-          @@index([post_id], name: "post_id")
-          @@index([user_id], name: "user_id")
+          @@index([post_id], map: "post_id")
+          @@index([user_id], map: "user_id")
         }
 
         model User {
@@ -82,7 +82,7 @@ async fn a_one_req_to_many_relation(api: &TestApi) -> TestResult {
           user_id Int
           User    User @relation(fields: [user_id], references: [id])
 
-          @@index([user_id], name: "user_id")
+          @@index([user_id], map: "user_id")
         }
 
         model User {
@@ -120,7 +120,7 @@ async fn a_one_to_many_relation(api: &TestApi) -> TestResult {
           user_id Int?
           User    User? @relation(fields: [user_id], references: [id])
 
-          @@index([user_id], name: "user_id")
+          @@index([user_id], map: "user_id")
         }
 
         model User {
@@ -163,8 +163,8 @@ async fn a_self_relation(api: &TestApi) -> TestResult {
           other_User_UserToUser_direct_report User[] @relation("UserToUser_direct_report")
           other_User_UserToUser_recruited_by  User[] @relation("UserToUser_recruited_by")
 
-          @@index([direct_report], name: "direct_report")
-          @@index([recruited_by], name: "recruited_by")
+          @@index([direct_report], map: "direct_report")
+          @@index([recruited_by], map: "recruited_by")
         }
     "#]];
 
@@ -197,7 +197,7 @@ async fn duplicate_fks_should_ignore_one_of_them(api: &TestApi) -> TestResult {
           user_id Int?
           User    User? @relation(fields: [user_id], references: [id])
 
-          @@index([user_id], name: "user_id")
+          @@index([user_id], map: "user_id")
         }
 
         model User {
@@ -218,16 +218,18 @@ async fn one_to_many_relation_field_names_do_not_conflict_with_many_to_many_rela
     api.barrel()
         .execute(move |migration| {
             migration.create_table("User", |table| {
-                table.add_column("id", types::primary());
+                table.add_column("id", types::integer().increments(true));
+                table.add_constraint("User_pkey", types::primary_constraint(&["id"]));
             });
 
             migration.create_table("Event", |table| {
-                table.add_column("id", types::primary());
+                table.add_column("id", types::integer().increments(true));
                 table.add_column("host_id", types::integer().nullable(false));
 
                 table.inject_custom(
                     "CONSTRAINT host_id FOREIGN KEY (host_id) REFERENCES `User`(id) ON DELETE RESTRICT ON UPDATE CASCADE",
                 );
+                table.add_constraint("Event_pkey", types::primary_constraint(&["id"]));
             });
 
             migration.create_table("_EventToUser", |table| {
@@ -254,7 +256,7 @@ async fn one_to_many_relation_field_names_do_not_conflict_with_many_to_many_rela
           User_Event_host_idToUser User   @relation("Event_host_idToUser", fields: [host_id], references: [id])
           User_EventToUser         User[]
 
-          @@index([host_id], name: "host_id")
+          @@index([host_id], map: "host_id")
         }
 
         model User {
@@ -292,7 +294,7 @@ async fn relations_should_avoid_name_clashes(api: &TestApi) -> TestResult {
           y      Int
           y_xToy y   @relation(fields: [y], references: [id])
 
-          @@index([y], name: "y")
+          @@index([y], map: "y")
         }
 
         model y {
@@ -345,8 +347,8 @@ async fn relations_should_avoid_name_clashes_2(api: &TestApi) -> TestResult {
           y_x_yToy             y   @relation("x_yToy", fields: [y], references: [id])
           y_xToy_fk_x_1_fk_x_2 y[] @relation("xToy_fk_x_1_fk_x_2")
 
-          @@unique([id, y], name: "unique_y_id")
-          @@index([y], name: "y")
+          @@unique([id, y], map: "unique_y_id")
+          @@index([y], map: "y")
         }
 
         model y {
@@ -357,7 +359,7 @@ async fn relations_should_avoid_name_clashes_2(api: &TestApi) -> TestResult {
           x_xToy_fk_x_1_fk_x_2 x   @relation("xToy_fk_x_1_fk_x_2", fields: [fk_x_1, fk_x_2], references: [id, y])
           x_x_yToy             x[] @relation("x_yToy")
 
-          @@index([fk_x_1, fk_x_2], name: "fk_x_1")
+          @@index([fk_x_1, fk_x_2], map: "fk_x_1")
         }
     "#]];
 
@@ -402,14 +404,14 @@ async fn two_one_to_one_relations_between_the_same_models(api: &TestApi) -> Test
     let expected = expect![[r#"
         model Post {
           id                      Int   @id @default(autoincrement())
-          user_id                 Int   @unique
+          user_id                 Int   @unique(map: "user_id")
           User_Post_user_idToUser User  @relation("Post_user_idToUser", fields: [user_id], references: [id])
           User_PostToUser_post_id User? @relation("PostToUser_post_id")
         }
 
         model User {
           id                      Int   @id @default(autoincrement())
-          post_id                 Int   @unique
+          post_id                 Int   @unique(map: "post_id")
           Post_PostToUser_post_id Post  @relation("PostToUser_post_id", fields: [post_id], references: [id])
           Post_Post_user_idToUser Post? @relation("Post_user_idToUser")
         }
@@ -441,7 +443,7 @@ async fn a_one_to_one_relation(api: &TestApi) -> TestResult {
     let expected = expect![[r#"
         model Post {
           id      Int   @id @default(autoincrement())
-          user_id Int?  @unique
+          user_id Int?  @unique(map: "user_id")
           User    User? @relation(fields: [user_id], references: [id])
         }
 
@@ -479,13 +481,13 @@ async fn a_one_to_one_relation_referencing_non_id(api: &TestApi) -> TestResult {
     let expected = expect![[r#"
         model Post {
           id         Int     @id @default(autoincrement())
-          user_email String? @unique @db.VarChar(10)
+          user_email String? @unique(map: "user_email") @db.VarChar(10)
           User       User?   @relation(fields: [user_email], references: [email])
         }
 
         model User {
           id    Int     @id @default(autoincrement())
-          email String? @unique @db.VarChar(10)
+          email String? @unique(map: "email") @db.VarChar(10)
           Post  Post?
         }
     "#]];
@@ -589,7 +591,7 @@ async fn one_to_one_req_relation(api: &TestApi) -> TestResult {
     let expected = expect![[r#"
         model Post {
           id      Int  @id @default(autoincrement())
-          user_id Int  @unique
+          user_id Int  @unique(map: "user_id")
           User    User @relation(fields: [user_id], references: [id])
         }
 
@@ -623,7 +625,7 @@ async fn one_to_one_relation_on_a_singular_primary_key(api: &TestApi) -> TestRes
 
     let expected = expect![[r#"
         model Post {
-          id   Int  @unique
+          id   Int  @unique(map: "id")
           User User @relation(fields: [id], references: [id])
         }
 

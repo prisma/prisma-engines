@@ -1,28 +1,29 @@
 use barrel::types;
-use expect_test::expect;
 use indoc::indoc;
 use introspection_engine_tests::test_api::*;
-use test_macros::test_connector;
 
 #[test_connector(tags(Mssql))]
 async fn multiple_changed_relation_names(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Employee", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("Employee_pkey", types::primary_constraint(&["id"]))
             });
 
             migration.create_table("Schedule", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
                 t.add_column("morningEmployeeId", types::integer().nullable(false));
                 t.add_column("eveningEmployeeId", types::integer().nullable(false));
 
                 t.add_foreign_key(&["morningEmployeeId"], "Employee", &["id"]);
                 t.add_foreign_key(&["eveningEmployeeId"], "Employee", &["id"]);
+                t.add_constraint("Schedule_pkey", types::primary_constraint(&["id"]))
             });
 
             migration.create_table("Unrelated", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("Unrelated_pkey", types::primary_constraint(&["id"]))
             });
         })
         .await?;
@@ -73,20 +74,25 @@ async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> 
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("User_pkey", types::primary_constraint(&["id"]))
             });
 
             migration.create_table("Post", |t| {
-                t.add_column("id", types::primary());
-                t.add_column("user_id", types::integer().nullable(false).unique(true));
-                t.add_column("user_id2", types::integer().nullable(false).unique(true));
+                t.add_column("id", types::integer().increments(true));
+                t.add_column("user_id", types::integer().nullable(false));
+                t.add_column("user_id2", types::integer().nullable(false));
 
                 t.add_foreign_key(&["user_id"], "User", &["id"]);
                 t.add_foreign_key(&["user_id2"], "User", &["id"]);
+                t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("Post_user_id_key", types::unique_constraint(&["user_id"]));
+                t.add_constraint("Post_user_id2_key", types::unique_constraint(&["user_id2"]));
             });
 
             migration.create_table("Unrelated", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("Unrelated_pkey", types::primary_constraint(&["id"]))
             });
         })
         .await?;
@@ -141,17 +147,21 @@ async fn mapped_model_and_field_name(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("User_pkey", types::primary_constraint(&["id"]))
             });
 
             migration.create_table("Post", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
                 t.add_column("user_id", types::integer().nullable(false));
+
                 t.add_foreign_key(&["user_id"], "User", &["id"]);
+                t.add_constraint("Post_pkey", types::primary_constraint(&["id"]))
             });
 
             migration.create_table("Unrelated", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("Unrelated_pkey", types::primary_constraint(&["id"]))
             });
         })
         .await?;
@@ -199,4 +209,55 @@ async fn mapped_model_and_field_name(api: &TestApi) -> TestResult {
     expected.assert_eq(&api.re_introspect_warnings(input_dm).await?);
 
     Ok(())
+}
+
+#[test_connector(tags(Mssql))]
+async fn updated_at(api: &TestApi) {
+    let setup = format!(
+        r#"
+        CREATE TABLE [{schema_name}].[User] (
+            id INTEGER,
+            [lastupdated] DATETIME,
+            [lastupdated2] DATETIME2,
+
+            CONSTRAINT [User_pkey] PRIMARY KEY ([id])
+        );
+
+        CREATE TABLE [{schema_name}].[Unrelated] (
+            id INTEGER IDENTITY,
+
+            CONSTRAINT [Unrelated_pkey] PRIMARY KEY ([id])
+        );
+        "#,
+        schema_name = api.schema_name()
+    );
+
+    api.raw_cmd(&setup).await;
+
+    let input_dm = indoc! {r#"
+        datasource db {
+            provider = "sqlserver"
+            url = env("TEST_DATABASE_URL")
+        }
+
+        model User {
+            id           Int    @id
+            lastupdated  DateTime? @updatedAt
+            lastupdated2 DateTime? @db.DateTime @updatedAt
+        }
+    "#};
+
+    let final_dm = indoc! {r#"
+        model User {
+            id           Int    @id
+            lastupdated  DateTime? @updatedAt @db.DateTime
+            lastupdated2 DateTime? @updatedAt
+        }
+
+        model Unrelated {
+            id               Int @id @default(autoincrement())
+        }
+    "#};
+
+    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await.unwrap());
 }

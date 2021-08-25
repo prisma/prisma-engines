@@ -8,7 +8,8 @@ async fn a_table_with_reserved_name(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("PrismaClient", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("PrismaClient_pkey", types::primary_constraint(vec!["id"]));
             });
         })
         .await?;
@@ -32,7 +33,8 @@ async fn reserved_names_case_sensitivity(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("prismaclient", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("prismaclient_pkey", types::primary_constraint(vec!["id"]));
             });
         })
         .await?;
