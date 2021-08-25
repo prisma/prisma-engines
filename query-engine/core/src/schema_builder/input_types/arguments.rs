@@ -118,7 +118,7 @@ pub(crate) fn many_records_arguments(
 
     let mut args = vec![
         where_argument(ctx, &model),
-        order_by_argument(ctx, &model, ctx.has_feature(&PreviewFeature::OrderByRelation), false),
+        order_by_argument(ctx, &model, true, false),
         input_field(args::CURSOR, unique_input_type, None).optional(),
         input_field(args::TAKE, InputType::int(), None).optional(),
         input_field(args::SKIP, InputType::int(), None).optional(),
