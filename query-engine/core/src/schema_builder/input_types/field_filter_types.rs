@@ -171,12 +171,12 @@ fn full_scalar_filter_type(
                 && (ctx.capabilities.contains(ConnectorCapability::JsonFilteringJsonPath)
                     || ctx.capabilities.contains(ConnectorCapability::JsonFilteringArrayPath))
             {
-                json_equality_filters(ctx, mapped_scalar_type.clone())
+                json_equality_filters(ctx, mapped_scalar_type.clone(), nullable)
                     .chain(alphanumeric_filters(mapped_scalar_type.clone()))
                     .chain(json_filters(ctx))
                     .collect()
             } else {
-                json_equality_filters(ctx, mapped_scalar_type.clone()).collect()
+                json_equality_filters(ctx, mapped_scalar_type.clone(), nullable).collect()
             }
         }
 
@@ -297,12 +297,18 @@ fn equality_filters(mapped_type: InputType, nullable: bool) -> impl Iterator<Ite
     )
 }
 
-fn json_equality_filters(ctx: &BuilderContext, mapped_type: InputType) -> impl Iterator<Item = InputField> {
+fn json_equality_filters(
+    ctx: &BuilderContext,
+    mapped_type: InputType,
+    nullable: bool,
+) -> impl Iterator<Item = InputField> {
     let field = if ctx.has_capability(ConnectorCapability::AdvancedJsonNullability) {
         let enum_type = json_null_filter_enum();
         input_field(filters::EQUALS, vec![InputType::Enum(enum_type), mapped_type], None).optional()
     } else {
-        input_field(filters::EQUALS, vec![mapped_type], None).optional()
+        input_field(filters::EQUALS, vec![mapped_type], None)
+            .optional()
+            .nullable_if(nullable)
     };
 
     std::iter::once(field)

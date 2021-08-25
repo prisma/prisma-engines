@@ -294,8 +294,33 @@ mod create {
 mod json_create {
     use query_engine_tests::{assert_error, run_query};
 
-    #[connector_test]
+    #[connector_test(only(MongoDb))]
     async fn create_json(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 1, json: "{}" }) { json }}"#),
+          @r###"{"data":{"createOneTestModel":{"json":"{}"}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 2, json: "null" }) { json }}"#),
+          @r###"{"data":{"createOneTestModel":{"json":null}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 3, json: null }) { json }}"#),
+          @r###"{"data":{"createOneTestModel":{"json":null}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 4 }) { json }}"#),
+          @r###"{"data":{"createOneTestModel":{"json":null}}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(capabilities(AdvancedJsonNullability))]
+    async fn create_json_adv(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 1, json: "{}" }) { json }}"#),
           @r###"{"data":{"createOneTestModel":{"json":"{}"}}}"###
@@ -319,7 +344,7 @@ mod json_create {
         Ok(())
     }
 
-    #[connector_test]
+    #[connector_test(capabilities(AdvancedJsonNullability))]
     async fn create_json_errors(runner: Runner) -> TestResult<()> {
         assert_error!(
             &runner,
