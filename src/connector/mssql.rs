@@ -496,7 +496,7 @@ impl MssqlUrl {
             .remove("encrypt")
             .map(|param| EncryptMode::from_str(&param))
             .transpose()?
-            .unwrap_or(EncryptMode::Off);
+            .unwrap_or(EncryptMode::On);
 
         let trust_server_certificate = props
             .remove("trustservercertificate")
