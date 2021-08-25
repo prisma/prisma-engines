@@ -36,7 +36,7 @@ case class Project(
     s"""
        |generator client {
        |  provider = "prisma-client-js"
-       |  previewFeatures = ["microsoftSqlServer", "mongodb", "orderByRelation", "napi", "selectRelationCount", "orderByAggregateGroup"]
+       |  previewFeatures = ["mongodb", "orderByRelation", "napi", "selectRelationCount", "orderByAggregateGroup"]
        |}
     """.stripMargin
   }

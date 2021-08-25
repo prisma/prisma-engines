@@ -132,7 +132,7 @@ fn named_default_constraints_should_work_on_sql_server() {
 
         generator js {
             provider = "prisma-client-js"
-            previewFeatures = ["microsoftSqlServer", "namedConstraints"]
+            previewFeatures = ["namedConstraints"]
         }
 
         model A {

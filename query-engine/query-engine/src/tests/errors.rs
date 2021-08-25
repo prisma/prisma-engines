@@ -22,11 +22,6 @@ async fn connection_string_problems_give_a_nice_error() {
                   url = "{}"
                 }}
 
-                generator js {{
-                    provider = "prisma-client-js"
-                    previewFeatures = ["microsoftSqlServer"]
-                }}
-
                 model A {{
                   id Int @id @default(autoincrement())
                 }}
