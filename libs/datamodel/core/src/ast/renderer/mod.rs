@@ -255,7 +255,6 @@ impl<'a> Renderer<'a> {
             self.end_line();
             let attributes = Self::sort_attributes(enm.attributes.clone(), false);
             for attribute in attributes {
-                self.write(" ");
                 self.render_block_attribute(&attribute, "".to_string());
             }
         }

@@ -8,7 +8,10 @@ use introspection_connector::{
     ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionContext, IntrospectionResult, Version,
 };
 use migration_connector::MigrationConnector;
-use quaint::{prelude::SqlFamily, single::Quaint};
+use quaint::{
+    prelude::{Queryable, SqlFamily},
+    single::Quaint,
+};
 use sql_introspection_connector::SqlIntrospectionConnector;
 use sql_migration_connector::SqlMigrationConnector;
 use std::fmt::Write;
@@ -281,6 +284,11 @@ impl TestApi {
             preview_feature_string
         );
         generator_block
+    }
+
+    #[track_caller]
+    pub async fn raw_cmd(&self, sql: &str) {
+        self.api.quaint().raw_cmd(sql).await.unwrap()
     }
 }
 
