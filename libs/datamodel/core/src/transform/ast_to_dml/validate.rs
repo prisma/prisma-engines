@@ -5,13 +5,12 @@ mod referential_actions;
 
 use crate::{
     ast,
-    common::{constraint_names::ConstraintNames, preview_features::PreviewFeature},
+    common::constraint_names::ConstraintNames,
     configuration,
     diagnostics::{DatamodelError, Diagnostics},
     dml,
 };
 use datamodel_connector::ConnectorCapability;
-use enumflags2::BitFlags;
 use names::NamesValidator;
 
 /// Helper for validating a datamodel.
@@ -19,7 +18,6 @@ use names::NamesValidator;
 /// When validating, we check if the datamodel is valid, and generate errors otherwise.
 pub struct Validator<'a> {
     source: Option<&'a configuration::Datasource>,
-    preview_features: BitFlags<PreviewFeature>,
 }
 
 /// State error message. Seeing this error means something went really wrong internally. It's the datamodel equivalent of a bluescreen.
@@ -30,14 +28,8 @@ const PRISMA_FORMAT_HINT: &str = "You can run `prisma format` to fix this automa
 
 impl<'a> Validator<'a> {
     /// Creates a new instance, with all builtin attributes registered.
-    pub fn new(
-        source: Option<&'a configuration::Datasource>,
-        preview_features: BitFlags<PreviewFeature>,
-    ) -> Validator<'a> {
-        Self {
-            source,
-            preview_features,
-        }
+    pub fn new(source: Option<&'a configuration::Datasource>) -> Validator<'a> {
+        Self { source }
     }
 
     pub(crate) fn validate(&self, ast: &ast::SchemaAst, schema: &dml::Datamodel, diagnostics: &mut Diagnostics) {
@@ -60,21 +52,21 @@ impl<'a> Validator<'a> {
                         }
                     }
                 }
+            }
 
-                for index in &model.indices {
-                    //doing this here for now since I want to have all field names already generated
-                    // it might be possible to move this
-                    if let Some(name) = &index.name {
-                        for field in model.fields() {
-                            if let Some(err) = ConstraintNames::client_name_already_in_use(
-                                name,
-                                field.name(),
-                                &model.name,
-                                ast_model.span,
-                                "@@unique",
-                            ) {
-                                diagnostics.push_error(err);
-                            }
+            for index in &model.indices {
+                //doing this here for now since I want to have all field names already generated
+                // it might be possible to move this
+                if let Some(name) = &index.name {
+                    for field in model.fields() {
+                        if let Some(err) = ConstraintNames::client_name_already_in_use(
+                            name,
+                            field.name(),
+                            &model.name,
+                            ast_model.span,
+                            "@@unique",
+                        ) {
+                            diagnostics.push_error(err);
                         }
                     }
                 }

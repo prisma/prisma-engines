@@ -18,7 +18,7 @@ fn basic_unique_index_must_work() {
     let user_model = schema.assert_has_model("User");
     user_model.assert_has_index(IndexDefinition {
         name: None,
-        db_name: Some("User.firstName_lastName_unique".to_string()),
+        db_name: Some("User_firstName_lastName_key".to_string()),
         fields: vec!["firstName".to_string(), "lastName".to_string()],
         tpe: IndexType::Unique,
         defined_on_field: false,
@@ -192,7 +192,7 @@ fn multi_field_unique_indexes_on_enum_fields_must_work() {
     let user_model = schema.assert_has_model("User");
     user_model.assert_has_index(IndexDefinition {
         name: None,
-        db_name: Some("User.role_unique".to_string()),
+        db_name: Some("User_role_key".to_string()),
         fields: vec!["role".to_string()],
         tpe: IndexType::Unique,
         defined_on_field: false,
@@ -407,21 +407,21 @@ fn defined_on_field_must_work() {
 }
 
 #[test]
-fn naming_unique_to_a_field_name_should_work() {
+fn mapping_unique_to_a_field_name_should_work() {
     let dml = r#"
      model User {
          used           Int
          name           String            
          identification Int
 
-         @@unique([name, identification], name: "used")
+         @@unique([name, identification], name: "usedUnique", map: "used")
      }
      "#;
 
     let datamodel = parse(&dml);
     let model = datamodel.assert_has_model("User");
     model.assert_has_index(IndexDefinition {
-        name: Some("used".to_string()),
+        name: Some("usedUnique".to_string()),
         db_name: Some("used".to_string()),
         fields: vec!["name".to_string(), "identification".to_string()],
         tpe: IndexType::Unique,

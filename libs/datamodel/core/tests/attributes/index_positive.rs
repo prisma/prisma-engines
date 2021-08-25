@@ -46,7 +46,7 @@ fn indexes_on_enum_fields_must_work() {
     let user_model = schema.assert_has_model("User");
     user_model.assert_has_index(IndexDefinition {
         name: None,
-        db_name: Some("User.role_index".to_string()),
+        db_name: Some("User_role_idx".to_string()),
         fields: vec!["role".to_string()],
         tpe: IndexType::Normal,
         defined_on_field: false,
@@ -168,7 +168,7 @@ fn multiple_index_must_work() {
 
     user_model.assert_has_index(IndexDefinition {
         name: None,
-        db_name: Some("User.firstName_lastName_index".to_string()),
+        db_name: Some("User_firstName_lastName_idx".to_string()),
         fields: vec!["firstName".to_string(), "lastName".to_string()],
         tpe: IndexType::Normal,
         defined_on_field: false,

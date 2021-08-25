@@ -1,5 +1,4 @@
 use crate::common::constraint_names::ConstraintNames;
-use crate::common::preview_features::PreviewFeature;
 use crate::common::RelationNames;
 use crate::transform::dml_to_ast::LowerDmlToAst;
 use crate::PreviewFeature::NamedConstraints;

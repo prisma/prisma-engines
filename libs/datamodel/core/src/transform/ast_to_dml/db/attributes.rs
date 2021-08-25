@@ -761,12 +761,17 @@ fn model_unique<'ast>(
 
     let name = get_name_argument(args, ctx);
 
-    let (name, db_name) = {
-        //We do not want to break existing datamodels for client purposes that use the old `@@unique([field], name: "ClientANDdbname")`
-        //Since we still parse the name argument and pass it to the client they will keep working
-        //Migrate will however get a new generated db name for the constraint in that case and try to change the underlying constraint name
-        //We are fine with that since this is not automatically breaking but rather prompts a migration upon the first run on migrate
-        //The client is unaffected by this.
+    let db_name = {
+        // We do not want to break existing datamodels for client purposes that
+        // use the old `@@unique([field], name: "ClientANDdbname")` Since we
+        // still parse the name argument and pass it to the client they will
+        // keep working Migrate will however get a new generated db name for the
+        // constraint in that case and try to change the underlying constraint
+        // name
+        //
+        // We are fine with that since this is not automatically breaking but
+        // rather prompts a migration upon the first run on migrate The client
+        // is unaffected by this.
         let generated_name = ConstraintNames::index_name(
             model_db_name,
             &field_db_names,
@@ -782,7 +787,7 @@ fn model_unique<'ast>(
             ctx.push_error(err);
         }
 
-        (name, db_name)
+        db_name
     };
 
     index_data.name = name;
