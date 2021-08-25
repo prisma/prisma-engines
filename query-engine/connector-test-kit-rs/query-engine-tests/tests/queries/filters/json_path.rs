@@ -92,7 +92,6 @@ mod json_path {
         match runner.connector() {
             // MariaDB does not support finding arrays in arrays, unlike MySQL
             ConnectorTag::MySql(mysql) if mysql.version() == Some(&MySqlVersion::MariaDb) => {
-                dbg!(&mysql);
                 insta::assert_snapshot!(
                     run_query!(
                         runner,
