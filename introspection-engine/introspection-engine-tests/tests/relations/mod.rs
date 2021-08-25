@@ -9,7 +9,7 @@ use indoc::indoc;
 use introspection_engine_tests::test_api::*;
 use test_macros::test_connector;
 
-#[test_connector(exclude(Mssql))]
+#[test_connector(exclude(Mssql, Mysql))]
 async fn one_to_one_req_relation(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
@@ -43,7 +43,7 @@ async fn one_to_one_req_relation(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(exclude(Mssql))]
+#[test_connector(exclude(Mssql, Mysql))]
 async fn one_to_one_relation_on_a_singular_primary_key(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -75,7 +75,7 @@ async fn one_to_one_relation_on_a_singular_primary_key(api: &TestApi) -> TestRes
     Ok(())
 }
 
-#[test_connector(exclude(Mssql))]
+#[test_connector(exclude(Mssql, Mysql))]
 async fn two_one_to_one_relations_between_the_same_models(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
@@ -131,7 +131,7 @@ async fn two_one_to_one_relations_between_the_same_models(api: &TestApi) -> Test
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(exclude(Mysql))]
 async fn a_one_to_one_relation(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -165,7 +165,7 @@ async fn a_one_to_one_relation(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(exclude(Sqlite))]
+#[test_connector(exclude(Sqlite, Mysql))]
 async fn a_one_to_one_relation_referencing_non_id(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -393,7 +393,7 @@ async fn a_self_relation(api: &TestApi) -> TestResult {
 
 // SQLite will always make the primary key autoincrement, which makes no sense
 // to build.
-#[test_connector(exclude(Sqlite, Mssql))]
+#[test_connector(exclude(Sqlite, Mssql, Mysql))]
 async fn id_fields_with_foreign_key(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
@@ -754,7 +754,7 @@ async fn many_to_many_relation_field_names_do_not_conflict_with_themselves(api: 
     Ok(())
 }
 
-#[test_connector(exclude(Sqlite, Mssql), preview_features("NamedConstraints"))]
+#[test_connector(exclude(Sqlite, Mssql, Mysql), preview_features("NamedConstraints"))]
 async fn one_to_one_req_relation_with_custom_fk_name(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {

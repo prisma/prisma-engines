@@ -1,7 +1,5 @@
 use std::io::{self, Read};
 
-use datamodel::common::preview_features::PreviewFeature;
-
 pub fn run() {
     let mut datamodel_string = String::new();
 

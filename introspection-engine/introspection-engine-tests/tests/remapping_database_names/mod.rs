@@ -112,16 +112,27 @@ async fn remapping_tables_with_invalid_characters(api: &TestApi) -> TestResult {
 
 #[test_connector(exclude(Mssql))]
 async fn remapping_models_in_relations(api: &TestApi) -> TestResult {
+    let sql_family = api.sql_family();
+
     api.barrel()
-        .execute(|migration| {
+        .execute(move |migration| {
             migration.create_table("User with Space", |t| {
                 t.add_column("id", types::primary());
             });
 
-            migration.create_table("Post", |t| {
+            migration.create_table("Post", move |t| {
                 t.add_column("id", types::primary());
                 t.add_column("user_id", types::integer());
-                t.add_foreign_key(&["user_id"], "User with Space", &["id"]);
+
+                if sql_family.is_mysql() {
+                    t.inject_custom(
+                        "CONSTRAINT asdf FOREIGN KEY (user_id) REFERENCES `User with Space`(id) ON DELETE RESTRICT ON UPDATE CASCADE",
+                    );
+                } else {
+                    t.inject_custom(
+                        r#"CONSTRAINT asdf FOREIGN KEY (user_id) REFERENCES "User with Space"(id) ON DELETE RESTRICT ON UPDATE CASCADE"#,
+                    );
+                }
 
                 t.add_constraint(
                     "post_user_unique",
@@ -135,7 +146,7 @@ async fn remapping_models_in_relations(api: &TestApi) -> TestResult {
         model Post {
           id              Int             @id @default(autoincrement())
           user_id         Int             @unique
-          User_with_Space User_with_Space @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+          User_with_Space User_with_Space @relation(fields: [user_id], references: [id])
         }
 
         model User_with_Space {
@@ -153,16 +164,28 @@ async fn remapping_models_in_relations(api: &TestApi) -> TestResult {
 
 #[test_connector(exclude(Mssql))]
 async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestApi) -> TestResult {
+    let sql_family = api.sql_family();
+
     api.barrel()
-        .execute(|migration| {
+        .execute(move |migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::primary());
             });
 
-            migration.create_table("Post With Space", |t| {
+            migration.create_table("Post With Space", move |t| {
                 t.add_column("id", types::primary());
                 t.add_column("user_id", types::integer());
-                t.add_foreign_key(&["user_id"], "User", &["id"]);
+
+                if sql_family.is_mysql() {
+                    t.inject_custom(
+                        "CONSTRAINT asdf FOREIGN KEY (user_id) REFERENCES `User`(id) ON DELETE RESTRICT ON UPDATE CASCADE",
+                    );
+                } else {
+                    t.inject_custom(
+                        r#"CONSTRAINT asdf FOREIGN KEY (user_id) REFERENCES "User"(id) ON DELETE RESTRICT ON UPDATE CASCADE"#,
+                    );
+                }
+
 
                 t.add_constraint("post_user_unique", types::unique_constraint(vec!["user_id"]));
             });
@@ -173,7 +196,7 @@ async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestA
         model Post_With_Space {
           id      Int  @id @default(autoincrement())
           user_id Int  @unique
-          User    User @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+          User    User @relation(fields: [user_id], references: [id])
 
           @@map("Post With Space")
         }
@@ -191,6 +214,8 @@ async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestA
 
 #[test_connector(exclude(Sqlite, Mssql))]
 async fn remapping_fields_in_compound_relations(api: &TestApi) -> TestResult {
+    let sql_family = api.sql_family();
+
     api.barrel()
         .execute(move |migration| {
             migration.create_table("User", move |t| {
@@ -208,7 +233,15 @@ async fn remapping_fields_in_compound_relations(api: &TestApi) -> TestResult {
                 t.add_column("user_id", types::integer());
                 t.add_column("user_age", types::integer());
 
-                t.add_foreign_key(&["user_id", "user_age"], "User", &["id", "age-that-is-invalid"]);
+                if sql_family.is_mysql() {
+                    t.inject_custom(
+                        "CONSTRAINT asdf FOREIGN KEY (user_id, user_age) REFERENCES User(id, `age-that-is-invalid`) ON DELETE RESTRICT ON UPDATE CASCADE",
+                    );
+                } else {
+                    t.inject_custom(
+                        r#"CONSTRAINT asdf FOREIGN KEY (user_id, user_age) REFERENCES "User"(id, "age-that-is-invalid") ON DELETE RESTRICT ON UPDATE CASCADE"#,
+                    );
+                }
 
                 t.add_constraint(
                     "post_user_unique",
@@ -223,7 +256,7 @@ async fn remapping_fields_in_compound_relations(api: &TestApi) -> TestResult {
           id       Int  @id @default(autoincrement())
           user_id  Int
           user_age Int
-          User     User @relation(fields: [user_id, user_age], references: [id, age_that_is_invalid], onDelete: NoAction, onUpdate: NoAction)
+          User     User @relation(fields: [user_id, user_age], references: [id, age_that_is_invalid])
 
           @@unique([user_id, user_age], name: "post_user_unique")
         }

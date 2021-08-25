@@ -1,4 +1,5 @@
 mod mssql;
+mod mysql;
 
 use barrel::types;
 use expect_test::expect;
@@ -7,7 +8,7 @@ use introspection_engine_tests::{assert_eq_json, test_api::*, TestResult};
 use serde_json::json;
 use test_macros::test_connector;
 
-#[test_connector(exclude(Mssql))]
+#[test_connector(exclude(Mssql, Mysql))]
 async fn a_table_without_uniques_should_ignore(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {

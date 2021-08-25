@@ -7,7 +7,7 @@ use expect_test::expect;
 use introspection_engine_tests::test_api::*;
 use test_macros::test_connector;
 
-#[test_connector(exclude(Sqlite))]
+#[test_connector(exclude(Sqlite, Mysql))]
 async fn compound_foreign_keys_for_one_to_one_relations(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
@@ -57,7 +57,7 @@ async fn compound_foreign_keys_for_one_to_one_relations(api: &TestApi) -> TestRe
     Ok(())
 }
 
-#[test_connector(exclude(Sqlite, Mssql))]
+#[test_connector(exclude(Sqlite, Mssql, Mysql))]
 async fn compound_foreign_keys_for_required_one_to_one_relations(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {

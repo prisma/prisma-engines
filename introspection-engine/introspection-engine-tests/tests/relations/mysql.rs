@@ -20,8 +20,12 @@ async fn a_many_to_many_relation_with_an_id(api: &TestApi) -> TestResult {
                 t.add_column("user_id", types::integer().nullable(false));
                 t.add_column("post_id", types::integer().nullable(false));
 
-                t.add_foreign_key(&["user_id"], "User", &["id"]);
-                t.add_foreign_key(&["post_id"], "Post", &["id"]);
+                t.inject_custom(
+                    "CONSTRAINT user_id FOREIGN KEY (user_id) REFERENCES `User`(id) ON DELETE RESTRICT ON UPDATE CASCADE",
+                );
+                t.inject_custom(
+                    "CONSTRAINT post_id FOREIGN KEY (post_id) REFERENCES `Post`(id) ON DELETE RESTRICT ON UPDATE CASCADE",
+                );
             });
         })
         .await?;
@@ -36,8 +40,8 @@ async fn a_many_to_many_relation_with_an_id(api: &TestApi) -> TestResult {
           id      Int  @id @default(autoincrement())
           user_id Int
           post_id Int
-          Post    Post @relation(fields: [post_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-          User    User @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+          Post    Post @relation(fields: [post_id], references: [id])
+          User    User @relation(fields: [user_id], references: [id])
 
           @@index([post_id], name: "post_id")
           @@index([user_id], name: "user_id")
@@ -65,7 +69,9 @@ async fn a_one_req_to_many_relation(api: &TestApi) -> TestResult {
             migration.create_table("Post", |t| {
                 t.add_column("id", types::primary());
                 t.add_column("user_id", types::integer().unique(false).nullable(false));
-                t.add_foreign_key(&["user_id"], "User", &["id"]);
+                t.inject_custom(
+                    "CONSTRAINT user_id FOREIGN KEY (user_id) REFERENCES `User`(id) ON DELETE RESTRICT ON UPDATE CASCADE",
+                );
             });
         })
         .await?;
@@ -74,7 +80,7 @@ async fn a_one_req_to_many_relation(api: &TestApi) -> TestResult {
         model Post {
           id      Int  @id @default(autoincrement())
           user_id Int
-          User    User @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+          User    User @relation(fields: [user_id], references: [id])
 
           @@index([user_id], name: "user_id")
         }
@@ -101,7 +107,9 @@ async fn a_one_to_many_relation(api: &TestApi) -> TestResult {
             migration.create_table("Post", |t| {
                 t.add_column("id", types::primary());
                 t.add_column("user_id", types::integer().unique(false).nullable(true));
-                t.add_foreign_key(&["user_id"], "User", &["id"]);
+                t.inject_custom(
+                    "CONSTRAINT user_id FOREIGN KEY (user_id) REFERENCES `User`(id) ON DELETE SET NULL ON UPDATE CASCADE",
+                );
             });
         })
         .await?;
@@ -110,7 +118,7 @@ async fn a_one_to_many_relation(api: &TestApi) -> TestResult {
         model Post {
           id      Int   @id @default(autoincrement())
           user_id Int?
-          User    User? @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+          User    User? @relation(fields: [user_id], references: [id])
 
           @@index([user_id], name: "user_id")
         }
@@ -135,8 +143,12 @@ async fn a_self_relation(api: &TestApi) -> TestResult {
                 t.add_column("recruited_by", types::integer().nullable(true));
                 t.add_column("direct_report", types::integer().nullable(true));
 
-                t.add_foreign_key(&["recruited_by"], "User", &["id"]);
-                t.add_foreign_key(&["direct_report"], "User", &["id"]);
+                t.inject_custom(
+                    "CONSTRAINT recruited_by FOREIGN KEY (recruited_by) REFERENCES `User`(id) ON DELETE SET NULL ON UPDATE CASCADE",
+                );
+                t.inject_custom(
+                    "CONSTRAINT direct_report FOREIGN KEY (direct_report) REFERENCES `User`(id) ON DELETE SET NULL ON UPDATE CASCADE",
+                );
             });
         })
         .await?;
@@ -146,8 +158,8 @@ async fn a_self_relation(api: &TestApi) -> TestResult {
           id                                  Int    @id @default(autoincrement())
           recruited_by                        Int?
           direct_report                       Int?
-          User_UserToUser_direct_report       User?  @relation("UserToUser_direct_report", fields: [direct_report], references: [id], onDelete: NoAction, onUpdate: NoAction)
-          User_UserToUser_recruited_by        User?  @relation("UserToUser_recruited_by", fields: [recruited_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+          User_UserToUser_direct_report       User?  @relation("UserToUser_direct_report", fields: [direct_report], references: [id])
+          User_UserToUser_recruited_by        User?  @relation("UserToUser_recruited_by", fields: [recruited_by], references: [id])
           other_User_UserToUser_direct_report User[] @relation("UserToUser_direct_report")
           other_User_UserToUser_recruited_by  User[] @relation("UserToUser_recruited_by")
 
@@ -161,8 +173,7 @@ async fn a_self_relation(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-// SQLite cannot alter tables to add foreign keys, so skipping the tests.
-#[test_connector(tags(Mysql), exclude(Sqlite))]
+#[test_connector(tags(Mysql))]
 async fn duplicate_fks_should_ignore_one_of_them(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -173,12 +184,10 @@ async fn duplicate_fks_should_ignore_one_of_them(api: &TestApi) -> TestResult {
             migration.create_table("Post", |t| {
                 t.add_column("id", types::primary());
                 t.add_column("user_id", types::integer().nullable(true));
-                t.add_foreign_key(&["user_id"], "User", &["id"]);
+                t.inject_custom(
+                    "CONSTRAINT user_id FOREIGN KEY (user_id) REFERENCES `User`(id) ON DELETE SET NULL ON UPDATE CASCADE",
+                );
             });
-
-            migration.change_table("Post", |t| {
-                t.add_foreign_key(&["user_id"], "User", &["id"]);
-            })
         })
         .await?;
 
@@ -186,7 +195,7 @@ async fn duplicate_fks_should_ignore_one_of_them(api: &TestApi) -> TestResult {
         model Post {
           id      Int   @id @default(autoincrement())
           user_id Int?
-          User    User? @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+          User    User? @relation(fields: [user_id], references: [id])
 
           @@index([user_id], name: "user_id")
         }
@@ -216,7 +225,9 @@ async fn one_to_many_relation_field_names_do_not_conflict_with_many_to_many_rela
                 table.add_column("id", types::primary());
                 table.add_column("host_id", types::integer().nullable(false));
 
-                table.add_foreign_key(&["host_id"], "User", &["id"]);
+                table.inject_custom(
+                    "CONSTRAINT host_id FOREIGN KEY (host_id) REFERENCES `User`(id) ON DELETE RESTRICT ON UPDATE CASCADE",
+                );
             });
 
             migration.create_table("_EventToUser", |table| {
@@ -240,7 +251,7 @@ async fn one_to_many_relation_field_names_do_not_conflict_with_many_to_many_rela
         model Event {
           id                       Int    @id @default(autoincrement())
           host_id                  Int
-          User_Event_host_idToUser User   @relation("Event_host_idToUser", fields: [host_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+          User_Event_host_idToUser User   @relation("Event_host_idToUser", fields: [host_id], references: [id])
           User_EventToUser         User[]
 
           @@index([host_id], name: "host_id")
@@ -270,7 +281,7 @@ async fn relations_should_avoid_name_clashes(api: &TestApi) -> TestResult {
             migration.create_table("x", |t| {
                 t.add_column("id", types::integer().primary(true));
                 t.add_column("y", types::integer().nullable(false));
-                t.add_foreign_key(&["y"], "y", &["id"]);
+                t.inject_custom("CONSTRAINT y FOREIGN KEY (y) REFERENCES `y`(id) ON DELETE RESTRICT ON UPDATE CASCADE");
             });
         })
         .await?;
@@ -279,7 +290,7 @@ async fn relations_should_avoid_name_clashes(api: &TestApi) -> TestResult {
         model x {
           id     Int @id
           y      Int
-          y_xToy y   @relation(fields: [y], references: [id], onDelete: NoAction, onUpdate: NoAction)
+          y_xToy y   @relation(fields: [y], references: [id])
 
           @@index([y], name: "y")
         }
@@ -314,11 +325,15 @@ async fn relations_should_avoid_name_clashes_2(api: &TestApi) -> TestResult {
             });
 
             migration.change_table("x", |t| {
-                t.add_foreign_key(&["y"], "y", &["id"]);
+                t.inject_custom(
+                    "ADD CONSTRAINT y FOREIGN KEY (y) REFERENCES `y`(id) ON DELETE RESTRICT ON UPDATE CASCADE",
+                );
             });
 
             migration.change_table("y", |t| {
-                t.add_foreign_key(&["fk_x_1", "fk_x_2"], "x", &["id", "y"]);
+                t.inject_custom(
+                    "ADD CONSTRAINT fk_x_1 FOREIGN KEY (fk_x_1, fk_x_2) REFERENCES `x`(id, y) ON DELETE RESTRICT ON UPDATE CASCADE",
+                );
             });
         })
         .await?;
@@ -327,7 +342,7 @@ async fn relations_should_avoid_name_clashes_2(api: &TestApi) -> TestResult {
         model x {
           id                   Int @id @default(autoincrement())
           y                    Int
-          y_x_yToy             y   @relation("x_yToy", fields: [y], references: [id], onDelete: NoAction, onUpdate: NoAction)
+          y_x_yToy             y   @relation("x_yToy", fields: [y], references: [id])
           y_xToy_fk_x_1_fk_x_2 y[] @relation("xToy_fk_x_1_fk_x_2")
 
           @@unique([id, y], name: "unique_y_id")
@@ -339,10 +354,282 @@ async fn relations_should_avoid_name_clashes_2(api: &TestApi) -> TestResult {
           x                    Int
           fk_x_1               Int
           fk_x_2               Int
-          x_xToy_fk_x_1_fk_x_2 x   @relation("xToy_fk_x_1_fk_x_2", fields: [fk_x_1, fk_x_2], references: [id, y], onDelete: NoAction, onUpdate: NoAction)
+          x_xToy_fk_x_1_fk_x_2 x   @relation("xToy_fk_x_1_fk_x_2", fields: [fk_x_1, fk_x_2], references: [id, y])
           x_x_yToy             x[] @relation("x_yToy")
 
           @@index([fk_x_1, fk_x_2], name: "fk_x_1")
+        }
+    "#]];
+
+    expected.assert_eq(&api.introspect_dml().await?);
+
+    Ok(())
+}
+
+#[test_connector(tags(Mysql))]
+async fn two_one_to_one_relations_between_the_same_models(api: &TestApi) -> TestResult {
+    let sql_family = api.sql_family();
+
+    api.barrel()
+        .execute(move |migration| {
+            migration.create_table("User", move |t| {
+                t.add_column("id", types::primary());
+                t.add_column("post_id", types::integer().unique(true).nullable(false));
+            });
+
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("user_id", types::integer().unique(true).nullable(false));
+
+                t.inject_custom(
+                    "CONSTRAINT user_id FOREIGN KEY (user_id) REFERENCES `User`(id) ON DELETE RESTRICT ON UPDATE CASCADE",
+                );
+            });
+
+            // Other databases can't create a foreign key before the table
+            // exists, SQLite can, but cannot alter table with a foreign
+            // key.
+            if !sql_family.is_sqlite() {
+                migration.change_table("User", |t| {
+                    t.inject_custom(
+                        "ADD CONSTRAINT post_id FOREIGN KEY (post_id) REFERENCES `Post`(id) ON DELETE RESTRICT ON UPDATE CASCADE",
+                    );
+                })
+            }
+        })
+        .await?;
+
+    let expected = expect![[r#"
+        model Post {
+          id                      Int   @id @default(autoincrement())
+          user_id                 Int   @unique
+          User_Post_user_idToUser User  @relation("Post_user_idToUser", fields: [user_id], references: [id])
+          User_PostToUser_post_id User? @relation("PostToUser_post_id")
+        }
+
+        model User {
+          id                      Int   @id @default(autoincrement())
+          post_id                 Int   @unique
+          Post_PostToUser_post_id Post  @relation("PostToUser_post_id", fields: [post_id], references: [id])
+          Post_Post_user_idToUser Post? @relation("Post_user_idToUser")
+        }
+    "#]];
+
+    expected.assert_eq(&api.introspect_dml().await?);
+
+    Ok(())
+}
+
+#[test_connector(tags(Mysql))]
+async fn a_one_to_one_relation(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+            });
+
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("user_id", types::integer().unique(true).nullable(true));
+                t.inject_custom(
+                    "CONSTRAINT user_id FOREIGN KEY (user_id) REFERENCES `User`(id) ON DELETE SET NULL ON UPDATE CASCADE",
+                );
+            });
+        })
+        .await?;
+
+    let expected = expect![[r#"
+        model Post {
+          id      Int   @id @default(autoincrement())
+          user_id Int?  @unique
+          User    User? @relation(fields: [user_id], references: [id])
+        }
+
+        model User {
+          id   Int   @id @default(autoincrement())
+          Post Post?
+        }
+    "#]];
+
+    expected.assert_eq(&api.introspect_dml().await?);
+
+    Ok(())
+}
+
+#[test_connector(tags(Mysql))]
+async fn a_one_to_one_relation_referencing_non_id(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("email", types::varchar(10).unique(true).nullable(true));
+            });
+
+            migration.create_table("Post", move |t| {
+                t.add_column("id", types::primary());
+                t.add_column("user_email", types::varchar(10).unique(true).nullable(true));
+
+                t.inject_custom(
+                    "CONSTRAINT user_email FOREIGN KEY (user_email) REFERENCES `User`(email) ON DELETE SET NULL ON UPDATE CASCADE",
+                );
+            });
+        })
+        .await?;
+
+    let expected = expect![[r#"
+        model Post {
+          id         Int     @id @default(autoincrement())
+          user_email String? @unique @db.VarChar(10)
+          User       User?   @relation(fields: [user_email], references: [email])
+        }
+
+        model User {
+          id    Int     @id @default(autoincrement())
+          email String? @unique @db.VarChar(10)
+          Post  Post?
+        }
+    "#]];
+
+    expected.assert_eq(&api.introspect_dml().await?);
+
+    Ok(())
+}
+
+// SQLite will always make the primary key autoincrement, which makes no sense
+// to build.
+#[test_connector(tags(Mysql))]
+async fn id_fields_with_foreign_key(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(move |migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("Post", move |t| {
+                t.add_column("user_id", types::integer().primary(true));
+                t.inject_custom(
+                    "CONSTRAINT user_id FOREIGN KEY (user_id) REFERENCES `User`(id) ON DELETE RESTRICT ON UPDATE CASCADE",
+                );
+            });
+        })
+        .await?;
+
+    let expected = expect![[r#"
+        model Post {
+          user_id Int  @id
+          User    User @relation(fields: [user_id], references: [id])
+        }
+
+        model User {
+          id   Int   @id @default(autoincrement())
+          Post Post?
+        }
+    "#]];
+
+    expected.assert_eq(&api.introspect_dml().await?);
+
+    Ok(())
+}
+
+#[test_connector(tags(Mysql), preview_features("NamedConstraints"))]
+async fn one_to_one_req_relation_with_custom_fk_name(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(move |migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
+            });
+
+            migration.create_table("Post", move |t| {
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
+                t.add_column("user_id", types::integer().nullable(false));
+                t.add_index("Post_user_id_key", types::index(&["user_id"]).unique(true));
+                t.inject_custom(
+                    "CONSTRAINT CustomFKName FOREIGN KEY (user_id) REFERENCES `User`(id) ON DELETE RESTRICT ON UPDATE CASCADE",
+                );
+            });
+        })
+        .await?;
+
+    let expected = expect![[r#"
+        model Post {
+          id      Int  @id @default(autoincrement())
+          user_id Int  @unique
+          User    User @relation(fields: [user_id], references: [id], map: "CustomFKName")
+        }
+
+        model User {
+          id   Int   @id @default(autoincrement())
+          Post Post?
+        }
+    "#]];
+
+    expected.assert_eq(&api.introspect_dml().await?);
+
+    Ok(())
+}
+#[test_connector(tags(Mysql))]
+async fn one_to_one_req_relation(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(move |migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+            });
+
+            migration.create_table("Post", move |t| {
+                t.add_column("id", types::primary());
+                t.add_column("user_id", types::integer().nullable(false).unique(true));
+                t.inject_custom(
+                    "CONSTRAINT user_id FOREIGN KEY (user_id) REFERENCES `User`(id) ON DELETE RESTRICT ON UPDATE CASCADE",
+                );
+            });
+        })
+        .await?;
+
+    let expected = expect![[r#"
+        model Post {
+          id      Int  @id @default(autoincrement())
+          user_id Int  @unique
+          User    User @relation(fields: [user_id], references: [id])
+        }
+
+        model User {
+          id   Int   @id @default(autoincrement())
+          Post Post?
+        }
+    "#]];
+
+    expected.assert_eq(&api.introspect_dml().await?);
+
+    Ok(())
+}
+
+#[test_connector(tags(Mysql))]
+async fn one_to_one_relation_on_a_singular_primary_key(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+            });
+
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::integer().nullable(false).unique(true));
+                t.inject_custom(
+                    "CONSTRAINT id FOREIGN KEY (id) REFERENCES `User`(id) ON DELETE RESTRICT ON UPDATE CASCADE",
+                );
+            });
+        })
+        .await?;
+
+    let expected = expect![[r#"
+        model Post {
+          id   Int  @unique
+          User User @relation(fields: [id], references: [id])
+        }
+
+        model User {
+          id   Int   @id @default(autoincrement())
+          Post Post?
         }
     "#]];
 

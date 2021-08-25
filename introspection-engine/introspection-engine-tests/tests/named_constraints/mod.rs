@@ -1,4 +1,5 @@
 mod mssql;
+mod mysql;
 mod sqlite;
 
 use barrel::types;
@@ -233,7 +234,7 @@ async fn introspecting_default_index_names_works(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(preview_features("NamedConstraints"), exclude(Mssql))]
+#[test_connector(preview_features("NamedConstraints"), exclude(Mssql, Mysql))]
 async fn introspecting_default_fk_names_works(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
@@ -275,7 +276,7 @@ async fn introspecting_default_fk_names_works(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(preview_features("NamedConstraints"), exclude(Sqlite, Mssql))]
+#[test_connector(preview_features("NamedConstraints"), exclude(Sqlite, Mssql, Mysql))]
 async fn introspecting_custom_fk_names_works(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
