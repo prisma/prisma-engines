@@ -232,13 +232,17 @@ mod json_lists {
         )
         .await?;
 
+        list_query(&runner, "json", "equals", r#"["null", "{}", "\"test\""]"#, Some(3)).await?;
+
         Ok(())
     }
 
     #[connector_test]
     async fn has(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
+
         list_query(&runner, "json", "has", r#""[1, 2, 3]""#, Some(1)).await?;
+        list_query(&runner, "json", "has", r#""null""#, Some(3)).await?;
 
         Ok(())
     }
@@ -246,7 +250,9 @@ mod json_lists {
     #[connector_test]
     async fn has_some(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
+
         list_query(&runner, "json", "hasSome", r#"["{}", "[1]"]"#, Some(1)).await?;
+        list_query(&runner, "json", "hasSome", r#"[null, "[1]"]"#, Some(3)).await?;
 
         Ok(())
     }
@@ -257,6 +263,7 @@ mod json_lists {
 
         list_query(&runner, "json", "hasEvery", r#"["{}", "[1]"]"#, None).await?;
         list_query(&runner, "json", "hasEvery", r#"["{}"]"#, Some(1)).await?;
+        list_query(&runner, "json", "hasEvery", r#"[null]"#, Some(3)).await?;
 
         Ok(())
     }
@@ -290,6 +297,18 @@ mod json_lists {
                 createOneTestModel(data: {
                   id:   2,
                   json: []
+                }) { id }
+            }
+            "#})
+            .await?
+            .assert_success();
+
+        runner
+            .query(indoc! { r#"
+              mutation {
+                createOneTestModel(data: {
+                  id:   3,
+                  json: ["null", "{}", "\"test\""]
                 }) { id }
             }
             "#})

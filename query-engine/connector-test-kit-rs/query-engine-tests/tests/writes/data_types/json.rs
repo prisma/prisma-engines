@@ -1,8 +1,10 @@
-use indoc::indoc;
 use query_engine_tests::*;
 
 #[test_suite(schema(schema))]
 mod json {
+    use indoc::indoc;
+    use query_engine_tests::run_query;
+
     fn schema() -> String {
         let schema = indoc! {
             r#"model Model {
@@ -69,7 +71,7 @@ mod json {
             updateOneModel(
               where: { id: "A" }
               data: {
-                field: null
+                field: DbNull
               }
             ) {
               field

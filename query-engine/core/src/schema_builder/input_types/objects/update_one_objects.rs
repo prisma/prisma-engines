@@ -165,20 +165,25 @@ fn non_list_scalar_update_field_mapper(
         TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
     };
 
-    if field.type_identifier != TypeIdentifier::Json {
-        let types = vec![map_scalar_input_type_for_field(ctx, field), base_update_type];
+    let has_adv_json = ctx.has_capability(ConnectorCapability::AdvancedJsonNullability);
+    match &field.type_identifier {
+        TypeIdentifier::Json if has_adv_json => {
+            let enum_type = json_null_input_enum(!field.is_required);
+            let input_field = input_field(
+                field.name.clone(),
+                vec![InputType::Enum(enum_type), base_update_type],
+                default,
+            );
 
-        let input_field = input_field(field.name.clone(), types, default);
-        input_field.optional().nullable_if(!field.is_required)
-    } else {
-        let enum_type = json_null_input_enum(!field.is_required);
-        let input_field = input_field(
-            field.name.clone(),
-            vec![InputType::Enum(enum_type), base_update_type],
-            default,
-        );
+            input_field.optional()
+        }
 
-        input_field.optional()
+        _ => {
+            let types = vec![map_scalar_input_type_for_field(ctx, field), base_update_type];
+
+            let input_field = input_field(field.name.clone(), types, default);
+            input_field.optional().nullable_if(!field.is_required)
+        }
     }
 }
 

@@ -171,12 +171,12 @@ fn full_scalar_filter_type(
                 && (ctx.capabilities.contains(ConnectorCapability::JsonFilteringJsonPath)
                     || ctx.capabilities.contains(ConnectorCapability::JsonFilteringArrayPath))
             {
-                json_equality_filters(mapped_scalar_type.clone())
+                json_equality_filters(ctx, mapped_scalar_type.clone())
                     .chain(alphanumeric_filters(mapped_scalar_type.clone()))
                     .chain(json_filters(ctx))
                     .collect()
             } else {
-                json_equality_filters(mapped_scalar_type.clone()).collect()
+                json_equality_filters(ctx, mapped_scalar_type.clone()).collect()
             }
         }
 
@@ -191,33 +191,14 @@ fn full_scalar_filter_type(
         TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
     };
 
-    // Shorthand `not equals` filter, skips the nested object filter.
-    let not_field = if typ == &TypeIdentifier::Json {
-        // Json is never nullable, only by proxy through an enum.
-        let enum_type = json_null_filter_enum();
-        input_field(
-            filters::NOT_LOWERCASE,
-            vec![InputType::Enum(enum_type), mapped_scalar_type],
-            None,
-        )
-        .optional()
-    } else {
-        // Full nested filter. Only available on non-JSON fields.
-        let shorthand = InputType::object(full_scalar_filter_type(
-            ctx,
-            typ,
-            list,
-            nullable,
-            true,
-            include_aggregates,
-        ));
-
-        input_field(filters::NOT_LOWERCASE, vec![mapped_scalar_type, shorthand], None)
-            .optional()
-            .nullable_if(nullable)
-    };
-
-    fields.push(not_field);
+    fields.push(not_filter_field(
+        ctx,
+        typ,
+        mapped_scalar_type,
+        nullable,
+        include_aggregates,
+        list,
+    ));
 
     if include_aggregates {
         fields.push(aggregate_filter_field(
@@ -309,15 +290,22 @@ fn full_scalar_filter_type(
 }
 
 fn equality_filters(mapped_type: InputType, nullable: bool) -> impl Iterator<Item = InputField> {
-    vec![input_field(filters::EQUALS, mapped_type, None)
-        .optional()
-        .nullable_if(nullable)]
-    .into_iter()
+    std::iter::once(
+        input_field(filters::EQUALS, mapped_type, None)
+            .optional()
+            .nullable_if(nullable),
+    )
 }
 
-fn json_equality_filters(mapped_type: InputType) -> impl Iterator<Item = InputField> {
-    let enum_type = json_null_filter_enum();
-    std::iter::once(input_field(filters::EQUALS, vec![InputType::Enum(enum_type), mapped_type], None).optional())
+fn json_equality_filters(ctx: &BuilderContext, mapped_type: InputType) -> impl Iterator<Item = InputField> {
+    let field = if ctx.has_capability(ConnectorCapability::AdvancedJsonNullability) {
+        let enum_type = json_null_filter_enum();
+        input_field(filters::EQUALS, vec![InputType::Enum(enum_type), mapped_type], None).optional()
+    } else {
+        input_field(filters::EQUALS, vec![mapped_type], None).optional()
+    };
+
+    std::iter::once(field)
 }
 
 fn json_null_filter_enum() -> EnumTypeRef {
@@ -460,5 +448,51 @@ fn map_avg_type_ident(typ: TypeIdentifier) -> TypeIdentifier {
     match &typ {
         TypeIdentifier::Int | TypeIdentifier::BigInt | TypeIdentifier::Float => TypeIdentifier::Float,
         _ => typ,
+    }
+}
+
+// Shorthand `not equals` filter input field, skips the nested object filter.
+fn not_filter_field(
+    ctx: &mut BuilderContext,
+    typ: &TypeIdentifier,
+    mapped_scalar_type: InputType,
+    is_nullable: bool,
+    include_aggregates: bool,
+    is_list: bool,
+) -> InputField {
+    let has_adv_json = ctx.has_capability(ConnectorCapability::AdvancedJsonNullability);
+
+    match typ {
+        // Json is not nullable on dbs with `AdvancedJsonNullability`, only by proxy through an enum.
+        TypeIdentifier::Json if has_adv_json => {
+            let enum_type = json_null_filter_enum();
+
+            input_field(
+                filters::NOT_LOWERCASE,
+                vec![InputType::Enum(enum_type), mapped_scalar_type],
+                None,
+            )
+            .optional()
+        }
+
+        TypeIdentifier::Json => input_field(filters::NOT_LOWERCASE, vec![mapped_scalar_type], None)
+            .optional()
+            .nullable_if(is_nullable),
+
+        _ => {
+            // Full nested filter. Only available on non-JSON fields.
+            let shorthand = InputType::object(full_scalar_filter_type(
+                ctx,
+                typ,
+                is_list,
+                is_nullable,
+                true,
+                include_aggregates,
+            ));
+
+            input_field(filters::NOT_LOWERCASE, vec![mapped_scalar_type, shorthand], None)
+                .optional()
+                .nullable_if(is_nullable)
+        }
     }
 }

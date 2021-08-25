@@ -4,3 +4,4 @@ mod datetime;
 mod decimal;
 mod native_types;
 mod scalar_lists;
+mod json;

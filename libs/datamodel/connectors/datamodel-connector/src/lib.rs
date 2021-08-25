@@ -259,7 +259,8 @@ capabilities!(
     CompoundIds,
     AnyId, // Any (or combination of) uniques and not only id fields can constitute an id for a model.
     QueryRaw,
-    FullTextSearchWithoutIndex
+    FullTextSearchWithoutIndex,
+    AdvancedJsonNullability, // Database distinguishes between their null type and JSON null.
 );
 
 /// Contains all capabilities that the connector is able to serve.

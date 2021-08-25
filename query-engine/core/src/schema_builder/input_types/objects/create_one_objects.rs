@@ -269,15 +269,18 @@ pub(crate) fn field_create_input(
     default: Option<DefaultValue>,
 ) -> InputField {
     let typ = map_scalar_input_type_for_field(ctx, &f);
+    let has_adv_json = ctx.has_capability(ConnectorCapability::AdvancedJsonNullability);
 
-    if &f.type_identifier == &TypeIdentifier::Json {
-        let enum_type = json_null_input_enum(!f.is_required);
+    match &f.type_identifier {
+        TypeIdentifier::Json if has_adv_json => {
+            let enum_type = json_null_input_enum(!f.is_required);
 
-        input_field(f.name.clone(), vec![InputType::Enum(enum_type), typ], default)
+            input_field(f.name.clone(), vec![InputType::Enum(enum_type), typ], default)
+                .optional_if(!f.is_required || f.default_value.is_some() || f.is_created_at() || f.is_updated_at())
+        }
+
+        _ => input_field(f.name.clone(), typ, default)
             .optional_if(!f.is_required || f.default_value.is_some() || f.is_created_at() || f.is_updated_at())
-    } else {
-        input_field(f.name.clone(), typ, default)
-            .optional_if(!f.is_required || f.default_value.is_some() || f.is_created_at() || f.is_updated_at())
-            .nullable_if(!f.is_required)
+            .nullable_if(!f.is_required),
     }
 }
