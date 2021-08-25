@@ -70,7 +70,6 @@ pub static GENERATOR: Lazy<FeatureMap> = Lazy::new(|| {
         .with_active(vec![
             OrderByRelation,
             NApi,
-            OrderByAggregateGroup,
             FilterJson,
             PlanetScaleMode,
             ReferentialActions,
@@ -92,6 +91,7 @@ pub static GENERATOR: Lazy<FeatureMap> = Lazy::new(|| {
             CreateMany,
             MicrosoftSqlServer,
             SelectRelationCount,
+            OrderByAggregateGroup,
         ])
 });
 
