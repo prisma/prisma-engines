@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schema))]
+#[test_suite(capabilities(Json), schema(schema))]
 mod json {
     use indoc::indoc;
     use query_engine_tests::run_query;
@@ -37,7 +37,7 @@ mod json {
     }
 
     // "Using a json field" should "work"
-    #[connector_test]
+    #[connector_test(exclude(MySql(5.6)))]
     async fn using_json_field(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
@@ -64,20 +64,6 @@ mod json {
             }
           }"#),
           @r###"{"data":{"updateOneModel":{"field":"{\"a\":\"b\"}"}}}"###
-        );
-
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation {
-            updateOneModel(
-              where: { id: "A" }
-              data: {
-                field: DbNull
-              }
-            ) {
-              field
-            }
-          }"#),
-          @r###"{"data":{"updateOneModel":{"field":null}}}"###
         );
 
         Ok(())
