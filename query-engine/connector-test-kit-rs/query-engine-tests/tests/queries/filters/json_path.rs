@@ -2,7 +2,7 @@ use query_engine_tests::*;
 
 #[test_suite(schema(schemas::json), only(Postgres, MySql(5.7, 8, "mariadb")))]
 mod json_path {
-    use query_engine_tests::{assert_error, run_query, ConnectorTag, ConnectorTagInterface, Runner};
+    use query_engine_tests::{assert_error, run_query, ConnectorTag, MySqlVersion, Runner};
 
     #[connector_test]
     async fn no_path_without_filter(runner: Runner) -> TestResult<()> {
@@ -91,9 +91,7 @@ mod json_path {
 
         match runner.connector() {
             // MariaDB does not support finding arrays in arrays, unlike MySQL
-            ConnectorTag::MySql(mysql)
-                if mysql.as_parse_pair() == ("mysql".to_string(), Some("mariadb".to_string())) =>
-            {
+            ConnectorTag::MySql(mysql) if mysql.version() == Some(&MySqlVersion::MariaDb) => {
                 dbg!(&mysql);
                 insta::assert_snapshot!(
                     run_query!(
