@@ -69,22 +69,17 @@ impl<'a> LowerDmlToAst<'a> {
         // @id
         if let dml::Field::ScalarField(sf) = field {
             if model.field_is_primary_and_defined_on_field(&sf.name) {
-                let mut args = vec![];
-                if self.preview_features.contains(NamedConstraints) {
-                    let pk = model.primary_key.as_ref().unwrap();
-                    if pk.db_name.is_some() {
-                        if let Some(src) = self.datasource {
-                            if !ConstraintNames::primary_key_name_matches(pk, model, &*src.active_connector) {
-                                args.push(ast::Argument::new(
-                                    "map",
-                                    ast::Expression::StringValue(
-                                        String::from(pk.db_name.as_ref().unwrap()),
-                                        Span::empty(),
-                                    ),
-                                ));
-                            }
-                        };
-                    }
+                let mut args = Vec::new();
+                let pk = model.primary_key.as_ref().unwrap();
+                if pk.db_name.is_some() {
+                    if let Some(src) = self.datasource {
+                        if !ConstraintNames::primary_key_name_matches(pk, model, &*src.active_connector) {
+                            args.push(ast::Argument::new(
+                                "map",
+                                ast::Expression::StringValue(String::from(pk.db_name.as_ref().unwrap()), Span::empty()),
+                            ));
+                        }
+                    };
                 }
 
                 attributes.push(ast::Attribute::new("id", args));
@@ -94,16 +89,14 @@ impl<'a> LowerDmlToAst<'a> {
         // @unique
         if let dml::Field::ScalarField(sf) = field {
             if model.field_is_unique_and_defined_on_field(&sf.name) {
-                let mut arguments = vec![];
-                if self.preview_features.contains(NamedConstraints) {
-                    if let Some(idx) = model
-                        .indices
-                        .iter()
-                        .find(|id| id.is_unique() && id.defined_on_field && id.fields == [field.name()])
-                    {
-                        self.push_index_map_argument(model, idx, &mut arguments)
-                    }
-                };
+                let mut arguments = Vec::new();
+                if let Some(idx) = model
+                    .indices
+                    .iter()
+                    .find(|id| id.is_unique() && id.defined_on_field && id.fields == [field.name()])
+                {
+                    self.push_index_map_argument(model, idx, &mut arguments)
+                }
 
                 attributes.push(ast::Attribute::new("unique", arguments));
             }
@@ -116,18 +109,16 @@ impl<'a> LowerDmlToAst<'a> {
                 LowerDmlToAst::<'a>::lower_default_value(default_value.clone()),
             )];
 
-            if self.preview_features.contains(PreviewFeature::NamedConstraints) {
-                let connector = self
-                    .datasource
-                    .map(|source| source.active_connector.as_ref())
-                    .unwrap_or(&EmptyDatamodelConnector as &dyn Connector);
+            let connector = self
+                .datasource
+                .map(|source| source.active_connector.as_ref())
+                .unwrap_or(&EmptyDatamodelConnector as &dyn Connector);
 
-                let prisma_default = ConstraintNames::default_name(model.name(), field.name(), connector);
+            let prisma_default = ConstraintNames::default_name(model.name(), field.name(), connector);
 
-                if let Some(name) = default_value.db_name() {
-                    if name != prisma_default {
-                        args.push(ast::Argument::new("map", Self::lower_string(name)))
-                    }
+            if let Some(name) = default_value.db_name() {
+                if name != prisma_default {
+                    args.push(ast::Argument::new("map", Self::lower_string(name)))
                 }
             }
 

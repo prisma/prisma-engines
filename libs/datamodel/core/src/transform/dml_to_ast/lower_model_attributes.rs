@@ -1,7 +1,6 @@
 use crate::ast::{Argument, Attribute};
 use crate::common::constraint_names::ConstraintNames;
 use crate::transform::dml_to_ast::LowerDmlToAst;
-use crate::PreviewFeature::NamedConstraints;
 use crate::{
     ast::{self, Span},
     dml, Ignorable, IndexDefinition, IndexType, Model, WithDatabaseName,
@@ -17,28 +16,24 @@ impl<'a> LowerDmlToAst<'a> {
         if let Some(pk) = &model.primary_key {
             if !pk.defined_on_field {
                 let mut args = vec![ast::Argument::new_array("", LowerDmlToAst::field_array(&pk.fields))];
-                if self.preview_features.contains(NamedConstraints) {
-                    if pk.name.is_some() {
-                        args.push(ast::Argument::new(
-                            "name",
-                            ast::Expression::StringValue(String::from(pk.name.as_ref().unwrap()), Span::empty()),
-                        ));
-                    }
 
-                    if pk.db_name.is_some() {
-                        if let Some(src) = self.datasource {
-                            if !ConstraintNames::primary_key_name_matches(pk, model, &*src.active_connector) {
-                                args.push(ast::Argument::new(
-                                    "map",
-                                    ast::Expression::StringValue(
-                                        String::from(pk.db_name.as_ref().unwrap()),
-                                        Span::empty(),
-                                    ),
-                                ));
-                            }
+                if pk.name.is_some() {
+                    args.push(ast::Argument::new(
+                        "name",
+                        ast::Expression::StringValue(String::from(pk.name.as_ref().unwrap()), Span::empty()),
+                    ));
+                }
+
+                if pk.db_name.is_some() {
+                    if let Some(src) = self.datasource {
+                        if !ConstraintNames::primary_key_name_matches(pk, model, &*src.active_connector) {
+                            args.push(ast::Argument::new(
+                                "map",
+                                ast::Expression::StringValue(String::from(pk.db_name.as_ref().unwrap()), Span::empty()),
+                            ));
                         }
                     }
-                };
+                }
 
                 attributes.push(ast::Attribute::new("id", args));
             }
@@ -55,15 +50,11 @@ impl<'a> LowerDmlToAst<'a> {
                     LowerDmlToAst::field_array(&index_def.fields),
                 )];
 
-                if self.preview_features.contains(NamedConstraints) {
-                    if let Some(name) = &index_def.name {
-                        args.push(ast::Argument::new_string("name", name));
-                    }
-
-                    self.push_index_map_argument(model, index_def, &mut args)
-                } else if let Some(name) = &index_def.name {
+                if let Some(name) = &index_def.name {
                     args.push(ast::Argument::new_string("name", name));
-                };
+                }
+
+                self.push_index_map_argument(model, index_def, &mut args);
 
                 attributes.push(ast::Attribute::new("unique", args));
             });
@@ -79,11 +70,7 @@ impl<'a> LowerDmlToAst<'a> {
                     LowerDmlToAst::field_array(&index_def.fields),
                 )];
 
-                if self.preview_features.contains(NamedConstraints) {
-                    self.push_index_map_argument(model, index_def, &mut args)
-                } else if let Some(name) = &index_def.name {
-                    args.push(ast::Argument::new_string("name", name));
-                }
+                self.push_index_map_argument(model, index_def, &mut args);
 
                 attributes.push(ast::Attribute::new("index", args));
             });

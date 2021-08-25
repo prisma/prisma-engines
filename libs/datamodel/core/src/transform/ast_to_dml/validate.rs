@@ -9,7 +9,6 @@ use crate::{
     configuration,
     diagnostics::{DatamodelError, Diagnostics},
     dml,
-    PreviewFeature::NamedConstraints,
 };
 use datamodel_connector::ConnectorCapability;
 use enumflags2::BitFlags;
@@ -47,19 +46,17 @@ impl<'a> Validator<'a> {
 
             //doing this here for now since I want to have all field names already generated
             // it might be possible to move this
-            if self.preview_features.contains(NamedConstraints) {
-                if let Some(pk) = &model.primary_key {
-                    if let Some(name) = &pk.name {
-                        for field in model.fields() {
-                            if let Some(err) = ConstraintNames::client_name_already_in_use(
-                                name,
-                                field.name(),
-                                &model.name,
-                                ast_model.span,
-                                "@@id",
-                            ) {
-                                diagnostics.push_error(err);
-                            }
+            if let Some(pk) = &model.primary_key {
+                if let Some(name) = &pk.name {
+                    for field in model.fields() {
+                        if let Some(err) = ConstraintNames::client_name_already_in_use(
+                            name,
+                            field.name(),
+                            &model.name,
+                            ast_model.span,
+                            "@@id",
+                        ) {
+                            diagnostics.push_error(err);
                         }
                     }
                 }
@@ -111,7 +108,7 @@ impl<'a> Validator<'a> {
         schema: &dml::Datamodel,
         diagnostics: &mut Diagnostics,
     ) {
-        let constraint_names = NamesValidator::new(schema, self.preview_features, self.source);
+        let constraint_names = NamesValidator::new(schema, self.source);
 
         for model in schema.models() {
             let ast_model = ast_schema.find_model(&model.name).expect(STATE_ERROR);

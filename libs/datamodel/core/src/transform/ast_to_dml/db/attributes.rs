@@ -8,7 +8,6 @@ use super::{
 };
 use crate::ast::{FieldId, Model, ModelId};
 use crate::common::constraint_names::ConstraintNames;
-use crate::PreviewFeature::NamedConstraints;
 
 use crate::{
     ast::{self, WithName},
@@ -234,17 +233,9 @@ fn visit_scalar_field_attributes<'ast>(
                     ast_model.span,
                 )),
                 None => {
-                    let db_name = if ctx.db.preview_features.contains(NamedConstraints) {
+                    let db_name =
                         primary_key_constraint_name(ast_model, model_data, args,  "@id", ctx)
-                    } else {
-                        ctx.is_sql_server().then(|| {
-                            Cow::from(format!(
-                                "PK__{}__{}",
-                                &ast_model.name(),
-                                scalar_field_data.mapped_name.unwrap_or_else(|| ast_field.name())
-                            ))
-                        })
-                    };
+                    ;
 
                     model_data.primary_key = Some(PrimaryKeyData{
                         name: None,
@@ -296,7 +287,7 @@ fn visit_scalar_field_attributes<'ast>(
              let model_db_name = model_data.mapped_name.unwrap_or(&ast_model.name.name);
              let field_db_name = scalar_field_data.mapped_name.unwrap_or(&ast_field.name.name);
 
-             let db_name : Option<Cow<'ast, str>> = if ctx.db.preview_features.contains(NamedConstraints) {
+             let db_name : Option<Cow<'ast, str>> = {
 
                  let generated_name = ConstraintNames::index_name(model_db_name, &[field_db_name], IndexType::Unique, ctx.db.active_connector());
                  let db_name = get_map_argument(args,  generated_name,ctx);
@@ -304,14 +295,6 @@ fn visit_scalar_field_attributes<'ast>(
 
                  db_name
 
-             } else {
-                 let generated_name = if ctx.is_sql_server() {
-                     format!("{}_{}_unique", model_db_name, field_db_name)
-                 } else {
-                     format!("{}.{}_unique", model_db_name, field_db_name)
-                 };
-
-                 Some(Cow::from(generated_name))
              };
 
             model_data.indexes.push((args.attribute(), IndexData {
@@ -365,10 +348,6 @@ fn default_value_constraint_name<'ast>(
     field_data: &ScalarField<'ast>,
     ctx: &mut Context<'ast>,
 ) -> Option<String> {
-    if !ctx.db.preview_features.contains(NamedConstraints) {
-        return None;
-    }
-
     let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
         Some(Ok("")) => error_on_empty_string_cow(args, ctx),
         Some(Ok(name)) => Some(name.into()),
@@ -661,7 +640,7 @@ fn visit_model_id<'ast>(
         ))
     }
 
-    let (name, db_name) = if ctx.db.preview_features.contains(NamedConstraints) {
+    let (name, db_name) = {
         let db_name = primary_key_constraint_name(ast_model, model_data, args, "@@id", ctx);
         let name = get_name_argument(args, ctx);
         if let Some(err) = ConstraintNames::is_client_name_valid(args.span(), &ast_model.name.name, name, "@@id") {
@@ -669,17 +648,6 @@ fn visit_model_id<'ast>(
         }
 
         (name, db_name)
-    } else {
-        let db_name = ctx.is_sql_server().then(|| {
-            format!(
-                "PK__{}__{}",
-                &ast_model.name(),
-                get_field_db_names(model_id, &resolved_fields, ctx).iter().join("_")
-            )
-            .into()
-        });
-
-        (None, db_name)
     };
 
     model_data.primary_key = Some(PrimaryKeyData {
@@ -730,7 +698,7 @@ fn model_index<'ast>(
     let field_db_names = get_field_db_names(model_id, &index_data.fields, ctx);
     let name = get_name_argument(args, ctx);
 
-    let (name, db_name) = if ctx.db.preview_features.contains(NamedConstraints) {
+    let (name, db_name) = {
         let generated_name = ConstraintNames::index_name(
             model_db_name,
             &field_db_names,
@@ -762,17 +730,6 @@ fn model_index<'ast>(
         };
 
         (None, db_name)
-    } else {
-        //old default name logic moved from sql schema calculator
-        let separator = if ctx.is_sql_server() { "_" } else { "." };
-        let generated_name = format!(
-            "{table}{separator}{fields}_index",
-            table = &model_db_name,
-            separator = separator,
-            fields = field_db_names.join("_")
-        );
-
-        (None, name.map(|f| f.into()).or_else(|| Some(generated_name.into())))
     };
 
     index_data.name = name;
@@ -801,7 +758,7 @@ fn model_unique<'ast>(
 
     let name = get_name_argument(args, ctx);
 
-    let (name, db_name) = if ctx.db.preview_features.contains(NamedConstraints) {
+    let (name, db_name) = {
         //We do not want to break existing datamodels for client purposes that use the old `@@unique([field], name: "ClientANDdbname")`
         //Since we still parse the name argument and pass it to the client they will keep working
         //Migrate will however get a new generated db name for the constraint in that case and try to change the underlying constraint name
@@ -823,18 +780,6 @@ fn model_unique<'ast>(
         }
 
         (name, db_name)
-    } else {
-        //old default name logic moved from sql schema calculator
-        let separator = if ctx.is_sql_server() { "_" } else { "." };
-
-        let generated_name = format!(
-            "{table}{separator}{fields}_unique",
-            table = &model_db_name,
-            separator = separator,
-            fields = field_db_names.join("_")
-        );
-
-        (name, name.map(|f| f.into()).or_else(|| Some(generated_name.into())))
     };
 
     index_data.name = name;
@@ -1008,7 +953,7 @@ fn visit_relation<'ast>(
         }
     }
 
-    let fk_name = if ctx.db.preview_features.contains(NamedConstraints) {
+    let fk_name = {
         let ast_model = &ctx.db.ast[model_id];
         //TODO(matthias) when is relationfield.fields populated exactly ????
         let generated_name = if let Some(fields) = &relation_field.fields {
@@ -1040,8 +985,6 @@ fn visit_relation<'ast>(
         validate_db_name(ast_model, args, &db_name, "@relation", ctx);
 
         db_name
-    } else {
-        None
     };
 
     relation_field.fk_name = fk_name;
