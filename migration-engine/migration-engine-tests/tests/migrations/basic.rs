@@ -287,14 +287,9 @@ fn updating_db_name_of_a_scalar_field_must_work(api: TestApi) {
     });
 }
 
-#[test_connector(preview_features("referentialActions"))]
+#[test_connector]
 fn reordering_and_altering_models_at_the_same_time_works(api: TestApi) {
     let dm1 = r#"
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model A {
             id Int @id
             name Int @unique
@@ -320,11 +315,6 @@ fn reordering_and_altering_models_at_the_same_time_works(api: TestApi) {
     api.schema_push_w_datasource(dm1).send().assert_green_bang();
 
     let dm2 = r#"
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model C {
             id Int @id
             a A @relation(name: "ctoa2", fields: [name], references: [name], onUpdate: NoAction)

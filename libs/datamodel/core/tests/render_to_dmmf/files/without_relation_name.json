@@ -89,7 +89,6 @@
           "relationToFields": [
             "id"
           ],
-          "relationOnDelete": "Cascade",
           "isGenerated": false,
           "isUpdatedAt": false
         }

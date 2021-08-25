@@ -136,11 +136,6 @@ fn relations_to_models_with_no_pk_and_a_single_unique_required_field_work(api: T
 fn reserved_sql_keywords_must_work(api: TestApi) {
     // Group is a reserved keyword
     let dm = r#"
-        generator js {
-           provider        = "prisma-client-js"
-           previewFeatures = ["referentialActions"]
-        }
-
         model Group {
             id          String  @id @default(cuid())
             parent_id   String?
@@ -411,11 +406,6 @@ fn indexes_on_composite_relation_fields(api: TestApi) {
 #[test_connector]
 fn dropping_mutually_referencing_tables_works(api: TestApi) {
     let dm1 = r#"
-    generator js {
-        provider        = "prisma-client-js"
-        previewFeatures = ["referentialActions"]
-    }
-
     model A {
         id Int @id
         b_id Int
