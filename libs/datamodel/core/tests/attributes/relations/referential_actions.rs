@@ -633,7 +633,7 @@ fn sql_server_cascading_on_delete_self_relations() {
 
         generator client {
             provider = "prisma-client-js"
-            previewFeatures = ["referentialActions", "microsoftSqlServer"]
+            previewFeatures = ["referentialActions"]
         }
 
         model A {
@@ -675,7 +675,7 @@ fn sql_server_cascading_on_update_self_relations() {
 
         generator client {
             provider = "prisma-client-js"
-            previewFeatures = ["referentialActions", "microsoftSqlServer"]
+            previewFeatures = ["referentialActions"]
         }
 
         model A {
@@ -717,7 +717,7 @@ fn sql_server_null_setting_on_delete_self_relations() {
 
         generator client {
             provider = "prisma-client-js"
-            previewFeatures = ["referentialActions", "microsoftSqlServer"]
+            previewFeatures = ["referentialActions"]
         }
 
         model A {
@@ -759,7 +759,7 @@ fn sql_server_null_setting_on_update_self_relations() {
 
         generator client {
             provider = "prisma-client-js"
-            previewFeatures = ["referentialActions", "microsoftSqlServer"]
+            previewFeatures = ["referentialActions"]
         }
 
         model A {
@@ -801,7 +801,7 @@ fn sql_server_default_setting_on_delete_self_relations() {
 
         generator client {
             provider = "prisma-client-js"
-            previewFeatures = ["referentialActions", "microsoftSqlServer"]
+            previewFeatures = ["referentialActions"]
         }
 
         model A {
@@ -843,7 +843,7 @@ fn sql_server_default_setting_on_update_self_relations() {
 
         generator client {
             provider = "prisma-client-js"
-            previewFeatures = ["referentialActions", "microsoftSqlServer"]
+            previewFeatures = ["referentialActions"]
         }
 
         model A {
@@ -885,7 +885,7 @@ fn sql_server_cascading_cyclic_one_hop_relations() {
 
         generator client {
             provider = "prisma-client-js"
-            previewFeatures = ["referentialActions", "microsoftSqlServer"]
+            previewFeatures = ["referentialActions"]
         }
 
         model A {
@@ -934,7 +934,7 @@ fn sql_server_cascading_cyclic_hop_over_table_relations() {
 
         generator client {
             provider = "prisma-client-js"
-            previewFeatures = ["referentialActions", "microsoftSqlServer"]
+            previewFeatures = ["referentialActions"]
         }
 
         model A {
@@ -997,7 +997,7 @@ fn sql_server_cascading_cyclic_hop_over_backrelation() {
 
         generator client {
             provider        = "prisma-client-js"
-            previewFeatures = ["microsoftSqlServer", "referentialActions"]
+            previewFeatures = ["referentialActions"]
         }
 
         model User {
@@ -1067,7 +1067,7 @@ fn sql_server_cascading_cyclic_crossing_path_relations() {
 
         generator client {
             provider = "prisma-client-js"
-            previewFeatures = ["referentialActions", "microsoftSqlServer"]
+            previewFeatures = ["referentialActions"]
         }
 
         model A {
@@ -1129,7 +1129,7 @@ fn cycle_detection_prints_the_right_path() {
 
     generator client {
         provider = "prisma-client-js"
-        previewFeatures = ["referentialActions", "microsoftSqlServer"]
+        previewFeatures = ["referentialActions"]
     }
 
     model Post {

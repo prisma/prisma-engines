@@ -5,7 +5,7 @@ datasource chinook {
 
 generator js {
   provider        = "prisma-client-js"
-  previewFeatures = ["microsoftSqlServer", "mongodb", "orderByRelation", "napi", "selectRelationCount", "orderByAggregateGroup", "interactiveTransactions"]
+  previewFeatures = ["mongodb", "orderByRelation", "napi", "selectRelationCount", "orderByAggregateGroup", "interactiveTransactions"]
 }
 
 model Album {

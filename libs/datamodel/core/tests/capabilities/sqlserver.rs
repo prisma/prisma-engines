@@ -45,11 +45,6 @@ fn scalar_list_support() {
           url = "file:test.db"
         }
 
-        generator js {
-          provider = "prisma-client-js"
-          previewFeatures = ["microsoftSqlServer"]
-        }
-
         model Todo {
           id     Int    @id
           val    String[]
@@ -60,11 +55,11 @@ fn scalar_list_support() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mField "val" in model "Todo" can't be a list. The current connector does not support lists of primitive types.[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
-        [1;94m12 | [0m  id     Int    @id
-        [1;94m13 | [0m  [1;91mval    String[][0m
-        [1;94m14 | [0m}
+        [1;94m 7 | [0m  id     Int    @id
+        [1;94m 8 | [0m  [1;91mval    String[][0m
+        [1;94m 9 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -77,11 +72,6 @@ fn unique_index_names_support() {
         datasource db {
           provider = "sqlserver"
           url = "sqlserver://"
-        }
-
-        generator js {
-          provider = "prisma-client-js"
-          previewFeatures = ["microsoftSqlServer"]
         }
 
         model User {
@@ -110,11 +100,6 @@ fn json_support() {
           url = "sqlserver://"
         }
 
-        generator js {
-          provider = "prisma-client-js"
-          previewFeatures = ["microsoftSqlServer"]
-        }
-
         model User {
           id   Int @id
           data Json
@@ -125,11 +110,11 @@ fn json_support() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating field `data` in model `User`: Field `data` in model `User` can't be of type Json. The current connector does not support the Json type.[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
-        [1;94m12 | [0m  id   Int @id
-        [1;94m13 | [0m  [1;91mdata Json[0m
-        [1;94m14 | [0m}
+        [1;94m 7 | [0m  id   Int @id
+        [1;94m 8 | [0m  [1;91mdata Json[0m
+        [1;94m 9 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -142,11 +127,6 @@ fn non_unique_relation_criteria_support() {
         datasource db {
           provider = "sqlserver"
           url = "sqlserver://"
-        }
-
-        generator js {
-          provider = "prisma-client-js"
-          previewFeatures = ["microsoftSqlServer"]
         }
 
         model Todo {
@@ -166,11 +146,11 @@ fn non_unique_relation_criteria_support() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating: The argument `references` must refer to a unique criteria in the related model `User`. But it is referencing the following fields that are not a unique criteria: name[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
-        [1;94m13 | [0m  assigneeName String
-        [1;94m14 | [0m  [1;91massignee     User   @relation(fields: [assigneeName], references: [name])[0m
-        [1;94m15 | [0m}
+        [1;94m 8 | [0m  assigneeName String
+        [1;94m 9 | [0m  [1;91massignee     User   @relation(fields: [assigneeName], references: [name])[0m
+        [1;94m10 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -183,11 +163,6 @@ fn auto_increment_on_non_primary_column_support() {
         datasource db {
           provider = "sqlserver"
           url = "sqlserver://"
-        }
-
-        generator js {
-          provider = "prisma-client-js"
-          previewFeatures = ["microsoftSqlServer"]
         }
 
         model Todo {
@@ -205,11 +180,6 @@ fn key_order_enforcement_support() {
         datasource db {
           provider = "sqlserver"
           url = "sqlserver://"
-        }
-
-        generator js {
-          provider = "prisma-client-js"
-          previewFeatures = ["microsoftSqlServer"]
         }
 
         model  Todo {
@@ -233,11 +203,11 @@ fn key_order_enforcement_support() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating: The argument `references` must refer to a unique criteria in the related model `Todo` using the same order of fields. Please check the ordering in the following fields: `id2, id1`.[0m
-          [1;94m-->[0m  [4mschema.prisma:24[0m
+          [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
-        [1;94m23 | [0m
-        [1;94m24 | [0m  [1;91mrel Todo @relation(fields: [todo1, todo2], references: [id2, id1])[0m
-        [1;94m25 | [0m}
+        [1;94m18 | [0m
+        [1;94m19 | [0m  [1;91mrel Todo @relation(fields: [todo1, todo2], references: [id2, id1])[0m
+        [1;94m20 | [0m}
         [1;94m   | [0m
     "#]];
 
