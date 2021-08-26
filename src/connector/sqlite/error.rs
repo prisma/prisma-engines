@@ -124,6 +124,23 @@ impl From<rusqlite::Error> for Error {
 
             rusqlite::Error::SqliteFailure(
                 ffi::Error {
+                    code: ffi::ErrorCode::ConstraintViolation,
+                    extended_code: 1811,
+                },
+                Some(description),
+            ) => {
+                let mut builder = Error::builder(ErrorKind::ForeignKeyConstraintViolation {
+                    constraint: DatabaseConstraint::ForeignKey,
+                });
+
+                builder.set_original_code("1811");
+                builder.set_original_message(description);
+
+                builder.build()
+            }
+
+            rusqlite::Error::SqliteFailure(
+                ffi::Error {
                     code: ffi::ErrorCode::DatabaseBusy,
                     extended_code,
                 },
