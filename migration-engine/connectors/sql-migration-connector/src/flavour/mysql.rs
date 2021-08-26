@@ -1,8 +1,7 @@
 use super::SqlFlavour;
 use crate::{
-    connect,
-    connection_wrapper::Connection,
-    error::{quaint_error_to_connector_error, SystemDatabase},
+    connection_wrapper::{connect, quaint_error_to_connector_error, Connection},
+    error::SystemDatabase,
     SqlMigrationConnector,
 };
 use datamodel::{common::preview_features::PreviewFeature, walkers::walk_scalar_fields, Datamodel};
@@ -483,7 +482,7 @@ impl SqlFlavour for MysqlFlavour {
 #[enumflags2::bitflags]
 #[derive(Debug, Clone, Copy, PartialEq)]
 #[repr(u8)]
-pub enum Circumstances {
+pub(crate) enum Circumstances {
     LowerCasesTableNames,
     IsMysql56,
     IsMariadb,

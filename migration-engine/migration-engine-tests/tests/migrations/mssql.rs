@@ -117,17 +117,13 @@ fn mssql_apply_migrations_error_output(api: TestApi) {
         Database error code: 3701
 
         Database error:
-        Cannot drop the table 'mssql_apply_migrations_error_output.Emu', because it does not exist or you do not have permission.
-
-    "#]];
+        Cannot drop the table 'mssql_apply_migrations_error_output.Emu', because it does not exist or you do not have permission."#]];
 
     let first_segment = err
-        .split_terminator("DbError {")
-        .next()
-        .unwrap()
         .split_terminator("   0: ")
         .next()
-        .unwrap();
+        .unwrap()
+        .trim_end_matches(|c| c == '\n' || c == ' ');
 
     expectation.assert_eq(first_segment)
 }

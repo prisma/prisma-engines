@@ -17,7 +17,6 @@ use crate::{
     SqlFlavour, SqlSchema,
 };
 use column::ColumnTypeChange;
-use datamodel::common::preview_features::PreviewFeature;
 use enums::EnumDiffer;
 use sql_schema_describer::{
     walkers::{EnumWalker, ForeignKeyWalker, SqlSchemaExt, TableWalker},
@@ -514,18 +513,10 @@ fn foreign_keys_match(fks: Pair<&ForeignKeyWalker<'_>>, db: &DifferDatabase<'_>)
         && constrains_same_columns
         && references_same_columns;
 
-    if db
-        .flavour
-        .preview_features()
-        .contains(PreviewFeature::ReferentialActions)
-    {
-        let same_on_delete_action = fks.previous.on_delete_action() == fks.next.on_delete_action();
-        let same_on_update_action = fks.previous.on_update_action() == fks.next.on_update_action();
+    let same_on_delete_action = fks.previous.on_delete_action() == fks.next.on_delete_action();
+    let same_on_update_action = fks.previous.on_update_action() == fks.next.on_update_action();
 
-        matches && same_on_delete_action && same_on_update_action
-    } else {
-        matches
-    }
+    matches && same_on_delete_action && same_on_update_action
 }
 
 fn enums_match(previous: &EnumWalker<'_>, next: &EnumWalker<'_>) -> bool {

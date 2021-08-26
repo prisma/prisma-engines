@@ -1,5 +1,6 @@
 use crate::{
-    connect, connection_wrapper::Connection, error::quaint_error_to_connector_error, SqlFlavour, SqlMigrationConnector,
+    connection_wrapper::{connect, quaint_error_to_connector_error, Connection},
+    SqlFlavour, SqlMigrationConnector,
 };
 use connection_string::JdbcString;
 use datamodel::common::preview_features::PreviewFeature;

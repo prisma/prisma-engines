@@ -219,8 +219,14 @@ fn changing_a_relation_field_to_a_scalar_field_must_work(api: TestApi) {
             .assert_column("b", |col| col.assert_type_is_int())
             .assert_foreign_keys_count(1)
             .assert_fk_on_columns(&["b"], |fk| {
+                let on_delete = if api.is_mssql() {
+                    ForeignKeyAction::NoAction
+                } else {
+                    ForeignKeyAction::Restrict
+                };
+
                 fk.assert_references("B", &["id"])
-                    .assert_referential_action_on_delete(ForeignKeyAction::Cascade)
+                    .assert_referential_action_on_delete(on_delete)
             })
     });
 

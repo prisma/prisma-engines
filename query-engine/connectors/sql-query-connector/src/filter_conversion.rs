@@ -508,19 +508,23 @@ fn convert_json_filter(
                 .and(expr_json.json_type_equals(JsonType::Array))
                 .into(),
         },
-        ScalarCondition::GreaterThan(value) => expr_string
+        ScalarCondition::GreaterThan(value) => expr_json
+            .clone()
             .greater_than(convert_value(&field, value.clone()))
             .and(filter_json_type(expr_json, value))
             .into(),
-        ScalarCondition::GreaterThanOrEquals(value) => expr_string
+        ScalarCondition::GreaterThanOrEquals(value) => expr_json
+            .clone()
             .greater_than_or_equals(convert_value(&field, value.clone()))
             .and(filter_json_type(expr_json, value))
             .into(),
-        ScalarCondition::LessThan(value) => expr_string
+        ScalarCondition::LessThan(value) => expr_json
+            .clone()
             .less_than(convert_value(&field, value.clone()))
             .and(filter_json_type(expr_json, value))
             .into(),
-        ScalarCondition::LessThanOrEquals(value) => expr_string
+        ScalarCondition::LessThanOrEquals(value) => expr_json
+            .clone()
             .less_than_or_equals(convert_value(&field, value.clone()))
             .and(filter_json_type(expr_json, value))
             .into(),

@@ -15,22 +15,16 @@ mod sql_renderer;
 mod sql_schema_calculator;
 mod sql_schema_differ;
 
-use std::env;
-
-use connection_wrapper::Connection;
+use connection_wrapper::{connect, Connection};
 use datamodel::{common::preview_features::PreviewFeature, walkers::walk_models, Configuration, Datamodel};
 use enumflags2::BitFlags;
-use error::quaint_error_to_connector_error;
 use flavour::SqlFlavour;
 use migration_connector::{migrations_directory::MigrationDirectory, *};
 use pair::Pair;
-use quaint::{
-    prelude::{ConnectionInfo, Queryable},
-    single::Quaint,
-};
+use quaint::prelude::{ConnectionInfo, Queryable};
 use sql_migration::{DropUserDefinedType, DropView, SqlMigration, SqlMigrationStep};
 use sql_schema_describer::{walkers::SqlSchemaExt, ColumnId, SqlSchema, TableId};
-use user_facing_errors::{common::InvalidConnectionString, KnownError};
+use std::env;
 
 /// The top-level SQL migration connector.
 pub struct SqlMigrationConnector {
@@ -328,33 +322,6 @@ impl MigrationConnector for SqlMigrationConnector {
 
         Ok(())
     }
-}
-
-async fn connect(connection_string: &str) -> ConnectorResult<Connection> {
-    let connection_info = ConnectionInfo::from_url(connection_string).map_err(|err| {
-        let details = user_facing_errors::quaint::invalid_connection_string_description(&err.to_string());
-        KnownError::new(InvalidConnectionString { details })
-    })?;
-
-    if let ConnectionInfo::Postgres(url) = &connection_info {
-        return quaint::connector::PostgreSql::new(url.clone())
-            .await
-            .map(|conn| Connection::new_postgres(conn, url.clone()))
-            .map_err(|err| quaint_error_to_connector_error(err, &connection_info));
-    }
-
-    if let ConnectionInfo::Mysql(url) = &connection_info {
-        return quaint::connector::Mysql::new(url.clone())
-            .await
-            .map(|conn| Connection::new_mysql(conn, url.clone()))
-            .map_err(|err| quaint_error_to_connector_error(err, &connection_info));
-    }
-
-    let connection = Quaint::new(connection_string)
-        .await
-        .map_err(|err| quaint_error_to_connector_error(err, &connection_info))?;
-
-    Ok(Connection::new_generic(connection))
 }
 
 /// List all the columns added in the migration, either by alter table steps or

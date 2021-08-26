@@ -1,15 +1,13 @@
 use crate::{
-    connect, connection_wrapper::Connection, error::quaint_error_to_connector_error, sql_renderer::IteratorJoin,
+    connection_wrapper::{connect, quaint_error_to_connector_error, Connection},
+    sql_renderer::IteratorJoin,
     SqlFlavour, SqlMigrationConnector,
 };
 use datamodel::common::preview_features::PreviewFeature;
 use enumflags2::BitFlags;
 use indoc::indoc;
 use migration_connector::{migrations_directory::MigrationDirectory, ConnectorError, ConnectorResult};
-use quaint::{
-    connector::{tokio_postgres::error::ErrorPosition, PostgresUrl},
-    error::ErrorKind as QuaintKind,
-};
+use quaint::connector::{tokio_postgres::error::ErrorPosition, PostgresUrl};
 use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
 use std::collections::HashMap;
 use url::Url;
@@ -221,10 +219,10 @@ impl SqlFlavour for PostgresFlavour {
 
         match conn.raw_cmd(&query).await {
             Ok(_) => (),
-            Err(err) if matches!(err.kind(), QuaintKind::DatabaseAlreadyExists { .. }) => {
+            Err(err) if err.is_user_facing_error::<user_facing_errors::common::DatabaseAlreadyExists>() => {
                 database_already_exists_error = Some(err)
             }
-            Err(err) if matches!(err.kind(), QuaintKind::UniqueConstraintViolation { .. }) => {
+            Err(err) if err.is_user_facing_error::<user_facing_errors::query_engine::UniqueKeyViolation>() => {
                 database_already_exists_error = Some(err)
             }
             Err(err) => return Err(err.into()),

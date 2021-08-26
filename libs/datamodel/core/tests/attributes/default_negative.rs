@@ -459,7 +459,7 @@ fn named_default_constraints_are_not_allowed_on_identity() {
 
         generator js {
           provider = "prisma-client-js"
-          previewFeatures = ["microsoftSqlServer", "namedConstraints"]
+          previewFeatures = ["namedConstraints"]
         }
 
         model A {
@@ -491,7 +491,7 @@ fn named_default_constraints_cannot_have_duplicate_names() {
 
         generator js {
           provider = "prisma-client-js"
-          previewFeatures = ["microsoftSqlServer", "namedConstraints"]
+          previewFeatures = ["namedConstraints"]
         }
 
         model A {
@@ -535,7 +535,7 @@ fn named_default_constraints_cannot_clash_with_pk_names() {
 
         generator js {
           provider = "prisma-client-js"
-          previewFeatures = ["microsoftSqlServer", "namedConstraints"]
+          previewFeatures = ["namedConstraints"]
         }
 
         model A {
@@ -578,7 +578,7 @@ fn named_default_constraints_cannot_clash_with_fk_names() {
 
         generator js {
           provider = "prisma-client-js"
-          previewFeatures = ["microsoftSqlServer", "namedConstraints"]
+          previewFeatures = ["namedConstraints"]
         }
 
         model A {

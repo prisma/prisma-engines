@@ -32,18 +32,7 @@ pub async fn load(
         SQLITE_SOURCE_NAME => sqlite(source, url).await,
         MYSQL_SOURCE_NAME => mysql(source, url).await,
         POSTGRES_SOURCE_NAME => postgres(source, url).await,
-
-        MSSQL_SOURCE_NAME => {
-            if !features.contains(&PreviewFeature::MicrosoftSqlServer) {
-                let error = CoreError::UnsupportedFeatureError(
-                    "Microsoft SQL Server (experimental feature, needs to be enabled)".into(),
-                );
-
-                return Err(error);
-            }
-
-            mssql(source, url).await
-        }
+        MSSQL_SOURCE_NAME => mssql(source, url).await,
 
         #[cfg(feature = "mongodb")]
         MONGODB_SOURCE_NAME => {

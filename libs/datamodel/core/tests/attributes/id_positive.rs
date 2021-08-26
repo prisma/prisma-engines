@@ -5,11 +5,11 @@ use prisma_value::PrismaValue;
 
 #[test]
 fn int_id_without_default_should_have_strategy_none() {
-    let dml = r#"
-    model Model {
-        id Int @id
-    }
-    "#;
+    let dml = indoc! {r#"
+        model Model {
+          id Int @id
+        }
+    "#};
 
     let datamodel = parse(dml);
     let user_model = datamodel.assert_has_model("Model");
@@ -18,11 +18,11 @@ fn int_id_without_default_should_have_strategy_none() {
 
 #[test]
 fn int_id_with_default_autoincrement_should_have_strategy_auto() {
-    let dml = r#"
-    model Model {
-        id Int @id @default(autoincrement())
-    }
-    "#;
+    let dml = indoc! {r#"
+        model Model {
+          id Int @id @default(autoincrement())
+        }
+    "#};
 
     let datamodel = parse(dml);
     let user_model = datamodel.assert_has_model("Model");
@@ -32,13 +32,13 @@ fn int_id_with_default_autoincrement_should_have_strategy_auto() {
 #[test]
 #[ignore] // bring back when we work on embeds
 fn id_should_also_work_on_embedded_types() {
-    let dml = r#"
-    model Model {
-        id Int @id
+    let dml = indoc! {r#"
+        model Model {
+          id Int @id
 
-        @@embedded
-    }
-    "#;
+          @@embedded
+        }
+    "#};
 
     let datamodel = parse(dml);
     let user_model = datamodel.assert_has_model("Model");
@@ -47,11 +47,11 @@ fn id_should_also_work_on_embedded_types() {
 
 #[test]
 fn should_allow_string_ids_with_cuid() {
-    let dml = r#"
-    model Model {
-        id String @id @default(cuid())
-    }
-    "#;
+    let dml = indoc! {r#"
+        model Model {
+          id String @id @default(cuid())
+        }
+    "#};
 
     let datamodel = parse(dml);
     let user_model = datamodel.assert_has_model("Model");
@@ -64,11 +64,11 @@ fn should_allow_string_ids_with_cuid() {
 
 #[test]
 fn should_allow_string_ids_with_uuid() {
-    let dml = r#"
-    model Model {
-        id String @id @default(uuid())
-    }
-    "#;
+    let dml = indoc! {r#"
+        model Model {
+          id String @id @default(uuid())
+        }
+    "#};
 
     let datamodel = parse(dml);
     let user_model = datamodel.assert_has_model("Model");
@@ -81,11 +81,11 @@ fn should_allow_string_ids_with_uuid() {
 
 #[test]
 fn should_allow_string_ids_without_default() {
-    let dml = r#"
-    model Model {
-        id String @id
-    }
-    "#;
+    let dml = indoc! {r#"
+        model Model {
+          id String @id
+        }
+    "#};
 
     let datamodel = parse(dml);
     let user_model = datamodel.assert_has_model("Model");
@@ -97,11 +97,11 @@ fn should_allow_string_ids_without_default() {
 
 #[test]
 fn should_allow_string_ids_with_static_default() {
-    let dml = r#"
-    model Model {
-        id String @id @default("")
-    }
-    "#;
+    let dml = indoc! {r#"
+        model Model {
+          id String @id @default("")
+        }
+    "#};
 
     let datamodel = parse(dml);
     let user_model = datamodel.assert_has_model("Model");
@@ -114,11 +114,11 @@ fn should_allow_string_ids_with_static_default() {
 
 #[test]
 fn should_allow_int_ids_with_static_default() {
-    let dml = r#"
-    model Model {
-        id Int @id @default(0)
-    }
-    "#;
+    let dml = indoc! {r#"
+        model Model {
+          id Int @id @default(0)
+        }
+    "#};
 
     let datamodel = parse(dml);
     let user_model = datamodel.assert_has_model("Model");
@@ -131,13 +131,13 @@ fn should_allow_int_ids_with_static_default() {
 
 #[test]
 fn multi_field_ids_must_work() {
-    let dml = r#"
-    model Model {
-        a String
-        b Int
-        @@id([a,b])
-    }
-    "#;
+    let dml = indoc! {r#"
+        model Model {
+          a String
+          b Int
+          @@id([a,b])
+        }
+    "#};
 
     let datamodel = parse(dml);
     let user_model = datamodel.assert_has_model("Model");
@@ -151,11 +151,11 @@ fn multi_field_ids_must_work() {
 
 #[test]
 fn should_allow_unique_and_id_on_same_field() {
-    let dml = r#"
-    model Model {
-        id Int @id @unique
-    }
-    "#;
+    let dml = indoc! {r#"
+        model Model {
+          id Int @id @unique
+        }
+    "#};
 
     let datamodel = parse(dml);
     let user_model = datamodel.assert_has_model("Model");
@@ -177,15 +177,13 @@ fn should_allow_unique_and_id_on_same_field() {
 
 #[test]
 fn unnamed_and_unmapped_multi_field_ids_must_work() {
-    let dml = with_named_constraints(
-        r#"
-    model Model {
-        a String
-        b Int
-        @@id([a,b])
-    }
-    "#,
-    );
+    let dml = with_named_constraints(indoc! {r#"
+        model Model {
+          a String
+          b Int
+          @@id([a,b])
+        }
+    "#});
 
     let datamodel = parse(&dml);
     let user_model = datamodel.assert_has_model("Model");
@@ -195,13 +193,11 @@ fn unnamed_and_unmapped_multi_field_ids_must_work() {
 
 #[test]
 fn unmapped_singular_id_must_work() {
-    let dml = with_named_constraints(
-        r#"
-    model Model {
-        a String @id
-    }
-    "#,
-    );
+    let dml = with_named_constraints(indoc! {r#"
+        model Model {
+          a String @id
+        }
+    "#});
 
     let datamodel = parse(&dml);
     let model = datamodel.assert_has_model("Model");
@@ -211,15 +207,13 @@ fn unmapped_singular_id_must_work() {
 
 #[test]
 fn named_multi_field_ids_must_work() {
-    let dml = with_named_constraints(
-        r#"
-    model Model {
-        a String
-        b Int
-        @@id([a,b], name: "compoundId")
-    }
-    "#,
-    );
+    let dml = with_named_constraints(indoc! {r#"
+        model Model {
+          a String
+          b Int
+          @@id([a,b], name: "compoundId")
+        }
+    "#});
 
     let datamodel = parse(&dml);
     let user_model = datamodel.assert_has_model("Model");
@@ -229,15 +223,13 @@ fn named_multi_field_ids_must_work() {
 
 #[test]
 fn mapped_multi_field_ids_must_work() {
-    let dml = with_named_constraints(
-        r#"
-    model Model {
-        a String
-        b Int
-        @@id([a,b], map:"dbname")
-    }
-    "#,
-    );
+    let dml = with_named_constraints(indoc! {r#"
+        model Model {
+          a String
+          b Int
+          @@id([a,b], map:"dbname")
+        }
+    "#});
 
     let datamodel = parse(&dml);
     let user_model = datamodel.assert_has_model("Model");
@@ -247,17 +239,15 @@ fn mapped_multi_field_ids_must_work() {
 
 #[test]
 fn mapped_singular_id_must_work() {
-    let dml = with_named_constraints(
-        r#"
-    model Model {
-        a String @id(map: "test")
-    }
+    let dml = with_named_constraints(indoc! {r#"
+        model Model {
+          a String @id(map: "test")
+        }
 
-    model Model2 {
-        a String @id(map: "test2")
-    }
-    "#,
-    );
+        model Model2 {
+          a String @id(map: "test2")
+        }
+    "#});
 
     let datamodel = parse(&dml);
     let model = datamodel.assert_has_model("Model");
@@ -271,15 +261,13 @@ fn mapped_singular_id_must_work() {
 
 #[test]
 fn named_and_mapped_multi_field_ids_must_work() {
-    let dml = with_named_constraints(
-        r#"
-    model Model {
-        a String
-        b Int
-        @@id([a,b], name: "compoundId", map:"dbname")
-    }
-    "#,
-    );
+    let dml = with_named_constraints(indoc! {r#"
+        model Model {
+          a String
+          b Int
+          @@id([a,b], name: "compoundId", map:"dbname")
+        }
+    "#});
 
     let datamodel = parse(&dml);
     let user_model = datamodel.assert_has_model("Model");

@@ -1,5 +1,4 @@
 use crate::common::*;
-use expect_test::expect;
 
 #[test]
 fn serialize_generators_to_cmf() {
@@ -7,6 +6,7 @@ fn serialize_generators_to_cmf() {
         generator js1 {
           provider = "javascript"
           output = "../../js"
+          engineType = "binary"
         }
 
         generator go {
@@ -27,7 +27,9 @@ fn serialize_generators_to_cmf() {
               "fromEnvVar": null,
               "value": "../../js"
             },
-            "config": {},
+            "config": {
+              "engineType": "binary"
+            },
             "binaryTargets": [],
             "previewFeatures": []
           },
@@ -255,7 +257,7 @@ fn nice_error_for_unknown_generator_preview_feature() {
         .unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mThe preview feature "foo" is not known. Expected one of: microsoftSqlServer, orderByRelation, nApi, selectRelationCount, orderByAggregateGroup, filterJson, planetScaleMode, referentialActions, mongoDb, interactiveTransactions, namedConstraints, fullTextSearch[0m
+        [1;91merror[0m: [1mThe preview feature "foo" is not known. Expected one of: orderByRelation, nApi, selectRelationCount, orderByAggregateGroup, filterJson, planetScaleMode, mongoDb, interactiveTransactions, namedConstraints, fullTextSearch[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
         [1;94m 2 | [0m  provider = "prisma-client-js"

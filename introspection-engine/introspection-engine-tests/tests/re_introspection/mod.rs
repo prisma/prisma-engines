@@ -1,4 +1,8 @@
+mod mssql;
+mod mysql;
+
 use barrel::types;
+use expect_test::expect;
 use indoc::formatdoc;
 use indoc::indoc;
 use introspection_engine_tests::{assert_eq_json, test_api::*};
@@ -104,7 +108,7 @@ async fn manually_overwritten_mapped_field_name(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(exclude(Mssql, Mysql))]
 async fn mapped_model_and_field_name(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -124,83 +128,47 @@ async fn mapped_model_and_field_name(api: &TestApi) -> TestResult {
         })
         .await?;
 
-    let extra_index = if api.sql_family().is_mysql() {
-        r#"@@index([c_user_id], name: "user_id")"#
-    } else {
-        ""
-    };
-
-    let input_dm = format!(
-        r#"
-        model Post {{
+    let input_dm = indoc! {r#"
+        model Post {
             id               Int         @id @default(autoincrement())
             c_user_id        Int         @map("user_id")
             Custom_User      Custom_User @relation(fields: [c_user_id], references: [c_id])
-            {extra_index}
-        }}
-
-        model Custom_User {{
-            c_id             Int         @id @default(autoincrement()) @map("id")
-            Post             Post[]
-
-            @@map(name: "User")
-        }}
-    "#,
-        extra_index = extra_index
-    );
-
-    let final_dm = format!(
-        r#"
-        model Post {{
-            id               Int         @id @default(autoincrement())
-            c_user_id        Int         @map("user_id")
-            Custom_User      Custom_User @relation(fields: [c_user_id], references: [c_id])
-            {extra_index}
-        }}
-
-        model Custom_User {{
-            c_id             Int         @id @default(autoincrement()) @map("id")
-            Post             Post[]
-
-            @@map(name: "User")
-        }}
-
-        model Unrelated {{
-            id               Int         @id @default(autoincrement())
-        }}
-    "#,
-        extra_index = extra_index
-    );
-
-    api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await?);
-
-    let expected = json!([
-        {
-            "code": 7,
-            "message": "These models were enriched with `@@map` information taken from the previous Prisma schema.",
-            "affected":[
-                {
-                    "model": "Custom_User"
-                },
-            ]
-        },
-        {
-            "code": 8,
-            "message": "These fields were enriched with `@map` information taken from the previous Prisma schema.",
-            "affected": [
-                {
-                    "model": "Post",
-                    "field": "c_user_id"
-                },
-                {
-                    "model": "Custom_User",
-                    "field": "c_id"
-                }
-            ]
         }
-    ]);
 
-    assert_eq_json!(expected, api.re_introspect_warnings(&input_dm).await?);
+        model Custom_User {
+            c_id             Int         @id @default(autoincrement()) @map("id")
+            Post             Post[]
+
+            @@map(name: "User")
+        }
+    "#};
+
+    let expected = expect![[r#"
+        model Post {
+          id          Int         @id @default(autoincrement())
+          c_user_id   Int         @map("user_id")
+          Custom_User Custom_User @relation(fields: [c_user_id], references: [c_id], onDelete: NoAction, onUpdate: NoAction)
+        }
+
+        model Custom_User {
+          c_id Int    @id @default(autoincrement()) @map("id")
+          Post Post[]
+
+          @@map("User")
+        }
+
+        model Unrelated {
+          id Int @id @default(autoincrement())
+        }
+    "#]];
+
+    expected.assert_eq(&api.re_introspect_dml(input_dm).await?);
+
+    let expected = expect![[
+        r#"[{"code":7,"message":"These models were enriched with `@@map` information taken from the previous Prisma schema.","affected":[{"model":"Custom_User"}]},{"code":8,"message":"These fields were enriched with `@map` information taken from the previous Prisma schema.","affected":[{"model":"Post","field":"c_user_id"},{"model":"Custom_User","field":"c_id"}]}]"#
+    ]];
+
+    expected.assert_eq(&api.re_introspect_warnings(input_dm).await?);
 
     Ok(())
 }
@@ -225,81 +193,47 @@ async fn manually_mapped_model_and_field_name(api: &TestApi) -> TestResult {
         })
         .await?;
 
-    let extra_index = if api.sql_family().is_mysql() {
-        r#"@@index([c_user_id], name: "user_id")"#
-    } else {
-        ""
-    };
-
-    let input_dm = format!(
-        r#"
-        model Post {{
+    let input_dm = indoc! {r#"
+        model Post {
             id               Int         @id @default(autoincrement())
             c_user_id        Int         @map("user_id")
             Custom_User      Custom_User @relation(fields: [c_user_id], references: [c_id])
-            {}
-        }}
-
-        model Custom_User {{
-            c_id             Int         @id @default(autoincrement()) @map("_id")
-            Post             Post[]
-
-            @@map(name: "_User")
-        }}
-    "#,
-        extra_index
-    );
-
-    let final_dm = format!(
-        r#"
-        model Post {{
-            id               Int         @id @default(autoincrement())
-            c_user_id        Int         @map("user_id")
-            Custom_User      Custom_User @relation(fields: [c_user_id], references: [c_id])
-            {}
-        }}
-
-        model Custom_User {{
-            c_id             Int         @id @default(autoincrement()) @map("_id")
-            Post             Post[]
-
-            @@map(name: "_User")
-        }}
-
-        model Unrelated {{
-            id               Int         @id @default(autoincrement())
-        }}
-    "#,
-        extra_index
-    );
-
-    api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await?);
-
-    let expected = json!([
-        {
-            "code": 7,
-            "message": "These models were enriched with `@@map` information taken from the previous Prisma schema.",
-            "affected": [{
-                "model": "Custom_User"
-            }]
-        },
-        {
-            "code": 8,
-            "message": "These fields were enriched with `@map` information taken from the previous Prisma schema.",
-            "affected": [
-                {
-                    "model": "Post",
-                    "field": "c_user_id"
-                },
-                {
-                    "model": "Custom_User",
-                    "field": "c_id"
-                }
-            ]
         }
-    ]);
 
-    assert_eq_json!(expected, api.re_introspect_warnings(&input_dm).await?);
+        model Custom_User {
+            c_id             Int         @id @default(autoincrement()) @map("_id")
+            Post             Post[]
+
+            @@map(name: "_User")
+        }
+    "#};
+
+    let expected = expect![[r#"
+        model Post {
+          id          Int         @id @default(autoincrement())
+          c_user_id   Int         @map("user_id")
+          Custom_User Custom_User @relation(fields: [c_user_id], references: [c_id], onDelete: NoAction, onUpdate: NoAction)
+        }
+
+        model Custom_User {
+          c_id Int    @id @default(autoincrement()) @map("_id")
+          Post Post[]
+
+          @@map("_User")
+        }
+
+        model Unrelated {
+          id Int @id @default(autoincrement())
+        }
+    "#]];
+
+    expected.assert_eq(&api.re_introspect_dml(input_dm).await?);
+
+    let expected = expect![[
+        r#"[{"code":7,"message":"These models were enriched with `@@map` information taken from the previous Prisma schema.","affected":[{"model":"Custom_User"}]},{"code":8,"message":"These fields were enriched with `@map` information taken from the previous Prisma schema.","affected":[{"model":"Post","field":"c_user_id"},{"model":"Custom_User","field":"c_id"}]}]"#
+    ]];
+
+    expected.assert_eq(&api.re_introspect_warnings(input_dm).await?);
 
     Ok(())
 }
@@ -774,7 +708,7 @@ async fn manually_re_mapped_invalid_enum_values(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(exclude(Mysql, Mssql))]
 async fn multiple_changed_relation_names(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -797,64 +731,43 @@ async fn multiple_changed_relation_names(api: &TestApi) -> TestResult {
         })
         .await?;
 
-    let (idx1, idx2) = if api.sql_family().is_mysql() {
-        (
-            r#"@@index([eveningEmployeeId], name: "eveningEmployeeId")"#,
-            r#"@@index([morningEmployeeId], name: "morningEmployeeId")"#,
-        )
-    } else {
-        ("", "")
-    };
-
-    let input_dm = format!(
-        r#"
-        model Employee {{
+    let input_dm = indoc! {r#"
+        model Employee {
             id                                            Int         @id @default(autoincrement())
             A                                             Schedule[]  @relation("EmployeeToSchedule_eveningEmployeeId")
             Schedule_EmployeeToSchedule_morningEmployeeId Schedule[]  @relation("EmployeeToSchedule_morningEmployeeId")
-        }}
+        }
 
-        model Schedule {{
+        model Schedule {
             id                                            Int         @id @default(autoincrement())
             morningEmployeeId                             Int
             eveningEmployeeId                             Int
-            Employee_EmployeeToSchedule_eveningEmployeeId Employee    @relation("EmployeeToSchedule_eveningEmployeeId", fields: [eveningEmployeeId], references: [id])
-            Employee_EmployeeToSchedule_morningEmployeeId Employee    @relation("EmployeeToSchedule_morningEmployeeId", fields: [morningEmployeeId], references: [id])
-            {idx1}
-            {idx2}
-        }}
-    "#,
-        idx1 = idx1,
-        idx2 = idx2,
-    );
+            Employee_EmployeeToSchedule_eveningEmployeeId Employee    @relation("EmployeeToSchedule_eveningEmployeeId", fields: [eveningEmployeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+            Employee_EmployeeToSchedule_morningEmployeeId Employee    @relation("EmployeeToSchedule_morningEmployeeId", fields: [morningEmployeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+        }
+    "#};
 
-    let final_dm = format!(
-        r#"
-        model Employee {{
-            id                                            Int         @id @default(autoincrement())
-            A                                             Schedule[]  @relation("EmployeeToSchedule_eveningEmployeeId")
-            Schedule_EmployeeToSchedule_morningEmployeeId Schedule[]  @relation("EmployeeToSchedule_morningEmployeeId")
-        }}
+    let expected = expect![[r#"
+        model Employee {
+          id                                            Int        @id @default(autoincrement())
+          A                                             Schedule[] @relation("EmployeeToSchedule_eveningEmployeeId")
+          Schedule_EmployeeToSchedule_morningEmployeeId Schedule[] @relation("EmployeeToSchedule_morningEmployeeId")
+        }
 
-        model Schedule {{
-            id                                            Int         @id @default(autoincrement())
-            morningEmployeeId                             Int
-            eveningEmployeeId                             Int
-            Employee_EmployeeToSchedule_eveningEmployeeId Employee    @relation("EmployeeToSchedule_eveningEmployeeId", fields: [eveningEmployeeId], references: [id])
-            Employee_EmployeeToSchedule_morningEmployeeId Employee    @relation("EmployeeToSchedule_morningEmployeeId", fields: [morningEmployeeId], references: [id])
-            {idx1}
-            {idx2}
-        }}
+        model Schedule {
+          id                                            Int      @id @default(autoincrement())
+          morningEmployeeId                             Int
+          eveningEmployeeId                             Int
+          Employee_EmployeeToSchedule_eveningEmployeeId Employee @relation("EmployeeToSchedule_eveningEmployeeId", fields: [eveningEmployeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+          Employee_EmployeeToSchedule_morningEmployeeId Employee @relation("EmployeeToSchedule_morningEmployeeId", fields: [morningEmployeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+        }
 
-        model Unrelated {{
-            id               Int @id @default(autoincrement())
-        }}
-    "#,
-        idx1 = idx1,
-        idx2 = idx2,
-    );
+        model Unrelated {
+          id Int @id @default(autoincrement())
+        }
+    "#]];
 
-    api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await?);
+    expected.assert_eq(&api.re_introspect_dml(input_dm).await?);
 
     Ok(())
 }
@@ -879,37 +792,37 @@ async fn custom_virtual_relation_field_names(api: &TestApi) -> TestResult {
         })
         .await?;
 
-    let input_dm = formatdoc! {r#"
-        model Post {{
+    let input_dm = indoc! {r#"
+        model Post {
             id               Int @id @default(autoincrement())
             user_id          Int  @unique
             custom_User      User @relation(fields: [user_id], references: [id])
-        }}
+        }
 
-        model User {{
+        model User {
             id               Int @id @default(autoincrement())
             custom_Post      Post?
-        }}
+        }
     "#};
 
-    let final_dm = formatdoc! {r#"
-        model Post {{
-            id               Int @id @default(autoincrement())
-            user_id          Int  @unique
-            custom_User      User @relation(fields: [user_id], references: [id])
-        }}
+    let expected = expect![[r#"
+        model Post {
+          id          Int  @id @default(autoincrement())
+          user_id     Int  @unique
+          custom_User User @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+        }
 
-        model User {{
-            id               Int @id @default(autoincrement())
-            custom_Post      Post?
-        }}
+        model User {
+          id          Int   @id @default(autoincrement())
+          custom_Post Post?
+        }
 
-        model Unrelated {{
-            id               Int @id @default(autoincrement())
-        }}
-    "#};
+        model Unrelated {
+          id Int @id @default(autoincrement())
+        }
+    "#]];
 
-    api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await?);
+    expected.assert_eq(&api.re_introspect_dml(input_dm).await?);
 
     Ok(())
 }
@@ -1095,7 +1008,7 @@ async fn custom_enum_order(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(exclude(Mssql, Mysql))]
 async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -1118,47 +1031,47 @@ async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> 
         })
         .await?;
 
-    let input_dm = formatdoc! {r#"
-        model Post {{
+    let input_dm = indoc! {r#"
+        model Post {
             id               Int @id @default(autoincrement())
             user_id          Int  @unique
             user_id2         Int  @unique
-            custom_User      Custom_User @relation("CustomRelationName", fields: [user_id], references: [id])
-            custom_User2     Custom_User @relation("AnotherCustomRelationName", fields: [user_id2], references: [id])
-        }}
+            custom_User      Custom_User @relation("CustomRelationName", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+            custom_User2     Custom_User @relation("AnotherCustomRelationName", fields: [user_id2], references: [id], onDelete: NoAction, onUpdate: NoAction)
+        }
 
-        model Custom_User {{
+        model Custom_User {
             id               Int @id @default(autoincrement())
             custom_Post      Post? @relation("CustomRelationName")
             custom_Post2     Post? @relation("AnotherCustomRelationName")
 
             @@map("User")
-        }}
+        }
     "#};
 
-    let final_dm = formatdoc! {r#"
-        model Post {{
-            id               Int @id @default(autoincrement())
-            user_id          Int  @unique
-            user_id2         Int  @unique
-            custom_User      Custom_User @relation("CustomRelationName", fields: [user_id], references: [id])
-            custom_User2     Custom_User @relation("AnotherCustomRelationName", fields: [user_id2], references: [id])
-        }}
+    let expected = expect![[r#"
+        model Post {
+          id           Int         @id @default(autoincrement())
+          user_id      Int         @unique
+          user_id2     Int         @unique
+          custom_User  Custom_User @relation("CustomRelationName", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+          custom_User2 Custom_User @relation("AnotherCustomRelationName", fields: [user_id2], references: [id], onDelete: NoAction, onUpdate: NoAction)
+        }
 
-        model Custom_User {{
-            id               Int @id @default(autoincrement())
-            custom_Post      Post? @relation("CustomRelationName")
-            custom_Post2     Post? @relation("AnotherCustomRelationName")
+        model Custom_User {
+          id           Int   @id @default(autoincrement())
+          custom_Post  Post? @relation("CustomRelationName")
+          custom_Post2 Post? @relation("AnotherCustomRelationName")
 
-            @@map("User")
-        }}
+          @@map("User")
+        }
 
-        model Unrelated {{
-            id               Int @id @default(autoincrement())
-        }}
-    "#};
+        model Unrelated {
+          id Int @id @default(autoincrement())
+        }
+    "#]];
 
-    api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await?);
+    expected.assert_eq(&api.re_introspect_dml(input_dm).await?);
 
     Ok(())
 }
@@ -1606,29 +1519,27 @@ async fn custom_repro(api: &TestApi) -> TestResult {
         }
     "#};
 
-    let final_dm = indoc! {r#"
-        model Post{
-          id        Int       @id @default(autoincrement())
-          tag_id    Int
-          tag       Tag       @relation("post_to_tag", fields:[tag_id], references: id)
+    let expected = expect![[r#"
+        model Post {
+          id     Int @id @default(autoincrement())
+          tag_id Int
+          tag    Tag @relation("post_to_tag", fields: [tag_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
         }
 
         model Tag {
-          id        Int       @id @default(autoincrement())
-          name      String    @unique
-          posts     Post[]    @relation("post_to_tag")
+          id    Int    @id @default(autoincrement())
+          name  String @unique
+          posts Post[] @relation("post_to_tag")
+
           @@map("tag")
         }
 
         model Unrelated {
-          id        Int      @id @default(autoincrement())
+          id Int @id @default(autoincrement())
         }
+    "#]];
 
-    "#};
-
-    let result = api.re_introspect(input_dm).await?;
-
-    api.assert_eq_datamodels(final_dm, &result);
+    expected.assert_eq(&api.re_introspect_dml(input_dm).await?);
 
     Ok(())
 }

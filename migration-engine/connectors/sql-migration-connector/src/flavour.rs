@@ -133,14 +133,11 @@ fn validate_connection_infos_do_not_match((previous, next): (&ConnectionInfo, &C
 }
 
 async fn generic_apply_migration_script(migration_name: &str, script: &str, conn: &Connection) -> ConnectorResult<()> {
-    conn.raw_cmd(script).await.map_err(|quaint_error| {
+    conn.raw_cmd(script).await.map_err(|sql_error| {
         ConnectorError::user_facing(ApplyMigrationError {
             migration_name: migration_name.to_owned(),
-            database_error_code: String::from(quaint_error.original_code().unwrap_or("none")),
-            database_error: quaint_error
-                .original_message()
-                .map(String::from)
-                .unwrap_or_else(|| ConnectorError::from(quaint_error).to_string()),
+            database_error_code: String::from(sql_error.error_code().unwrap_or("none")),
+            database_error: ConnectorError::from(sql_error).to_string(),
         })
     })
 }

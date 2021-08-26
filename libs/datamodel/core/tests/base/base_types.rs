@@ -1,6 +1,4 @@
 use crate::common::*;
-use datamodel::ast::Span;
-use datamodel::diagnostics::DatamodelError;
 use datamodel::{dml, ScalarType};
 
 #[test]
@@ -77,89 +75,103 @@ fn parse_field_arity() {
 
 #[test]
 fn scalar_list_types_are_not_supported_by_default() {
-    let dml = r#"
-    model Post {
-        id         Int @id
-        text       String
-        photo      String?
-        comments   String[]
-        enums      Enum[]
-        categories Category[] // make sure that relations still work
-    }
+    let dml = indoc! {r#"
+        model Post {
+          id         Int @id
+          text       String
+          photo      String?
+          comments   String[]
+          enums      Enum[]
+          categories Category[] // make sure that relations still work
+        }
 
-    enum Enum {
-        A
-        B
-        C
-    }
+        enum Enum {
+          A
+          B
+          C
+        }
 
-    model Category {
-      id   Int    @id
-      name String
-    }
-    "#;
+        model Category {
+          id   Int    @id
+          name String
+        }
+    "#};
 
-    let errors = parse_error(dml);
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
-    errors.assert_length(2);
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mField "comments" in model "Post" can't be a list. The current connector does not support lists of primitive types.[0m
+          [1;94m-->[0m  [4mschema.prisma:5[0m
+        [1;94m   | [0m
+        [1;94m 4 | [0m  photo      String?
+        [1;94m 5 | [0m  [1;91mcomments   String[][0m
+        [1;94m 6 | [0m  enums      Enum[]
+        [1;94m   | [0m
+        [1;91merror[0m: [1mField "enums" in model "Post" can't be a list. The current connector does not support lists of primitive types.[0m
+          [1;94m-->[0m  [4mschema.prisma:6[0m
+        [1;94m   | [0m
+        [1;94m 5 | [0m  comments   String[]
+        [1;94m 6 | [0m  [1;91menums      Enum[][0m
+        [1;94m 7 | [0m  categories Category[] // make sure that relations still work
+        [1;94m   | [0m
+    "#]];
 
-    errors.assert_is_at(
-        0,
-        DatamodelError::new_scalar_list_fields_are_not_supported("Post", "comments", Span::new(106, 126)),
-    );
-
-    errors.assert_is_at(
-        1,
-        DatamodelError::new_scalar_list_fields_are_not_supported("Post", "enums", Span::new(134, 152)),
-    );
+    expectation.assert_eq(&error)
 }
 
 #[test]
 fn scalar_list_types_are_not_supported_by_mysql() {
-    let dml = r#"
-    datasource mysql {
-        provider = "mysql"
-        url = "mysql://asdlj"
-    }
+    let dml = indoc! {r#"
+        datasource mysql {
+          provider = "mysql"
+          url = "mysql://asdlj"
+        }
 
-    model Post {
-        id Int @id
-        text String
-        photo String?
-        comments String[]
-        enums    Enum[]
-    }
+        model Post {
+          id Int @id
+          text String
+          photo String?
+          comments String[]
+          enums    Enum[]
+        }
 
-    enum Enum {
-        A
-        B
-        C
-    }
-    "#;
+        enum Enum {
+          A
+          B
+          C
+        }
+    "#};
 
-    let errors = parse_error(dml);
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
-    errors.assert_length(2);
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mField "comments" in model "Post" can't be a list. The current connector does not support lists of primitive types.[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
+        [1;94m   | [0m
+        [1;94m 9 | [0m  photo String?
+        [1;94m10 | [0m  [1;91mcomments String[][0m
+        [1;94m11 | [0m  enums    Enum[]
+        [1;94m   | [0m
+        [1;91merror[0m: [1mField "enums" in model "Post" can't be a list. The current connector does not support lists of primitive types.[0m
+          [1;94m-->[0m  [4mschema.prisma:11[0m
+        [1;94m   | [0m
+        [1;94m10 | [0m  comments String[]
+        [1;94m11 | [0m  [1;91menums    Enum[][0m
+        [1;94m12 | [0m}
+        [1;94m   | [0m
+    "#]];
 
-    errors.assert_is_at(
-        0,
-        DatamodelError::new_scalar_list_fields_are_not_supported("Post", "comments", Span::new(174, 192)),
-    );
-
-    errors.assert_is_at(
-        1,
-        DatamodelError::new_scalar_list_fields_are_not_supported("Post", "enums", Span::new(200, 216)),
-    );
+    expectation.assert_eq(&error)
 }
 
 #[test]
 fn json_type_must_work_for_some_connectors() {
-    let dml = r#"
-    model User {
-        id   Int    @id
-        json Json
-    }
-    "#;
+    let dml = indoc! {r#"
+        model User {
+          id   Int    @id
+          json Json
+        }
+    "#};
 
     // empty connector does support it
     parse(dml)
@@ -167,13 +179,21 @@ fn json_type_must_work_for_some_connectors() {
         .assert_has_scalar_field("json")
         .assert_base_type(&ScalarType::Json);
 
-    // SQLite does not support it
-    parse_error(&format!("{}\n{}", SQLITE_SOURCE, dml)).assert_is(DatamodelError::new_field_validation_error(
-        "Field `json` in model `User` can\'t be of type Json. The current connector does not support the Json type.",
-        "User",
-        "json",
-        Span::new(139, 149),
-    ));
+    let error = datamodel::parse_schema(&format!("{}\n{}", SQLITE_SOURCE, dml))
+        .map(drop)
+        .unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError validating field `json` in model `User`: Field `json` in model `User` can't be of type Json. The current connector does not support the Json type.[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
+        [1;94m   | [0m
+        [1;94m 8 | [0m  id   Int    @id
+        [1;94m 9 | [0m  [1;91mjson Json[0m
+        [1;94m10 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error);
 
     // Postgres does support it
     parse(&format!("{}\n{}", POSTGRES_SOURCE, dml))

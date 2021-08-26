@@ -7,6 +7,7 @@ import util._
 // RS: Ported
 class SameModelSelfRelationWithoutBackRelationSpec extends FlatSpec with Matchers with ApiSpecBase {
   override def runOnlyForCapabilities = Set(JoinRelationLinksCapability)
+  override def doNotRun = true
 
   // Bring back sql server when cascading rules can be set!
   "A Many to Many Self Relation" should "be accessible from only one side" taggedAs (IgnoreMsSql) in {

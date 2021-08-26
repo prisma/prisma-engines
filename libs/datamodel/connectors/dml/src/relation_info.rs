@@ -20,9 +20,6 @@ pub struct RelationInfo {
     /// A strategy indicating what happens when
     /// a related node is updated.
     pub on_update: Option<ReferentialAction>,
-    /// Set true if referential actions feature is not in use.
-    /// This prevents the datamodel validator nagging about the missing preview feature, when automatically setting the values.
-    pub legacy_referential_actions: bool,
 }
 
 impl PartialEq for RelationInfo {
@@ -44,14 +41,7 @@ impl RelationInfo {
             fk_name: None,
             on_delete: None,
             on_update: None,
-            legacy_referential_actions: false,
         }
-    }
-
-    /// Set referential action legacy mode, skipping the validation errors on
-    /// automatically set actions.
-    pub fn legacy_referential_actions(&mut self) {
-        self.legacy_referential_actions = true;
     }
 }
 

@@ -44,6 +44,7 @@ impl From<ApiError> for user_facing_errors::Error {
                     user_facing_errors::common::SchemaParserError { full_error },
                 ))
             }
+            ApiError::Core(error) => user_facing_errors::Error::from(error),
             other => user_facing_errors::Error::new_non_panic_with_current_backtrace(other.to_string()),
         }
     }

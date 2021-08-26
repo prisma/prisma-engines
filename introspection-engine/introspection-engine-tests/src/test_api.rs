@@ -8,7 +8,10 @@ use introspection_connector::{
     ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionContext, IntrospectionResult, Version,
 };
 use migration_connector::MigrationConnector;
-use quaint::{prelude::SqlFamily, single::Quaint};
+use quaint::{
+    prelude::{Queryable, SqlFamily},
+    single::Quaint,
+};
 use sql_introspection_connector::SqlIntrospectionConnector;
 use sql_migration_connector::SqlMigrationConnector;
 use std::fmt::Write;
@@ -138,6 +141,20 @@ impl TestApi {
         let rendering_span = tracing::info_span!("render_datamodel after introspection");
         let _span = rendering_span.enter();
         let dm = datamodel::render_datamodel_and_config_to_string(&introspection_result.data_model, &config);
+
+        Ok(dm)
+    }
+
+    #[tracing::instrument(skip(self, data_model_string))]
+    #[track_caller]
+    pub async fn re_introspect_dml(&self, data_model_string: &str) -> Result<String> {
+        let config = self.configuration();
+        let data_model = parse_datamodel(data_model_string);
+        let introspection_result = self.test_introspect_internal(data_model).await?;
+
+        let rendering_span = tracing::info_span!("render_datamodel after introspection");
+        let _span = rendering_span.enter();
+        let dm = datamodel::render_datamodel_to_string(&introspection_result.data_model, Some(&config));
 
         Ok(dm)
     }
@@ -281,6 +298,11 @@ impl TestApi {
             preview_feature_string
         );
         generator_block
+    }
+
+    #[track_caller]
+    pub async fn raw_cmd(&self, sql: &str) {
+        self.api.quaint().raw_cmd(sql).await.unwrap()
     }
 }
 

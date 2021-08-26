@@ -41,7 +41,7 @@ class SelfRelationFilterBugSpec extends FlatSpec with Matchers with ApiSpecBase 
       .pathAsString("data.createCategory.parent.id")
   }
 
-  "Getting all categories" should "succeed" in {
+  "Getting all categories" should "succeed" taggedAs (IgnoreMsSql) in {
     val allCategories =
       s"""{
          |  allCategories: categories(orderBy: { id: asc }) {
@@ -56,7 +56,7 @@ class SelfRelationFilterBugSpec extends FlatSpec with Matchers with ApiSpecBase 
     res1 should be("""{"data":{"allCategories":[{"name":"Sub","parent":{"name":"Root"}},{"name":"Root","parent":null}]}}""")
   }
 
-  "Getting root categories categories" should "succeed" in {
+  "Getting root categories categories" should "succeed" taggedAs (IgnoreMsSql) in {
     val rootCategories =
       s"""{
          |  allRootCategories: categories(where: { parent: { is: null }}) {
@@ -71,7 +71,7 @@ class SelfRelationFilterBugSpec extends FlatSpec with Matchers with ApiSpecBase 
     res2 should be("""{"data":{"allRootCategories":[{"name":"Root","parent":null}]}}""")
   }
 
-  "Getting subcategories with not" should "succeed" taggedAs (IgnoreMongo) in {
+  "Getting subcategories with not" should "succeed" taggedAs (IgnoreMongo, IgnoreMsSql) in {
     val subCategories = s"""{
                                |  allSubCategories: categories(
                                |    where: { NOT: [{parent: { is: null }}] }
@@ -87,7 +87,7 @@ class SelfRelationFilterBugSpec extends FlatSpec with Matchers with ApiSpecBase 
     res3 should be("""{"data":{"allSubCategories":[{"name":"Sub","parent":{"name":"Root"}}]}}""")
   }
 
-  "Getting subcategories with value" should "succeed" in {
+  "Getting subcategories with value" should "succeed" taggedAs (IgnoreMsSql) in {
     val subCategories2 = s"""{
                            |  allSubCategories2: categories(
                            |    where: { parent: { is: { name: { equals: "Root" }}}}
