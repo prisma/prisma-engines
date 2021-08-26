@@ -1,6 +1,6 @@
 use super::{
-    db::ParserDatabase, lift::LiftAstToDml, standardise_formatting::StandardiserForFormatting,
-    standardise_parsing::StandardiserForParsing, validate::Validator,
+    db::ParserDatabase, lift::LiftAstToDml, standardise_formatting::StandardiserForFormatting, standardise_parsing,
+    validate::Validator,
 };
 use crate::{
     ast, common::preview_features::PreviewFeature, configuration, diagnostics::Diagnostics, ValidatedDatamodel,
@@ -13,7 +13,6 @@ pub(crate) struct ValidationPipeline<'a> {
     source: Option<&'a configuration::Datasource>,
     validator: Validator<'a>,
     standardiser_for_formatting: StandardiserForFormatting,
-    standardiser_for_parsing: StandardiserForParsing,
     preview_features: BitFlags<PreviewFeature>,
 }
 
@@ -28,7 +27,6 @@ impl<'a, 'b> ValidationPipeline<'a> {
             source,
             validator: Validator::new(source, preview_features),
             standardiser_for_formatting: StandardiserForFormatting::new(),
-            standardiser_for_parsing: StandardiserForParsing::new(preview_features),
             preview_features,
         }
     }
@@ -67,7 +65,7 @@ impl<'a, 'b> ValidationPipeline<'a> {
         diagnostics.to_result()?;
 
         // Phase 5: Consistency fixes. These don't fail and always run, during parsing AND formatting
-        self.standardiser_for_parsing.standardise(&mut schema);
+        standardise_parsing::standardise(&mut schema);
 
         // Transform phase: These only run during formatting.
         if relation_transformation_enabled {

@@ -9,11 +9,6 @@ fn on_delete_actions() {
     for action in actions {
         let dml = formatdoc!(
             r#"
-            generator client {{
-                provider = "prisma-client-js"
-                previewFeatures = ["referentialActions"]
-            }}
-
             model A {{
                 id Int @id
                 bs B[]
@@ -42,11 +37,6 @@ fn on_update_actions() {
     for action in actions {
         let dml = formatdoc!(
             r#"
-            generator client {{
-                provider = "prisma-client-js"
-                previewFeatures = ["referentialActions"]
-            }}
-
             model A {{
                 id Int @id
                 bs B[]
@@ -78,11 +68,6 @@ fn actions_on_mongo() {
             datasource db {{
                 provider = "mongodb"
                 url = "mongodb://"
-            }}
-
-            generator client {{
-                provider = "prisma-client-js"
-                previewFeatures = ["referentialActions"]
             }}
 
             model A {{
@@ -122,7 +107,7 @@ fn actions_on_planetscale() {
 
             generator client {{
                 provider = "prisma-client-js"
-                previewFeatures = ["planetScaleMode", "referentialActions"]
+                previewFeatures = ["planetScaleMode"]
             }}
 
             model A {{
@@ -150,11 +135,6 @@ fn actions_on_planetscale() {
 #[test]
 fn invalid_on_delete_action() {
     let dml = indoc! { r#"
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model A {
             id Int @id
             bs B[]
@@ -169,10 +149,10 @@ fn invalid_on_delete_action() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@relation": Invalid referential action: `MeowMeow`[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
-        [1;94m13 | [0m    aId Int
-        [1;94m14 | [0m    a A @relation(fields: [aId], references: [id], onDelete: [1;91mMeowMeow[0m)
+        [1;94m 8 | [0m    aId Int
+        [1;94m 9 | [0m    a A @relation(fields: [aId], references: [id], onDelete: [1;91mMeowMeow[0m)
         [1;94m   | [0m
     "#]];
 
@@ -182,11 +162,6 @@ fn invalid_on_delete_action() {
 #[test]
 fn invalid_on_update_action() {
     let dml = indoc! { r#"
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model A {
             id Int @id
             bs B[]
@@ -201,10 +176,10 @@ fn invalid_on_update_action() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@relation": Invalid referential action: `MeowMeow`[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
-        [1;94m13 | [0m    aId Int
-        [1;94m14 | [0m    a A @relation(fields: [aId], references: [id], onUpdate: [1;91mMeowMeow[0m)
+        [1;94m 8 | [0m    aId Int
+        [1;94m 9 | [0m    a A @relation(fields: [aId], references: [id], onUpdate: [1;91mMeowMeow[0m)
         [1;94m   | [0m
     "#]];
 
@@ -217,11 +192,6 @@ fn restrict_should_not_work_on_sql_server() {
         datasource db {
             provider = "sqlserver"
             url = "sqlserver://"
-        }
-
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
         }
 
         model A {
@@ -238,18 +208,18 @@ fn restrict_should_not_work_on_sql_server() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@relation": Invalid referential action: `Restrict`. Allowed values: (`Cascade`, `NoAction`, `SetNull`, `SetDefault`)[0m
-          [1;94m-->[0m  [4mschema.prisma:19[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m18 | [0m    aId Int
-        [1;94m19 | [0m    [1;91ma A @relation(fields: [aId], references: [id], onUpdate: Restrict, onDelete: Restrict)[0m
-        [1;94m20 | [0m}
+        [1;94m13 | [0m    aId Int
+        [1;94m14 | [0m    [1;91ma A @relation(fields: [aId], references: [id], onUpdate: Restrict, onDelete: Restrict)[0m
+        [1;94m15 | [0m}
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": Invalid referential action: `Restrict`. Allowed values: (`Cascade`, `NoAction`, `SetNull`, `SetDefault`)[0m
-          [1;94m-->[0m  [4mschema.prisma:19[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m18 | [0m    aId Int
-        [1;94m19 | [0m    [1;91ma A @relation(fields: [aId], references: [id], onUpdate: Restrict, onDelete: Restrict)[0m
-        [1;94m20 | [0m}
+        [1;94m13 | [0m    aId Int
+        [1;94m14 | [0m    [1;91ma A @relation(fields: [aId], references: [id], onUpdate: Restrict, onDelete: Restrict)[0m
+        [1;94m15 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -262,11 +232,6 @@ fn actions_should_be_defined_only_from_one_side() {
         datasource db {
             provider = "sqlserver"
             url = "sqlserver://"
-        }
-
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
         }
 
         model A {
@@ -283,18 +248,18 @@ fn actions_should_be_defined_only_from_one_side() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `b` on Model `A` and `a` on Model `B` both provide the `onDelete` or `onUpdate` argument in the @relation attribute. You have to provide it only on one of the two fields.[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
-        [1;94m12 | [0m    id Int @id
-        [1;94m13 | [0m    [1;91mb B? @relation(onUpdate: NoAction, onDelete: NoAction)[0m
-        [1;94m14 | [0m}
+        [1;94m 7 | [0m    id Int @id
+        [1;94m 8 | [0m    [1;91mb B? @relation(onUpdate: NoAction, onDelete: NoAction)[0m
+        [1;94m 9 | [0m}
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `a` on Model `B` and `b` on Model `A` both provide the `onDelete` or `onUpdate` argument in the @relation attribute. You have to provide it only on one of the two fields.[0m
-          [1;94m-->[0m  [4mschema.prisma:19[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m18 | [0m    aId Int
-        [1;94m19 | [0m    [1;91ma A @relation(fields: [aId], references: [id], onUpdate: NoAction, onDelete: NoAction)[0m
-        [1;94m20 | [0m}
+        [1;94m13 | [0m    aId Int
+        [1;94m14 | [0m    [1;91ma A @relation(fields: [aId], references: [id], onUpdate: NoAction, onDelete: NoAction)[0m
+        [1;94m15 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -313,7 +278,7 @@ fn cascade_action_should_not_work_on_planetscale() {
 
             generator client {
                 provider = "prisma-client-js"
-                previewFeatures = ["planetScaleMode", "referentialActions"]
+                previewFeatures = ["planetScaleMode"]
             }
 
             model A {{
@@ -354,7 +319,7 @@ fn no_action_should_not_work_on_planetscale() {
 
             generator client {
                 provider = "prisma-client-js"
-                previewFeatures = ["planetScaleMode", "referentialActions"]
+                previewFeatures = ["planetScaleMode"]
             }
 
             model A {{
@@ -395,7 +360,7 @@ fn set_default_action_should_not_work_on_planetscale() {
 
             generator client {
                 provider = "prisma-client-js"
-                previewFeatures = ["planetScaleMode", "referentialActions"]
+                previewFeatures = ["planetScaleMode"]
             }
 
             model A {{
@@ -432,11 +397,6 @@ fn on_delete_cannot_be_defined_on_the_wrong_side_1_n() {
             url = "mysql://"
         }
 
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model A {
             id Int @id
             bs B[] @relation(onDelete: Restrict)
@@ -451,11 +411,11 @@ fn on_delete_cannot_be_defined_on_the_wrong_side_1_n() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@relation": The relation field `bs` on Model `A` must not specify the `onDelete` or `onUpdate` argument in the @relation attribute. You must only specify it on the opposite field `a` on model `B`, or in case of a many to many relation, in an explicit join table.[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
-        [1;94m12 | [0m    id Int @id
-        [1;94m13 | [0m    [1;91mbs B[] @relation(onDelete: Restrict)[0m
-        [1;94m14 | [0m}
+        [1;94m 7 | [0m    id Int @id
+        [1;94m 8 | [0m    [1;91mbs B[] @relation(onDelete: Restrict)[0m
+        [1;94m 9 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -468,11 +428,6 @@ fn on_update_cannot_be_defined_on_the_wrong_side_1_n() {
         datasource db {
             provider = "mysql"
             url = "mysql://"
-        }
-
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
         }
 
         model A {
@@ -489,11 +444,11 @@ fn on_update_cannot_be_defined_on_the_wrong_side_1_n() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@relation": The relation field `bs` on Model `A` must not specify the `onDelete` or `onUpdate` argument in the @relation attribute. You must only specify it on the opposite field `a` on model `B`, or in case of a many to many relation, in an explicit join table.[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
-        [1;94m12 | [0m    id Int @id
-        [1;94m13 | [0m    [1;91mbs B[] @relation(onUpdate: Restrict)[0m
-        [1;94m14 | [0m}
+        [1;94m 7 | [0m    id Int @id
+        [1;94m 8 | [0m    [1;91mbs B[] @relation(onUpdate: Restrict)[0m
+        [1;94m 9 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -508,11 +463,6 @@ fn on_delete_cannot_be_defined_on_the_wrong_side_1_1() {
             url = "mysql://"
         }
 
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model Chicken {
             id        Int      @id @default(autoincrement())
             cock      Chicken? @relation(name: "a_self_relation", onDelete: NoAction)
@@ -523,11 +473,11 @@ fn on_delete_cannot_be_defined_on_the_wrong_side_1_1() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@relation": The relation field `cock` on Model `Chicken` must not specify the `onDelete` or `onUpdate` argument in the @relation attribute. You must only specify it on the opposite field `hen` on model `Chicken`.[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
-        [1;94m12 | [0m    id        Int      @id @default(autoincrement())
-        [1;94m13 | [0m    [1;91mcock      Chicken? @relation(name: "a_self_relation", onDelete: NoAction)[0m
-        [1;94m14 | [0m    hen       Chicken? @relation(name: "a_self_relation", fields: [chickenId], references: [id])
+        [1;94m 7 | [0m    id        Int      @id @default(autoincrement())
+        [1;94m 8 | [0m    [1;91mcock      Chicken? @relation(name: "a_self_relation", onDelete: NoAction)[0m
+        [1;94m 9 | [0m    hen       Chicken? @relation(name: "a_self_relation", fields: [chickenId], references: [id])
         [1;94m   | [0m
     "#]];
 
@@ -542,11 +492,6 @@ fn on_update_cannot_be_defined_on_the_wrong_side_1_1() {
             url = "mysql://"
         }
 
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model Chicken {
             id        Int      @id @default(autoincrement())
             cock      Chicken? @relation(name: "a_self_relation", onUpdate: NoAction)
@@ -557,65 +502,11 @@ fn on_update_cannot_be_defined_on_the_wrong_side_1_1() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@relation": The relation field `cock` on Model `Chicken` must not specify the `onDelete` or `onUpdate` argument in the @relation attribute. You must only specify it on the opposite field `hen` on model `Chicken`.[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
-        [1;94m12 | [0m    id        Int      @id @default(autoincrement())
-        [1;94m13 | [0m    [1;91mcock      Chicken? @relation(name: "a_self_relation", onUpdate: NoAction)[0m
-        [1;94m14 | [0m    hen       Chicken? @relation(name: "a_self_relation", fields: [chickenId], references: [id])
-        [1;94m   | [0m
-    "#]];
-
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
-}
-
-#[test]
-fn on_delete_without_preview_feature_should_error() {
-    let dml = indoc! { r#"
-        model A {
-            id Int @id
-            bs B[]
-        }
-
-        model B {
-            id Int @id
-            aId Int
-            a A @relation(fields: [aId], references: [id], onDelete: Restrict)
-        }
-    "#};
-
-    let expect = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@relation": The relation field `a` on Model `B` must not specify the `onDelete` argument in the @relation attribute without enabling the `referentialActions` preview feature.[0m
-          [1;94m-->[0m  [4mschema.prisma:9[0m
-        [1;94m   | [0m
-        [1;94m 8 | [0m    aId Int
-        [1;94m 9 | [0m    a A @relation(fields: [aId], references: [id], [1;91monDelete: Restrict[0m)
-        [1;94m   | [0m
-    "#]];
-
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
-}
-
-#[test]
-fn on_update_without_preview_feature_should_error() {
-    let dml = indoc! { r#"
-        model A {
-            id Int @id
-            bs B[]
-        }
-
-        model B {
-            id Int @id
-            aId Int
-            a A @relation(fields: [aId], references: [id], onUpdate: Restrict)
-        }
-    "#};
-
-    let expect = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@relation": The relation field `a` on Model `B` must not specify the `onUpdate` argument in the @relation attribute without enabling the `referentialActions` preview feature.[0m
-          [1;94m-->[0m  [4mschema.prisma:9[0m
-        [1;94m   | [0m
-        [1;94m 8 | [0m    aId Int
-        [1;94m 9 | [0m    a A @relation(fields: [aId], references: [id], [1;91monUpdate: Restrict[0m)
+        [1;94m 7 | [0m    id        Int      @id @default(autoincrement())
+        [1;94m 8 | [0m    [1;91mcock      Chicken? @relation(name: "a_self_relation", onUpdate: NoAction)[0m
+        [1;94m 9 | [0m    hen       Chicken? @relation(name: "a_self_relation", fields: [chickenId], references: [id])
         [1;94m   | [0m
     "#]];
 
@@ -631,11 +522,6 @@ fn sql_server_cascading_on_delete_self_relations() {
             url = "sqlserver://"
         }
 
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model A {
             id     Int  @id @default(autoincrement())
             child  A?   @relation(name: "a_self_relation")
@@ -646,18 +532,18 @@ fn sql_server_cascading_on_delete_self_relations() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Implicit default `onDelete` and `onUpdate` values: `SetNull` and `Cascade`. Read more at https://pris.ly/d/cyclic-referential-actions[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
-        [1;94m12 | [0m    id     Int  @id @default(autoincrement())
-        [1;94m13 | [0m    [1;91mchild  A?   @relation(name: "a_self_relation")[0m
-        [1;94m14 | [0m    parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: Cascade)
+        [1;94m 7 | [0m    id     Int  @id @default(autoincrement())
+        [1;94m 8 | [0m    [1;91mchild  A?   @relation(name: "a_self_relation")[0m
+        [1;94m 9 | [0m    parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: Cascade)
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Implicit default `onUpdate` value: `Cascade`. Read more at https://pris.ly/d/cyclic-referential-actions[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
-        [1;94m13 | [0m    child  A?   @relation(name: "a_self_relation")
-        [1;94m14 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: Cascade)[0m
-        [1;94m15 | [0m    aId    Int?
+        [1;94m 8 | [0m    child  A?   @relation(name: "a_self_relation")
+        [1;94m 9 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: Cascade)[0m
+        [1;94m10 | [0m    aId    Int?
         [1;94m   | [0m
     "#]];
 
@@ -673,11 +559,6 @@ fn sql_server_cascading_on_update_self_relations() {
             url = "sqlserver://"
         }
 
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model A {
             id     Int  @id @default(autoincrement())
             child  A?   @relation(name: "a_self_relation")
@@ -688,18 +569,18 @@ fn sql_server_cascading_on_update_self_relations() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Implicit default `onDelete` and `onUpdate` values: `SetNull` and `Cascade`. Read more at https://pris.ly/d/cyclic-referential-actions[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
-        [1;94m12 | [0m    id     Int  @id @default(autoincrement())
-        [1;94m13 | [0m    [1;91mchild  A?   @relation(name: "a_self_relation")[0m
-        [1;94m14 | [0m    parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: Cascade)
+        [1;94m 7 | [0m    id     Int  @id @default(autoincrement())
+        [1;94m 8 | [0m    [1;91mchild  A?   @relation(name: "a_self_relation")[0m
+        [1;94m 9 | [0m    parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: Cascade)
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Implicit default `onDelete` value: `SetNull`. Read more at https://pris.ly/d/cyclic-referential-actions[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
-        [1;94m13 | [0m    child  A?   @relation(name: "a_self_relation")
-        [1;94m14 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: Cascade)[0m
-        [1;94m15 | [0m    aId    Int?
+        [1;94m 8 | [0m    child  A?   @relation(name: "a_self_relation")
+        [1;94m 9 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: Cascade)[0m
+        [1;94m10 | [0m    aId    Int?
         [1;94m   | [0m
     "#]];
 
@@ -715,11 +596,6 @@ fn sql_server_null_setting_on_delete_self_relations() {
             url = "sqlserver://"
         }
 
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model A {
             id     Int  @id @default(autoincrement())
             child  A?   @relation(name: "a_self_relation")
@@ -730,18 +606,18 @@ fn sql_server_null_setting_on_delete_self_relations() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Implicit default `onDelete` and `onUpdate` values: `SetNull` and `Cascade`. Read more at https://pris.ly/d/cyclic-referential-actions[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
-        [1;94m12 | [0m    id     Int  @id @default(autoincrement())
-        [1;94m13 | [0m    [1;91mchild  A?   @relation(name: "a_self_relation")[0m
-        [1;94m14 | [0m    parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: SetNull)
+        [1;94m 7 | [0m    id     Int  @id @default(autoincrement())
+        [1;94m 8 | [0m    [1;91mchild  A?   @relation(name: "a_self_relation")[0m
+        [1;94m 9 | [0m    parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: SetNull)
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Implicit default `onUpdate` value: `Cascade`. Read more at https://pris.ly/d/cyclic-referential-actions[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
-        [1;94m13 | [0m    child  A?   @relation(name: "a_self_relation")
-        [1;94m14 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: SetNull)[0m
-        [1;94m15 | [0m    aId    Int?
+        [1;94m 8 | [0m    child  A?   @relation(name: "a_self_relation")
+        [1;94m 9 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: SetNull)[0m
+        [1;94m10 | [0m    aId    Int?
         [1;94m   | [0m
     "#]];
 
@@ -757,11 +633,6 @@ fn sql_server_null_setting_on_update_self_relations() {
             url = "sqlserver://"
         }
 
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model A {
             id     Int  @id @default(autoincrement())
             child  A?   @relation(name: "a_self_relation")
@@ -772,18 +643,18 @@ fn sql_server_null_setting_on_update_self_relations() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Implicit default `onDelete` and `onUpdate` values: `SetNull` and `Cascade`. Read more at https://pris.ly/d/cyclic-referential-actions[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
-        [1;94m12 | [0m    id     Int  @id @default(autoincrement())
-        [1;94m13 | [0m    [1;91mchild  A?   @relation(name: "a_self_relation")[0m
-        [1;94m14 | [0m    parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: SetNull)
+        [1;94m 7 | [0m    id     Int  @id @default(autoincrement())
+        [1;94m 8 | [0m    [1;91mchild  A?   @relation(name: "a_self_relation")[0m
+        [1;94m 9 | [0m    parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: SetNull)
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Implicit default `onDelete` value: `SetNull`. Read more at https://pris.ly/d/cyclic-referential-actions[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
-        [1;94m13 | [0m    child  A?   @relation(name: "a_self_relation")
-        [1;94m14 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: SetNull)[0m
-        [1;94m15 | [0m    aId    Int?
+        [1;94m 8 | [0m    child  A?   @relation(name: "a_self_relation")
+        [1;94m 9 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: SetNull)[0m
+        [1;94m10 | [0m    aId    Int?
         [1;94m   | [0m
     "#]];
 
@@ -799,11 +670,6 @@ fn sql_server_default_setting_on_delete_self_relations() {
             url = "sqlserver://"
         }
 
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model A {
             id     Int  @id @default(autoincrement())
             child  A?   @relation(name: "a_self_relation")
@@ -814,18 +680,18 @@ fn sql_server_default_setting_on_delete_self_relations() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Implicit default `onDelete` and `onUpdate` values: `SetNull` and `Cascade`. Read more at https://pris.ly/d/cyclic-referential-actions[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
-        [1;94m12 | [0m    id     Int  @id @default(autoincrement())
-        [1;94m13 | [0m    [1;91mchild  A?   @relation(name: "a_self_relation")[0m
-        [1;94m14 | [0m    parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: SetDefault)
+        [1;94m 7 | [0m    id     Int  @id @default(autoincrement())
+        [1;94m 8 | [0m    [1;91mchild  A?   @relation(name: "a_self_relation")[0m
+        [1;94m 9 | [0m    parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: SetDefault)
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Implicit default `onUpdate` value: `Cascade`. Read more at https://pris.ly/d/cyclic-referential-actions[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
-        [1;94m13 | [0m    child  A?   @relation(name: "a_self_relation")
-        [1;94m14 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: SetDefault)[0m
-        [1;94m15 | [0m    aId    Int?
+        [1;94m 8 | [0m    child  A?   @relation(name: "a_self_relation")
+        [1;94m 9 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: SetDefault)[0m
+        [1;94m10 | [0m    aId    Int?
         [1;94m   | [0m
     "#]];
 
@@ -841,11 +707,6 @@ fn sql_server_default_setting_on_update_self_relations() {
             url = "sqlserver://"
         }
 
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model A {
             id     Int  @id @default(autoincrement())
             child  A?   @relation(name: "a_self_relation")
@@ -856,18 +717,18 @@ fn sql_server_default_setting_on_update_self_relations() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Implicit default `onDelete` and `onUpdate` values: `SetNull` and `Cascade`. Read more at https://pris.ly/d/cyclic-referential-actions[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
-        [1;94m12 | [0m    id     Int  @id @default(autoincrement())
-        [1;94m13 | [0m    [1;91mchild  A?   @relation(name: "a_self_relation")[0m
-        [1;94m14 | [0m    parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: SetDefault)
+        [1;94m 7 | [0m    id     Int  @id @default(autoincrement())
+        [1;94m 8 | [0m    [1;91mchild  A?   @relation(name: "a_self_relation")[0m
+        [1;94m 9 | [0m    parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: SetDefault)
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Implicit default `onDelete` value: `SetNull`. Read more at https://pris.ly/d/cyclic-referential-actions[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
-        [1;94m13 | [0m    child  A?   @relation(name: "a_self_relation")
-        [1;94m14 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: SetDefault)[0m
-        [1;94m15 | [0m    aId    Int?
+        [1;94m 8 | [0m    child  A?   @relation(name: "a_self_relation")
+        [1;94m 9 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: SetDefault)[0m
+        [1;94m10 | [0m    aId    Int?
         [1;94m   | [0m
     "#]];
 
@@ -881,11 +742,6 @@ fn sql_server_cascading_cyclic_one_hop_relations() {
         datasource db {
             provider = "sqlserver"
             url = "sqlserver://"
-        }
-
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
         }
 
         model A {
@@ -905,18 +761,18 @@ fn sql_server_cascading_cyclic_one_hop_relations() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Cycle path: A.b → B.a. Implicit default `onUpdate` value: `Cascade`. Read more at https://pris.ly/d/cyclic-referential-actions[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
-        [1;94m12 | [0m    id     Int  @id @default(autoincrement())
-        [1;94m13 | [0m    [1;91mb      B    @relation(name: "foo", fields: [bId], references: [id], onDelete: Cascade)[0m
-        [1;94m14 | [0m    bId    Int
+        [1;94m 7 | [0m    id     Int  @id @default(autoincrement())
+        [1;94m 8 | [0m    [1;91mb      B    @relation(name: "foo", fields: [bId], references: [id], onDelete: Cascade)[0m
+        [1;94m 9 | [0m    bId    Int
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Cycle path: B.a → A.b. Read more at https://pris.ly/d/cyclic-referential-actions[0m
-          [1;94m-->[0m  [4mschema.prisma:20[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
-        [1;94m19 | [0m    id     Int @id @default(autoincrement())
-        [1;94m20 | [0m    [1;91ma      A   @relation(name: "bar", fields: [aId], references: [id], onUpdate: Cascade)[0m
-        [1;94m21 | [0m    as     A[] @relation(name: "foo")
+        [1;94m14 | [0m    id     Int @id @default(autoincrement())
+        [1;94m15 | [0m    [1;91ma      A   @relation(name: "bar", fields: [aId], references: [id], onUpdate: Cascade)[0m
+        [1;94m16 | [0m    as     A[] @relation(name: "foo")
         [1;94m   | [0m
     "#]];
 
@@ -930,11 +786,6 @@ fn sql_server_cascading_cyclic_hop_over_table_relations() {
         datasource db {
             provider = "sqlserver"
             url = "sqlserver://"
-        }
-
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
         }
 
         model A {
@@ -961,25 +812,25 @@ fn sql_server_cascading_cyclic_hop_over_table_relations() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Cycle path: A.b → B.c → C.a. Implicit default `onUpdate` value: `Cascade`. Read more at https://pris.ly/d/cyclic-referential-actions[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
-        [1;94m13 | [0m    bId    Int
-        [1;94m14 | [0m    [1;91mb      B    @relation(fields: [bId], references: [id])[0m
-        [1;94m15 | [0m    cs     C[]
+        [1;94m 8 | [0m    bId    Int
+        [1;94m 9 | [0m    [1;91mb      B    @relation(fields: [bId], references: [id])[0m
+        [1;94m10 | [0m    cs     C[]
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Cycle path: B.c → C.a → A.b. Implicit default `onUpdate` value: `Cascade`. Read more at https://pris.ly/d/cyclic-referential-actions[0m
-          [1;94m-->[0m  [4mschema.prisma:22[0m
+          [1;94m-->[0m  [4mschema.prisma:17[0m
         [1;94m   | [0m
-        [1;94m21 | [0m    cId    Int
-        [1;94m22 | [0m    [1;91mc      C    @relation(fields: [cId], references: [id])[0m
-        [1;94m23 | [0m}
+        [1;94m16 | [0m    cId    Int
+        [1;94m17 | [0m    [1;91mc      C    @relation(fields: [cId], references: [id])[0m
+        [1;94m18 | [0m}
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Cycle path: C.a → A.b → B.c. Implicit default `onUpdate` value: `Cascade`. Read more at https://pris.ly/d/cyclic-referential-actions[0m
-          [1;94m-->[0m  [4mschema.prisma:29[0m
+          [1;94m-->[0m  [4mschema.prisma:24[0m
         [1;94m   | [0m
-        [1;94m28 | [0m    aId    Int
-        [1;94m29 | [0m    [1;91ma      A   @relation(fields: [aId], references: [id])[0m
-        [1;94m30 | [0m}
+        [1;94m23 | [0m    aId    Int
+        [1;94m24 | [0m    [1;91ma      A   @relation(fields: [aId], references: [id])[0m
+        [1;94m25 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -993,11 +844,6 @@ fn sql_server_cascading_cyclic_hop_over_backrelation() {
         datasource test {
             provider = "sqlserver"
             url      = "sqlserver://localhost:1433;database=master;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true"
-        }
-
-        generator client {
-            provider        = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
         }
 
         model User {
@@ -1031,25 +877,25 @@ fn sql_server_cascading_cyclic_hop_over_backrelation() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Cycle path: Post.author → User.comments → Comment.post. Implicit default `onUpdate` value: `Cascade`. Read more at https://pris.ly/d/cyclic-referential-actions[0m
-          [1;94m-->[0m  [4mschema.prisma:20[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
-        [1;94m19 | [0m    authorId  Int
-        [1;94m20 | [0m    [1;91mauthor    User      @relation(fields: [authorId], references: [id])[0m
-        [1;94m21 | [0m    comments  Comment[]
+        [1;94m14 | [0m    authorId  Int
+        [1;94m15 | [0m    [1;91mauthor    User      @relation(fields: [authorId], references: [id])[0m
+        [1;94m16 | [0m    comments  Comment[]
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Cycle path: Comment.writtenBy → User.posts → Post.comments. Implicit default `onUpdate` value: `Cascade`. Read more at https://pris.ly/d/cyclic-referential-actions[0m
-          [1;94m-->[0m  [4mschema.prisma:29[0m
+          [1;94m-->[0m  [4mschema.prisma:24[0m
         [1;94m   | [0m
-        [1;94m28 | [0m    postId      Int
-        [1;94m29 | [0m    [1;91mwrittenBy   User     @relation(fields: [writtenById], references: [id])[0m
-        [1;94m30 | [0m    post        Post     @relation(fields: [postId], references: [id])
+        [1;94m23 | [0m    postId      Int
+        [1;94m24 | [0m    [1;91mwrittenBy   User     @relation(fields: [writtenById], references: [id])[0m
+        [1;94m25 | [0m    post        Post     @relation(fields: [postId], references: [id])
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Cycle path: Comment.post → Post.author → User.comments. Implicit default `onUpdate` value: `Cascade`. Read more at https://pris.ly/d/cyclic-referential-actions[0m
-          [1;94m-->[0m  [4mschema.prisma:30[0m
+          [1;94m-->[0m  [4mschema.prisma:25[0m
         [1;94m   | [0m
-        [1;94m29 | [0m    writtenBy   User     @relation(fields: [writtenById], references: [id])
-        [1;94m30 | [0m    [1;91mpost        Post     @relation(fields: [postId], references: [id])[0m
-        [1;94m31 | [0m}
+        [1;94m24 | [0m    writtenBy   User     @relation(fields: [writtenById], references: [id])
+        [1;94m25 | [0m    [1;91mpost        Post     @relation(fields: [postId], references: [id])[0m
+        [1;94m26 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -1063,11 +909,6 @@ fn sql_server_cascading_cyclic_crossing_path_relations() {
         datasource db {
             provider = "sqlserver"
             url = "sqlserver://"
-        }
-
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
         }
 
         model A {
@@ -1094,25 +935,25 @@ fn sql_server_cascading_cyclic_crossing_path_relations() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Cycle path: A.b → B.cs → C.a. Implicit default `onUpdate` value: `Cascade`. Read more at https://pris.ly/d/cyclic-referential-actions[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
-        [1;94m13 | [0m    bId    Int
-        [1;94m14 | [0m    [1;91mb      B    @relation(fields: [bId], references: [id])[0m
-        [1;94m15 | [0m    cs     C[]
+        [1;94m 8 | [0m    bId    Int
+        [1;94m 9 | [0m    [1;91mb      B    @relation(fields: [bId], references: [id])[0m
+        [1;94m10 | [0m    cs     C[]
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Cycle path: C.a → A.b → B.cs. Implicit default `onUpdate` value: `Cascade`. Read more at https://pris.ly/d/cyclic-referential-actions[0m
-          [1;94m-->[0m  [4mschema.prisma:28[0m
+          [1;94m-->[0m  [4mschema.prisma:23[0m
         [1;94m   | [0m
-        [1;94m27 | [0m    bId    Int
-        [1;94m28 | [0m    [1;91ma      A    @relation(fields: [aId], references: [id])[0m
-        [1;94m29 | [0m    b      B    @relation(fields: [bId], references: [id])
+        [1;94m22 | [0m    bId    Int
+        [1;94m23 | [0m    [1;91ma      A    @relation(fields: [aId], references: [id])[0m
+        [1;94m24 | [0m    b      B    @relation(fields: [bId], references: [id])
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Cycle path: C.b → B.as → A.cs. Implicit default `onUpdate` value: `Cascade`. Read more at https://pris.ly/d/cyclic-referential-actions[0m
-          [1;94m-->[0m  [4mschema.prisma:29[0m
+          [1;94m-->[0m  [4mschema.prisma:24[0m
         [1;94m   | [0m
-        [1;94m28 | [0m    a      A    @relation(fields: [aId], references: [id])
-        [1;94m29 | [0m    [1;91mb      B    @relation(fields: [bId], references: [id])[0m
-        [1;94m30 | [0m}
+        [1;94m23 | [0m    a      A    @relation(fields: [aId], references: [id])
+        [1;94m24 | [0m    [1;91mb      B    @relation(fields: [bId], references: [id])[0m
+        [1;94m25 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -1125,11 +966,6 @@ fn cycle_detection_prints_the_right_path() {
     datasource db {
         provider = "sqlserver"
         url = "sqlserver://"
-    }
-
-    generator client {
-        provider = "prisma-client-js"
-        previewFeatures = ["referentialActions"]
     }
 
     model Post {
@@ -1180,25 +1016,25 @@ fn cycle_detection_prints_the_right_path() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Cycle path: Post.user → User.comment → Comment.post. Implicit default `onUpdate` value: `Cascade`. Read more at https://pris.ly/d/cyclic-referential-actions[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
-        [1;94m14 | [0m        user_id  Int       @map("bId")
-        [1;94m15 | [0m        [1;91muser     User      @relation(fields: [user_id], references: [id])[0m
-        [1;94m16 | [0m        comments Comment[]
+        [1;94m 9 | [0m        user_id  Int       @map("bId")
+        [1;94m10 | [0m        [1;91muser     User      @relation(fields: [user_id], references: [id])[0m
+        [1;94m11 | [0m        comments Comment[]
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Cycle path: User.comment → Comment.post → Post.user. Implicit default `onUpdate` value: `Cascade`. Read more at https://pris.ly/d/cyclic-referential-actions[0m
-          [1;94m-->[0m  [4mschema.prisma:26[0m
+          [1;94m-->[0m  [4mschema.prisma:21[0m
         [1;94m   | [0m
-        [1;94m25 | [0m        address    Address @relation(fields: [address_id], references: [id])
-        [1;94m26 | [0m        [1;91mcomment    Comment @relation(fields: [comment_id], references: [id])[0m
-        [1;94m27 | [0m        @@map("B")
+        [1;94m20 | [0m        address    Address @relation(fields: [address_id], references: [id])
+        [1;94m21 | [0m        [1;91mcomment    Comment @relation(fields: [comment_id], references: [id])[0m
+        [1;94m22 | [0m        @@map("B")
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Cycle path: Comment.post → Post.user → User.comment. Implicit default `onUpdate` value: `Cascade`. Read more at https://pris.ly/d/cyclic-referential-actions[0m
-          [1;94m-->[0m  [4mschema.prisma:53[0m
+          [1;94m-->[0m  [4mschema.prisma:48[0m
         [1;94m   | [0m
-        [1;94m52 | [0m        post_id Int    @map("aId")
-        [1;94m53 | [0m        [1;91mpost    Post   @relation(fields: [post_id], references: [id])[0m
-        [1;94m54 | [0m        @@map("C")
+        [1;94m47 | [0m        post_id Int    @map("aId")
+        [1;94m48 | [0m        [1;91mpost    Post   @relation(fields: [post_id], references: [id])[0m
+        [1;94m49 | [0m        @@map("C")
         [1;94m   | [0m
     "#]];
 

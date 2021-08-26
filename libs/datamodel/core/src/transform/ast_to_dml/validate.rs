@@ -507,41 +507,7 @@ impl<'a> Validator<'a> {
                     ));
                 }
 
-                if !self.preview_features.contains(PreviewFeature::ReferentialActions) {
-                    if rel_info.on_delete.is_some() && !rel_info.legacy_referential_actions {
-                        let message = &format!(
-                            "The relation field `{}` on Model `{}` must not specify the `onDelete` argument in the {} attribute without enabling the `referentialActions` preview feature.",
-                            &field.name, &model.name, RELATION_ATTRIBUTE_NAME_WITH_AT
-                        );
-
-                        let attribute_span = ast_field
-                            .map(|f| f.span_for_argument("relation", "onDelete"))
-                            .unwrap_or_else(ast::Span::empty);
-
-                        errors.push_error(DatamodelError::new_attribute_validation_error(
-                            message,
-                            RELATION_ATTRIBUTE_NAME,
-                            attribute_span,
-                        ));
-                    }
-
-                    if rel_info.on_update.is_some() && !rel_info.legacy_referential_actions {
-                        let message = &format!(
-                            "The relation field `{}` on Model `{}` must not specify the `onUpdate` argument in the {} attribute without enabling the `referentialActions` preview feature.",
-                            &field.name, &model.name, RELATION_ATTRIBUTE_NAME_WITH_AT
-                        );
-
-                        let attribute_span = ast_field
-                            .map(|f| f.span_for_argument("relation", "onUpdate"))
-                            .unwrap_or_else(ast::Span::empty);
-
-                        errors.push_error(DatamodelError::new_attribute_validation_error(
-                            message,
-                            RELATION_ATTRIBUTE_NAME,
-                            attribute_span,
-                        ));
-                    }
-                } else if field.is_list()
+                if field.is_list()
                     && !related_field.is_list()
                     && (rel_info.on_delete.is_some() || rel_info.on_update.is_some())
                 {
@@ -598,35 +564,32 @@ impl<'a> Validator<'a> {
                         ));
                     }
 
-                    if self.preview_features.contains(PreviewFeature::ReferentialActions) {
-                        if (rel_info.on_delete.is_some() || rel_info.on_update.is_some())
-                            && (related_field_rel_info.on_delete.is_some()
-                                || related_field_rel_info.on_update.is_some())
-                        {
-                            let message = format!(
-                                "The relation fields `{}` on Model `{}` and `{}` on Model `{}` both provide the `onDelete` or `onUpdate` argument in the {} attribute. You have to provide it only on one of the two fields.",
-                                &field.name, &model.name, &related_field.name, &related_model.name, RELATION_ATTRIBUTE_NAME_WITH_AT
-                            );
+                    if (rel_info.on_delete.is_some() || rel_info.on_update.is_some())
+                        && (related_field_rel_info.on_delete.is_some() || related_field_rel_info.on_update.is_some())
+                    {
+                        let message = format!(
+                            "The relation fields `{}` on Model `{}` and `{}` on Model `{}` both provide the `onDelete` or `onUpdate` argument in the {} attribute. You have to provide it only on one of the two fields.",
+                            &field.name, &model.name, &related_field.name, &related_model.name, RELATION_ATTRIBUTE_NAME_WITH_AT
+                        );
 
-                            errors.push_error(DatamodelError::new_attribute_validation_error(
-                                &message,
-                                RELATION_ATTRIBUTE_NAME,
-                                field_span,
-                            ));
-                        } else if rel_info.fields.is_empty()
-                            && (rel_info.on_delete.is_some() || rel_info.on_update.is_some())
-                        {
-                            let message = &format!(
-                                "The relation field `{}` on Model `{}` must not specify the `onDelete` or `onUpdate` argument in the {} attribute. You must only specify it on the opposite field `{}` on model `{}`.",
-                                &field.name, &model.name, RELATION_ATTRIBUTE_NAME_WITH_AT, &related_field.name, &related_model.name
-                            );
+                        errors.push_error(DatamodelError::new_attribute_validation_error(
+                            &message,
+                            RELATION_ATTRIBUTE_NAME,
+                            field_span,
+                        ));
+                    } else if rel_info.fields.is_empty()
+                        && (rel_info.on_delete.is_some() || rel_info.on_update.is_some())
+                    {
+                        let message = &format!(
+                            "The relation field `{}` on Model `{}` must not specify the `onDelete` or `onUpdate` argument in the {} attribute. You must only specify it on the opposite field `{}` on model `{}`.",
+                            &field.name, &model.name, RELATION_ATTRIBUTE_NAME_WITH_AT, &related_field.name, &related_model.name
+                        );
 
-                            errors.push_error(DatamodelError::new_attribute_validation_error(
-                                message,
-                                RELATION_ATTRIBUTE_NAME,
-                                field_span,
-                            ));
-                        }
+                        errors.push_error(DatamodelError::new_attribute_validation_error(
+                            message,
+                            RELATION_ATTRIBUTE_NAME,
+                            field_span,
+                        ));
                     }
 
                     if !rel_info.fields.is_empty() && !related_field_rel_info.fields.is_empty() {
@@ -702,7 +665,6 @@ impl<'a> Validator<'a> {
                 }
 
                 if !field.is_list()
-                    && self.preview_features.contains(PreviewFeature::ReferentialActions)
                     && self
                         .source
                         .map(|source| &source.active_connector)

@@ -74,7 +74,6 @@ pub static GENERATOR: Lazy<FeatureMap> = Lazy::new(|| {
             OrderByAggregateGroup,
             FilterJson,
             PlanetScaleMode,
-            ReferentialActions,
             MongoDb,
             InteractiveTransactions,
             NamedConstraints,
@@ -92,6 +91,7 @@ pub static GENERATOR: Lazy<FeatureMap> = Lazy::new(|| {
             GroupBy,
             CreateMany,
             MicrosoftSqlServer,
+            ReferentialActions,
         ])
 });
 

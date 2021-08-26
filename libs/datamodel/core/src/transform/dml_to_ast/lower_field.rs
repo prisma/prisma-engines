@@ -188,19 +188,17 @@ impl<'a> LowerDmlToAst<'a> {
                 }
             }
 
-            if self.preview_features.contains(PreviewFeature::ReferentialActions) {
-                if let Some(ref_action) = relation_info.on_delete {
-                    if rf.default_on_delete_action() != ref_action {
-                        let expression = ast::Expression::ConstantValue(ref_action.to_string(), ast::Span::empty());
-                        args.push(ast::Argument::new("onDelete", expression));
-                    }
+            if let Some(ref_action) = relation_info.on_delete {
+                if rf.default_on_delete_action() != ref_action {
+                    let expression = ast::Expression::ConstantValue(ref_action.to_string(), ast::Span::empty());
+                    args.push(ast::Argument::new("onDelete", expression));
                 }
+            }
 
-                if let Some(ref_action) = relation_info.on_update {
-                    if rf.default_on_update_action() != ref_action {
-                        let expression = ast::Expression::ConstantValue(ref_action.to_string(), ast::Span::empty());
-                        args.push(ast::Argument::new("onUpdate", expression));
-                    }
+            if let Some(ref_action) = relation_info.on_update {
+                if rf.default_on_update_action() != ref_action {
+                    let expression = ast::Expression::ConstantValue(ref_action.to_string(), ast::Span::empty());
+                    args.push(ast::Argument::new("onUpdate", expression));
                 }
             }
 

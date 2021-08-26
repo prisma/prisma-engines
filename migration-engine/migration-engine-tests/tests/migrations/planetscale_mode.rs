@@ -44,7 +44,7 @@ fn schema_push_planetscale_mode_works(api: TestApi) {
         .assert_table("Comment", |table| table.assert_foreign_keys_count(0));
 }
 
-#[test_connector]
+#[test_connector(tags(Mysql))]
 fn create_migration_planetscale_mode_works(api: TestApi) {
     let migrations_directory = api.create_migrations_directory();
 

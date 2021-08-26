@@ -137,7 +137,7 @@ class DeleteMutationRelationsSpec extends FlatSpec with Matchers with ApiSpecBas
     }
   }
 
-  "a PM to C1!  relation " should "error when deleting the parent" in {
+  "a PM to C1!  relation " should "error when deleting the parent" taggedAs (IgnoreSQLite, IgnoreMsSql, IgnoreMySql, IgnoreMySql56, IgnorePostgres, IgnoreVitess) in {
     schemaWithRelation(onParent = ChildList, onChild = ParentReq).test { t =>
       val project = SchemaDsl.fromStringV11() {
         t.datamodel
@@ -223,7 +223,7 @@ class DeleteMutationRelationsSpec extends FlatSpec with Matchers with ApiSpecBas
 
   }
 
-  "a P1 to C1!  relation " should "error when trying to delete the parent" in {
+  "a P1 to C1!  relation " should "error when trying to delete the parent" taggedAs (IgnoreSQLite, IgnoreMsSql, IgnoreMySql, IgnoreMySql56, IgnorePostgres, IgnoreVitess) in {
     schemaWithRelation(onParent = ChildOpt, onChild = ParentReq).test { t =>
       val project = SchemaDsl.fromStringV11() {
         t.datamodel

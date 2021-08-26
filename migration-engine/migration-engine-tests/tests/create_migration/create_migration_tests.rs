@@ -504,7 +504,7 @@ fn no_additional_unique_created(api: TestApi) {
                         );
 
                         -- AddForeignKey
-                        ALTER TABLE "Collar" ADD FOREIGN KEY ("id") REFERENCES "Cat"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+                        ALTER TABLE "Collar" ADD FOREIGN KEY ("id") REFERENCES "Cat"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
                         "#
                     }
                 }
@@ -578,7 +578,7 @@ fn create_constraint_name_tests_w_implicit_names(api: TestApi) {
                      CREATE INDEX [B_a_b_idx] ON [create_constraint_name_tests_w_implicit_names].[B]([a], [b]);
                      
                      -- AddForeignKey
-                     ALTER TABLE [create_constraint_name_tests_w_implicit_names].[B] ADD CONSTRAINT [B_aId_fkey] FOREIGN KEY ([aId]) REFERENCES [create_constraint_name_tests_w_implicit_names].[A]([id]) ON DELETE CASCADE ON UPDATE CASCADE;
+                     ALTER TABLE [create_constraint_name_tests_w_implicit_names].[B] ADD CONSTRAINT [B_aId_fkey] FOREIGN KEY ([aId]) REFERENCES [create_constraint_name_tests_w_implicit_names].[A]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
                      
                      COMMIT TRAN;
                      
@@ -629,7 +629,7 @@ fn create_constraint_name_tests_w_implicit_names(api: TestApi) {
                      CREATE INDEX "B_a_b_idx" ON "B"("a", "b");
                      
                      -- AddForeignKey
-                     ALTER TABLE "B" ADD CONSTRAINT "B_aId_fkey" FOREIGN KEY ("aId") REFERENCES "A"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+                     ALTER TABLE "B" ADD CONSTRAINT "B_aId_fkey" FOREIGN KEY ("aId") REFERENCES "A"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
                  "#
                  }
             } else if api.is_mysql(){
@@ -659,7 +659,7 @@ fn create_constraint_name_tests_w_implicit_names(api: TestApi) {
                  ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
                  
                  -- AddForeignKey
-                 ALTER TABLE `B` ADD CONSTRAINT `B_aId_fkey` FOREIGN KEY (`aId`) REFERENCES `A`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+                 ALTER TABLE `B` ADD CONSTRAINT `B_aId_fkey` FOREIGN KEY (`aId`) REFERENCES `A`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
                  "#
                  }
             }else if api.is_sqlite(){
@@ -679,7 +679,7 @@ fn create_constraint_name_tests_w_implicit_names(api: TestApi) {
                      "aId" INTEGER NOT NULL,
                  
                      PRIMARY KEY ("a", "b"),
-                     CONSTRAINT "B_aId_fkey" FOREIGN KEY ("aId") REFERENCES "A" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+                     CONSTRAINT "B_aId_fkey" FOREIGN KEY ("aId") REFERENCES "A" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
                  );
                  
                  -- CreateIndex
@@ -769,7 +769,7 @@ fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
                      CREATE INDEX [CompoundIndex] ON [create_constraint_name_tests_w_explicit_names].[B]([a], [b]);
                      
                      -- AddForeignKey
-                     ALTER TABLE [create_constraint_name_tests_w_explicit_names].[B] ADD CONSTRAINT [ForeignKey] FOREIGN KEY ([aId]) REFERENCES [create_constraint_name_tests_w_explicit_names].[A]([id]) ON DELETE CASCADE ON UPDATE CASCADE;
+                     ALTER TABLE [create_constraint_name_tests_w_explicit_names].[B] ADD CONSTRAINT [ForeignKey] FOREIGN KEY ([aId]) REFERENCES [create_constraint_name_tests_w_explicit_names].[A]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
                      
                      COMMIT TRAN;
                      
@@ -823,7 +823,7 @@ fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
                      CREATE INDEX "CompoundIndex" ON "B"("a", "b");
                      
                      -- AddForeignKey
-                     ALTER TABLE "B" ADD CONSTRAINT "ForeignKey" FOREIGN KEY ("aId") REFERENCES "A"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+                     ALTER TABLE "B" ADD CONSTRAINT "ForeignKey" FOREIGN KEY ("aId") REFERENCES "A"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
                  "#
                  }
             } else if api.is_mysql(){
@@ -854,7 +854,7 @@ fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
                  ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
                  
                  -- AddForeignKey
-                 ALTER TABLE `B` ADD CONSTRAINT `ForeignKey` FOREIGN KEY (`aId`) REFERENCES `A`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+                 ALTER TABLE `B` ADD CONSTRAINT `ForeignKey` FOREIGN KEY (`aId`) REFERENCES `A`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
                  "#
                  }
             }else if api.is_sqlite(){
@@ -874,7 +874,7 @@ fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
                      "aId" INTEGER NOT NULL,
                  
                      PRIMARY KEY ("a", "b"),
-                     CONSTRAINT "B_aId_fkey" FOREIGN KEY ("aId") REFERENCES "A" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+                     CONSTRAINT "B_aId_fkey" FOREIGN KEY ("aId") REFERENCES "A" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
                  );
                  
                  -- CreateIndex
@@ -980,7 +980,7 @@ fn alter_constraint_name_tests(api: TestApi) {
                      EXEC SP_RENAME N'alter_constraint_name_tests.B_pkey', N'CustomCompoundId';
                      
                      -- AddForeignKey
-                     ALTER TABLE [alter_constraint_name_tests].[B] ADD CONSTRAINT [CustomFK] FOREIGN KEY ([aId]) REFERENCES [alter_constraint_name_tests].[A]([id]) ON DELETE CASCADE ON UPDATE CASCADE;
+                     ALTER TABLE [alter_constraint_name_tests].[B] ADD CONSTRAINT [CustomFK] FOREIGN KEY ([aId]) REFERENCES [alter_constraint_name_tests].[A]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
                      
                      -- RenameIndex
                      EXEC SP_RENAME N'alter_constraint_name_tests.A.A_a_b_key', N'CustomCompoundUnique', N'INDEX';
@@ -1023,7 +1023,7 @@ fn alter_constraint_name_tests(api: TestApi) {
                      ALTER TABLE "B" RENAME CONSTRAINT "B_pkey" TO "CustomCompoundId";
 
                      -- AddForeignKey
-                     ALTER TABLE "B" ADD CONSTRAINT "CustomFK" FOREIGN KEY ("aId") REFERENCES "A"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+                     ALTER TABLE "B" ADD CONSTRAINT "CustomFK" FOREIGN KEY ("aId") REFERENCES "A"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
                      -- RenameIndex
                      ALTER INDEX "A_a_b_key" RENAME TO "CustomCompoundUnique";
@@ -1045,7 +1045,7 @@ fn alter_constraint_name_tests(api: TestApi) {
                  ALTER TABLE `B` DROP FOREIGN KEY `B_aId_fkey`;
 
                  -- AddForeignKey
-                 ALTER TABLE `B` ADD CONSTRAINT `CustomFK` FOREIGN KEY (`aId`) REFERENCES `A`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+                 ALTER TABLE `B` ADD CONSTRAINT `CustomFK` FOREIGN KEY (`aId`) REFERENCES `A`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
                  -- RedefineIndex
                  CREATE UNIQUE INDEX `CustomCompoundUnique` ON `A`(`a`, `b`);
@@ -1072,7 +1072,7 @@ fn alter_constraint_name_tests(api: TestApi) {
                  ALTER TABLE `B` DROP FOREIGN KEY `B_aId_fkey`;
 
                  -- AddForeignKey
-                 ALTER TABLE `B` ADD CONSTRAINT `CustomFK` FOREIGN KEY (`aId`) REFERENCES `A`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+                 ALTER TABLE `B` ADD CONSTRAINT `CustomFK` FOREIGN KEY (`aId`) REFERENCES `A`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
                  -- RenameIndex
                  ALTER TABLE `A` RENAME INDEX `A_a_b_key` TO `CustomCompoundUnique`;
