@@ -5,8 +5,6 @@ use test_macros::test_connector;
 
 #[test_connector(tags(Mssql))]
 async fn two_one_to_one_relations_between_the_same_models(api: &TestApi) -> TestResult {
-    let sql_family = api.sql_family();
-
     api.barrel()
         .execute(move |migration| {
             migration.create_table("User", move |t| {
