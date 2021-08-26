@@ -12,13 +12,6 @@ async fn two_one_to_one_relations_between_the_same_models(api: &TestApi) -> Test
             migration.create_table("User", move |t| {
                 t.add_column("id", types::primary());
                 t.add_column("post_id", types::integer().unique(true).nullable(false));
-
-                // Other databases can't create a foreign key before the table
-                // exists, SQLite can, but cannot alter table with a foreign
-                // key.
-                if sql_family.is_sqlite() {
-                    t.add_foreign_key(&["post_id"], "Post", &["id"]);
-                }
             });
 
             migration.create_table("Post", |t| {
@@ -27,14 +20,9 @@ async fn two_one_to_one_relations_between_the_same_models(api: &TestApi) -> Test
                 t.add_foreign_key(&["user_id"], "User", &["id"]);
             });
 
-            // Other databases can't create a foreign key before the table
-            // exists, SQLite can, but cannot alter table with a foreign
-            // key.
-            if !sql_family.is_sqlite() {
-                migration.change_table("User", |t| {
-                    t.add_foreign_key(&["post_id"], "Post", &["id"]);
-                })
-            }
+            migration.change_table("User", |t| {
+                t.add_foreign_key(&["post_id"], "Post", &["id"]);
+            })
         })
         .await?;
 

@@ -4,7 +4,7 @@ use crate::{
     ConnectorContext, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult,
 };
 use connector::{Filter, RecordFilter, WriteArgs};
-use datamodel::{common::preview_features::PreviewFeature, ReferentialAction};
+use datamodel::ReferentialAction;
 use datamodel_connector::ConnectorCapability;
 use prisma_models::{ModelProjection, ModelRef, RelationFieldRef};
 use std::sync::Arc;
@@ -328,7 +328,6 @@ pub fn insert_emulated_on_delete(
 
     for rf in relation_fields {
         match rf.relation().on_delete() {
-            // old behavior was to only insert restrict checks.
             ReferentialAction::Restrict => emulate_restrict(graph, &rf, parent_node, child_node)?,
             ReferentialAction::NoAction => continue, // Explicitly do nothing.
 
