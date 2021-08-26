@@ -11,6 +11,7 @@ use crate::{
 };
 use sql_schema_describer::{walkers::ColumnWalker, ColumnArity};
 
+#[async_trait::async_trait]
 impl DestructiveChangeCheckerFlavour for SqliteFlavour {
     fn check_alter_column(
         &self,
@@ -72,5 +73,25 @@ impl DestructiveChangeCheckerFlavour for SqliteFlavour {
         _step_index: usize,
     ) {
         unreachable!("check_drop_and_recreate_column on SQLite");
+    }
+
+    async fn count_rows_in_table(
+        &self,
+        table_name: &str,
+        conn: &crate::connection_wrapper::Connection,
+    ) -> migration_connector::ConnectorResult<i64> {
+        let query = format!("SELECT COUNT(*) FROM \"{}\"", table_name);
+        let result_set = conn.query_raw(&query, &[]).await?;
+        super::extract_table_rows_count(table_name, result_set)
+    }
+
+    async fn count_values_in_column(
+        &self,
+        (table, column): (&str, &str),
+        conn: &crate::connection_wrapper::Connection,
+    ) -> migration_connector::ConnectorResult<i64> {
+        let query = format!("SELECT COUNT(*) FROM \"{}\" WHERE \"{}\" IS NOT NULL", table, column);
+        let result_set = conn.query_raw(&query, &[]).await?;
+        super::extract_column_values_count(result_set)
     }
 }

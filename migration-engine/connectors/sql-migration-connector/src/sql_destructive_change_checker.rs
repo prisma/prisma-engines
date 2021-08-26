@@ -279,7 +279,7 @@ impl SqlMigrationConnector {
     async fn check_impl(&self, migration: &SqlMigration) -> ConnectorResult<DestructiveChangeDiagnostics> {
         let plan = self.plan(migration);
 
-        plan.execute(self.conn()).await
+        plan.execute(self.flavour(), self.conn()).await
     }
 }
 
@@ -288,7 +288,7 @@ impl DestructiveChangeChecker for SqlMigrationConnector {
     async fn check(&self, migration: &Migration) -> ConnectorResult<DestructiveChangeDiagnostics> {
         let plan = self.plan(migration.downcast_ref());
 
-        plan.execute(self.conn()).await
+        plan.execute(self.flavour(), self.conn()).await
     }
 
     fn pure_check(&self, migration: &Migration) -> DestructiveChangeDiagnostics {

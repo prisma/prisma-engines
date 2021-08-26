@@ -13,6 +13,7 @@ use datamodel_connector::Connector;
 use sql_datamodel_connector::SqlDatamodelConnectors;
 use sql_schema_describer::walkers::ColumnWalker;
 
+#[async_trait::async_trait]
 impl DestructiveChangeCheckerFlavour for MssqlFlavour {
     fn check_alter_column(
         &self,
@@ -118,5 +119,30 @@ impl DestructiveChangeCheckerFlavour for MssqlFlavour {
                 step_index,
             )
         }
+    }
+
+    async fn count_rows_in_table(
+        &self,
+        table_name: &str,
+        conn: &crate::connection_wrapper::Connection,
+    ) -> migration_connector::ConnectorResult<i64> {
+        let query = format!("SELECT COUNT(*) FROM [{}].[{}]", conn.schema_name(), table_name);
+        let result_set = conn.query_raw(&query, &[]).await?;
+        super::extract_table_rows_count(table_name, result_set)
+    }
+
+    async fn count_values_in_column(
+        &self,
+        (table, column): (&str, &str),
+        conn: &crate::connection_wrapper::Connection,
+    ) -> migration_connector::ConnectorResult<i64> {
+        let query = format!(
+            "SELECT COUNT(*) FROM [{}].[{}] WHERE [{}] IS NOT NULL",
+            conn.schema_name(),
+            table,
+            column
+        );
+        let result_set = conn.query_raw(&query, &[]).await?;
+        super::extract_column_values_count(result_set)
     }
 }
