@@ -6,7 +6,7 @@ use introspection_engine_tests::test_api::*;
 use quaint::prelude::Queryable;
 use test_macros::test_connector;
 
-#[test_connector(tags(Mysql))]
+#[test_connector(tags(Mysql57))]
 async fn nul_default_bytes(api: &TestApi) -> TestResult {
     let create_table = indoc! {r#"
         CREATE TABLE nul_default_bytes
