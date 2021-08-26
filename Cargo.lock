@@ -461,7 +461,7 @@ version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cc403c26e6b03005522e6e8053384c4e881dfe5b2bf041c0c2c49be33d64a539"
 dependencies = [
- "num-bigint",
+ "num-bigint 0.3.2",
  "num-integer",
  "num-traits",
  "serde",
@@ -2430,7 +2430,7 @@ dependencies = [
  "flate2",
  "lazy_static",
  "lexical",
- "num-bigint",
+ "num-bigint 0.3.2",
  "num-traits",
  "rand 0.8.3",
  "regex",
@@ -2544,6 +2544,17 @@ name = "num-bigint"
 version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7d0a3d5e207573f948a9e5376662aa743a2ea13f7c50a554d7af443a73fbfeba"
+dependencies = [
+ "autocfg",
+ "num-integer",
+ "num-traits",
+]
+
+[[package]]
+name = "num-bigint"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4e0d047c1062aa51e256408c560894e5251f08925980e53cf1aa5bd00eec6512"
 dependencies = [
  "autocfg",
  "num-integer",
@@ -3214,7 +3225,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#d23b824b70baa552e69eb954280664bee2082f29"
+source = "git+https://github.com/prisma/quaint#c1f7cf4c7074e8999d89f7d8d63476d3a2f13270"
 dependencies = [
  "async-trait",
  "base64 0.12.3",
@@ -3233,7 +3244,7 @@ dependencies = [
  "mobc",
  "mysql_async",
  "native-tls",
- "num-bigint",
+ "num-bigint 0.4.0",
  "num_cpus",
  "percent-encoding",
  "postgres-native-tls",
@@ -4501,7 +4512,7 @@ dependencies = [
  "futures",
  "futures-sink",
  "futures-util",
- "num-bigint",
+ "num-bigint 0.3.2",
  "num-traits",
  "once_cell",
  "opentls",
