@@ -319,3 +319,31 @@ async fn a_table_with_enum_default_values_that_look_like_booleans(api: &TestApi)
 
     Ok(())
 }
+
+#[test_connector(tags(Postgres))]
+async fn enum_reintrospection_preserves_good_indentation(api: &TestApi) -> TestResult {
+    let original = indoc!(
+        r#"
+        enum MyEnum {
+          A
+          B
+
+          @@map("theEnumName")
+        }
+        "#
+    );
+
+    api.raw_cmd(r#"CREATE TYPE "theEnumName" AS ENUM ('A', 'B');"#).await;
+
+    let reintrospected: String = api
+        .re_introspect(original)
+        .await?
+        .lines()
+        .skip_while(|l| !l.starts_with("enum"))
+        .collect::<Vec<&str>>()
+        .join("\n");
+
+    assert_eq!(original.trim_end(), reintrospected);
+
+    Ok(())
+}
