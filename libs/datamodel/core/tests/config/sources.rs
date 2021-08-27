@@ -1,5 +1,5 @@
 use crate::common::*;
-use datamodel::{common::preview_features::*, StringFromEnvVar};
+use datamodel::StringFromEnvVar;
 use pretty_assertions::assert_eq;
 
 #[test]
@@ -551,26 +551,6 @@ fn fail_when_no_source_is_declared() {
     "#]];
 
     expectation.assert_eq(&error)
-}
-
-#[test]
-fn microsoft_sql_server_preview_feature_must_work() {
-    let schema = indoc! {r#"
-        datasource redmond {
-          provider = "sqlserver"
-          url = "sqlserver://localhost:1645;foo=bar"
-        }
-
-        generator client {
-          provider = "prisma-client-js"
-          previewFeatures = ["microsoftSqlServer"]
-        }
-    "#};
-
-    let config = parse_configuration(schema);
-    let generator = config.generators.first().unwrap();
-
-    assert!(generator.preview_features.contains(&PreviewFeature::MicrosoftSqlServer));
 }
 
 #[test]

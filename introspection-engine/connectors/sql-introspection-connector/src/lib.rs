@@ -84,6 +84,11 @@ impl SqlIntrospectionConnector {
     }
 
     /// Exported for tests
+    pub fn quaint(&self) -> &Quaint {
+        &self.connection
+    }
+
+    /// Exported for tests
     pub async fn describe(&self) -> SqlIntrospectionResult<SqlSchema> {
         Ok(self
             .describer()

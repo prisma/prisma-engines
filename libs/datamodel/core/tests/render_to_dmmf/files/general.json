@@ -106,7 +106,6 @@
           "relationName": "ProfileToUser",
           "relationFromFields": [],
           "relationToFields": [],
-          "relationOnDelete": "SetNull",
           "isGenerated": false,
           "isUpdatedAt": false
         }
@@ -164,7 +163,6 @@
           "relationToFields": [
             "id"
           ],
-          "relationOnDelete": "Cascade",
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -303,7 +301,6 @@
           "relationToFields": [
             "id"
           ],
-          "relationOnDelete": "Cascade",
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -477,7 +474,6 @@
             "title",
             "createdAt"
           ],
-          "relationOnDelete": "Cascade",
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -498,7 +494,6 @@
           "relationToFields": [
             "id"
           ],
-          "relationOnDelete": "Cascade",
           "isGenerated": false,
           "isUpdatedAt": false
         }
@@ -559,7 +554,6 @@
           "relationToFields": [
             "id"
           ],
-          "relationOnDelete": "Cascade",
           "isGenerated": false,
           "isUpdatedAt": false
         }
@@ -600,7 +594,6 @@
           "relationName": "AToB",
           "relationFromFields": [],
           "relationToFields": [],
-          "relationOnDelete": "SetNull",
           "isGenerated": false,
           "isUpdatedAt": false
         }

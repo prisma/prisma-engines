@@ -1,10 +1,14 @@
+mod mssql;
+mod mysql;
+
 use barrel::types;
+use expect_test::expect;
 use indoc::indoc;
 use introspection_engine_tests::{assert_eq_json, test_api::*, TestResult};
 use serde_json::json;
 use test_macros::test_connector;
 
-#[test_connector]
+#[test_connector(exclude(Mssql, Mysql))]
 async fn a_table_without_uniques_should_ignore(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -20,24 +24,24 @@ async fn a_table_without_uniques_should_ignore(api: &TestApi) -> TestResult {
         })
         .await?;
 
-    let dm = indoc! {r#"
-            /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
-            model Post {
-              id      Int
-              user_id Int
-              User    User @relation(fields: [user_id], references: [id])
+    let expected = expect![[r#"
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        model Post {
+          id      Int
+          user_id Int
+          User    User @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
-              @@index([user_id], name: "Post_user_id_idx")
-              @@ignore
-            }
+          @@index([user_id], name: "Post_user_id_idx")
+          @@ignore
+        }
 
-            model User {
-              id   Int    @id @default(autoincrement())
-              Post Post[] @ignore
-            }
-        "#};
+        model User {
+          id   Int    @id @default(autoincrement())
+          Post Post[] @ignore
+        }
+    "#]];
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    expected.assert_eq(&api.introspect_dml().await?);
 
     Ok(())
 }
@@ -57,26 +61,26 @@ async fn relations_between_ignored_models_should_not_have_field_level_ignores(ap
         })
         .await?;
 
-    let dm = indoc! {r#"
-            /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
-            model Post {
-              id      Unsupported("macaddr") @id
-              user_id Unsupported("macaddr")
-              User    User                   @relation(fields: [user_id], references: [id])
+    let expected = expect![[r#"
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        model Post {
+          id      Unsupported("macaddr") @id
+          user_id Unsupported("macaddr")
+          User    User                   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
-              @@ignore
-            }
+          @@ignore
+        }
 
-            /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
-            model User {
-              id   Unsupported("macaddr") @id
-              Post Post[]
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        model User {
+          id   Unsupported("macaddr") @id
+          Post Post[]
 
-              @@ignore
-            }
-        "#};
+          @@ignore
+        }
+    "#]];
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    expected.assert_eq(&api.introspect_dml().await?);
 
     Ok(())
 }
@@ -253,21 +257,21 @@ async fn a_table_with_unsupported_types_in_a_relation(api: &TestApi) -> TestResu
         })
         .await?;
 
-    let dm = indoc! {r#"
-            model Post {
-              id            Int                     @id @default(autoincrement())
-              user_ip       Unsupported("cidr")
-              User          User                    @relation(fields: [user_ip], references: [ip])
-            }
+    let expected = expect![[r#"
+        model Post {
+          id      Int                 @id @default(autoincrement())
+          user_ip Unsupported("cidr")
+          User    User                @relation(fields: [user_ip], references: [ip], onDelete: NoAction, onUpdate: NoAction)
+        }
 
-            model User {
-              id            Int                     @id @default(autoincrement())
-              ip            Unsupported("cidr")  @unique
-              Post          Post[]
-            }
-        "#};
+        model User {
+          id   Int                 @id @default(autoincrement())
+          ip   Unsupported("cidr") @unique
+          Post Post[]
+        }
+    "#]];
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    expected.assert_eq(&api.introspect_dml().await?);
 
     Ok(())
 }
@@ -370,24 +374,24 @@ async fn ignore_on_back_relation_field_if_pointing_to_ignored_model(api: &TestAp
         })
         .await?;
 
-    let dm = indoc! {r#"
-            ///The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
-            model Post {
-                id      Int
-                user_ip Int
-                User    User @relation(fields: [user_ip], references: [ip])
+    let expected = expect![[r#"
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        model Post {
+          id      Int
+          user_ip Int
+          User    User @relation(fields: [user_ip], references: [ip], onDelete: NoAction, onUpdate: NoAction)
 
-                @@ignore
-            }
+          @@ignore
+        }
 
-            model User {
-                id      Int  @id @default(autoincrement())
-                ip      Int  @unique
-                Post  Post[] @ignore
-            }
-        "#};
+        model User {
+          id   Int    @id @default(autoincrement())
+          ip   Int    @unique
+          Post Post[] @ignore
+        }
+    "#]];
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    expected.assert_eq(&api.introspect_dml().await?);
 
     Ok(())
 }

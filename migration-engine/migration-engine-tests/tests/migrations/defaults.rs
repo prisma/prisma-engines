@@ -224,7 +224,7 @@ fn default_constraint_names_should_work(api: TestApi) {
     let dm = r#"
         generator js {
             provider = "prisma-client-js"
-            previewFeatures = ["microsoftSqlServer", "namedConstraints"]
+            previewFeatures = ["namedConstraints"]
         }
 
         model A {
@@ -250,7 +250,7 @@ fn default_constraint_name_default_values_should_work(api: TestApi) {
     let dm = r#"
         generator js {
             provider = "prisma-client-js"
-            previewFeatures = ["microsoftSqlServer", "namedConstraints"]
+            previewFeatures = ["namedConstraints"]
         }
 
         model A {
@@ -276,7 +276,7 @@ fn default_constraint_name_default_values_with_mapping_should_work(api: TestApi)
     let dm = r#"
         generator js {
             provider = "prisma-client-js"
-            previewFeatures = ["microsoftSqlServer", "namedConstraints"]
+            previewFeatures = ["namedConstraints"]
         }
 
         model A {
