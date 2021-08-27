@@ -2,7 +2,7 @@ use query_engine_tests::*;
 
 #[test_suite(schema(schemas::json), only(Postgres, MySql(5.7, 8, "mariadb")))]
 mod json_path {
-    use query_engine_tests::{assert_error, run_query, ConnectorTag};
+    use query_engine_tests::{assert_error, run_query, ConnectorTag, MySqlVersion, Runner};
 
     #[connector_test]
     async fn no_path_without_filter(runner: Runner) -> TestResult<()> {
@@ -64,8 +64,7 @@ mod json_path {
         Ok(())
     }
 
-    // TODO: MariaDB is excluded because it produces different results than MySQL and Postgres
-    #[connector_test(only(Postgres, MySql(5.7, 8)))]
+    #[connector_test]
     async fn array_contains(runner: Runner) -> TestResult<()> {
         create_row(&runner, 1, r#"[1, 2, 3]"#, true).await?;
         create_row(&runner, 2, r#"[3, 4, 5]"#, true).await?;
@@ -90,19 +89,32 @@ mod json_path {
             @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":[\"a\",\"b\"]}}"}]}}"###
         );
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                jsonq(&runner, r#"array_contains: "[[1, 2]]" "#, None)
-            ),
-            @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":[[1,2]]}}"}]}}"###
-        );
+        match runner.connector() {
+            // MariaDB does not support finding arrays in arrays, unlike MySQL
+            ConnectorTag::MySql(mysql) if mysql.version() == Some(&MySqlVersion::MariaDb) => {
+                insta::assert_snapshot!(
+                    run_query!(
+                        runner,
+                        jsonq(&runner, r#"array_contains: "[[1, 2]]" "#, None)
+                    ),
+                    @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":[1,2,3]}}"},{"json":"{\"a\":{\"b\":[[1,2]]}}"}]}}"###
+                );
+            }
+            _ => {
+                insta::assert_snapshot!(
+                    run_query!(
+                        runner,
+                        jsonq(&runner, r#"array_contains: "[[1, 2]]" "#, None)
+                    ),
+                    @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":[[1,2]]}}"}]}}"###
+                );
+            }
+        }
 
         Ok(())
     }
 
-    // TODO: MariaDB is excluded because it doesn't support array_starts_with yet
-    #[connector_test(only(Postgres, MySql(5.7, 8)))]
+    #[connector_test]
     async fn array_starts_with(runner: Runner) -> TestResult<()> {
         create_row(&runner, 1, r#"[1, 2, 3]"#, true).await?;
         create_row(&runner, 2, r#"[3, 4, 5]"#, true).await?;
@@ -138,8 +150,7 @@ mod json_path {
         Ok(())
     }
 
-    // TODO: MariaDB is excluded because array_ends_with doesn't work yet
-    #[connector_test(only(Postgres, MySql(5.7, 8)))]
+    #[connector_test]
     async fn array_ends_with(runner: Runner) -> TestResult<()> {
         create_row(&runner, 1, r#"[1, 2, 3]"#, true).await?;
         create_row(&runner, 2, r#"[3, 4, 5]"#, true).await?;
@@ -311,8 +322,7 @@ mod json_path {
         Ok(())
     }
 
-    // TODO: MariaDB is excluded because array_starts_with doesn't work yet
-    #[connector_test(only(Postgres, MySql(5.7, 8)))]
+    #[connector_test]
     async fn multi_filtering(runner: Runner) -> TestResult<()> {
         create_row(&runner, 1, r#"[1, 2, 3]"#, true).await?;
         create_row(&runner, 2, r#"[3, 4, 5]"#, true).await?;

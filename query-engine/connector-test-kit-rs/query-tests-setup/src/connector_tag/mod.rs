@@ -8,7 +8,7 @@ mod vitess;
 use datamodel_connector::ConnectorCapability;
 use enum_dispatch::enum_dispatch;
 use mongodb::*;
-use mysql::*;
+pub use mysql::*;
 use postgres::*;
 use sql_server::*;
 use sqlite::*;
