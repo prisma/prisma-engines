@@ -20,13 +20,16 @@ mod json_path {
     async fn extract_array_path(runner: Runner) -> TestResult<()> {
         create_row(&runner, 1, r#"{ \"a\": { \"b\": \"c\" } }"#, false).await?;
         create_row(&runner, 2, r#"{ \"a\": { \"b\": [1, 2, 3] } }"#, false).await?;
+        create_row(&runner, 3, r#"{ \"a\": { \"b\": null } }"#, false).await?;
+        create_row(&runner, 4, r#"{ \"a\": { \"b\": [null] } }"#, false).await?;
+        create_row(&runner, 5, r#"{ }"#, false).await?;
 
         insta::assert_snapshot!(
             run_query!(
                 runner,
                 jsonq(&runner, r#"path: ["a", "b"], equals: "\"c\"" "#, Some(""))
             ),
-            @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":\"c\"}}"}]}}"###
+            @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
         insta::assert_snapshot!(
@@ -34,7 +37,39 @@ mod json_path {
                 runner,
                 jsonq(&runner, r#"path: ["a", "b", "0"], equals: "1" "#, Some(""))
             ),
-            @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":[1,2,3]}}"}]}}"###
+            @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                jsonq(&runner, r#"path: ["a", "b", "0"], equals: JsonNull "#, Some(""))
+            ),
+            @r###"{"data":{"findManyTestModel":[{"id":4}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                jsonq(&runner, r#"path: ["a", "b"], equals: JsonNull "#, Some(""))
+            ),
+            @r###"{"data":{"findManyTestModel":[{"id":3}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                jsonq(&runner, r#"path: ["a", "b"], equals: DbNull "#, Some(""))
+            ),
+            @r###"{"data":{"findManyTestModel":[{"id":5}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                jsonq(&runner, r#"path: ["a", "b"], equals: AnyNull "#, Some(""))
+            ),
+            @r###"{"data":{"findManyTestModel":[{"id":3},{"id":5}]}}"###
         );
 
         Ok(())
@@ -44,13 +79,17 @@ mod json_path {
     async fn extract_json_path(runner: Runner) -> TestResult<()> {
         create_row(&runner, 1, r#"{ \"a\": { \"b\": \"c\" } }"#, false).await?;
         create_row(&runner, 2, r#"{ \"a\": { \"b\": [1, 2, 3] } }"#, false).await?;
+        create_row(&runner, 3, r#"{ \"a\": { \"b\": 1 } }"#, false).await?;
+        create_row(&runner, 4, r#"{ \"a\": { \"b\": null } }"#, false).await?;
+        create_row(&runner, 5, r#"{ \"a\": { \"b\": [null] } }"#, false).await?;
+        create_row(&runner, 6, r#"{ }"#, false).await?;
 
         insta::assert_snapshot!(
             run_query!(
                 runner,
                 jsonq(&runner, r#"path: "$.a.b", equals: "\"c\"" "#, Some(""))
             ),
-            @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":\"c\"}}"}]}}"###
+            @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
         insta::assert_snapshot!(
@@ -58,7 +97,31 @@ mod json_path {
                 runner,
                 jsonq(&runner, r#"path: "$.a.b[0]", equals: "1" "#, Some(""))
             ),
-            @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":[1,2,3]}}"}]}}"###
+            @r###"{"data":{"findManyTestModel":[{"id":2},{"id":3}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                jsonq(&runner, r#"path: "$.a.b[0]", equals: JsonNull "#, Some(""))
+            ),
+            @r###"{"data":{"findManyTestModel":[{"id":4},{"id":5}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                jsonq(&runner, r#"path: "$.a.b", equals: DbNull "#, Some(""))
+            ),
+            @r###"{"data":{"findManyTestModel":[{"id":6}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                jsonq(&runner, r#"path: "$.a.b", equals: AnyNull "#, Some(""))
+            ),
+            @r###"{"data":{"findManyTestModel":[{"id":4},{"id":6}]}}"###
         );
 
         Ok(())
@@ -73,13 +136,15 @@ mod json_path {
         create_row(&runner, 4, r#"[\"a\", \"b\"]"#, true).await?;
         create_row(&runner, 5, r#"\"a\""#, true).await?;
         create_row(&runner, 6, r#"[[1, 2]]"#, true).await?;
+        create_row(&runner, 7, r#"null"#, true).await?;
+        create_row(&runner, 8, r#"[1, null, \"test\"]"#, true).await?;
 
         insta::assert_snapshot!(
             run_query!(
                 runner,
                 jsonq(&runner, r#"array_contains: "[3]" "#, None)
             ),
-            @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":[1,2,3]}}"},{"json":"{\"a\":{\"b\":[3,4,5]}}"}]}}"###
+            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
         insta::assert_snapshot!(
@@ -87,7 +152,7 @@ mod json_path {
                 runner,
                 jsonq(&runner, r#"array_contains: "[\"a\"]" "#, None)
             ),
-            @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":[\"a\",\"b\"]}}"}]}}"###
+            @r###"{"data":{"findManyTestModel":[{"id":4}]}}"###
         );
 
         insta::assert_snapshot!(
@@ -95,7 +160,23 @@ mod json_path {
                 runner,
                 jsonq(&runner, r#"array_contains: "[[1, 2]]" "#, None)
             ),
-            @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":[[1,2]]}}"}]}}"###
+            @r###"{"data":{"findManyTestModel":[{"id":6}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                jsonq(&runner, r#"array_contains: "null" "#, None)
+            ),
+            @r###"{"data":{"findManyTestModel":[{"id":7},{"id":8}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                jsonq(&runner, r#"array_contains: "[null]" "#, None)
+            ),
+            @r###"{"data":{"findManyTestModel":[{"id":8}]}}"###
         );
 
         Ok(())
@@ -110,13 +191,15 @@ mod json_path {
         create_row(&runner, 4, r#"[\"a\", \"b\"]"#, true).await?;
         create_row(&runner, 5, r#"\"a\""#, true).await?;
         create_row(&runner, 6, r#"[[1, 2]]"#, true).await?;
+        create_row(&runner, 7, r#"null"#, true).await?;
+        create_row(&runner, 8, r#"[1, null, \"test\"]"#, true).await?;
 
         insta::assert_snapshot!(
             run_query!(
                 runner,
                 jsonq(&runner, r#"array_starts_with: "3" "#, None)
             ),
-            @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":[3,4,5]}}"}]}}"###
+            @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         insta::assert_snapshot!(
@@ -124,7 +207,7 @@ mod json_path {
                 runner,
                 jsonq(&runner, r#"array_starts_with: "\"a\"" "#, None)
             ),
-            @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":[\"a\",\"b\"]}}"}]}}"###
+            @r###"{"data":{"findManyTestModel":[{"id":4}]}}"###
         );
 
         insta::assert_snapshot!(
@@ -132,7 +215,7 @@ mod json_path {
                 runner,
                 jsonq(&runner, r#"array_starts_with: "[1, 2]" "#, None)
             ),
-            @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":[[1,2]]}}"}]}}"###
+            @r###"{"data":{"findManyTestModel":[{"id":6}]}}"###
         );
 
         Ok(())
@@ -151,7 +234,7 @@ mod json_path {
                 runner,
                 jsonq(&runner, r#"array_ends_with: "3" "#, None)
             ),
-            @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":[1,2,3]}}"}]}}"###
+            @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
         insta::assert_snapshot!(
@@ -159,7 +242,7 @@ mod json_path {
                 runner,
                 jsonq(&runner, r#"array_ends_with: "\"b\"" "#, None)
             ),
-            @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":[\"a\",\"b\"]}}"}]}}"###
+            @r###"{"data":{"findManyTestModel":[{"id":3}]}}"###
         );
 
         insta::assert_snapshot!(
@@ -167,7 +250,7 @@ mod json_path {
                 runner,
                 jsonq(&runner, r#"array_ends_with: "[3, 4]" "#, None)
             ),
-            @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":[[1,2],[3,4]]}}"}]}}"###
+            @r###"{"data":{"findManyTestModel":[{"id":4}]}}"###
         );
 
         Ok(())
@@ -184,7 +267,7 @@ mod json_path {
                 runner,
                 jsonq(&runner, r#"string_contains: "oo" "#, None)
             ),
-            @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":\"foo\"}}"},{"json":"{\"a\":{\"b\":\"fool\"}}"}]}}"###
+            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
         Ok(())
     }
@@ -200,7 +283,7 @@ mod json_path {
                 runner,
                 jsonq(&runner, r#"string_starts_with: "foo" "#, None)
             ),
-            @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":\"foo\"}}"},{"json":"{\"a\":{\"b\":\"fool\"}}"}]}}"###
+            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
         Ok(())
     }
@@ -216,7 +299,7 @@ mod json_path {
                 runner,
                 jsonq(&runner, r#"string_ends_with: "oo" "#, None)
             ),
-            @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":\"foo\"}}"}]}}"###
+            @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
         Ok(())
     }
@@ -236,7 +319,7 @@ mod json_path {
                 runner,
                 jsonq(&runner, r#"gt: "\"b\"" "#, None)
             ),
-            @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":\"foo\"}}"},{"json":"{\"a\":{\"b\":\"bar\"}}"}]}}"###
+            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
         insta::assert_snapshot!(
@@ -244,7 +327,7 @@ mod json_path {
                 runner,
                 jsonq(&runner, r#"gte: "\"b\"" "#, None)
             ),
-            @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":\"foo\"}}"},{"json":"{\"a\":{\"b\":\"bar\"}}"}]}}"###
+            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
         insta::assert_snapshot!(
@@ -375,7 +458,7 @@ mod json_path {
         let path = path.unwrap_or_else(|| json_path(runner));
 
         format!(
-            r#"query {{ findManyTestModel(where: {{ json: {{ {}, {} }} }} ) {{ json }} }}"#,
+            r#"query {{ findManyTestModel(where: {{ json: {{ {}, {} }} }} ) {{ id }} }}"#,
             filter, path
         )
     }
