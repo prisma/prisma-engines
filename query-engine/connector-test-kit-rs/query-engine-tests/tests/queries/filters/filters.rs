@@ -255,6 +255,18 @@ mod filter_spec {
     }
 
     #[connector_test]
+    async fn not_not(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
+
+        insta::assert_snapshot!(
+          &user_uniques(&runner, r#"(where: { NOT: { NOT: { name: { startsWith: "P" }} }})"#).await?,
+          @r###"{"data":{"findManyUser":[{"unique":1}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
     async fn not_list(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
 
