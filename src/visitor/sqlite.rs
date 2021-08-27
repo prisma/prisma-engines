@@ -247,26 +247,6 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
     }
 
     #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
-    fn visit_json_array_begins_with(
-        &mut self,
-        _left: Expression<'a>,
-        _right: Expression<'a>,
-        _not: bool,
-    ) -> visitor::Result {
-        unimplemented!("JSON filtering is not yet supported on SQLite")
-    }
-
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
-    fn visit_json_array_ends_into(
-        &mut self,
-        _left: Expression<'a>,
-        _right: Expression<'a>,
-        _not: bool,
-    ) -> visitor::Result {
-        unimplemented!("JSON filtering is not yet supported on SQLite")
-    }
-
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
     fn visit_json_type_equals(&mut self, _left: Expression<'a>, _json_type: JsonType) -> visitor::Result {
         unimplemented!("JSON_TYPE is not yet supported on SQLite")
     }
@@ -284,6 +264,16 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
         _not: bool,
     ) -> visitor::Result {
         unimplemented!("Full-text search is not yet supported on SQLite")
+    }
+
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn visit_json_extract_last_array_item(&mut self, _extract: JsonExtractLastArrayElem<'a>) -> visitor::Result {
+        unimplemented!("JSON filtering is not yet supported on SQLite")
+    }
+
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn visit_json_extract_first_array_item(&mut self, _extract: JsonExtractFirstArrayElem<'a>) -> visitor::Result {
+        unimplemented!("JSON filtering is not yet supported on SQLite")
     }
 }
 

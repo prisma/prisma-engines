@@ -106,13 +106,13 @@ pub trait Visitor<'a> {
     fn visit_json_extract(&mut self, json_extract: JsonExtract<'a>) -> Result;
 
     #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn visit_json_extract_last_array_item(&mut self, extract: JsonExtractLastArrayElem<'a>) -> Result;
+
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn visit_json_extract_first_array_item(&mut self, extract: JsonExtractFirstArrayElem<'a>) -> Result;
+
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
     fn visit_json_array_contains(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> Result;
-
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
-    fn visit_json_array_begins_with(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> Result;
-
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
-    fn visit_json_array_ends_into(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> Result;
 
     #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
     fn visit_json_type_equals(&mut self, left: Expression<'a>, json_type: JsonType) -> Result;
@@ -872,10 +872,6 @@ pub trait Visitor<'a> {
             Compare::JsonCompare(json_compare) => match json_compare {
                 JsonCompare::ArrayContains(left, right) => self.visit_json_array_contains(*left, *right, false),
                 JsonCompare::ArrayNotContains(left, right) => self.visit_json_array_contains(*left, *right, true),
-                JsonCompare::ArrayBeginsWith(left, right) => self.visit_json_array_begins_with(*left, *right, false),
-                JsonCompare::ArrayNotBeginsWith(left, right) => self.visit_json_array_begins_with(*left, *right, true),
-                JsonCompare::ArrayEndsInto(left, right) => self.visit_json_array_ends_into(*left, *right, false),
-                JsonCompare::ArrayNotEndsInto(left, right) => self.visit_json_array_ends_into(*left, *right, true),
                 JsonCompare::TypeEquals(left, json_type) => self.visit_json_type_equals(*left, json_type),
             },
             #[cfg(feature = "postgresql")]
@@ -999,6 +995,14 @@ pub trait Visitor<'a> {
             #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
             FunctionType::JsonExtract(json_extract) => {
                 self.visit_json_extract(json_extract)?;
+            }
+            #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+            FunctionType::JsonExtractFirstArrayElem(extract) => {
+                self.visit_json_extract_first_array_item(extract)?;
+            }
+            #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+            FunctionType::JsonExtractLastArrayElem(extract) => {
+                self.visit_json_extract_last_array_item(extract)?;
             }
             #[cfg(feature = "postgresql")]
             FunctionType::TextSearch(text_search) => {

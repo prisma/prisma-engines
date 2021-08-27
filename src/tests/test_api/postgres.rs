@@ -3,6 +3,7 @@ use crate::{connector::Queryable, single::Quaint};
 use names::Generator;
 use once_cell::sync::Lazy;
 use std::env;
+use test_setup::Tags;
 
 pub static CONN_STR: Lazy<String> = Lazy::new(|| env::var("TEST_PSQL").expect("TEST_PSQL env var"));
 
@@ -94,5 +95,9 @@ impl<'a> TestApi for PostgreSql<'a> {
 
     fn get_name(&mut self) -> String {
         self.names.next().unwrap().replace('-', "")
+    }
+
+    fn connector_tag(&self) -> test_setup::Tags {
+        Tags::POSTGRES
     }
 }

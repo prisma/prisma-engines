@@ -377,60 +377,6 @@ impl<'a> Visitor<'a> for Mysql<'a> {
     }
 
     #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
-    fn visit_json_array_begins_with(
-        &mut self,
-        left: Expression<'a>,
-        right: Expression<'a>,
-        not: bool,
-    ) -> visitor::Result {
-        self.write("JSON_EXTRACT(")?;
-        self.visit_expression(left)?;
-        self.write(", ")?;
-        self.visit_parameterized(Value::text("$[0]"))?;
-        self.write(")")?;
-
-        if not {
-            self.write(" <> ")?;
-        } else {
-            self.write(" = ")?;
-        }
-
-        self.write("CAST(")?;
-        self.visit_expression(right)?;
-        self.write(" AS JSON)")?;
-
-        Ok(())
-    }
-
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
-    fn visit_json_array_ends_into(
-        &mut self,
-        left: Expression<'a>,
-        right: Expression<'a>,
-        not: bool,
-    ) -> visitor::Result {
-        self.write("JSON_EXTRACT(")?;
-        self.visit_expression(left.clone())?;
-        self.write(", ")?;
-        self.write("CONCAT('$[', ")?;
-        self.write("JSON_LENGTH(")?;
-        self.visit_expression(left)?;
-        self.write(") - 1, ']'))")?;
-
-        if not {
-            self.write(" <> ")?;
-        } else {
-            self.write(" = ")?;
-        }
-
-        self.write("CAST(")?;
-        self.visit_expression(right)?;
-        self.write(" AS JSON)")?;
-
-        Ok(())
-    }
-
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
     fn visit_json_type_equals(&mut self, left: Expression<'a>, json_type: JsonType) -> visitor::Result {
         self.write("(")?;
         self.write("JSON_TYPE")?;
@@ -503,6 +449,30 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         _not: bool,
     ) -> visitor::Result {
         unimplemented!("Full-text search is not yet supported on MySQL")
+    }
+
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn visit_json_extract_last_array_item(&mut self, extract: JsonExtractLastArrayElem<'a>) -> visitor::Result {
+        self.write("JSON_EXTRACT(")?;
+        self.visit_expression(*extract.expr.clone())?;
+        self.write(", ")?;
+        self.write("CONCAT('$[', ")?;
+        self.write("JSON_LENGTH(")?;
+        self.visit_expression(*extract.expr)?;
+        self.write(") - 1, ']'))")?;
+
+        Ok(())
+    }
+
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn visit_json_extract_first_array_item(&mut self, extract: JsonExtractFirstArrayElem<'a>) -> visitor::Result {
+        self.write("JSON_EXTRACT(")?;
+        self.visit_expression(*extract.expr)?;
+        self.write(", ")?;
+        self.visit_parameterized(Value::text("$[0]"))?;
+        self.write(")")?;
+
+        Ok(())
     }
 }
 

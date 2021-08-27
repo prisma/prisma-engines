@@ -1,3 +1,5 @@
+use test_setup::Tags;
+
 #[cfg(feature = "mssql")]
 pub mod mssql;
 #[cfg(feature = "mysql")]
@@ -25,6 +27,7 @@ pub trait TestApi {
     async fn create_index(&mut self, table: &str, columns: &str) -> crate::Result<String>;
 
     fn system(&self) -> &'static str;
+    fn connector_tag(&self) -> Tags;
     fn unique_constraint(&mut self, column: &str) -> String;
     fn foreign_key(&mut self, parent_table: &str, parent_column: &str, child_column: &str) -> String;
     fn autogen_id(&self, name: &str) -> String;

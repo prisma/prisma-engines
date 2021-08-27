@@ -4,6 +4,8 @@ mod coalesce;
 mod count;
 #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
 mod json_extract;
+#[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+mod json_extract_array;
 mod lower;
 mod maximum;
 mod minimum;
@@ -21,6 +23,8 @@ pub use coalesce::*;
 pub use count::*;
 #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
 pub use json_extract::*;
+#[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+pub(crate) use json_extract_array::*;
 pub use lower::*;
 pub use maximum::*;
 pub use minimum::*;
@@ -59,6 +63,10 @@ pub(crate) enum FunctionType<'a> {
     Coalesce(Coalesce<'a>),
     #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
     JsonExtract(JsonExtract<'a>),
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    JsonExtractLastArrayElem(JsonExtractLastArrayElem<'a>),
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    JsonExtractFirstArrayElem(JsonExtractFirstArrayElem<'a>),
     #[cfg(feature = "postgresql")]
     TextSearch(TextSearch<'a>),
 }
@@ -80,6 +88,12 @@ function!(RowToJson);
 
 #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
 function!(JsonExtract);
+
+#[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+function!(JsonExtractLastArrayElem);
+
+#[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+function!(JsonExtractFirstArrayElem);
 
 #[cfg(feature = "postgresql")]
 function!(TextSearch);

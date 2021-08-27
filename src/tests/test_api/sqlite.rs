@@ -1,6 +1,7 @@
 use super::TestApi;
 use crate::{connector::Queryable, single::Quaint};
 use names::Generator;
+use test_setup::Tags;
 
 pub(crate) async fn sqlite_test_api<'a>() -> crate::Result<Sqlite<'a>> {
     Sqlite::new().await
@@ -89,5 +90,9 @@ impl<'a> TestApi for Sqlite<'a> {
 
     fn get_name(&mut self) -> String {
         self.names.next().unwrap().replace('-', "")
+    }
+
+    fn connector_tag(&self) -> test_setup::Tags {
+        Tags::SQLITE
     }
 }

@@ -314,45 +314,21 @@ impl<'a> Visitor<'a> for Postgres<'a> {
     }
 
     #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
-    fn visit_json_array_begins_with(
-        &mut self,
-        left: Expression<'a>,
-        right: Expression<'a>,
-        not: bool,
-    ) -> visitor::Result {
-        if not {
-            self.write("( NOT ")?;
-        }
-
-        self.visit_expression(left)?;
-        self.write("->0 = ")?;
-        self.visit_expression(right)?;
-
-        if not {
-            self.write(" )")?;
-        }
+    fn visit_json_extract_last_array_item(&mut self, extract: JsonExtractLastArrayElem<'a>) -> visitor::Result {
+        self.write("(")?;
+        self.visit_expression(*extract.expr)?;
+        self.write("->-1")?;
+        self.write(")")?;
 
         Ok(())
     }
 
     #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
-    fn visit_json_array_ends_into(
-        &mut self,
-        left: Expression<'a>,
-        right: Expression<'a>,
-        not: bool,
-    ) -> visitor::Result {
-        if not {
-            self.write("( NOT ")?;
-        }
-
-        self.visit_expression(left)?;
-        self.write("->-1 = ")?;
-        self.visit_expression(right)?;
-
-        if not {
-            self.write(" )")?;
-        }
+    fn visit_json_extract_first_array_item(&mut self, extract: JsonExtractFirstArrayElem<'a>) -> visitor::Result {
+        self.write("(")?;
+        self.visit_expression(*extract.expr)?;
+        self.write("->0")?;
+        self.write(")")?;
 
         Ok(())
     }

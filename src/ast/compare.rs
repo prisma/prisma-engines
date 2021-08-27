@@ -59,10 +59,6 @@ pub enum Compare<'a> {
 pub enum JsonCompare<'a> {
     ArrayContains(Box<Expression<'a>>, Box<Expression<'a>>),
     ArrayNotContains(Box<Expression<'a>>, Box<Expression<'a>>),
-    ArrayBeginsWith(Box<Expression<'a>>, Box<Expression<'a>>),
-    ArrayNotBeginsWith(Box<Expression<'a>>, Box<Expression<'a>>),
-    ArrayEndsInto(Box<Expression<'a>>, Box<Expression<'a>>),
-    ArrayNotEndsInto(Box<Expression<'a>>, Box<Expression<'a>>),
     TypeEquals(Box<Expression<'a>>, JsonType),
 }
 
@@ -638,12 +634,13 @@ pub trait Comparable<'a> {
     /// ```rust
     /// # use quaint::{ast::*, visitor::{Visitor, Mysql}};
     /// # fn main() -> Result<(), quaint::error::Error> {
-    /// let query = Select::from_table("users").so_that("json".json_array_contains("1"));
+    /// let query = Select::from_table("users")
+    ///     .so_that("json".json_array_contains(serde_json::json!(1)));
     /// let (sql, params) = Mysql::build(query)?;
     ///
     /// assert_eq!("SELECT `users`.* FROM `users` WHERE JSON_CONTAINS(`json`, ?)", sql);
     ///
-    /// assert_eq!(vec![Value::from("1")], params);
+    /// assert_eq!(vec![Value::from(serde_json::json!(1))], params);
     /// # Ok(())
     /// # }
     /// ```
@@ -657,12 +654,13 @@ pub trait Comparable<'a> {
     /// ```rust
     /// # use quaint::{ast::*, visitor::{Visitor, Mysql}};
     /// # fn main() -> Result<(), quaint::error::Error> {
-    /// let query = Select::from_table("users").so_that("json".json_array_not_contains("1"));
+    /// let query = Select::from_table("users")
+    ///     .so_that("json".json_array_not_contains(serde_json::json!(1)));
     /// let (sql, params) = Mysql::build(query)?;
     ///
     /// assert_eq!("SELECT `users`.* FROM `users` WHERE JSON_CONTAINS(`json`, ?) = FALSE", sql);
+    /// assert_eq!(vec![Value::from(serde_json::json!(1))], params);
     ///
-    /// assert_eq!(vec![Value::from("1")], params);
     /// # Ok(())
     /// # }
     /// ```
@@ -676,15 +674,23 @@ pub trait Comparable<'a> {
     /// ```rust
     /// # use quaint::{ast::*, visitor::{Visitor, Mysql}};
     /// # fn main() -> Result<(), quaint::error::Error> {
-    /// let query = Select::from_table("users").so_that("json".json_array_begins_with("1"));
+    /// let query = Select::from_table("users")
+    ///     .so_that("json".json_array_begins_with(serde_json::json!(1)));
     /// let (sql, params) = Mysql::build(query)?;
     ///
-    /// assert_eq!("SELECT `users`.* FROM `users` WHERE JSON_EXTRACT(`json`, ?) = CAST(? AS JSON)", sql);
-    ///
+    /// assert_eq!(
+    ///   "SELECT `users`.* FROM `users` WHERE \
+    ///      JSON_CONTAINS(JSON_EXTRACT(`json`, ?), ?) AND \
+    ///      JSON_CONTAINS(?, JSON_EXTRACT(`json`, ?))",
+    ///   sql
+    /// );
     /// assert_eq!(vec![
     ///     Value::from("$[0]"),
-    ///     Value::from("1"),
+    ///     Value::from(serde_json::json!(1)),
+    ///     Value::from(serde_json::json!(1)),
+    ///     Value::from("$[0]"),
     /// ], params);
+    ///
     /// # Ok(())
     /// # }
     /// ```
@@ -698,15 +704,23 @@ pub trait Comparable<'a> {
     /// ```rust
     /// # use quaint::{ast::*, visitor::{Visitor, Mysql}};
     /// # fn main() -> Result<(), quaint::error::Error> {
-    /// let query = Select::from_table("users").so_that("json".json_array_not_begins_with("1"));
+    /// let query = Select::from_table("users")
+    ///   .so_that("json".json_array_not_begins_with(serde_json::json!(1)));
     /// let (sql, params) = Mysql::build(query)?;
     ///
-    /// assert_eq!("SELECT `users`.* FROM `users` WHERE JSON_EXTRACT(`json`, ?) <> CAST(? AS JSON)", sql);
-    ///
+    /// assert_eq!(
+    ///   "SELECT `users`.* FROM `users` WHERE \
+    ///      NOT JSON_CONTAINS(JSON_EXTRACT(`json`, ?), ?) OR \
+    ///      NOT JSON_CONTAINS(?, JSON_EXTRACT(`json`, ?))",
+    ///   sql
+    /// );
     /// assert_eq!(vec![
     ///     Value::from("$[0]"),
-    ///     Value::from("1"),
+    ///     Value::from(serde_json::json!(1)),
+    ///     Value::from(serde_json::json!(1)),
+    ///     Value::from("$[0]"),
     /// ], params);
+    ///
     /// # Ok(())
     /// # }
     /// ```
@@ -720,14 +734,21 @@ pub trait Comparable<'a> {
     /// ```rust
     /// # use quaint::{ast::*, visitor::{Visitor, Mysql}};
     /// # fn main() -> Result<(), quaint::error::Error> {
-    /// let query = Select::from_table("users").so_that("json".json_array_ends_into("1"));
+    /// let query = Select::from_table("users")
+    ///     .so_that("json".json_array_ends_into(serde_json::json!(1)));
     /// let (sql, params) = Mysql::build(query)?;
     ///
     /// assert_eq!(
     ///   "SELECT `users`.* FROM `users` WHERE \
-    ///   JSON_EXTRACT(`json`, CONCAT(\'$[\', JSON_LENGTH(`json`) - 1, \']\')) = CAST(? AS JSON)", sql);
+    ///      JSON_CONTAINS(JSON_EXTRACT(`json`, CONCAT('$[', JSON_LENGTH(`json`) - 1, ']')), ?) AND \
+    ///      JSON_CONTAINS(?, JSON_EXTRACT(`json`, CONCAT('$[', JSON_LENGTH(`json`) - 1, ']')))",
+    ///   sql
+    /// );
+    /// assert_eq!(vec![
+    ///    Value::from(serde_json::json!(1)),
+    ///    Value::from(serde_json::json!(1)),
+    /// ], params);
     ///
-    /// assert_eq!(vec![Value::from("1")], params);
     /// # Ok(())
     /// # }
     /// ```
@@ -741,14 +762,21 @@ pub trait Comparable<'a> {
     /// ```rust
     /// # use quaint::{ast::*, visitor::{Visitor, Mysql}};
     /// # fn main() -> Result<(), quaint::error::Error> {
-    /// let query = Select::from_table("users").so_that("json".json_array_not_ends_into("1"));
+    /// let query = Select::from_table("users").so_that("json".json_array_not_ends_into(serde_json::json!(1)));
     /// let (sql, params) = Mysql::build(query)?;
     ///
     /// assert_eq!(
     ///   "SELECT `users`.* FROM `users` WHERE \
-    ///   JSON_EXTRACT(`json`, CONCAT(\'$[\', JSON_LENGTH(`json`) - 1, \']\')) <> CAST(? AS JSON)", sql);
+    ///      NOT JSON_CONTAINS(JSON_EXTRACT(`json`, CONCAT('$[', JSON_LENGTH(`json`) - 1, ']')), ?) OR \
+    ///      NOT JSON_CONTAINS(?, JSON_EXTRACT(`json`, CONCAT('$[', JSON_LENGTH(`json`) - 1, ']')))",
+    ///   sql
+    /// );
     ///
-    /// assert_eq!(vec![Value::from("1")], params);
+    /// assert_eq!(vec![
+    ///    Value::from(serde_json::json!(1)),
+    ///    Value::from(serde_json::json!(1)),
+    /// ], params);
+    ///
     /// # Ok(())
     /// # }
     /// ```
@@ -791,6 +819,7 @@ pub trait Comparable<'a> {
     /// );
     ///
     /// assert_eq!(params, vec![Value::from("chicken")]);
+    ///
     /// # Ok(())    
     /// # }
     /// ```
@@ -814,6 +843,7 @@ pub trait Comparable<'a> {
     /// );
     ///
     /// assert_eq!(params, vec![Value::from("chicken")]);
+    ///
     /// # Ok(())    
     /// # }
     /// ```
@@ -835,6 +865,7 @@ pub trait Comparable<'a> {
     /// assert_eq!(vec![
     ///     Value::from("%bar%"),
     /// ], params);
+    ///
     /// # Ok(())
     /// # }
     /// ```
