@@ -5,7 +5,7 @@ use datamodel::{
     Datamodel, ScalarType,
 };
 use datamodel_connector::Connector;
-use sql_schema_describer::{self as sql};
+use sql_schema_describer as sql;
 
 impl SqlSchemaCalculatorFlavour for MysqlFlavour {
     fn calculate_enums(&self, datamodel: &Datamodel) -> Vec<sql::Enum> {
