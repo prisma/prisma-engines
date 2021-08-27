@@ -144,15 +144,6 @@ impl Connection {
             .map_err(|quaint_error| sql_error(quaint_error, &self.connection_info()))
     }
 
-    /// Render a table name with the required prefixing for use with quaint query building.
-    pub(crate) fn table_name<'a>(&'a self, name: &'a str) -> quaint::ast::Table<'a> {
-        if self.connection_info().sql_family().is_sqlite() {
-            name.into()
-        } else {
-            (self.schema_name(), name).into()
-        }
-    }
-
     pub(crate) fn unwrap_postgres(&self) -> &(PostgreSql, PostgresUrl) {
         match &self.0 {
             ConnectionInner::Postgres(inner) => inner,
