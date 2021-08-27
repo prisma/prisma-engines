@@ -1,9 +1,35 @@
 use barrel::{functions, types};
+use expect_test::expect;
 use indoc::formatdoc;
 use indoc::indoc;
 use introspection_engine_tests::test_api::*;
 use quaint::prelude::Queryable;
 use test_macros::test_connector;
+
+#[test_connector(tags(Mysql57))]
+async fn nul_default_bytes(api: &TestApi) -> TestResult {
+    let create_table = indoc! {r#"
+        CREATE TABLE nul_default_bytes
+        (
+            id  INT                  NOT NULL
+                PRIMARY KEY,
+            val BINARY(5) DEFAULT '\0\0\0\0\0' NOT NULL
+        )
+    "#};
+
+    api.database().raw_cmd(create_table).await?;
+
+    let expected = expect![[r#"
+        model nul_default_bytes {
+          id  Int   @id
+          val Bytes @default(dbgenerated()) @db.Binary(5)
+        }
+    "#]];
+
+    expected.assert_eq(&api.introspect_dml().await?);
+
+    Ok(())
+}
 
 #[test_connector]
 async fn a_simple_table_with_gql_types(api: &TestApi) -> TestResult {

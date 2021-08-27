@@ -71,7 +71,6 @@ pub static GENERATOR: Lazy<FeatureMap> = Lazy::new(|| {
             NApi,
             FilterJson,
             PlanetScaleMode,
-            ReferentialActions,
             MongoDb,
             InteractiveTransactions,
             NamedConstraints,
@@ -92,6 +91,7 @@ pub static GENERATOR: Lazy<FeatureMap> = Lazy::new(|| {
             SelectRelationCount,
             OrderByAggregateGroup,
             OrderByRelation,
+            ReferentialActions,
         ])
 });
 

@@ -10,6 +10,13 @@ pub struct MySqlConnectorTag {
     capabilities: Vec<ConnectorCapability>,
 }
 
+impl MySqlConnectorTag {
+    /// Get a reference to the MySQL connector tag's version.
+    pub fn version(&self) -> Option<&MySqlVersion> {
+        self.version.as_ref()
+    }
+}
+
 impl ConnectorTagInterface for MySqlConnectorTag {
     fn datamodel_provider(&self) -> &'static str {
         "mysql"

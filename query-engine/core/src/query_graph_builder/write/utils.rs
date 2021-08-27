@@ -4,7 +4,7 @@ use crate::{
     ConnectorContext, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult,
 };
 use connector::{Filter, RecordFilter, WriteArgs};
-use datamodel::{common::preview_features::PreviewFeature, ReferentialAction};
+use datamodel::ReferentialAction;
 use datamodel_connector::ConnectorCapability;
 use prisma_models::{ModelProjection, ModelRef, RelationFieldRef};
 use std::sync::Arc;
@@ -274,9 +274,6 @@ pub fn insert_existing_1to1_related_model_checks(
 /// This function is usually part of a delete (`deleteOne` or `deleteMany`).
 /// Expects `parent_node` to return one or more IDs (for records of `model`) to be checked.
 ///
-/// The old behavior (pre-referential actions) is preserved for if the ReferentialActions feature flag is disabled,
-/// which was basically only the `Restrict` part of this code.
-///
 /// Resulting graph (all emulations):
 /// ```text
 ///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
@@ -319,10 +316,9 @@ pub fn insert_emulated_on_delete(
     child_node: &NodeRef,
 ) -> QueryGraphBuilderResult<()> {
     let has_fks = connector_ctx.capabilities.contains(&ConnectorCapability::ForeignKeys);
-    let has_ra_feature = connector_ctx.features.contains(&PreviewFeature::ReferentialActions);
 
     // If the connector supports foreign keys and the new mode is enabled (preview feature), we do not do any checks / emulation.
-    if has_ra_feature && has_fks {
+    if has_fks {
         return Ok(());
     }
 
@@ -332,8 +328,6 @@ pub fn insert_emulated_on_delete(
 
     for rf in relation_fields {
         match rf.relation().on_delete() {
-            // old behavior was to only insert restrict checks.
-            _ if !has_ra_feature => emulate_restrict(graph, &rf, parent_node, child_node)?,
             ReferentialAction::Restrict => emulate_restrict(graph, &rf, parent_node, child_node)?,
             ReferentialAction::NoAction => continue, // Explicitly do nothing.
 
@@ -604,9 +598,6 @@ pub fn emulate_set_null(
 /// This function is usually part of a delete (`deleteOne` or `deleteMany`).
 /// Expects `parent_node` to return one or more IDs (for records of `model`) to be checked.
 ///
-/// The old behavior (pre-referential actions) is preserved for if the ReferentialActions feature flag is disabled,
-/// which was basically only the `Restrict` part of this code.
-///
 /// Resulting graph (all emulations):
 /// ```text
 ///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
@@ -649,10 +640,9 @@ pub fn insert_emulated_on_update(
     child_node: &NodeRef,
 ) -> QueryGraphBuilderResult<()> {
     let has_fks = connector_ctx.capabilities.contains(&ConnectorCapability::ForeignKeys);
-    let has_ra_feature = connector_ctx.features.contains(&PreviewFeature::ReferentialActions);
 
     // If the connector supports foreign keys and the new mode is enabled (preview feature), we do not do any checks / emulation.
-    if has_ra_feature && has_fks {
+    if has_fks {
         return Ok(());
     }
 
