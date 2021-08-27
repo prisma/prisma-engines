@@ -1,5 +1,5 @@
-mod filter_grouping;
 mod filter_fold;
+mod filter_grouping;
 mod relation;
 mod scalar;
 
@@ -10,8 +10,8 @@ use crate::{
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
 use connector::{filter::Filter, QueryMode, RelationCompare, ScalarCompare, ScalarCondition, ScalarProjection};
-use filter_grouping::*;
 use filter_fold::*;
+use filter_grouping::*;
 use prisma_models::{Field, ModelRef, PrismaValue, RelationFieldRef, ScalarFieldRef};
 use std::{collections::HashMap, convert::TryInto, str::FromStr};
 
