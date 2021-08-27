@@ -30,22 +30,20 @@ pub(crate) fn initialize_model_object_type_cache(ctx: &mut BuilderContext) {
             let obj: ObjectTypeWeakRef = output_objects::map_model_object_type(ctx, &model);
             let mut fields = compute_model_object_type_fields(ctx, &model);
 
-            if ctx.has_feature(&PreviewFeature::SelectRelationCount) {
-                // Only include to-many fields
-                let relation_fields = model.fields().relation().into_iter().filter(|f| f.is_list).collect();
+            // Add _count field. Only include to-many fields.
+            let relation_fields = model.fields().relation().into_iter().filter(|f| f.is_list).collect();
 
-                append_opt(
-                    &mut fields,
-                    aggregation_relation_field(
-                        ctx,
-                        UNDERSCORE_COUNT,
-                        &model,
-                        relation_fields,
-                        |_, _| OutputType::int(),
-                        identity,
-                    ),
-                );
-            }
+            append_opt(
+                &mut fields,
+                aggregation_relation_field(
+                    ctx,
+                    UNDERSCORE_COUNT,
+                    &model,
+                    relation_fields,
+                    |_, _| OutputType::int(),
+                    identity,
+                ),
+            );
 
             obj.into_arc().set_fields(fields);
         });
