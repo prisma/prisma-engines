@@ -1,5 +1,5 @@
+mod filter_fold;
 mod filter_grouping;
-mod flatten;
 mod relation;
 mod scalar;
 
@@ -10,8 +10,8 @@ use crate::{
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
 use connector::{filter::Filter, QueryMode, RelationCompare, ScalarCompare, ScalarCondition, ScalarProjection};
+use filter_fold::*;
 use filter_grouping::*;
-use flatten::*;
 use prisma_models::{Field, ModelRef, PrismaValue, RelationFieldRef, ScalarFieldRef};
 use std::{collections::HashMap, convert::TryInto, str::FromStr};
 
@@ -164,7 +164,7 @@ pub fn extract_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraph
 /// eg: `Filter(And([SearchFilter("query", [FieldA]), SearchFilter("query", [FieldB])]))` -> `Filter(And([SearchFilter("query", [FieldA, FieldB])]))`
 fn merge_search_filters(filter: Filter) -> Filter {
     // The filter tree _needs_ to be flattened for the merge to work properly
-    let flattened = flatten_filter(filter);
+    let flattened = fold_filter(filter);
 
     match flattened {
         Filter::And(and) => Filter::And(fold_search_filters(&and)),
