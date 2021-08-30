@@ -680,8 +680,8 @@ pub trait Comparable<'a> {
     ///
     /// assert_eq!(
     ///   "SELECT `users`.* FROM `users` WHERE \
-    ///      JSON_CONTAINS(JSON_EXTRACT(`json`, ?), ?) AND \
-    ///      JSON_CONTAINS(?, JSON_EXTRACT(`json`, ?))",
+    ///      (JSON_CONTAINS(JSON_EXTRACT(`json`, ?), ?) AND \
+    ///      JSON_CONTAINS(?, JSON_EXTRACT(`json`, ?)))",
     ///   sql
     /// );
     /// assert_eq!(vec![
@@ -710,8 +710,8 @@ pub trait Comparable<'a> {
     ///
     /// assert_eq!(
     ///   "SELECT `users`.* FROM `users` WHERE \
-    ///      NOT JSON_CONTAINS(JSON_EXTRACT(`json`, ?), ?) OR \
-    ///      NOT JSON_CONTAINS(?, JSON_EXTRACT(`json`, ?))",
+    ///      (NOT JSON_CONTAINS(JSON_EXTRACT(`json`, ?), ?) OR \
+    ///      NOT JSON_CONTAINS(?, JSON_EXTRACT(`json`, ?)))",
     ///   sql
     /// );
     /// assert_eq!(vec![
@@ -740,8 +740,8 @@ pub trait Comparable<'a> {
     ///
     /// assert_eq!(
     ///   "SELECT `users`.* FROM `users` WHERE \
-    ///      JSON_CONTAINS(JSON_EXTRACT(`json`, CONCAT('$[', JSON_LENGTH(`json`) - 1, ']')), ?) AND \
-    ///      JSON_CONTAINS(?, JSON_EXTRACT(`json`, CONCAT('$[', JSON_LENGTH(`json`) - 1, ']')))",
+    ///      (JSON_CONTAINS(JSON_EXTRACT(`json`, CONCAT('$[', JSON_LENGTH(`json`) - 1, ']')), ?) AND \
+    ///      JSON_CONTAINS(?, JSON_EXTRACT(`json`, CONCAT('$[', JSON_LENGTH(`json`) - 1, ']'))))",
     ///   sql
     /// );
     /// assert_eq!(vec![
@@ -767,8 +767,8 @@ pub trait Comparable<'a> {
     ///
     /// assert_eq!(
     ///   "SELECT `users`.* FROM `users` WHERE \
-    ///      NOT JSON_CONTAINS(JSON_EXTRACT(`json`, CONCAT('$[', JSON_LENGTH(`json`) - 1, ']')), ?) OR \
-    ///      NOT JSON_CONTAINS(?, JSON_EXTRACT(`json`, CONCAT('$[', JSON_LENGTH(`json`) - 1, ']')))",
+    ///      (NOT JSON_CONTAINS(JSON_EXTRACT(`json`, CONCAT('$[', JSON_LENGTH(`json`) - 1, ']')), ?) OR \
+    ///      NOT JSON_CONTAINS(?, JSON_EXTRACT(`json`, CONCAT('$[', JSON_LENGTH(`json`) - 1, ']'))))",
     ///   sql
     /// );
     ///

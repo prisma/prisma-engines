@@ -1,7 +1,9 @@
-use bigdecimal::{BigDecimal, ToPrimitive, Zero};
+use bigdecimal::{
+    num_bigint::{BigInt, Sign},
+    BigDecimal, ToPrimitive, Zero,
+};
 use byteorder::{BigEndian, ReadBytesExt};
 use bytes::{BufMut, BytesMut};
-use num_bigint::{BigInt, Sign};
 use postgres_types::{to_sql_checked, FromSql, IsNull, ToSql, Type};
 use std::{cmp, convert::TryInto, error, fmt, io::Cursor};
 

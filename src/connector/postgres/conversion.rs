@@ -7,15 +7,13 @@ use crate::{
     error::{Error, ErrorKind},
 };
 #[cfg(feature = "bigdecimal")]
-use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
+use bigdecimal::{num_bigint::BigInt, BigDecimal, FromPrimitive, ToPrimitive};
 use bit_vec::BitVec;
 use bytes::BytesMut;
 #[cfg(feature = "chrono")]
 use chrono::{DateTime, NaiveDateTime, Utc};
 #[cfg(feature = "bigdecimal")]
 pub(crate) use decimal::DecimalWrapper;
-#[cfg(feature = "bigdecimal")]
-use num_bigint::BigInt;
 use postgres_types::{FromSql, ToSql};
 use std::error::Error as StdError;
 use tokio_postgres::{
