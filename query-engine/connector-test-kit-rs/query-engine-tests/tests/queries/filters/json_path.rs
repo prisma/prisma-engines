@@ -2,7 +2,7 @@ use query_engine_tests::*;
 
 #[test_suite(schema(schemas::json), only(Postgres, MySql(5.7, 8, "mariadb")))]
 mod json_path {
-    use query_engine_tests::{assert_error, run_query, ConnectorTag};
+    use query_engine_tests::{assert_error, is_one_of, run_query, ConnectorTag};
 
     #[connector_test]
     async fn no_path_without_filter(runner: Runner) -> TestResult<()> {
@@ -142,7 +142,7 @@ mod json_path {
         insta::assert_snapshot!(
             run_query!(
                 runner,
-                jsonq(&runner, r#"array_contains: "[3]" "#, None)
+                jsonq(&runner, r#"array_contains: "[3]""#, None)
             ),
             @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
@@ -150,7 +150,7 @@ mod json_path {
         insta::assert_snapshot!(
             run_query!(
                 runner,
-                jsonq(&runner, r#"array_contains: "[\"a\"]" "#, None)
+                jsonq(&runner, r#"array_contains: "[\"a\"]""#, None)
             ),
             @r###"{"data":{"findManyTestModel":[{"id":4}]}}"###
         );
@@ -158,25 +158,26 @@ mod json_path {
         insta::assert_snapshot!(
             run_query!(
                 runner,
-                jsonq(&runner, r#"array_contains: "[[1, 2]]" "#, None)
+                jsonq(&runner, r#"array_contains: "[[1, 2]]""#, None)
             ),
             @r###"{"data":{"findManyTestModel":[{"id":6}]}}"###
         );
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                jsonq(&runner, r#"array_contains: "null" "#, None)
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":7}]}}"###
+        // MySQL has slightly different semantics and also coerces null to [null].
+        is_one_of!(
+            run_query!(runner, jsonq(&runner, r#"array_contains: "null""#, None)),
+            vec![
+                r#"{"data":{"findManyTestModel":[{"id":7}]}}"#,
+                r#"{"data":{"findManyTestModel":[{"id":7},{"id":8}]}}"#
+            ]
         );
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                jsonq(&runner, r#"array_contains: "[null]" "#, None)
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":7}]}}"###
+        is_one_of!(
+            run_query!(runner, jsonq(&runner, r#"array_contains: "[null]""#, None)),
+            vec![
+                r#"{"data":{"findManyTestModel":[{"id":7}]}}"#,
+                r#"{"data":{"findManyTestModel":[{"id":7},{"id":8}]}}"#
+            ]
         );
 
         insta::assert_snapshot!(
