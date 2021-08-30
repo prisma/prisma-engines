@@ -374,44 +374,21 @@ fn json_filters(ctx: &mut BuilderContext) -> impl Iterator<Item = InputField> {
         unreachable!()
     };
 
-    if ctx.has_capability(ConnectorCapability::AdvancedJsonNullability) {
-        let enum_type = InputType::Enum(json_null_filter_enum());
-
-        vec![
-            input_field(filters::PATH, vec![path_type], None).optional(),
-            input_field(filters::STRING_CONTAINS, InputType::string(), None).optional(),
-            input_field(filters::STRING_STARTS_WITH, InputType::string(), None).optional(),
-            input_field(filters::STRING_ENDS_WITH, InputType::string(), None).optional(),
-            input_field(
-                filters::ARRAY_CONTAINS,
-                vec![enum_type.clone(), InputType::json()],
-                None,
-            )
-            .optional(),
-            input_field(
-                filters::ARRAY_STARTS_WITH,
-                vec![enum_type.clone(), InputType::json()],
-                None,
-            )
-            .optional(),
-            input_field(
-                filters::ARRAY_ENDS_WITH,
-                vec![enum_type.clone(), InputType::json()],
-                None,
-            )
-            .optional(),
-        ]
-    } else {
-        vec![
-            input_field(filters::PATH, vec![path_type], None).optional(),
-            input_field(filters::STRING_CONTAINS, InputType::string(), None).optional(),
-            input_field(filters::STRING_STARTS_WITH, InputType::string(), None).optional(),
-            input_field(filters::STRING_ENDS_WITH, InputType::string(), None).optional(),
-            input_field(filters::ARRAY_CONTAINS, InputType::json(), None).optional(),
-            input_field(filters::ARRAY_STARTS_WITH, InputType::json(), None).optional(),
-            input_field(filters::ARRAY_ENDS_WITH, InputType::json(), None).optional(),
-        ]
-    }
+    vec![
+        input_field(filters::PATH, vec![path_type], None).optional(),
+        input_field(filters::STRING_CONTAINS, InputType::string(), None).optional(),
+        input_field(filters::STRING_STARTS_WITH, InputType::string(), None).optional(),
+        input_field(filters::STRING_ENDS_WITH, InputType::string(), None).optional(),
+        input_field(filters::ARRAY_CONTAINS, InputType::json(), None)
+            .optional()
+            .nullable(),
+        input_field(filters::ARRAY_STARTS_WITH, InputType::json(), None)
+            .optional()
+            .nullable(),
+        input_field(filters::ARRAY_ENDS_WITH, InputType::json(), None)
+            .optional()
+            .nullable(),
+    ]
     .into_iter()
 }
 

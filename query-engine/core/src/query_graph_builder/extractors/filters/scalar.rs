@@ -114,7 +114,7 @@ fn parse_internal_json(
         // Json-specific filters
         filters::ARRAY_CONTAINS if reverse => {
             let filter = json_null_enum_filter(
-                as_prisma_value(input)?,
+                coerce_json_null(as_prisma_value(input)?),
                 json_path,
                 |val, path| field.json_not_contains(val, path, JsonTargetType::Array),
                 true,
@@ -125,7 +125,7 @@ fn parse_internal_json(
 
         filters::ARRAY_STARTS_WITH if reverse => {
             let filter = json_null_enum_filter(
-                as_prisma_value(input)?,
+                coerce_json_null(as_prisma_value(input)?),
                 json_path,
                 |val, path| field.json_not_starts_with(val, path, JsonTargetType::Array),
                 true,
@@ -136,7 +136,7 @@ fn parse_internal_json(
 
         filters::ARRAY_ENDS_WITH if reverse => {
             let filter = json_null_enum_filter(
-                as_prisma_value(input)?,
+                coerce_json_null(as_prisma_value(input)?),
                 json_path,
                 |val, path| field.json_not_ends_with(val, path, JsonTargetType::Array),
                 true,
@@ -165,7 +165,7 @@ fn parse_internal_json(
 
         filters::ARRAY_CONTAINS => {
             let filter = json_null_enum_filter(
-                as_prisma_value(input)?,
+                coerce_json_null(as_prisma_value(input)?),
                 json_path,
                 |val, path| field.json_contains(val, path, JsonTargetType::Array),
                 true,
@@ -176,7 +176,7 @@ fn parse_internal_json(
 
         filters::ARRAY_STARTS_WITH => {
             let filter = json_null_enum_filter(
-                as_prisma_value(input)?,
+                coerce_json_null(as_prisma_value(input)?),
                 json_path,
                 |val, path| field.json_starts_with(val, path, JsonTargetType::Array),
                 true,
@@ -397,5 +397,12 @@ fn parse_json_path(input: ParsedInputValue) -> QueryGraphBuilderResult<JsonFilte
             Ok(JsonFilterPath::Array(keys))
         }
         _ => unreachable!(),
+    }
+}
+
+fn coerce_json_null(value: PrismaValue) -> PrismaValue {
+    match value {
+        PrismaValue::Null => PrismaValue::Json("null".to_owned()),
+        _ => value,
     }
 }

@@ -136,8 +136,8 @@ mod json_path {
         create_row(&runner, 4, r#"[\"a\", \"b\"]"#, true).await?;
         create_row(&runner, 5, r#"\"a\""#, true).await?;
         create_row(&runner, 6, r#"[[1, 2]]"#, true).await?;
-        create_row(&runner, 7, r#"null"#, true).await?;
-        create_row(&runner, 8, r#"[1, null, \"test\"]"#, true).await?;
+        create_row(&runner, 7, r#"[1, null, 2]"#, true).await?;
+        create_row(&runner, 8, r#"[1, [null], 2]"#, true).await?;
 
         insta::assert_snapshot!(
             run_query!(
@@ -168,13 +168,21 @@ mod json_path {
                 runner,
                 jsonq(&runner, r#"array_contains: "null" "#, None)
             ),
-            @r###"{"data":{"findManyTestModel":[{"id":7},{"id":8}]}}"###
+            @r###"{"data":{"findManyTestModel":[{"id":7}]}}"###
         );
 
         insta::assert_snapshot!(
             run_query!(
                 runner,
                 jsonq(&runner, r#"array_contains: "[null]" "#, None)
+            ),
+            @r###"{"data":{"findManyTestModel":[{"id":7}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                jsonq(&runner, r#"array_contains: "[[null]]" "#, None)
             ),
             @r###"{"data":{"findManyTestModel":[{"id":8}]}}"###
         );
@@ -192,7 +200,8 @@ mod json_path {
         create_row(&runner, 5, r#"\"a\""#, true).await?;
         create_row(&runner, 6, r#"[[1, 2]]"#, true).await?;
         create_row(&runner, 7, r#"null"#, true).await?;
-        create_row(&runner, 8, r#"[1, null, \"test\"]"#, true).await?;
+        create_row(&runner, 8, r#"[null, \"test\"]"#, true).await?;
+        create_row(&runner, 9, r#"[[null], \"test\"]"#, true).await?;
 
         insta::assert_snapshot!(
             run_query!(
@@ -218,6 +227,22 @@ mod json_path {
             @r###"{"data":{"findManyTestModel":[{"id":6}]}}"###
         );
 
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                jsonq(&runner, r#"array_starts_with: "null" "#, None)
+            ),
+            @r###"{"data":{"findManyTestModel":[{"id":8}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                jsonq(&runner, r#"array_starts_with: "[null]" "#, None)
+            ),
+            @r###"{"data":{"findManyTestModel":[{"id":9}]}}"###
+        );
+
         Ok(())
     }
 
@@ -228,6 +253,9 @@ mod json_path {
         create_row(&runner, 2, r#"[3, 4, 5]"#, true).await?;
         create_row(&runner, 3, r#"[\"a\", \"b\"]"#, true).await?;
         create_row(&runner, 4, r#"[[1, 2], [3, 4]]"#, true).await?;
+        create_row(&runner, 7, r#"null"#, true).await?;
+        create_row(&runner, 8, r#"[\"test\", null]"#, true).await?;
+        create_row(&runner, 9, r#"[\"test\", [null]]"#, true).await?;
 
         insta::assert_snapshot!(
             run_query!(
@@ -251,6 +279,22 @@ mod json_path {
                 jsonq(&runner, r#"array_ends_with: "[3, 4]" "#, None)
             ),
             @r###"{"data":{"findManyTestModel":[{"id":4}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                jsonq(&runner, r#"array_ends_with: "null" "#, None)
+            ),
+            @r###"{"data":{"findManyTestModel":[{"id":8}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                jsonq(&runner, r#"array_ends_with: "[null]" "#, None)
+            ),
+            @r###"{"data":{"findManyTestModel":[{"id":9}]}}"###
         );
 
         Ok(())
@@ -335,7 +379,7 @@ mod json_path {
                 runner,
                 jsonq(&runner, r#"gt: "1" "#, None)
             ),
-            @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":2}}"},{"json":"{\"a\":{\"b\":1.4}}"},{"json":"{\"a\":{\"b\":100}}"}]}}"###
+            @r###"{"data":{"findManyTestModel":[{"id":4},{"id":5},{"id":6}]}}"###
         );
 
         insta::assert_snapshot!(
@@ -343,7 +387,7 @@ mod json_path {
                 runner,
                 jsonq(&runner, r#"gte: "1" "#, None)
             ),
-            @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":1}}"},{"json":"{\"a\":{\"b\":2}}"},{"json":"{\"a\":{\"b\":1.4}}"},{"json":"{\"a\":{\"b\":100}}"}]}}"###
+            @r###"{"data":{"findManyTestModel":[{"id":3},{"id":4},{"id":5},{"id":6}]}}"###
         );
 
         Ok(())
@@ -364,7 +408,7 @@ mod json_path {
                 runner,
                 jsonq(&runner, r#"lt: "\"f\"" "#, None)
             ),
-            @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":\"bar\"}}"}]}}"###
+            @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         insta::assert_snapshot!(
@@ -372,7 +416,7 @@ mod json_path {
                 runner,
                 jsonq(&runner, r#"lte: "\"foo\"" "#, None)
             ),
-            @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":\"foo\"}}"},{"json":"{\"a\":{\"b\":\"bar\"}}"}]}}"###
+            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
         insta::assert_snapshot!(
@@ -380,7 +424,7 @@ mod json_path {
                 runner,
                 jsonq(&runner, r#"lt: "100" "#, None)
             ),
-            @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":1}}"},{"json":"{\"a\":{\"b\":2}}"},{"json":"{\"a\":{\"b\":1.4}}"}]}}"###
+            @r###"{"data":{"findManyTestModel":[{"id":3},{"id":4},{"id":5}]}}"###
         );
 
         insta::assert_snapshot!(
@@ -388,7 +432,7 @@ mod json_path {
                 runner,
                 jsonq(&runner, r#"lte: "100" "#, None)
             ),
-            @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":1}}"},{"json":"{\"a\":{\"b\":2}}"},{"json":"{\"a\":{\"b\":1.4}}"},{"json":"{\"a\":{\"b\":100}}"}]}}"###
+            @r###"{"data":{"findManyTestModel":[{"id":3},{"id":4},{"id":5},{"id":6}]}}"###
         );
 
         Ok(())
