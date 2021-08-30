@@ -3225,7 +3225,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#c1f7cf4c7074e8999d89f7d8d63476d3a2f13270"
+source = "git+https://github.com/prisma/quaint#06ae975a2ac34aea5e2d61727742a83474c61c01"
 dependencies = [
  "async-trait",
  "base64 0.12.3",
@@ -3270,6 +3270,7 @@ dependencies = [
  "async-trait",
  "chrono",
  "futures",
+ "indexmap",
  "itertools 0.10.0",
  "prisma-models",
  "prisma-value",

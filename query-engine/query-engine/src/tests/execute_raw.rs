@@ -11,7 +11,7 @@ type TestResult = anyhow::Result<()>;
 static TODO: &str = indoc! {r#"
     generator js {
         provider = "prisma-client-js"
-        previewFeatures = ["mongodb", "orderByRelation", "napi", "selectRelationCount", "orderByAggregateGroup"]
+        previewFeatures = ["mongodb", "napi"]
     }
 
     model Todo {
