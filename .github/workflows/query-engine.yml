@@ -35,7 +35,7 @@ jobs:
           toolchain: stable
           default: true
 
-      - uses: olafurpg/setup-scala@v10
+      - uses: olafurpg/setup-scala@v13
         with:
           java-version: adopt@1.8
 
