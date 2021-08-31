@@ -26,9 +26,9 @@ fn basic_create_migration_works(api: TestApi) {
                             "id" INTEGER NOT NULL,
                             "name" TEXT NOT NULL,
 
-                            PRIMARY KEY ("id")
+                            CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
                         );
-                        "#
+                    "#
                 }
             } else if api.is_mysql() {
                 indoc! {
@@ -63,7 +63,7 @@ fn basic_create_migration_works(api: TestApi) {
                         CREATE TABLE [basic_create_migration_works].[Cat] (
                             [id] INT NOT NULL,
                             [name] NVARCHAR(1000) NOT NULL,
-                            CONSTRAINT [PK__Cat__id] PRIMARY KEY ([id])
+                            CONSTRAINT [Cat_pkey] PRIMARY KEY ([id])
                         );
 
                         COMMIT TRAN;
@@ -121,7 +121,6 @@ fn creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline(a
 
     api.create_migration("create-dogs", &dm2, &dir)
         .send_sync()
-
         .assert_migration_directories_count(2)
         .assert_migration("create-dogs", |migration| {
             let expected_script = if api.is_postgres()
@@ -133,7 +132,7 @@ fn creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline(a
                             "id" INTEGER NOT NULL,
                             "name" TEXT NOT NULL,
 
-                            PRIMARY KEY ("id")
+                            CONSTRAINT "Dog_pkey" PRIMARY KEY ("id")
                         );
                         "#
                     }
@@ -173,7 +172,7 @@ fn creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline(a
                         CREATE TABLE [creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline].[Dog] (
                             [id] INT NOT NULL,
                             [name] NVARCHAR(1000) NOT NULL,
-                            CONSTRAINT [PK__Dog__id] PRIMARY KEY ([id])
+                            CONSTRAINT [Dog_pkey] PRIMARY KEY ([id])
                         );
 
                         COMMIT TRAN;
@@ -350,7 +349,7 @@ fn create_enum_step_only_rendered_when_needed(api: TestApi) {
 
                             PRIMARY KEY ("id")
                         );
-                        "#
+                    "#
                 }
             } else if api.is_mysql() {
                 indoc! {
@@ -408,9 +407,9 @@ fn create_enum_renders_correctly(api: TestApi) {
                             "id" INTEGER NOT NULL,
                             "mood" "Mood" NOT NULL,
 
-                            PRIMARY KEY ("id")
+                            CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
                         );
-                        "#
+                    "#
                 }
             } else {
                 unreachable!()
@@ -448,7 +447,7 @@ fn unsupported_type_renders_correctly(api: TestApi) {
                             "id" INTEGER NOT NULL,
                             "home" point NOT NULL,
 
-                            PRIMARY KEY ("id")
+                            CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
                         );
                         "#
                 }
@@ -493,18 +492,18 @@ fn no_additional_unique_created(api: TestApi) {
                         CREATE TABLE "Cat" (
                             "id" INTEGER NOT NULL,
 
-                            PRIMARY KEY ("id")
+                            CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
                         );
 
                         -- CreateTable
                         CREATE TABLE "Collar" (
                             "id" INTEGER NOT NULL,
 
-                            PRIMARY KEY ("id")
+                            CONSTRAINT "Collar_pkey" PRIMARY KEY ("id")
                         );
 
                         -- AddForeignKey
-                        ALTER TABLE "Collar" ADD FOREIGN KEY ("id") REFERENCES "Cat"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+                        ALTER TABLE "Collar" ADD CONSTRAINT "Collar_id_fkey" FOREIGN KEY ("id") REFERENCES "Cat"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
                         "#
                     }
                 }

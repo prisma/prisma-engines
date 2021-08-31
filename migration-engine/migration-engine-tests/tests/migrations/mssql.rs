@@ -35,11 +35,12 @@ fn shared_default_constraints_are_ignored_issue_5423(api: TestApi) {
 
     api.raw_cmd(&format!(
         r#"
-                CREATE TABLE [{0}].cats (
-                    id INT IDENTITY PRIMARY KEY,
-                    name NVARCHAR(255) NOT NULL
-                )
-            "#,
+            CREATE TABLE [{0}].cats (
+                id INT IDENTITY,
+                name NVARCHAR(255) NOT NULL,
+                CONSTRAINT [cats_pkey] PRIMARY KEY CLUSTERED ([id] ASC)
+            )
+        "#,
         schema
     ));
 

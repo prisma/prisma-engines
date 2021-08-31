@@ -1,7 +1,5 @@
+use crate::{configuration, dml};
 use std::collections::HashMap;
-
-use crate::{configuration, dml, PreviewFeature};
-use enumflags2::BitFlags;
 
 /// A validator to see if the given constraint name is used anywhere else in the
 /// data model.
@@ -11,18 +9,12 @@ pub(crate) struct NamesValidator<'dml> {
 }
 
 impl<'dml> NamesValidator<'dml> {
-    pub(crate) fn new(
-        schema: &'dml dml::Datamodel,
-        preview_features: BitFlags<PreviewFeature>,
-        source: Option<&configuration::Datasource>,
-    ) -> Self {
+    pub(crate) fn new(schema: &'dml dml::Datamodel, source: Option<&configuration::Datasource>) -> Self {
         let mut seen: HashMap<&'dml str, usize> = HashMap::new();
 
-        // TODO: Remove me when needing to use this with other providers.
-        let enabled = preview_features.contains(PreviewFeature::NamedConstraints)
-            && source
-                .map(|source| source.active_connector.supports_named_default_values())
-                .unwrap_or(false);
+        let enabled = source
+            .map(|source| source.active_connector.supports_named_default_values())
+            .unwrap_or(false);
 
         if enabled {
             for model in schema.models() {

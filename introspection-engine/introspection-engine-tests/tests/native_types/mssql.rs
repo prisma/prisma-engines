@@ -46,7 +46,7 @@ async fn native_type_columns_feature_on(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("Blog", move |t| {
-                t.inject_custom("id int identity(1,1) primary key");
+                t.inject_custom("id INT IDENTITY, CONSTRAINT [Blog_pkey] PRIMARY KEY ([id])");
 
                 for column in &columns {
                     t.inject_custom(column);

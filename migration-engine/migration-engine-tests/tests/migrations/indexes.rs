@@ -40,7 +40,7 @@ fn index_settings_must_be_migrated(api: TestApi) {
             name String
             followersCount Int
 
-            @@index([name, followersCount], name: "nameAndFollowers")
+            @@index([name, followersCount], map: "nameAndFollowers")
         }
     "#;
 
@@ -60,7 +60,7 @@ fn index_settings_must_be_migrated(api: TestApi) {
             name String
             followersCount Int
 
-            @@unique([name, followersCount], name: "nameAndFollowers")
+            @@unique([name, followersCount], map: "nameAndFollowers")
         }
     "#;
 
@@ -205,7 +205,7 @@ fn index_renaming_must_work(api: TestApi) {
             field String
             secondField Int
 
-            @@unique([field, secondField], name: "customName")
+            @@unique([field, secondField], map: "customName")
             @@index([secondField, field], name: "customNameNonUnique")
         }
     "#;
@@ -228,8 +228,8 @@ fn index_renaming_must_work(api: TestApi) {
             field String
             secondField Int
 
-            @@unique([field, secondField], name: "customNameA")
-            @@index([secondField, field], name: "customNameNonUniqueA")
+            @@unique([field, secondField], map: "customNameA")
+            @@index([secondField, field], map: "customNameNonUniqueA")
         }
     "#;
 
@@ -255,7 +255,7 @@ fn index_renaming_must_work_when_renaming_to_default(api: TestApi) {
             field String
             secondField Int
 
-            @@unique([field, secondField], name: "customName")
+            @@unique([field, secondField], map: "customName")
         }
     "#;
 
@@ -279,11 +279,7 @@ fn index_renaming_must_work_when_renaming_to_default(api: TestApi) {
     api.schema_push_w_datasource(dm2).send();
     api.assert_schema().assert_table("A", |t| {
         t.assert_index_on_columns(&["field", "secondField"], |idx| {
-            idx.assert_is_unique().assert_name(if api.is_mssql() {
-                "A_field_secondField_unique"
-            } else {
-                "A.field_secondField_unique"
-            })
+            idx.assert_is_unique().assert_name("A_field_secondField_key")
         })
     });
 }
@@ -314,7 +310,7 @@ fn index_renaming_must_work_when_renaming_to_custom(api: TestApi) {
             field String
             secondField Int
 
-            @@unique([field, secondField], name: "somethingCustom")
+            @@unique([field, secondField], map: "somethingCustom")
         }
     "#;
 
@@ -372,7 +368,7 @@ fn dropping_a_model_with_a_multi_field_unique_index_must_work(api: TestApi) {
             field String
             secondField Int
 
-            @@unique([field, secondField], name: "customName")
+            @@unique([field, secondField], map: "customName")
         }
     "#;
 
@@ -412,9 +408,9 @@ fn indexes_with_an_automatically_truncated_name_are_idempotent(api: TestApi) {
                 idx.assert_name(if api.is_mysql() {
                     // The size limit of identifiers is 64 bytes on MySQL
                     // and 63 on Postgres.
-                    "TestModelWithALongName.looooooooooooongfield_evenLongerFieldName"
+                    "TestModelWithALongName_looooooooooooongfield_evenLongerField_idx"
                 } else {
-                    "TestModelWithALongName.looooooooooooongfield_evenLongerFieldNam"
+                    "TestModelWithALongName_looooooooooooongfield_evenLongerFiel_idx"
                 })
             },
         )

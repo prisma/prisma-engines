@@ -9,7 +9,7 @@ fn foreign_keys_to_indexes_being_renamed_must_work(api: TestApi) {
             name String
             posts Post[]
 
-            @@unique([name], name: "idxname")
+            @@unique([name], name: "idxname", map: "idxname")
         }
 
         model Post {
@@ -23,7 +23,7 @@ fn foreign_keys_to_indexes_being_renamed_must_work(api: TestApi) {
 
     api.assert_schema()
         .assert_table("User", |table| {
-            table.assert_index_on_columns(&["name"], |idx| idx.assert_name("idxname"))
+            table.assert_index_on_columns(&["name"], |idx| idx.assert_is_unique().assert_name("idxname"))
         })
         .assert_table("Post", |table| {
             table.assert_fk_on_columns(&["author"], |fk| fk.assert_references("User", &["name"]))
@@ -46,7 +46,7 @@ fn foreign_keys_to_indexes_being_renamed_must_work(api: TestApi) {
             name String
             posts Post[]
 
-            @@unique([name], name: "idxrenamed")
+            @@unique([name], name: "idxrenamed", map: "idxrenamed")
         }
 
         model Post {
@@ -60,7 +60,7 @@ fn foreign_keys_to_indexes_being_renamed_must_work(api: TestApi) {
 
     api.assert_schema()
         .assert_table("User", |table| {
-            table.assert_index_on_columns(&["name"], |idx| idx.assert_name("idxrenamed"))
+            table.assert_index_on_columns(&["name"], |idx| idx.assert_is_unique().assert_name("idxrenamed"))
         })
         .assert_table("Post", |table| {
             table.assert_fk_on_columns(&["author"], |fk| fk.assert_references("User", &["name"]))

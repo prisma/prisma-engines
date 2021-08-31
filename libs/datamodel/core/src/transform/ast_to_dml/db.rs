@@ -51,7 +51,7 @@ pub(crate) struct ParserDatabase<'ast> {
     datasource: Option<&'ast Datasource>,
     names: Names<'ast>,
     types: Types<'ast>,
-    preview_features: BitFlags<PreviewFeature>,
+    _preview_features: BitFlags<PreviewFeature>,
 }
 
 impl<'ast> ParserDatabase<'ast> {
@@ -67,7 +67,7 @@ impl<'ast> ParserDatabase<'ast> {
             datasource,
             names: Names::default(),
             types: Types::default(),
-            preview_features,
+            _preview_features: preview_features,
         };
 
         let mut ctx = Context::new(db, diagnostics);

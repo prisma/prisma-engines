@@ -159,7 +159,7 @@ fn multiple_indexes_with_same_name_are_not_supported_by_postgres() {
 }
 
 #[test]
-fn unique_insert_with_same_name_are_not_supported_by_postgres() {
+fn unique_indexes_with_same_name_are_not_supported_by_postgres() {
     let dml = indoc! {r#"
         datasource postgres {
           provider = "postgres"
@@ -170,14 +170,14 @@ fn unique_insert_with_same_name_are_not_supported_by_postgres() {
           id         Int @id
           neighborId Int
 
-          @@index([id], name: "MyIndexName")
+          @@index([id], map: "MyIndexName")
         }
 
         model Post {
           id Int @id
           optionId Int
 
-          @@unique([id], name: "MyIndexName")
+          @@unique([id], map: "MyIndexName")
         }
     "#};
 
@@ -188,7 +188,7 @@ fn unique_insert_with_same_name_are_not_supported_by_postgres() {
           [1;94m-->[0m  [4mschema.prisma:17[0m
         [1;94m   | [0m
         [1;94m16 | [0m
-        [1;94m17 | [0m  @@[1;91munique([id], name: "MyIndexName")[0m
+        [1;94m17 | [0m  @@[1;91munique([id], map: "MyIndexName")[0m
         [1;94m   | [0m
     "#]];
 
@@ -239,32 +239,6 @@ fn stringified_field_names_in_index_return_nice_error() {
         [1;94m   | [0m
         [1;94m 5 | [0m
         [1;94m 6 | [0m  @@index([[1;91m"firstName"[0m, "lastName"])
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&error)
-}
-
-#[test]
-fn the_map_argument_must_be_rejected() {
-    let dml = indoc! {r#"
-        model User {
-          id        Int    @id
-          firstName String
-          lastName  String
-
-          @@index([firstName,lastName], map: "MyIndexName")
-        }
-     "#};
-
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mNo such argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:6[0m
-        [1;94m   | [0m
-        [1;94m 5 | [0m
-        [1;94m 6 | [0m  @@index([firstName,lastName], [1;91mmap: "MyIndexName"[0m)
         [1;94m   | [0m
     "#]];
 

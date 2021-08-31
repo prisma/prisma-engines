@@ -178,19 +178,9 @@ impl SqlRenderer for MysqlFlavour {
     }
 
     fn render_create_index(&self, index: &IndexWalker<'_>) -> String {
-        let name = index.name();
-        //TODO (matthias, NamedConstraints) for the constraint name preview flagged code this is already checked during
-        // parsing and default name generation, this can be removed once the flag is the default
-
-        let name = if name.len() > MYSQL_IDENTIFIER_SIZE_LIMIT {
-            &name[0..MYSQL_IDENTIFIER_SIZE_LIMIT]
-        } else {
-            &name
-        };
-
         ddl::CreateIndex {
             unique: index.index_type().is_unique(),
-            index_name: name.into(),
+            index_name: index.name().into(),
             on: (
                 index.table().name().into(),
                 index.columns().map(|c| c.name().into()).collect(),

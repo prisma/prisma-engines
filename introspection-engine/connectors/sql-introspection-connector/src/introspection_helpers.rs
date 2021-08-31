@@ -1,5 +1,4 @@
 use crate::Dedup;
-use crate::PreviewFeature::NamedConstraints;
 use crate::SqlError;
 use datamodel::{
     common::RelationNames, Datamodel, DefaultValue as DMLDef, FieldArity, FieldType, IndexDefinition, Model,
@@ -121,7 +120,7 @@ pub fn calculate_many_to_many_field(
     RelationField::new(&name, FieldArity::List, FieldArity::List, relation_info)
 }
 
-pub(crate) fn calculate_index(index: &Index, ctx: &IntrospectionContext) -> IndexDefinition {
+pub(crate) fn calculate_index(index: &Index) -> IndexDefinition {
     debug!("Handling index  {:?}", index);
     let tpe = match index.tpe {
         IndexType::Unique => datamodel::dml::IndexType::Unique,
@@ -133,10 +132,8 @@ pub(crate) fn calculate_index(index: &Index, ctx: &IntrospectionContext) -> Inde
     //and re-introspection will keep them. This is a change in introspection behaviour,
     //but due to re-introspection previous datamodels and clients should keep working as before.
 
-    let name = (!ctx.preview_features.contains(NamedConstraints)).then(|| index.name.clone());
-
     IndexDefinition {
-        name,
+        name: None,
         db_name: Some(index.name.clone()),
         fields: index.columns.clone(),
         tpe,

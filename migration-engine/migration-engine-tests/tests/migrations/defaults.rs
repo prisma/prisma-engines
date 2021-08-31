@@ -20,7 +20,7 @@ fn datetime_defaults_work(api: TestApi) {
         DefaultValue::db_generated("'2018-01-27 08:00:00'::timestamp without time zone")
     } else if api.is_mssql() {
         let mut df = DefaultValue::db_generated("2018-01-27 08:00:00 +00:00");
-        df.set_constraint_name("DF__Cat__birthday");
+        df.set_constraint_name("Cat_birthday_df");
         df
     } else if api.is_mysql_mariadb() {
         DefaultValue::db_generated("2018-01-27T08:00:00+00:00")
@@ -340,21 +340,21 @@ fn escaped_string_defaults_are_not_arbitrarily_migrated(api: TestApi) {
         assert_eq!(DefaultValue::value("top\ndown").kind(), default.kind());
         assert!(default
             .constraint_name()
-            .map(|cn| cn.starts_with("DF__Fruit__sideNames"))
+            .map(|cn| cn.starts_with("Fruit_sideNames_df"))
             .unwrap());
 
         let default = table.column("contains").and_then(|c| c.default.clone()).unwrap();
         assert_eq!(DefaultValue::value("'potassium'").kind(), default.kind());
         assert!(default
             .constraint_name()
-            .map(|cn| cn.starts_with("DF__Fruit__contains"))
+            .map(|cn| cn.starts_with("Fruit_contains_df"))
             .unwrap());
 
         let default = table.column("seasonality").and_then(|c| c.default.clone()).unwrap();
         assert_eq!(DefaultValue::value(r#""summer""#).kind(), default.kind());
         assert!(default
             .constraint_name()
-            .map(|cn| cn.starts_with("DF__Fruit__seasonali"))
+            .map(|cn| cn.starts_with("Fruit_seasonality_df"))
             .unwrap());
     } else {
         assert_eq!(

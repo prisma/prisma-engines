@@ -72,7 +72,7 @@ async fn referential_actions_mysql(api: &TestApi) -> TestResult {
           a_id Int
           a    a   @relation(fields: [a_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
-          @@index([a_id], name: "asdf")
+          @@index([a_id], map: "asdf")
         }
     "#]];
 
@@ -86,16 +86,18 @@ async fn referential_actions_mssql(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("a", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("a_pkey", types::primary_constraint(vec!["id"]));
             });
 
             migration.create_table("b", move |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
                 t.add_column("a_id", types::integer().nullable(false));
 
                 t.inject_custom(
                     "CONSTRAINT asdf FOREIGN KEY (a_id) REFERENCES referential_actions_mssql.a(id) ON DELETE CASCADE ON UPDATE NO ACTION",
                 );
+                t.add_constraint("b_pkey", types::primary_constraint(vec!["id"]));
             });
         })
         .await?;
@@ -183,7 +185,7 @@ async fn default_referential_actions_with_restrict_mysql(api: &TestApi) -> TestR
           a_id Int
           a    a   @relation(fields: [a_id], references: [id])
 
-          @@index([a_id], name: "asdf")
+          @@index([a_id], map: "asdf")
         }
     "#]];
 
@@ -197,15 +199,17 @@ async fn default_referential_actions_without_restrict_mssql(api: &TestApi) -> Te
     api.barrel()
         .execute(|migration| {
             migration.create_table("a", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("a_pkey", types::primary_constraint(vec!["id"]));
             });
 
             migration.create_table("b", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
                 t.add_column("a_id", types::integer().nullable(false));
                 t.inject_custom(
                     "CONSTRAINT asdf FOREIGN KEY (a_id) REFERENCES default_referential_actions_without_restrict_mssql.a(id) ON DELETE NO ACTION ON UPDATE CASCADE",
                 );
+                t.add_constraint("b_pkey", types::primary_constraint(vec!["id"]));
             });
         })
         .await?;
@@ -230,22 +234,22 @@ async fn default_referential_actions_without_restrict_mssql(api: &TestApi) -> Te
 
 #[test_connector(tags(Mssql))]
 async fn default_optional_actions_mssql(api: &TestApi) -> TestResult {
-    api.barrel()
-        .execute(move |migration| {
-            migration.create_table("a", |t| {
-                t.add_column("id", types::primary());
-            });
+    let setup = r#"
+       CREATE TABLE [default_optional_actions_mssql].[a] (
+            [id] INTEGER IDENTITY,
+            CONSTRAINT a_pkey PRIMARY KEY CLUSTERED ([id])
+        );
 
-            migration.create_table("b", move |t| {
-                t.add_column("id", types::primary());
-                t.add_column("a_id", types::integer().nullable(true));
+        CREATE TABLE [default_optional_actions_mssql].[b] (
+            [id] INTEGER IDENTITY,
+            [a_id] INTEGER,
 
-                t.inject_custom(
-                    "CONSTRAINT asdf FOREIGN KEY (a_id) REFERENCES default_optional_actions_mssql.a(id) ON DELETE SET NULL ON UPDATE CASCADE",
-                );
-            });
-        })
-        .await?;
+            CONSTRAINT b_pkey PRIMARY KEY CLUSTERED ([id]),
+            CONSTRAINT asdf FOREIGN KEY (a_id) REFERENCES default_optional_actions_mssql.a(id) ON DELETE SET NULL ON UPDATE CASCADE
+        );
+    "#;
+
+    api.raw_cmd(setup).await;
 
     let expected = expect![[r#"
         model a {
@@ -295,7 +299,7 @@ async fn default_optional_actions_mysql(api: &TestApi) -> TestResult {
           a_id Int?
           a    a?   @relation(fields: [a_id], references: [id])
 
-          @@index([a_id], name: "asdf")
+          @@index([a_id], map: "asdf")
         }
     "#]];
 

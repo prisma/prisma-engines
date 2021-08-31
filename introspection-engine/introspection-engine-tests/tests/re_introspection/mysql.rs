@@ -1,8 +1,6 @@
 use barrel::types;
-use expect_test::expect;
 use indoc::indoc;
 use introspection_engine_tests::test_api::*;
-use test_macros::test_connector;
 
 #[test_connector(tags(Mysql))]
 async fn multiple_changed_relation_names(api: &TestApi) -> TestResult {
@@ -65,8 +63,8 @@ async fn multiple_changed_relation_names(api: &TestApi) -> TestResult {
           Employee_EmployeeToSchedule_eveningEmployeeId Employee @relation("EmployeeToSchedule_eveningEmployeeId", fields: [eveningEmployeeId], references: [id])
           Employee_EmployeeToSchedule_morningEmployeeId Employee @relation("EmployeeToSchedule_morningEmployeeId", fields: [morningEmployeeId], references: [id])
 
-          @@index([eveningEmployeeId], name: "eveningEmployeeId")
-          @@index([morningEmployeeId], name: "morningEmployeeId")
+          @@index([eveningEmployeeId], map: "eveningEmployeeId")
+          @@index([morningEmployeeId], map: "morningEmployeeId")
         }
 
         model Unrelated {
@@ -124,7 +122,7 @@ async fn mapped_model_and_field_name(api: &TestApi) -> TestResult {
           c_user_id   Int         @map("user_id")
           Custom_User Custom_User @relation(fields: [c_user_id], references: [c_id])
 
-          @@index([c_user_id], name: "user_id")
+          @@index([c_user_id], map: "user_id")
         }
 
         model Custom_User {
@@ -198,8 +196,8 @@ async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> 
     let expected = expect![[r#"
         model Post {
           id           Int         @id @default(autoincrement())
-          user_id      Int         @unique
-          user_id2     Int         @unique
+          user_id      Int         @unique(map: "user_id")
+          user_id2     Int         @unique(map: "user_id2")
           custom_User  Custom_User @relation("CustomRelationName", fields: [user_id], references: [id])
           custom_User2 Custom_User @relation("AnotherCustomRelationName", fields: [user_id2], references: [id])
         }

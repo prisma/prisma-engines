@@ -172,14 +172,14 @@ fn uuids_do_not_generate_drift_issue_5282(api: TestApi) {
 
     let dm = r#"
         model a {
-            id String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+            id String @id(map: "a_pkey") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
             b  b[]
         }
 
         model b {
-            id   String  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+            id   String  @id(map: "b_pkey") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
             a_id String? @db.Uuid
-            a    a?      @relation(fields: [a_id], references: [id])
+            a    a?      @relation(fields: [a_id], references: [id], map: "aaa")
         }
         "#;
 

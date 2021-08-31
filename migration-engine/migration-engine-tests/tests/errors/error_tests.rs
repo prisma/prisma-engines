@@ -311,19 +311,17 @@ fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: TestApi
     let expected_msg = if api.is_vitess() {
         "Unique constraint failed on the (not available)"
     } else if api.is_mysql() {
-        "Unique constraint failed on the constraint: `name_unique`"
+        "Unique constraint failed on the constraint: `Fruit_name_key`"
     } else if api.is_mssql() {
-        "Unique constraint failed on the constraint: `Fruit_name_unique`"
+        "Unique constraint failed on the constraint: `Fruit_name_key`"
     } else {
         "Unique constraint failed on the fields: (`name`)"
     };
 
     let expected_target = if api.is_vitess() {
         serde_json::Value::Null
-    } else if api.is_mysql() {
-        json!("name_unique")
-    } else if api.is_mssql() {
-        json!("Fruit_name_unique")
+    } else if api.is_mysql() || api.is_mssql() {
+        json!("Fruit_name_key")
     } else {
         json!(["name"])
     };
