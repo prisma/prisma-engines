@@ -103,7 +103,7 @@ pub(crate) fn detect_multiple_cascading_paths(
         let mut iter = path.iter();
 
         let seen_models = match iter.next() {
-            Some((_, Some(field_name))) => seen.entry(field_name).or_insert_with(|| HashSet::new()),
+            Some((_, Some(field_name))) => seen.entry(field_name).or_default(),
             _ => continue,
         };
 
