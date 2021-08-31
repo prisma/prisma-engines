@@ -1,6 +1,6 @@
 use crate::{error::ApiError, logger::ChannelLogger};
 use datamodel::{diagnostics::ValidatedConfiguration, Datamodel};
-use napi::threadsafe_function::ThreadsafeFunction;
+use napi::{threadsafe_function::ThreadsafeFunction, Env};
 use opentelemetry::global;
 use prisma_models::DatamodelConverter;
 use query_core::{executor, schema_builder, BuildMode, QueryExecutor, QuerySchema, QuerySchemaRenderer, TxId};
@@ -21,6 +21,8 @@ use tracing_opentelemetry::OpenTelemetrySpanExt;
 #[derive(Clone)]
 pub struct QueryEngine {
     inner: Arc<RwLock<Inner>>,
+    // Store the `log_callback` here to perform `release` when disconnecting
+    log_callback: Arc<ThreadsafeFunction<String>>,
 }
 
 /// The state of the engine.
@@ -108,7 +110,7 @@ pub struct TelemetryOptions {
 
 impl QueryEngine {
     /// Parse a validated datamodel and configuration to allow connecting later on.
-    pub fn new(opts: ConstructorOptions, log_callback: ThreadsafeFunction<String>) -> crate::Result<Self> {
+    pub fn new(opts: ConstructorOptions, log_callback: Arc<ThreadsafeFunction<String>>) -> crate::Result<Self> {
         set_panic_hook();
 
         let ConstructorOptions {
@@ -154,9 +156,9 @@ impl QueryEngine {
         };
 
         let logger = if telemetry.enabled {
-            ChannelLogger::new_with_telemetry(log_callback, telemetry.endpoint)
+            ChannelLogger::new_with_telemetry(log_callback.clone(), telemetry.endpoint)
         } else {
-            ChannelLogger::new(&log_level, log_queries, log_callback)
+            ChannelLogger::new(&log_level, log_queries, log_callback.clone())
         };
 
         let builder = EngineBuilder {
@@ -169,7 +171,15 @@ impl QueryEngine {
 
         Ok(Self {
             inner: Arc::new(RwLock::new(Inner::Builder(builder))),
+            log_callback,
         })
+    }
+
+    pub fn ref_log_callback(&mut self, env: &Env) -> napi::Result<()> {
+        // It's safe to call `Arc::make_mut` here
+        // Because this function is called from the Node.js process, which is single thread
+        Arc::make_mut(&mut self.log_callback).refer(env)?;
+        Ok(())
     }
 
     /// Connect to the database, allow queries to be run.
@@ -231,6 +241,15 @@ impl QueryEngine {
             }
             Inner::Connected(_) => Err(ApiError::AlreadyConnected),
         }
+    }
+
+    // call this function before `connect`
+    // Or the `log_callback` will prevent the Node.js process to exit
+    pub fn unref_log_callback(&mut self, env: &Env) -> napi::Result<()> {
+        // It's safe to call `Arc::make_mut` here
+        // Because this function is called from the Node.js process, which is single thread
+        Arc::make_mut(&mut self.log_callback).unref(env)?;
+        Ok(())
     }
 
     /// Disconnect and drop the core. Can be reconnected later with `#connect`.

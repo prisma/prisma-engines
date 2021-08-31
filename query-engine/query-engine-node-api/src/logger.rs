@@ -37,7 +37,7 @@ pub struct ChannelLogger {
 
 impl ChannelLogger {
     /// Creates a new instance of a logger with the minimum log level.
-    pub fn new(level: &str, log_queries: bool, callback: ThreadsafeFunction<String>) -> Self {
+    pub fn new(level: &str, log_queries: bool, callback: Arc<ThreadsafeFunction<String>>) -> Self {
         let mut filter = EnvFilter::new(level);
 
         if log_queries {
@@ -57,7 +57,7 @@ impl ChannelLogger {
 
     /// Creates a new instance of a logger with the `trace` minimum level.
     /// Enables tracing events to OTLP endpoint.
-    pub fn new_with_telemetry(callback: ThreadsafeFunction<String>, endpoint: Option<String>) -> Self {
+    pub fn new_with_telemetry(callback: Arc<ThreadsafeFunction<String>>, endpoint: Option<String>) -> Self {
         let javascript_cb = EventChannel::new(callback, EnvFilter::new("trace"), true);
 
         global::set_text_map_propagator(TraceContextPropagator::new());

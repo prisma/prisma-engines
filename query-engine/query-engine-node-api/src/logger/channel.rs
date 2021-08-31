@@ -8,13 +8,13 @@ use tracing_subscriber::{layer::Context, registry::LookupSpan, EnvFilter, Layer}
 
 #[derive(Clone)]
 pub struct EventChannel {
-    callback: ThreadsafeFunction<String>,
+    callback: Arc<ThreadsafeFunction<String>>,
     telemetry: bool,
     filter: Arc<EnvFilter>,
 }
 
 impl EventChannel {
-    pub fn new(callback: ThreadsafeFunction<String>, filter: EnvFilter, telemetry: bool) -> Self {
+    pub fn new(callback: Arc<ThreadsafeFunction<String>>, filter: EnvFilter, telemetry: bool) -> Self {
         Self {
             callback,
             telemetry,
@@ -43,7 +43,8 @@ where
         let js_object = Value::Object(object);
         let json_str = serde_json::to_string(&js_object).unwrap();
 
-        self.callback.call(Ok(json_str), ThreadsafeFunctionCallMode::Blocking);
+        self.callback
+            .call(Ok(json_str), ThreadsafeFunctionCallMode::NonBlocking);
     }
 
     fn enabled(&self, metadata: &tracing::Metadata<'_>, ctx: Context<'_, S>) -> bool {

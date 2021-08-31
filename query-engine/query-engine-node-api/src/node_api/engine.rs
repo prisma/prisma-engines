@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use napi::{
     threadsafe_function::ThreadSafeCallContext, CallContext, JsFunction, JsObject, JsString, JsUndefined, JsUnknown,
 };
@@ -22,10 +24,12 @@ pub fn constructor(ctx: CallContext) -> napi::Result<JsUndefined> {
                     .map(|js_string| vec![js_string])
             })?;
 
+    // Make the ref count of the callback 0
+    // So that it will not prevent the Node.js process to exit unless the `connect` function is called.
     log_callback.unref(&ctx.env)?;
 
     let mut this: JsObject = ctx.this_unchecked();
-    let engine = QueryEngine::new(params, log_callback)?;
+    let engine = QueryEngine::new(params, Arc::new(log_callback))?;
 
     ctx.env.wrap(&mut this, engine)?;
     ctx.env.get_undefined()
@@ -34,7 +38,9 @@ pub fn constructor(ctx: CallContext) -> napi::Result<JsUndefined> {
 #[js_function(0)]
 pub fn connect(ctx: CallContext) -> napi::Result<JsObject> {
     let this: JsObject = ctx.this_unchecked();
-    let engine: &QueryEngine = ctx.env.unwrap(&this)?;
+    let engine: &mut QueryEngine = ctx.env.unwrap(&this)?;
+    // Reference the `log_callback` to prevent Node.js process to exit
+    engine.ref_log_callback(&ctx.env)?;
     let engine: QueryEngine = engine.clone();
 
     ctx.env
@@ -46,7 +52,10 @@ pub fn connect(ctx: CallContext) -> napi::Result<JsObject> {
 #[js_function(0)]
 pub fn disconnect(ctx: CallContext) -> napi::Result<JsObject> {
     let this: JsObject = ctx.this_unchecked();
-    let engine: &QueryEngine = ctx.env.unwrap(&this)?;
+    let engine: &mut QueryEngine = ctx.env.unwrap(&this)?;
+    // Downgrade the reference count of the `log_callback` to 0
+    // So that the Node.js process can exit if no `connect` function is re-called.
+    engine.unref_log_callback(&ctx.env)?;
     let engine: QueryEngine = engine.clone();
 
     ctx.env
