@@ -665,6 +665,8 @@ impl<'a> Validator<'a> {
                 }
 
                 if !field.is_list()
+                    && !field.relation_info.fields.is_empty()
+                    && !field.relation_info.references.is_empty()
                     && self
                         .source
                         .map(|source| &source.active_connector)

@@ -19,13 +19,6 @@ fn cascading_on_delete_self_relations() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. (Implicit default `onDelete`: `SetNull`, and `onUpdate`: `Cascade`) Read more at https://pris.ly/d/cyclic-referential-actions[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
-        [1;94m   | [0m
-        [1;94m 7 | [0m    id     Int  @id @default(autoincrement())
-        [1;94m 8 | [0m    [1;91mchild  A?   @relation(name: "a_self_relation")[0m
-        [1;94m 9 | [0m    parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: Cascade)
-        [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. (Implicit default `onUpdate`: `Cascade`) Read more at https://pris.ly/d/cyclic-referential-actions[0m
           [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
@@ -56,13 +49,6 @@ fn cascading_on_update_self_relations() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. (Implicit default `onDelete`: `SetNull`, and `onUpdate`: `Cascade`) Read more at https://pris.ly/d/cyclic-referential-actions[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
-        [1;94m   | [0m
-        [1;94m 7 | [0m    id     Int  @id @default(autoincrement())
-        [1;94m 8 | [0m    [1;91mchild  A?   @relation(name: "a_self_relation")[0m
-        [1;94m 9 | [0m    parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: Cascade)
-        [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. (Implicit default `onDelete`: `SetNull`) Read more at https://pris.ly/d/cyclic-referential-actions[0m
           [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
@@ -93,13 +79,6 @@ fn null_setting_on_delete_self_relations() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. (Implicit default `onDelete`: `SetNull`, and `onUpdate`: `Cascade`) Read more at https://pris.ly/d/cyclic-referential-actions[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
-        [1;94m   | [0m
-        [1;94m 7 | [0m    id     Int  @id @default(autoincrement())
-        [1;94m 8 | [0m    [1;91mchild  A?   @relation(name: "a_self_relation")[0m
-        [1;94m 9 | [0m    parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: SetNull)
-        [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. (Implicit default `onUpdate`: `Cascade`) Read more at https://pris.ly/d/cyclic-referential-actions[0m
           [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
@@ -130,13 +109,6 @@ fn null_setting_on_update_self_relations() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. (Implicit default `onDelete`: `SetNull`, and `onUpdate`: `Cascade`) Read more at https://pris.ly/d/cyclic-referential-actions[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
-        [1;94m   | [0m
-        [1;94m 7 | [0m    id     Int  @id @default(autoincrement())
-        [1;94m 8 | [0m    [1;91mchild  A?   @relation(name: "a_self_relation")[0m
-        [1;94m 9 | [0m    parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: SetNull)
-        [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. (Implicit default `onDelete`: `SetNull`) Read more at https://pris.ly/d/cyclic-referential-actions[0m
           [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
@@ -167,13 +139,6 @@ fn default_setting_on_delete_self_relations() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. (Implicit default `onDelete`: `SetNull`, and `onUpdate`: `Cascade`) Read more at https://pris.ly/d/cyclic-referential-actions[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
-        [1;94m   | [0m
-        [1;94m 7 | [0m    id     Int  @id @default(autoincrement())
-        [1;94m 8 | [0m    [1;91mchild  A?   @relation(name: "a_self_relation")[0m
-        [1;94m 9 | [0m    parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: SetDefault)
-        [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. (Implicit default `onUpdate`: `Cascade`) Read more at https://pris.ly/d/cyclic-referential-actions[0m
           [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
@@ -204,13 +169,6 @@ fn default_setting_on_update_self_relations() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. (Implicit default `onDelete`: `SetNull`, and `onUpdate`: `Cascade`) Read more at https://pris.ly/d/cyclic-referential-actions[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
-        [1;94m   | [0m
-        [1;94m 7 | [0m    id     Int  @id @default(autoincrement())
-        [1;94m 8 | [0m    [1;91mchild  A?   @relation(name: "a_self_relation")[0m
-        [1;94m 9 | [0m    parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: SetDefault)
-        [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. (Implicit default `onDelete`: `SetNull`) Read more at https://pris.ly/d/cyclic-referential-actions[0m
           [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m

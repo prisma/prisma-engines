@@ -22,6 +22,23 @@ pub(crate) fn detect_multiple_cascading_paths(
     span: Span,
     errors: &mut Diagnostics,
 ) {
+    let on_update = parent_field
+        .relation_info
+        .on_update
+        .unwrap_or_else(|| parent_field.default_on_update_action());
+
+    let on_delete = parent_field
+        .relation_info
+        .on_delete
+        .unwrap_or_else(|| parent_field.default_on_delete_action());
+
+    if !on_update.triggers_modification() && !on_delete.triggers_modification() {
+        return;
+    }
+
+    // We don't want to cycle forever.
+    let mut visited = HashSet::new();
+
     // A graph of relations to traverse.
     let mut next_relations = Vec::new();
 
@@ -33,7 +50,29 @@ pub(crate) fn detect_multiple_cascading_paths(
     // we only care about multiple paths from this model to any other model. We
     // handle paths that cross, but are not started from here, when calling the
     // function from corresponding models.
-    for field in parent_model.relation_fields().filter(|field| field.is_singular()) {
+
+    let relation_fields = parent_model
+        .relation_fields()
+        .filter(|field| field.is_singular())
+        .filter(|field| {
+            let related_field = datamodel.find_related_field_bang(field).1;
+
+            let on_update = field
+                .relation_info
+                .on_update
+                .or(related_field.relation_info.on_update)
+                .unwrap_or_else(|| field.default_on_update_action());
+
+            let on_delete = field
+                .relation_info
+                .on_delete
+                .or(related_field.relation_info.on_delete)
+                .unwrap_or_else(|| field.default_on_delete_action());
+
+            on_update.triggers_modification() || on_delete.triggers_modification()
+        });
+
+    for field in relation_fields {
         next_relations.push((
             parent_model,
             field,
@@ -44,6 +83,8 @@ pub(crate) fn detect_multiple_cascading_paths(
     while let Some((model, field, visited_relations)) = next_relations.pop() {
         let related_field = datamodel.find_related_field_bang(field).1;
         let related_model = datamodel.find_model(&field.relation_info.to).unwrap();
+
+        visited.insert((model.name(), field.name()));
 
         // Following a directed graph, we don't need to go through back-relations.
         if field.is_list() {
@@ -79,6 +120,11 @@ pub(crate) fn detect_multiple_cascading_paths(
             // inspection.
             if !related_model.relation_fields().any(|f| f.is_singular()) {
                 paths.push(visited_relations.link_model(related_model.name()));
+
+                // We can, again, visit the same model/field combo when
+                // traversing a different path.
+                visited.clear();
+
                 continue;
             }
 
@@ -86,6 +132,7 @@ pub(crate) fn detect_multiple_cascading_paths(
             related_model
                 .relation_fields()
                 .filter(|f| f.is_singular())
+                .filter(|f| !visited.contains(&(related_model.name(), f.name())))
                 .for_each(|related_field| {
                     next_relations.push((
                         related_model,
