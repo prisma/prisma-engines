@@ -1,6 +1,8 @@
 use barrel::types;
 use expect_test::expect;
+use indoc::formatdoc;
 use introspection_engine_tests::test_api::*;
+use quaint::prelude::Queryable;
 use test_macros::test_connector;
 
 #[test_connector(tags(Mssql))]
@@ -425,6 +427,48 @@ async fn relations_should_avoid_name_clashes_2(api: &TestApi) -> TestResult {
     "#]];
 
     expected.assert_eq(&api.introspect_dml().await?);
+
+    Ok(())
+}
+
+#[test_connector(tags(Mssql))]
+async fn multiple_foreign_key_constraints_are_taken_always_in_the_same_order(api: &TestApi) -> TestResult {
+    let migration = formatdoc! {r#"
+        CREATE TABLE [{schema_name}].[A]
+        (
+            id  int NOT NULL,
+            foo int NOT NULL
+        );
+
+        CREATE TABLE [{schema_name}].[B]
+        (
+            id int NOT NULL
+        );
+
+        ALTER TABLE [{schema_name}].[A] ADD CONSTRAINT [A_pkey] PRIMARY KEY (id);
+        ALTER TABLE [{schema_name}].[B] ADD CONSTRAINT [B_pkey] PRIMARY KEY (id);
+        ALTER TABLE [{schema_name}].[A] ADD CONSTRAINT [fk_1] FOREIGN KEY (foo) REFERENCES [{schema_name}].[B](id) ON DELETE CASCADE ON UPDATE CASCADE;
+        ALTER TABLE [{schema_name}].[A] ADD CONSTRAINT [fk_2] FOREIGN KEY (foo) REFERENCES [{schema_name}].[B](id) ON DELETE NO ACTION ON UPDATE NO ACTION;
+    "#, schema_name = api.schema_name()};
+
+    api.database().raw_cmd(&migration).await?;
+
+    let expected = expect![[r#"
+        model A {
+          id  Int @id
+          foo Int
+          B   B   @relation(fields: [foo], references: [id], onDelete: Cascade)
+        }
+
+        model B {
+          id Int @id
+          A  A[]
+        }
+    "#]];
+
+    for _ in 0..10 {
+        expected.assert_eq(&api.introspect_dml().await?);
+    }
 
     Ok(())
 }
