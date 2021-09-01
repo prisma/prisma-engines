@@ -95,4 +95,7 @@ pub(crate) trait SqlRenderer {
     fn render_commit_transaction(&self) -> Option<&'static str> {
         None
     }
+
+    /// Render a `RenameForeignKey` step.
+    fn render_rename_foreign_key(&self, fks: &Pair<ForeignKeyWalker<'_>>) -> String;
 }

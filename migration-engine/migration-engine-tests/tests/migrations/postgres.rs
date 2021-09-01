@@ -1,3 +1,4 @@
+use migration_connector::DiffTarget;
 use migration_engine_tests::sync_test_api::*;
 use sql_schema_describer::ColumnTypeFamily;
 use std::fmt::Write;
@@ -365,4 +366,60 @@ fn citext_to_text_and_back_works(api: TestApi) {
     api.dump_table("User")
         .assert_row_count(3)
         .assert_first_row(|row| row.assert_text_value("name", "myCat"));
+}
+
+#[test_connector(tags(Postgres))]
+fn foreign_key_renaming_to_default_works(api: TestApi) {
+    let setup = r#"
+        CREATE TABLE "food" (
+            id SERIAL PRIMARY KEY
+        );
+
+        CREATE TABLE "Dog" (
+            id SERIAL PRIMARY KEY,
+            favourite_food_id INTEGER NOT NULL,
+            CONSTRAINT "favouriteFood" FOREIGN KEY ("favourite_food_id")
+                    REFERENCES "food"("id")
+                    ON DELETE RESTRICT
+                    ON UPDATE CASCADE
+        );
+    "#;
+
+    api.raw_cmd(setup);
+
+    let target_schema = r#"
+        datasource db {
+            provider = "postgresql"
+            url = env("TEST_DATABASE_URL")
+        }
+
+        model Dog {
+            id                  Int @id @default(autoincrement())
+            favourite_food_id   Int
+            favouriteFood       food @relation(fields: [favourite_food_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
+        }
+
+        model food {
+            id      Int @id @default(autoincrement())
+            dogs    Dog[]
+        }
+    "#;
+
+    let parsed = datamodel::parse_schema(target_schema).unwrap();
+    let migration = api.diff(DiffTarget::Database, DiffTarget::Datamodel((&parsed.0, &parsed.1)));
+    let expected = expect![[r#"
+        -- RenameForeignKey
+        ALTER TABLE "Dog" RENAME CONSTRAINT "favouriteFood" TO "Dog_favourite_food_id_fkey";
+    "#]];
+
+    expected.assert_eq(&migration);
+
+    // Check that the migration applies cleanly.
+    api.raw_cmd(&migration);
+
+    // Check that the migration is idempotent.
+    api.schema_push(target_schema)
+        .send()
+        .assert_green_bang()
+        .assert_no_steps();
 }

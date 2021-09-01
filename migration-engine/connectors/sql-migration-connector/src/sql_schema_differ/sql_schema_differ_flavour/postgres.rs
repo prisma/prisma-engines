@@ -24,6 +24,10 @@ static POSTGIS_TABLES_OR_VIEWS: Lazy<RegexSet> = Lazy::new(|| {
 static EXTENSION_VIEWS: Lazy<RegexSet> = Lazy::new(|| RegexSet::new(&["(?i)^pg_buffercache$"]).unwrap());
 
 impl SqlSchemaDifferFlavour for PostgresFlavour {
+    fn can_rename_foreign_key(&self) -> bool {
+        true
+    }
+
     fn push_enum_steps(&self, differ: &SqlSchemaDiffer<'_>, steps: &mut Vec<SqlMigrationStep>) {
         for enum_differ in differ.enum_pairs() {
             let mut alter_enum = AlterEnum {

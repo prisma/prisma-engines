@@ -1,4 +1,4 @@
-use super::differ_database::DifferDatabase;
+use super::{differ_database::DifferDatabase, foreign_keys_match};
 use crate::pair::Pair;
 use sql_schema_describer::{
     walkers::{ColumnWalker, ForeignKeyWalker, IndexWalker, TableWalker},
@@ -63,6 +63,14 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
             !self
                 .next_indexes()
                 .any(|next_index| indexes_match(previous_index, &next_index))
+        })
+    }
+
+    pub(crate) fn foreign_key_pairs(&self) -> impl Iterator<Item = Pair<ForeignKeyWalker<'schema>>> + '_ {
+        self.previous_foreign_keys().filter_map(move |previous_fk| {
+            self.next_foreign_keys()
+                .find(move |next_fk| foreign_keys_match(Pair::new(&previous_fk, next_fk), self.db))
+                .map(move |next_fk| Pair::new(previous_fk, next_fk))
         })
     }
 

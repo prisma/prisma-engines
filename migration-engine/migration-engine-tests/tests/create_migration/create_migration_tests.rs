@@ -72,7 +72,7 @@ fn basic_create_migration_works(api: TestApi) {
                         BEGIN CATCH
 
                         IF @@TRANCOUNT > 0
-                        BEGIN 
+                        BEGIN
                             ROLLBACK TRAN;
                         END;
                         THROW
@@ -181,7 +181,7 @@ fn creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline(a
                         BEGIN CATCH
 
                         IF @@TRANCOUNT > 0
-                        BEGIN 
+                        BEGIN
                             ROLLBACK TRAN;
                         END;
                         THROW
@@ -514,7 +514,7 @@ fn no_additional_unique_created(api: TestApi) {
         });
 }
 
-#[test_connector(preview_features("NamedConstraints"))]
+#[test_connector]
 fn create_constraint_name_tests_w_implicit_names(api: TestApi) {
     let dm = api.datamodel_with_provider(
         r#"
@@ -585,7 +585,7 @@ fn create_constraint_name_tests_w_implicit_names(api: TestApi) {
                      BEGIN CATCH
                      
                      IF @@TRANCOUNT > 0
-                     BEGIN 
+                     BEGIN
                          ROLLBACK TRAN;
                      END;
                      THROW
@@ -776,7 +776,7 @@ fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
                      BEGIN CATCH
                      
                      IF @@TRANCOUNT > 0
-                     BEGIN 
+                     BEGIN
                          ROLLBACK TRAN;
                      END;
                      THROW
@@ -899,9 +899,8 @@ fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
         });
 }
 
-//todo switch this to exclude Windows as soon as the test setup has that capability
-#[test_connector(exclude(Mysql), preview_features("NamedConstraints"))]
-fn alter_constraint_name_tests(api: TestApi) {
+#[cfg_attr(not(target_os = "windows"), test_connector)]
+fn alter_constraint_name(api: TestApi) {
     let plain_dm = api.datamodel_with_provider(
         r#"
          model A {
@@ -948,9 +947,13 @@ fn alter_constraint_name_tests(api: TestApi) {
            @@id([a, b]{})
          }}
      "#,
-        if api.is_sqlite() { "" } else { r#"(map: "CustomId")"# },
+        if api.is_sqlite() || api.is_mysql() {
+            ""
+        } else {
+            r#"(map: "CustomId")"#
+        },
         if api.is_sqlite() { "" } else { r#", map: "CustomFK""# },
-        if api.is_sqlite() {
+        if api.is_sqlite() || api.is_mysql() {
             ""
         } else {
             r#", map: "CustomCompoundId""#
@@ -962,81 +965,72 @@ fn alter_constraint_name_tests(api: TestApi) {
         .assert_migration_directories_count(2)
         .assert_migration("custom", |migration| {
             let expected_script = if api.is_mssql() {
-                //TODO (matthias NamedConstraints) implement rename foreign key here instead of drop and recreate
                 indoc! {
                      r#"
-                     BEGIN TRY
-                     
-                     BEGIN TRAN;
-                     
-                     -- DropForeignKey
-                     ALTER TABLE [alter_constraint_name_tests].[B] DROP CONSTRAINT [B_aId_fkey];
-                     
-                     -- AlterTable
-                     EXEC SP_RENAME N'alter_constraint_name_tests.A_pkey', N'CustomId';
-                     
-                     -- AlterTable
-                     EXEC SP_RENAME N'alter_constraint_name_tests.B_pkey', N'CustomCompoundId';
-                     
-                     -- AddForeignKey
-                     ALTER TABLE [alter_constraint_name_tests].[B] ADD CONSTRAINT [CustomFK] FOREIGN KEY ([aId]) REFERENCES [alter_constraint_name_tests].[A]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
-                     
-                     -- RenameIndex
-                     EXEC SP_RENAME N'alter_constraint_name_tests.A.A_a_b_key', N'CustomCompoundUnique', N'INDEX';
-                     
-                     -- RenameIndex
-                     EXEC SP_RENAME N'alter_constraint_name_tests.A.A_a_idx', N'CustomIndex', N'INDEX';
-                     
-                     -- RenameIndex
-                     EXEC SP_RENAME N'alter_constraint_name_tests.A.A_name_key', N'CustomUnique', N'INDEX';
-                     
-                     -- RenameIndex
-                     EXEC SP_RENAME N'alter_constraint_name_tests.B.B_a_b_idx', N'AnotherCustomIndex', N'INDEX';
-                     
-                     COMMIT TRAN;
-                     
-                     END TRY
-                     BEGIN CATCH
-                     
-                     IF @@TRANCOUNT > 0
-                     BEGIN 
-                         ROLLBACK TRAN;
-                     END;
-                     THROW
-                     
-                     END CATCH
+                    BEGIN TRY
+
+                    BEGIN TRAN;
+
+                    -- AlterTable
+                    EXEC SP_RENAME N'alter_constraint_name.A_pkey', N'CustomId';
+
+                    -- AlterTable
+                    EXEC SP_RENAME N'alter_constraint_name.B_pkey', N'CustomCompoundId';
+
+                    -- RenameForeignKey
+                    EXEC sp_rename 'alter_constraint_name.B_aId_fkey', 'CustomFK', 'OBJECT';
+
+                    -- RenameIndex
+                    EXEC SP_RENAME N'alter_constraint_name.A.A_a_b_key', N'CustomCompoundUnique', N'INDEX';
+
+                    -- RenameIndex
+                    EXEC SP_RENAME N'alter_constraint_name.A.A_a_idx', N'CustomIndex', N'INDEX';
+
+                    -- RenameIndex
+                    EXEC SP_RENAME N'alter_constraint_name.A.A_name_key', N'CustomUnique', N'INDEX';
+
+                    -- RenameIndex
+                    EXEC SP_RENAME N'alter_constraint_name.B.B_a_b_idx', N'AnotherCustomIndex', N'INDEX';
+
+                    COMMIT TRAN;
+
+                    END TRY
+                    BEGIN CATCH
+
+                    IF @@TRANCOUNT > 0
+                    BEGIN
+                        ROLLBACK TRAN;
+                    END;
+                    THROW
+
+                    END CATCH
                  "#
                  }
             } else if api.is_postgres() {
-
-                //Todo postgres use rename constraint for foreign keys as well
                 indoc! {
                      r#"
-                     -- DropForeignKey
-                     ALTER TABLE "B" DROP CONSTRAINT "B_aId_fkey";
+                -- AlterTable
+                ALTER TABLE "A" RENAME CONSTRAINT "A_pkey" TO "CustomId";
 
-                     -- AlterTable
-                     ALTER TABLE "A" RENAME CONSTRAINT "A_pkey" TO "CustomId";
+                -- AlterTable
+                ALTER TABLE "B" RENAME CONSTRAINT "B_pkey" TO "CustomCompoundId";
 
-                     -- AlterTable
-                     ALTER TABLE "B" RENAME CONSTRAINT "B_pkey" TO "CustomCompoundId";
+                -- RenameForeignKey
+                ALTER TABLE "B" RENAME CONSTRAINT "B_aId_fkey" TO "CustomFK";
 
-                     -- AddForeignKey
-                     ALTER TABLE "B" ADD CONSTRAINT "CustomFK" FOREIGN KEY ("aId") REFERENCES "A"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+                -- RenameIndex
+                ALTER INDEX "A_a_b_key" RENAME TO "CustomCompoundUnique";
 
-                     -- RenameIndex
-                     ALTER INDEX "A_a_b_key" RENAME TO "CustomCompoundUnique";
+                -- RenameIndex
+                ALTER INDEX "A_a_idx" RENAME TO "CustomIndex";
 
-                     -- RenameIndex
-                     ALTER INDEX "A_a_idx" RENAME TO "CustomIndex";
+                -- RenameIndex
+                ALTER INDEX "A_name_key" RENAME TO "CustomUnique";
 
-                     -- RenameIndex
-                     ALTER INDEX "A_name_key" RENAME TO "CustomUnique";
-
-                     -- RenameIndex
-                     ALTER INDEX "B_a_b_idx" RENAME TO "AnotherCustomIndex";
-                 "#
-                 }
+                -- RenameIndex
+                ALTER INDEX "B_a_b_idx" RENAME TO "AnotherCustomIndex";
+                "#
+              }
             } else if api.is_mysql_5_6() || api.is_mariadb(){
                 indoc! {
                      r#"

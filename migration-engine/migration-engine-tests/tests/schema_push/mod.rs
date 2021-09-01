@@ -160,7 +160,7 @@ fn multi_column_indexes_and_unique_constraints_on_the_same_fields_do_not_collide
     api.schema_push_w_datasource(dm).send().assert_green_bang();
 }
 
-#[test_connector(preview_features("NamedConstraints"))]
+#[test_connector]
 fn alter_constraint_name_push(api: TestApi) {
     let plain_dm = r#"
          model A {

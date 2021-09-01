@@ -174,5 +174,12 @@ fn render_raw_sql(
 
             vec![renderer.render_drop_user_defined_type(&udt)]
         }
+        SqlMigrationStep::RenameForeignKey {
+            table_id,
+            foreign_key_id,
+        } => {
+            let fks = schemas.tables(table_id).foreign_keys(foreign_key_id);
+            vec![renderer.render_rename_foreign_key(&fks)]
+        }
     }
 }

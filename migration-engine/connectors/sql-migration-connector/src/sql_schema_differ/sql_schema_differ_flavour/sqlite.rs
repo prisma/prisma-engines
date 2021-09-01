@@ -6,6 +6,10 @@ use sql_schema_describer::{walkers::ColumnWalker, ColumnTypeFamily};
 use std::collections::HashSet;
 
 impl SqlSchemaDifferFlavour for SqliteFlavour {
+    fn can_rename_foreign_key(&self) -> bool {
+        false
+    }
+
     fn can_rename_index(&self) -> bool {
         false
     }

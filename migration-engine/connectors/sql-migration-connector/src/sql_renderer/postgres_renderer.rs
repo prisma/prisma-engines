@@ -126,7 +126,7 @@ impl SqlRenderer for PostgresFlavour {
                 let table = schemas.previous().table_walker_at(*table_idx);
 
                 let drop_default = format!(
-                    "ALTER TABLE \"{table_name}\" ALTER COLUMN \"{column_name}\" DROP DEFAULT",
+                    r#"ALTER TABLE "{table_name}" ALTER COLUMN "{column_name}" DROP DEFAULT"#,
                     table_name = table.name(),
                     column_name = table.column_at(*colidx).name(),
                 );
@@ -446,6 +446,15 @@ impl SqlRenderer for PostgresFlavour {
 
     fn render_drop_user_defined_type(&self, _: &UserDefinedTypeWalker<'_>) -> String {
         unreachable!("render_drop_user_defined_type on PostgreSQL")
+    }
+
+    fn render_rename_foreign_key(&self, fks: &Pair<ForeignKeyWalker<'_>>) -> String {
+        format!(
+            r#"ALTER TABLE "{table}" RENAME CONSTRAINT "{previous}" TO "{next}""#,
+            table = fks.previous().table().name(),
+            previous = fks.previous().constraint_name().unwrap(),
+            next = fks.next().constraint_name().unwrap(),
+        )
     }
 }
 
