@@ -4,7 +4,7 @@ use expect_test::expect;
 use introspection_engine_tests::{test_api::*, TestResult};
 use test_macros::test_connector;
 
-#[test_connector(preview_features("NamedConstraints"), tags(Mssql))]
+#[test_connector(tags(Mssql))]
 async fn introspecting_custom_fk_names_works(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
@@ -46,7 +46,7 @@ async fn introspecting_custom_fk_names_works(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(preview_features("NamedConstraints"), tags(Mssql))]
+#[test_connector(tags(Mssql))]
 async fn introspecting_default_fk_names_works(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {

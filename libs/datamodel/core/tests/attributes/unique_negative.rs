@@ -287,11 +287,6 @@ fn invalid_name_for_compound_unique_must_error() {
           url = "mysql://root:prisma@127.0.0.1:3309/ReproIndexNames?connection_limit=1"
         }
 
-        generator js {
-          provider = "prisma-client-js"
-          previewFeatures = ["NamedConstraints"]
-        }
-
         model User {
           name           String            
           identification Int
@@ -304,10 +299,10 @@ fn invalid_name_for_compound_unique_must_error() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating model "User": The `name` property within the `@@unique` attribute only allows for the following characters: `_a-zA-Z0-9`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91munique([name, identification], name: "Test.User")[0m
+        [1;94m 9 | [0m
+        [1;94m10 | [0m  @@[1;91munique([name, identification], name: "Test.User")[0m
         [1;94m   | [0m
     "#]];
 
@@ -320,11 +315,6 @@ fn mapping_unique_with_a_name_that_is_too_long_should_error() {
         datasource test {
           provider = "mysql"
           url = "mysql://root:prisma@127.0.0.1:3309/ReproIndexNames?connection_limit=1"
-        }
-
-        generator js {
-          provider = "prisma-client-js"
-          previewFeatures = ["NamedConstraints"]
         }
 
         model User {
@@ -344,16 +334,16 @@ fn mapping_unique_with_a_name_that_is_too_long_should_error() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating model "User": The constraint name 'IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits' specified in the `map` argument for the `@@unique` constraint is too long for your chosen provider. The maximum allowed length is 64 bytes.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91munique([name, identification], map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits")[0m
+        [1;94m 9 | [0m
+        [1;94m10 | [0m  @@[1;91munique([name, identification], map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits")[0m
         [1;94m   | [0m
         [1;91merror[0m: [1mError validating model "User1": The constraint name 'IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimitsHereAsWell' specified in the `map` argument for the `@unique` constraint is too long for your chosen provider. The maximum allowed length is 64 bytes.[0m
-          [1;94m-->[0m  [4mschema.prisma:19[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m18 | [0mmodel User1 {
-        [1;94m19 | [0m  name           String @[1;91munique(map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimitsHereAsWell")[0m            
+        [1;94m13 | [0mmodel User1 {
+        [1;94m14 | [0m  name           String @[1;91munique(map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimitsHereAsWell")[0m            
         [1;94m   | [0m
     "#]];
 

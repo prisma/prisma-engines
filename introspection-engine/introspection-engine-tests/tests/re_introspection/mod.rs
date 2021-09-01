@@ -1627,7 +1627,7 @@ async fn do_not_try_to_keep_custom_many_to_many_self_relation_names(api: &TestAp
     Ok(())
 }
 
-#[test_connector(tags(Postgres, Mssql), preview_features("NamedConstraints"))]
+#[test_connector(tags(Postgres, Mssql))]
 async fn re_introspecting_custom_compound_unique_names(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -1650,11 +1650,6 @@ async fn re_introspecting_custom_compound_unique_names(api: &TestApi) -> TestRes
         .await?;
 
     let input_dm = indoc! {r#"
-         generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["NamedConstraints"]
-         }
-         
          model User {
              id     Int @id @default(autoincrement()) 
              first  Int
@@ -1665,11 +1660,6 @@ async fn re_introspecting_custom_compound_unique_names(api: &TestApi) -> TestRes
      "#};
 
     let final_dm = indoc! {r#"
-         generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["NamedConstraints"]
-         }   
-    
          model User {
              id     Int @id @default(autoincrement()) 
              first  Int
@@ -1698,7 +1688,7 @@ async fn re_introspecting_custom_compound_unique_names(api: &TestApi) -> TestRes
     Ok(())
 }
 
-#[test_connector(tags(Postgres, Mssql), preview_features("NamedConstraints"))]
+#[test_connector(tags(Postgres, Mssql))]
 async fn re_introspecting_custom_compound_id_names(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -1726,11 +1716,6 @@ async fn re_introspecting_custom_compound_id_names(api: &TestApi) -> TestResult 
 
     let input_dm = api.dm_with_sources(
         r#"
-         generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["NamedConstraints"]
-         }
-    
          model User {
              first  Int
              last   Int
@@ -1748,11 +1733,6 @@ async fn re_introspecting_custom_compound_id_names(api: &TestApi) -> TestResult 
     );
 
     let final_dm = r#"
-         generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["NamedConstraints"]
-         }
-         
          model User {
              first  Int
              last   Int

@@ -60,8 +60,8 @@ async fn multiple_changed_relation_names(api: &TestApi) -> TestResult {
           id                                            Int      @id @default(autoincrement())
           morningEmployeeId                             Int
           eveningEmployeeId                             Int
-          Employee_EmployeeToSchedule_eveningEmployeeId Employee @relation("EmployeeToSchedule_eveningEmployeeId", fields: [eveningEmployeeId], references: [id])
-          Employee_EmployeeToSchedule_morningEmployeeId Employee @relation("EmployeeToSchedule_morningEmployeeId", fields: [morningEmployeeId], references: [id])
+          Employee_EmployeeToSchedule_eveningEmployeeId Employee @relation("EmployeeToSchedule_eveningEmployeeId", fields: [eveningEmployeeId], references: [id], map: "eveningEmployeeId")
+          Employee_EmployeeToSchedule_morningEmployeeId Employee @relation("EmployeeToSchedule_morningEmployeeId", fields: [morningEmployeeId], references: [id], map: "morningEmployeeId")
 
           @@index([eveningEmployeeId], map: "eveningEmployeeId")
           @@index([morningEmployeeId], map: "morningEmployeeId")
@@ -120,7 +120,7 @@ async fn mapped_model_and_field_name(api: &TestApi) -> TestResult {
         model Post {
           id          Int         @id @default(autoincrement())
           c_user_id   Int         @map("user_id")
-          Custom_User Custom_User @relation(fields: [c_user_id], references: [c_id])
+          Custom_User Custom_User @relation(fields: [c_user_id], references: [c_id], map: "user_id")
 
           @@index([c_user_id], map: "user_id")
         }
@@ -198,8 +198,8 @@ async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> 
           id           Int         @id @default(autoincrement())
           user_id      Int         @unique(map: "user_id")
           user_id2     Int         @unique(map: "user_id2")
-          custom_User  Custom_User @relation("CustomRelationName", fields: [user_id], references: [id])
-          custom_User2 Custom_User @relation("AnotherCustomRelationName", fields: [user_id2], references: [id])
+          custom_User  Custom_User @relation("CustomRelationName", fields: [user_id], references: [id], map: "user_id")
+          custom_User2 Custom_User @relation("AnotherCustomRelationName", fields: [user_id2], references: [id], map: "user_id2")
         }
 
         model Custom_User {

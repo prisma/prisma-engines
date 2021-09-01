@@ -15,8 +15,11 @@ async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestA
             migration.create_table("Post With Space", |t| {
                 t.add_column("id", types::integer().increments(true));
                 t.add_column("user_id", types::integer());
-                t.add_foreign_key(&["user_id"], "User", &["id"]);
 
+                t.add_constraint(
+                    "user_id_fkey",
+                    types::foreign_constraint(&["user_id"], "User", &["id"], None, None),
+                );
                 t.add_constraint("post_user_unique", types::unique_constraint(vec!["user_id"]));
                 t.add_constraint("Post With Space_pkey", types::primary_constraint(vec!["id"]))
             });
@@ -27,7 +30,7 @@ async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestA
         model Post_With_Space {
           id      Int  @id @default(autoincrement())
           user_id Int  @unique(map: "post_user_unique")
-          User    User @relation(fields: [user_id], references: [id], onUpdate: NoAction)
+          User    User @relation(fields: [user_id], references: [id], onUpdate: NoAction, map: "user_id_fkey")
 
           @@map("Post With Space")
         }
@@ -55,8 +58,11 @@ async fn remapping_models_in_relations(api: &TestApi) -> TestResult {
             migration.create_table("Post", |t| {
                 t.add_column("id", types::integer().increments(true));
                 t.add_column("user_id", types::integer());
-                t.add_foreign_key(&["user_id"], "User with Space", &["id"]);
 
+                t.add_constraint(
+                    "user_id_fkey",
+                    types::foreign_constraint(&["user_id"], "User with Space", &["id"], None, None),
+                );
                 t.add_constraint(
                     "post_user_unique",
                     types::unique_constraint(vec!["user_id"]).unique(true),
@@ -70,7 +76,7 @@ async fn remapping_models_in_relations(api: &TestApi) -> TestResult {
         model Post {
           id              Int             @id @default(autoincrement())
           user_id         Int             @unique(map: "post_user_unique")
-          User_with_Space User_with_Space @relation(fields: [user_id], references: [id], onUpdate: NoAction)
+          User_with_Space User_with_Space @relation(fields: [user_id], references: [id], onUpdate: NoAction, map: "user_id_fkey")
         }
 
         model User_with_Space {
@@ -106,7 +112,16 @@ async fn remapping_fields_in_compound_relations(api: &TestApi) -> TestResult {
                 t.add_column("user_id", types::integer());
                 t.add_column("user_age", types::integer());
 
-                t.add_foreign_key(&["user_id", "user_age"], "User", &["id", "age-that-is-invalid"]);
+                t.add_constraint(
+                    "Post_fkey",
+                    types::foreign_constraint(
+                        &["user_id", "user_age"],
+                        "User",
+                        &["id", "age-that-is-invalid"],
+                        None,
+                        None,
+                    ),
+                );
 
                 t.add_constraint(
                     "post_user_unique",
@@ -122,7 +137,7 @@ async fn remapping_fields_in_compound_relations(api: &TestApi) -> TestResult {
           id       Int  @id @default(autoincrement())
           user_id  Int
           user_age Int
-          User     User @relation(fields: [user_id, user_age], references: [id, age_that_is_invalid], onUpdate: NoAction)
+          User     User @relation(fields: [user_id, user_age], references: [id, age_that_is_invalid], onUpdate: NoAction, map: "Post_fkey")
 
           @@unique([user_id, user_age], map: "post_user_unique")
         }

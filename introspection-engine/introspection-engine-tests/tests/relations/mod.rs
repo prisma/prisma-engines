@@ -131,7 +131,10 @@ async fn a_one_to_one_relation(api: &TestApi) -> TestResult {
                 t.add_column("id", types::integer().increments(true));
                 t.add_column("user_id", types::integer().nullable(true));
 
-                t.add_foreign_key(&["user_id"], "User", &["id"]);
+                t.add_constraint(
+                    "Post_user_id_fkey",
+                    types::foreign_constraint(&["user_id"], "User", &["id"], None, None),
+                );
                 t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
                 t.add_constraint("Post_user_id_key", types::unique_constraint(&["user_id"]));
             });
@@ -171,7 +174,10 @@ async fn a_one_to_one_relation_referencing_non_id(api: &TestApi) -> TestResult {
             migration.create_table("Post", |t| {
                 t.add_column("id", types::integer().increments(true));
                 t.add_column("user_email", types::varchar(10).nullable(true));
-                t.add_foreign_key(&["user_email"], "User", &["email"]);
+                t.add_constraint(
+                    "Post_user_email_fkey",
+                    types::foreign_constraint(&["user_email"], "User", &["email"], None, None),
+                );
 
                 t.add_constraint("Post_pkey", types::primary_constraint(vec!["id"]));
                 t.add_constraint("Post_user_email_key", types::unique_constraint(vec!["user_email"]));
@@ -198,7 +204,7 @@ async fn a_one_to_one_relation_referencing_non_id(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(exclude(Mysql))]
+#[test_connector(exclude(Mysql, Sqlite))]
 async fn a_one_to_many_relation(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -210,7 +216,10 @@ async fn a_one_to_many_relation(api: &TestApi) -> TestResult {
             migration.create_table("Post", |t| {
                 t.add_column("id", types::integer().increments(true));
                 t.add_column("user_id", types::integer().unique(false).nullable(true));
-                t.add_foreign_key(&["user_id"], "User", &["id"]);
+                t.add_constraint(
+                    "user_id_fkey",
+                    types::foreign_constraint(&["user_id"], "User", &["id"], None, None),
+                );
                 t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
             });
         })
@@ -220,7 +229,7 @@ async fn a_one_to_many_relation(api: &TestApi) -> TestResult {
         model Post {
           id      Int   @id @default(autoincrement())
           user_id Int?
-          User    User? @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+          User    User? @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_id_fkey")
         }
 
         model User {
@@ -360,7 +369,7 @@ async fn a_many_to_many_relation_with_an_id(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(exclude(Mysql))]
+#[test_connector(exclude(Mysql, Sqlite))]
 async fn a_self_relation(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
@@ -369,8 +378,14 @@ async fn a_self_relation(api: &TestApi) -> TestResult {
                 t.add_column("recruited_by", types::integer().nullable(true));
                 t.add_column("direct_report", types::integer().nullable(true));
 
-                t.add_foreign_key(&["recruited_by"], "User", &["id"]);
-                t.add_foreign_key(&["direct_report"], "User", &["id"]);
+                t.add_constraint(
+                    "recruited_by_fkey",
+                    types::foreign_constraint(&["recruited_by"], "User", &["id"], None, None),
+                );
+                t.add_constraint(
+                    "direct_report_fkey",
+                    types::foreign_constraint(&["direct_report"], "User", &["id"], None, None),
+                );
                 t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
             });
         })
@@ -381,8 +396,8 @@ async fn a_self_relation(api: &TestApi) -> TestResult {
           id                                  Int    @id @default(autoincrement())
           recruited_by                        Int?
           direct_report                       Int?
-          User_UserToUser_direct_report       User?  @relation("UserToUser_direct_report", fields: [direct_report], references: [id], onDelete: NoAction, onUpdate: NoAction)
-          User_UserToUser_recruited_by        User?  @relation("UserToUser_recruited_by", fields: [recruited_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+          User_UserToUser_direct_report       User?  @relation("UserToUser_direct_report", fields: [direct_report], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "direct_report_fkey")
+          User_UserToUser_recruited_by        User?  @relation("UserToUser_recruited_by", fields: [recruited_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "recruited_by_fkey")
           other_User_UserToUser_direct_report User[] @relation("UserToUser_direct_report")
           other_User_UserToUser_recruited_by  User[] @relation("UserToUser_recruited_by")
         }
@@ -440,12 +455,14 @@ async fn duplicate_fks_should_ignore_one_of_them(api: &TestApi) -> TestResult {
                 t.add_column("id", types::integer().increments(true));
                 t.add_column("user_id", types::integer().nullable(true));
 
-                t.add_foreign_key(&["user_id"], "User", &["id"]);
                 t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
             });
 
             migration.change_table("Post", |t| {
-                t.add_foreign_key(&["user_id"], "User", &["id"]);
+                t.add_constraint(
+                    "Post_user_id_fkey",
+                    types::foreign_constraint(&["user_id"], "User", &["id"], None, None),
+                );
             })
         })
         .await?;
@@ -586,72 +603,6 @@ async fn relations_should_avoid_name_clashes(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-// SQL Server cannot form a foreign key without the related columns being part
-// of a primary or candidate keys.
-#[test_connector(exclude(Mysql, Mssql))]
-async fn relations_should_avoid_name_clashes_2(api: &TestApi) -> TestResult {
-    let sql_family = api.sql_family();
-
-    api.barrel()
-        .execute(move |migration| {
-            migration.create_table("x", move |t| {
-                t.add_column("id", types::primary());
-                t.add_column("y", types::integer().nullable(false));
-                t.add_index("unique_y_id", types::index(vec!["id", "y"]).unique(true));
-
-                if sql_family.is_sqlite() {
-                    t.add_foreign_key(&["y"], "y", &["id"]);
-                }
-            });
-
-            migration.create_table("y", move |t| {
-                t.add_column("id", types::primary());
-                t.add_column("x", types::integer().nullable(false));
-                t.add_column("fk_x_1", types::integer().nullable(false));
-                t.add_column("fk_x_2", types::integer().nullable(false));
-
-                if sql_family.is_sqlite() {
-                    t.add_foreign_key(&["fk_x_1", "fk_x_2"], "x", &["id", "y"]);
-                }
-            });
-
-            if !sql_family.is_sqlite() {
-                migration.change_table("x", |t| {
-                    t.add_foreign_key(&["y"], "y", &["id"]);
-                });
-
-                migration.change_table("y", |t| {
-                    t.add_foreign_key(&["fk_x_1", "fk_x_2"], "x", &["id", "y"]);
-                });
-            }
-        })
-        .await?;
-
-    let expected = expect![[r#"
-        model x {
-          id                   Int @id @default(autoincrement())
-          y                    Int
-          y_x_yToy             y   @relation("x_yToy", fields: [y], references: [id], onDelete: NoAction, onUpdate: NoAction)
-          y_xToy_fk_x_1_fk_x_2 y[] @relation("xToy_fk_x_1_fk_x_2")
-
-          @@unique([id, y], map: "unique_y_id")
-        }
-
-        model y {
-          id                   Int @id @default(autoincrement())
-          x                    Int
-          fk_x_1               Int
-          fk_x_2               Int
-          x_xToy_fk_x_1_fk_x_2 x   @relation("xToy_fk_x_1_fk_x_2", fields: [fk_x_1, fk_x_2], references: [id, y], onDelete: NoAction, onUpdate: NoAction)
-          x_x_yToy             x[] @relation("x_yToy")
-        }
-    "#]];
-
-    expected.assert_eq(&api.introspect_dml().await?);
-
-    Ok(())
-}
-
 #[test_connector(exclude(Mysql, Mssql))]
 async fn one_to_many_relation_field_names_do_not_conflict_with_many_to_many_relation_field_names(
     api: &TestApi,
@@ -760,7 +711,7 @@ async fn many_to_many_relation_field_names_do_not_conflict_with_themselves(api: 
     Ok(())
 }
 
-#[test_connector(exclude(Sqlite, Mssql, Mysql), preview_features("NamedConstraints"))]
+#[test_connector(exclude(Sqlite, Mssql, Mysql))]
 async fn one_to_one_req_relation_with_custom_fk_name(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {

@@ -51,7 +51,7 @@ async fn a_table_without_uniques_should_ignore(api: &TestApi) -> TestResult {
         model Post {
           id      Int
           user_id Int
-          User    User @relation(fields: [user_id], references: [id])
+          User    User @relation(fields: [user_id], references: [id], map: "user_id")
 
           @@index([user_id])
           @@ignore
