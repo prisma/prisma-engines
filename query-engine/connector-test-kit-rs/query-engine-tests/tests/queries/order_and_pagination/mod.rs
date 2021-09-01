@@ -1,3 +1,4 @@
+mod order_by;
 mod nested_multi_order_pagination;
 mod nested_pagination;
 mod order_by_aggregation;
