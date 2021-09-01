@@ -89,7 +89,7 @@ mod combinations {
                 }
               }
             "# }),
-            @r###"{"data":{"aggregateItem":{"_count":{"_all":2},"_sum":{"float":10,"int":15,"dec":"10"},"_avg":{"float":5,"int":7.5,"dec":"5"},"_min":{"float":4.5,"int":5,"dec":"4.5"},"_max":{"float":5.5,"int":10,"dec":"5.5"}}}}"###
+            @r###"{"data":{"aggregateItem":{"_count":{"_all":2},"_sum":{"float":10.0,"int":15,"dec":"10"},"_avg":{"float":5.0,"int":7.5,"dec":"5"},"_min":{"float":4.5,"int":5,"dec":"4.5"},"_max":{"float":5.5,"int":10,"dec":"5.5"}}}}"###
         );
 
         Ok(())
