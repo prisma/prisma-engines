@@ -283,6 +283,10 @@ impl SqlRenderer for MysqlFlavour {
     fn render_drop_user_defined_type(&self, _: &UserDefinedTypeWalker<'_>) -> String {
         unreachable!("render_drop_user_defined_type on MySQL")
     }
+
+    fn render_rename_foreign_key(&self, _fks: &Pair<ForeignKeyWalker<'_>>) -> String {
+        unreachable!("render RenameForeignKey on MySQL")
+    }
 }
 
 fn render_mysql_modify(

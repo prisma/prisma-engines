@@ -10,7 +10,7 @@ Migrate](https://www.prisma.io/migrate).
 
 The engines and their respective binary crates are:
 - Query engine: `query-engine`
-- Migration engine: `migration-engine`
+- Migration engine: `migration-engine-cli`
 - Introspection engine: `introspection-engine`
 - Prisma Format: `prisma-fmt`
 
@@ -186,10 +186,6 @@ If you want to use the command line, start `sbt` in
 
 **Run:**
 Run `cargo test` in the repository root.
-
-## WIP Coding Guidelines
-- Prevent compiler warnings
-- Use Rust formatting (`cargo fmt`)
 
 ## Security
 

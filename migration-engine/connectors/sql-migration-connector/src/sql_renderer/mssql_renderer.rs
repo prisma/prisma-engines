@@ -416,7 +416,7 @@ impl SqlRenderer for MssqlFlavour {
             BEGIN CATCH
 
             IF @@TRANCOUNT > 0
-            BEGIN 
+            BEGIN
                 ROLLBACK TRAN;
             END;
             THROW
@@ -425,6 +425,15 @@ impl SqlRenderer for MssqlFlavour {
         "# };
 
         Some(sql)
+    }
+
+    fn render_rename_foreign_key(&self, fks: &Pair<ForeignKeyWalker<'_>>) -> String {
+        format!(
+            r#"EXEC sp_rename '{schema}.{previous}', '{next}', 'OBJECT'"#,
+            schema = self.schema_name(),
+            previous = fks.previous().constraint_name().unwrap(),
+            next = fks.next().constraint_name().unwrap(),
+        )
     }
 }
 

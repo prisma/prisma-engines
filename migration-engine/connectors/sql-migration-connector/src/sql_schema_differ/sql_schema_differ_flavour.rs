@@ -26,6 +26,9 @@ pub(crate) trait SqlSchemaDifferFlavour {
         true
     }
 
+    /// Controls whether we will generate `RenameForeignKey` steps for this flavour.
+    fn can_rename_foreign_key(&self) -> bool;
+
     /// Return whether a column's type needs to be migrated, and how.
     fn column_type_change(&self, differ: Pair<ColumnWalker<'_>>) -> Option<ColumnTypeChange> {
         if differ.previous.column_type_family() != differ.next.column_type_family() {

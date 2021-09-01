@@ -13,6 +13,10 @@ use sql_schema_describer::{
 use std::collections::HashSet;
 
 impl SqlSchemaDifferFlavour for MssqlFlavour {
+    fn can_rename_foreign_key(&self) -> bool {
+        true
+    }
+
     fn should_skip_index_for_new_table(&self, index: &IndexWalker<'_>) -> bool {
         index.index_type().is_unique()
     }

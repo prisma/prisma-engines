@@ -34,6 +34,12 @@ fn adding_a_many_to_many_relation_must_result_in_a_prisma_style_relation_table(a
                     .assert_referential_action_on_delete(ForeignKeyAction::Cascade)
             })
     });
+
+    // Check that the migration is idempotent
+    api.schema_push_w_datasource(dm1)
+        .send()
+        .assert_green_bang()
+        .assert_no_steps();
 }
 
 #[test_connector]

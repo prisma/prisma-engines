@@ -121,6 +121,16 @@ impl SqlMigration {
                         ));
                     }
                 }
+                SqlMigrationStep::RenameForeignKey {
+                    table_id,
+                    foreign_key_id: _,
+                } => {
+                    drift_items.insert((
+                        DriftType::ChangedTable,
+                        self.schemas().tables(table_id).next().name(),
+                        idx,
+                    ));
+                }
                 SqlMigrationStep::CreateIndex {
                     table_id: (_, table_id),
                     ..
@@ -311,6 +321,17 @@ impl SqlMigration {
                     out.push('\n');
                 }
                 SqlMigrationStep::RedefineTables(_) => {}
+                SqlMigrationStep::RenameForeignKey {
+                    table_id,
+                    foreign_key_id,
+                } => {
+                    let fks = self.schemas().tables(table_id).foreign_keys(foreign_key_id);
+                    out.push_str("  [*] Renamed the foreign key \"");
+                    out.push_str(fks.previous().constraint_name().unwrap());
+                    out.push_str("\" to \"");
+                    out.push_str(fks.next().constraint_name().unwrap());
+                    out.push_str("\"\n");
+                }
                 SqlMigrationStep::CreateIndex {
                     table_id: (_, table_id),
                     index_index,
@@ -435,6 +456,10 @@ pub(crate) enum SqlMigrationStep {
         table_id: (Option<TableId>, TableId),
         index_index: usize,
     },
+    RenameForeignKey {
+        table_id: Pair<TableId>,
+        foreign_key_id: Pair<usize>,
+    },
     // Order matters: this needs to come after create_indexes, because the foreign keys can depend on unique
     // indexes created there.
     AddForeignKey {
@@ -471,20 +496,21 @@ impl SqlMigrationStep {
     pub(crate) fn description(&self) -> &'static str {
         match self {
             SqlMigrationStep::AddForeignKey { .. } => "AddForeignKey",
-            SqlMigrationStep::CreateTable { .. } => "CreateTable",
-            SqlMigrationStep::AlterTable(_) => "AlterTable",
-            SqlMigrationStep::RedefineIndex { .. } => "RedefineIndex",
-            SqlMigrationStep::DropForeignKey { .. } => "DropForeignKey",
-            SqlMigrationStep::DropTable { .. } => "DropTable",
-            SqlMigrationStep::RedefineTables { .. } => "RedefineTables",
-            SqlMigrationStep::CreateIndex { .. } => "CreateIndex",
-            SqlMigrationStep::DropIndex { .. } => "DropIndex",
-            SqlMigrationStep::RenameIndex { .. } => "RenameIndex",
-            SqlMigrationStep::CreateEnum { .. } => "CreateEnum",
-            SqlMigrationStep::DropEnum { .. } => "DropEnum",
             SqlMigrationStep::AlterEnum(_) => "AlterEnum",
-            SqlMigrationStep::DropView(_) => "DropView",
+            SqlMigrationStep::AlterTable(_) => "AlterTable",
+            SqlMigrationStep::CreateEnum { .. } => "CreateEnum",
+            SqlMigrationStep::CreateIndex { .. } => "CreateIndex",
+            SqlMigrationStep::CreateTable { .. } => "CreateTable",
+            SqlMigrationStep::DropEnum { .. } => "DropEnum",
+            SqlMigrationStep::DropForeignKey { .. } => "DropForeignKey",
+            SqlMigrationStep::DropIndex { .. } => "DropIndex",
+            SqlMigrationStep::DropTable { .. } => "DropTable",
             SqlMigrationStep::DropUserDefinedType(_) => "DropUserDefinedType",
+            SqlMigrationStep::DropView(_) => "DropView",
+            SqlMigrationStep::RedefineIndex { .. } => "RedefineIndex",
+            SqlMigrationStep::RedefineTables { .. } => "RedefineTables",
+            SqlMigrationStep::RenameForeignKey { .. } => "RenameForeignKey",
+            SqlMigrationStep::RenameIndex { .. } => "RenameIndex",
         }
     }
 }

@@ -1,5 +1,5 @@
 use sql_schema_describer::{
-    walkers::{ColumnWalker, EnumWalker, IndexWalker, SqlSchemaExt, TableWalker},
+    walkers::{ColumnWalker, EnumWalker, ForeignKeyWalker, IndexWalker, SqlSchemaExt, TableWalker},
     ColumnId, SqlSchema, TableId,
 };
 
@@ -96,6 +96,12 @@ impl<'a> Pair<TableWalker<'a>> {
             self.previous().column_at(*column_ids.previous()),
             self.next().column_at(*column_ids.next()),
         )
+    }
+
+    pub(crate) fn foreign_keys(&self, foreign_key_ids: &Pair<usize>) -> Pair<ForeignKeyWalker<'a>> {
+        self.as_ref()
+            .zip(foreign_key_ids.as_ref())
+            .map(|(t, fk)| t.foreign_key_at(*fk))
     }
 
     pub(crate) fn indexes(&self, index_indexes: &Pair<usize>) -> Pair<IndexWalker<'a>> {

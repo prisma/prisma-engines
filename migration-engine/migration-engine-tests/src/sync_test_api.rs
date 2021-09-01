@@ -4,7 +4,7 @@ pub use test_macros::test_connector;
 pub use test_setup::{BitFlags, Capabilities, Tags};
 
 use crate::{commands::*, multi_engine_test_api::TestApi as RootTestApi};
-use migration_connector::MigrationPersistence;
+use migration_connector::{DatabaseMigrationStepApplier, DiffTarget, MigrationConnector, MigrationPersistence};
 use quaint::{
     prelude::{ConnectionInfo, ResultSet},
     Value,
@@ -171,7 +171,7 @@ impl TestApi {
         )
     }
 
-    /// Block on a future
+    /// Block on a future.
     pub fn block_on<O, F: Future<Output = O>>(&self, f: F) -> O {
         self.root.block_on(f)
     }
@@ -183,6 +183,12 @@ impl TestApi {
 
     pub fn datasource_block_with<'a>(&'a self, params: &'a [(&'a str, &'a str)]) -> DatasourceBlock<'a> {
         self.root.args.datasource_block(self.root.connection_string(), params)
+    }
+
+    /// Generate a migration script using `MigrationConnector::diff()`.
+    pub fn diff(&self, from: DiffTarget<'_>, to: DiffTarget<'_>) -> String {
+        let migration = self.block_on(self.connector.diff(from, to)).unwrap();
+        self.connector.render_script(&migration, &Default::default())
     }
 
     pub fn normalize_identifier<'a>(&self, identifier: &'a str) -> Cow<'a, str> {
