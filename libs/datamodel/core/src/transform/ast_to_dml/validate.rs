@@ -654,6 +654,8 @@ impl<'a> Validator<'a> {
                 }
 
                 if !field.is_list()
+                    && !field.relation_info.fields.is_empty()
+                    && !field.relation_info.references.is_empty()
                     && self
                         .source
                         .map(|source| &source.active_connector)
@@ -661,6 +663,13 @@ impl<'a> Validator<'a> {
                         .unwrap_or_default()
                 {
                     referential_actions::detect_cycles(datamodel, model, field, field_span, &mut errors);
+                    referential_actions::detect_multiple_cascading_paths(
+                        datamodel,
+                        model,
+                        field,
+                        field_span,
+                        &mut errors,
+                    );
                 }
             } else {
                 let message = format!(
