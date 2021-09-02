@@ -1,5 +1,6 @@
 use super::*;
 use constants::{aggregations, ordering};
+use itertools::Itertools;
 use output_types::aggregation;
 
 /// Builds "<Model>OrderByInput" object types.
@@ -9,16 +10,20 @@ pub(crate) fn order_by_object_type(
     model: &ModelRef,
     include_relations: bool,
     include_scalar_aggregations: bool,
+    include_full_text_search: bool,
 ) -> InputObjectTypeWeakRef {
     let enum_type = Arc::new(string_enum_type(
         ordering::SORT_ORDER,
         vec![ordering::ASC.to_owned(), ordering::DESC.to_owned()],
     ));
-    let ident_suffix = match (include_relations, include_scalar_aggregations) {
-        (false, false) => "",
-        (true, false) => "WithRelation",
-        (false, true) => "WithAggregation",
-        (true, true) => unreachable!("Order by with relations and scalar aggregations is not supported yet"),
+    let ident_suffix = match (include_relations, include_scalar_aggregations, include_full_text_search) {
+        (true, true, _) => unimplemented!("Order by with relations and scalar aggregations is not supported yet"),
+        (false, false, false) => "",
+        (true, false, false) => "WithRelation",
+        (true, false, true) => "WithRelationAndSearchRelevance",
+        (false, true, false) => "WithAggregation",
+        (false, true, true) => "WithAggregationAndSearchRelevance",
+        (false, false, true) => "WithSearchRelevance",
     };
     let ident = Identifier::new(format!("{}OrderBy{}Input", model.name, ident_suffix), PRISMA_NAMESPACE);
     return_cached_input!(ctx, &ident);
@@ -42,8 +47,13 @@ pub(crate) fn order_by_object_type(
             }
             ModelField::Relation(rf) if include_relations => {
                 let related_model = rf.related_model();
-                let related_object_type =
-                    order_by_object_type(ctx, &related_model, include_relations, include_scalar_aggregations);
+                let related_object_type = order_by_object_type(
+                    ctx,
+                    &related_model,
+                    include_relations,
+                    include_scalar_aggregations,
+                    include_full_text_search,
+                );
 
                 Some(input_field(rf.name.clone(), InputType::object(related_object_type), None).optional())
             }
@@ -114,6 +124,10 @@ pub(crate) fn order_by_object_type(
                 numeric_fields,
             ),
         );
+    }
+
+    if include_full_text_search {
+        append_opt(&mut fields, order_by_field_text_search(ctx, model, &enum_type))
     }
 
     input_object.set_fields(fields);
@@ -198,6 +212,81 @@ fn order_by_object_type_rel_aggregate(
         None,
     )
     .optional()];
+
+    input_object.set_fields(fields);
+
+    Arc::downgrade(&input_object)
+}
+
+fn order_by_field_text_search(
+    ctx: &mut BuilderContext,
+    model: &ModelRef,
+    enum_type: &Arc<EnumType>,
+) -> Option<InputField> {
+    let scalar_fields: Vec<_> = model
+        .fields()
+        .scalar()
+        .into_iter()
+        .filter(|sf| sf.type_identifier == TypeIdentifier::String)
+        .collect();
+
+    if scalar_fields.is_empty() {
+        None
+    } else {
+        Some(
+            input_field(
+                ordering::UNDERSCORE_RELEVANCE,
+                InputType::object(order_by_object_type_text_search(ctx, model, scalar_fields, &enum_type)),
+                None,
+            )
+            .optional(),
+        )
+    }
+}
+
+fn order_by_object_type_text_search(
+    ctx: &mut BuilderContext,
+    model: &ModelRef,
+    scalar_fields: Vec<ScalarFieldRef>,
+    order_enum_type: &Arc<EnumType>,
+) -> InputObjectTypeWeakRef {
+    let ident = Identifier::new(format!("{}OrderByRelevanceInput", model.name), PRISMA_NAMESPACE);
+
+    return_cached_input!(ctx, &ident);
+
+    let input_object = init_input_object_type(ident.clone());
+
+    let input_object = Arc::new(input_object);
+    ctx.cache_input_type(ident, input_object.clone());
+
+    let fields_enum_type = InputType::enum_type(Arc::new(string_enum_type(
+        format!("{}OrderByRelevanceFieldEnum", model.name),
+        scalar_fields.iter().map(|sf| sf.name.clone()).collect_vec(),
+    )));
+    let mut fields = vec![];
+
+    append_opt(
+        &mut fields,
+        Some(input_field(
+            "fields",
+            vec![fields_enum_type.clone(), InputType::list(fields_enum_type)],
+            None,
+        )),
+    );
+
+    append_opt(
+        &mut fields,
+        Some(input_field(
+            ordering::SORT,
+            InputType::Enum(order_enum_type.clone()),
+            None,
+        )),
+    );
+
+    append_opt(
+        &mut fields,
+        Some(input_field(ordering::SEARCH, InputType::string(), None)),
+    );
 
     input_object.set_fields(fields);
 
