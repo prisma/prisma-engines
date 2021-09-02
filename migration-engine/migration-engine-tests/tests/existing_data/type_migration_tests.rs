@@ -1,4 +1,4 @@
-use migration_engine_tests::sync_test_api::*;
+use migration_engine_tests::test_api::*;
 use quaint::Value;
 
 #[test_connector]
@@ -11,7 +11,7 @@ fn altering_the_type_of_a_column_in_a_non_empty_table_warns(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     let insert = quaint::ast::Insert::single_into(api.render_table_name("User"))
         .value("id", "abc")
@@ -55,7 +55,7 @@ fn migrating_a_required_column_from_int_to_string_should_cast(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.insert("Test")
         .value("id", "abcd")
@@ -72,7 +72,7 @@ fn migrating_a_required_column_from_int_to_string_should_cast(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green();
 
     api.assert_schema().assert_table("Test", |table| {
         table.assert_column("serialNumber", |col| col.assert_type_is_string())
@@ -93,7 +93,7 @@ fn changing_a_string_array_column_to_scalar_is_fine(api: TestApi) {
         }
         "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.insert("Film")
         .value("id", "film1")
@@ -110,7 +110,7 @@ fn changing_a_string_array_column_to_scalar_is_fine(api: TestApi) {
             }
             "#;
 
-    api.schema_push_w_datasource(dm2).force(true).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).force(true).send().assert_green();
 
     api.assert_schema().assert_table("Film", |table| {
         table.assert_column("mainProtagonist", |column| column.assert_is_required())
@@ -132,7 +132,7 @@ fn changing_an_int_array_column_to_scalar_is_not_possible(api: TestApi) {
         }
         "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.insert("Film")
         .value("id", "film1")
@@ -171,7 +171,7 @@ fn int_to_string_conversions_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.insert("Cat").value("tag", 20).result_raw();
 
@@ -184,7 +184,7 @@ fn int_to_string_conversions_work(api: TestApi) {
 
     api.schema_push_w_datasource(dm2)
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_has_executed_steps();
 
     api.dump_table("Cat")
@@ -200,7 +200,7 @@ fn string_to_int_conversions_are_risky(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.insert("Cat").value("tag", "20").result_raw();
 
@@ -284,7 +284,7 @@ fn datetime_to_float_conversions_are_impossible(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.insert("Cat")
         .value("birthday", Value::datetime("2018-01-18T08:01:02Z".parse().unwrap()))

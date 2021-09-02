@@ -1,5 +1,5 @@
 use indoc::formatdoc;
-use migration_engine_tests::sync_test_api::*;
+use migration_engine_tests::test_api::*;
 use pretty_assertions::assert_eq;
 use user_facing_errors::{migration_engine::ApplyMigrationError, UserFacingError};
 
@@ -219,7 +219,7 @@ fn migrations_should_fail_on_an_uninitialized_nonempty_database(api: TestApi) {
     "#,
     );
 
-    api.schema_push(dm.clone()).send().assert_green_bang();
+    api.schema_push(dm.clone()).send().assert_green();
 
     let directory = api.create_migrations_directory();
 

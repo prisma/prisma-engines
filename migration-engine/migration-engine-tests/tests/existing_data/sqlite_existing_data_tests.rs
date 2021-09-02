@@ -1,4 +1,4 @@
-use migration_engine_tests::sync_test_api::*;
+use migration_engine_tests::test_api::*;
 use quaint::{prelude::Insert, Value};
 use sql_schema_describer::DefaultValue;
 
@@ -11,7 +11,7 @@ fn changing_a_column_from_optional_to_required_with_a_default_is_safe(api: TestA
         }
     "#;
 
-    api.schema_push_w_datasource(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     let insert = Insert::multi_into(api.render_table_name("Test"), &["id", "age"])
         .values(("a", 12))
@@ -27,7 +27,7 @@ fn changing_a_column_from_optional_to_required_with_a_default_is_safe(api: TestA
         }
     "#;
 
-    api.schema_push_w_datasource(dm2).force(true).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).force(true).send().assert_green();
 
     api.assert_schema().assert_table("Test", |table| {
         table.assert_column("age", |column| {

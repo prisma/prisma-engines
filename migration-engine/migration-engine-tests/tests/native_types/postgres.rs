@@ -1,6 +1,6 @@
 use bigdecimal::BigDecimal;
 use chrono::Utc;
-use migration_engine_tests::sync_test_api::*;
+use migration_engine_tests::test_api::*;
 use once_cell::sync::Lazy;
 use quaint::{prelude::Insert, Value};
 use sql_datamodel_connector::SqlDatamodelConnectors;
@@ -821,7 +821,7 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
 
         tracing::info!(dm = dm1.as_str());
 
-        api.schema_push_w_datasource(&dm1).send().assert_green_bang();
+        api.schema_push_w_datasource(&dm1).send().assert_green();
 
         // inserts
         api.query(insert.into());
@@ -846,7 +846,7 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
             columns = next_columns
         );
 
-        api.schema_push_w_datasource(&dm2).send().assert_green_bang();
+        api.schema_push_w_datasource(&dm2).send().assert_green();
 
         // second assertions
         api.assert_schema().assert_table("A", |table| {
@@ -914,7 +914,7 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
             columns = previous_columns,
         );
 
-        api.schema_push_w_datasource(&dm1).send().assert_green_bang();
+        api.schema_push_w_datasource(&dm1).send().assert_green();
 
         // inserts
         api.query(insert.into());
@@ -1016,7 +1016,7 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
             columns = previous_columns,
         );
 
-        api.schema_push_w_datasource(&dm1).send().assert_green_bang();
+        api.schema_push_w_datasource(&dm1).send().assert_green();
 
         // inserts
         api.query(insert.into());
@@ -1191,7 +1191,7 @@ fn safe_casts_from_array_with_existing_data_should_work(api: TestApi) {
             columns = previous_columns,
         );
 
-        api.schema_push_w_datasource(&dm1).send().assert_green_bang();
+        api.schema_push_w_datasource(&dm1).send().assert_green();
 
         // inserts
         api.query(insert.into());
@@ -1216,7 +1216,7 @@ fn safe_casts_from_array_with_existing_data_should_work(api: TestApi) {
             columns = next_columns,
         );
 
-        api.schema_push_w_datasource(&dm2).send().assert_green_bang();
+        api.schema_push_w_datasource(&dm2).send().assert_green();
 
         //second assertions
         api.assert_schema().assert_table("A", |table| {
@@ -1271,17 +1271,17 @@ fn typescript_starter_schema_with_native_types_is_idempotent(api: TestApi) {
     api.schema_push_w_datasource(dm)
         .migration_id(Some("first"))
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_has_executed_steps();
     api.schema_push_w_datasource(dm)
         .migration_id(Some("second"))
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_no_steps();
     api.schema_push_w_datasource(dm2)
         .migration_id(Some("third"))
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_no_steps();
 }
 
@@ -1326,21 +1326,21 @@ fn typescript_starter_schema_with_different_native_types_is_idempotent(api: Test
     api.schema_push_w_datasource(dm)
         .migration_id(Some("first"))
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_has_executed_steps();
     api.schema_push_w_datasource(dm)
         .migration_id(Some("second"))
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_no_steps();
     api.schema_push_w_datasource(dm2)
         .migration_id(Some("third"))
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_has_executed_steps();
     api.schema_push_w_datasource(dm2)
         .migration_id(Some("fourth"))
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_no_steps();
 }

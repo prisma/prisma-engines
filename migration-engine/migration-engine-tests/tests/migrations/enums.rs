@@ -1,4 +1,4 @@
-use migration_engine_tests::sync_test_api::*;
+use migration_engine_tests::test_api::*;
 use sql_schema_describer::ColumnTypeFamily;
 
 const BASIC_ENUM_DM: &str = r#"
@@ -27,7 +27,7 @@ fn adding_an_enum_field_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     api.assert_schema().assert_table("Test", |table| {
         table.assert_columns_count(2).assert_column("enum", |c| {
@@ -62,7 +62,7 @@ fn adding_an_enum_field_must_work_with_native_types_off(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     api.assert_schema().assert_table("Test", |table| {
         table.assert_columns_count(2).assert_column("enum", |c| {
@@ -84,7 +84,7 @@ fn adding_an_enum_field_must_work_with_native_types_off(api: TestApi) {
 
 #[test_connector(capabilities(Enums))]
 fn an_enum_can_be_turned_into_a_model(api: TestApi) {
-    api.schema_push_w_datasource(BASIC_ENUM_DM).send().assert_green_bang();
+    api.schema_push_w_datasource(BASIC_ENUM_DM).send().assert_green();
 
     let enum_name = if api.lower_cases_table_names() {
         "cat_mood"
@@ -112,7 +112,7 @@ fn an_enum_can_be_turned_into_a_model(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green();
 
     api.assert_schema()
         .assert_table("Cat", |table| table.assert_columns_count(2).assert_has_column("moodId"))
@@ -133,7 +133,7 @@ fn variants_can_be_added_to_an_existing_enum(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     let enum_name = if api.lower_cases_table_names() {
         "cat_mood"
@@ -159,7 +159,7 @@ fn variants_can_be_added_to_an_existing_enum(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green();
 
     api.assert_schema()
         .assert_enum(enum_name, |enm| enm.assert_values(&["HUNGRY", "HAPPY", "JOYJOY"]));
@@ -179,7 +179,7 @@ fn variants_can_be_removed_from_an_existing_enum(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     let enum_name = if api.lower_cases_table_names() {
         "cat_mood"
@@ -221,7 +221,7 @@ fn variants_can_be_removed_from_an_existing_enum(api: TestApi) {
 
 #[test_connector(capabilities(Enums))]
 fn models_with_enum_values_can_be_dropped(api: TestApi) {
-    api.schema_push_w_datasource(BASIC_ENUM_DM).send().assert_green_bang();
+    api.schema_push_w_datasource(BASIC_ENUM_DM).send().assert_green();
 
     api.assert_schema().assert_tables_count(1);
 
@@ -256,7 +256,7 @@ fn enum_field_to_string_field_works(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.assert_schema().assert_table("Cat", |table| {
         table.assert_column("mood", |col| col.assert_type_is_enum())
@@ -287,7 +287,7 @@ fn string_field_to_enum_field_works(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.assert_schema().assert_table("Cat", |table| {
         table.assert_column("mood", |col| col.assert_type_is_string())
@@ -365,7 +365,7 @@ fn enums_used_in_default_can_be_changed(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.assert_schema().assert_tables_count(5);
 
@@ -445,7 +445,7 @@ fn changing_all_values_of_enums_used_in_defaults_works(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     let dm2 = r#"
         model Cat {
@@ -499,10 +499,7 @@ fn existing_enums_are_picked_up(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm)
-        .send()
-        .assert_green_bang()
-        .assert_no_steps();
+    api.schema_push_w_datasource(dm).send().assert_green().assert_no_steps();
 }
 
 // Bug: https://github.com/prisma/prisma/issues/8137

@@ -1,5 +1,5 @@
 use indoc::indoc;
-use migration_engine_tests::sync_test_api::*;
+use migration_engine_tests::test_api::*;
 
 #[test_connector]
 fn basic_create_migration_works(api: TestApi) {

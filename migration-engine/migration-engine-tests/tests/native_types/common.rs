@@ -1,4 +1,4 @@
-use migration_engine_tests::sync_test_api::*;
+use migration_engine_tests::test_api::*;
 
 #[test_connector]
 fn typescript_starter_schema_is_idempotent_without_native_type_annotations(api: TestApi) {
@@ -22,16 +22,10 @@ fn typescript_starter_schema_is_idempotent_without_native_type_annotations(api: 
 
     api.schema_push_w_datasource(dm)
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_has_executed_steps();
-    api.schema_push_w_datasource(dm)
-        .send()
-        .assert_green_bang()
-        .assert_no_steps();
-    api.schema_push_w_datasource(dm)
-        .send()
-        .assert_green_bang()
-        .assert_no_steps();
+    api.schema_push_w_datasource(dm).send().assert_green().assert_no_steps();
+    api.schema_push_w_datasource(dm).send().assert_green().assert_no_steps();
 }
 
 #[test_connector(exclude(Mssql))]
@@ -57,15 +51,9 @@ fn typescript_starter_schema_starting_without_native_types_is_idempotent(api: Te
         }
     "#;
 
-    api.schema_push(dm)
-        .send()
-        .assert_green_bang()
-        .assert_has_executed_steps();
-    api.schema_push(dm).send().assert_green_bang().assert_no_steps();
-    api.schema_push_w_datasource(dm)
-        .send()
-        .assert_green_bang()
-        .assert_no_steps();
+    api.schema_push(dm).send().assert_green().assert_has_executed_steps();
+    api.schema_push(dm).send().assert_green().assert_no_steps();
+    api.schema_push_w_datasource(dm).send().assert_green().assert_no_steps();
 }
 
 #[test_connector(tags(Postgres, Mysql, Mssql))]
@@ -76,10 +64,10 @@ fn bigint_primary_keys_are_idempotent(api: TestApi) {
             }
         "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
     api.schema_push_w_datasource(dm1)
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_no_steps();
 
     let dm2 = r#"
@@ -88,9 +76,9 @@ fn bigint_primary_keys_are_idempotent(api: TestApi) {
         }
         "#;
 
-    api.schema_push_w_datasource(dm2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green();
     api.schema_push_w_datasource(dm2)
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_no_steps();
 }

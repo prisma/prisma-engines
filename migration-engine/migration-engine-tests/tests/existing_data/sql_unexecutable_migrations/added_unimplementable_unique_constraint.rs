@@ -1,4 +1,4 @@
-use migration_engine_tests::sync_test_api::*;
+use migration_engine_tests::test_api::*;
 
 #[test_connector]
 fn adding_a_unique_constraint_should_warn(api: TestApi) {
@@ -9,7 +9,7 @@ fn adding_a_unique_constraint_should_warn(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     {
         api.insert("Test")
@@ -60,7 +60,7 @@ fn dropping_enum_values_should_warn(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     {
         api.insert("Test")
@@ -110,7 +110,7 @@ fn adding_a_unique_constraint_when_existing_data_respects_it_works(api: TestApi)
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.insert("Test")
         .value("id", "abc")
