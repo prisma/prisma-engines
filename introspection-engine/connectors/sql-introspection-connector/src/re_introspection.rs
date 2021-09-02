@@ -42,7 +42,10 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, ctx: &
     }
 
     let mut changed_index_names = vec![];
-    let mut changed_primary_key_names = vec![];
+
+    // (model_name, reintrospected_pk_name)
+    let mut changed_primary_key_names: Vec<(Model, &str)> = Vec::new();
+
     //custom index names
     {
         for model in new_data_model.models() {
@@ -72,32 +75,24 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, ctx: &
 
     //custom primary key names
     {
-        for model in new_data_model.models() {
-            if let Some(old_model) = &old_data_model.find_model(&model.name) {
-                if let Some(primary_key) = &model.primary_key {
-                    if let Some(old_primary_key) = &old_model.primary_key {
-                        if old_primary_key.fields == primary_key.fields
-                            && (old_primary_key.db_name == primary_key.db_name || primary_key.db_name.is_none())
-                            && old_primary_key.name.is_some()
-                        {
-                            let mf = Model::new(&model.name);
-                            changed_primary_key_names.push((mf, old_primary_key.name.clone()))
-                        }
-                    }
-                }
-            }
-        }
+        let reintrospected_pk_names = new_data_model.models().filter_map(|new_model| {
+            old_data_model
+                .find_model(&new_model.name)
+                .and_then(|old_model| old_model.primary_key.as_ref().and_then(|pk| pk.name.as_deref()))
+                .map(|old_pk_name| (Model::new(new_model.name.as_str()), old_pk_name))
+        });
+
+        changed_primary_key_names.extend(reintrospected_pk_names);
 
         //change primary key names
         for changed_primary_key_name in &changed_primary_key_names {
             let pk = new_data_model
                 .find_model_mut(&changed_primary_key_name.0.model)
                 .primary_key
-                .as_mut();
+                .as_mut()
+                .unwrap();
 
-            if let Some(primary_key) = pk {
-                primary_key.name = changed_primary_key_name.1.clone()
-            }
+            pk.name = Some(changed_primary_key_name.1.to_owned());
         }
     }
 
