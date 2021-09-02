@@ -58,12 +58,12 @@ pub mod filters {
     pub const CONTAINS: &str = "contains";
     pub const STARTS_WITH: &str = "startsWith";
     pub const ENDS_WITH: &str = "endsWith";
-    pub const SEARCH: &str = "search";
     pub const LOWER_THAN: &str = "lt";
     pub const LOWER_THAN_OR_EQUAL: &str = "lte";
     pub const GREATER_THAN: &str = "gt";
     pub const GREATER_THAN_OR_EQUAL: &str = "gte";
     pub const IN: &str = "in";
+    pub const SEARCH: &str = "search";
 
     // legacy filter
     pub const NOT_IN: &str = "notIn";
@@ -126,6 +126,12 @@ pub mod ordering {
     pub const SORT_ORDER: &str = "SortOrder";
     pub const ASC: &str = "asc";
     pub const DESC: &str = "desc";
+
+    // Full-text-search specifics
+    pub const UNDERSCORE_RELEVANCE: &str = "_relevance";
+    pub const SEARCH: &str = "search";
+    pub const SORT: &str = "sort";
+    pub const FIELDS: &str = "fields";
 }
 
 pub mod json_null {
