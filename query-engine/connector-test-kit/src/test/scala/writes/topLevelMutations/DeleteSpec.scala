@@ -4,6 +4,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import util.ConnectorCapability.UuidIdCapability
 import util._
 
+// RS: Won't port, duplicate tests
 class DeleteSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   val project = ProjectDsl.fromString {
