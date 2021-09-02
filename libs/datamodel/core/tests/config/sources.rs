@@ -1,5 +1,6 @@
 use crate::common::*;
 use datamodel::StringFromEnvVar;
+use datamodel_connector::ReferentialIntegrity;
 use pretty_assertions::assert_eq;
 
 #[test]
@@ -554,11 +555,11 @@ fn fail_when_no_source_is_declared() {
 }
 
 #[test]
-fn planet_scale_mode_without_preview_feature_errors() {
+fn referential_integrity_without_preview_feature_errors() {
     let schema = indoc! {r#"
         datasource ps {
           provider = "sqlserver"
-          planetScaleMode = true
+          referentialIntegrity = "prisma"
           url = "mysql://root:prisma@localhost:3306/mydb"
         }
 
@@ -571,19 +572,19 @@ fn planet_scale_mode_without_preview_feature_errors() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating datasource `ps`: 
-        The `planetScaleMode` option can only be set if the preview feature is enabled in a generator block.
+        The `referentialIntegrity` option can only be set if the preview feature is enabled in a generator block.
 
         Example:
 
         generator client {
             provider = "prisma-client-js"
-            previewFeatures = ["planetScaleMode"]
+            previewFeatures = ["referentialIntegrity"]
         }
         [0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
         [1;94m 2 | [0m  provider = "sqlserver"
-        [1;94m 3 | [0m  planetScaleMode = [1;91mtrue[0m
+        [1;94m 3 | [0m  referentialIntegrity = [1;91m"prisma"[0m
         [1;94m   | [0m
     "#]];
 
@@ -591,24 +592,50 @@ fn planet_scale_mode_without_preview_feature_errors() {
 }
 
 #[test]
-fn planet_scale_mode_with_preview_feature_works() {
+fn referential_integrity_with_preview_feature_works() {
     let schema = indoc! {r#"
         datasource ps {
           provider = "sqlserver"
-          planetScaleMode = true
+          referentialIntegrity = "prisma"
           url = "mysql://root:prisma@localhost:3306/mydb"
         }
 
         generator client {
           provider = "prisma-client-js"
-          previewFeatures = ["planetScaleMode"]
+          previewFeatures = ["referentialIntegrity"]
         }
     "#};
 
     let config = parse_configuration(schema);
 
-    assert!(config.datasources[0].planet_scale_mode);
-    assert!(config.planet_scale_mode());
+    assert_eq!(
+        config.datasources[0].referential_integrity,
+        ReferentialIntegrity::Prisma
+    );
+    assert_eq!(config.referential_integrity(), ReferentialIntegrity::Prisma);
+}
+
+#[test]
+fn referential_integrity_default() {
+    let schema = indoc! {r#"
+        datasource ps {
+          provider = "sqlserver"
+          url = "mysql://root:prisma@localhost:3306/mydb"
+        }
+
+        generator client {
+          provider = "prisma-client-js"
+          previewFeatures = ["referentialIntegrity"]
+        }
+    "#};
+
+    let config = parse_configuration(schema);
+
+    assert_eq!(
+        config.datasources[0].referential_integrity,
+        ReferentialIntegrity::ForeignKeys
+    );
+    assert_eq!(config.referential_integrity(), ReferentialIntegrity::ForeignKeys);
 }
 
 fn load_env_var(key: &str) -> Option<String> {

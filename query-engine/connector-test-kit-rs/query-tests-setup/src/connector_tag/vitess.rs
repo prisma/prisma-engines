@@ -1,6 +1,6 @@
 use std::{fmt::Display, str::FromStr};
 
-use datamodel_connector::Connector;
+use datamodel_connector::{Connector, ReferentialIntegrity};
 use sql_datamodel_connector::MySqlDatamodelConnector;
 
 use super::*;
@@ -112,6 +112,6 @@ impl Display for VitessVersion {
 }
 
 fn vitess_capabilities() -> Vec<ConnectorCapability> {
-    let dm_connector = MySqlDatamodelConnector::new(true);
+    let dm_connector = MySqlDatamodelConnector::new(ReferentialIntegrity::Prisma);
     dm_connector.capabilities().to_owned()
 }

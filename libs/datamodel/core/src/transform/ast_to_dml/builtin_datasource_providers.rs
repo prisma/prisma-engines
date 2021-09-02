@@ -1,6 +1,6 @@
 use super::datasource_provider::DatasourceProvider;
 use crate::common::provider_names::*;
-use datamodel_connector::Connector;
+use datamodel_connector::{Connector, ReferentialIntegrity};
 use mongodb_datamodel_connector::MongoDbDatamodelConnector;
 use sql_datamodel_connector::SqlDatamodelConnectors;
 
@@ -49,12 +49,12 @@ impl DatasourceProvider for PostgresDatasourceProvider {
 }
 
 pub struct MySqlDatasourceProvider {
-    is_planetscale: bool,
+    referential_integrity: ReferentialIntegrity,
 }
 
 impl MySqlDatasourceProvider {
-    pub fn new(is_planetscale: bool) -> Self {
-        Self { is_planetscale }
+    pub fn new(referential_integrity: ReferentialIntegrity) -> Self {
+        Self { referential_integrity }
     }
 }
 
@@ -68,7 +68,7 @@ impl DatasourceProvider for MySqlDatasourceProvider {
     }
 
     fn connector(&self) -> Box<dyn Connector> {
-        Box::new(SqlDatamodelConnectors::mysql(self.is_planetscale))
+        Box::new(SqlDatamodelConnectors::mysql(self.referential_integrity))
     }
 }
 

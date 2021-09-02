@@ -1,14 +1,14 @@
 use migration_engine_tests::test_api::*;
 
-#[test_connector(tags(Mysql))]
-fn schema_push_planetscale_mode_works(api: TestApi) {
+#[test_connector]
+fn schema_push_referential_integrity_prisma_works(api: TestApi) {
     let dm = format!(
         r#"
         {datasource}
 
         generator client {{
             provider = "prisma-client-js"
-            previewFeatures = ["planetScaleMode"]
+            previewFeatures = ["referentialIntegrity"]
         }}
 
         model Post {{
@@ -32,7 +32,7 @@ fn schema_push_planetscale_mode_works(api: TestApi) {
             post        Post @relation(fields: [postId], references: [id])
         }}
         "#,
-        datasource = api.datasource_block_with(&[("planetScaleMode", "true")]),
+        datasource = api.datasource_block_with(&[("referentialIntegrity", "\"prisma\"")]),
     );
 
     api.schema_push(&dm).send().assert_green();
@@ -44,8 +44,8 @@ fn schema_push_planetscale_mode_works(api: TestApi) {
         .assert_table("Comment", |table| table.assert_foreign_keys_count(0));
 }
 
-#[test_connector(tags(Mysql))]
-fn create_migration_planetscale_mode_works(api: TestApi) {
+#[test_connector]
+fn create_migration_referential_integrity_prisma_works(api: TestApi) {
     let migrations_directory = api.create_migrations_directory();
 
     let dm = format!(
@@ -54,7 +54,7 @@ fn create_migration_planetscale_mode_works(api: TestApi) {
 
         generator client {{
             provider = "prisma-client-js"
-            previewFeatures = ["planetScaleMode"]
+            previewFeatures = ["referentialIntegrity"]
         }}
 
         model Post {{
@@ -78,7 +78,7 @@ fn create_migration_planetscale_mode_works(api: TestApi) {
             post        Post @relation(fields: [postId], references: [id])
         }}
         "#,
-        datasource = api.datasource_block_with(&[("planetScaleMode", "true")]),
+        datasource = api.datasource_block_with(&[("referentialIntegrity", "\"prisma\"")]),
     );
 
     api.create_migration("01init", &dm, &migrations_directory)

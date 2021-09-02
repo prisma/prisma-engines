@@ -54,7 +54,7 @@ features!(
     SelectRelationCount,
     OrderByAggregateGroup,
     FilterJson,
-    PlanetScaleMode,
+    ReferentialIntegrity,
     ReferentialActions,
     InteractiveTransactions,
     NamedConstraints,
@@ -70,7 +70,7 @@ pub static GENERATOR: Lazy<FeatureMap> = Lazy::new(|| {
         .with_active(vec![
             NApi,
             FilterJson,
-            PlanetScaleMode,
+            ReferentialIntegrity,
             MongoDb,
             InteractiveTransactions,
             FullTextSearch,

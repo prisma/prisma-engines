@@ -16,6 +16,7 @@ use crate::{
     configuration::StringFromEnvVar,
     Datasource,
 };
+use datamodel_connector::ReferentialIntegrity;
 use enumflags2::BitFlags;
 use std::collections::HashMap;
 
@@ -154,10 +155,11 @@ impl DatasourceLoader {
         preview_features_guardrail(&args, diagnostics);
 
         let documentation = ast_source.documentation.as_ref().map(|comment| comment.text.clone());
-        let planet_scale_mode = get_planet_scale_mode_arg(&args, preview_features, ast_source, diagnostics);
+        let referential_integrity =
+            get_referential_integrity(&args, preview_features, ast_source, diagnostics).unwrap_or_default();
 
         let datasource_provider: Box<dyn DatasourceProvider> = match provider {
-            p if p == MYSQL_SOURCE_NAME => Box::new(MySqlDatasourceProvider::new(planet_scale_mode)),
+            p if p == MYSQL_SOURCE_NAME => Box::new(MySqlDatasourceProvider::new(referential_integrity)),
             p if p == POSTGRES_SOURCE_NAME || p == POSTGRES_SOURCE_NAME_HEROKU => {
                 Box::new(PostgresDatasourceProvider::new())
             }
@@ -183,53 +185,59 @@ impl DatasourceLoader {
             documentation,
             active_connector: datasource_provider.connector(),
             shadow_database_url,
-            planet_scale_mode,
+            referential_integrity,
         })
     }
 }
 
-const PLANET_SCALE_PREVIEW_FEATURE_ERR: &str = r#"
-The `planetScaleMode` option can only be set if the preview feature is enabled in a generator block.
+const REFERENTIAL_INTEGRITY_PREVIEW_FEATURE_ERR: &str = r#"
+The `referentialIntegrity` option can only be set if the preview feature is enabled in a generator block.
 
 Example:
 
 generator client {
     provider = "prisma-client-js"
-    previewFeatures = ["planetScaleMode"]
+    previewFeatures = ["referentialIntegrity"]
 }
 "#;
 
-fn get_planet_scale_mode_arg(
+fn get_referential_integrity(
     args: &HashMap<&str, ValueValidator<'_>>,
     preview_features: BitFlags<PreviewFeature>,
     source: &SourceConfig,
     diagnostics: &mut Diagnostics,
-) -> bool {
-    let arg = args.get("planetScaleMode");
+) -> Option<ReferentialIntegrity> {
+    args.get("referentialIntegrity").and_then(|value| {
+        if !preview_features.contains(PreviewFeature::ReferentialIntegrity) {
+            diagnostics.push_error(DatamodelError::new_source_validation_error(
+                REFERENTIAL_INTEGRITY_PREVIEW_FEATURE_ERR,
+                &source.name.name,
+                value.span(),
+            ));
 
-    match arg {
-        None => false,
-        Some(value) => {
-            let mode_enabled = match value.as_bool() {
-                Ok(mode_enabled) => mode_enabled,
-                Err(err) => {
-                    diagnostics.push_error(err);
-                    false
+            None
+        } else {
+            match value.as_str() {
+                Ok("prisma") => Some(ReferentialIntegrity::Prisma),
+                Ok("foreignKeys") => Some(ReferentialIntegrity::ForeignKeys),
+                Ok(s) => {
+                    let message = format!(
+                        "Invalid referential integrity setting: \"{}\". Supported values: \"prisma\", \"foreignKeys\"",
+                        s
+                    );
+
+                    let error = DatamodelError::new_source_validation_error(&message, "", value.span());
+                    diagnostics.push_error(error);
+
+                    None
                 }
-            };
-
-            if mode_enabled && !preview_features.contains(PreviewFeature::PlanetScaleMode) {
-                diagnostics.push_error(DatamodelError::new_source_validation_error(
-                    PLANET_SCALE_PREVIEW_FEATURE_ERR,
-                    &source.name.name,
-                    value.span(),
-                ));
-                return false;
+                Err(e) => {
+                    diagnostics.push_error(e);
+                    None
+                }
             }
-
-            mode_enabled
         }
-    }
+    })
 }
 
 fn preview_features_guardrail(args: &HashMap<&str, ValueValidator<'_>>, diagnostics: &mut Diagnostics) {
