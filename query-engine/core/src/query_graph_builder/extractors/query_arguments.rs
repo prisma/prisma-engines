@@ -169,11 +169,7 @@ fn extract_order_by_relevance(model: &ModelRef, object: ParsedInputMap) -> Query
 
 fn extract_sort_aggregation(field_name: &str) -> QueryGraphBuilderResult<SortAggregation> {
     match field_name {
-        aggregations::UNDERSCORE_COUNT => Ok(SortAggregation::Count),
-        aggregations::UNDERSCORE_AVG => Ok(SortAggregation::Avg),
-        aggregations::UNDERSCORE_SUM => Ok(SortAggregation::Sum),
-        aggregations::UNDERSCORE_MIN => Ok(SortAggregation::Min),
-        aggregations::UNDERSCORE_MAX => Ok(SortAggregation::Max),
+        aggregations::COUNT | aggregations::UNDERSCORE_COUNT => Ok(SortAggregation::Count),
         _ => Err(QueryGraphBuilderError::InputError(
             "No aggregation operation could be found. This should not happen".to_string(),
         )),

@@ -254,9 +254,7 @@ fn order_by_object_type_text_search(
 
     return_cached_input!(ctx, &ident);
 
-    let input_object = init_input_object_type(ident.clone());
-
-    let input_object = Arc::new(input_object);
+    let input_object = Arc::new(init_input_object_type(ident.clone()));
     ctx.cache_input_type(ident, input_object.clone());
 
     let fields_enum_type = InputType::enum_type(Arc::new(string_enum_type(
