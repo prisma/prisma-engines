@@ -10,11 +10,6 @@ fn constraint_names() {
           url = "posgresql://..."
         }
 
-        generator js {
-          provider = "prisma-client-js"
-          previewFeatures = ["NamedConstraints"]
-        }
-
         /// explicit different dbnames
         model A {
           id   Int    @id(map: "CustomDBId")

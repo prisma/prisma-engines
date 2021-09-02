@@ -244,11 +244,6 @@ fn mapped_id_must_error_on_mysql() {
           url = "mysql://root:prisma@127.0.0.1:3309/NoNamedPKsOnMysql"
         }
 
-        generator js {
-          provider = "prisma-client-js"
-          previewFeatures = ["NamedConstraints"]
-        }
-
         model User {
           name           String
           identification Int
@@ -265,23 +260,23 @@ fn mapped_id_must_error_on_mysql() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating model "User": You defined a database name for the primary key on the model. This is not supported by the provider.[0m
-          [1;94m-->[0m  [4mschema.prisma:11[0m
+          [1;94m-->[0m  [4mschema.prisma:6[0m
         [1;94m   | [0m
-        [1;94m10 | [0m
-        [1;94m11 | [0m[1;91mmodel User {[0m
-        [1;94m12 | [0m  name           String
-        [1;94m13 | [0m  identification Int
-        [1;94m14 | [0m
-        [1;94m15 | [0m  @@id([name, identification], map: "NotSupportedByProvider")
-        [1;94m16 | [0m}
+        [1;94m 5 | [0m
+        [1;94m 6 | [0m[1;91mmodel User {[0m
+        [1;94m 7 | [0m  name           String
+        [1;94m 8 | [0m  identification Int
+        [1;94m 9 | [0m
+        [1;94m10 | [0m  @@id([name, identification], map: "NotSupportedByProvider")
+        [1;94m11 | [0m}
         [1;94m   | [0m
         [1;91merror[0m: [1mError validating model "User1": You defined a database name for the primary key on the model. This is not supported by the provider.[0m
-          [1;94m-->[0m  [4mschema.prisma:18[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
-        [1;94m17 | [0m
-        [1;94m18 | [0m[1;91mmodel User1 {[0m
-        [1;94m19 | [0m  name           String @id(map: "NotSupportedByProvider")
-        [1;94m20 | [0m}
+        [1;94m12 | [0m
+        [1;94m13 | [0m[1;91mmodel User1 {[0m
+        [1;94m14 | [0m  name           String @id(map: "NotSupportedByProvider")
+        [1;94m15 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -296,11 +291,6 @@ fn mapped_id_must_error_on_sqlite() {
           url = "file://...."
         }
 
-        generator js {
-          provider = "prisma-client-js"
-          previewFeatures = ["NamedConstraints"]
-        }
-
         model User {
           name           String
           identification Int
@@ -317,23 +307,23 @@ fn mapped_id_must_error_on_sqlite() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating model "User": You defined a database name for the primary key on the model. This is not supported by the provider.[0m
-          [1;94m-->[0m  [4mschema.prisma:11[0m
+          [1;94m-->[0m  [4mschema.prisma:6[0m
         [1;94m   | [0m
-        [1;94m10 | [0m
-        [1;94m11 | [0m[1;91mmodel User {[0m
-        [1;94m12 | [0m  name           String
-        [1;94m13 | [0m  identification Int
-        [1;94m14 | [0m
-        [1;94m15 | [0m  @@id([name, identification], map: "NotSupportedByProvider")
-        [1;94m16 | [0m}
+        [1;94m 5 | [0m
+        [1;94m 6 | [0m[1;91mmodel User {[0m
+        [1;94m 7 | [0m  name           String
+        [1;94m 8 | [0m  identification Int
+        [1;94m 9 | [0m
+        [1;94m10 | [0m  @@id([name, identification], map: "NotSupportedByProvider")
+        [1;94m11 | [0m}
         [1;94m   | [0m
         [1;91merror[0m: [1mError validating model "User1": You defined a database name for the primary key on the model. This is not supported by the provider.[0m
-          [1;94m-->[0m  [4mschema.prisma:18[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
-        [1;94m17 | [0m
-        [1;94m18 | [0m[1;91mmodel User1 {[0m
-        [1;94m19 | [0m  name           String @id(map: "NotSupportedByProvider")
-        [1;94m20 | [0m}
+        [1;94m12 | [0m
+        [1;94m13 | [0m[1;91mmodel User1 {[0m
+        [1;94m14 | [0m  name           String @id(map: "NotSupportedByProvider")
+        [1;94m15 | [0m}
         [1;94m   | [0m
     "#]];
 

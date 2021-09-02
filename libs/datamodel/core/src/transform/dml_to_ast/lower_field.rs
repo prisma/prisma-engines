@@ -1,7 +1,6 @@
 use crate::common::constraint_names::ConstraintNames;
 use crate::common::RelationNames;
 use crate::transform::dml_to_ast::LowerDmlToAst;
-use crate::PreviewFeature::NamedConstraints;
 use crate::{
     ast::{self, Attribute, Span},
     dml, Datasource, Field, Ignorable,
@@ -192,17 +191,15 @@ impl<'a> LowerDmlToAst<'a> {
                 }
             }
 
-            if self.preview_features.contains(NamedConstraints) {
-                if let Some(fk_name) = &relation_info.fk_name {
-                    if let Some(src) = self.datasource {
-                        if !ConstraintNames::foreign_key_name_matches(relation_info, model, &*src.active_connector) {
-                            args.push(ast::Argument::new(
-                                "map",
-                                ast::Expression::StringValue(String::from(fk_name), Span::empty()),
-                            ));
-                        }
-                    };
-                }
+            if let Some(fk_name) = &relation_info.fk_name {
+                if let Some(src) = self.datasource {
+                    if !ConstraintNames::foreign_key_name_matches(relation_info, model, &*src.active_connector) {
+                        args.push(ast::Argument::new(
+                            "map",
+                            ast::Expression::StringValue(String::from(fk_name), Span::empty()),
+                        ));
+                    }
+                };
             }
 
             if !args.is_empty() {

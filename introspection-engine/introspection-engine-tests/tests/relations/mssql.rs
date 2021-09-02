@@ -20,12 +20,18 @@ async fn two_one_to_one_relations_between_the_same_models(api: &TestApi) -> Test
                 t.add_column("id", types::integer().increments(true));
                 t.add_column("user_id", types::integer().nullable(false));
                 t.add_constraint("Post_user_id_key", types::unique_constraint(&["user_id"]));
-                t.add_foreign_key(&["user_id"], "User", &["id"]);
+                t.add_constraint(
+                    "post_fk",
+                    types::foreign_constraint(&["user_id"], "User", &["id"], None, None),
+                );
                 t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
             });
 
             migration.change_table("User", |t| {
-                t.add_foreign_key(&["post_id"], "Post", &["id"]);
+                t.add_constraint(
+                    "user_fk",
+                    types::foreign_constraint(&["post_id"], "Post", &["id"], None, None),
+                );
             })
         })
         .await?;
@@ -34,14 +40,14 @@ async fn two_one_to_one_relations_between_the_same_models(api: &TestApi) -> Test
         model Post {
           id                      Int   @id @default(autoincrement())
           user_id                 Int   @unique
-          User_Post_user_idToUser User  @relation("Post_user_idToUser", fields: [user_id], references: [id], onUpdate: NoAction)
+          User_Post_user_idToUser User  @relation("Post_user_idToUser", fields: [user_id], references: [id], onUpdate: NoAction, map: "post_fk")
           User_PostToUser_post_id User? @relation("PostToUser_post_id")
         }
 
         model User {
           id                      Int   @id @default(autoincrement())
           post_id                 Int   @unique
-          Post_PostToUser_post_id Post  @relation("PostToUser_post_id", fields: [post_id], references: [id], onUpdate: NoAction)
+          Post_PostToUser_post_id Post  @relation("PostToUser_post_id", fields: [post_id], references: [id], onUpdate: NoAction, map: "user_fk")
           Post_Post_user_idToUser Post? @relation("Post_user_idToUser")
         }
     "#]];
@@ -70,8 +76,14 @@ async fn a_many_to_many_relation_with_an_id(api: &TestApi) -> TestResult {
                 t.add_column("user_id", types::integer().nullable(false));
                 t.add_column("post_id", types::integer().nullable(false));
 
-                t.add_foreign_key(&["user_id"], "User", &["id"]);
-                t.add_foreign_key(&["post_id"], "Post", &["id"]);
+                t.add_constraint(
+                    "userfk",
+                    types::foreign_constraint(&["user_id"], "User", &["id"], None, None),
+                );
+                t.add_constraint(
+                    "postfk",
+                    types::foreign_constraint(&["post_id"], "Post", &["id"], None, None),
+                );
 
                 t.add_constraint("PostsToUsers_pkey", types::primary_constraint(&["id"]));
             });
@@ -88,8 +100,8 @@ async fn a_many_to_many_relation_with_an_id(api: &TestApi) -> TestResult {
           id      Int  @id @default(autoincrement())
           user_id Int
           post_id Int
-          Post    Post @relation(fields: [post_id], references: [id], onUpdate: NoAction)
-          User    User @relation(fields: [user_id], references: [id], onUpdate: NoAction)
+          Post    Post @relation(fields: [post_id], references: [id], onUpdate: NoAction, map: "postfk")
+          User    User @relation(fields: [user_id], references: [id], onUpdate: NoAction, map: "userfk")
         }
 
         model User {
@@ -115,7 +127,10 @@ async fn a_one_req_to_many_relation(api: &TestApi) -> TestResult {
             migration.create_table("Post", |t| {
                 t.add_column("id", types::integer().increments(true));
                 t.add_column("user_id", types::integer().unique(false).nullable(false));
-                t.add_foreign_key(&["user_id"], "User", &["id"]);
+                t.add_constraint(
+                    "Post_user_id_fkey",
+                    types::foreign_constraint(&["user_id"], "User", &["id"], None, None),
+                );
                 t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
             });
         })
@@ -149,7 +164,10 @@ async fn id_fields_with_foreign_key(api: &TestApi) -> TestResult {
             });
             migration.create_table("Post", move |t| {
                 t.add_column("user_id", types::integer());
-                t.add_foreign_key(&["user_id"], "User", &["id"]);
+                t.add_constraint(
+                    "Post_user_id_fkey",
+                    types::foreign_constraint(&["user_id"], "User", &["id"], None, None),
+                );
                 t.add_constraint("Post_pkey", types::primary_constraint(&["user_id"]));
             });
         })
@@ -187,7 +205,10 @@ async fn one_to_many_relation_field_names_do_not_conflict_with_many_to_many_rela
                 table.add_column("id", types::integer().increments(true));
                 table.add_column("host_id", types::integer().nullable(false));
 
-                table.add_foreign_key(&["host_id"], "User", &["id"]);
+                table.add_constraint(
+                    "Event_host_id_fkey",
+                    types::foreign_constraint(&["host_id"], "User", &["id"], None, None),
+                );
                 table.add_constraint("Event_pkey", types::primary_constraint(&["id"]));
             });
 
@@ -195,8 +216,8 @@ async fn one_to_many_relation_field_names_do_not_conflict_with_many_to_many_rela
                 table.add_column("A", types::integer().nullable(false));
                 table.add_column("B", types::integer().nullable(false));
 
-                table.add_foreign_key(&["A"], "Event", &["id"]);
-                table.add_foreign_key(&["B"], "User", &["id"]);
+                table.add_constraint("afk", types::foreign_constraint(&["A"], "Event", &["id"], None, None));
+                table.add_constraint("bfk", types::foreign_constraint(&["B"], "User", &["id"], None, None));
 
                 table.add_index(
                     "_EventToUser_AB_unique",
@@ -239,7 +260,10 @@ async fn one_to_one_relation_on_a_singular_primary_key(api: &TestApi) -> TestRes
 
             migration.create_table("Post", |t| {
                 t.add_column("id", types::integer().nullable(false));
-                t.add_foreign_key(&["id"], "User", &["id"]);
+                t.add_constraint(
+                    "Post_id_fkey",
+                    types::foreign_constraint(&["id"], "User", &["id"], None, None),
+                );
                 t.add_constraint("Post_id_key", types::unique_constraint(&["id"]));
             });
         })
@@ -262,7 +286,7 @@ async fn one_to_one_relation_on_a_singular_primary_key(api: &TestApi) -> TestRes
     Ok(())
 }
 
-#[test_connector(tags(Mssql), preview_features("NamedConstraints"))]
+#[test_connector(tags(Mssql))]
 async fn one_to_one_req_relation_with_custom_fk_name(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
@@ -315,7 +339,10 @@ async fn one_to_one_req_relation(api: &TestApi) -> TestResult {
                 t.add_column("id", types::integer().increments(true));
                 t.add_column("user_id", types::integer().nullable(false));
                 t.add_constraint("Post_user_id_key", types::unique_constraint(&["user_id"]));
-                t.add_foreign_key(&["user_id"], "User", &["id"]);
+                t.add_constraint(
+                    "Post_user_id_fkey",
+                    types::foreign_constraint(&["user_id"], "User", &["id"], None, None),
+                );
                 t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
             });
         })
@@ -341,28 +368,33 @@ async fn one_to_one_req_relation(api: &TestApi) -> TestResult {
 
 #[test_connector(tags(Mssql))]
 async fn relations_should_avoid_name_clashes(api: &TestApi) -> TestResult {
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("y", |t| {
-                t.add_column("id", types::integer());
-                t.add_column("x", types::integer().nullable(false));
-                t.add_constraint("y_pkey", types::primary_constraint(&["id"]));
-            });
+    let setup = format!(
+        r#"
+        CREATE TABLE [{schema}].[y] (
+            id INTEGER,
+            x INTEGER NOT NULL,
 
-            migration.create_table("x", |t| {
-                t.add_column("id", types::integer());
-                t.add_column("y", types::integer().nullable(false));
-                t.add_foreign_key(&["y"], "y", &["id"]);
-                t.add_constraint("x_pkey", types::primary_constraint(&["id"]));
-            });
-        })
-        .await?;
+            CONSTRAINT [y_pkey] PRIMARY KEY (id)
+        );
+
+        CREATE TABLE [{schema}].[x] (
+            id INTEGER,
+            y INTEGER NOT NULL,
+
+            CONSTRAINT [x_pkey] PRIMARY KEY (id),
+            CONSTRAINT [x_y] FOREIGN KEY (y) REFERENCES [{schema}].[y] (id)
+        );
+        "#,
+        schema = api.schema_name(),
+    );
+
+    api.raw_cmd(&setup).await;
 
     let expected = expect![[r#"
         model x {
           id     Int @id
           y      Int
-          y_xToy y   @relation(fields: [y], references: [id], onUpdate: NoAction)
+          y_xToy y   @relation(fields: [y], references: [id], onUpdate: NoAction, map: "x_y")
         }
 
         model y {
@@ -377,6 +409,8 @@ async fn relations_should_avoid_name_clashes(api: &TestApi) -> TestResult {
     Ok(())
 }
 
+// SQL Server cannot form a foreign key without the related columns being part
+// of a primary or candidate keys.
 #[test_connector(tags(Mssql))]
 async fn relations_should_avoid_name_clashes_2(api: &TestApi) -> TestResult {
     api.barrel()
@@ -397,11 +431,14 @@ async fn relations_should_avoid_name_clashes_2(api: &TestApi) -> TestResult {
             });
 
             migration.change_table("x", |t| {
-                t.add_foreign_key(&["y"], "y", &["id"]);
+                t.add_constraint("xfk", types::foreign_constraint(&["y"], "y", &["id"], None, None));
             });
 
             migration.change_table("y", |t| {
-                t.add_foreign_key(&["fk_x_1", "fk_x_2"], "x", &["id", "y"]);
+                t.add_constraint(
+                    "yfk",
+                    types::foreign_constraint(&["fk_x_1", "fk_x_2"], "x", &["id", "y"], None, None),
+                );
             });
         })
         .await?;
@@ -410,7 +447,7 @@ async fn relations_should_avoid_name_clashes_2(api: &TestApi) -> TestResult {
         model x {
           id                   Int @id @default(autoincrement())
           y                    Int
-          y_x_yToy             y   @relation("x_yToy", fields: [y], references: [id], onUpdate: NoAction)
+          y_x_yToy             y   @relation("x_yToy", fields: [y], references: [id], onUpdate: NoAction, map: "xfk")
           y_xToy_fk_x_1_fk_x_2 y[] @relation("xToy_fk_x_1_fk_x_2")
 
           @@unique([id, y], map: "unique_y_id")
@@ -421,7 +458,7 @@ async fn relations_should_avoid_name_clashes_2(api: &TestApi) -> TestResult {
           x                    Int
           fk_x_1               Int
           fk_x_2               Int
-          x_xToy_fk_x_1_fk_x_2 x   @relation("xToy_fk_x_1_fk_x_2", fields: [fk_x_1, fk_x_2], references: [id, y], onUpdate: NoAction)
+          x_xToy_fk_x_1_fk_x_2 x   @relation("xToy_fk_x_1_fk_x_2", fields: [fk_x_1, fk_x_2], references: [id, y], onUpdate: NoAction, map: "yfk")
           x_x_yToy             x[] @relation("x_yToy")
         }
     "#]];
@@ -457,7 +494,7 @@ async fn multiple_foreign_key_constraints_are_taken_always_in_the_same_order(api
         model A {
           id  Int @id
           foo Int
-          B   B   @relation(fields: [foo], references: [id], onDelete: Cascade)
+          B   B   @relation(fields: [foo], references: [id], onDelete: Cascade, map: "fk_1")
         }
 
         model B {

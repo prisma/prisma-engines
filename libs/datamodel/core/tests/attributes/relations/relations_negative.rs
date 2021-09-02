@@ -754,11 +754,6 @@ fn mapping_foreign_keys_on_sqlite_should_error() {
           url = "sqlite://..."
         }
 
-        generator js {
-          provider = "prisma-client-js"
-          previewFeatures = ["NamedConstraints"]
-        }
-
         model User {
           id Int    @id
           posts   Post[]
@@ -773,10 +768,10 @@ fn mapping_foreign_keys_on_sqlite_should_error() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@relation": Your provider does not support named foreign keys.[0m
-          [1;94m-->[0m  [4mschema.prisma:19[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m18 | [0m  user_id Int
-        [1;94m19 | [0m  user    User   @[1;91mrelation(fields:[post_id], references: [id], map: "NoNamedForeignKeysOnSQLite")[0m
+        [1;94m13 | [0m  user_id Int
+        [1;94m14 | [0m  user    User   @[1;91mrelation(fields:[post_id], references: [id], map: "NoNamedForeignKeysOnSQLite")[0m
         [1;94m   | [0m
     "#]];
 

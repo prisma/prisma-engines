@@ -4,29 +4,35 @@ use introspection_engine_tests::test_api::*;
 
 #[test_connector(tags(Mssql))]
 async fn multiple_changed_relation_names(api: &TestApi) -> TestResult {
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("Employee", |t| {
-                t.add_column("id", types::integer().increments(true));
-                t.add_constraint("Employee_pkey", types::primary_constraint(&["id"]))
-            });
+    let setup = format!(
+        r#"
+        CREATE TABLE [{schema}].[Employee] (
+            id INTEGER IDENTITY,
 
-            migration.create_table("Schedule", |t| {
-                t.add_column("id", types::integer().increments(true));
-                t.add_column("morningEmployeeId", types::integer().nullable(false));
-                t.add_column("eveningEmployeeId", types::integer().nullable(false));
+            CONSTRAINT [Employee_pkey] PRIMARY KEY ("id")
+        );
 
-                t.add_foreign_key(&["morningEmployeeId"], "Employee", &["id"]);
-                t.add_foreign_key(&["eveningEmployeeId"], "Employee", &["id"]);
-                t.add_constraint("Schedule_pkey", types::primary_constraint(&["id"]))
-            });
 
-            migration.create_table("Unrelated", |t| {
-                t.add_column("id", types::integer().increments(true));
-                t.add_constraint("Unrelated_pkey", types::primary_constraint(&["id"]))
-            });
-        })
-        .await?;
+        CREATE TABLE [{schema}].[Schedule] (
+            id INTEGER IDENTITY,
+            [morningEmployeeId] INTEGER,
+            [eveningEmployeeId] INTEGER,
+
+            CONSTRAINT [morning_fkey] FOREIGN KEY ([morningEmployeeId]) REFERENCES [{schema}].[Employee] ("id"),
+            CONSTRAINT [evening_fkey] FOREIGN KEY ([eveningEmployeeId]) REFERENCES [{schema}].[Employee] ("id"),
+            CONSTRAINT [Schedule_pkey] PRIMARY KEY ("id")
+        );
+
+        CREATE TABLE [{schema}].[Unrelated] (
+            id INTEGER IDENTITY,
+
+            CONSTRAINT [Unrelated_pkey] PRIMARY KEY ("id")
+        );
+        "#,
+        schema = api.schema_name()
+    );
+
+    api.raw_cmd(&setup).await;
 
     let input_dm = indoc! {r#"
         model Employee {
@@ -52,11 +58,11 @@ async fn multiple_changed_relation_names(api: &TestApi) -> TestResult {
         }
 
         model Schedule {
-          id                                            Int      @id @default(autoincrement())
-          morningEmployeeId                             Int
-          eveningEmployeeId                             Int
-          Employee_EmployeeToSchedule_eveningEmployeeId Employee @relation("EmployeeToSchedule_eveningEmployeeId", fields: [eveningEmployeeId], references: [id], onUpdate: NoAction)
-          Employee_EmployeeToSchedule_morningEmployeeId Employee @relation("EmployeeToSchedule_morningEmployeeId", fields: [morningEmployeeId], references: [id], onUpdate: NoAction)
+          id                                            Int       @id @default(autoincrement())
+          morningEmployeeId                             Int?
+          eveningEmployeeId                             Int?
+          Employee_EmployeeToSchedule_eveningEmployeeId Employee? @relation("EmployeeToSchedule_eveningEmployeeId", fields: [eveningEmployeeId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "evening_fkey")
+          Employee_EmployeeToSchedule_morningEmployeeId Employee? @relation("EmployeeToSchedule_morningEmployeeId", fields: [morningEmployeeId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "morning_fkey")
         }
 
         model Unrelated {
@@ -83,8 +89,14 @@ async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> 
                 t.add_column("user_id", types::integer().nullable(false));
                 t.add_column("user_id2", types::integer().nullable(false));
 
-                t.add_foreign_key(&["user_id"], "User", &["id"]);
-                t.add_foreign_key(&["user_id2"], "User", &["id"]);
+                t.add_constraint(
+                    "post_userid_fk",
+                    types::foreign_constraint(&["user_id"], "User", &["id"], None, None),
+                );
+                t.add_constraint(
+                    "post_userid2_fk",
+                    types::foreign_constraint(&["user_id2"], "User", &["id"], None, None),
+                );
                 t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
                 t.add_constraint("Post_user_id_key", types::unique_constraint(&["user_id"]));
                 t.add_constraint("Post_user_id2_key", types::unique_constraint(&["user_id2"]));
@@ -120,8 +132,8 @@ async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> 
           id           Int         @id @default(autoincrement())
           user_id      Int         @unique
           user_id2     Int         @unique
-          custom_User  Custom_User @relation("CustomRelationName", fields: [user_id], references: [id], onUpdate: NoAction)
-          custom_User2 Custom_User @relation("AnotherCustomRelationName", fields: [user_id2], references: [id], onUpdate: NoAction)
+          custom_User  Custom_User @relation("CustomRelationName", fields: [user_id], references: [id], onUpdate: NoAction, map: "post_userid_fk")
+          custom_User2 Custom_User @relation("AnotherCustomRelationName", fields: [user_id2], references: [id], onUpdate: NoAction, map: "post_userid2_fk")
         }
 
         model Custom_User {
@@ -155,7 +167,10 @@ async fn mapped_model_and_field_name(api: &TestApi) -> TestResult {
                 t.add_column("id", types::integer().increments(true));
                 t.add_column("user_id", types::integer().nullable(false));
 
-                t.add_foreign_key(&["user_id"], "User", &["id"]);
+                t.add_constraint(
+                    "Post_fkey",
+                    types::foreign_constraint(&["user_id"], "User", &["id"], None, None),
+                );
                 t.add_constraint("Post_pkey", types::primary_constraint(&["id"]))
             });
 
@@ -185,7 +200,7 @@ async fn mapped_model_and_field_name(api: &TestApi) -> TestResult {
         model Post {
           id          Int         @id @default(autoincrement())
           c_user_id   Int         @map("user_id")
-          Custom_User Custom_User @relation(fields: [c_user_id], references: [c_id], onUpdate: NoAction)
+          Custom_User Custom_User @relation(fields: [c_user_id], references: [c_id], onUpdate: NoAction, map: "Post_fkey")
         }
 
         model Custom_User {

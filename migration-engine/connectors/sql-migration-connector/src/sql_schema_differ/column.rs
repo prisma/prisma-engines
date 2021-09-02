@@ -1,5 +1,4 @@
 use crate::{flavour::SqlFlavour, pair::Pair};
-use datamodel::common::preview_features::PreviewFeature;
 use enumflags2::BitFlags;
 use prisma_value::PrismaValue;
 use sql_schema_describer::{walkers::ColumnWalker, DefaultKind};
@@ -47,13 +46,11 @@ fn defaults_match(cols: Pair<ColumnWalker<'_>>, flavour: &dyn SqlFlavour) -> boo
 
     let defaults = (&prev.as_ref().map(|d| d.kind()), &next.as_ref().map(|d| d.kind()));
 
-    let names_match = if flavour.preview_features().contains(PreviewFeature::NamedConstraints) {
+    let names_match = {
         let prev_constraint = prev.and_then(|v| v.constraint_name());
         let next_constraint = next.and_then(|v| v.constraint_name());
 
         prev_constraint == next_constraint
-    } else {
-        true
     };
 
     match defaults {
@@ -91,9 +88,8 @@ fn defaults_match(cols: Pair<ColumnWalker<'_>>, flavour: &dyn SqlFlavour) -> boo
         (None, Some(DefaultKind::Value(_))) => false,
         (None, Some(DefaultKind::Now)) => false,
 
-        // We now do migrate to @dbgenerated
         (Some(DefaultKind::DbGenerated(prev)), Some(DefaultKind::DbGenerated(next))) => {
-            (prev.to_lowercase() == next.to_lowercase()) && names_match
+            (prev.eq_ignore_ascii_case(next)) && names_match
         }
         (_, Some(DefaultKind::DbGenerated(_))) => false,
         // Sequence migrations are handled separately.

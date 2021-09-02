@@ -238,7 +238,7 @@ fn alter_constraint_name_push(api: TestApi) {
     });
 }
 
-#[test_connector(tags(Sqlite), preview_features("NamedConstraints"))]
+#[test_connector(tags(Sqlite))]
 fn sqlite_reserved_name_space_can_be_used(api: TestApi) {
     let plain_dm = r#"
          model A {
