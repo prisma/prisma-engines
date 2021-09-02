@@ -117,10 +117,6 @@ impl SortOrder {
 #[derive(Clone, Copy, PartialEq, Debug, Eq, Hash)]
 pub enum SortAggregation {
     Count,
-    Avg,
-    Sum,
-    Min,
-    Max,
 }
 
 impl ToString for SortOrder {

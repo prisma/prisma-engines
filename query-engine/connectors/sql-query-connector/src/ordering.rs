@@ -92,7 +92,6 @@ fn build_order_aggr(
             // `COALESCE(NULL, 0)` will return `0`, thus preserving the order
             (coalesce(exprs).into(), order)
         }
-        _ => (order_column.clone().into(), order),
     };
     OrderByDefinition {
         order_column: order_column.into(),
@@ -119,7 +118,6 @@ pub fn compute_joins_aggregation(
 
     let aggregation_type = match order_by.sort_aggregation {
         SortAggregation::Count => AggregationType::Count,
-        _ => unreachable!("Order by relation aggregations only support COUNT"),
     };
     // We perform the aggregation on the last join
     let last_aggr_join = compute_aggr_join(
