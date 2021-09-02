@@ -99,9 +99,13 @@ fn process_order_object(
     match object.into_iter().next() {
         None => Ok(None),
         Some((field_name, field_value)) => {
-            let sort_aggregation = extract_sort_aggregation(field_name.as_str());
+            if field_name.as_str() == ordering::UNDERSCORE_RELEVANCE {
+                let object: ParsedInputMap = field_value.try_into()?;
 
-            if let Ok(sort_aggr) = sort_aggregation {
+                return extract_order_by_relevance(model, object);
+            }
+
+            if let Ok(sort_aggr) = extract_sort_aggregation(field_name.as_str()) {
                 let object: ParsedInputMap = field_value.try_into()?;
 
                 return process_order_object(model, object, path, Some(sort_aggr));
@@ -111,44 +115,56 @@ fn process_order_object(
 
             match field {
                 Field::Relation(rf) if rf.is_list => {
+                    let object: ParsedInputMap = field_value.try_into()?;
+
                     path.push(rf.clone());
 
-                    let object: ParsedInputMap = field_value.try_into()?;
                     let (inner_field_name, inner_field_value) = object.into_iter().next().unwrap();
                     let sort_aggregation = extract_sort_aggregation(inner_field_name.as_str())?;
                     let sort_order = extract_sort_order(inner_field_value)?;
-                    let ids: Vec<_> = rf.related_model().primary_identifier().scalar_fields().collect();
-                    // FIXME: This is a hack to fulfil the requirement of the `OrderBy` struct to have a field to order by
-                    // In the case of aggregations, at least for now, we use AGGR(*), meaning that this field won't ever be used
-                    // This needs to be refactored when we add order by aggregations on specific fields
-                    let first_id = ids.first().unwrap();
 
-                    Ok(Some(OrderBy::new(
-                        first_id.clone(),
-                        path,
-                        sort_order,
-                        Some(sort_aggregation),
-                    )))
+                    Ok(Some(OrderBy::aggregation(path, sort_order, sort_aggregation)))
                 }
                 Field::Relation(rf) => {
+                    let object: ParsedInputMap = field_value.try_into()?;
+
                     path.push(rf.clone());
 
-                    let object: ParsedInputMap = field_value.try_into()?;
                     process_order_object(&rf.related_model(), object, path, None)
                 }
                 Field::Scalar(sf) => {
                     let sort_order = extract_sort_order(field_value)?;
 
-                    Ok(Some(OrderBy::new(
-                        sf.clone(),
-                        path,
-                        sort_order,
-                        parent_sort_aggregation,
-                    )))
+                    Ok(Some(OrderBy::scalar(sf.clone(), path, sort_order)))
                 }
             }
         }
     }
+}
+
+fn extract_order_by_relevance(model: &ModelRef, object: ParsedInputMap) -> QueryGraphBuilderResult<Option<OrderBy>> {
+    let sort_order = extract_sort_order(object.get(ordering::SORT).unwrap().clone())?;
+    let search: PrismaValue = object.get(ordering::SEARCH).unwrap().clone().try_into()?;
+    let search = search.into_string().unwrap();
+    let fields: PrismaValue = object.get(ordering::FIELDS).unwrap().clone().try_into()?;
+
+    let fields = match fields {
+        PrismaValue::String(s) => Ok(vec![PrismaValue::String(s)]),
+        PrismaValue::Enum(e) => Ok(vec![PrismaValue::String(e)]),
+        PrismaValue::List(l) => Ok(l),
+        x => Err(QueryGraphBuilderError::InputError(format!(
+            "Expected field `fields` to be of type String, Enum or List<Enum>, found: {:?}",
+            x
+        ))),
+    }?;
+
+    let fields = fields
+        .into_iter()
+        .map(|pv| pv.into_string().unwrap())
+        .map(|field_name| model.fields().find_from_scalar(&field_name))
+        .collect::<Result<Vec<ScalarFieldRef>, _>>()?;
+
+    Ok(Some(OrderBy::relevance(fields, search, sort_order)))
 }
 
 fn extract_sort_aggregation(field_name: &str) -> QueryGraphBuilderResult<SortAggregation> {

@@ -2,27 +2,98 @@ use crate::{RelationFieldRef, ScalarFieldRef};
 use quaint::prelude::Order;
 use std::string::ToString;
 
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
-pub struct OrderBy {
-    pub field: ScalarFieldRef,
-    pub path: Vec<RelationFieldRef>,
-    pub sort_order: SortOrder,
-    pub sort_aggregation: Option<SortAggregation>,
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum OrderBy {
+    Scalar(OrderByScalar),
+    Aggregation(OrderByAggregation),
+    Relevance(OrderByRelevance),
 }
 
 impl OrderBy {
-    pub fn new(
-        field: ScalarFieldRef,
-        path: Vec<RelationFieldRef>,
-        sort_order: SortOrder,
-        sort_aggregation: Option<SortAggregation>,
-    ) -> Self {
-        Self {
+    pub fn path(&self) -> Vec<RelationFieldRef> {
+        match self {
+            OrderBy::Scalar(o) => o.path.clone(),
+            OrderBy::Aggregation(o) => o.path.clone(),
+            OrderBy::Relevance(_) => vec![],
+        }
+    }
+
+    pub fn sort_order(&self) -> SortOrder {
+        match self {
+            OrderBy::Scalar(o) => o.sort_order,
+            OrderBy::Aggregation(o) => o.sort_order,
+            OrderBy::Relevance(o) => o.sort_order,
+        }
+    }
+
+    pub fn field(&self) -> Option<ScalarFieldRef> {
+        match self {
+            OrderBy::Scalar(o) => Some(o.field.clone()),
+            OrderBy::Aggregation(o) => Some(o.field()),
+            OrderBy::Relevance(_) => None,
+        }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+pub struct OrderByScalar {
+    pub field: ScalarFieldRef,
+    pub path: Vec<RelationFieldRef>,
+    pub sort_order: SortOrder,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct OrderByAggregation {
+    pub path: Vec<RelationFieldRef>,
+    pub sort_order: SortOrder,
+    pub sort_aggregation: SortAggregation,
+}
+
+impl OrderByAggregation {
+    pub fn field(&self) -> ScalarFieldRef {
+        let ids: Vec<_> = self
+            .path
+            .last()
+            .unwrap()
+            .related_model()
+            .primary_identifier()
+            .scalar_fields()
+            .collect();
+        let id = ids.first().unwrap();
+
+        id.clone()
+    }
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct OrderByRelevance {
+    pub fields: Vec<ScalarFieldRef>,
+    pub sort_order: SortOrder,
+    pub search: String,
+}
+
+impl OrderBy {
+    pub fn scalar(field: ScalarFieldRef, path: Vec<RelationFieldRef>, sort_order: SortOrder) -> Self {
+        Self::Scalar(OrderByScalar {
             field,
             path,
             sort_order,
+        })
+    }
+
+    pub fn aggregation(path: Vec<RelationFieldRef>, sort_order: SortOrder, sort_aggregation: SortAggregation) -> Self {
+        Self::Aggregation(OrderByAggregation {
+            path,
+            sort_order,
             sort_aggregation,
-        }
+        })
+    }
+
+    pub fn relevance(fields: Vec<ScalarFieldRef>, search: String, sort_order: SortOrder) -> Self {
+        Self::Relevance(OrderByRelevance {
+            fields,
+            sort_order,
+            search,
+        })
     }
 }
 
@@ -63,11 +134,10 @@ impl ToString for SortOrder {
 
 impl From<ScalarFieldRef> for OrderBy {
     fn from(field: ScalarFieldRef) -> Self {
-        Self {
+        Self::Scalar(OrderByScalar {
             field,
             path: vec![],
             sort_order: SortOrder::Ascending,
-            sort_aggregation: None,
-        }
+        })
     }
 }

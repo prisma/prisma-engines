@@ -71,7 +71,12 @@ impl QueryArguments {
 
     /// A null cursor is a cursor that is used in conjunction with a nullable order by (i.e. a field is optional).
     pub fn contains_null_cursor(&self) -> bool {
-        self.cursor.is_some() && self.order_by.iter().any(|o| !o.field.is_required)
+        self.cursor.is_some()
+            && self.order_by.iter().any(|o| match o {
+                OrderBy::Scalar(o) => !o.field.is_required,
+                OrderBy::Aggregation(_) => false,
+                OrderBy::Relevance(o) => o.fields.iter().any(|f| !f.is_required),
+            })
     }
 
     /// Checks if the orderBy provided is guaranteeing a stable ordering of records for the model.
@@ -106,21 +111,40 @@ impl QueryArguments {
 
         // Partition into orderings on the same model and ones that require relation hops.
         // Note: One ordering is always on one scalar in the end.
-        let (on_model, on_relation): (Vec<&OrderBy>, Vec<&OrderBy>) =
-            self.order_by.iter().partition(|o| o.path.is_empty());
+        let (on_model, on_relation): (Vec<&OrderBy>, Vec<&OrderBy>) = self.order_by.iter().partition(|o| match o {
+            OrderBy::Scalar(o) => o.path.is_empty(),
+            OrderBy::Aggregation(o) => o.path.is_empty(),
+            OrderBy::Relevance(_) => true,
+        });
 
         // Indicates whether or not a combination of contained fields is on the source model (we don't check for relations for now).
         let order_by_contains_unique_index = self.model.unique_indexes().into_iter().any(|index| {
-            index
-                .fields()
-                .into_iter()
-                .all(|f| on_model.iter().any(|o| o.field == f))
+            index.fields().into_iter().all(|f| {
+                on_model.iter().any(|o| match o {
+                    OrderBy::Scalar(o) => o.field == f,
+                    OrderBy::Aggregation(_) => false,
+                    OrderBy::Relevance(o) => o.fields.contains(&f),
+                })
+            })
         });
 
-        let source_contains_unique = on_model.iter().any(|o| o.field.unique());
-        let relations_contain_1to1_unique = on_relation
-            .iter()
-            .any(|o| o.field.unique() && o.path.iter().all(|r| r.relation().is_one_to_one()));
+        let source_contains_unique = on_model.iter().any(|o| match o {
+            OrderBy::Scalar(o) => o.field.unique(),
+            OrderBy::Aggregation(_) => false,
+            OrderBy::Relevance(o) => o.fields.iter().any(|f| f.unique()),
+        });
+        let relations_contain_1to1_unique = on_relation.iter().any(|o| {
+            let (has_unique_field, path) = match o {
+                OrderBy::Scalar(o) => (o.field.unique(), Some(&o.path)),
+                OrderBy::Aggregation(o) => (false, Some(&o.path)),
+                OrderBy::Relevance(o) => (o.fields.iter().any(|f| f.unique()), None),
+            };
+            let all_1to1 = path
+                .map(|path| path.iter().all(|r| r.relation().is_one_to_one()))
+                .unwrap_or(true);
+
+            has_unique_field && all_1to1
+        });
 
         source_contains_unique || order_by_contains_unique_index || relations_contain_1to1_unique
     }
