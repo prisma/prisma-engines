@@ -140,7 +140,7 @@ mod multi_field_unique {
     fn many_unique_fields() -> String {
         let schema = indoc! {
             r#"model User {
-                id        Int @id
+                #id(id, Int, @id)
                 a String
                 b String
                 c String

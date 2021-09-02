@@ -95,7 +95,8 @@ mod combinations {
         Ok(())
     }
 
-    #[connector_test]
+    // Mongo precision issue.
+    #[connector_test(exclude(MongoDB))]
     async fn with_query_args(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: "1", float: 5.5, int: 5, dec: "5.5" }"#).await?;
         create_row(&runner, r#"{ id: "2", float: 4.5, int: 10, dec: "4.5" }"#).await?;

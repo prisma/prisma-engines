@@ -322,23 +322,23 @@ mod delete_many_rels {
     fn additional_schema() -> String {
         let schema = indoc! {
             r#"
-            model Parent{
+            model Parent {
                 #id(id, Int, @id)
+                #m2m(childrenOpt, Child[], Int)
 
                 p            String     @unique
                 stepChildId  Int?
-                childrenOpt  Child[]
                 stepChildOpt StepChild? @relation(fields: [stepChildId], references: [id])
             }
 
-            model Child{
+            model Child {
                 #id(id, Int, @id)
+                #m2m(parentsOpt, Parent[], Int)
 
                 c          String @unique
-                parentsOpt Parent[]
             }
 
-            model StepChild{
+            model StepChild {
                 #id(id, Int, @id)
 
                 s         String  @unique
