@@ -7,6 +7,7 @@ import util._
 class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpecBase with SchemaBaseV11 {
   override def runOnlyForCapabilities = Set(JoinRelationLinksCapability)
 
+  // RS: No port, everything excluded.
   "a PM to C1! relation " should "error when deleting the parent" taggedAs (IgnoreSQLite, IgnoreMsSql, IgnoreMySql, IgnoreMySql56, IgnorePostgres, IgnoreVitess) in {
     val schema =
       """
@@ -59,6 +60,7 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
 
   }
 
+  // RS: No port, everything excluded.
   "a PM to C1! relation " should "error when deleting the parent with empty filter" taggedAs (IgnoreSQLite, IgnoreMsSql, IgnoreMySql, IgnoreMySql56, IgnorePostgres, IgnoreVitess) in {
     val schema = """model Parent{
                             id String @id @default(cuid())
@@ -109,6 +111,7 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
 
   }
 
+  // RS: No port, no dmls.
   "a P1! to C1 relation" should "succeed when trying to delete the parent" in {
     schemaWithRelation(onParent = ChildReq, onChild = ParentOpt, withoutParams = true).test { t =>
       val project = SchemaDsl.fromStringV11() {
@@ -158,6 +161,7 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
     }
   }
 
+  // RS: Ported
   "a P1 to C1  relation " should "succeed when trying to delete the parent" in {
     schemaWithRelation(onParent = ChildOpt, onChild = ParentOpt, withoutParams = true).test { t =>
       val project = SchemaDsl.fromStringV11() {
@@ -202,6 +206,7 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
     }
   }
 
+  // RS: Ported
   "a P1 to C1  relation " should "succeed when trying to delete the parent if there are no children" in {
     schemaWithRelation(onParent = ChildOpt, onChild = ParentOpt).test { t =>
       val project = SchemaDsl.fromStringV11() {
@@ -237,7 +242,8 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
     }
   }
 
-  "a PM to C1!  relation " should "error when deleting the parent"  taggedAs (IgnoreSQLite, IgnoreMsSql, IgnoreMySql, IgnoreMySql56, IgnorePostgres, IgnoreVitess)  in {
+  // RS: No port, everything excluded.
+  "a PM to C1!  relation " should "error when deleting the parent" taggedAs (IgnoreSQLite, IgnoreMsSql, IgnoreMySql, IgnoreMySql56, IgnorePostgres, IgnoreVitess) in {
     schemaWithRelation(onParent = ChildList, onChild = ParentReq).test { t =>
       val project = SchemaDsl.fromStringV11() {
         t.datamodel
@@ -280,6 +286,7 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
     }
   }
 
+  // RS: Ported
   "a PM to C1!  relation " should "succeed if no child exists that requires the parent" in {
     schemaWithRelation(onParent = ChildList, onChild = ParentReq).test { t =>
       val project = SchemaDsl.fromStringV11() {
@@ -317,6 +324,7 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
 
   }
 
+  // RS: No port, everything excluded.
   "a P1 to C1!  relation " should "error when trying to delete the parent" taggedAs (IgnoreSQLite, IgnoreMsSql, IgnoreMySql, IgnoreMySql56, IgnorePostgres, IgnoreVitess) in {
     schemaWithRelation(onParent = ChildOpt, onChild = ParentReq).test { t =>
       val project = SchemaDsl.fromStringV11() {
@@ -360,6 +368,7 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
     }
   }
 
+  // RS: Ported
   "a P1 to C1!  relation " should "succeed when trying to delete the parent if there is no child" in {
     schemaWithRelation(onParent = ChildOpt, onChild = ParentReq).test { t =>
       val project = SchemaDsl.fromStringV11() {
@@ -394,6 +403,7 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
     }
   }
 
+  // RS: Ported
   "a PM to C1 " should "succeed in deleting the parent" in {
     schemaWithRelation(onParent = ChildList, onChild = ParentOpt).test { t =>
       val project = SchemaDsl.fromStringV11() {
@@ -436,6 +446,7 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
     }
   }
 
+  // RS: Ported
   "a PM to C1 " should "succeed in deleting the parent if there is no child" in {
     schemaWithRelation(onParent = ChildList, onChild = ParentOpt).test { t =>
       val project = SchemaDsl.fromStringV11() {
@@ -471,6 +482,7 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
     }
   }
 
+  // RS: Ported
   "a P1! to CM  relation" should "should succeed in deleting the parent " in {
     schemaWithRelation(onParent = ChildReq, onChild = ParentList).test { t =>
       val project = SchemaDsl.fromStringV11() {
@@ -515,6 +527,7 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
     }
   }
 
+  // RS: Ported
   "a P1 to CM  relation " should " should succeed in deleting the parent" in {
     schemaWithRelation(onParent = ChildOpt, onChild = ParentList).test { t =>
       val project = SchemaDsl.fromStringV11() {
@@ -555,6 +568,7 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
     }
   }
 
+  // RS: Ported
   "a P1 to CM  relation " should " should succeed in deleting the parent if there is no child" in {
     schemaWithRelation(onParent = ChildOpt, onChild = ParentList).test { t =>
       val project = SchemaDsl.fromStringV11() {
@@ -590,6 +604,7 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
     }
   }
 
+  // RS: Ported
   "a PM to CM  relation" should "succeed in deleting the parent" in {
     schemaWithRelation(onParent = ChildList, onChild = ParentList).test { t =>
       val project = SchemaDsl.fromStringV11() {
@@ -630,6 +645,7 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
     }
   }
 
+  // RS: Ported
   "a PM to CM  relation" should "succeed in deleting the parent if there is no child" in {
     schemaWithRelation(onParent = ChildList, onChild = ParentList).test { t =>
       val project = SchemaDsl.fromStringV11() {
