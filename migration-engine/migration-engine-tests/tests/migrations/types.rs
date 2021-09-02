@@ -1,4 +1,4 @@
-use migration_engine_tests::sync_test_api::*;
+use migration_engine_tests::test_api::*;
 use quaint::Value;
 use sql_schema_describer::ColumnTypeFamily;
 
@@ -13,13 +13,10 @@ fn bytes_columns_are_idempotent(api: TestApi) {
 
     api.schema_push_w_datasource(dm)
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_has_executed_steps();
 
-    api.schema_push_w_datasource(dm)
-        .send()
-        .assert_green_bang()
-        .assert_no_steps();
+    api.schema_push_w_datasource(dm).send().assert_green().assert_no_steps();
 }
 
 #[test_connector]
@@ -33,13 +30,10 @@ fn float_columns_are_idempotent(api: TestApi) {
 
     api.schema_push_w_datasource(dm)
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_has_executed_steps();
 
-    api.schema_push_w_datasource(dm)
-        .send()
-        .assert_green_bang()
-        .assert_no_steps();
+    api.schema_push_w_datasource(dm).send().assert_green().assert_no_steps();
 }
 
 #[test_connector]
@@ -53,13 +47,10 @@ fn decimal_columns_are_idempotent(api: TestApi) {
 
     api.schema_push_w_datasource(dm)
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_has_executed_steps();
 
-    api.schema_push_w_datasource(dm)
-        .send()
-        .assert_green_bang()
-        .assert_no_steps();
+    api.schema_push_w_datasource(dm).send().assert_green().assert_no_steps();
 }
 
 #[test_connector]
@@ -71,7 +62,7 @@ fn float_to_decimal_works(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.assert_schema().assert_table("Cat", |table| {
         table.assert_column("meowFrequency", |col| col.assert_type_family(ColumnTypeFamily::Float))
@@ -86,7 +77,7 @@ fn float_to_decimal_works(api: TestApi) {
 
     api.schema_push_w_datasource(dm2)
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_has_executed_steps();
 
     api.assert_schema().assert_table("Cat", |table| {
@@ -103,7 +94,7 @@ fn decimal_to_float_works(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.assert_schema().assert_table("Cat", |table| {
         table.assert_column("meowFrequency", |col| col.assert_type_family(ColumnTypeFamily::Decimal))
@@ -118,7 +109,7 @@ fn decimal_to_float_works(api: TestApi) {
 
     api.schema_push_w_datasource(dm2)
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_has_executed_steps();
 
     api.assert_schema().assert_table("Cat", |table| {
@@ -135,7 +126,7 @@ fn bytes_to_string_works(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.assert_schema().assert_table("Cat", |table| {
         table.assert_column("meowData", |col| col.assert_type_is_bytes())
@@ -150,7 +141,7 @@ fn bytes_to_string_works(api: TestApi) {
 
     api.schema_push_w_datasource(dm2)
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_has_executed_steps();
 
     api.assert_schema().assert_table("Cat", |table| {
@@ -167,7 +158,7 @@ fn string_to_bytes_works(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.assert_schema().assert_table("Cat", |table| {
         table.assert_column("meowData", |col| col.assert_type_is_bytes())
@@ -182,7 +173,7 @@ fn string_to_bytes_works(api: TestApi) {
 
     api.schema_push_w_datasource(dm2)
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_has_executed_steps();
 
     api.assert_schema().assert_table("Cat", |table| {
@@ -199,7 +190,7 @@ fn decimal_to_decimal_array_works(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.assert_schema().assert_table("Test", |table| {
         table.assert_column("decFloat", |col| col.assert_type_is_decimal().assert_is_required())
@@ -214,14 +205,14 @@ fn decimal_to_decimal_array_works(api: TestApi) {
 
     api.schema_push_w_datasource(dm2)
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_has_executed_steps();
 
     api.assert_schema().assert_table("Test", |table| {
         table.assert_column("decFloat", |col| col.assert_type_is_decimal().assert_is_list())
     });
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.assert_schema().assert_table("Test", |table| {
         table.assert_column("decFloat", |col| col.assert_type_is_decimal().assert_is_required())
@@ -237,7 +228,7 @@ fn bytes_to_bytes_array_works(api: TestApi) {
             }
         "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.assert_schema().assert_table("Test", |table| {
         table.assert_column("bytesCol", |col| col.assert_type_is_bytes().assert_is_required())
@@ -252,14 +243,14 @@ fn bytes_to_bytes_array_works(api: TestApi) {
 
     api.schema_push_w_datasource(dm2)
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_has_executed_steps();
 
     api.assert_schema().assert_table("Test", |table| {
         table.assert_column("bytesCol", |col| col.assert_type_is_bytes().assert_is_list())
     });
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.assert_schema().assert_table("Test", |table| {
         table.assert_column("bytesCol", |col| col.assert_type_is_bytes().assert_is_required())
@@ -275,7 +266,7 @@ fn a_table_recreation_with_noncastable_columns_should_trigger_warnings(api: Test
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     // Removing autoincrement requires us to recreate the table.
     let dm2 = r#"
@@ -301,7 +292,7 @@ fn a_column_recreation_with_non_castable_type_change_should_trigger_warnings(api
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
     let insert = quaint::ast::Insert::single_into((api.schema_name(), "Blog"))
         .value("id", 1)
         .value("float", Value::double(7.5));

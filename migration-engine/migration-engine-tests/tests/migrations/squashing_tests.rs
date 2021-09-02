@@ -1,5 +1,5 @@
 use migration_core::commands::{DiagnoseMigrationHistoryOutput, HistoryDiagnostic};
-use migration_engine_tests::sync_test_api::*;
+use migration_engine_tests::test_api::*;
 use std::io::Write;
 
 #[test_connector]

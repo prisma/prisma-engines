@@ -1,4 +1,4 @@
-use migration_engine_tests::sync_test_api::*;
+use migration_engine_tests::test_api::*;
 use sql_schema_describer::ColumnTypeFamily;
 
 const SCHEMA: &str = r#"
@@ -19,7 +19,7 @@ model Box {
 fn schema_push_happy_path(api: TestApi) {
     api.schema_push_w_datasource(SCHEMA)
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_has_executed_steps();
 
     api.assert_schema()
@@ -47,7 +47,7 @@ fn schema_push_happy_path(api: TestApi) {
 
     api.schema_push_w_datasource(dm2)
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_has_executed_steps();
 
     api.assert_schema()
@@ -65,7 +65,7 @@ fn schema_push_happy_path(api: TestApi) {
 fn schema_push_warns_about_destructive_changes(api: TestApi) {
     api.schema_push_w_datasource(SCHEMA)
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_has_executed_steps();
 
     api.insert("Box")
@@ -100,7 +100,7 @@ fn schema_push_warns_about_destructive_changes(api: TestApi) {
 fn schema_push_with_an_unexecutable_migration_returns_a_message_and_aborts(api: TestApi) {
     api.schema_push_w_datasource(SCHEMA)
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_has_executed_steps();
 
     api.insert("Box")
@@ -141,7 +141,7 @@ fn indexes_and_unique_constraints_on_the_same_field_do_not_collide(api: TestApi)
         }
     "#;
 
-    api.schema_push_w_datasource(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 }
 
 #[test_connector]
@@ -157,7 +157,7 @@ fn multi_column_indexes_and_unique_constraints_on_the_same_fields_do_not_collide
         }
     "#;
 
-    api.schema_push_w_datasource(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 }
 
 #[test_connector]
@@ -182,7 +182,7 @@ fn alter_constraint_name_push(api: TestApi) {
          }
      "#;
 
-    api.schema_push_w_datasource(plain_dm).send().assert_green_bang();
+    api.schema_push_w_datasource(plain_dm).send().assert_green();
     let no_named_pk = api.is_sqlite() || api.is_mysql();
 
     let (singular_id, compound_id) = if no_named_pk {
@@ -216,7 +216,7 @@ fn alter_constraint_name_push(api: TestApi) {
         singular_id, no_named_fk, compound_id
     );
 
-    api.schema_push_w_datasource(custom_dm).send().assert_green_bang();
+    api.schema_push_w_datasource(custom_dm).send().assert_green();
 
     api.assert_schema().assert_table("A", |table| {
         if !no_named_pk {
@@ -250,7 +250,7 @@ fn sqlite_reserved_name_space_can_be_used(api: TestApi) {
          }
      "#;
 
-    api.schema_push_w_datasource(plain_dm).send().assert_green_bang();
+    api.schema_push_w_datasource(plain_dm).send().assert_green();
     api.assert_schema().assert_table("A", |table| {
         table.assert_has_index_name_and_type("sqlite_unique", true);
         table.assert_has_index_name_and_type("sqlite_compound_unique", true);

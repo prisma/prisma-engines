@@ -1,5 +1,5 @@
 use datamodel::ReferentialAction;
-use migration_engine_tests::sync_test_api::*;
+use migration_engine_tests::test_api::*;
 use sql_schema_describer::{ColumnTypeFamily, ForeignKeyAction};
 
 #[test_connector]
@@ -16,7 +16,7 @@ fn adding_a_many_to_many_relation_must_result_in_a_prisma_style_relation_table(a
         }
     "##;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.assert_schema().assert_table("_AToB", |table| {
         table
@@ -38,7 +38,7 @@ fn adding_a_many_to_many_relation_must_result_in_a_prisma_style_relation_table(a
     // Check that the migration is idempotent
     api.schema_push_w_datasource(dm1)
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_no_steps();
 }
 
@@ -55,7 +55,7 @@ fn adding_a_many_to_many_relation_with_custom_name_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.assert_schema().assert_table("_my_relation", |table| {
         table
@@ -90,7 +90,7 @@ fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_table(api
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
     api.assert_schema().assert_table("A", |t| {
         t.assert_column("bid", |c| c.assert_type_is_int().assert_is_required())
             .assert_column("cid", |c| c.assert_type_is_int().assert_is_nullable())
@@ -123,7 +123,7 @@ fn specifying_a_db_name_for_an_inline_relation_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
     api.assert_schema().assert_table("A", |t| {
         t.assert_column("b_column", |c| c.assert_type_is_int())
             .assert_foreign_keys_count(1)
@@ -147,7 +147,7 @@ fn changing_the_type_of_a_field_referenced_by_a_fk_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.assert_schema().assert_table("A", |table| {
         table
@@ -169,7 +169,7 @@ fn changing_the_type_of_a_field_referenced_by_a_fk_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green();
 
     api.assert_schema().assert_table("A", |table| {
         table
@@ -193,7 +193,7 @@ fn adding_an_inline_relation_to_a_model_with_an_exotic_id_type(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
     api.assert_schema().assert_table("A", |t| {
         t.assert_column("b_id", |c| c.assert_type_is_string())
             .assert_foreign_keys_count(1)
@@ -224,7 +224,7 @@ fn removing_an_inline_relation_must_work(api: TestApi) {
             }
         "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.assert_schema()
         .assert_table("A", |table| table.assert_has_column("b_id"));
@@ -239,7 +239,7 @@ fn removing_an_inline_relation_must_work(api: TestApi) {
             }
         "#;
 
-    api.schema_push_w_datasource(dm2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green();
 
     api.assert_schema().assert_table("A", |table| {
         table
@@ -269,7 +269,7 @@ fn compound_foreign_keys_should_work_in_correct_order(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.assert_schema().assert_table("A", |t| {
         t.assert_foreign_keys_count(1)
@@ -300,7 +300,7 @@ fn moving_an_inline_relation_to_the_other_side_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
     api.assert_schema().assert_table("A", |t| {
         t.assert_foreign_keys_count(1).assert_fk_on_columns(&["b_id"], |fk| {
             fk.assert_referential_action_on_delete(if api.is_mssql() {
@@ -326,7 +326,7 @@ fn moving_an_inline_relation_to_the_other_side_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green();
     api.assert_schema()
         .assert_table("B", |table| {
             table
@@ -360,7 +360,7 @@ fn relations_can_reference_arbitrary_unique_fields(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
     api.assert_schema().assert_table("Account", |t| {
         t.assert_foreign_keys_count(1)
             .assert_fk_on_columns(&["uem"], |fk| fk.assert_references("User", &["email"]))
@@ -385,7 +385,7 @@ fn relations_can_reference_arbitrary_unique_fields_with_maps(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     api.assert_schema().assert_table("Account", |table| {
         table
@@ -414,7 +414,7 @@ fn relations_can_reference_multiple_fields(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     api.assert_schema().assert_table("Account", |table| {
         table
@@ -447,7 +447,7 @@ fn a_relation_with_mappings_on_both_sides_can_reference_multiple_fields(api: Tes
         }
     "#;
 
-    api.schema_push_w_datasource(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     api.assert_schema().assert_table("Account", |table| {
         table
@@ -479,7 +479,7 @@ fn relations_with_mappings_on_referenced_side_can_reference_multiple_fields(api:
         }
     "#;
 
-    api.schema_push_w_datasource(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     api.assert_schema().assert_table("Account", |table| {
         table
@@ -511,7 +511,7 @@ fn relations_with_mappings_on_referencing_side_can_reference_multiple_fields(api
         }
     "#;
 
-    api.schema_push_w_datasource(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     api.assert_schema().assert_table("Account", |table| {
         table
@@ -547,7 +547,7 @@ fn on_delete_referential_actions_should_work(api: TestApi) {
             ra
         );
 
-        api.schema_push_w_datasource(&dm).send().assert_green_bang();
+        api.schema_push_w_datasource(&dm).send().assert_green();
 
         api.assert_schema().assert_table("B", |table| {
             table.assert_foreign_keys_count(1).assert_fk_on_columns(&["aId"], |fk| {
@@ -556,7 +556,7 @@ fn on_delete_referential_actions_should_work(api: TestApi) {
             })
         });
 
-        api.schema_push_w_datasource("").send().assert_green_bang();
+        api.schema_push_w_datasource("").send().assert_green();
     }
 }
 
@@ -577,7 +577,7 @@ fn on_delete_set_default_should_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     api.assert_schema().assert_table("B", |table| {
         table.assert_foreign_keys_count(1).assert_fk_on_columns(&["aId"], |fk| {
@@ -602,7 +602,7 @@ fn on_delete_restrict_should_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     api.assert_schema().assert_table("B", |table| {
         table.assert_foreign_keys_count(1).assert_fk_on_columns(&["aId"], |fk| {
@@ -637,7 +637,7 @@ fn on_update_referential_actions_should_work(api: TestApi) {
             ra
         );
 
-        api.schema_push_w_datasource(&dm).send().assert_green_bang();
+        api.schema_push_w_datasource(&dm).send().assert_green();
 
         api.assert_schema().assert_table("B", |table| {
             table.assert_foreign_keys_count(1).assert_fk_on_columns(&["aId"], |fk| {
@@ -665,7 +665,7 @@ fn on_update_set_default_should_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     api.assert_schema().assert_table("B", |table| {
         table.assert_foreign_keys_count(1).assert_fk_on_columns(&["aId"], |fk| {
@@ -690,7 +690,7 @@ fn on_update_restrict_should_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     api.assert_schema().assert_table("B", |table| {
         table.assert_foreign_keys_count(1).assert_fk_on_columns(&["aId"], |fk| {
@@ -715,7 +715,7 @@ fn on_delete_required_default_action(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     api.assert_schema().assert_table("B", |table| {
         table.assert_foreign_keys_count(1).assert_fk_on_columns(&["aId"], |fk| {
@@ -740,7 +740,7 @@ fn on_delete_required_default_action_with_no_restrict(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     api.assert_schema().assert_table("B", |table| {
         table.assert_foreign_keys_count(1).assert_fk_on_columns(&["aId"], |fk| {
@@ -765,7 +765,7 @@ fn on_delete_optional_default_action(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     api.assert_schema().assert_table("B", |table| {
         table.assert_foreign_keys_count(1).assert_fk_on_columns(&["aId"], |fk| {
@@ -793,7 +793,7 @@ fn on_delete_compound_optional_optional_default_action(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     api.assert_schema().assert_table("B", |table| {
         table
@@ -823,7 +823,7 @@ fn on_delete_compound_required_optional_default_action_with_restrict(api: TestAp
         }
     "#;
 
-    api.schema_push_w_datasource(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     api.assert_schema().assert_table("B", |table| {
         table
@@ -853,7 +853,7 @@ fn on_delete_compound_required_optional_default_action_without_restrict(api: Tes
         }
     "#;
 
-    api.schema_push_w_datasource(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     api.assert_schema().assert_table("B", |table| {
         table
@@ -880,7 +880,7 @@ fn on_update_optional_default_action(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     api.assert_schema().assert_table("B", |table| {
         table.assert_foreign_keys_count(1).assert_fk_on_columns(&["aId"], |fk| {
@@ -905,7 +905,7 @@ fn on_update_required_default_action(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     api.assert_schema().assert_table("B", |table| {
         table.assert_foreign_keys_count(1).assert_fk_on_columns(&["aId"], |fk| {
@@ -927,7 +927,7 @@ fn adding_mutual_references_on_existing_tables_works(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     let dm2 = r#"
         model A {
@@ -950,7 +950,7 @@ fn adding_mutual_references_on_existing_tables_works(api: TestApi) {
     let res = api.schema_push_w_datasource(dm2).force(true).send();
 
     if api.is_sqlite() {
-        res.assert_green_bang();
+        res.assert_green();
     } else {
         res.assert_warnings(&["A unique constraint covering the columns `[name]` on the table `A` will be added. If there are existing duplicate values, this will fail.".into(), "A unique constraint covering the columns `[email]` on the table `B` will be added. If there are existing duplicate values, this will fail.".into()]);
     };
@@ -978,7 +978,7 @@ fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(api: Te
         }
     "#;
 
-    api.schema_push_w_datasource(dm_1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm_1).send().assert_green();
     api.assert_schema().assert_table("_ProfileToSkill", |t| {
         t.assert_index_on_columns(&["A", "B"], |idx| idx.assert_is_unique())
     });
@@ -1003,7 +1003,7 @@ fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(api: Te
         }
     "#;
 
-    api.schema_push_w_datasource(dm_2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm_2).send().assert_green();
     api.assert_schema().assert_table("_ProfileToSkill", |table| {
         table.assert_index_on_columns(&["A", "B"], |idx| {
             idx.assert_is_unique().assert_name("_ProfileToSkill_AB_unique")
@@ -1013,7 +1013,7 @@ fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(api: Te
     // Check that the migration is idempotent
     api.schema_push_w_datasource(dm_2)
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_no_steps();
 }
 
@@ -1033,7 +1033,7 @@ fn removing_a_relation_field_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm_1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm_1).send().assert_green();
 
     api.assert_schema()
         .assert_table("User", |table| table.assert_has_column("address_name"));
@@ -1049,7 +1049,7 @@ fn removing_a_relation_field_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm_2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm_2).send().assert_green();
 
     api.assert_schema()
         .assert_table("User", |table| table.assert_does_not_have_column("address_name"));
@@ -1075,7 +1075,7 @@ fn references_to_models_with_compound_primary_keys_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     api.assert_schema().assert_table("Pet", |table| {
         table
@@ -1118,7 +1118,7 @@ fn join_tables_between_models_with_compound_primary_keys_must_work(api: TestApi)
         }
     "#;
 
-    api.schema_push_w_datasource(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     api.assert_schema().assert_table("HumanToCat", |table| {
         table
@@ -1178,7 +1178,7 @@ fn join_tables_between_models_with_mapped_compound_primary_keys_must_work(api: T
         }
     "#;
 
-    api.schema_push_w_datasource(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     api.assert_schema().assert_table("HumanToCat", |table| {
         table

@@ -1,4 +1,4 @@
-use migration_engine_tests::sync_test_api::*;
+use migration_engine_tests::test_api::*;
 
 #[test_connector]
 fn adding_a_new_unique_field_must_work(api: TestApi) {
@@ -9,7 +9,7 @@ fn adding_a_new_unique_field_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.assert_schema().assert_table("A", |table| {
         table.assert_index_on_columns(&["field"], |index| index.assert_is_unique())
@@ -28,7 +28,7 @@ fn adding_new_fields_with_multi_column_unique_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
     api.assert_schema().assert_table("A", |t| {
         t.assert_index_on_columns(&["field", "secondField"], |idx| idx.assert_is_unique())
     });
@@ -43,7 +43,7 @@ fn unique_in_conjunction_with_custom_column_name_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
     api.assert_schema().assert_table("A", |t| {
         t.assert_index_on_columns(&["custom_field_name"], |idx| idx.assert_is_unique())
     });
@@ -61,7 +61,7 @@ fn multi_column_unique_in_conjunction_with_custom_column_name_must_work(api: Tes
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
     api.assert_schema().assert_table("A", |t| {
         t.assert_index_on_columns(&["custom_field_name", "second_custom_field_name"], |idx| {
             idx.assert_is_unique()
@@ -78,7 +78,7 @@ fn removing_an_existing_unique_field_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
     api.assert_schema().assert_table("A", |table| {
         table.assert_index_on_columns(&["field"], |idx| idx.assert_is_unique())
     });
@@ -89,7 +89,7 @@ fn removing_an_existing_unique_field_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green();
 
     api.assert_schema().assert_table("A", |t| {
         t.assert_indexes_count(0)
@@ -107,7 +107,7 @@ fn adding_unique_to_an_existing_field_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.assert_schema()
         .assert_table("A", |table| table.assert_indexes_count(0));
@@ -142,7 +142,7 @@ fn removing_unique_from_an_existing_field_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
     api.assert_schema().assert_table("A", |t| {
         t.assert_index_on_columns(&["field"], |idx| idx.assert_is_unique())
     });
@@ -154,7 +154,7 @@ fn removing_unique_from_an_existing_field_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green();
     api.assert_schema().assert_table("A", |t| t.assert_indexes_count(0));
 }
 
@@ -166,7 +166,7 @@ fn unique_is_allowed_on_an_id_field(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
     api.assert_schema().assert_table("A", |t| {
         t.assert_index_on_columns(&["id"], |idx| idx.assert_is_unique())
     });

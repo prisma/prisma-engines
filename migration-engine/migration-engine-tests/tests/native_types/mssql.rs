@@ -1,6 +1,6 @@
 use bigdecimal::BigDecimal;
 use chrono::Utc;
-use migration_engine_tests::sync_test_api::*;
+use migration_engine_tests::test_api::*;
 use once_cell::sync::Lazy;
 use quaint::{prelude::Insert, Value};
 use std::{collections::HashMap, str::FromStr};
@@ -1913,7 +1913,7 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
                 from,
             );
 
-            api.schema_push_w_datasource(dm1).send().assert_green_bang();
+            api.schema_push_w_datasource(dm1).send().assert_green();
 
             let insert = Insert::single_into((api.schema_name(), "A")).value("x", seed.clone());
             api.query(insert.into());
@@ -1938,7 +1938,7 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
                 to,
             );
 
-            api.schema_push_w_datasource(dm2).send().assert_green_bang();
+            api.schema_push_w_datasource(dm2).send().assert_green();
 
             api.assert_schema().assert_table("A", |table| {
                 table.assert_columns_count(2).assert_column("x", |c| {
@@ -1971,7 +1971,7 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
                 from,
             );
 
-            api.schema_push_w_datasource(dm1).send().assert_green_bang();
+            api.schema_push_w_datasource(dm1).send().assert_green();
 
             let insert = Insert::single_into((api.schema_name(), "A")).value("x", seed.clone());
             api.query(insert.into());
@@ -2040,7 +2040,7 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
                 from,
             );
 
-            api.schema_push_w_datasource(dm1).send().assert_green_bang();
+            api.schema_push_w_datasource(dm1).send().assert_green();
 
             let insert = Insert::single_into((api.schema_name(), "A")).value("x", seed.clone());
             api.query(insert.into());
@@ -2124,17 +2124,17 @@ fn typescript_starter_schema_with_native_types_is_idempotent(api: TestApi) {
     api.schema_push_w_datasource(dm)
         .migration_id(Some("first"))
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_has_executed_steps();
     api.schema_push_w_datasource(dm)
         .migration_id(Some("second"))
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_no_steps();
     api.schema_push_w_datasource(dm2)
         .migration_id(Some("third"))
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_no_steps();
 }
 
@@ -2179,22 +2179,22 @@ fn typescript_starter_schema_with_different_native_types_is_idempotent(api: Test
     api.schema_push_w_datasource(dm)
         .migration_id(Some("first"))
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_has_executed_steps();
     api.schema_push_w_datasource(dm)
         .migration_id(Some("second"))
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_no_steps();
 
     api.schema_push_w_datasource(dm2)
         .migration_id(Some("third"))
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_has_executed_steps();
     api.schema_push_w_datasource(dm2)
         .migration_id(Some("fourth"))
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_no_steps();
 }

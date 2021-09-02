@@ -1,5 +1,5 @@
 use migration_connector::DiffTarget;
-use migration_engine_tests::sync_test_api::*;
+use migration_engine_tests::test_api::*;
 
 #[test_connector(tags(Mssql))]
 fn reset_clears_udts(api: TestApi) {
@@ -57,7 +57,7 @@ fn shared_default_constraints_are_ignored_issue_5423(api: TestApi) {
     api.schema_push_w_datasource(dm)
         .migration_id(Some("first"))
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_no_steps();
 }
 
@@ -202,8 +202,5 @@ fn foreign_key_renaming_to_default_works(api: TestApi) {
     api.raw_cmd(&migration);
 
     // Check that the migration is idempotent.
-    api.schema_push(target_schema)
-        .send()
-        .assert_green_bang()
-        .assert_no_steps();
+    api.schema_push(target_schema).send().assert_green().assert_no_steps();
 }

@@ -1,5 +1,5 @@
 use indoc::indoc;
-use migration_engine_tests::sync_test_api::*;
+use migration_engine_tests::test_api::*;
 use std::fmt::Write as _;
 
 // We need to test this specifically for mysql, because foreign keys are indexes, and they are
@@ -38,7 +38,7 @@ fn indexes_on_foreign_key_fields_are_not_created_twice(api: TestApi) {
     api.schema_push_w_datasource(schema)
         .force(true)
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_no_steps();
 
     api.assert_schema().assert_equals(&sql_schema);
@@ -64,10 +64,10 @@ fn enum_creation_is_idempotent(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
     api.schema_push_w_datasource(dm1)
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_no_steps();
 }
 
@@ -88,7 +88,7 @@ fn enums_work_when_table_name_is_remapped(api: TestApi) {
     }
     "#;
 
-    api.schema_push_w_datasource(schema).send().assert_green_bang();
+    api.schema_push_w_datasource(schema).send().assert_green();
 }
 
 #[test_connector(tags(Mysql))]
@@ -107,7 +107,7 @@ fn arity_of_enum_columns_can_be_changed(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.assert_schema().assert_table("A", |table| {
         table
@@ -129,7 +129,7 @@ fn arity_of_enum_columns_can_be_changed(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green();
 
     api.assert_schema().assert_table("A", |table| {
         table
@@ -154,7 +154,7 @@ fn arity_is_preserved_by_alter_enum(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.assert_schema().assert_table("A", |table| {
         table
@@ -259,7 +259,7 @@ fn native_type_columns_can_be_created(api: TestApi) {
 
     dm.push_str("}\n");
 
-    api.schema_push_w_datasource(&dm).send().assert_green_bang();
+    api.schema_push_w_datasource(&dm).send().assert_green();
 
     api.assert_schema().assert_table("A", |table| {
         types.iter().fold(
@@ -271,10 +271,7 @@ fn native_type_columns_can_be_created(api: TestApi) {
     });
 
     // Check that the migration is idempotent
-    api.schema_push_w_datasource(dm)
-        .send()
-        .assert_green_bang()
-        .assert_no_steps();
+    api.schema_push_w_datasource(dm).send().assert_green().assert_no_steps();
 }
 
 #[test_connector(tags(Mysql))]

@@ -82,7 +82,7 @@ impl Debug for SchemaPushAssertion<'_> {
 impl<'a> SchemaPushAssertion<'a> {
     /// Asserts that the command produced no warning and no unexecutable migration message.
     #[track_caller]
-    pub fn assert_green_bang(self) -> Self {
+    pub fn assert_green(self) -> Self {
         self.assert_no_warning().assert_executable()
     }
 

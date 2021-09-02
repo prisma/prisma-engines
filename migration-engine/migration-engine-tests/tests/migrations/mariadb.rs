@@ -1,4 +1,4 @@
-use migration_engine_tests::sync_test_api::*;
+use migration_engine_tests::test_api::*;
 use quaint::ast as quaint_ast;
 
 #[test_connector(tags(Mariadb))]
@@ -19,7 +19,7 @@ fn foreign_keys_to_indexes_being_renamed_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.assert_schema()
         .assert_table("User", |table| {
@@ -56,7 +56,7 @@ fn foreign_keys_to_indexes_being_renamed_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green();
 
     api.assert_schema()
         .assert_table("User", |table| {
