@@ -1,7 +1,7 @@
 use datamodel_connector::{
     connector_error::ConnectorError,
     helper::{args_vec_from_opt, parse_one_opt_u32, parse_one_u32, parse_two_opt_u32},
-    Connector, ConnectorCapability,
+    Connector, ConnectorCapability, ReferentialIntegrity,
 };
 use dml::{
     field::{Field, FieldType},
@@ -61,14 +61,11 @@ const NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION: &[&str] = &[
 pub struct MySqlDatamodelConnector {
     capabilities: Vec<ConnectorCapability>,
     constructors: Vec<NativeTypeConstructor>,
-    referential_actions: BitFlags<ReferentialAction>,
-    is_planetscale: bool,
+    referential_integrity: ReferentialIntegrity,
 }
 
 impl MySqlDatamodelConnector {
-    pub fn new(is_planetscale: bool) -> MySqlDatamodelConnector {
-        use ReferentialAction::*;
-
+    pub fn new(referential_integrity: ReferentialIntegrity) -> MySqlDatamodelConnector {
         let mut capabilities = vec![
             ConnectorCapability::RelationsOverNonUniqueCriteria,
             ConnectorCapability::Enums,
@@ -91,7 +88,7 @@ impl MySqlDatamodelConnector {
             ConnectorCapability::AdvancedJsonNullability,
         ];
 
-        if !is_planetscale {
+        if matches!(referential_integrity, ReferentialIntegrity::ForeignKeys) {
             capabilities.push(ConnectorCapability::ForeignKeys);
         }
 
@@ -167,17 +164,10 @@ impl MySqlDatamodelConnector {
             json,
         ];
 
-        let referential_actions = if is_planetscale {
-            Restrict | SetNull
-        } else {
-            Restrict | Cascade | SetNull | NoAction | SetDefault
-        };
-
         MySqlDatamodelConnector {
             capabilities,
             constructors,
-            referential_actions,
-            is_planetscale,
+            referential_integrity,
         }
     }
 }
@@ -208,11 +198,14 @@ impl Connector for MySqlDatamodelConnector {
     }
 
     fn referential_actions(&self) -> BitFlags<ReferentialAction> {
-        self.referential_actions
+        use ReferentialAction::*;
+
+        self.referential_integrity
+            .allowed_referential_actions(Restrict | Cascade | SetNull | NoAction | SetDefault)
     }
 
     fn emulates_referential_actions(&self) -> bool {
-        self.is_planetscale
+        matches!(self.referential_integrity, ReferentialIntegrity::Prisma)
     }
 
     fn scalar_type_for_native_type(&self, native_type: serde_json::Value) -> ScalarType {

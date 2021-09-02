@@ -3,7 +3,7 @@ use crate::{
     configuration::StringFromEnvVar,
     diagnostics::{DatamodelError, Diagnostics},
 };
-use datamodel_connector::{Connector, ConnectorCapabilities};
+use datamodel_connector::{Connector, ConnectorCapabilities, ReferentialIntegrity};
 use std::path::Path;
 
 /// a `datasource` from the prisma schema.
@@ -20,8 +20,8 @@ pub struct Datasource {
     pub active_connector: Box<dyn Connector>,
     /// An optional user-defined shadow database URL.
     pub shadow_database_url: Option<(StringFromEnvVar, Span)>,
-    /// Whether planetScaleMode = true was provided
-    pub planet_scale_mode: bool,
+    /// In which layer referential actions are handled.
+    pub referential_integrity: ReferentialIntegrity,
 }
 
 impl std::fmt::Debug for Datasource {

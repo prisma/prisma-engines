@@ -95,7 +95,7 @@ fn actions_on_mongo() {
 }
 
 #[test]
-fn actions_on_planetscale() {
+fn actions_on_prisma_referential_integrity() {
     let actions = &[Restrict, SetNull];
 
     for action in actions {
@@ -103,13 +103,13 @@ fn actions_on_planetscale() {
             r#"
             datasource db {{
                 provider = "mysql"
-                planetScaleMode = true
+                referentialIntegrity = "prisma"
                 url = "mysql://root:prisma@localhost:3306/mydb"
             }}
 
             generator client {{
                 provider = "prisma-client-js"
-                previewFeatures = ["planetScaleMode"]
+                previewFeatures = ["referentialIntegrity"]
             }}
 
             model A {{
@@ -269,18 +269,18 @@ fn actions_should_be_defined_only_from_one_side() {
 }
 
 #[test]
-fn cascade_action_should_not_work_on_planetscale() {
+fn cascade_action_should_not_work_on_prisma_level_referential_integrity() {
     let dml = indoc!(
         r#"
             datasource db {
                 provider = "mysql"
-                planetScaleMode = true
+                referentialIntegrity = "prisma"
                 url = "mysql://root:prisma@localhost:3306/mydb"
             }
 
             generator client {
                 provider = "prisma-client-js"
-                previewFeatures = ["planetScaleMode"]
+                previewFeatures = ["referentialIntegrity"]
             }
 
             model A {{
@@ -310,18 +310,18 @@ fn cascade_action_should_not_work_on_planetscale() {
 }
 
 #[test]
-fn no_action_should_not_work_on_planetscale() {
+fn no_action_should_not_work_on_prisma_level_referential_integrity() {
     let dml = indoc!(
         r#"
             datasource db {
                 provider = "mysql"
-                planetScaleMode = true
+                referentialIntegrity = "prisma"
                 url = "mysql://root:prisma@localhost:3306/mydb"
             }
 
             generator client {
                 provider = "prisma-client-js"
-                previewFeatures = ["planetScaleMode"]
+                previewFeatures = ["referentialIntegrity"]
             }
 
             model A {{
@@ -351,18 +351,18 @@ fn no_action_should_not_work_on_planetscale() {
 }
 
 #[test]
-fn set_default_action_should_not_work_on_planetscale() {
+fn set_default_action_should_not_work_on_prisma_level_referential_integrity() {
     let dml = indoc!(
         r#"
             datasource db {
                 provider = "mysql"
-                planetScaleMode = true
+                referentialIntegrity = "prisma"
                 url = "mysql://root:prisma@localhost:3306/mydb"
             }
 
             generator client {
                 provider = "prisma-client-js"
-                previewFeatures = ["planetScaleMode"]
+                previewFeatures = ["referentialIntegrity"]
             }
 
             model A {{

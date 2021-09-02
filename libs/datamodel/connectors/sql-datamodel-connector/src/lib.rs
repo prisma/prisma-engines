@@ -8,6 +8,8 @@ pub use mysql_datamodel_connector::MySqlDatamodelConnector;
 pub use postgres_datamodel_connector::PostgresDatamodelConnector;
 pub use sqlite_datamodel_connector::SqliteDatamodelConnector;
 
+use datamodel_connector::ReferentialIntegrity;
+
 pub struct SqlDatamodelConnectors {}
 
 impl SqlDatamodelConnectors {
@@ -15,8 +17,8 @@ impl SqlDatamodelConnectors {
         PostgresDatamodelConnector::new()
     }
 
-    pub fn mysql(is_planetscale: bool) -> MySqlDatamodelConnector {
-        MySqlDatamodelConnector::new(is_planetscale)
+    pub fn mysql(referential_integrity: ReferentialIntegrity) -> MySqlDatamodelConnector {
+        MySqlDatamodelConnector::new(referential_integrity)
     }
 
     pub fn sqlite() -> SqliteDatamodelConnector {
