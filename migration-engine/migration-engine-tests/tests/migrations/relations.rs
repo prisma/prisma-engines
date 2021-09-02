@@ -1003,12 +1003,18 @@ fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(api: Te
         }
     "#;
 
-    api.schema_push_w_datasource(dm_2).send();
+    api.schema_push_w_datasource(dm_2).send().assert_green_bang();
     api.assert_schema().assert_table("_ProfileToSkill", |table| {
         table.assert_index_on_columns(&["A", "B"], |idx| {
             idx.assert_is_unique().assert_name("_ProfileToSkill_AB_unique")
         })
     });
+
+    // Check that the migration is idempotent
+    api.schema_push_w_datasource(dm_2)
+        .send()
+        .assert_green_bang()
+        .assert_no_steps();
 }
 
 #[test_connector]
