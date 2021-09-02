@@ -162,11 +162,11 @@ To actually get the tests working, read the contents of `.envrc`. Then `Edit
 environment variables for your account` from Windows settings, and add at least
 the correct values for the following variables:
 
-- `SERVER ROOT` should point to the root directory of `prisma-engines` project.
+- `WORKSPACE_ROOT` should point to the root directory of `prisma-engines` project.
 - `PRISMA_BINARY_PATH` is usually
-  `%SERVER_ROOT%\target\release\query-engine.exe`.
+  `%WORKSPACE_ROOT%\target\release\query-engine.exe`.
 - `MIGRATION_ENGINE_BINARY_PATH` should be
-  `%SERVER_ROOT%\target\release\migration-engine.exe`.
+  `%WORKSPACE_ROOT%\target\release\migration-engine.exe`.
 
 Other variables may or may not be useful.
 
