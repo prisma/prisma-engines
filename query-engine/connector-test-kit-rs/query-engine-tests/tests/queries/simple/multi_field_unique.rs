@@ -8,7 +8,7 @@ mod multi_field_unique {
     fn two_field_unique() -> String {
         let schema = indoc! {
             r#"model User {
-                id        Int    @id
+                #id(id, Int, @id)
                 FirstName String
                 LastName  String
 
@@ -22,7 +22,7 @@ mod multi_field_unique {
     fn aliased() -> String {
         let schema = indoc! {
             r#"model User {
-                id        Int    @id
+                #id(id, Int, @id)
                 FirstName String
                 LastName  String
 
@@ -36,7 +36,7 @@ mod multi_field_unique {
     fn single_multi() -> String {
         let schema = indoc! {
             r#"model User {
-                id   Int    @id
+                #id(id, Int, @id)
                 uniq String
 
                 @@unique([uniq])

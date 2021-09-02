@@ -5,6 +5,7 @@ mod default_value;
 mod delete;
 mod delete_many;
 mod delete_many_relations;
+mod delete_mutation_relations;
 mod insert_null_in_required_field;
 mod non_embedded_upsert;
 mod update;

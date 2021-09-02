@@ -9,7 +9,7 @@ mod combinations {
         let schema = indoc! {
             r#"
               model Item {
-                id    String  @id @default(cuid())
+                #id(id, String, @id, @default(cuid()))
                 float Float   @map("db_float")
                 int   Int     @map("db_int")
                 dec   Decimal @map("db_dec")

@@ -8,7 +8,7 @@ mod basic_order_by {
     fn schema() -> String {
         let schema = indoc! {
             r#"model OrderTest {
-                id            Int    @id
+                #id(id, Int, @id)
                 uniqueField   Int    @unique
                 nonUniqFieldA String
                 nonUniqFieldB String

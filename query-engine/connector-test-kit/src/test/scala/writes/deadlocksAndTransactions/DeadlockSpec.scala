@@ -7,6 +7,7 @@ import util._
 
 import scala.concurrent.Future
 
+// RS: Won't port, this is a load test.
 class DeadlockSpec extends FlatSpec with Matchers with Retries with ApiSpecBase with AwaitUtils {
 
   override def runOnlyForCapabilities = Set(ScalarListsCapability)

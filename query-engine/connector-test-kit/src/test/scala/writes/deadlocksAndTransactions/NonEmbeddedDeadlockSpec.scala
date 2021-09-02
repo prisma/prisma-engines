@@ -5,6 +5,7 @@ import org.scalatest.{FlatSpec, Matchers, Retries}
 import util.ConnectorCapability.{JoinRelationLinksCapability, ScalarListsCapability}
 import util._
 
+// RS: Won't port, this is a load test.
 class NonEmbeddedDeadlockSpec extends FlatSpec with Matchers with Retries with ApiSpecBase with AwaitUtils {
 
   override def runOnlyForCapabilities = Set(JoinRelationLinksCapability, ScalarListsCapability)

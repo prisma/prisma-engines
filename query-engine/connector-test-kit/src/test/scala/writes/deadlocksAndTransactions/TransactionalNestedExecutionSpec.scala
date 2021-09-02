@@ -5,6 +5,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import util.ConnectorCapability.{EnumCapability, TransactionalExecutionCapability}
 import util._
 
+// RS: Won't port, unnecessary checks in Prisma 2+
 class TransactionalNestedExecutionSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   override def runOnlyForCapabilities = Set(TransactionalExecutionCapability, EnumCapability)
