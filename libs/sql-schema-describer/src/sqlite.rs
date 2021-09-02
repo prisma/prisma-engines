@@ -5,7 +5,7 @@ use crate::{
     PrismaValue, Regex, SqlMetadata, SqlSchema, SqlSchemaDescriberBackend, Table, View,
 };
 use quaint::{ast::Value, prelude::Queryable};
-use std::{any::type_name, borrow::Cow, collections::HashMap, convert::TryInto, fmt::Debug};
+use std::{any::type_name, borrow::Cow, collections::BTreeMap, convert::TryInto, fmt::Debug};
 use tracing::trace;
 
 pub struct SqlSchemaDescriber<'a> {
@@ -176,7 +176,7 @@ impl<'a> SqlSchemaDescriber<'a> {
     async fn get_columns(&self, table: &str) -> DescriberResult<(Vec<Column>, Option<PrimaryKey>)> {
         let sql = format!(r#"PRAGMA table_info ("{}")"#, table);
         let result_set = self.conn.query_raw(&sql, &[]).await?;
-        let mut pk_cols: HashMap<i64, String> = HashMap::new();
+        let mut pk_cols: BTreeMap<i64, String> = BTreeMap::new();
         let mut cols: Vec<Column> = result_set
             .into_iter()
             .map(|row| {
@@ -305,9 +305,9 @@ impl<'a> SqlSchemaDescriber<'a> {
 
     async fn get_foreign_keys(&self, table: &str) -> DescriberResult<Vec<ForeignKey>> {
         struct IntermediateForeignKey {
-            pub columns: HashMap<i64, String>,
+            pub columns: BTreeMap<i64, String>,
             pub referenced_table: String,
-            pub referenced_columns: HashMap<i64, String>,
+            pub referenced_columns: BTreeMap<i64, String>,
             pub on_delete_action: ForeignKeyAction,
             pub on_update_action: ForeignKeyAction,
         }
@@ -319,7 +319,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         // Since one foreign key with multiple columns will be represented here as several
         // rows with the same ID, we have to use an intermediate representation that gets
         // translated into the real foreign keys in another pass
-        let mut intermediate_fks: HashMap<i64, IntermediateForeignKey> = HashMap::new();
+        let mut intermediate_fks: BTreeMap<i64, IntermediateForeignKey> = BTreeMap::new();
         for row in result_set.into_iter() {
             trace!("got FK description row {:?}", row);
             let id = row.get("id").and_then(|x| x.as_i64()).expect("id");
@@ -336,9 +336,9 @@ impl<'a> SqlSchemaDescriber<'a> {
                     };
                 }
                 None => {
-                    let mut columns: HashMap<i64, String> = HashMap::new();
+                    let mut columns: BTreeMap<i64, String> = BTreeMap::new();
                     columns.insert(seq, column);
-                    let mut referenced_columns: HashMap<i64, String> = HashMap::new();
+                    let mut referenced_columns: BTreeMap<i64, String> = BTreeMap::new();
 
                     if let Some(column) = referenced_column {
                         referenced_columns.insert(seq, column);
