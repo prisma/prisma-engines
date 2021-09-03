@@ -5,20 +5,20 @@ pub fn sqlite_test_url(db_name: &str) -> String {
 }
 
 fn sqlite_test_file(db_name: &str) -> String {
-    static SERVER_ROOT: Lazy<std::path::PathBuf> = Lazy::new(|| {
-        std::env::var("SERVER_ROOT")
+    static WORKSPACE_ROOT: Lazy<std::path::PathBuf> = Lazy::new(|| {
+        std::env::var("WORKSPACE_ROOT")
             .map(|root| std::path::Path::new(&root).join("db"))
             .unwrap_or_else(|_| {
-                let dir = std::env::temp_dir().join("prisma_tests_server_root");
+                let dir = std::env::temp_dir().join("prisma_tests_workspace_root");
                 let path = dir.to_string_lossy().into_owned();
 
-                std::fs::create_dir_all(&path).expect("failed to create SERVER_ROOT directory");
+                std::fs::create_dir_all(&path).expect("failed to create WORKSPACE_ROOT directory");
 
                 path.into()
             })
     });
 
-    let file_path = SERVER_ROOT.join(db_name);
+    let file_path = WORKSPACE_ROOT.join(db_name);
 
     // Truncate the file.
     std::fs::File::create(&file_path).expect("Failed to create or truncate SQLite database.");
