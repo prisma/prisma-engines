@@ -1,7 +1,7 @@
 use crate::constants::json_null;
 
 use super::*;
-use constants::{aggregations, deprecation, filters};
+use constants::{aggregations, filters};
 use datamodel_connector::ConnectorCapability;
 use prisma_models::{dml::DefaultValue, PrismaValue};
 
@@ -209,14 +209,6 @@ fn full_scalar_filter_type(
             list,
         ));
 
-        fields.push(
-            aggregate_filter_field(ctx, aggregations::COUNT, &TypeIdentifier::Int, nullable, list).deprecate(
-                deprecation::AGGR_DEPRECATION,
-                "2.23",
-                None,
-            ),
-        );
-
         if typ.is_numeric() {
             let avg_type = map_avg_type_ident(typ.clone());
             fields.push(aggregate_filter_field(
@@ -227,14 +219,6 @@ fn full_scalar_filter_type(
                 list,
             ));
 
-            fields.push(
-                aggregate_filter_field(ctx, aggregations::AVG, &avg_type, nullable, list).deprecate(
-                    deprecation::AGGR_DEPRECATION,
-                    "2.23",
-                    None,
-                ),
-            );
-
             fields.push(aggregate_filter_field(
                 ctx,
                 aggregations::UNDERSCORE_SUM,
@@ -242,14 +226,6 @@ fn full_scalar_filter_type(
                 nullable,
                 list,
             ));
-
-            fields.push(
-                aggregate_filter_field(ctx, aggregations::SUM, typ, nullable, list).deprecate(
-                    deprecation::AGGR_DEPRECATION,
-                    "2.23",
-                    None,
-                ),
-            );
         }
 
         if !list {
@@ -260,13 +236,6 @@ fn full_scalar_filter_type(
                 nullable,
                 list,
             ));
-            fields.push(
-                aggregate_filter_field(ctx, aggregations::MIN, typ, nullable, list).deprecate(
-                    deprecation::AGGR_DEPRECATION,
-                    "2.23",
-                    None,
-                ),
-            );
 
             fields.push(aggregate_filter_field(
                 ctx,
@@ -275,13 +244,6 @@ fn full_scalar_filter_type(
                 nullable,
                 list,
             ));
-            fields.push(
-                aggregate_filter_field(ctx, aggregations::MAX, typ, nullable, list).deprecate(
-                    deprecation::AGGR_DEPRECATION,
-                    "2.23",
-                    None,
-                ),
-            );
         }
     }
 

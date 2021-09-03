@@ -73,11 +73,7 @@ fn soft_resets_work_on_postgres(api: TestApi) {
         engine.reset().send_sync();
         engine.assert_schema().assert_tables_count(0);
 
-        engine
-            .schema_push(dm)
-            .send()
-            .assert_has_executed_steps()
-            .assert_green_bang();
+        engine.schema_push(dm).send().assert_has_executed_steps().assert_green();
 
         engine.assert_schema().assert_tables_count(1).assert_has_table("Cat");
 
@@ -199,11 +195,7 @@ fn soft_resets_work_on_sql_server(api: TestApi) {
         engine.reset().send_sync();
         engine.assert_schema().assert_tables_count(0);
 
-        engine
-            .schema_push(dm)
-            .send()
-            .assert_has_executed_steps()
-            .assert_green_bang();
+        engine.schema_push(dm).send().assert_has_executed_steps().assert_green();
 
         engine.assert_schema().assert_tables_count(1).assert_has_table("Cat");
 
@@ -286,11 +278,7 @@ fn soft_resets_work_on_mysql(api: TestApi) {
         engine.reset().send_sync();
         engine.assert_schema().assert_tables_count(0);
 
-        engine
-            .schema_push(dm)
-            .send()
-            .assert_has_executed_steps()
-            .assert_green_bang();
+        engine.schema_push(dm).send().assert_has_executed_steps().assert_green();
 
         engine.assert_schema().assert_tables_count(1).assert_has_table("Cat");
 

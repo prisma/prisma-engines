@@ -25,7 +25,7 @@ impl<'a, 'b> ValidationPipeline<'a> {
 
         ValidationPipeline {
             source,
-            validator: Validator::new(source, preview_features),
+            validator: Validator::new(source),
             standardiser_for_formatting: StandardiserForFormatting::new(),
             preview_features,
         }

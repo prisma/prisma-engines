@@ -24,6 +24,7 @@ pub fn init(mut exports: JsObject, env: Env) -> napi::Result<()> {
     exports.create_named_method("version", functions::version)?;
     exports.create_named_method("getConfig", functions::get_config)?;
     exports.create_named_method("dmmf", functions::dmmf)?;
+    exports.create_named_method("debugPanic", functions::debug_panic)?;
 
     Ok(())
 }

@@ -686,6 +686,7 @@ impl<'a> ForeignKeyAssertion<'a> {
 pub struct IndexAssertion<'a>(&'a Index);
 
 impl<'a> IndexAssertion<'a> {
+    #[track_caller]
     pub fn assert_name(self, name: &str) -> Self {
         assert_eq!(self.0.name, name);
 

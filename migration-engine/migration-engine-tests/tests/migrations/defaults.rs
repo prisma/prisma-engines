@@ -1,7 +1,6 @@
-use migration_engine_tests::sync_test_api::*;
+use migration_engine_tests::test_api::*;
 use prisma_value::PrismaValue;
 use sql_schema_describer::{DefaultKind, DefaultValue};
-use test_macros::test_connector;
 
 // MySQL 5.7 and MariaDB are skipped, because the datamodel parser gives us a
 // chrono DateTime, and we don't render that in the exact expected format.
@@ -14,13 +13,13 @@ fn datetime_defaults_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     let expected_default = if api.is_postgres() {
         DefaultValue::db_generated("'2018-01-27 08:00:00'::timestamp without time zone")
     } else if api.is_mssql() {
         let mut df = DefaultValue::db_generated("2018-01-27 08:00:00 +00:00");
-        df.set_constraint_name("DF__Cat__birthday");
+        df.set_constraint_name("Cat_birthday_df");
         df
     } else if api.is_mysql_mariadb() {
         DefaultValue::db_generated("2018-01-27T08:00:00+00:00")
@@ -43,7 +42,7 @@ fn function_expressions_as_dbgenerated_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     api.assert_schema().assert_table("Cat", |table| {
         table.assert_column("id", |col| {
@@ -60,7 +59,7 @@ fn default_dbgenerated_with_type_definitions_should_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     api.assert_schema().assert_table("A", |table| {
         table.assert_column("id", |col| {
@@ -77,7 +76,7 @@ fn default_dbgenerated_should_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     api.assert_schema().assert_table("A", |table| {
         table.assert_column("id", |col| {
@@ -95,7 +94,7 @@ fn uuid_default(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     api.assert_schema().assert_table("A", |table| {
         table.assert_column("uuid", |col| {
@@ -156,7 +155,7 @@ fn schemas_with_dbgenerated_work(api: TestApi) {
     }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 }
 
 #[test_connector(tags(Mysql8, Mariadb), exclude(Vitess))]
@@ -183,7 +182,7 @@ fn schemas_with_dbgenerated_expressions_work(api: TestApi) {
     }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 }
 
 #[test_connector]
@@ -195,7 +194,7 @@ fn column_defaults_must_be_migrated(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.assert_schema().assert_table("Fruit", |table| {
         table.assert_column("name", |col| {
@@ -210,7 +209,7 @@ fn column_defaults_must_be_migrated(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green();
 
     api.assert_schema().assert_table("Fruit", |table| {
         table.assert_column("name", |col| {
@@ -233,7 +232,7 @@ fn default_constraint_names_should_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     api.assert_schema().assert_table("A", |table| {
         table.assert_column("data", |col| {
@@ -259,7 +258,7 @@ fn default_constraint_name_default_values_should_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     api.assert_schema().assert_table("A", |table| {
         table.assert_column("data", |col| {
@@ -287,7 +286,7 @@ fn default_constraint_name_default_values_with_mapping_should_work(api: TestApi)
         }
     "#;
 
-    api.schema_push_w_datasource(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     api.assert_schema().assert_table("meow", |table| {
         table.assert_column("purr", |col| {
@@ -316,7 +315,7 @@ fn escaped_string_defaults_are_not_arbitrarily_migrated(api: TestApi) {
     api.schema_push_w_datasource(dm1)
         .migration_id(Some("first migration"))
         .send()
-        .assert_green_bang();
+        .assert_green();
 
     let insert = Insert::single_into(api.render_table_name("Fruit"))
         .value("id", "apple-id")
@@ -329,7 +328,7 @@ fn escaped_string_defaults_are_not_arbitrarily_migrated(api: TestApi) {
     api.schema_push_w_datasource(dm1)
         .migration_id(Some("second migration"))
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_no_steps();
 
     let sql_schema = api.assert_schema().into_schema();
@@ -340,21 +339,21 @@ fn escaped_string_defaults_are_not_arbitrarily_migrated(api: TestApi) {
         assert_eq!(DefaultValue::value("top\ndown").kind(), default.kind());
         assert!(default
             .constraint_name()
-            .map(|cn| cn.starts_with("DF__Fruit__sideNames"))
+            .map(|cn| cn.starts_with("Fruit_sideNames_df"))
             .unwrap());
 
         let default = table.column("contains").and_then(|c| c.default.clone()).unwrap();
         assert_eq!(DefaultValue::value("'potassium'").kind(), default.kind());
         assert!(default
             .constraint_name()
-            .map(|cn| cn.starts_with("DF__Fruit__contains"))
+            .map(|cn| cn.starts_with("Fruit_contains_df"))
             .unwrap());
 
         let default = table.column("seasonality").and_then(|c| c.default.clone()).unwrap();
         assert_eq!(DefaultValue::value(r#""summer""#).kind(), default.kind());
         assert!(default
             .constraint_name()
-            .map(|cn| cn.starts_with("DF__Fruit__seasonali"))
+            .map(|cn| cn.starts_with("Fruit_seasonality_df"))
             .unwrap());
     } else {
         assert_eq!(

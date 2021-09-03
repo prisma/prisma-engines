@@ -15,7 +15,7 @@ struct CursorOrderDefinition {
     // Direction of the sort
     pub(crate) sort_order: SortOrder,
     // Final column identifier to be used for the scalar field to order by
-    pub(crate) order_column: Column<'static>,
+    pub(crate) order_column: Expression<'static>,
     // Foreign keys of the relations on which the order is performed
     pub(crate) fks: Option<Vec<MaybeAliasedScalar>>,
 }
@@ -132,7 +132,7 @@ pub fn build(
             let order_subquery = definitions
                 .iter()
                 .fold(Select::from_table(model.as_table()), |select, definition| {
-                    select.column(
+                    select.value(
                         definition
                             .order_column
                             .clone()
@@ -293,7 +293,10 @@ fn map_orderby_condition(
     order_expr
 }
 
-fn map_equality_condition(field: &AliasedScalar, order_column: Column<'static>) -> Expression<'static> {
+fn map_equality_condition(
+    field: &AliasedScalar,
+    order_column: impl Comparable<'static> + Clone,
+) -> Expression<'static> {
     let (field, field_alias) = field;
     let cmp_column = Column::from((ORDER_TABLE_ALIAS, field_alias.to_owned()));
 
@@ -375,10 +378,21 @@ fn order_definitions(
             format!("{}_{}_{}", order_by.field.model().name, order_by.field.name, index).to_owned(),
         );
 
+        // We coalesce the order_column if it's an order by aggregate
+        // To prevent from having null comparisons against the `order_cmp` table
+        let order_column = if order_by.sort_aggregation.is_some() {
+            let coalesce_exprs: Vec<Expression> =
+                vec![joins_for_hop.order_column.clone().into(), Value::integer(0).into()];
+
+            coalesce(coalesce_exprs).into()
+        } else {
+            joins_for_hop.order_column.clone().into()
+        };
+
         orderings.push(CursorOrderDefinition {
             field_aliased,
             sort_order: order_by.sort_order,
-            order_column: joins_for_hop.order_column.clone(),
+            order_column,
             fks,
         });
     }
@@ -393,7 +407,7 @@ fn order_definitions(
                 CursorOrderDefinition {
                     field_aliased,
                     sort_order: SortOrder::Ascending,
-                    order_column: f.as_column(),
+                    order_column: f.as_column().into(),
                     fks: None,
                 }
             })

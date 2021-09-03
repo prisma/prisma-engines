@@ -1,12 +1,9 @@
 use crate::introspection_helpers::replace_field_names;
-use crate::warnings::*;
-use crate::PreviewFeature::NamedConstraints;
-use crate::SqlFamilyTrait;
+use crate::{warnings::*, SqlFamilyTrait};
 use datamodel::{Datamodel, DefaultValue, FieldType, Ignorable, ValueGenerator};
 use introspection_connector::{IntrospectionContext, Warning};
 use prisma_value::PrismaValue;
-use std::cmp::Ordering;
-use std::cmp::Ordering::{Equal, Greater, Less};
+use std::cmp::Ordering::{self, Equal, Greater, Less};
 
 pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, ctx: &IntrospectionContext) -> Vec<Warning> {
     let mut warnings = vec![];
@@ -46,62 +43,60 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, ctx: &
 
     let mut changed_index_names = vec![];
     let mut changed_primary_key_names = vec![];
-    if ctx.preview_features.contains(NamedConstraints) {
-        //custom index names
-        {
-            for model in new_data_model.models() {
-                if let Some(old_model) = &old_data_model.find_model(&model.name) {
-                    for index in &model.indices {
-                        if let Some(old_index) = old_model.indices.iter().find(|old| old.db_name == index.db_name) {
-                            if old_index.name.is_some() {
-                                let mf = ModelAndIndex::new(&model.name, old_index.db_name.as_ref().unwrap());
-                                changed_index_names.push((mf, old_index.name.clone()))
-                            }
+    //custom index names
+    {
+        for model in new_data_model.models() {
+            if let Some(old_model) = &old_data_model.find_model(&model.name) {
+                for index in &model.indices {
+                    if let Some(old_index) = old_model.indices.iter().find(|old| old.db_name == index.db_name) {
+                        if old_index.name.is_some() {
+                            let mf = ModelAndIndex::new(&model.name, old_index.db_name.as_ref().unwrap());
+                            changed_index_names.push((mf, old_index.name.clone()))
                         }
                     }
                 }
-            }
-
-            //change index name
-            for changed_index_name in &changed_index_names {
-                let index = new_data_model
-                    .find_model_mut(&changed_index_name.0.model)
-                    .indices
-                    .iter_mut()
-                    .find(|i| i.db_name == Some(changed_index_name.0.index_db_name.clone()))
-                    .unwrap();
-                index.name = changed_index_name.1.clone();
             }
         }
 
-        //custom primary key names
-        {
-            for model in new_data_model.models() {
-                if let Some(old_model) = &old_data_model.find_model(&model.name) {
-                    if let Some(primary_key) = &model.primary_key {
-                        if let Some(old_primary_key) = &old_model.primary_key {
-                            if old_primary_key.fields == primary_key.fields
-                                && (old_primary_key.db_name == primary_key.db_name || primary_key.db_name.is_none())
-                                && old_primary_key.name.is_some()
-                            {
-                                let mf = Model::new(&model.name);
-                                changed_primary_key_names.push((mf, old_primary_key.name.clone()))
-                            }
+        //change index name
+        for changed_index_name in &changed_index_names {
+            let index = new_data_model
+                .find_model_mut(&changed_index_name.0.model)
+                .indices
+                .iter_mut()
+                .find(|i| i.db_name == Some(changed_index_name.0.index_db_name.clone()))
+                .unwrap();
+            index.name = changed_index_name.1.clone();
+        }
+    }
+
+    //custom primary key names
+    {
+        for model in new_data_model.models() {
+            if let Some(old_model) = &old_data_model.find_model(&model.name) {
+                if let Some(primary_key) = &model.primary_key {
+                    if let Some(old_primary_key) = &old_model.primary_key {
+                        if old_primary_key.fields == primary_key.fields
+                            && (old_primary_key.db_name == primary_key.db_name || primary_key.db_name.is_none())
+                            && old_primary_key.name.is_some()
+                        {
+                            let mf = Model::new(&model.name);
+                            changed_primary_key_names.push((mf, old_primary_key.name.clone()))
                         }
                     }
                 }
             }
+        }
 
-            //change primary key names
-            for changed_primary_key_name in &changed_primary_key_names {
-                let pk = new_data_model
-                    .find_model_mut(&changed_primary_key_name.0.model)
-                    .primary_key
-                    .as_mut();
+        //change primary key names
+        for changed_primary_key_name in &changed_primary_key_names {
+            let pk = new_data_model
+                .find_model_mut(&changed_primary_key_name.0.model)
+                .primary_key
+                .as_mut();
 
-                if let Some(primary_key) = pk {
-                    primary_key.name = changed_primary_key_name.1.clone()
-                }
+            if let Some(primary_key) = pk {
+                primary_key.name = changed_primary_key_name.1.clone()
             }
         }
     }

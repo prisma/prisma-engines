@@ -12,7 +12,7 @@ use regex::Regex;
 use std::{
     any::type_name,
     borrow::Cow,
-    collections::{BTreeMap, HashMap, HashSet},
+    collections::{BTreeMap, HashSet},
     convert::TryInto,
 };
 use tracing::{debug, trace};
@@ -220,9 +220,9 @@ impl<'a> SqlSchemaDescriber<'a> {
     fn get_table(
         &self,
         name: &str,
-        columns: &mut HashMap<String, Vec<Column>>,
-        indexes: &mut HashMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)>,
-        foreign_keys: &mut HashMap<String, Vec<ForeignKey>>,
+        columns: &mut BTreeMap<String, Vec<Column>>,
+        indexes: &mut BTreeMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)>,
+        foreign_keys: &mut BTreeMap<String, Vec<ForeignKey>>,
     ) -> Table {
         let columns = columns.remove(name).unwrap_or_default();
         let (indices, primary_key) = indexes.remove(name).unwrap_or_else(|| (BTreeMap::new(), None));
@@ -238,7 +238,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         }
     }
 
-    async fn get_all_columns(&self, schema: &str) -> DescriberResult<HashMap<String, Vec<Column>>> {
+    async fn get_all_columns(&self, schema: &str) -> DescriberResult<BTreeMap<String, Vec<Column>>> {
         let sql = indoc! {r#"
             SELECT c.name                                                       AS column_name,
                 CASE typ.is_assembly_type
@@ -265,7 +265,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             ORDER BY COLUMNPROPERTY(c.object_id, c.name, 'ordinal');
         "#};
 
-        let mut map = HashMap::new();
+        let mut map = BTreeMap::new();
         let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
 
         for col in rows {
@@ -372,8 +372,8 @@ impl<'a> SqlSchemaDescriber<'a> {
     async fn get_all_indices(
         &self,
         schema: &str,
-    ) -> DescriberResult<HashMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)>> {
-        let mut map = HashMap::new();
+    ) -> DescriberResult<BTreeMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)>> {
+        let mut map = BTreeMap::new();
         let mut indexes_with_expressions: HashSet<(String, String)> = HashSet::new();
 
         let sql = indoc! {r#"
@@ -570,10 +570,10 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(types)
     }
 
-    async fn get_foreign_keys(&self, schema: &str) -> DescriberResult<HashMap<String, Vec<ForeignKey>>> {
+    async fn get_foreign_keys(&self, schema: &str) -> DescriberResult<BTreeMap<String, Vec<ForeignKey>>> {
         // Foreign keys covering multiple columns will return multiple rows, which we need to
         // merge.
-        let mut map: HashMap<String, HashMap<String, ForeignKey>> = HashMap::new();
+        let mut map: BTreeMap<String, BTreeMap<String, ForeignKey>> = BTreeMap::new();
 
         let sql = indoc! {r#"
             SELECT OBJECT_NAME(fkc.constraint_object_id) AS constraint_name,

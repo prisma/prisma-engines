@@ -8,7 +8,7 @@ use native_types::{NativeType, PostgresType};
 use quaint::{connector::ResultRow, prelude::Queryable};
 use regex::Regex;
 use serde_json::from_str;
-use std::{any::type_name, borrow::Cow, collections::HashMap, convert::TryInto};
+use std::{any::type_name, borrow::Cow, collections::BTreeMap, convert::TryInto};
 use tracing::trace;
 
 #[enumflags2::bitflags]
@@ -188,9 +188,9 @@ impl<'a> SqlSchemaDescriber<'a> {
     fn get_table(
         &self,
         name: &str,
-        columns: &mut HashMap<String, Vec<Column>>,
-        foreign_keys: &mut HashMap<String, Vec<ForeignKey>>,
-        indices: &mut HashMap<String, (Vec<Index>, Option<PrimaryKey>)>,
+        columns: &mut BTreeMap<String, Vec<Column>>,
+        foreign_keys: &mut BTreeMap<String, Vec<ForeignKey>>,
+        indices: &mut BTreeMap<String, (Vec<Index>, Option<PrimaryKey>)>,
     ) -> Table {
         let (indices, primary_key) = indices.remove(name).unwrap_or_else(|| (Vec::new(), None));
         let foreign_keys = foreign_keys.remove(name).unwrap_or_else(Vec::new);
@@ -230,8 +230,8 @@ impl<'a> SqlSchemaDescriber<'a> {
         schema: &str,
         enums: &[Enum],
         sequences: &[Sequence],
-    ) -> DescriberResult<HashMap<String, Vec<Column>>> {
-        let mut columns: HashMap<String, Vec<Column>> = HashMap::new();
+    ) -> DescriberResult<BTreeMap<String, Vec<Column>>> {
+        let mut columns: BTreeMap<String, Vec<Column>> = BTreeMap::new();
 
         let sql = r#"
             SELECT
@@ -362,7 +362,7 @@ impl<'a> SqlSchemaDescriber<'a> {
     }
 
     /// Returns a map from table name to foreign keys.
-    async fn get_foreign_keys(&self, schema: &str) -> DescriberResult<HashMap<String, Vec<ForeignKey>>> {
+    async fn get_foreign_keys(&self, schema: &str) -> DescriberResult<BTreeMap<String, Vec<ForeignKey>>> {
         // The `generate_subscripts` in the inner select is needed because the optimizer is free to reorganize the unnested rows if not explicitly ordered.
         let sql = r#"
             SELECT con.oid         as "con_id",
@@ -407,7 +407,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         // rows with the same ID, which we will have to combine into corresponding foreign key
         // objects.
         let result_set = self.conn.query_raw(sql, &[schema.into()]).await?;
-        let mut intermediate_fks: HashMap<i64, (String, ForeignKey)> = HashMap::new();
+        let mut intermediate_fks: BTreeMap<i64, (String, ForeignKey)> = BTreeMap::new();
         for row in result_set.into_iter() {
             trace!("Got description FK row {:?}", row);
             let id = row.get_expect_i64("con_id");
@@ -468,7 +468,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             };
         }
 
-        let mut fks = HashMap::new();
+        let mut fks = BTreeMap::new();
 
         for (table_name, fk) in intermediate_fks.into_iter().map(|(_k, v)| v) {
             let entry = fks.entry(table_name).or_insert_with(Vec::new);
@@ -495,8 +495,8 @@ impl<'a> SqlSchemaDescriber<'a> {
         &self,
         schema: &str,
         sequences: &[Sequence],
-    ) -> DescriberResult<HashMap<String, (Vec<Index>, Option<PrimaryKey>)>> {
-        let mut indexes_map = HashMap::new();
+    ) -> DescriberResult<BTreeMap<String, (Vec<Index>, Option<PrimaryKey>)>> {
+        let mut indexes_map = BTreeMap::new();
 
         let sql = r#"
         SELECT
@@ -635,7 +635,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             ORDER BY e.enumsortorder";
 
         let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
-        let mut enum_values: HashMap<String, Vec<String>> = HashMap::new();
+        let mut enum_values: BTreeMap<String, Vec<String>> = BTreeMap::new();
 
         for row in rows.into_iter() {
             trace!("Got enum row: {:?}", row);

@@ -4,7 +4,7 @@ use std::{
 };
 
 use datamodel_connector::ConnectorCapabilities;
-use napi::{CallContext, JsString, JsUnknown};
+use napi::{CallContext, JsString, JsUndefined, JsUnknown};
 use napi_derive::js_function;
 use prisma_models::DatamodelConverter;
 use query_core::{schema_builder, BuildMode, QuerySchemaRef};
@@ -102,4 +102,12 @@ pub fn get_config(ctx: CallContext) -> napi::Result<JsUnknown> {
 
     ctx.env.adjust_external_memory(s.len() as i64)?;
     ctx.env.to_js_value(&serialized)
+}
+
+#[js_function(0)]
+pub fn debug_panic(_: CallContext<'_>) -> napi::Result<JsUndefined> {
+    let user_facing = user_facing_errors::Error::from_panic_payload(Box::new("Debug panic"));
+    let message = serde_json::to_string(&user_facing).unwrap();
+
+    Err(napi::Error::from_reason(message))
 }

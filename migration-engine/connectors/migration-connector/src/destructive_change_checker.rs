@@ -16,7 +16,8 @@ pub trait DestructiveChangeChecker: Send + Sync {
     fn pure_check(&self, migration: &Migration) -> DestructiveChangeDiagnostics;
 }
 
-/// The errors and warnings emitted by the [DestructiveChangeChecker](trait.DestructiveChangeChecker.html).
+/// The errors and warnings emitted by the
+/// [DestructiveChangeChecker](trait.DestructiveChangeChecker.html).
 #[derive(Debug, Default)]
 pub struct DestructiveChangeDiagnostics {
     /// The warnings.

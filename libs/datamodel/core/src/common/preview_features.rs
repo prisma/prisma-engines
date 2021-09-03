@@ -73,13 +73,13 @@ pub static GENERATOR: Lazy<FeatureMap> = Lazy::new(|| {
             PlanetScaleMode,
             MongoDb,
             InteractiveTransactions,
-            NamedConstraints,
             FullTextSearch,
         ])
         .with_deprecated(vec![
             AtomicNumberOperations,
             AggregateApi,
             Middlewares,
+            NamedConstraints,
             NativeTypes,
             Distinct,
             ConnectOrCreate,

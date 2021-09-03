@@ -37,7 +37,7 @@ async fn remapping_fields_with_invalid_characters(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
                 t.add_column("_a", types::text());
                 t.add_column("*b", types::text());
                 t.add_column("?c", types::text());
@@ -47,6 +47,8 @@ async fn remapping_fields_with_invalid_characters(api: &TestApi) -> TestResult {
                 t.add_column("g a", types::text());
                 t.add_column("h-a", types::text());
                 t.add_column("h1", types::text());
+
+                t.add_constraint("User_pkey", types::primary_constraint(vec!["id"]));
             });
         })
         .await?;
@@ -82,11 +84,13 @@ async fn remapping_tables_with_invalid_characters(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("?User", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("?User_pkey", types::primary_constraint(vec!["id"]))
             });
 
             migration.create_table("User with Space", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("User with Space_pkey", types::primary_constraint(vec!["id"]))
             });
         })
         .await?;
@@ -110,7 +114,7 @@ async fn remapping_tables_with_invalid_characters(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(exclude(Mssql))]
+#[test_connector(exclude(Mssql, Sqlite))]
 async fn remapping_models_in_relations(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
@@ -145,8 +149,8 @@ async fn remapping_models_in_relations(api: &TestApi) -> TestResult {
     let expected = expect![[r#"
         model Post {
           id              Int             @id @default(autoincrement())
-          user_id         Int             @unique
-          User_with_Space User_with_Space @relation(fields: [user_id], references: [id])
+          user_id         Int             @unique(map: "post_user_unique")
+          User_with_Space User_with_Space @relation(fields: [user_id], references: [id], map: "asdf")
         }
 
         model User_with_Space {
@@ -162,18 +166,19 @@ async fn remapping_models_in_relations(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(exclude(Mssql))]
+#[test_connector(exclude(Mssql, Sqlite))]
 async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
     api.barrel()
         .execute(move |migration| {
             migration.create_table("User", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("User_pkey", types::primary_constraint(vec!["id"]))
             });
 
             migration.create_table("Post With Space", move |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
                 t.add_column("user_id", types::integer());
 
                 if sql_family.is_mysql() {
@@ -188,6 +193,7 @@ async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestA
 
 
                 t.add_constraint("post_user_unique", types::unique_constraint(vec!["user_id"]));
+                t.add_constraint("Post With Space_pkey", types::primary_constraint(vec!["id"]))
             });
         })
         .await?;
@@ -195,8 +201,8 @@ async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestA
     let expected = expect![[r#"
         model Post_With_Space {
           id      Int  @id @default(autoincrement())
-          user_id Int  @unique
-          User    User @relation(fields: [user_id], references: [id])
+          user_id Int  @unique(map: "post_user_unique")
+          User    User @relation(fields: [user_id], references: [id], map: "asdf")
 
           @@map("Post With Space")
         }
@@ -256,9 +262,9 @@ async fn remapping_fields_in_compound_relations(api: &TestApi) -> TestResult {
           id       Int  @id @default(autoincrement())
           user_id  Int
           user_age Int
-          User     User @relation(fields: [user_id, user_age], references: [id, age_that_is_invalid])
+          User     User @relation(fields: [user_id, user_age], references: [id, age_that_is_invalid], map: "asdf")
 
-          @@unique([user_id, user_age], name: "post_user_unique")
+          @@unique([user_id, user_age], map: "post_user_unique")
         }
 
         model User {
@@ -266,7 +272,7 @@ async fn remapping_fields_in_compound_relations(api: &TestApi) -> TestResult {
           age_that_is_invalid Int   @map("age-that-is-invalid")
           Post                Post?
 
-          @@unique([id, age_that_is_invalid], name: "user_unique")
+          @@unique([id, age_that_is_invalid], map: "user_unique")
         }
     "#]];
 
@@ -434,7 +440,7 @@ async fn remapping_compound_primary_keys(api: &TestApi) -> TestResult {
             migration.create_table("User", |t| {
                 t.add_column("first_name", types::integer());
                 t.add_column("last@name", types::integer());
-                t.set_primary_key(&["first_name", "last@name"]);
+                t.add_constraint("User_pkey", types::primary_constraint(vec!["first_name", "last@name"]));
             });
         })
         .await?;
@@ -453,7 +459,7 @@ async fn remapping_compound_primary_keys(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(preview_features("NamedConstraints"))]
+#[test_connector]
 async fn not_automatically_remapping_invalid_compound_unique_key_names(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -471,11 +477,6 @@ async fn not_automatically_remapping_invalid_compound_unique_key_names(api: &Tes
         .await?;
 
     let dm = indoc! {r#"
-         generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["NamedConstraints"]
-         }
-         
          model User {
              id     Int @id @default(autoincrement()) 
              first  Int
@@ -490,7 +491,7 @@ async fn not_automatically_remapping_invalid_compound_unique_key_names(api: &Tes
     Ok(())
 }
 
-#[test_connector(preview_features("NamedConstraints"))]
+#[test_connector]
 async fn not_automatically_remapping_invalid_compound_primary_key_names(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -512,11 +513,6 @@ async fn not_automatically_remapping_invalid_compound_primary_key_names(api: &Te
     };
 
     let dm = format! {r#"
-         generator js {{
-            provider = "prisma-client-js"
-            previewFeatures = ["NamedConstraints"]
-         }}
-
          model User {{
              first  Int
              last   Int

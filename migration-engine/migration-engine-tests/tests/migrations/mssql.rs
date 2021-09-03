@@ -1,4 +1,5 @@
-use migration_engine_tests::sync_test_api::*;
+use migration_connector::DiffTarget;
+use migration_engine_tests::test_api::*;
 
 #[test_connector(tags(Mssql))]
 fn reset_clears_udts(api: TestApi) {
@@ -35,11 +36,12 @@ fn shared_default_constraints_are_ignored_issue_5423(api: TestApi) {
 
     api.raw_cmd(&format!(
         r#"
-                CREATE TABLE [{0}].cats (
-                    id INT IDENTITY PRIMARY KEY,
-                    name NVARCHAR(255) NOT NULL
-                )
-            "#,
+            CREATE TABLE [{0}].cats (
+                id INT IDENTITY,
+                name NVARCHAR(255) NOT NULL,
+                CONSTRAINT [cats_pkey] PRIMARY KEY CLUSTERED ([id] ASC)
+            )
+        "#,
         schema
     ));
 
@@ -55,7 +57,7 @@ fn shared_default_constraints_are_ignored_issue_5423(api: TestApi) {
     api.schema_push_w_datasource(dm)
         .migration_id(Some("first"))
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_no_steps();
 }
 
@@ -126,4 +128,79 @@ fn mssql_apply_migrations_error_output(api: TestApi) {
         .trim_end_matches(|c| c == '\n' || c == ' ');
 
     expectation.assert_eq(first_segment)
+}
+
+#[test_connector(tags(Mssql))]
+fn foreign_key_renaming_to_default_works(api: TestApi) {
+    let setup = format!(
+        r#"
+        CREATE TABLE [{schema}].[food] (
+            id INTEGER IDENTITY,
+            CONSTRAINT [food_pkey] PRIMARY KEY (id)
+        );
+
+        CREATE TABLE [{schema}].[Dog] (
+            id INTEGER IDENTITY,
+            favourite_food_id INTEGER NOT NULL,
+            CONSTRAINT [Dog_pkey] PRIMARY KEY (id),
+            CONSTRAINT [favouriteFood] FOREIGN KEY ([favourite_food_id])
+                    REFERENCES [{schema}].[food]([id])
+                    ON UPDATE NO ACTION
+                    ON DELETE NO ACTION
+        );
+        "#,
+        schema = api.schema_name(),
+    );
+
+    api.raw_cmd(&setup);
+
+    let target_schema = r#"
+        datasource db {
+            provider = "sqlserver"
+            url = env("TEST_DATABASE_URL")
+        }
+
+        model Dog {
+            id                  Int @id @default(autoincrement())
+            favourite_food_id   Int
+            favouriteFood       food @relation(fields: [favourite_food_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+        }
+
+        model food {
+            id      Int @id @default(autoincrement())
+            dogs    Dog[]
+        }
+    "#;
+
+    let parsed = datamodel::parse_schema(target_schema).unwrap();
+    let migration = api.diff(DiffTarget::Database, DiffTarget::Datamodel((&parsed.0, &parsed.1)));
+    let expected = expect![[r#"
+        BEGIN TRY
+
+        BEGIN TRAN;
+
+        -- RenameForeignKey
+        EXEC sp_rename 'foreign_key_renaming_to_default_works.favouriteFood', 'Dog_favourite_food_id_fkey', 'OBJECT';
+
+        COMMIT TRAN;
+
+        END TRY
+        BEGIN CATCH
+
+        IF @@TRANCOUNT > 0
+        BEGIN
+            ROLLBACK TRAN;
+        END;
+        THROW
+
+        END CATCH
+    "#]];
+
+    expected.assert_eq(&migration);
+
+    // Check that the migration applies cleanly.
+    api.raw_cmd(&migration);
+
+    // Check that the migration is idempotent.
+    api.schema_push(target_schema).send().assert_green().assert_no_steps();
 }

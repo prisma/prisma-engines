@@ -387,7 +387,7 @@ mod tests {
                 ],
                 is_generated: false,
                 indices: vec![IndexDefinition {
-                    name: Some("unique_unique".to_string()),
+                    name: None,
                     db_name: Some("unique_unique".to_string()),
                     fields: vec!["unique".to_string()],
                     tpe: dml::IndexType::Unique,
@@ -756,7 +756,7 @@ mod tests {
                 ],
                 is_generated: false,
                 indices: vec![datamodel::dml::IndexDefinition {
-                    name: Some("name_last_name_unique".to_string()),
+                    name: None,
                     db_name: Some("name_last_name_unique".to_string()),
                     fields: vec!["name".to_string(), "lastname".to_string()],
                     tpe: datamodel::dml::IndexType::Unique,

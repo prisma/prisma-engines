@@ -8,15 +8,20 @@ async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestA
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("User_pkey", types::primary_constraint(vec!["id"]))
             });
 
             migration.create_table("Post With Space", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
                 t.add_column("user_id", types::integer());
-                t.add_foreign_key(&["user_id"], "User", &["id"]);
 
+                t.add_constraint(
+                    "user_id_fkey",
+                    types::foreign_constraint(&["user_id"], "User", &["id"], None, None),
+                );
                 t.add_constraint("post_user_unique", types::unique_constraint(vec!["user_id"]));
+                t.add_constraint("Post With Space_pkey", types::primary_constraint(vec!["id"]))
             });
         })
         .await?;
@@ -24,8 +29,8 @@ async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestA
     let expected = expect![[r#"
         model Post_With_Space {
           id      Int  @id @default(autoincrement())
-          user_id Int  @unique
-          User    User @relation(fields: [user_id], references: [id], onUpdate: NoAction)
+          user_id Int  @unique(map: "post_user_unique")
+          User    User @relation(fields: [user_id], references: [id], onUpdate: NoAction, map: "user_id_fkey")
 
           @@map("Post With Space")
         }
@@ -46,18 +51,23 @@ async fn remapping_models_in_relations(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User with Space", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("User with Space_pkey", types::primary_constraint(&["id"]));
             });
 
             migration.create_table("Post", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
                 t.add_column("user_id", types::integer());
-                t.add_foreign_key(&["user_id"], "User with Space", &["id"]);
 
+                t.add_constraint(
+                    "user_id_fkey",
+                    types::foreign_constraint(&["user_id"], "User with Space", &["id"], None, None),
+                );
                 t.add_constraint(
                     "post_user_unique",
                     types::unique_constraint(vec!["user_id"]).unique(true),
                 );
+                t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
             });
         })
         .await?;
@@ -65,8 +75,8 @@ async fn remapping_models_in_relations(api: &TestApi) -> TestResult {
     let expected = expect![[r#"
         model Post {
           id              Int             @id @default(autoincrement())
-          user_id         Int             @unique
-          User_with_Space User_with_Space @relation(fields: [user_id], references: [id], onUpdate: NoAction)
+          user_id         Int             @unique(map: "post_user_unique")
+          User_with_Space User_with_Space @relation(fields: [user_id], references: [id], onUpdate: NoAction, map: "user_id_fkey")
         }
 
         model User_with_Space {
@@ -87,26 +97,37 @@ async fn remapping_fields_in_compound_relations(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("User", move |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
                 t.add_column("age-that-is-invalid", types::integer());
 
                 t.add_constraint(
                     "user_unique",
                     types::unique_constraint(vec!["id", "age-that-is-invalid"]),
                 );
+                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
             });
 
             migration.create_table("Post", move |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
                 t.add_column("user_id", types::integer());
                 t.add_column("user_age", types::integer());
 
-                t.add_foreign_key(&["user_id", "user_age"], "User", &["id", "age-that-is-invalid"]);
+                t.add_constraint(
+                    "Post_fkey",
+                    types::foreign_constraint(
+                        &["user_id", "user_age"],
+                        "User",
+                        &["id", "age-that-is-invalid"],
+                        None,
+                        None,
+                    ),
+                );
 
                 t.add_constraint(
                     "post_user_unique",
                     types::unique_constraint(vec!["user_id", "user_age"]),
                 );
+                t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
             });
         })
         .await?;
@@ -116,9 +137,9 @@ async fn remapping_fields_in_compound_relations(api: &TestApi) -> TestResult {
           id       Int  @id @default(autoincrement())
           user_id  Int
           user_age Int
-          User     User @relation(fields: [user_id, user_age], references: [id, age_that_is_invalid], onUpdate: NoAction)
+          User     User @relation(fields: [user_id, user_age], references: [id, age_that_is_invalid], onUpdate: NoAction, map: "Post_fkey")
 
-          @@unique([user_id, user_age], name: "post_user_unique")
+          @@unique([user_id, user_age], map: "post_user_unique")
         }
 
         model User {
@@ -126,7 +147,7 @@ async fn remapping_fields_in_compound_relations(api: &TestApi) -> TestResult {
           age_that_is_invalid Int   @map("age-that-is-invalid")
           Post                Post?
 
-          @@unique([id, age_that_is_invalid], name: "user_unique")
+          @@unique([id, age_that_is_invalid], map: "user_unique")
         }
     "#]];
 

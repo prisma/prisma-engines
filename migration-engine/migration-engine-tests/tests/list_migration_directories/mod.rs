@@ -1,4 +1,4 @@
-use migration_engine_tests::sync_test_api::*;
+use migration_engine_tests::test_api::*;
 
 #[test_connector]
 fn list_migration_directories_with_an_empty_migrations_folder_works(api: TestApi) {

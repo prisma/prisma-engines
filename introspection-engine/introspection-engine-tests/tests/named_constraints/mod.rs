@@ -12,7 +12,7 @@ use introspection_engine_tests::TestResult;
 use quaint::prelude::Queryable;
 use test_macros::test_connector;
 
-#[test_connector(preview_features("NamedConstraints"), tags(Mssql, Postgres))]
+#[test_connector(tags(Mssql, Postgres))]
 async fn introspecting_non_default_pkey_names_works(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -47,7 +47,7 @@ async fn introspecting_non_default_pkey_names_works(api: &TestApi) -> TestResult
     Ok(())
 }
 
-#[test_connector(preview_features("NamedConstraints"), tags(Mssql, Postgres))]
+#[test_connector(tags(Mssql, Postgres))]
 async fn introspecting_default_pkey_names_works(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -82,7 +82,7 @@ async fn introspecting_default_pkey_names_works(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(preview_features("NamedConstraints"), tags(Mssql, Postgres))]
+#[test_connector(tags(Mssql, Postgres))]
 async fn introspecting_non_default_unique_constraint_names_works(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -117,7 +117,7 @@ async fn introspecting_non_default_unique_constraint_names_works(api: &TestApi) 
     Ok(())
 }
 
-#[test_connector(preview_features("NamedConstraints"), tags(Mssql, Postgres))]
+#[test_connector(tags(Mssql, Postgres))]
 async fn introspecting_default_unique_names_works(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -152,7 +152,7 @@ async fn introspecting_default_unique_names_works(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(preview_features("NamedConstraints"), tags(Mssql, Postgres))]
+#[test_connector(tags(Mssql, Postgres))]
 async fn introspecting_non_default_index_names_works(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -193,7 +193,7 @@ async fn introspecting_non_default_index_names_works(api: &TestApi) -> TestResul
     Ok(())
 }
 
-#[test_connector(preview_features("NamedConstraints"), tags(Mssql, Postgres))]
+#[test_connector(tags(Mssql, Postgres))]
 async fn introspecting_default_index_names_works(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -234,7 +234,7 @@ async fn introspecting_default_index_names_works(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(preview_features("NamedConstraints"), exclude(Mssql, Mysql))]
+#[test_connector(exclude(Mssql, Mysql))]
 async fn introspecting_default_fk_names_works(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
@@ -276,7 +276,7 @@ async fn introspecting_default_fk_names_works(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(preview_features("NamedConstraints"), exclude(Sqlite, Mssql, Mysql))]
+#[test_connector(exclude(Sqlite, Mssql, Mysql))]
 async fn introspecting_custom_fk_names_works(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
@@ -318,7 +318,7 @@ async fn introspecting_custom_fk_names_works(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(preview_features("NamedConstraints"), tags(Mssql))]
+#[test_connector(tags(Mssql))]
 async fn introspecting_custom_default_names_should_output_to_dml(api: &TestApi) -> TestResult {
     let create_table = format!(
         "CREATE TABLE [{}].[custom_defaults_test] (id INT CONSTRAINT pk_meow PRIMARY KEY, data NVARCHAR(255) CONSTRAINT meow DEFAULT 'foo')",
@@ -339,7 +339,7 @@ async fn introspecting_custom_default_names_should_output_to_dml(api: &TestApi) 
     Ok(())
 }
 
-#[test_connector(preview_features("NamedConstraints"), tags(Mssql))]
+#[test_connector(tags(Mssql))]
 async fn introspecting_default_default_names_should_not_output_to_dml(api: &TestApi) -> TestResult {
     let create_table = format!(
         "CREATE TABLE [{}].[custom_defaults_test] (id INT CONSTRAINT pk_meow PRIMARY KEY, data NVARCHAR(255) CONSTRAINT custom_defaults_test_data_df DEFAULT 'foo')",

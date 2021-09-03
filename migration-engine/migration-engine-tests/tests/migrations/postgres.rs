@@ -1,4 +1,5 @@
-use migration_engine_tests::sync_test_api::*;
+use migration_connector::DiffTarget;
+use migration_engine_tests::test_api::*;
 use sql_schema_describer::ColumnTypeFamily;
 use std::fmt::Write;
 
@@ -18,7 +19,7 @@ fn enums_can_be_dropped_on_postgres(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
     api.assert_schema()
         .assert_enum("CatMood", |r#enum| r#enum.assert_values(&["ANGRY", "HUNGRY", "CUDDLY"]));
 
@@ -29,7 +30,7 @@ fn enums_can_be_dropped_on_postgres(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green();
     api.assert_schema().assert_has_no_enum("CatMood");
 }
 
@@ -48,7 +49,7 @@ fn adding_a_scalar_list_for_a_model_with_id_type_int_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.assert_schema().assert_table("A", |table| {
         table
@@ -70,10 +71,7 @@ fn existing_postgis_tables_must_not_be_migrated(api: TestApi) {
     "#;
 
     api.raw_cmd(create_tables);
-    api.schema_push_w_datasource("")
-        .send()
-        .assert_green_bang()
-        .assert_no_steps();
+    api.schema_push_w_datasource("").send().assert_green().assert_no_steps();
 
     api.assert_schema()
         .assert_has_table("spatial_ref_sys")
@@ -91,10 +89,7 @@ fn existing_postgis_views_must_not_be_migrated(api: TestApi) {
     "#;
 
     api.raw_cmd(create_views);
-    api.schema_push_w_datasource("")
-        .send()
-        .assert_green_bang()
-        .assert_no_steps();
+    api.schema_push_w_datasource("").send().assert_green().assert_no_steps();
 }
 
 #[test_connector(tags(Postgres))]
@@ -143,7 +138,7 @@ fn native_type_columns_can_be_created(api: TestApi) {
 
     dm.push_str("}\n");
 
-    api.schema_push_w_datasource(&dm).send().assert_green_bang();
+    api.schema_push_w_datasource(&dm).send().assert_green();
 
     api.assert_schema().assert_table("A", |table| {
         types.iter().fold(
@@ -154,10 +149,7 @@ fn native_type_columns_can_be_created(api: TestApi) {
         )
     });
 
-    api.schema_push_w_datasource(dm)
-        .send()
-        .assert_green_bang()
-        .assert_no_steps();
+    api.schema_push_w_datasource(dm).send().assert_green().assert_no_steps();
 }
 
 #[test_connector(tags(Postgres))]
@@ -172,21 +164,21 @@ fn uuids_do_not_generate_drift_issue_5282(api: TestApi) {
 
     let dm = r#"
         model a {
-            id String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+            id String @id(map: "a_pkey") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
             b  b[]
         }
 
         model b {
-            id   String  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+            id   String  @id(map: "b_pkey") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
             a_id String? @db.Uuid
-            a    a?      @relation(fields: [a_id], references: [id])
+            a    a?      @relation(fields: [a_id], references: [id], map: "aaa")
         }
         "#;
 
     api.schema_push_w_datasource(dm)
         .migration_id(Some("first"))
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_no_steps();
 }
 
@@ -202,12 +194,9 @@ fn functions_with_schema_prefix_in_dbgenerated_are_idempotent(api: TestApi) {
 
     api.schema_push_w_datasource(dm)
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_has_executed_steps();
-    api.schema_push_w_datasource(dm)
-        .send()
-        .assert_green_bang()
-        .assert_no_steps();
+    api.schema_push_w_datasource(dm).send().assert_green().assert_no_steps();
 }
 
 #[test_connector(tags(Postgres))]
@@ -342,14 +331,14 @@ fn citext_to_text_and_back_works(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.raw_cmd("INSERT INTO \"User\" (name) VALUES ('myCat'), ('myDog'), ('yourDog');");
 
     // TEXT -> CITEXT
     api.schema_push_w_datasource(dm2)
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_has_executed_steps();
 
     api.dump_table("User")
@@ -359,10 +348,63 @@ fn citext_to_text_and_back_works(api: TestApi) {
     // CITEXT -> TEXT
     api.schema_push_w_datasource(dm1)
         .send()
-        .assert_green_bang()
+        .assert_green()
         .assert_has_executed_steps();
 
     api.dump_table("User")
         .assert_row_count(3)
         .assert_first_row(|row| row.assert_text_value("name", "myCat"));
+}
+
+#[test_connector(tags(Postgres))]
+fn foreign_key_renaming_to_default_works(api: TestApi) {
+    let setup = r#"
+        CREATE TABLE "food" (
+            id SERIAL PRIMARY KEY
+        );
+
+        CREATE TABLE "Dog" (
+            id SERIAL PRIMARY KEY,
+            favourite_food_id INTEGER NOT NULL,
+            CONSTRAINT "favouriteFood" FOREIGN KEY ("favourite_food_id")
+                    REFERENCES "food"("id")
+                    ON DELETE RESTRICT
+                    ON UPDATE CASCADE
+        );
+    "#;
+
+    api.raw_cmd(setup);
+
+    let target_schema = r#"
+        datasource db {
+            provider = "postgresql"
+            url = env("TEST_DATABASE_URL")
+        }
+
+        model Dog {
+            id                  Int @id @default(autoincrement())
+            favourite_food_id   Int
+            favouriteFood       food @relation(fields: [favourite_food_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
+        }
+
+        model food {
+            id      Int @id @default(autoincrement())
+            dogs    Dog[]
+        }
+    "#;
+
+    let parsed = datamodel::parse_schema(target_schema).unwrap();
+    let migration = api.diff(DiffTarget::Database, DiffTarget::Datamodel((&parsed.0, &parsed.1)));
+    let expected = expect![[r#"
+        -- RenameForeignKey
+        ALTER TABLE "Dog" RENAME CONSTRAINT "favouriteFood" TO "Dog_favourite_food_id_fkey";
+    "#]];
+
+    expected.assert_eq(&migration);
+
+    // Check that the migration applies cleanly.
+    api.raw_cmd(&migration);
+
+    // Check that the migration is idempotent.
+    api.schema_push(target_schema).send().assert_green().assert_no_steps();
 }

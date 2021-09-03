@@ -209,6 +209,10 @@ impl SqlRenderer for SqliteFlavour {
     fn render_drop_user_defined_type(&self, _: &UserDefinedTypeWalker<'_>) -> String {
         unreachable!("render_drop_user_defined_type on SQLite")
     }
+
+    fn render_rename_foreign_key(&self, _fks: &Pair<ForeignKeyWalker<'_>>) -> String {
+        unreachable!("render RenameForeignKey on SQLite")
+    }
 }
 
 fn render_column_type(t: &ColumnType) -> &str {

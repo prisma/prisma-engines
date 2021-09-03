@@ -287,14 +287,14 @@ mod order_by_aggr {
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"{
-            findManyUser(orderBy: { posts: { _count: asc } }, cursor: { id: 2 }) {
+            findManyUser(orderBy: { posts: { _count: asc } }, cursor: { id: 1 }) {
               id
               posts {
-                title
+                id
               }
             }
           }"#),
-          @r###"{"data":{"findManyUser":[{"id":2,"posts":[{"title":"bob_post_1"},{"title":"bob_post_2"}]}]}}"###
+          @r###"{"data":{"findManyUser":[{"id":1,"posts":[{"id":1}]},{"id":2,"posts":[{"id":2},{"id":3}]}]}}"###
         );
 
         Ok(())
@@ -310,11 +310,11 @@ mod order_by_aggr {
             findManyUser(orderBy: { posts: { _count: desc } }, cursor: { id: 1 }) {
               id
               posts {
-                title
+                id
               }
             }
           }"#),
-          @r###"{"data":{"findManyUser":[{"id":1,"posts":[{"title":"alice_post_1"}]}]}}"###
+          @r###"{"data":{"findManyUser":[{"id":1,"posts":[{"id":1}]},{"id":3,"posts":[]}]}}"###
         );
 
         Ok(())

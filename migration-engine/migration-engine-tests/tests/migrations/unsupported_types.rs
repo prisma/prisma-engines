@@ -1,4 +1,4 @@
-use migration_engine_tests::sync_test_api::*;
+use migration_engine_tests::test_api::*;
 use prisma_value::PrismaValue;
 use sql_schema_describer::ColumnTypeFamily;
 
@@ -20,7 +20,7 @@ fn adding_an_unsupported_type_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     api.assert_schema().assert_table("Post", |table| {
         table
@@ -57,7 +57,7 @@ fn switching_an_unsupported_type_to_supported_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.assert_schema().assert_table("Post", |table| {
         table
@@ -83,7 +83,7 @@ fn switching_an_unsupported_type_to_supported_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green();
 
     api.assert_schema().assert_table("Post", |table| {
         table
@@ -116,7 +116,7 @@ fn adding_and_removing_properties_on_unsupported_should_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.assert_schema().assert_table("Post", |table| {
         table
@@ -182,7 +182,7 @@ fn adding_and_removing_properties_on_unsupported_should_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm3).send().assert_green_bang();
+    api.schema_push_w_datasource(dm3).send().assert_green();
 
     api.assert_schema().assert_table("Post", |table| {
         table
@@ -222,5 +222,5 @@ fn using_unsupported_and_ignore_should_work(api: TestApi) {
         unsupported_type
     );
 
-    api.schema_push_w_datasource(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 }

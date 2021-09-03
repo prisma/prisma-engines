@@ -1,8 +1,20 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schemas::json), only(Postgres, MySql(5.7, 8, "mariadb")))]
+#[test_suite(schema(schemas::json), only(Postgres))]
 mod json_path {
+    use indoc::indoc;
     use query_engine_tests::{assert_error, is_one_of, run_query, ConnectorTag, MySqlVersion, Runner};
+
+    fn pg_json() -> String {
+        let schema = indoc! {
+            r#"model TestModel {
+                #id(id, Int, @id)
+                json Json @test.Json
+            }"#
+        };
+
+        schema.to_owned()
+    }
 
     #[connector_test]
     async fn no_path_without_filter(runner: Runner) -> TestResult<()> {
@@ -16,8 +28,7 @@ mod json_path {
         Ok(())
     }
 
-    #[connector_test(capabilities(JsonFilteringArrayPath))]
-    async fn extract_array_path(runner: Runner) -> TestResult<()> {
+    async fn extract_array_path_runner(runner: Runner) -> TestResult<()> {
         create_row(&runner, 1, r#"{ \"a\": { \"b\": \"c\" } }"#, false).await?;
         create_row(&runner, 2, r#"{ \"a\": { \"b\": [1, 2, 3] } }"#, false).await?;
         create_row(&runner, 3, r#"{ \"a\": { \"b\": null } }"#, false).await?;
@@ -75,6 +86,20 @@ mod json_path {
         Ok(())
     }
 
+    #[connector_test(schema(pg_json), capabilities(JsonFilteringArrayPath))]
+    async fn extract_array_path_pg_json(runner: Runner) -> TestResult<()> {
+        extract_array_path_runner(runner).await?;
+
+        Ok(())
+    }
+
+    #[connector_test(capabilities(JsonFilteringArrayPath))]
+    async fn extract_array_path(runner: Runner) -> TestResult<()> {
+        extract_array_path_runner(runner).await?;
+
+        Ok(())
+    }
+
     #[connector_test(capabilities(JsonFilteringJsonPath), only(MySql(5.7), MySql(8)))]
     async fn extract_json_path(runner: Runner) -> TestResult<()> {
         create_row(&runner, 1, r#"{ \"a\": { \"b\": \"c\" } }"#, false).await?;
@@ -127,8 +152,7 @@ mod json_path {
         Ok(())
     }
 
-    #[connector_test]
-    async fn array_contains(runner: Runner) -> TestResult<()> {
+    async fn array_contains_runner(runner: Runner) -> TestResult<()> {
         create_row(&runner, 1, r#"[1, 2, 3]"#, true).await?;
         create_row(&runner, 2, r#"[3, 4, 5]"#, true).await?;
         create_row(&runner, 3, r#"3"#, true).await?;
@@ -204,8 +228,21 @@ mod json_path {
         Ok(())
     }
 
+    #[connector_test(schema(pg_json), only(Postgres))]
+    async fn array_contains_pg_json(runner: Runner) -> TestResult<()> {
+        array_contains_runner(runner).await?;
+
+        Ok(())
+    }
+
     #[connector_test]
-    async fn array_starts_with(runner: Runner) -> TestResult<()> {
+    async fn array_contains(runner: Runner) -> TestResult<()> {
+        array_contains_runner(runner).await?;
+
+        Ok(())
+    }
+
+    async fn array_starts_with_runner(runner: Runner) -> TestResult<()> {
         create_row(&runner, 1, r#"[1, 2, 3]"#, true).await?;
         create_row(&runner, 2, r#"[3, 4, 5]"#, true).await?;
         create_row(&runner, 3, r#"3"#, true).await?;
@@ -259,8 +296,21 @@ mod json_path {
         Ok(())
     }
 
+    #[connector_test(schema(pg_json), only(Postgres))]
+    async fn array_starts_with_pg_json(runner: Runner) -> TestResult<()> {
+        array_starts_with_runner(runner).await?;
+
+        Ok(())
+    }
+
     #[connector_test]
-    async fn array_ends_with(runner: Runner) -> TestResult<()> {
+    async fn array_starts_with(runner: Runner) -> TestResult<()> {
+        array_starts_with_runner(runner).await?;
+
+        Ok(())
+    }
+
+    async fn array_ends_with_runner(runner: Runner) -> TestResult<()> {
         create_row(&runner, 1, r#"[1, 2, 3]"#, true).await?;
         create_row(&runner, 2, r#"[3, 4, 5]"#, true).await?;
         create_row(&runner, 3, r#"[\"a\", \"b\"]"#, true).await?;
@@ -312,8 +362,21 @@ mod json_path {
         Ok(())
     }
 
+    #[connector_test(schema(pg_json), only(Postgres))]
+    async fn array_ends_with_pg_json(runner: Runner) -> TestResult<()> {
+        array_ends_with_runner(runner).await?;
+
+        Ok(())
+    }
+
     #[connector_test]
-    async fn string_contains(runner: Runner) -> TestResult<()> {
+    async fn array_ends_with(runner: Runner) -> TestResult<()> {
+        array_ends_with_runner(runner).await?;
+
+        Ok(())
+    }
+
+    async fn string_contains_runner(runner: Runner) -> TestResult<()> {
         create_row(&runner, 1, r#"\"foo\""#, true).await?;
         create_row(&runner, 2, r#"\"fool\""#, true).await?;
         create_row(&runner, 3, r#"[\"foo\"]"#, true).await?;
@@ -328,8 +391,21 @@ mod json_path {
         Ok(())
     }
 
+    #[connector_test(schema(pg_json), only(Postgres))]
+    async fn string_contains_pg_json(runner: Runner) -> TestResult<()> {
+        string_contains_runner(runner).await?;
+
+        Ok(())
+    }
+
     #[connector_test]
-    async fn string_starts_with(runner: Runner) -> TestResult<()> {
+    async fn string_contains(runner: Runner) -> TestResult<()> {
+        string_contains_runner(runner).await?;
+
+        Ok(())
+    }
+
+    async fn string_starts_with_runner(runner: Runner) -> TestResult<()> {
         create_row(&runner, 1, r#"\"foo\""#, true).await?;
         create_row(&runner, 2, r#"\"fool\""#, true).await?;
         create_row(&runner, 3, r#"[\"foo\"]"#, true).await?;
@@ -344,8 +420,21 @@ mod json_path {
         Ok(())
     }
 
+    #[connector_test(schema(pg_json), only(Postgres))]
+    async fn string_starts_with_pg_json(runner: Runner) -> TestResult<()> {
+        string_starts_with_runner(runner).await?;
+
+        Ok(())
+    }
+
     #[connector_test]
-    async fn string_ends_with(runner: Runner) -> TestResult<()> {
+    async fn string_starts_with(runner: Runner) -> TestResult<()> {
+        string_starts_with_runner(runner).await?;
+
+        Ok(())
+    }
+
+    async fn string_ends_with_runner(runner: Runner) -> TestResult<()> {
         create_row(&runner, 1, r#"\"foo\""#, true).await?;
         create_row(&runner, 2, r#"\"fool\""#, true).await?;
         create_row(&runner, 3, r#"[\"foo\"]"#, true).await?;
@@ -360,8 +449,21 @@ mod json_path {
         Ok(())
     }
 
+    #[connector_test(schema(pg_json), only(Postgres))]
+    async fn string_ends_with_pg_json(runner: Runner) -> TestResult<()> {
+        string_ends_with_runner(runner).await?;
+
+        Ok(())
+    }
+
     #[connector_test]
-    async fn gt_gte(runner: Runner) -> TestResult<()> {
+    async fn string_ends_with(runner: Runner) -> TestResult<()> {
+        string_ends_with_runner(runner).await?;
+
+        Ok(())
+    }
+
+    async fn gt_gte_runner(runner: Runner) -> TestResult<()> {
         create_row(&runner, 1, r#"\"foo\""#, true).await?;
         create_row(&runner, 2, r#"\"bar\""#, true).await?;
         create_row(&runner, 3, r#"1"#, true).await?;
@@ -405,8 +507,21 @@ mod json_path {
         Ok(())
     }
 
+    #[connector_test(schema(pg_json), only(Postgres))]
+    async fn gt_gte_pg_json(runner: Runner) -> TestResult<()> {
+        gt_gte_runner(runner).await?;
+
+        Ok(())
+    }
+
     #[connector_test]
-    async fn lt_lte(runner: Runner) -> TestResult<()> {
+    async fn gt_gte(runner: Runner) -> TestResult<()> {
+        gt_gte_runner(runner).await?;
+
+        Ok(())
+    }
+
+    async fn lt_lte_runner(runner: Runner) -> TestResult<()> {
         create_row(&runner, 1, r#"\"foo\""#, true).await?;
         create_row(&runner, 2, r#"\"bar\""#, true).await?;
         create_row(&runner, 3, r#"1"#, true).await?;
@@ -450,8 +565,21 @@ mod json_path {
         Ok(())
     }
 
+    #[connector_test(schema(pg_json), only(Postgres))]
+    async fn lt_lte_pg_json(runner: Runner) -> TestResult<()> {
+        lt_lte_runner(runner).await?;
+
+        Ok(())
+    }
+
     #[connector_test]
-    async fn multi_filtering(runner: Runner) -> TestResult<()> {
+    async fn lt_lte(runner: Runner) -> TestResult<()> {
+        lt_lte_runner(runner).await?;
+
+        Ok(())
+    }
+
+    async fn multi_filtering_runner(runner: Runner) -> TestResult<()> {
         create_row(&runner, 1, r#"[1, 2, 3]"#, true).await?;
         create_row(&runner, 2, r#"[3, 4, 5]"#, true).await?;
         create_row(&runner, 3, r#"[3, 4, 6]"#, true).await?;
@@ -490,6 +618,20 @@ mod json_path {
             ),
             @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":1}}"},{"json":"{\"a\":{\"b\":2.4}}"}]}}"###
         );
+
+        Ok(())
+    }
+
+    #[connector_test(schema(pg_json), only(Postgres))]
+    async fn multi_filtering_pg_json(runner: Runner) -> TestResult<()> {
+        multi_filtering_runner(runner).await?;
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn multi_filtering(runner: Runner) -> TestResult<()> {
+        multi_filtering_runner(runner).await?;
 
         Ok(())
     }
