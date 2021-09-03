@@ -1,7 +1,7 @@
 use datamodel_connector::{
     connector_error::ConnectorError,
     helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32},
-    Connector, ConnectorCapability,
+    Connector, ConnectorCapability, ReferentialIntegrity,
 };
 use dml::{
     field::{Field, FieldType},
@@ -44,15 +44,13 @@ const JSON_B_TYPE_NAME: &str = "JsonB";
 pub struct PostgresDatamodelConnector {
     capabilities: Vec<ConnectorCapability>,
     constructors: Vec<NativeTypeConstructor>,
-    referential_actions: BitFlags<ReferentialAction>,
+    referential_integrity: ReferentialIntegrity,
 }
 
 //todo should this also contain the pretty printed output for SQL rendering?
 impl PostgresDatamodelConnector {
-    pub fn new() -> PostgresDatamodelConnector {
-        use ReferentialAction::*;
-
-        let capabilities = vec![
+    pub fn new(referential_integrity: ReferentialIntegrity) -> PostgresDatamodelConnector {
+        let mut capabilities = vec![
             ConnectorCapability::ScalarLists,
             ConnectorCapability::Enums,
             ConnectorCapability::Json,
@@ -69,15 +67,17 @@ impl PostgresDatamodelConnector {
             ConnectorCapability::CreateManyWriteableAutoIncId,
             ConnectorCapability::AutoIncrement,
             ConnectorCapability::CompoundIds,
-            ConnectorCapability::ForeignKeys,
             ConnectorCapability::AnyId,
             ConnectorCapability::QueryRaw,
             ConnectorCapability::NamedPrimaryKeys,
             ConnectorCapability::NamedForeignKeys,
-            ConnectorCapability::ForeignKeys,
             ConnectorCapability::FullTextSearchWithoutIndex,
             ConnectorCapability::AdvancedJsonNullability,
         ];
+
+        if referential_integrity.uses_foreign_keys() {
+            capabilities.push(ConnectorCapability::ForeignKeys);
+        }
 
         let small_int = NativeTypeConstructor::without_args(SMALL_INT_TYPE_NAME, vec![ScalarType::Int]);
         let integer = NativeTypeConstructor::without_args(INTEGER_TYPE_NAME, vec![ScalarType::Int]);
@@ -136,12 +136,10 @@ impl PostgresDatamodelConnector {
             json_b,
         ];
 
-        let referential_actions = NoAction | Restrict | Cascade | SetNull | SetDefault;
-
         PostgresDatamodelConnector {
             capabilities,
             constructors,
-            referential_actions,
+            referential_integrity,
         }
     }
 }
@@ -175,7 +173,10 @@ impl Connector for PostgresDatamodelConnector {
     }
 
     fn referential_actions(&self) -> BitFlags<ReferentialAction> {
-        self.referential_actions
+        use ReferentialAction::*;
+
+        self.referential_integrity
+            .allowed_referential_actions(NoAction | Restrict | Cascade | SetNull | SetDefault)
     }
 
     fn scalar_type_for_native_type(&self, native_type: serde_json::Value) -> ScalarType {
@@ -371,11 +372,5 @@ impl Connector for PostgresDatamodelConnector {
         }
 
         Ok(())
-    }
-}
-
-impl Default for PostgresDatamodelConnector {
-    fn default() -> Self {
-        Self::new()
     }
 }

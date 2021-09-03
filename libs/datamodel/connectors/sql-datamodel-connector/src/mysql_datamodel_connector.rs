@@ -83,12 +83,11 @@ impl MySqlDatamodelConnector {
             ConnectorCapability::CompoundIds,
             ConnectorCapability::AnyId,
             ConnectorCapability::QueryRaw,
-            ConnectorCapability::ForeignKeys,
             ConnectorCapability::NamedForeignKeys,
             ConnectorCapability::AdvancedJsonNullability,
         ];
 
-        if matches!(referential_integrity, ReferentialIntegrity::ForeignKeys) {
+        if referential_integrity.uses_foreign_keys() {
             capabilities.push(ConnectorCapability::ForeignKeys);
         }
 

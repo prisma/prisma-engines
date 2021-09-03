@@ -1,7 +1,11 @@
+use std::fmt;
+
 use dml::relation_info::ReferentialAction;
-use enumflags2::BitFlags;
+use enumflags2::{bitflags, BitFlags};
 
 /// Defines the part of the stack where referential actions are handled.
+#[bitflags]
+#[repr(u8)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum ReferentialIntegrity {
     /// Enforced in the database. Needs support from the underlying database
@@ -37,5 +41,14 @@ impl ReferentialIntegrity {
 impl Default for ReferentialIntegrity {
     fn default() -> Self {
         Self::ForeignKeys
+    }
+}
+
+impl fmt::Display for ReferentialIntegrity {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            ReferentialIntegrity::ForeignKeys => write!(f, "foreignKeys"),
+            ReferentialIntegrity::Prisma => write!(f, "prisma"),
+        }
     }
 }

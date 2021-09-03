@@ -671,7 +671,8 @@ impl<'a> Validator<'a> {
                     && self
                         .source
                         .map(|source| &source.active_connector)
-                        .map(|connector| connector.has_capability(ConnectorCapability::ReferenceCycleDetection))
+                        .filter(|connector| connector.has_capability(ConnectorCapability::ReferenceCycleDetection))
+                        .map(|connector| connector.has_capability(ConnectorCapability::ForeignKeys))
                         .unwrap_or_default()
                 {
                     referential_actions::detect_cycles(datamodel, model, field, field_span, &mut errors);

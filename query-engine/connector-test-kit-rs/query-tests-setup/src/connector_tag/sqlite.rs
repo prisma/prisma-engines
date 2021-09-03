@@ -1,4 +1,4 @@
-use datamodel_connector::Connector;
+use datamodel_connector::{Connector, ReferentialIntegrity};
 use sql_datamodel_connector::SqliteDatamodelConnector;
 
 use super::*;
@@ -54,6 +54,6 @@ impl SqliteConnectorTag {
 }
 
 fn sqlite_capabilities() -> Vec<ConnectorCapability> {
-    let dm_connector = SqliteDatamodelConnector::new();
+    let dm_connector = SqliteDatamodelConnector::new(ReferentialIntegrity::default());
     dm_connector.capabilities().to_owned()
 }

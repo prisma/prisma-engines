@@ -25,7 +25,7 @@ mod tests {
             url: StringFromEnvVar::new_literal("test".to_string()),
             url_span: Span::empty(),
             documentation: None,
-            active_connector: Box::new(PostgresDatamodelConnector::new()),
+            active_connector: Box::new(PostgresDatamodelConnector::new(Default::default())),
             shadow_database_url: None,
             provider: "postgresql".to_string(),
             referential_integrity: ReferentialIntegrity::ForeignKeys,

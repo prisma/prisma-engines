@@ -155,16 +155,21 @@ impl DatasourceLoader {
         preview_features_guardrail(&args, diagnostics);
 
         let documentation = ast_source.documentation.as_ref().map(|comment| comment.text.clone());
-        let referential_integrity =
-            get_referential_integrity(&args, preview_features, ast_source, diagnostics).unwrap_or_default();
+        let referential_integrity = get_referential_integrity(&args, preview_features, ast_source, diagnostics);
 
         let datasource_provider: Box<dyn DatasourceProvider> = match provider {
-            p if p == MYSQL_SOURCE_NAME => Box::new(MySqlDatasourceProvider::new(referential_integrity)),
-            p if p == POSTGRES_SOURCE_NAME || p == POSTGRES_SOURCE_NAME_HEROKU => {
-                Box::new(PostgresDatasourceProvider::new())
+            p if p == MYSQL_SOURCE_NAME => {
+                Box::new(MySqlDatasourceProvider::new(referential_integrity.unwrap_or_default()))
             }
-            p if p == SQLITE_SOURCE_NAME => Box::new(SqliteDatasourceProvider::new()),
-            p if p == MSSQL_SOURCE_NAME => Box::new(MsSqlDatasourceProvider::new()),
+            p if p == POSTGRES_SOURCE_NAME || p == POSTGRES_SOURCE_NAME_HEROKU => Box::new(
+                PostgresDatasourceProvider::new(referential_integrity.unwrap_or_default()),
+            ),
+            p if p == SQLITE_SOURCE_NAME => {
+                Box::new(SqliteDatasourceProvider::new(referential_integrity.unwrap_or_default()))
+            }
+            p if p == MSSQL_SOURCE_NAME => {
+                Box::new(MsSqlDatasourceProvider::new(referential_integrity.unwrap_or_default()))
+            }
             p if p == MONGODB_SOURCE_NAME => Box::new(MongoDbDatasourceProvider::new()),
             _ => {
                 diagnostics.push_error(DatamodelError::new_datasource_provider_not_known_error(
@@ -175,6 +180,35 @@ impl DatasourceLoader {
                 return None;
             }
         };
+
+        let referential_integrity =
+            referential_integrity.unwrap_or_else(|| datasource_provider.default_referential_integrity());
+
+        if !datasource_provider
+            .allowed_referential_integrity_settings()
+            .contains(referential_integrity)
+        {
+            let span = args
+                .get("referentialIntegrity")
+                .map(|v| v.span())
+                .unwrap_or_else(Span::empty);
+
+            let supported_values = datasource_provider
+                .allowed_referential_integrity_settings()
+                .iter()
+                .map(|v| format!(r#""{}""#, v))
+                .collect::<Vec<_>>()
+                .join(", ");
+
+            let message = format!(
+                "Invalid referential integrity setting: \"{}\". Supported values: {}",
+                referential_integrity, supported_values,
+            );
+
+            let error = DatamodelError::new_source_validation_error(&message, "referentialIntegrity", span);
+
+            diagnostics.push_error(error);
+        }
 
         Some(Datasource {
             name: source_name.to_string(),
@@ -226,7 +260,9 @@ fn get_referential_integrity(
                         s
                     );
 
-                    let error = DatamodelError::new_source_validation_error(&message, "", value.span());
+                    let error =
+                        DatamodelError::new_source_validation_error(&message, "referentialIntegrity", value.span());
+
                     diagnostics.push_error(error);
 
                     None

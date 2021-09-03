@@ -35,7 +35,7 @@ services:
       - "5431:5432"
     networks:
       - databases
-    tmpfs: /pgtmpfs9
+    tmpfs: /pgtmpfs9:size=4g
 
   postgres10:
     image: postgres:10
@@ -48,7 +48,7 @@ services:
       - "5432:5432"
     networks:
       - databases
-    tmpfs: /pgtmpfs10
+    tmpfs: /pgtmpfs10:size=4g
 
   postgres11:
     image: postgres:11
@@ -61,7 +61,7 @@ services:
       - "5433:5432"
     networks:
       - databases
-    tmpfs: /pgtmpfs11
+    tmpfs: /pgtmpfs11:size=4g
 
   postgres12:
     image: postgres:12
@@ -87,7 +87,7 @@ services:
       - "5435:5432"
     networks:
       - databases
-    tmpfs: /pgtmpfs13
+    tmpfs: /pgtmpfs13:size=4g
 
   mysql-5-6:
     image: mysql:5.6.50
