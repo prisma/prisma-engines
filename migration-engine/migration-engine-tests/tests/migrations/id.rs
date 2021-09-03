@@ -1,6 +1,8 @@
+mod vitess;
+
 use migration_engine_tests::test_api::*;
 
-#[test_connector]
+#[test_connector(exclude(Vitess))]
 fn changing_the_type_of_an_id_field_must_work(api: TestApi) {
     let dm1 = r#"
         model A {
@@ -46,7 +48,7 @@ fn changing_the_type_of_an_id_field_must_work(api: TestApi) {
     });
 }
 
-#[test_connector(exclude(Sqlite))]
+#[test_connector(exclude(Sqlite), preview_features("referentialIntegrity"))]
 fn models_with_an_autoincrement_field_as_part_of_a_multi_field_id_can_be_created(api: TestApi) {
     let dm = r#"
         model List {

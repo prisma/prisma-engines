@@ -899,7 +899,7 @@ fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
         });
 }
 
-#[cfg_attr(not(target_os = "windows"), test_connector)]
+#[cfg_attr(not(target_os = "windows"), test_connector(exclude(Vitess)))]
 fn alter_constraint_name(api: TestApi) {
     let plain_dm = api.datamodel_with_provider(
         r#"
@@ -924,7 +924,7 @@ fn alter_constraint_name(api: TestApi) {
     );
 
     let dir = api.create_migrations_directory();
-    api.create_migration("plain", &plain_dm, &dir).send_sync();
+    api.create_migration("plain", dbg!(&plain_dm), &dir).send_sync();
 
     let custom_dm = api.datamodel_with_provider(&format!(
         r#"

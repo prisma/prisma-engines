@@ -1,6 +1,6 @@
 use migration_engine_tests::test_api::*;
 
-#[test_connector]
+#[test_connector(preview_features("referentialIntegrity"))]
 fn index_on_compound_relation_fields_must_work(api: TestApi) {
     let dm = r#"
         model User {
@@ -78,7 +78,7 @@ fn index_settings_must_be_migrated(api: TestApi) {
     });
 }
 
-#[test_connector]
+#[test_connector(preview_features("referentialIntegrity"))]
 fn unique_directive_on_required_one_to_one_relation_creates_one_index(api: TestApi) {
     // We want to test that only one index is created, because of the implicit unique index on
     // required 1:1 relations.
@@ -102,7 +102,7 @@ fn unique_directive_on_required_one_to_one_relation_creates_one_index(api: TestA
         .assert_table("Cat", |table| table.assert_indexes_count(1));
 }
 
-#[test_connector]
+#[test_connector(exclude(Vitess))]
 fn one_to_many_self_relations_do_not_create_a_unique_index(api: TestApi) {
     let dm = r#"
         model Location {
@@ -127,7 +127,7 @@ fn one_to_many_self_relations_do_not_create_a_unique_index(api: TestApi) {
     }
 }
 
-#[test_connector]
+#[test_connector(preview_features("referentialIntegrity"))]
 fn model_with_multiple_indexes_works(api: TestApi) {
     let dm = r#"
     model User {
@@ -419,7 +419,7 @@ fn indexes_with_an_automatically_truncated_name_are_idempotent(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_green().assert_no_steps();
 }
 
-#[test_connector]
+#[test_connector(preview_features("referentialIntegrity"))]
 fn new_index_with_same_name_as_index_from_dropped_table_works(api: TestApi) {
     let dm1 = r#"
         model Cat {
