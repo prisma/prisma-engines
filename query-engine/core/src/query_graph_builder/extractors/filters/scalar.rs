@@ -258,13 +258,6 @@ fn parse_internal_scalar(
         aggregations::UNDERSCORE_MIN => aggregation_filter(field, input, reverse, Filter::min),
         aggregations::UNDERSCORE_MAX => aggregation_filter(field, input, reverse, Filter::max),
 
-        // Deprecated aggregation filters
-        aggregations::COUNT => aggregation_filter(field, input, reverse, Filter::count),
-        aggregations::AVG => aggregation_filter(field, input, reverse, Filter::average),
-        aggregations::SUM => aggregation_filter(field, input, reverse, Filter::sum),
-        aggregations::MIN => aggregation_filter(field, input, reverse, Filter::min),
-        aggregations::MAX => aggregation_filter(field, input, reverse, Filter::max),
-
         _ => {
             return Err(QueryGraphBuilderError::InputError(format!(
                 "{} is not a valid scalar filter operation",
