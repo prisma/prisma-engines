@@ -132,7 +132,4 @@ pub mod output_fields {
     pub const AFFECTED_COUNT: &str = "count";
 }
 
-pub mod deprecation {
-    pub const AGGR_DEPRECATION: &str =
-        "Aggregation keywords got unified to use underscore as prefix to prevent field clashes.";
-}
+pub mod deprecation {}
