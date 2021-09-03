@@ -1,7 +1,7 @@
 use migration_engine_tests::test_api::*;
 use sql_schema_describer::ForeignKeyAction;
 
-#[test_connector]
+#[test_connector(preview_features("referentialIntegrity"))]
 fn foreign_keys_of_inline_one_to_one_relations_have_a_unique_constraint(api: TestApi) {
     let dm = r#"
         model Cat {
@@ -24,7 +24,7 @@ fn foreign_keys_of_inline_one_to_one_relations_have_a_unique_constraint(api: Tes
     });
 }
 
-#[test_connector]
+#[test_connector(exclude(Vitess))]
 fn foreign_keys_are_added_on_existing_tables(api: TestApi) -> TestResult {
     let dm1 = r#"
         model User {
@@ -66,7 +66,7 @@ fn foreign_keys_are_added_on_existing_tables(api: TestApi) -> TestResult {
     });
 }
 
-#[test_connector]
+#[test_connector(exclude(Vitess))]
 fn foreign_keys_can_be_added_on_existing_columns(api: TestApi) -> TestResult {
     let dm1 = r#"
         model User {
@@ -109,7 +109,7 @@ fn foreign_keys_can_be_added_on_existing_columns(api: TestApi) -> TestResult {
     });
 }
 
-#[test_connector]
+#[test_connector(exclude(Vitess))]
 fn foreign_keys_can_be_dropped_on_existing_columns(api: TestApi) {
     let dm1 = r#"
         model User {
@@ -151,7 +151,7 @@ fn foreign_keys_can_be_dropped_on_existing_columns(api: TestApi) {
         .assert_table("Account", |table| table.assert_foreign_keys_count(0));
 }
 
-#[test_connector]
+#[test_connector(exclude(Vitess))]
 fn changing_a_scalar_field_to_a_relation_field_must_work(api: TestApi) {
     let dm1 = r#"
         model A {
@@ -197,7 +197,7 @@ fn changing_a_scalar_field_to_a_relation_field_must_work(api: TestApi) {
     });
 }
 
-#[test_connector]
+#[test_connector(exclude(Vitess))]
 fn changing_a_relation_field_to_a_scalar_field_must_work(api: TestApi) {
     let dm1 = r#"
         model A {
@@ -249,7 +249,7 @@ fn changing_a_relation_field_to_a_scalar_field_must_work(api: TestApi) {
     });
 }
 
-#[test_connector]
+#[test_connector(exclude(Vitess))]
 fn changing_a_foreign_key_constrained_column_from_nullable_to_required_and_back_works(api: TestApi) {
     let dm = r#"
         model Student {
@@ -285,7 +285,7 @@ fn changing_a_foreign_key_constrained_column_from_nullable_to_required_and_back_
     api.schema_push_w_datasource(dm).send().assert_green();
 }
 
-#[test_connector]
+#[test_connector(preview_features("referentialIntegrity"))]
 fn changing_all_referenced_columns_of_foreign_key_works(api: TestApi) {
     let dm1 = r#"
        model Post {

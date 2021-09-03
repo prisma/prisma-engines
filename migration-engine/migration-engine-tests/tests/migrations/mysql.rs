@@ -5,7 +5,7 @@ use std::fmt::Write as _;
 // We need to test this specifically for mysql, because foreign keys are indexes, and they are
 // inferred as both foreign key and index by the sql-schema-describer. We do not want to
 // create/delete a second index.
-#[test_connector(tags(Mysql))]
+#[test_connector(tags(Mysql), exclude(Vitess))]
 fn indexes_on_foreign_key_fields_are_not_created_twice(api: TestApi) {
     let schema = r#"
         model Human {

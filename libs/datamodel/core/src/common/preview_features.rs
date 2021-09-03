@@ -1,5 +1,6 @@
 use once_cell::sync::Lazy;
 use serde::{Serialize, Serializer};
+use std::fmt;
 use PreviewFeature::*;
 
 macro_rules! features {
@@ -23,11 +24,11 @@ macro_rules! features {
             }
         }
 
-        impl ToString for PreviewFeature {
-            fn to_string(&self) -> String {
+        impl fmt::Display for PreviewFeature {
+            fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
                 match self {
                     $(
-                        Self::$variant => decapitalize(stringify!($variant)),
+                        Self::$variant => write!(f, "{}", decapitalize(stringify!($variant))),
                     )*
                 }
             }

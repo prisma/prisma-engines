@@ -71,7 +71,7 @@ fn creating_tables_without_primary_key_must_work(api: TestApi) {
     });
 }
 
-#[test_connector]
+#[test_connector(exclude(Vitess))]
 fn relations_to_models_without_a_primary_key_work(api: TestApi) {
     let dm = r#"
         model Pair {
@@ -104,7 +104,7 @@ fn relations_to_models_without_a_primary_key_work(api: TestApi) {
         });
 }
 
-#[test_connector]
+#[test_connector(exclude(Vitess))]
 fn relations_to_models_with_no_pk_and_a_single_unique_required_field_work(api: TestApi) {
     let dm = r#"
         model Pair {
@@ -132,7 +132,7 @@ fn relations_to_models_with_no_pk_and_a_single_unique_required_field_work(api: T
         });
 }
 
-#[test_connector]
+#[test_connector(exclude(Vitess))]
 fn reserved_sql_keywords_must_work(api: TestApi) {
     // Group is a reserved keyword
     let dm = r#"
@@ -259,7 +259,7 @@ fn enum_defaults_must_work(api: TestApi) {
     );
 }
 
-#[test_connector]
+#[test_connector(exclude(Vitess))]
 fn id_as_part_of_relation_must_work(api: TestApi) {
     let dm = r##"
         model Cat {
@@ -282,7 +282,7 @@ fn id_as_part_of_relation_must_work(api: TestApi) {
     });
 }
 
-#[test_connector]
+#[test_connector(exclude(Vitess))]
 fn multi_field_id_as_part_of_relation_must_work(api: TestApi) {
     let dm = r##"
         model Cat {
@@ -314,7 +314,7 @@ fn multi_field_id_as_part_of_relation_must_work(api: TestApi) {
     });
 }
 
-#[test_connector]
+#[test_connector(exclude(Vitess))]
 fn remapped_multi_field_id_as_part_of_relation_must_work(api: TestApi) {
     let dm = r##"
         model Cat {
@@ -345,7 +345,7 @@ fn remapped_multi_field_id_as_part_of_relation_must_work(api: TestApi) {
     });
 }
 
-#[test_connector]
+#[test_connector(preview_features("referentialIntegrity"))]
 fn unique_constraints_on_composite_relation_fields(api: TestApi) {
     let dm = r##"
         model Parent {
@@ -374,7 +374,7 @@ fn unique_constraints_on_composite_relation_fields(api: TestApi) {
     });
 }
 
-#[test_connector]
+#[test_connector(preview_features("referentialIntegrity"))]
 fn indexes_on_composite_relation_fields(api: TestApi) {
     let dm = r##"
         model User {
@@ -403,7 +403,7 @@ fn indexes_on_composite_relation_fields(api: TestApi) {
     });
 }
 
-#[test_connector]
+#[test_connector(exclude(Vitess), preview_features("referentialIntegrity"))]
 fn dropping_mutually_referencing_tables_works(api: TestApi) {
     let dm1 = r#"
     model A {

@@ -154,6 +154,7 @@ services:
       KEYSPACES: "test"
       NUM_SHARDS: "1"
       MYSQL_BIND_HOST: "0.0.0.0"
+      FOREIGN_KEY_MODE: "disallow"
 
   vitess-test-8_0:
     image: vitess/vttestserver:mysql80@sha256:d7c9036e27557d16dc6b20c1a2582e710b61b9723d5523ecba37feccaf4f97ba
@@ -165,6 +166,7 @@ services:
       KEYSPACES: "test"
       NUM_SHARDS: "1"
       MYSQL_BIND_HOST: "0.0.0.0"
+      FOREIGN_KEY_MODE: "disallow"
 
   vitess-shadow-5_7:
     image: vitess/vttestserver:mysql57@sha256:96cb401d180fe054196b969adce928b83590842ec5e300cfb95fd602ec8e7494
@@ -176,6 +178,7 @@ services:
       KEYSPACES: "shadow"
       NUM_SHARDS: "1"
       MYSQL_BIND_HOST: "0.0.0.0"
+      FOREIGN_KEY_MODE: "disallow"
 
   vitess-shadow-8_0:
     image: vitess/vttestserver:mysql80@sha256:d7c9036e27557d16dc6b20c1a2582e710b61b9723d5523ecba37feccaf4f97ba
@@ -187,6 +190,7 @@ services:
       KEYSPACES: "shadow"
       NUM_SHARDS: "1"
       MYSQL_BIND_HOST: "0.0.0.0"
+      FOREIGN_KEY_MODE: "disallow"
 
   mssql-2019:
     image: mcr.microsoft.com/mssql/server:2019-latest
