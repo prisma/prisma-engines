@@ -457,11 +457,11 @@ checksum = "904dfeac50f3cdaba28fc6f57fdcddb75f49ed61346676a78c4ffe55877802fd"
 
 [[package]]
 name = "bigdecimal"
-version = "0.2.1"
+version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2a20163f8a564c667f959814dc19977b06762ab12cd63fd3e08da8a15e960a5f"
+checksum = "d1e50562e37200edf7c6c43e54a08e64a5553bfb59d9c297d5572512aa517256"
 dependencies = [
- "num-bigint 0.4.0",
+ "num-bigint",
  "num-integer",
  "num-traits",
  "serde",
@@ -2439,7 +2439,7 @@ dependencies = [
  "flate2",
  "lazy_static",
  "lexical",
- "num-bigint 0.3.2",
+ "num-bigint",
  "num-traits",
  "rand 0.8.3",
  "regex",
@@ -2543,17 +2543,6 @@ name = "num-bigint"
 version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7d0a3d5e207573f948a9e5376662aa743a2ea13f7c50a554d7af443a73fbfeba"
-dependencies = [
- "autocfg",
- "num-integer",
- "num-traits",
-]
-
-[[package]]
-name = "num-bigint"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4e0d047c1062aa51e256408c560894e5251f08925980e53cf1aa5bd00eec6512"
 dependencies = [
  "autocfg",
  "num-integer",
@@ -3224,7 +3213,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#06ae975a2ac34aea5e2d61727742a83474c61c01"
+source = "git+https://github.com/prisma/quaint#807c458c66d246f8a464d7d8a10d53c7a4b521f6"
 dependencies = [
  "async-trait",
  "base64 0.12.3",
@@ -3243,7 +3232,6 @@ dependencies = [
  "mobc",
  "mysql_async",
  "native-tls",
- "num-bigint 0.4.0",
  "num_cpus",
  "percent-encoding",
  "postgres-native-tls",
@@ -4493,9 +4481,9 @@ dependencies = [
 
 [[package]]
 name = "tiberius"
-version = "0.6.3"
+version = "0.6.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "92d4bad44a70b0a8624007a42aaf9acb6e9da29893401cd0922c6fb9e50542f1"
+checksum = "fa12e58f1ede91b897b3e6d399f09dd5ee1f6d44d8162b61e1b53032b9976fb6"
 dependencies = [
  "async-native-tls",
  "async-stream 0.2.1",
@@ -4511,7 +4499,6 @@ dependencies = [
  "futures",
  "futures-sink",
  "futures-util",
- "num-bigint 0.4.0",
  "num-traits",
  "once_cell",
  "opentls",
