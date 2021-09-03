@@ -291,9 +291,16 @@ impl<'a> Visitor<'a> for Postgres<'a> {
                     }
                     Ok(())
                 })?;
-                self.write(")::jsonb")
+
+                self.write(")")?;
+
+                if !json_extract.extract_as_string {
+                    self.write("::jsonb")?;
+                }
             }
         }
+
+        Ok(())
     }
 
     #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]

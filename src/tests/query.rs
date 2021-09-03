@@ -2073,6 +2073,15 @@ async fn json_extract_array_path_postgres(api: &mut dyn TestApi, json_type: &str
     let row = api.conn().select(select).await?.into_single()?;
     assert_eq!(Some(serde_json::json!({ "a\":{": "b" })), value_into_json(&row["obj"]));
 
+    // Test equality with Json value with `extract_as_string: true`
+    let extract: Expression = json_extract(col!("obj"), JsonPath::array(["a", "b"]), true).into();
+    let select = Select::from_table(&table).so_that(extract.equals("c"));
+    let row = api.conn().select(select).await?.into_single()?;
+    assert_eq!(
+        Some(serde_json::json!({ "a": { "b": "c" } })),
+        value_into_json(&row["obj"])
+    );
+
     Ok(())
 }
 
