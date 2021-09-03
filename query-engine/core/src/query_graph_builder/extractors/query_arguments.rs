@@ -153,7 +153,7 @@ fn process_order_object(
 
 fn extract_sort_aggregation(field_name: &str) -> QueryGraphBuilderResult<SortAggregation> {
     match field_name {
-        aggregations::COUNT | aggregations::UNDERSCORE_COUNT => Ok(SortAggregation::Count),
+        aggregations::UNDERSCORE_COUNT => Ok(SortAggregation::Count),
         aggregations::UNDERSCORE_AVG => Ok(SortAggregation::Avg),
         aggregations::UNDERSCORE_SUM => Ok(SortAggregation::Sum),
         aggregations::UNDERSCORE_MIN => Ok(SortAggregation::Min),

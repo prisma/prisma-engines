@@ -1,4 +1,4 @@
-use crate::constants::{aggregations::*, deprecation::*};
+use crate::constants::aggregations::*;
 
 use super::*;
 use std::convert::identity;
@@ -36,23 +36,6 @@ pub(crate) fn aggregation_object_type(ctx: &mut BuilderContext, model: &ModelRef
         &mut object_fields,
         aggregation_field(
             ctx,
-            COUNT,
-            &model,
-            model.fields().scalar(),
-            |_, _| OutputType::int(),
-            |mut obj| {
-                obj.add_field(field("_all", vec![], OutputType::int(), None));
-                obj
-            },
-            true,
-        )
-        .map(|f| f.deprecate(AGGR_DEPRECATION, "2.23", None)),
-    );
-
-    append_opt(
-        &mut object_fields,
-        aggregation_field(
-            ctx,
             UNDERSCORE_AVG,
             &model,
             numeric_fields.clone(),
@@ -60,20 +43,6 @@ pub(crate) fn aggregation_object_type(ctx: &mut BuilderContext, model: &ModelRef
             identity,
             false,
         ),
-    );
-
-    append_opt(
-        &mut object_fields,
-        aggregation_field(
-            ctx,
-            AVG,
-            &model,
-            numeric_fields.clone(),
-            field_avg_output_type,
-            identity,
-            false,
-        )
-        .map(|f| f.deprecate(AGGR_DEPRECATION, "2.23", None)),
     );
 
     append_opt(
@@ -93,20 +62,6 @@ pub(crate) fn aggregation_object_type(ctx: &mut BuilderContext, model: &ModelRef
         &mut object_fields,
         aggregation_field(
             ctx,
-            SUM,
-            &model,
-            numeric_fields,
-            map_scalar_output_type_for_field,
-            identity,
-            false,
-        )
-        .map(|f| f.deprecate(AGGR_DEPRECATION, "2.23", None)),
-    );
-
-    append_opt(
-        &mut object_fields,
-        aggregation_field(
-            ctx,
             UNDERSCORE_MIN,
             &model,
             non_list_nor_json_fields.clone(),
@@ -120,20 +75,6 @@ pub(crate) fn aggregation_object_type(ctx: &mut BuilderContext, model: &ModelRef
         &mut object_fields,
         aggregation_field(
             ctx,
-            MIN,
-            &model,
-            non_list_nor_json_fields.clone(),
-            map_scalar_output_type_for_field,
-            identity,
-            false,
-        )
-        .map(|f| f.deprecate(AGGR_DEPRECATION, "2.23", None)),
-    );
-
-    append_opt(
-        &mut object_fields,
-        aggregation_field(
-            ctx,
             UNDERSCORE_MAX,
             &model,
             non_list_nor_json_fields.clone(),
@@ -141,20 +82,6 @@ pub(crate) fn aggregation_object_type(ctx: &mut BuilderContext, model: &ModelRef
             identity,
             false,
         ),
-    );
-
-    append_opt(
-        &mut object_fields,
-        aggregation_field(
-            ctx,
-            MAX,
-            &model,
-            non_list_nor_json_fields,
-            map_scalar_output_type_for_field,
-            identity,
-            false,
-        )
-        .map(|f| f.deprecate(AGGR_DEPRECATION, "2.23", None)),
     );
 
     object.set_fields(object_fields);
