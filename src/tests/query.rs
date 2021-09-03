@@ -2027,10 +2027,9 @@ async fn json_extract_path_fun(api: &mut dyn TestApi) -> crate::Result<()> {
 }
 
 #[cfg(all(feature = "json", feature = "postgresql"))]
-#[test_each_connector(tags("postgresql"))]
-async fn json_extract_array_path_fun(api: &mut dyn TestApi) -> crate::Result<()> {
+async fn json_extract_array_path_postgres(api: &mut dyn TestApi, json_type: &str) -> crate::Result<()> {
     let table = api
-        .create_table(&format!("{}, obj jsonb", api.autogen_id("id")))
+        .create_table(&format!("{}, obj {}", api.autogen_id("id"), json_type))
         .await?;
 
     let insert = Insert::single_into(&table).value("obj", serde_json::json!({ "a": { "b": "c" } }));
@@ -2077,15 +2076,26 @@ async fn json_extract_array_path_fun(api: &mut dyn TestApi) -> crate::Result<()>
     Ok(())
 }
 
+#[cfg(all(feature = "json", feature = "postgresql"))]
+#[test_each_connector(tags("postgresql"))]
+async fn json_extract_array_path_fun_on_jsonb(api: &mut dyn TestApi) -> crate::Result<()> {
+    json_extract_array_path_postgres(api, "jsonb").await?;
+
+    Ok(())
+}
+
+#[cfg(all(feature = "json", feature = "postgresql"))]
+#[test_each_connector(tags("postgresql"))]
+async fn json_extract_array_path_fun_on_json(api: &mut dyn TestApi) -> crate::Result<()> {
+    json_extract_array_path_postgres(api, "json").await?;
+
+    Ok(())
+}
+
 #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
-#[test_each_connector(tags("postgresql", "mysql"))]
-async fn json_array_contains_fun(api: &mut dyn TestApi) -> crate::Result<()> {
+async fn json_array_contains(api: &mut dyn TestApi, json_type: &str) -> crate::Result<()> {
     use test_setup::Tags;
 
-    let json_type = match api.system() {
-        "postgres" => "jsonb",
-        _ => "json",
-    };
     let table = api
         .create_table(&format!("{}, obj {}", api.autogen_id("id"), json_type))
         .await?;
@@ -2163,13 +2173,32 @@ async fn json_array_contains_fun(api: &mut dyn TestApi) -> crate::Result<()> {
     Ok(())
 }
 
+#[cfg(all(feature = "json", feature = "postgresql"))]
+#[test_each_connector(tags("postgresql"))]
+async fn json_array_contains_fun_pg_jsonb(api: &mut dyn TestApi) -> crate::Result<()> {
+    json_array_contains(api, "jsonb").await?;
+
+    Ok(())
+}
+
+#[cfg(all(feature = "json", feature = "postgresql"))]
+#[test_each_connector(tags("postgresql"))]
+async fn json_array_contains_fun_pg_json(api: &mut dyn TestApi) -> crate::Result<()> {
+    json_array_contains(api, "json").await?;
+
+    Ok(())
+}
+
+#[cfg(all(feature = "json", feature = "mysql"))]
+#[test_each_connector(tags("mysql"))]
+async fn json_array_contains_fun(api: &mut dyn TestApi) -> crate::Result<()> {
+    json_array_contains(api, "json").await?;
+
+    Ok(())
+}
+
 #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
-#[test_each_connector(tags("postgresql", "mysql"))]
-async fn json_array_not_contains_fun(api: &mut dyn TestApi) -> crate::Result<()> {
-    let json_type = match api.system() {
-        "postgres" => "jsonb",
-        _ => "json",
-    };
+async fn json_array_not_contains(api: &mut dyn TestApi, json_type: &str) -> crate::Result<()> {
     let table = api
         .create_table(&format!("{}, obj {}", api.autogen_id("id"), json_type))
         .await?;
@@ -2202,13 +2231,32 @@ async fn json_array_not_contains_fun(api: &mut dyn TestApi) -> crate::Result<()>
     Ok(())
 }
 
+#[cfg(all(feature = "json", feature = "postgresql"))]
+#[test_each_connector(tags("postgresql"))]
+async fn json_array_not_contains_fun_pg_jsonb(api: &mut dyn TestApi) -> crate::Result<()> {
+    json_array_not_contains(api, "jsonb").await?;
+
+    Ok(())
+}
+
+#[cfg(all(feature = "json", feature = "postgresql"))]
+#[test_each_connector(tags("postgresql"))]
+async fn json_array_not_contains_fun_pg_json(api: &mut dyn TestApi) -> crate::Result<()> {
+    json_array_not_contains(api, "json").await?;
+
+    Ok(())
+}
+
+#[cfg(all(feature = "json", feature = "mysql"))]
+#[test_each_connector(tags("mysql"))]
+async fn json_array_not_contains_fun(api: &mut dyn TestApi) -> crate::Result<()> {
+    json_array_not_contains(api, "json").await?;
+
+    Ok(())
+}
+
 #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
-#[test_each_connector(tags("postgresql", "mysql"))]
-async fn json_array_begins_with_fun(api: &mut dyn TestApi) -> crate::Result<()> {
-    let json_type = match api.system() {
-        "postgres" => "jsonb",
-        _ => "json",
-    };
+async fn json_array_begins_with(api: &mut dyn TestApi, json_type: &str) -> crate::Result<()> {
     let table = api
         .create_table(&format!("{}, obj {}", api.autogen_id("id"), json_type))
         .await?;
@@ -2275,13 +2323,32 @@ async fn json_array_begins_with_fun(api: &mut dyn TestApi) -> crate::Result<()> 
     Ok(())
 }
 
+#[cfg(all(feature = "json", feature = "postgresql"))]
+#[test_each_connector(tags("postgresql"))]
+async fn json_array_begins_with_fun_pg_jsonb(api: &mut dyn TestApi) -> crate::Result<()> {
+    json_array_begins_with(api, "jsonb").await?;
+
+    Ok(())
+}
+
+#[cfg(all(feature = "json", feature = "postgresql"))]
+#[test_each_connector(tags("postgresql"))]
+async fn json_array_begins_with_fun_pg_json(api: &mut dyn TestApi) -> crate::Result<()> {
+    json_array_begins_with(api, "json").await?;
+
+    Ok(())
+}
+
+#[cfg(all(feature = "json", feature = "mysql"))]
+#[test_each_connector(tags("mysql"))]
+async fn json_array_begins_with_fun(api: &mut dyn TestApi) -> crate::Result<()> {
+    json_array_begins_with(api, "json").await?;
+
+    Ok(())
+}
+
 #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
-#[test_each_connector(tags("postgresql", "mysql"))]
-async fn json_array_not_begins_with_fun(api: &mut dyn TestApi) -> crate::Result<()> {
-    let json_type = match api.system() {
-        "postgres" => "jsonb",
-        _ => "json",
-    };
+async fn json_array_not_begins_with(api: &mut dyn TestApi, json_type: &str) -> crate::Result<()> {
     let table = api
         .create_table(&format!("{}, obj {}", api.autogen_id("id"), json_type))
         .await?;
@@ -2315,13 +2382,32 @@ async fn json_array_not_begins_with_fun(api: &mut dyn TestApi) -> crate::Result<
     Ok(())
 }
 
+#[cfg(all(feature = "json", feature = "postgresql"))]
+#[test_each_connector(tags("postgresql"))]
+async fn json_array_not_begins_with_fun_pg_jsonb(api: &mut dyn TestApi) -> crate::Result<()> {
+    json_array_not_begins_with(api, "jsonb").await?;
+
+    Ok(())
+}
+
+#[cfg(all(feature = "json", feature = "postgresql"))]
+#[test_each_connector(tags("postgresql"))]
+async fn json_array_not_begins_with_fun_pg_json(api: &mut dyn TestApi) -> crate::Result<()> {
+    json_array_not_begins_with(api, "json").await?;
+
+    Ok(())
+}
+
+#[cfg(all(feature = "json", feature = "mysql"))]
+#[test_each_connector(tags("mysql"))]
+async fn json_array_not_begins_with_fun(api: &mut dyn TestApi) -> crate::Result<()> {
+    json_array_not_begins_with(api, "json").await?;
+
+    Ok(())
+}
+
 #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
-#[test_each_connector(tags("postgresql", "mysql"))]
-async fn json_array_ends_into_fun(api: &mut dyn TestApi) -> crate::Result<()> {
-    let json_type = match api.system() {
-        "postgres" => "jsonb",
-        _ => "json",
-    };
+async fn json_array_ends_into(api: &mut dyn TestApi, json_type: &str) -> crate::Result<()> {
     let table = api
         .create_table(&format!("{}, obj {}", api.autogen_id("id"), json_type))
         .await?;
@@ -2389,13 +2475,32 @@ async fn json_array_ends_into_fun(api: &mut dyn TestApi) -> crate::Result<()> {
     Ok(())
 }
 
+#[cfg(all(feature = "json", feature = "postgresql"))]
+#[test_each_connector(tags("postgresql"))]
+async fn json_array_ends_into_fun_pg_jsonb(api: &mut dyn TestApi) -> crate::Result<()> {
+    json_array_ends_into(api, "jsonb").await?;
+
+    Ok(())
+}
+
+#[cfg(all(feature = "json", feature = "postgresql"))]
+#[test_each_connector(tags("postgresql"))]
+async fn json_array_ends_into_fun_pg_json(api: &mut dyn TestApi) -> crate::Result<()> {
+    json_array_ends_into(api, "json").await?;
+
+    Ok(())
+}
+
+#[cfg(all(feature = "json", feature = "mysql"))]
+#[test_each_connector(tags("mysql"))]
+async fn json_array_ends_into_fun(api: &mut dyn TestApi) -> crate::Result<()> {
+    json_array_ends_into(api, "json").await?;
+
+    Ok(())
+}
+
 #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
-#[test_each_connector(tags("postgresql", "mysql"))]
-async fn json_array_not_ends_into_fun(api: &mut dyn TestApi) -> crate::Result<()> {
-    let json_type = match api.system() {
-        "postgres" => "jsonb",
-        _ => "json",
-    };
+async fn json_array_not_ends_into(api: &mut dyn TestApi, json_type: &str) -> crate::Result<()> {
     let table = api
         .create_table(&format!("{}, obj {}", api.autogen_id("id"), json_type))
         .await?;
@@ -2430,13 +2535,32 @@ async fn json_array_not_ends_into_fun(api: &mut dyn TestApi) -> crate::Result<()
     Ok(())
 }
 
+#[cfg(all(feature = "json", feature = "postgresql"))]
+#[test_each_connector(tags("postgresql"))]
+async fn json_array_not_ends_into_fun_pg_jsonb(api: &mut dyn TestApi) -> crate::Result<()> {
+    json_array_not_ends_into(api, "jsonb").await?;
+
+    Ok(())
+}
+
+#[cfg(all(feature = "json", feature = "postgresql"))]
+#[test_each_connector(tags("postgresql"))]
+async fn json_array_not_ends_into_fun_pg_json(api: &mut dyn TestApi) -> crate::Result<()> {
+    json_array_not_ends_into(api, "json").await?;
+
+    Ok(())
+}
+
+#[cfg(all(feature = "json", feature = "mysql"))]
+#[test_each_connector(tags("mysql"))]
+async fn json_array_not_ends_into_fun(api: &mut dyn TestApi) -> crate::Result<()> {
+    json_array_not_ends_into(api, "json").await?;
+
+    Ok(())
+}
+
 #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
-#[test_each_connector(tags("postgresql", "mysql"))]
-async fn json_gt_gte_lt_lte_fun(api: &mut dyn TestApi) -> crate::Result<()> {
-    let json_type = match api.system() {
-        "postgres" => "jsonb",
-        _ => "json",
-    };
+async fn json_gt_gte_lt_lte(api: &mut dyn TestApi, json_type: &str) -> crate::Result<()> {
     let table = api
         .create_table(&format!("{}, json {}", api.autogen_id("id"), json_type))
         .await?;
@@ -2575,6 +2699,30 @@ async fn json_gt_gte_lt_lte_fun(api: &mut dyn TestApi) -> crate::Result<()> {
         value_into_json(&res.get(2).unwrap()["json"])
     );
     assert_eq!(None, res.get(3));
+
+    Ok(())
+}
+
+#[cfg(all(feature = "json", feature = "postgresql"))]
+#[test_each_connector(tags("postgresql"))]
+async fn json_gt_gte_lt_lte_fun_pg_jsonb(api: &mut dyn TestApi) -> crate::Result<()> {
+    json_gt_gte_lt_lte(api, "jsonb").await?;
+
+    Ok(())
+}
+
+#[cfg(all(feature = "json", feature = "postgresql"))]
+#[test_each_connector(tags("postgresql"))]
+async fn json_gt_gte_lt_lte_fun_pg_json(api: &mut dyn TestApi) -> crate::Result<()> {
+    json_gt_gte_lt_lte(api, "json").await?;
+
+    Ok(())
+}
+
+#[cfg(all(feature = "json", feature = "mysql"))]
+#[test_each_connector(tags("mysql"))]
+async fn json_gt_gte_lt_lte_fun(api: &mut dyn TestApi) -> crate::Result<()> {
+    json_gt_gte_lt_lte(api, "json").await?;
 
     Ok(())
 }

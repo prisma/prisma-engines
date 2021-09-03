@@ -291,7 +291,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
                     }
                     Ok(())
                 })?;
-                self.write(")")
+                self.write(")::jsonb")
             }
         }
     }

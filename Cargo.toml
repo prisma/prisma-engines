@@ -66,7 +66,7 @@ mysql = ["mysql_async", "tokio/time", "lru-cache"]
 pooled = ["mobc"]
 serde-support = ["serde", "chrono/serde"]
 sqlite = ["rusqlite", "libsqlite3-sys", "tokio/sync"]
-bigdecimal = ["bigdecimal_", "num-bigint"]
+bigdecimal = ["bigdecimal_"]
 
 [dependencies]
 connection-string = "0.1.10"
@@ -133,12 +133,6 @@ features = ["sql-browser-tokio", "chrono", "bigdecimal"]
 version = "0.2.0"
 optional = true
 package = "bigdecimal"
-
-[dependencies.num-bigint]
-version = "0.4.0"
-default-features = false
-optional = true
-features = ["std"]
 
 [dependencies.uuid]
 version = "0.8"
