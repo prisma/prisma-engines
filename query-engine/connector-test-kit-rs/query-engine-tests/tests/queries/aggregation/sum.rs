@@ -8,8 +8,8 @@ mod aggregation_sum {
     #[connector_test(exclude(MongoDb))]
     async fn sum_no_records(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(&runner, "query { aggregateTestModel { sum { int bInt float decimal } } }"),
-          @r###"{"data":{"aggregateTestModel":{"sum":{"int":null,"bInt":null,"float":null,"decimal":null}}}}"###
+          run_query!(&runner, "query { aggregateTestModel { _sum { int bInt float decimal } } }"),
+          @r###"{"data":{"aggregateTestModel":{"_sum":{"int":null,"bInt":null,"float":null,"decimal":null}}}}"###
         );
 
         Ok(())
@@ -24,9 +24,9 @@ mod aggregation_sum {
         insta::assert_snapshot!(
             run_query!(
                 runner,
-                "query { aggregateTestModel { sum { int bInt float decimal } } }"
+                "query { aggregateTestModel { _sum { int bInt float decimal } } }"
             ),
-            @r###"{"data":{"aggregateTestModel":{"sum":{"int":15,"bInt":"15","float":10.0,"decimal":"10"}}}}"###
+            @r###"{"data":{"aggregateTestModel":{"_sum":{"int":15,"bInt":"15","float":10.0,"decimal":"10"}}}}"###
         );
 
         Ok(())
@@ -41,33 +41,33 @@ mod aggregation_sum {
         create_row(&runner, r#"{ id: 4, float: 0.0, int: 1, decimal: "0.0", bInt: "1" }"#).await?;
 
         insta::assert_snapshot!(
-            run_query!(&runner, "query { aggregateTestModel(take: 2) { sum { int bInt float decimal } } }"),
-            @r###"{"data":{"aggregateTestModel":{"sum":{"int":15,"bInt":"15","float":10.0,"decimal":"10"}}}}"###
+            run_query!(&runner, "query { aggregateTestModel(take: 2) { _sum { int bInt float decimal } } }"),
+            @r###"{"data":{"aggregateTestModel":{"_sum":{"int":15,"bInt":"15","float":10.0,"decimal":"10"}}}}"###
         );
 
         insta::assert_snapshot!(
-            run_query!(&runner, "query { aggregateTestModel(take: 5) { sum { int bInt float decimal } } }"),
-            @r###"{"data":{"aggregateTestModel":{"sum":{"int":18,"bInt":"18","float":11.5,"decimal":"11.5"}}}}"###
+            run_query!(&runner, "query { aggregateTestModel(take: 5) { _sum { int bInt float decimal } } }"),
+            @r###"{"data":{"aggregateTestModel":{"_sum":{"int":18,"bInt":"18","float":11.5,"decimal":"11.5"}}}}"###
         );
 
         insta::assert_snapshot!(
-            run_query!(&runner, "query { aggregateTestModel(take: -5) { sum { int bInt float decimal } } }"),
-            @r###"{"data":{"aggregateTestModel":{"sum":{"int":18,"bInt":"18","float":11.5,"decimal":"11.5"}}}}"###
+            run_query!(&runner, "query { aggregateTestModel(take: -5) { _sum { int bInt float decimal } } }"),
+            @r###"{"data":{"aggregateTestModel":{"_sum":{"int":18,"bInt":"18","float":11.5,"decimal":"11.5"}}}}"###
         );
 
         insta::assert_snapshot!(
-            run_query!(&runner, r#"query { aggregateTestModel(where: { id: { gt: 2 }}) { sum { int bInt float decimal } } }"#),
-            @r###"{"data":{"aggregateTestModel":{"sum":{"int":3,"bInt":"3","float":1.5,"decimal":"1.5"}}}}"###
+            run_query!(&runner, r#"query { aggregateTestModel(where: { id: { gt: 2 }}) { _sum { int bInt float decimal } } }"#),
+            @r###"{"data":{"aggregateTestModel":{"_sum":{"int":3,"bInt":"3","float":1.5,"decimal":"1.5"}}}}"###
         );
 
         insta::assert_snapshot!(
-            run_query!(&runner, "query { aggregateTestModel(skip: 2) { sum { int bInt float decimal } } }"),
-            @r###"{"data":{"aggregateTestModel":{"sum":{"int":3,"bInt":"3","float":1.5,"decimal":"1.5"}}}}"###
+            run_query!(&runner, "query { aggregateTestModel(skip: 2) { _sum { int bInt float decimal } } }"),
+            @r###"{"data":{"aggregateTestModel":{"_sum":{"int":3,"bInt":"3","float":1.5,"decimal":"1.5"}}}}"###
         );
 
         insta::assert_snapshot!(
-            run_query!(&runner, r#"query { aggregateTestModel(cursor: { id: 3 }) { sum { int bInt float decimal } } }"#),
-            @r###"{"data":{"aggregateTestModel":{"sum":{"int":3,"bInt":"3","float":1.5,"decimal":"1.5"}}}}"###
+            run_query!(&runner, r#"query { aggregateTestModel(cursor: { id: 3 }) { _sum { int bInt float decimal } } }"#),
+            @r###"{"data":{"aggregateTestModel":{"_sum":{"int":3,"bInt":"3","float":1.5,"decimal":"1.5"}}}}"###
         );
 
         Ok(())
