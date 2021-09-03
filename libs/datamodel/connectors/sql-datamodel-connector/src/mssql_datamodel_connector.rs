@@ -1,6 +1,6 @@
 use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
 use datamodel_connector::helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32};
-use datamodel_connector::{Connector, ConnectorCapability};
+use datamodel_connector::{Connector, ConnectorCapability, ReferentialIntegrity};
 use dml::{
     field::{Field, FieldType},
     model::Model,
@@ -49,21 +49,18 @@ const UNIQUE_IDENTIFIER_TYPE_NAME: &str = "UniqueIdentifier";
 pub struct MsSqlDatamodelConnector {
     capabilities: Vec<ConnectorCapability>,
     constructors: Vec<NativeTypeConstructor>,
-    referential_actions: BitFlags<ReferentialAction>,
+    referential_integrity: ReferentialIntegrity,
 }
 
 impl MsSqlDatamodelConnector {
-    pub fn new() -> MsSqlDatamodelConnector {
-        use ReferentialAction::*;
-
-        let capabilities = vec![
+    pub fn new(referential_integrity: ReferentialIntegrity) -> MsSqlDatamodelConnector {
+        let mut capabilities = vec![
             ConnectorCapability::AutoIncrement,
             ConnectorCapability::AutoIncrementAllowedOnNonId,
             ConnectorCapability::AutoIncrementMultipleAllowed,
             ConnectorCapability::AutoIncrementNonIndexedAllowed,
             ConnectorCapability::CompoundIds,
             ConnectorCapability::CreateMany,
-            ConnectorCapability::ForeignKeys,
             ConnectorCapability::MultipleIndexesWithSameName,
             ConnectorCapability::UpdateableId,
             ConnectorCapability::AnyId,
@@ -71,9 +68,12 @@ impl MsSqlDatamodelConnector {
             ConnectorCapability::NamedPrimaryKeys,
             ConnectorCapability::NamedForeignKeys,
             ConnectorCapability::NamedDefaultValues,
-            ConnectorCapability::ForeignKeys,
             ConnectorCapability::ReferenceCycleDetection,
         ];
+
+        if referential_integrity.uses_foreign_keys() {
+            capabilities.push(ConnectorCapability::ForeignKeys);
+        }
 
         let constructors: Vec<NativeTypeConstructor> = vec![
             NativeTypeConstructor::without_args(TINY_INT_TYPE_NAME, vec![ScalarType::Int]),
@@ -106,12 +106,10 @@ impl MsSqlDatamodelConnector {
             NativeTypeConstructor::without_args(UNIQUE_IDENTIFIER_TYPE_NAME, vec![ScalarType::String]),
         ];
 
-        let referential_actions = NoAction | Cascade | SetNull | SetDefault;
-
         MsSqlDatamodelConnector {
             capabilities,
             constructors,
-            referential_actions,
+            referential_integrity,
         }
     }
 
@@ -166,7 +164,10 @@ impl Connector for MsSqlDatamodelConnector {
     }
 
     fn referential_actions(&self) -> BitFlags<ReferentialAction> {
-        self.referential_actions
+        use ReferentialAction::*;
+
+        self.referential_integrity
+            .allowed_referential_actions(NoAction | Cascade | SetNull | SetDefault)
     }
 
     fn scalar_type_for_native_type(&self, native_type: serde_json::Value) -> ScalarType {
@@ -414,12 +415,6 @@ impl Connector for MsSqlDatamodelConnector {
         }
 
         Ok(())
-    }
-}
-
-impl Default for MsSqlDatamodelConnector {
-    fn default() -> Self {
-        Self::new()
     }
 }
 

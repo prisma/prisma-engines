@@ -924,7 +924,7 @@ fn alter_constraint_name(api: TestApi) {
     );
 
     let dir = api.create_migrations_directory();
-    api.create_migration("plain", dbg!(&plain_dm), &dir).send_sync();
+    api.create_migration("plain", &plain_dm, &dir).send_sync();
 
     let custom_dm = api.datamodel_with_provider(&format!(
         r#"

@@ -1263,7 +1263,7 @@ async fn updated_at(api: &TestApi) {
     api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await.unwrap());
 }
 
-#[test_connector]
+#[test_connector(exclude(Vitess))]
 async fn multiple_many_to_many_on_same_model(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -1578,7 +1578,7 @@ async fn re_introspecting_ignore(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(exclude(Vitess))]
 async fn do_not_try_to_keep_custom_many_to_many_self_relation_names(api: &TestApi) -> TestResult {
     //we do not have enough information to correctly assign which field should point to column A in the
     //join table and which one to B

@@ -4,11 +4,13 @@ use datamodel_connector::{Connector, ReferentialIntegrity};
 use mongodb_datamodel_connector::MongoDbDatamodelConnector;
 use sql_datamodel_connector::SqlDatamodelConnectors;
 
-pub struct SqliteDatasourceProvider {}
+pub struct SqliteDatasourceProvider {
+    referential_integrity: ReferentialIntegrity,
+}
 
 impl SqliteDatasourceProvider {
-    pub fn new() -> Self {
-        Self {}
+    pub fn new(referential_integrity: ReferentialIntegrity) -> Self {
+        Self { referential_integrity }
     }
 }
 
@@ -22,15 +24,17 @@ impl DatasourceProvider for SqliteDatasourceProvider {
     }
 
     fn connector(&self) -> Box<dyn Connector> {
-        Box::new(SqlDatamodelConnectors::sqlite())
+        Box::new(SqlDatamodelConnectors::sqlite(self.referential_integrity))
     }
 }
 
-pub struct PostgresDatasourceProvider {}
+pub struct PostgresDatasourceProvider {
+    referential_integrity: ReferentialIntegrity,
+}
 
 impl PostgresDatasourceProvider {
-    pub fn new() -> Self {
-        Self {}
+    pub fn new(referential_integrity: ReferentialIntegrity) -> Self {
+        Self { referential_integrity }
     }
 }
 
@@ -44,7 +48,7 @@ impl DatasourceProvider for PostgresDatasourceProvider {
     }
 
     fn connector(&self) -> Box<dyn Connector> {
-        Box::new(SqlDatamodelConnectors::postgres())
+        Box::new(SqlDatamodelConnectors::postgres(self.referential_integrity))
     }
 }
 
@@ -72,10 +76,13 @@ impl DatasourceProvider for MySqlDatasourceProvider {
     }
 }
 
-pub struct MsSqlDatasourceProvider {}
+pub struct MsSqlDatasourceProvider {
+    referential_integrity: ReferentialIntegrity,
+}
+
 impl MsSqlDatasourceProvider {
-    pub fn new() -> Self {
-        Self {}
+    pub fn new(referential_integrity: ReferentialIntegrity) -> Self {
+        Self { referential_integrity }
     }
 }
 
@@ -89,7 +96,7 @@ impl DatasourceProvider for MsSqlDatasourceProvider {
     }
 
     fn connector(&self) -> Box<dyn Connector> {
-        Box::new(SqlDatamodelConnectors::mssql())
+        Box::new(SqlDatamodelConnectors::mssql(self.referential_integrity))
     }
 }
 
@@ -111,5 +118,13 @@ impl DatasourceProvider for MongoDbDatasourceProvider {
 
     fn connector(&self) -> Box<dyn Connector> {
         Box::new(MongoDbDatamodelConnector::new())
+    }
+
+    fn default_referential_integrity(&self) -> ReferentialIntegrity {
+        ReferentialIntegrity::Prisma
+    }
+
+    fn allowed_referential_integrity_settings(&self) -> enumflags2::BitFlags<ReferentialIntegrity> {
+        ReferentialIntegrity::Prisma.into()
     }
 }

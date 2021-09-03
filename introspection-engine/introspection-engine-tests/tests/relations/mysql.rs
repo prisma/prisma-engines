@@ -5,7 +5,7 @@ use introspection_engine_tests::test_api::*;
 use quaint::prelude::Queryable;
 use test_macros::test_connector;
 
-#[test_connector(tags(Mysql))]
+#[test_connector(tags(Mysql), exclude(Vitess))]
 async fn a_many_to_many_relation_with_an_id(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -60,7 +60,7 @@ async fn a_many_to_many_relation_with_an_id(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql))]
+#[test_connector(tags(Mysql), exclude(Vitess))]
 async fn a_one_req_to_many_relation(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -98,7 +98,7 @@ async fn a_one_req_to_many_relation(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql))]
+#[test_connector(tags(Mysql), exclude(Vitess))]
 async fn a_one_to_many_relation(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -136,7 +136,7 @@ async fn a_one_to_many_relation(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql))]
+#[test_connector(tags(Mysql), exclude(Vitess))]
 async fn a_self_relation(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
@@ -175,7 +175,7 @@ async fn a_self_relation(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql))]
+#[test_connector(tags(Mysql), exclude(Vitess))]
 async fn duplicate_fks_should_ignore_one_of_them(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -213,7 +213,7 @@ async fn duplicate_fks_should_ignore_one_of_them(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql))]
+#[test_connector(tags(Mysql), exclude(Vitess))]
 async fn one_to_many_relation_field_names_do_not_conflict_with_many_to_many_relation_field_names(
     api: &TestApi,
 ) -> TestResult {
@@ -273,7 +273,7 @@ async fn one_to_many_relation_field_names_do_not_conflict_with_many_to_many_rela
     Ok(())
 }
 
-#[test_connector(tags(Mysql))]
+#[test_connector(tags(Mysql), exclude(Vitess))]
 async fn relations_should_avoid_name_clashes(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -311,7 +311,7 @@ async fn relations_should_avoid_name_clashes(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql))]
+#[test_connector(tags(Mysql), exclude(Vitess))]
 async fn relations_should_avoid_name_clashes_2(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
@@ -370,7 +370,7 @@ async fn relations_should_avoid_name_clashes_2(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql))]
+#[test_connector(tags(Mysql), exclude(Vitess))]
 async fn two_one_to_one_relations_between_the_same_models(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
@@ -424,7 +424,7 @@ async fn two_one_to_one_relations_between_the_same_models(api: &TestApi) -> Test
     Ok(())
 }
 
-#[test_connector(tags(Mysql))]
+#[test_connector(tags(Mysql), exclude(Vitess))]
 async fn a_one_to_one_relation(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -460,7 +460,7 @@ async fn a_one_to_one_relation(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql))]
+#[test_connector(tags(Mysql), exclude(Vitess))]
 async fn a_one_to_one_relation_referencing_non_id(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -501,7 +501,7 @@ async fn a_one_to_one_relation_referencing_non_id(api: &TestApi) -> TestResult {
 
 // SQLite will always make the primary key autoincrement, which makes no sense
 // to build.
-#[test_connector(tags(Mysql))]
+#[test_connector(tags(Mysql), exclude(Vitess))]
 async fn id_fields_with_foreign_key(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
@@ -534,7 +534,7 @@ async fn id_fields_with_foreign_key(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql))]
+#[test_connector(tags(Mysql), exclude(Vitess))]
 async fn one_to_one_req_relation_with_custom_fk_name(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
@@ -572,7 +572,7 @@ async fn one_to_one_req_relation_with_custom_fk_name(api: &TestApi) -> TestResul
 
     Ok(())
 }
-#[test_connector(tags(Mysql))]
+#[test_connector(tags(Mysql), exclude(Vitess))]
 async fn one_to_one_req_relation(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
@@ -608,7 +608,7 @@ async fn one_to_one_req_relation(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql))]
+#[test_connector(tags(Mysql), exclude(Vitess))]
 async fn one_to_one_relation_on_a_singular_primary_key(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -642,7 +642,7 @@ async fn one_to_one_relation_on_a_singular_primary_key(api: &TestApi) -> TestRes
     Ok(())
 }
 
-#[test_connector(tags(Mysql57))]
+#[test_connector(tags(Mysql), exclude(Vitess))]
 async fn multiple_foreign_key_constraints_are_taken_always_in_the_same_order(api: &TestApi) -> TestResult {
     let migration = indoc! {r#"
         CREATE TABLE A

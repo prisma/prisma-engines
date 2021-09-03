@@ -1,7 +1,8 @@
 mod cycle_detection;
 
-use crate::common::*;
+use crate::{common::*, config::parse_config};
 use datamodel::ReferentialAction::*;
+use datamodel_connector::ReferentialIntegrity;
 use indoc::{formatdoc, indoc};
 
 #[test]
@@ -131,6 +132,127 @@ fn actions_on_prisma_referential_integrity() {
             .assert_has_relation_field("a")
             .assert_relation_delete_strategy(*action)
             .assert_relation_update_strategy(*action);
+    }
+}
+
+#[test]
+fn foreign_keys_not_allowed_on_mongo() {
+    let dml = indoc! {r#"
+        datasource db {
+          provider = "mongodb"
+          referentialIntegrity = "foreignKeys"
+          url = "mongodb://"
+        }
+
+        generator client {
+          provider = "prisma-client-js"
+          previewFeatures = ["referentialIntegrity"]
+        }
+
+        model A {
+          id Int @id
+          bs B[]
+        }
+
+        model B {
+          id Int @id
+          aId Int
+          a A @relation(fields: [aId], references: [id])
+        }
+    "#};
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError validating datasource `referentialIntegrity`: Invalid referential integrity setting: "foreignKeys". Supported values: "prisma"[0m
+          [1;94m-->[0m  [4mschema.prisma:3[0m
+        [1;94m   | [0m
+        [1;94m 2 | [0m  provider = "mongodb"
+        [1;94m 3 | [0m  referentialIntegrity = [1;91m"foreignKeys"[0m
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&parse_config(dml).map(drop).unwrap_err())
+}
+
+#[test]
+fn prisma_level_integrity_should_be_allowed_on_mongo() {
+    let dml = indoc! {r#"
+        datasource db {
+          provider = "mongodb"
+          referentialIntegrity = "prisma"
+          url = "mongodb://"
+        }
+
+        generator client {
+          provider = "prisma-client-js"
+          previewFeatures = ["referentialIntegrity"]
+        }
+
+        model A {
+          id Int @id
+          bs B[]
+        }
+
+        model B {
+          id Int @id
+          aId Int
+          a A @relation(fields: [aId], references: [id])
+        }
+    "#};
+
+    assert!(parse_config(dml).is_ok());
+}
+
+#[test]
+fn mongo_uses_prisma_referential_integrity_by_default() {
+    let dml = indoc! {r#"
+        datasource db {
+          provider = "mongodb"
+          url = "mongodb://"
+        }
+
+        model A {
+          id Int @id
+          bs B[]
+        }
+
+        model B {
+          id Int @id
+          aId Int
+          a A @relation(fields: [aId], references: [id])
+        }
+    "#};
+
+    assert_eq!(
+        ReferentialIntegrity::Prisma,
+        parse_config(dml).unwrap().subject.referential_integrity()
+    );
+}
+
+#[test]
+fn sql_databases_use_foreign_keys_referential_integrity_by_default() {
+    for db in ["postgres", "mysql", "sqlserver", "sqlite"] {
+        let dml = formatdoc! {r#"
+            datasource db {{
+              provider = "{db}"
+              url = "{db}://"
+            }}
+
+            model A {{
+              id Int @id
+              bs B[]
+            }}
+
+            model B {{
+              id Int @id
+              aId Int
+              a A @relation(fields: [aId], references: [id])
+            }}
+        "#, db = db};
+
+        assert_eq!(
+            ReferentialIntegrity::ForeignKeys,
+            parse_config(&dml).unwrap().subject.referential_integrity()
+        );
     }
 }
 

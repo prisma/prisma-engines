@@ -27,7 +27,7 @@ async fn a_table_without_required_uniques(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql))]
+#[test_connector(tags(Mysql), exclude(Vitess))]
 async fn a_table_without_uniques_should_ignore(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {

@@ -89,7 +89,7 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
                 let connector = config.test_connector_tag().unwrap();
 
                 query_tests_setup::run_with_tokio(async move {
-                    tracing::debug!("Used datamodel:\n {}", datamodel.clone().yellow());
+                    tracing::debug!("Used datamodel:\n {}", datamodel.yellow());
                     let runner = Runner::load(config.runner(), datamodel.clone(), connector).await.unwrap();
                     query_tests_setup::setup_project(&datamodel).await.unwrap();
                     #runner_fn_ident(runner).await.unwrap();
