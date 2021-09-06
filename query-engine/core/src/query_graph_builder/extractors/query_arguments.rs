@@ -123,7 +123,7 @@ fn process_order_object(
                     let sort_aggregation = extract_sort_aggregation(inner_field_name.as_str())?;
                     let sort_order = extract_sort_order(inner_field_value)?;
 
-                    Ok(Some(OrderBy::aggregation(path, sort_order, sort_aggregation)))
+                    Ok(Some(OrderBy::aggregation(None, path, sort_order, sort_aggregation)))
                 }
                 Field::Relation(rf) => {
                     let object: ParsedInputMap = field_value.try_into()?;
@@ -135,7 +135,16 @@ fn process_order_object(
                 Field::Scalar(sf) => {
                     let sort_order = extract_sort_order(field_value)?;
 
-                    Ok(Some(OrderBy::scalar(sf.clone(), path, sort_order)))
+                    if let Some(sort_aggr) = parent_sort_aggregation {
+                        Ok(Some(OrderBy::aggregation(
+                            Some(sf.clone()),
+                            vec![],
+                            sort_order,
+                            sort_aggr,
+                        )))
+                    } else {
+                        Ok(Some(OrderBy::scalar(sf.clone(), path, sort_order)))
+                    }
                 }
             }
         }
@@ -169,7 +178,11 @@ fn extract_order_by_relevance(model: &ModelRef, object: ParsedInputMap) -> Query
 
 fn extract_sort_aggregation(field_name: &str) -> QueryGraphBuilderResult<SortAggregation> {
     match field_name {
-        aggregations::COUNT | aggregations::UNDERSCORE_COUNT => Ok(SortAggregation::Count),
+        aggregations::UNDERSCORE_COUNT => Ok(SortAggregation::Count),
+        aggregations::UNDERSCORE_AVG => Ok(SortAggregation::Avg),
+        aggregations::UNDERSCORE_SUM => Ok(SortAggregation::Sum),
+        aggregations::UNDERSCORE_MIN => Ok(SortAggregation::Min),
+        aggregations::UNDERSCORE_MAX => Ok(SortAggregation::Max),
         _ => Err(QueryGraphBuilderError::InputError(
             "No aggregation operation could be found. This should not happen".to_string(),
         )),

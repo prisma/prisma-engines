@@ -392,16 +392,10 @@ fn cursor_order_def_aggregation(
         index
     );
 
-    let order_column: Expression = match order_by.sort_aggregation {
-        SortAggregation::Count => {
-            let order_column = order_by_def.order_column.clone();
-            let coalesce_exprs = vec![order_column, Value::integer(0).into()];
-
-            // We coalesce the order column to 0 when it's compared to the cmp table since the aggregations joins
-            // might return NULL on relations that have no connected records
-            coalesce(coalesce_exprs).into()
-        }
-    };
+    let coalesce_exprs: Vec<Expression> = vec![order_by_def.order_column.clone(), Value::integer(0).into()];
+    // We coalesce the order column to 0 when it's compared to the cmp table since the aggregations joins
+    // might return NULL on relations that have no connected records
+    let order_column: Expression = coalesce(coalesce_exprs).into();
 
     CursorOrderDefinition {
         sort_order: order_by.sort_order,

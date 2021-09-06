@@ -44,6 +44,7 @@ pub struct OrderByScalar {
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct OrderByAggregation {
+    pub field: Option<ScalarFieldRef>,
     pub path: Vec<RelationFieldRef>,
     pub sort_order: SortOrder,
     pub sort_aggregation: SortAggregation,
@@ -51,6 +52,14 @@ pub struct OrderByAggregation {
 
 impl OrderByAggregation {
     pub fn field(&self) -> ScalarFieldRef {
+        match &self.field {
+            Some(sf) => sf.clone(),
+            // TODO: This is a hack that should be removed once MongoDB is refactored too
+            None => self.id_field_from_relation(),
+        }
+    }
+
+    fn id_field_from_relation(&self) -> ScalarFieldRef {
         let ids: Vec<_> = self
             .path
             .last()
@@ -62,6 +71,10 @@ impl OrderByAggregation {
         let id = ids.first().unwrap();
 
         id.clone()
+    }
+
+    pub fn is_scalar_aggregation(&self) -> bool {
+        self.field.is_some() && self.path.is_empty()
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -80,8 +93,14 @@ impl OrderBy {
         })
     }
 
-    pub fn aggregation(path: Vec<RelationFieldRef>, sort_order: SortOrder, sort_aggregation: SortAggregation) -> Self {
+    pub fn aggregation(
+        field: Option<ScalarFieldRef>,
+        path: Vec<RelationFieldRef>,
+        sort_order: SortOrder,
+        sort_aggregation: SortAggregation,
+    ) -> Self {
         Self::Aggregation(OrderByAggregation {
+            field,
             path,
             sort_order,
             sort_aggregation,
@@ -117,6 +136,10 @@ impl SortOrder {
 #[derive(Clone, Copy, PartialEq, Debug, Eq, Hash)]
 pub enum SortAggregation {
     Count,
+    Avg,
+    Sum,
+    Min,
+    Max,
 }
 
 impl ToString for SortOrder {
