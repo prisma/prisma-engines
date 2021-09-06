@@ -17,13 +17,10 @@ pub(crate) fn order_by_object_type(
         vec![ordering::ASC.to_owned(), ordering::DESC.to_owned()],
     ));
     let ident_suffix = match (include_relations, include_scalar_aggregations, include_full_text_search) {
-        (true, true, _) => unimplemented!("Order by with relations and scalar aggregations is not supported yet"),
-        (false, false, false) => "",
         (true, false, false) => "WithRelation",
-        (true, false, true) => "WithRelationAndSearchRelevance",
         (false, true, false) => "WithAggregation",
-        (false, true, true) => "WithAggregationAndSearchRelevance",
-        (false, false, true) => "WithSearchRelevance",
+        (true, false, true) => "WithRelationAndSearchRelevance",
+        _ => unreachable!("Invalid combination of parameters"),
     };
     let ident = Identifier::new(format!("{}OrderBy{}Input", model.name, ident_suffix), PRISMA_NAMESPACE);
     return_cached_input!(ctx, &ident);
