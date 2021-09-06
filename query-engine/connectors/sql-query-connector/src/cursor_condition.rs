@@ -405,9 +405,9 @@ fn cursor_order_def_aggregation(
 
     CursorOrderDefinition {
         sort_order: order_by.sort_order,
-        order_column,
+        order_column: order_column.clone(),
         order_fks: fks,
-        cmp_column: order_by_def.order_column.clone().alias(cmp_column_alias.clone()),
+        cmp_column: order_column.alias(cmp_column_alias.clone()),
         cmp_column_alias: cmp_column_alias.clone(),
         on_nullable_fields: false,
     }

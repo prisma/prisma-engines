@@ -235,7 +235,7 @@ mod order_by_relevance {
               { relations: { _count: asc } }
             ]
           ) { id } }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":4}, {"id":3}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":4},{"id":3}]}}"###
         );
 
         Ok(())
