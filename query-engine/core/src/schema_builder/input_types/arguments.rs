@@ -123,7 +123,8 @@ pub(crate) fn many_records_arguments(
             &model,
             true,
             false,
-            ctx.has_feature(&PreviewFeature::FullTextSearch),
+            ctx.has_feature(&PreviewFeature::FullTextSearch)
+                && ctx.has_capability(ConnectorCapability::FullTextSearchWithoutIndex),
         ),
         input_field(args::CURSOR, unique_input_type, None).optional(),
         input_field(args::TAKE, InputType::int(), None).optional(),
