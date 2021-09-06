@@ -359,10 +359,10 @@ impl<'a> Visitor<'a> for Postgres<'a> {
 
     #[cfg(feature = "postgresql")]
     fn visit_text_search(&mut self, text_search: crate::prelude::TextSearch<'a>) -> visitor::Result {
-        let len = text_search.columns.len();
+        let len = text_search.exprs.len();
         self.surround_with("to_tsvector(", ")", |s| {
-            for (i, column) in text_search.columns.into_iter().enumerate() {
-                s.visit_column(column)?;
+            for (i, expr) in text_search.exprs.into_iter().enumerate() {
+                s.visit_expression(expr)?;
 
                 if i < (len - 1) {
                     s.write("|| ' ' ||")?;

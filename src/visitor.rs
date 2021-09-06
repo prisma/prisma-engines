@@ -1008,6 +1008,28 @@ pub trait Visitor<'a> {
             FunctionType::TextSearch(text_search) => {
                 self.visit_text_search(text_search)?;
             }
+            #[cfg(feature = "postgresql")]
+            FunctionType::TextSearchRelevance(text_search_relevance) => {
+                let len = text_search_relevance.exprs.len();
+                let exprs = text_search_relevance.exprs;
+                let query = text_search_relevance.query;
+
+                self.write("ts_rank(")?;
+                self.surround_with("to_tsvector(", ")", |s| {
+                    for (i, expr) in exprs.into_iter().enumerate() {
+                        s.visit_expression(expr)?;
+
+                        if i < (len - 1) {
+                            s.write("|| ' ' ||")?;
+                        }
+                    }
+
+                    Ok(())
+                })?;
+                self.write(", ")?;
+                self.surround_with("to_tsquery(", ")", |s| s.visit_parameterized(Value::text(query)))?;
+                self.write(")")?;
+            }
         };
 
         if let Some(alias) = fun.alias {

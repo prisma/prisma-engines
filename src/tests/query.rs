@@ -2751,7 +2751,7 @@ async fn text_search_fun(api: &mut dyn TestApi) -> crate::Result<()> {
     api.conn().insert(insert_2.into()).await?;
 
     // Search on multiple columns at the same time
-    let search: Expression = text_search(&vec!["name", "ingredients"]).into();
+    let search: Expression = text_search(&[col!("name"), col!("ingredients")]).into();
     let q = Select::from_table(&table).so_that(search.matches("chicken"));
     let res = api.conn().select(q).await?;
     let row_one = res.get(0).unwrap();
@@ -2766,7 +2766,7 @@ async fn text_search_fun(api: &mut dyn TestApi) -> crate::Result<()> {
     );
 
     // Search on a single column
-    let search: Expression = text_search(&vec!["name"]).into();
+    let search: Expression = text_search(&[col!("name")]).into();
     let q = Select::from_table(&table).so_that(search.matches("chicken"));
     let row = api.conn().select(q).await?.into_single()?;
 
@@ -2774,12 +2774,47 @@ async fn text_search_fun(api: &mut dyn TestApi) -> crate::Result<()> {
     assert_eq!(row["ingredients"], Value::from("Chicken, Curry, Rice"));
 
     // Search on a single column with NOT
-    let search: Expression = text_search(&vec!["name"]).into();
+    let search: Expression = text_search(&[col!("name")]).into();
     let q = Select::from_table(&table).so_that(search.not_matches("salad"));
     let row = api.conn().select(q).await?.into_single()?;
 
     assert_eq!(row["name"], Value::from("Chicken Curry"));
     assert_eq!(row["ingredients"], Value::from("Chicken, Curry, Rice"));
+
+    Ok(())
+}
+
+#[cfg(feature = "postgresql")]
+#[test_each_connector(tags("postgresql"))]
+async fn text_search_relevance_fun(api: &mut dyn TestApi) -> crate::Result<()> {
+    let table = api.create_table("name varchar(255), ingredients varchar(255)").await?;
+
+    let insert_1 = Insert::single_into(&table)
+        .value("name", "Chicken Curry")
+        .value("ingredients", "Chicken, Curry, Rice");
+    let insert_2 = Insert::single_into(&table)
+        .value("name", "Caesar Salad")
+        .value("ingredients", "Salad, Chicken, Parmesan, Caesar Sauce");
+    api.conn().insert(insert_1.into()).await?;
+    api.conn().insert(insert_2.into()).await?;
+
+    // Compute search relevance on multiple columns at the same time
+    let search: Expression = text_search_relevance(&[col!("name"), col!("ingredients")], "chicken").into();
+    let q = Select::from_table(&table).value(search.alias("relevance"));
+    let mut res = api.conn().select(q).await?.into_iter();
+
+    assert_eq!(res.next().unwrap()["relevance"], Value::float(0.075990885));
+    assert_eq!(res.next().unwrap()["relevance"], Value::float(0.06079271));
+    assert_eq!(res.next(), None);
+
+    // Search on a single column
+    let search: Expression = text_search_relevance(&[col!("name")], "chicken").into();
+    let q = Select::from_table(&table).value(search.alias("relevance"));
+    let mut res = api.conn().select(q).await?.into_iter();
+
+    assert_eq!(res.next().unwrap()["relevance"], Value::float(0.06079271));
+    assert_eq!(res.next().unwrap()["relevance"], Value::float(0.0));
+    assert_eq!(res.next(), None);
 
     Ok(())
 }

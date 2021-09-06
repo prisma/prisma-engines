@@ -69,6 +69,8 @@ pub(crate) enum FunctionType<'a> {
     JsonExtractFirstArrayElem(JsonExtractFirstArrayElem<'a>),
     #[cfg(feature = "postgresql")]
     TextSearch(TextSearch<'a>),
+    #[cfg(feature = "postgresql")]
+    TextSearchRelevance(TextSearchRelevance<'a>),
 }
 
 impl<'a> Aliasable<'a> for Function<'a> {
@@ -97,6 +99,9 @@ function!(JsonExtractFirstArrayElem);
 
 #[cfg(feature = "postgresql")]
 function!(TextSearch);
+
+#[cfg(feature = "postgresql")]
+function!(TextSearchRelevance);
 
 function!(
     RowNumber,
