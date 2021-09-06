@@ -5,6 +5,7 @@ use prisma_models::*;
 use quaint::ast::*;
 
 static ORDER_TABLE_ALIAS: &str = "order_cmp";
+
 #[derive(Debug)]
 struct CursorOrderDefinition {
     /// Direction of the sort
@@ -339,18 +340,21 @@ fn order_definitions(
         .enumerate()
         .zip(order_by_defs.iter())
         .map(|((index, order_by), order_by_def)| match order_by {
-            OrderBy::Scalar(order_by) => cursor_order_def_scalar(index, order_by, order_by_def),
-            OrderBy::Aggregation(order_by) => cursor_order_def_aggregation(index, order_by, order_by_def),
-            OrderBy::Relevance(o) => cursor_order_def_relevance(order_by_def, &o.fields, o.sort_order),
+            OrderBy::Scalar(order_by) => cursor_order_def_scalar(order_by, order_by_def, index),
+            OrderBy::Aggregation(order_by) if order_by.is_scalar_aggregation() => {
+                cursor_order_def_aggregation_scalar(order_by, order_by_def, index)
+            }
+            OrderBy::Aggregation(order_by) => cursor_order_def_aggregation_rel(order_by, order_by_def, index),
+            OrderBy::Relevance(order_by) => cursor_order_def_relevance(order_by, order_by_def),
         })
         .collect_vec()
 }
 
 /// Build a CursorOrderDefinition for an order by scalar
 fn cursor_order_def_scalar(
-    index: usize,
     order_by: &OrderByScalar,
     order_by_def: &OrderByDefinition,
+    index: usize,
 ) -> CursorOrderDefinition {
     // If there are any ordering hop, this finds the foreign key fields for the _last_ hop (we look for the last one because the ordering is done the last one).
     // These fk fields are needed to check whether they are nullable
@@ -367,16 +371,43 @@ fn cursor_order_def_scalar(
         order_column: order_by_def.order_column.clone(),
         order_fks: fks,
         cmp_column: order_by_def.order_column.clone().alias(cmp_column_alias.clone()),
-        cmp_column_alias: cmp_column_alias.clone(),
+        cmp_column_alias,
         on_nullable_fields: !order_by.field.is_required,
     }
 }
 
-/// Build a CursorOrderDefinition for an order by aggregation
-fn cursor_order_def_aggregation(
-    index: usize,
+/// Build a CursorOrderDefinition for an order by aggregation scalar
+fn cursor_order_def_aggregation_scalar(
     order_by: &OrderByAggregation,
     order_by_def: &OrderByDefinition,
+    index: usize,
+) -> CursorOrderDefinition {
+    let field = order_by.field.as_ref().unwrap();
+    // Selected fields needs to be aliased in case there are two order bys on two different tables, pointing to a field of the same name.
+    // eg: orderBy: [{ id: asc }, { b: { id: asc } }]
+    // Without these aliases, selecting from the <ORDER_TABLE_ALIAS> cmp table would result in ambiguous field name
+    let cmp_column_alias = format!("aggr_{}_{}_{}", &field.model().name, &field.name, index);
+
+    let coalesce_exprs: Vec<Expression> = vec![order_by_def.order_column.clone(), Value::integer(0).into()];
+    // We coalesce the order column to 0 when it's compared to the cmp table since the aggregations joins
+    // might return NULL on relations that have no connected records
+    let order_column: Expression = coalesce(coalesce_exprs).into();
+
+    CursorOrderDefinition {
+        sort_order: order_by.sort_order,
+        order_column: order_column.clone(),
+        order_fks: None,
+        cmp_column: order_column.alias(cmp_column_alias.clone()),
+        cmp_column_alias,
+        on_nullable_fields: false,
+    }
+}
+
+/// Build a CursorOrderDefinition for an order by aggregation on relations
+fn cursor_order_def_aggregation_rel(
+    order_by: &OrderByAggregation,
+    order_by_def: &OrderByDefinition,
+    index: usize,
 ) -> CursorOrderDefinition {
     // If there are any ordering hop, this finds the foreign key fields for the _last_ hop (we look for the last one because the ordering is done the last one).
     // These fk fields are needed to check whether they are nullable
@@ -402,26 +433,22 @@ fn cursor_order_def_aggregation(
         order_column: order_column.clone(),
         order_fks: fks,
         cmp_column: order_column.alias(cmp_column_alias.clone()),
-        cmp_column_alias: cmp_column_alias.clone(),
+        cmp_column_alias,
         on_nullable_fields: false,
     }
 }
 
 /// Build a CursorOrderDefinition for an order by relevance
-fn cursor_order_def_relevance(
-    order_by_def: &OrderByDefinition,
-    fields: &[ScalarFieldRef],
-    sort_order: SortOrder,
-) -> CursorOrderDefinition {
+fn cursor_order_def_relevance(order_by: &OrderByRelevance, order_by_def: &OrderByDefinition) -> CursorOrderDefinition {
     let cmp_column = order_by_def.column_to_select.as_ref().unwrap();
 
     CursorOrderDefinition {
-        sort_order,
-        order_column: order_by_def.order_column.clone().into(),
+        sort_order: order_by.sort_order,
+        order_column: order_by_def.order_column.clone(),
         order_fks: None,
         cmp_column: cmp_column.clone(),
         cmp_column_alias: cmp_column.alias().unwrap().to_owned(),
-        on_nullable_fields: fields.iter().any(|f| !f.is_required),
+        on_nullable_fields: order_by.fields.iter().any(|f| !f.is_required),
     }
 }
 
