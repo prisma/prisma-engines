@@ -88,6 +88,7 @@ impl MySqlDatamodelConnector {
             ConnectorCapability::QueryRaw,
             ConnectorCapability::ForeignKeys,
             ConnectorCapability::NamedForeignKeys,
+            ConnectorCapability::AdvancedJsonNullability,
         ];
 
         if !is_planetscale {

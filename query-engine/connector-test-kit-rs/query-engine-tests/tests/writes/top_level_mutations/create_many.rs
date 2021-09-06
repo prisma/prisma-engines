@@ -249,3 +249,97 @@ mod create_many {
         Ok(())
     }
 }
+
+#[test_suite(schema(json_opt), exclude(MySql(5.6)), capabilities(CreateMany, Json))]
+mod json_create_many {
+    use query_engine_tests::{assert_error, run_query};
+
+    #[connector_test(only(MongoDb))]
+    async fn create_many_json(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+              createManyTestModel(data: [
+                { id: 1, json: "{}" },
+                { id: 2, json: "null" },
+                { id: 3, json: null },
+                { id: 4 },
+              ]) {
+                count
+              }
+            }"#),
+          @r###"{"data":{"createManyTestModel":{"count":4}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+              findManyTestModel {
+                id
+                json
+              }
+            }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1,"json":"{}"},{"id":2,"json":null},{"id":3,"json":null},{"id":4,"json":null}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(capabilities(AdvancedJsonNullability))]
+    async fn create_many_json_adv(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+              createManyTestModel(data: [
+                { id: 1, json: "{}" },
+                { id: 2, json: JsonNull },
+                { id: 3, json: DbNull },
+                { id: 4 },
+              ]) {
+                count
+              }
+            }"#),
+          @r###"{"data":{"createManyTestModel":{"count":4}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+              findManyTestModel {
+                id
+                json
+              }
+            }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1,"json":"{}"},{"id":2,"json":"null"},{"id":3,"json":null},{"id":4,"json":null}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(capabilities(AdvancedJsonNullability))]
+    async fn create_many_json_errors(runner: Runner) -> TestResult<()> {
+        assert_error!(
+            &runner,
+            r#"mutation {
+                  createManyTestModel(data: [
+                    { id: 1, json: null },
+                  ]) {
+                    count
+                  }
+                }"#,
+            2009,
+            "A value is required but not set."
+        );
+
+        assert_error!(
+            &runner,
+            r#"mutation {
+                createManyTestModel(data: [
+                  { id: 1, json: AnyNull },
+                ]) {
+                  count
+                }
+              }"#,
+            2009,
+            "Value types mismatch. Have: Enum(\"AnyNull\")"
+        );
+
+        Ok(())
+    }
+}

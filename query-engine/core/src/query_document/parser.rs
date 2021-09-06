@@ -391,7 +391,7 @@ impl QueryDocumentParser {
                 None => err(&db.name),
             },
             EnumType::String(s) => match s.value_for(raw.as_str()) {
-                Some(val) => Ok(ParsedInputValue::Single(PrismaValue::String(val.to_owned()))),
+                Some(val) => Ok(ParsedInputValue::Single(PrismaValue::Enum(val.to_owned()))),
                 None => err(&s.name),
             },
             EnumType::FieldRef(f) => match f.value_for(raw.as_str()) {

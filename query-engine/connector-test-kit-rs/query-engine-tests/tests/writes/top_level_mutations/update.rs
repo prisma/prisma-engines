@@ -486,3 +486,85 @@ mod update {
         Ok(())
     }
 }
+
+#[test_suite(schema(json_opt), exclude(MySql(5.6)), capabilities(Json))]
+mod json_update {
+    use query_engine_tests::{assert_error, run_query};
+
+    #[connector_test(only(MongoDb))]
+    async fn update_json(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 1 }) { json }}"#),
+          @r###"{"data":{"createOneTestModel":{"json":null}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { updateOneTestModel(where: { id: 1 }, data: { json: "{}" }) { json }}"#),
+          @r###"{"data":{"updateOneTestModel":{"json":"{}"}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { updateOneTestModel(where: { id: 1 }, data: { json: "null" }) { json }}"#),
+          @r###"{"data":{"updateOneTestModel":{"json":null}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { updateOneTestModel(where: { id: 1 }, data: { json: null }) { json }}"#),
+          @r###"{"data":{"updateOneTestModel":{"json":null}}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(capabilities(AdvancedJsonNullability))]
+    async fn update_json_adv(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 1 }) { json }}"#),
+          @r###"{"data":{"createOneTestModel":{"json":null}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { updateOneTestModel(where: { id: 1 }, data: { json: "{}" }) { json }}"#),
+          @r###"{"data":{"updateOneTestModel":{"json":"{}"}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { updateOneTestModel(where: { id: 1 }, data: { json: JsonNull }) { json }}"#),
+          @r###"{"data":{"updateOneTestModel":{"json":"null"}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { updateOneTestModel(where: { id: 1 }, data: { json: DbNull }) { json }}"#),
+          @r###"{"data":{"updateOneTestModel":{"json":null}}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(capabilities(AdvancedJsonNullability))]
+    async fn update_json_errors(runner: Runner) -> TestResult<()> {
+        assert_error!(
+            &runner,
+            r#"mutation {
+                  updateOneTestModel(where: { id: 1 }, data: { json: null }) {
+                    json
+                  }
+                }"#,
+            2009,
+            "A value is required but not set."
+        );
+
+        assert_error!(
+            &runner,
+            r#"mutation {
+                updateOneTestModel(where: { id: 1 }, data: { json: AnyNull }) {
+                  id
+                }
+              }"#,
+            2009,
+            "Value types mismatch. Have: Enum(\"AnyNull\")"
+        );
+
+        Ok(())
+    }
+}
