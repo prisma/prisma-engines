@@ -97,22 +97,43 @@ fn build_order_aggr(
     needs_reversed_order: bool,
     index: usize,
 ) -> OrderByDefinition {
-    let (joins, order_column) = compute_joins_aggregation(order_by, index, base_model);
     let order: Option<Order> = Some(order_by.sort_order.into_order(needs_reversed_order));
-    let order_definition: OrderDefinition = match order_by.sort_aggregation {
-        SortAggregation::Count => {
-            let exprs: Vec<Expression> = vec![order_column.clone().into(), Value::integer(0).into()];
 
-            // We coalesce the order by expr to 0 so that if there's no relation,
-            // `COALESCE(NULL, 0)` will return `0`, thus preserving the order
-            (coalesce(exprs).into(), order)
+    if order_by.is_scalar_aggregation() {
+        let order_column = order_by.field.as_ref().unwrap().as_column();
+        let order_definition: OrderDefinition = match order_by.sort_aggregation {
+            SortAggregation::Count => (count(order_column.clone()).into(), order),
+            SortAggregation::Avg => (avg(order_column.clone()).into(), order),
+            SortAggregation::Sum => (sum(order_column.clone()).into(), order),
+            SortAggregation::Min => (min(order_column.clone()).into(), order),
+            SortAggregation::Max => (max(order_column.clone()).into(), order),
+        };
+
+        OrderByDefinition {
+            order_column: order_column.into(),
+            order_definition,
+            joins: vec![],
+            column_to_select: None,
         }
-    };
-    OrderByDefinition {
-        order_column: order_column.into(),
-        order_definition,
-        joins,
-        column_to_select: None,
+    } else {
+        let (joins, order_column) = compute_joins_aggregation(order_by, index, base_model);
+        let order_definition: OrderDefinition = match order_by.sort_aggregation {
+            SortAggregation::Count => {
+                let exprs: Vec<Expression> = vec![order_column.clone().into(), Value::integer(0).into()];
+
+                // We coalesce the order by expr to 0 so that if there's no relation,
+                // `COALESCE(NULL, 0)` will return `0`, thus preserving the order
+                (coalesce(exprs).into(), order)
+            }
+            _ => unreachable!("Order by relation aggregation other than count are not supported"),
+        };
+
+        OrderByDefinition {
+            order_column: order_column.into(),
+            order_definition,
+            joins,
+            column_to_select: None,
+        }
     }
 }
 
@@ -133,6 +154,7 @@ pub fn compute_joins_aggregation(
 
     let aggregation_type = match order_by.sort_aggregation {
         SortAggregation::Count => AggregationType::Count,
+        _ => unreachable!("Order by relation aggregation other than count are not supported"),
     };
     // We perform the aggregation on the last join
     let last_aggr_join = compute_aggr_join(
