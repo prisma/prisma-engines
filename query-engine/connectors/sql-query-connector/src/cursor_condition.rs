@@ -9,14 +9,14 @@ static ORDER_TABLE_ALIAS: &str = "order_cmp";
 struct CursorOrderDefinition {
     /// Direction of the sort
     pub(crate) sort_order: SortOrder,
-    /// Column identifier on which the top-level ORDER BY is performed
-    pub(crate) top_order_column: Expression<'static>,
-    /// Column identifier that needs to be selected in the ORDER_TABLE_ALIAS cmp table
-    pub(crate) inner_cmp_column: Expression<'static>,
-    /// Alias of the inner_cmp_column
-    pub(crate) inner_cmp_column_alias: String,
+    /// Column on which the top-level ORDER BY is performed
+    pub(crate) order_column: Expression<'static>,
     /// Foreign keys of the relations on which the order is performed
-    pub(crate) top_order_fks: Option<Vec<CursorOrderForeignKey>>,
+    pub(crate) order_fks: Option<Vec<CursorOrderForeignKey>>,
+    /// Column selected from the ORDER_TABLE_ALIAS cmp table and compared against the order_column
+    pub(crate) cmp_column: Expression<'static>,
+    /// Alias of the cmp_column
+    pub(crate) cmp_column_alias: String,
     /// Indicates whether the ordering is performed on nullable field(s)
     pub(crate) on_nullable_fields: bool,
 }
@@ -139,7 +139,7 @@ pub fn build(
             let order_subquery = definitions
                 .iter()
                 .fold(Select::from_table(model.as_table()), |select, definition| {
-                    select.value(definition.inner_cmp_column.clone())
+                    select.value(definition.cmp_column.clone())
                 })
                 .so_that(cursor_condition);
 
@@ -217,43 +217,43 @@ fn map_orderby_condition(
     reverse: bool,
     include_eq: bool,
 ) -> Expression<'static> {
-    let cmp_column = Column::from((ORDER_TABLE_ALIAS, order_definition.inner_cmp_column_alias.to_owned()));
+    let cmp_column = Column::from((ORDER_TABLE_ALIAS, order_definition.cmp_column_alias.to_owned()));
     let cloned_cmp_column = cmp_column.clone();
-    let top_order_column = order_definition.top_order_column.clone();
-    let cloned_order_column = top_order_column.clone();
+    let order_column = order_definition.order_column.clone();
+    let cloned_order_column = order_column.clone();
 
     let order_expr: Expression<'static> = match order_definition.sort_order {
         // If it's ASC but we want to take from the back, the ORDER BY will be DESC, meaning that comparisons done need to be lt(e).
         SortOrder::Ascending if reverse => {
             if include_eq {
-                top_order_column.less_than_or_equals(cmp_column)
+                order_column.less_than_or_equals(cmp_column)
             } else {
-                top_order_column.less_than(cmp_column)
+                order_column.less_than(cmp_column)
             }
         }
 
         // If it's DESC but we want to take from the back, the ORDER BY will be ASC, meaning that comparisons done need to be gt(e).
         SortOrder::Descending if reverse => {
             if include_eq {
-                top_order_column.greater_than_or_equals(cmp_column)
+                order_column.greater_than_or_equals(cmp_column)
             } else {
-                top_order_column.greater_than(cmp_column)
+                order_column.greater_than(cmp_column)
             }
         }
 
         SortOrder::Ascending => {
             if include_eq {
-                top_order_column.greater_than_or_equals(cmp_column)
+                order_column.greater_than_or_equals(cmp_column)
             } else {
-                top_order_column.greater_than(cmp_column)
+                order_column.greater_than(cmp_column)
             }
         }
 
         SortOrder::Descending => {
             if include_eq {
-                top_order_column.less_than_or_equals(cmp_column)
+                order_column.less_than_or_equals(cmp_column)
             } else {
-                top_order_column.less_than(cmp_column)
+                order_column.less_than(cmp_column)
             }
         }
     }
@@ -271,7 +271,7 @@ fn map_orderby_condition(
     };
 
     // Add OR statements for the foreign key fields too if they are nullable
-    let order_expr = if let Some(fks) = &order_definition.top_order_fks {
+    let order_expr = if let Some(fks) = &order_definition.order_fks {
         fks.iter()
             .filter(|fk| !fk.field.is_required)
             .fold(order_expr, |acc, fk| {
@@ -292,20 +292,20 @@ fn map_orderby_condition(
 }
 
 fn map_equality_condition(order_definition: &CursorOrderDefinition) -> Expression<'static> {
-    let cmp_column = Column::from((ORDER_TABLE_ALIAS, order_definition.inner_cmp_column_alias.to_owned()));
-    let top_order_column = order_definition.top_order_column.to_owned();
+    let cmp_column = Column::from((ORDER_TABLE_ALIAS, order_definition.cmp_column_alias.to_owned()));
+    let order_column = order_definition.order_column.to_owned();
 
     // If we have null values in the ordering or comparison row, those are automatically included because we can't make a
     // statement over their order relative to the cursor.
     if order_definition.on_nullable_fields {
-        top_order_column
+        order_column
             .clone()
             .equals(cmp_column.clone())
             .or(cmp_column.is_null())
-            .or(top_order_column.is_null())
+            .or(order_column.is_null())
             .into()
     } else {
-        top_order_column.equals(cmp_column).into()
+        order_column.equals(cmp_column).into()
     }
 }
 
@@ -324,10 +324,10 @@ fn order_definitions(
             .scalar_fields()
             .map(|f| CursorOrderDefinition {
                 sort_order: SortOrder::Ascending,
-                top_order_column: f.as_column().into(),
-                inner_cmp_column: f.as_column().into(),
-                inner_cmp_column_alias: f.db_name().to_string(),
-                top_order_fks: None,
+                order_column: f.as_column().into(),
+                order_fks: None,
+                cmp_column: f.as_column().into(),
+                cmp_column_alias: f.db_name().to_string(),
                 on_nullable_fields: !f.is_required,
             })
             .collect();
@@ -339,38 +339,77 @@ fn order_definitions(
         .enumerate()
         .zip(order_by_defs.iter())
         .map(|((index, order_by), order_by_def)| match order_by {
-            OrderBy::Scalar(o) => cursor_order_def(index, order_by_def, o.field.clone(), &o.path, o.sort_order),
-            OrderBy::Aggregation(o) => cursor_order_def(index, order_by_def, o.field(), &o.path, o.sort_order),
+            OrderBy::Scalar(order_by) => cursor_order_def_scalar(index, order_by, order_by_def),
+            OrderBy::Aggregation(order_by) => cursor_order_def_aggregation(index, order_by, order_by_def),
             OrderBy::Relevance(o) => cursor_order_def_relevance(order_by_def, &o.fields, o.sort_order),
         })
         .collect_vec()
 }
 
-/// Build a CursorOrderDefinition for an order by scalar or aggregation
-fn cursor_order_def(
+/// Build a CursorOrderDefinition for an order by scalar
+fn cursor_order_def_scalar(
     index: usize,
+    order_by: &OrderByScalar,
     order_by_def: &OrderByDefinition,
-    field: ScalarFieldRef,
-    path: &[RelationFieldRef],
-    sort_order: SortOrder,
 ) -> CursorOrderDefinition {
     // If there are any ordering hop, this finds the foreign key fields for the _last_ hop (we look for the last one because the ordering is done the last one).
     // These fk fields are needed to check whether they are nullable
     // cf: part #2 of the SQL query above, when a field is nullable.
-    let fks = foreign_keys_from_order_path(path, &order_by_def.joins);
+    let fks = foreign_keys_from_order_path(&order_by.path, &order_by_def.joins);
 
     // Selected fields needs to be aliased in case there are two order bys on two different tables, pointing to a field of the same name.
     // eg: orderBy: [{ id: asc }, { b: { id: asc } }]
     // Without these aliases, selecting from the <ORDER_TABLE_ALIAS> tmp table would result in ambiguous field name
-    let field_alias = format!("{}_{}_{}", field.model().name, field.name, index);
+    let cmp_column_alias = format!("{}_{}_{}", &order_by.field.model().name, &order_by.field.name, index);
 
     CursorOrderDefinition {
-        sort_order,
-        top_order_column: order_by_def.order_column.clone(),
-        inner_cmp_column: order_by_def.order_column.clone().alias(field_alias.clone()),
-        inner_cmp_column_alias: field_alias.clone(),
-        top_order_fks: fks,
-        on_nullable_fields: !field.is_required,
+        sort_order: order_by.sort_order,
+        order_column: order_by_def.order_column.clone(),
+        order_fks: fks,
+        cmp_column: order_by_def.order_column.clone().alias(cmp_column_alias.clone()),
+        cmp_column_alias: cmp_column_alias.clone(),
+        on_nullable_fields: !order_by.field.is_required,
+    }
+}
+
+/// Build a CursorOrderDefinition for an order by aggregation
+fn cursor_order_def_aggregation(
+    index: usize,
+    order_by: &OrderByAggregation,
+    order_by_def: &OrderByDefinition,
+) -> CursorOrderDefinition {
+    // If there are any ordering hop, this finds the foreign key fields for the _last_ hop (we look for the last one because the ordering is done the last one).
+    // These fk fields are needed to check whether they are nullable
+    // cf: part #2 of the SQL query above, when a field is nullable.
+    let fks = foreign_keys_from_order_path(&order_by.path, &order_by_def.joins);
+
+    // Selected fields needs to be aliased in case there are two order bys on two different tables, pointing to a field of the same name.
+    // eg: orderBy: [{ id: asc }, { b: { id: asc } }]
+    // Without these aliases, selecting from the <ORDER_TABLE_ALIAS> cmp table would result in ambiguous field name
+    let cmp_column_alias = format!(
+        "aggr_{}_{}",
+        order_by.path.iter().map(|rf| rf.model().name.to_owned()).join("_"),
+        index
+    );
+
+    let order_column: Expression = match order_by.sort_aggregation {
+        SortAggregation::Count => {
+            let order_column = order_by_def.order_column.clone();
+            let coalesce_exprs = vec![order_column, Value::integer(0).into()];
+
+            // We coalesce the order column to 0 when it's compared to the cmp table since the aggregations joins
+            // might return NULL on relations that have no connected records
+            coalesce(coalesce_exprs).into()
+        }
+    };
+
+    CursorOrderDefinition {
+        sort_order: order_by.sort_order,
+        order_column,
+        order_fks: fks,
+        cmp_column: order_by_def.order_column.clone().alias(cmp_column_alias.clone()),
+        cmp_column_alias: cmp_column_alias.clone(),
+        on_nullable_fields: false,
     }
 }
 
@@ -380,17 +419,16 @@ fn cursor_order_def_relevance(
     fields: &[ScalarFieldRef],
     sort_order: SortOrder,
 ) -> CursorOrderDefinition {
-    let inner_order_column = order_by_def.column_to_select.as_ref().unwrap();
-    let output = CursorOrderDefinition {
-        sort_order,
-        top_order_column: order_by_def.order_column.clone().into(),
-        inner_cmp_column: inner_order_column.clone(),
-        inner_cmp_column_alias: inner_order_column.alias().unwrap().to_owned(),
-        top_order_fks: None,
-        on_nullable_fields: fields.iter().any(|f| !f.is_required),
-    };
+    let cmp_column = order_by_def.column_to_select.as_ref().unwrap();
 
-    output
+    CursorOrderDefinition {
+        sort_order,
+        order_column: order_by_def.order_column.clone().into(),
+        order_fks: None,
+        cmp_column: cmp_column.clone(),
+        cmp_column_alias: cmp_column.alias().unwrap().to_owned(),
+        on_nullable_fields: fields.iter().any(|f| !f.is_required),
+    }
 }
 
 fn foreign_keys_from_order_path(
