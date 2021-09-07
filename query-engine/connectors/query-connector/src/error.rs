@@ -77,7 +77,11 @@ impl ConnectorError {
                     actual: *actual,
                 },
             )),
-
+            ErrorKind::BindValuesExceeded(message) => {
+                Some(KnownError::new(user_facing_errors::query_engine::BindValuesExceeded {
+                    message: message.clone(),
+                }))
+            }
             _ => None,
         };
 
@@ -198,6 +202,9 @@ pub enum ErrorKind {
 
     #[error("{}", message)]
     TransactionAlreadyClosed { message: String },
+
+    #[error("The maximum amount of bind values supported by your database is exceeded: {0}.")]
+    BindValuesExceeded(String),
 }
 
 impl From<DomainError> for ConnectorError {

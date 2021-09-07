@@ -142,6 +142,9 @@ pub enum SqlError {
 
     #[error("{}", _0)]
     TransactionAlreadyClosed(String),
+
+    #[error("Bind values exceeded error: {0}.")]
+    BindValuesExceeded(String),
 }
 
 impl SqlError {
@@ -232,6 +235,7 @@ impl SqlError {
                 )),
                 kind: ErrorKind::TransactionAlreadyClosed { message },
             },
+            SqlError::BindValuesExceeded(e) => ConnectorError::from_kind(ErrorKind::BindValuesExceeded(e)),
         }
     }
 }

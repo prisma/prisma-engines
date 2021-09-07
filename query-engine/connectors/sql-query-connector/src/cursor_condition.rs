@@ -345,7 +345,7 @@ fn order_definitions(
                 cursor_order_def_aggregation_scalar(order_by, order_by_def, index)
             }
             OrderBy::Aggregation(order_by) => cursor_order_def_aggregation_rel(order_by, order_by_def, index),
-            OrderBy::Relevance(order_by) => cursor_order_def_relevance(order_by, order_by_def),
+            OrderBy::Relevance(order_by) => cursor_order_def_relevance(order_by, order_by_def, index),
         })
         .collect_vec()
 }
@@ -439,16 +439,25 @@ fn cursor_order_def_aggregation_rel(
 }
 
 /// Build a CursorOrderDefinition for an order by relevance
-fn cursor_order_def_relevance(order_by: &OrderByRelevance, order_by_def: &OrderByDefinition) -> CursorOrderDefinition {
-    let cmp_column = order_by_def.column_to_select.as_ref().unwrap();
+fn cursor_order_def_relevance(
+    order_by: &OrderByRelevance,
+    order_by_def: &OrderByDefinition,
+    index: usize,
+) -> CursorOrderDefinition {
+    let order_column = &order_by_def.order_column;
+    let cmp_column_alias = format!(
+        "relevance_{}_{}",
+        order_by.fields.iter().map(|sf| sf.name.as_str()).join("_"),
+        index
+    );
 
     CursorOrderDefinition {
         sort_order: order_by.sort_order,
-        order_column: order_by_def.order_column.clone(),
+        order_column: order_column.clone(),
         order_fks: None,
-        cmp_column: cmp_column.clone(),
-        cmp_column_alias: cmp_column.alias().unwrap().to_owned(),
-        on_nullable_fields: order_by.fields.iter().any(|f| !f.is_required),
+        cmp_column: order_column.clone().alias(cmp_column_alias.clone()),
+        cmp_column_alias: cmp_column_alias,
+        on_nullable_fields: false,
     }
 }
 

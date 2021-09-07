@@ -291,3 +291,9 @@ pub struct MultiError {
 pub struct InteractiveTransactionError {
     pub error: String,
 }
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P2029", message = "Bind values exceeded error: {message}.")]
+pub struct BindValuesExceeded {
+    pub message: String,
+}
