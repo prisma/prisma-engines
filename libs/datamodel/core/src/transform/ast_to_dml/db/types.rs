@@ -100,8 +100,8 @@ pub(crate) struct RelationField<'ast> {
     /// The name _explicitly present_ in the AST.
     pub(crate) name: Option<&'ast str>,
     pub(crate) is_ignored: bool,
-    /// The fk_name _explicitly present_ in the AST by using the map argument or the one being generated as default.
-    pub(crate) fk_name: Option<Cow<'ast, str>>,
+    /// The fk_name _explicitly present_ in the AST through the map argument.
+    pub(crate) fk_name: Option<&'ast str>,
 }
 
 impl RelationField<'_> {
@@ -155,7 +155,7 @@ pub(crate) struct IndexData<'ast> {
     pub(crate) fields: Vec<ast::FieldId>,
     pub(crate) source_field: Option<ast::FieldId>,
     pub(crate) name: Option<&'ast str>,
-    pub(crate) db_name: Option<Cow<'ast, str>>,
+    pub(crate) db_name: Option<&'ast str>,
 }
 
 #[derive(Debug, Default)]

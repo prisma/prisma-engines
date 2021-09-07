@@ -38,13 +38,14 @@ impl<'a> LiftAstToDml<'a> {
     /// Internal: Validates a model AST node and lifts it to a DML model.
     fn lift_model(&self, model_id: ast::ModelId, ast_model: &ast::Model) -> dml::Model {
         let mut model = dml::Model::new(ast_model.name.name.clone(), None);
-        let model_data = self.db.get_model_data(&model_id).unwrap();
+        let model_data = self.db.walk_model(model_id);
 
         model.documentation = ast_model.documentation.clone().map(|comment| comment.text);
-        model.database_name = model_data.mapped_name.map(String::from);
-        model.is_ignored = model_data.is_ignored;
+        model.database_name = model_data.attributes().mapped_name.map(String::from);
+        model.is_ignored = model_data.attributes().is_ignored;
 
         model.primary_key = model_data
+            .attributes()
             .primary_key
             .as_ref()
             .map(|pk_data| dml::PrimaryKeyDefinition {
@@ -59,21 +60,21 @@ impl<'a> LiftAstToDml<'a> {
             });
 
         model.indices = model_data
-            .indexes
-            .iter()
-            .map(|(_, idx)| dml::IndexDefinition {
-                name: idx.name.map(String::from),
-                db_name: idx.db_name.as_ref().map(|name| name.to_string()),
+            .walk_indexes()
+            .map(|idx| dml::IndexDefinition {
+                name: idx.attribute().name.map(String::from),
+                db_name: Some(idx.final_database_name().into_owned()),
                 fields: idx
+                    .attribute()
                     .fields
                     .iter()
                     .map(|id| self.db.ast()[model_id][*id].name.name.clone())
                     .collect(),
-                tpe: match idx.is_unique {
+                tpe: match idx.attribute().is_unique {
                     true => dml::IndexType::Unique,
                     false => dml::IndexType::Normal,
                 },
-                defined_on_field: idx.source_field.is_some(),
+                defined_on_field: idx.attribute().source_field.is_some(),
             })
             .collect();
 
@@ -101,10 +102,11 @@ impl<'a> LiftAstToDml<'a> {
             model.add_field(dml::Field::ScalarField(field));
         }
 
-        for (field_id, relation_field) in self.db.iter_model_relation_fields(model_id) {
-            let ast_field = &ast_model[field_id];
+        for relation_field in model_data.walk_relation_fields() {
+            let ast_field = relation_field.ast_field();
             let arity = self.lift_field_arity(&ast_field.arity);
-            let target_model = &self.db.ast()[relation_field.referenced_model];
+            let attributes = relation_field.attributes();
+            let target_model = &self.db.ast()[attributes.referenced_model];
             let relation_info = dml::RelationInfo::new(target_model.name());
 
             let mut field = dml::RelationField::new(&ast_field.name.name, arity, arity, relation_info);
@@ -115,18 +117,18 @@ impl<'a> LiftAstToDml<'a> {
             field.emulates_referential_actions(active_connector.emulates_referential_actions());
 
             field.documentation = ast_field.documentation.clone().map(|comment| comment.text);
-            field.relation_info.name = relation_field.name.map(String::from).unwrap_or_default();
-            field.relation_info.on_delete = relation_field.on_delete;
-            field.relation_info.on_update = relation_field.on_update;
-            field.is_ignored = relation_field.is_ignored;
+            field.relation_info.name = attributes.name.map(String::from).unwrap_or_default();
+            field.relation_info.on_delete = attributes.on_delete;
+            field.relation_info.on_update = attributes.on_update;
+            field.is_ignored = attributes.is_ignored;
 
-            field.relation_info.references = relation_field
+            field.relation_info.references = attributes
                 .references
                 .as_ref()
                 .map(|references| references.iter().map(|s| target_model[*s].name().to_owned()).collect())
                 .unwrap_or_default();
 
-            field.relation_info.fields = relation_field
+            field.relation_info.fields = attributes
                 .fields
                 .as_ref()
                 .map(|fields| {
@@ -137,9 +139,9 @@ impl<'a> LiftAstToDml<'a> {
                 })
                 .unwrap_or_default();
 
-            field.relation_info.fk_name = relation_field.fk_name.as_ref().map(|n| n.to_string());
+            field.relation_info.fk_name = relation_field.final_foreign_key_name().map(|cow| cow.into_owned());
 
-            field_ids_for_sorting.insert(&ast_field.name.name, field_id);
+            field_ids_for_sorting.insert(&ast_field.name.name, relation_field.field_id());
             model.add_field(dml::Field::RelationField(field))
         }
 

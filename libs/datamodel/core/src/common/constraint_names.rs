@@ -1,18 +1,17 @@
 use crate::ast::Span;
 use crate::diagnostics::DatamodelError;
-use crate::{IndexType, PrimaryKeyDefinition, WithDatabaseName};
+use crate::{PrimaryKeyDefinition, WithDatabaseName};
 use datamodel_connector::Connector;
 use dml::model::{IndexDefinition, Model};
 use dml::relation_info::RelationInfo;
 use once_cell::sync::Lazy;
 use regex::Regex;
-use std::borrow::Cow;
 
-pub(crate) struct ConstraintNames {}
+pub(crate) struct ConstraintNames;
 
 impl ConstraintNames {
-    ///Aligned with PG, to maximize the amount of times where we do not need
-    ///to render names because they already align with our convention.
+    /// Aligned with PG, to maximize the amount of times where we do not need
+    /// to render names because they already align with our convention.
     ///
     /// We always take the database names of entities. So if a model is remapped to
     /// a different name in the datamodel, the default name generation will still take
@@ -67,13 +66,13 @@ impl ConstraintNames {
             .collect();
 
         idx.db_name.as_ref().unwrap()
-            == &ConstraintNames::index_name(model.final_database_name(), &column_names, idx.tpe, connector)
+            == &ConstraintNames::index_name(model.final_database_name(), &column_names, idx.is_unique(), connector)
     }
 
     pub(crate) fn index_name(
         table_name: &str,
         column_names: &[&str],
-        tpe: IndexType,
+        is_unique: bool,
         connector: &dyn Connector,
     ) -> String {
         let index_suffix = "_idx";
@@ -89,9 +88,10 @@ impl ConstraintNames {
             joined.as_str()
         };
 
-        match tpe {
-            IndexType::Unique => format!("{}{}", trimmed, unique_suffix),
-            IndexType::Normal => format!("{}{}", trimmed, index_suffix),
+        if is_unique {
+            format!("{}{}", trimmed, unique_suffix)
+        } else {
+            format!("{}{}", trimmed, index_suffix)
         }
     }
 
@@ -160,10 +160,10 @@ impl ConstraintNames {
         None
     }
 
-    pub(crate) fn is_db_name_too_long<'ast>(
+    pub(crate) fn is_db_name_too_long(
         span: Span,
         object_name: &str,
-        name: &Option<Cow<'ast, str>>,
+        name: Option<&str>,
         attribute: &str,
         connector: &dyn Connector,
     ) -> Option<DatamodelError> {
