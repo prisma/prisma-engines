@@ -84,6 +84,12 @@ pub async fn get_many_records(
     // The should_batch has been adjusted to reflect that as a band-aid, but deeper investigation is necessary.
     match sql_info.max_bind_values {
         Some(chunk_size) if query_arguments.should_batch(chunk_size) => {
+            if query_arguments.cannot_batch() {
+                return Err(SqlError::BindValuesExceeded(format!(
+                    "Your query cannot be split into multiple queries because of the order by aggregation or relevance"
+                )));
+            }
+
             // We don't need to order in the database due to us ordering in this function.
             let order = std::mem::take(&mut query_arguments.order_by);
 

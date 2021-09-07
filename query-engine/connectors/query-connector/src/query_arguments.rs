@@ -75,7 +75,7 @@ impl QueryArguments {
             && self.order_by.iter().any(|o| match o {
                 OrderBy::Scalar(o) => !o.field.is_required,
                 OrderBy::Aggregation(_) => false,
-                OrderBy::Relevance(o) => o.fields.iter().any(|f| !f.is_required),
+                OrderBy::Relevance(_) => false,
             })
     }
 
@@ -109,48 +109,48 @@ impl QueryArguments {
             return true;
         }
 
+        // We're filtering order bys aggregation & relevance since they will never lead to stable ordering anyway.
+        let maybe_stable_order_bys: Vec<_> = self
+            .order_by
+            .iter()
+            .filter_map(|o| match o {
+                OrderBy::Scalar(o) => Some(o),
+                OrderBy::Aggregation(_) => None,
+                OrderBy::Relevance(_) => None,
+            })
+            .collect();
+
         // Partition into orderings on the same model and ones that require relation hops.
         // Note: One ordering is always on one scalar in the end.
-        let (on_model, on_relation): (Vec<&OrderBy>, Vec<&OrderBy>) = self.order_by.iter().partition(|o| match o {
-            OrderBy::Scalar(o) => o.path.is_empty(),
-            OrderBy::Aggregation(o) => o.path.is_empty(),
-            OrderBy::Relevance(_) => true,
-        });
+        let (on_model, on_relation): (Vec<&OrderByScalar>, Vec<&OrderByScalar>) =
+            maybe_stable_order_bys.iter().partition(|o| o.path.is_empty());
 
         // Indicates whether or not a combination of contained fields is on the source model (we don't check for relations for now).
         let order_by_contains_unique_index = self.model.unique_indexes().into_iter().any(|index| {
-            index.fields().into_iter().all(|f| {
-                on_model.iter().any(|o| match o {
-                    OrderBy::Scalar(o) => o.field == f,
-                    OrderBy::Aggregation(_) => false,
-                    OrderBy::Relevance(o) => o.fields.contains(&f),
-                })
-            })
+            index
+                .fields()
+                .into_iter()
+                .all(|f| on_model.iter().any(|o| o.field == f))
         });
 
-        let source_contains_unique = on_model.iter().any(|o| match o {
-            OrderBy::Scalar(o) => o.field.unique(),
-            OrderBy::Aggregation(_) => false,
-            OrderBy::Relevance(o) => o.fields.iter().any(|f| f.unique()),
-        });
-        let relations_contain_1to1_unique = on_relation.iter().any(|o| {
-            let (has_unique_field, path) = match o {
-                OrderBy::Scalar(o) => (o.field.unique(), Some(&o.path)),
-                OrderBy::Aggregation(o) => (false, Some(&o.path)),
-                OrderBy::Relevance(o) => (o.fields.iter().any(|f| f.unique()), None),
-            };
-            let all_1to1 = path
-                .map(|path| path.iter().all(|r| r.relation().is_one_to_one()))
-                .unwrap_or(true);
-
-            has_unique_field && all_1to1
-        });
+        let source_contains_unique = on_model.iter().any(|o| o.field.unique());
+        let relations_contain_1to1_unique = on_relation
+            .iter()
+            .any(|o| o.field.unique() && o.path.iter().all(|r| r.relation().is_one_to_one()));
 
         source_contains_unique || order_by_contains_unique_index || relations_contain_1to1_unique
     }
 
     pub fn take_abs(&self) -> Option<i64> {
         self.take.map(|t| if t < 0 { -t } else { t })
+    }
+
+    pub fn cannot_batch(&self) -> bool {
+        self.order_by.iter().any(|o| match o {
+            OrderBy::Scalar(_) => false,
+            OrderBy::Aggregation(_) => true,
+            OrderBy::Relevance(_) => true,
+        })
     }
 
     pub fn should_batch(&self, chunk_size: usize) -> bool {
