@@ -6,7 +6,6 @@ use quaint::ast::*;
 
 static ORDER_JOIN_PREFIX: &str = "orderby_";
 static ORDER_AGGREGATOR_ALIAS: &str = "orderby_aggregator";
-static ORDER_RELEVANCE_VALUE_ALIAS: &str = "orderby_relevance";
 
 #[derive(Debug, Clone)]
 pub struct OrderByDefinition {
@@ -16,8 +15,6 @@ pub struct OrderByDefinition {
     pub(crate) order_definition: OrderDefinition<'static>,
     /// Joins necessary to perform the order by
     pub(crate) joins: Vec<AliasedJoin>,
-    /// Top-level column that needs to be selected
-    pub(crate) column_to_select: Option<Expression<'static>>,
 }
 
 /// Builds all expressions for an `ORDER BY` clause based on the query arguments.
@@ -39,7 +36,7 @@ pub fn build(
                 build_order_aggr_scalar(order_by, needs_reversed_order)
             }
             OrderBy::Aggregation(order_by) => build_order_aggr_rel(order_by, base_model, needs_reversed_order, index),
-            OrderBy::Relevance(order_by) => build_order_relevance(order_by, needs_reversed_order, index),
+            OrderBy::Relevance(order_by) => build_order_relevance(order_by, needs_reversed_order),
         })
         .collect_vec()
 }
@@ -58,11 +55,10 @@ fn build_order_scalar(
         order_column: order_column.into(),
         order_definition,
         joins,
-        column_to_select: None,
     }
 }
 
-fn build_order_relevance(order_by: &OrderByRelevance, needs_reversed_order: bool, index: usize) -> OrderByDefinition {
+fn build_order_relevance(order_by: &OrderByRelevance, needs_reversed_order: bool) -> OrderByDefinition {
     let columns: Vec<Expression> = order_by
         .fields
         .iter()
@@ -79,18 +75,14 @@ fn build_order_relevance(order_by: &OrderByRelevance, needs_reversed_order: bool
             }
         })
         .collect();
-    let relevance: Expression = text_search_relevance(&columns, order_by.search.clone()).into();
-    let relevance_value_alias = format!("{}_{}", ORDER_RELEVANCE_VALUE_ALIAS, index);
-
+    let order_column: Expression = text_search_relevance(&columns, order_by.search.clone()).into();
     let order: Option<Order> = Some(order_by.sort_order.into_order(needs_reversed_order));
-    let order_column: Expression = Column::from(relevance_value_alias.clone()).into();
     let order_definition: OrderDefinition = (order_column.clone(), order);
 
     OrderByDefinition {
         order_column,
         order_definition,
         joins: vec![],
-        column_to_select: Some(relevance.alias(relevance_value_alias)),
     }
 }
 
@@ -109,7 +101,6 @@ fn build_order_aggr_scalar(order_by: &OrderByAggregation, needs_reversed_order: 
         order_column: order_column.into(),
         order_definition,
         joins: vec![],
-        column_to_select: None,
     }
 }
 
@@ -136,7 +127,6 @@ fn build_order_aggr_rel(
         order_column: order_column.into(),
         order_definition,
         joins,
-        column_to_select: None,
     }
 }
 

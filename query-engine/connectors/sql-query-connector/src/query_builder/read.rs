@@ -48,7 +48,7 @@ impl SelectDefinition for QueryArguments {
     ) -> (Select<'static>, Vec<Expression<'static>>) {
         let order_by_definitions = ordering::build(&self, &model);
         let (table_opt, cursor_condition) = cursor_condition::build(&self, &model, &order_by_definitions);
-        let mut aggregation_joins = nested_aggregations::build(aggr_selections);
+        let aggregation_joins = nested_aggregations::build(aggr_selections);
 
         let limit = if self.ignore_take { None } else { self.take_abs() };
         let skip = if self.ignore_skip { 0 } else { self.skip.unwrap_or(0) };
@@ -90,19 +90,9 @@ impl SelectDefinition for QueryArguments {
             .iter()
             .fold(select_ast, |acc, o| acc.order_by(o.order_definition.clone()));
 
-        let mut additional_selection_set: Vec<Expression> = vec![];
-
-        additional_selection_set.append(&mut aggregation_joins.columns);
-        additional_selection_set.append(
-            &mut order_by_definitions
-                .into_iter()
-                .filter_map(|o| o.column_to_select)
-                .collect_vec(),
-        );
-
         match limit {
-            Some(limit) => (select_ast.limit(limit as usize), additional_selection_set),
-            None => (select_ast, additional_selection_set),
+            Some(limit) => (select_ast.limit(limit as usize), aggregation_joins.columns),
+            None => (select_ast, aggregation_joins.columns),
         }
     }
 }
