@@ -456,7 +456,7 @@ fn cursor_order_def_relevance(
         order_column: order_column.clone(),
         order_fks: None,
         cmp_column: order_column.clone().alias(cmp_column_alias.clone()),
-        cmp_column_alias: cmp_column_alias,
+        cmp_column_alias,
         on_nullable_fields: false,
     }
 }
