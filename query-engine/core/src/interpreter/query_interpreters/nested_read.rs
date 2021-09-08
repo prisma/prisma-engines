@@ -261,7 +261,7 @@ pub async fn one2m(
         );
     }
 
-    let mut scalars = processor.apply(scalars);
+    let scalars = processor.apply(scalars);
     let (scalars, aggregation_rows) = read::extract_aggregation_rows_from_scalars(scalars, aggr_selections);
 
     Ok((scalars, aggregation_rows))
