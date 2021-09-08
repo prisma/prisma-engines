@@ -85,9 +85,10 @@ pub async fn get_many_records(
     match sql_info.max_bind_values {
         Some(chunk_size) if query_arguments.should_batch(chunk_size) => {
             if query_arguments.cannot_batch() {
-                return Err(SqlError::BindValuesExceeded(format!(
+                return Err(SqlError::BindValuesExceeded(
                     "Your query cannot be split into multiple queries because of the order by aggregation or relevance"
-                )));
+                        .to_string(),
+                ));
             }
 
             // We don't need to order in the database due to us ordering in this function.
