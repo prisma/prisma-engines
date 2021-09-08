@@ -37,7 +37,7 @@ fn read_one(tx: &mut dyn ConnectionLike, query: RecordQuery) -> BoxFuture<'_, In
             Some(record) => {
                 let scalars: ManyRecords = record.into();
                 let (scalars, aggregation_rows) =
-                    extract_aggregation_rows_from_scalars(scalars.clone(), query.aggregation_selections);
+                    extract_aggregation_rows_from_scalars(scalars, query.aggregation_selections);
                 let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
 
                 Ok(RecordSelection {
@@ -90,7 +90,7 @@ fn read_many(
                 .await?;
             let scalars = processor.apply(scalars);
             let (scalars, aggregation_rows) =
-                extract_aggregation_rows_from_scalars(scalars.clone(), query.aggregation_selections);
+                extract_aggregation_rows_from_scalars(scalars, query.aggregation_selections);
 
             (scalars, aggregation_rows)
         } else {
@@ -103,7 +103,7 @@ fn read_many(
                 )
                 .await?;
             let (scalars, aggregation_rows) =
-                extract_aggregation_rows_from_scalars(scalars.clone(), query.aggregation_selections);
+                extract_aggregation_rows_from_scalars(scalars, query.aggregation_selections);
             (scalars, aggregation_rows)
         };
 
