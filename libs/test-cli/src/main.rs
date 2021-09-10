@@ -5,7 +5,7 @@ mod diagnose_migration_history;
 use anyhow::Context;
 use colored::Colorize;
 use migration_core::commands::SchemaPushInput;
-use std::{fs::File, io::Read};
+use std::{fmt, fs::File, io::Read, str::FromStr};
 use structopt::*;
 
 #[derive(Debug, StructOpt)]
@@ -26,6 +26,8 @@ enum Command {
     SchemaPush(SchemaPush),
     /// DiagnoseMigrationHistory wrapper
     DiagnoseMigrationHistory(DiagnoseMigrationHistory),
+    /// Output the difference between the data model and the database.
+    MigrateDiff(MigrateDiff),
 }
 
 #[derive(Debug, StructOpt)]
@@ -57,6 +59,51 @@ struct DiagnoseMigrationHistory {
     migrations_directory_path: String,
 }
 
+#[derive(Debug, Clone, Copy)]
+enum DiffOutputType {
+    Summary,
+    Ddl,
+}
+
+impl Default for DiffOutputType {
+    fn default() -> Self {
+        Self::Summary
+    }
+}
+
+impl FromStr for DiffOutputType {
+    type Err = std::io::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "summary" => Ok(Self::Summary),
+            "ddl" => Ok(Self::Ddl),
+            _ => {
+                let kind = std::io::ErrorKind::InvalidInput;
+                Err(std::io::Error::new(kind, format!("Invalid output type: `{}`", s)))
+            }
+        }
+    }
+}
+
+impl fmt::Display for DiffOutputType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            DiffOutputType::Summary => write!(f, "summary"),
+            DiffOutputType::Ddl => write!(f, "ddl"),
+        }
+    }
+}
+
+#[derive(StructOpt, Debug)]
+struct MigrateDiff {
+    /// Path to the prisma data model.
+    schema_path: String,
+    /// `summary` for list of changes, `ddl` for database statements.
+    #[structopt(default_value, long = "output-type", short = "t")]
+    output_type: DiffOutputType,
+}
+
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     init_logger();
@@ -65,6 +112,7 @@ async fn main() -> anyhow::Result<()> {
         Command::DiagnoseMigrationHistory(cmd) => cmd.execute().await?,
         Command::Dmmf(cmd) => generate_dmmf(&cmd).await?,
         Command::SchemaPush(cmd) => schema_push(&cmd).await?,
+        Command::MigrateDiff(cmd) => migrate_diff(&cmd).await?,
         Command::Introspect { url, file_path } => {
             if url.as_ref().xor(file_path.as_ref()).is_none() {
                 anyhow::bail!(
@@ -221,6 +269,30 @@ async fn schema_push(cmd: &SchemaPush) -> anyhow::Result<()> {
             "The schema was not pushed. Pass the --force flag to ignore warnings."
         );
         std::process::exit(1);
+    }
+
+    Ok(())
+}
+
+async fn migrate_diff(cmd: &MigrateDiff) -> anyhow::Result<()> {
+    let schema = read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
+    let api = migration_core::migration_api(&schema).await?;
+
+    match cmd.output_type {
+        DiffOutputType::Summary => {
+            let summary = api.migration_diff(&schema).await?;
+
+            if !summary.is_empty() {
+                println!("{}", summary);
+            }
+        }
+        DiffOutputType::Ddl => {
+            let ddl = api.migration_ddl(&schema).await?;
+
+            if !ddl.is_empty() {
+                println!("{}", ddl);
+            }
+        }
     }
 
     Ok(())

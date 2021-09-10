@@ -1,7 +1,7 @@
 //! The external facing programmatic API to the migration engine.
 
 use crate::{commands::*, CoreResult};
-use migration_connector::{migrations_directory, MigrationConnector};
+use migration_connector::{migrations_directory, DestructiveChangeDiagnostics, DiffTarget, MigrationConnector};
 use std::path::Path;
 use tracing_futures::Instrument;
 
@@ -56,6 +56,12 @@ pub trait GenericApi: Send + Sync + 'static {
 
     /// The command behind `prisma db push`.
     async fn schema_push(&self, input: &SchemaPushInput) -> CoreResult<SchemaPushOutput>;
+
+    /// Creates a migration between two targets.
+    async fn migration_diff(&self, schema: &str) -> CoreResult<String>;
+
+    /// Lists the DDL of the given schema against the database.
+    async fn migration_ddl(&self, schema: &str) -> CoreResult<String>;
 }
 
 #[async_trait::async_trait]
@@ -160,5 +166,34 @@ impl<C: MigrationConnector> GenericApi for C {
         schema_push(input, self)
             .instrument(tracing::info_span!("SchemaPush"))
             .await
+    }
+
+    async fn migration_diff(&self, schema: &str) -> CoreResult<String> {
+        let (configuration, datamodel) = crate::parse_schema(schema)?;
+
+        let migration = self
+            .diff(
+                DiffTarget::Database,
+                DiffTarget::Datamodel((&configuration, &datamodel)),
+            )
+            .await?;
+
+        Ok(self.migration_summary(&migration))
+    }
+
+    async fn migration_ddl(&self, schema: &str) -> CoreResult<String> {
+        let (configuration, datamodel) = crate::parse_schema(schema)?;
+        let applier = self.database_migration_step_applier();
+
+        let migration = self
+            .diff(
+                DiffTarget::Database,
+                DiffTarget::Datamodel((&configuration, &datamodel)),
+            )
+            .await?;
+
+        let script = applier.render_script(&migration, &DestructiveChangeDiagnostics::default());
+
+        Ok(script)
     }
 }
