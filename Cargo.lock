@@ -4406,6 +4406,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "colored",
+ "datamodel",
  "enumflags2",
  "introspection-core",
  "migration-core",

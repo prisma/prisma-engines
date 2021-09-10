@@ -28,6 +28,8 @@ enum Command {
     DiagnoseMigrationHistory(DiagnoseMigrationHistory),
     /// Output the difference between the data model and the database.
     MigrateDiff(MigrateDiff),
+    /// Validate the given data model.
+    ValidateDatamodel(ValidateDatamodel),
 }
 
 #[derive(Debug, StructOpt)]
@@ -104,6 +106,12 @@ struct MigrateDiff {
     output_type: DiffOutputType,
 }
 
+#[derive(StructOpt, Debug)]
+struct ValidateDatamodel {
+    /// Path to the prisma data model.
+    schema_path: String,
+}
+
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     init_logger();
@@ -135,6 +143,17 @@ async fn main() -> anyhow::Result<()> {
                 .map_err(|err| anyhow::anyhow!("{:?}", err.data))?;
 
             println!("{}", introspected);
+        }
+        Command::ValidateDatamodel(cmd) => {
+            use std::io::{self, Read as _};
+
+            let mut file = std::fs::File::open(&cmd.schema_path).expect("error opening datamodel file");
+
+            let mut datamodel = String::new();
+            file.read_to_string(&mut datamodel).unwrap();
+
+            datamodel::parse_schema(&datamodel)
+                .map_err(|diagnostics| io::Error::new(io::ErrorKind::InvalidInput, diagnostics))?;
         }
     }
 
