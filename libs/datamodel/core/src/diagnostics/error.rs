@@ -53,8 +53,8 @@ pub enum DatamodelError {
   #[error("No such argument.")]
   UnusedArgumentError { arg_name: String, span: Span },
 
-  #[error("Field \"{}\" is already defined on model \"{}\".", field_name, model_name)]
-  DuplicateFieldError { model_name: String, field_name: String, span: Span },
+  #[error("Field \"{}\" is already defined on {} \"{}\".", field_name, schema_item, item_name)]
+  DuplicateFieldError { schema_item: String, item_name: String, field_name: String, span: Span },
 
   #[error("Field \"{}\" in model \"{}\" can't be a list. The current connector does not support lists of primitive types.", field_name, model_name)]
   ScalarListFieldsAreNotSupported { model_name: String, field_name: String, span: Span },
@@ -113,8 +113,11 @@ pub enum DatamodelError {
   #[error("Error validating model \"{}\": {}", model_name, message)]
   ModelValidationError { message: String, model_name: String, span: Span  },
 
-  #[error("Error validating field `{}` in model `{}`: {}", field, model, message)]
-  FieldValidationError { message: String, model: String, field: String, span: Span },
+  #[error("Error validating type \"{}\": {}", type_name, message)]
+  TypeValidationError { message: String, type_name: String, span: Span  },
+
+  #[error("Error validating field `{}` in {} `{}`: {}", field, schema_item, item_name, message)]
+  FieldValidationError { message: String, schema_item: String, item_name: String, field: String, span: Span },
 
   #[error("Error validating datasource `{datasource}`: {message}")]
   SourceValidationError { message: String, datasource: String, span: Span },
@@ -268,9 +271,15 @@ impl DatamodelError {
         }
     }
 
-    pub fn new_duplicate_field_error(model_name: &str, field_name: &str, span: Span) -> DatamodelError {
+    pub fn new_duplicate_field_error(
+        schema_item: &str,
+        item_name: &str,
+        field_name: &str,
+        span: Span,
+    ) -> DatamodelError {
         DatamodelError::DuplicateFieldError {
-            model_name: String::from(model_name),
+            schema_item: String::from(schema_item),
+            item_name: String::from(item_name),
             field_name: String::from(field_name),
             span,
         }
@@ -299,6 +308,14 @@ impl DatamodelError {
         }
     }
 
+    pub fn new_type_validation_error(message: &str, type_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::TypeValidationError {
+            message: String::from(message),
+            type_name: String::from(type_name),
+            span,
+        }
+    }
+
     pub fn new_enum_validation_error(message: &str, enum_name: &str, span: Span) -> DatamodelError {
         DatamodelError::EnumValidationError {
             message: String::from(message),
@@ -307,10 +324,17 @@ impl DatamodelError {
         }
     }
 
-    pub fn new_field_validation_error(message: &str, model: &str, field: &str, span: Span) -> DatamodelError {
+    pub fn new_field_validation_error(
+        message: &str,
+        schema_item: &str,
+        item_name: &str,
+        field: &str,
+        span: Span,
+    ) -> DatamodelError {
         DatamodelError::FieldValidationError {
             message: message.to_owned(),
-            model: model.to_owned(),
+            schema_item: schema_item.to_owned(),
+            item_name: item_name.to_owned(),
             field: field.to_owned(),
             span,
         }
@@ -473,6 +497,7 @@ impl DatamodelError {
             DatamodelError::ConnectorError { span, .. } => *span,
             DatamodelError::PreviewFeatureNotKnownError { span, .. } => *span,
             DatamodelError::ShadowDatabaseUrlIsSameAsMainUrl { span, .. } => *span,
+            DatamodelError::TypeValidationError { span, .. } => *span,
         }
     }
     pub fn description(&self) -> String {

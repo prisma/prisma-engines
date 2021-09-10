@@ -5,7 +5,8 @@ use super::{
     parse_enum::parse_enum,
     parse_model::parse_model,
     parse_source_and_generator::{parse_generator, parse_source},
-    parse_types::parse_type_alias,
+    parse_type_definition::parse_type_definition,
+    parse_types::parse_alias,
     PrismaDatamodelParser, Rule,
 };
 use crate::ast::*;
@@ -24,9 +25,10 @@ pub fn parse_schema(datamodel_string: &str) -> Result<SchemaAst, Diagnostics> {
                 match current.as_rule() {
                     Rule::model_declaration => top_level_definitions.push(Top::Model(parse_model(&current, &mut errors))),
                     Rule::enum_declaration => top_level_definitions.push(Top::Enum(parse_enum(&current, &mut errors))),
+                    Rule::type_declaration => top_level_definitions.push(Top::Type(parse_type_definition(&current, &mut errors))),
                     Rule::source_block => top_level_definitions.push(Top::Source(parse_source(&current, &mut errors))),
                     Rule::generator_block => top_level_definitions.push(Top::Generator(parse_generator(&current, &mut errors))),
-                    Rule::type_alias => top_level_definitions.push(Top::Type(parse_type_alias(&current))),
+                    Rule::alias => top_level_definitions.push(Top::Alias(parse_alias(&current))),
                     Rule::comment_block => (),
                     Rule::EOI => {}
                     Rule::CATCH_ALL => errors.push_error(DatamodelError::new_validation_error(
@@ -76,6 +78,7 @@ fn rule_to_string(rule: Rule) -> &'static str {
     match rule {
         Rule::model_declaration => "model declaration",
         Rule::enum_declaration => "enum declaration",
+        Rule::type_declaration => "type declaration",
         Rule::source_block => "source definition",
         Rule::generator_block => "generator definition",
         Rule::arbitrary_block => "arbitrary block",
@@ -103,7 +106,7 @@ fn rule_to_string(rule: Rule) -> &'static str {
         Rule::list_type => "list type",
         Rule::field_type => "field type",
         Rule::field_declaration => "field declaration",
-        Rule::type_alias => "type alias",
+        Rule::alias => "alias",
         Rule::key_value => "configuration property",
         Rule::string_any => "any character",
         Rule::string_escaped_interpolation => "string interpolation",

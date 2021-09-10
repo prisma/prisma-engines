@@ -7,6 +7,7 @@ mod parse_field;
 mod parse_model;
 mod parse_schema;
 mod parse_source_and_generator;
+mod parse_type_definition;
 mod parse_types;
 
 pub use parse_schema::parse_schema;

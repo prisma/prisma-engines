@@ -191,6 +191,7 @@ fn visit_scalar_field_attributes<'ast>(
 
             if ctx.mapped_model_scalar_field_names.insert((model_id, mapped_name), field_id).is_some() {
                 ctx.push_error(DatamodelError::new_duplicate_field_error(
+                    "model",
                     ast_model.name(),
                     ast_field.name(),
                     ast_field.span,

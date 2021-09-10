@@ -7,7 +7,8 @@ pub enum Top {
     Model(Model),
     Source(SourceConfig),
     Generator(GeneratorConfig),
-    Type(Field),
+    Alias(Field),
+    Type(TypeDefinition),
 }
 
 impl WithIdentifier for Top {
@@ -17,6 +18,7 @@ impl WithIdentifier for Top {
             Top::Model(x) => x.identifier(),
             Top::Source(x) => x.identifier(),
             Top::Generator(x) => x.identifier(),
+            Top::Alias(x) => x.identifier(),
             Top::Type(x) => x.identifier(),
         }
     }
@@ -29,6 +31,7 @@ impl WithSpan for Top {
             Top::Model(x) => x.span(),
             Top::Source(x) => x.span(),
             Top::Generator(x) => x.span(),
+            Top::Alias(x) => x.span(),
             Top::Type(x) => x.span(),
         }
     }
@@ -41,6 +44,7 @@ impl Top {
             Top::Model(_) => "model",
             Top::Source(_) => "source",
             Top::Generator(_) => "generator",
+            Top::Alias(_) => "alias",
             Top::Type(_) => "type",
         }
     }
@@ -51,6 +55,7 @@ impl Top {
             Top::Model(x) => &x.name.name,
             Top::Source(x) => &x.name.name,
             Top::Generator(x) => &x.name.name,
+            Top::Alias(x) => &x.name.name,
             Top::Type(x) => &x.name.name,
         }
     }
@@ -76,9 +81,9 @@ impl Top {
         }
     }
 
-    pub fn as_type_alias(&self) -> Option<&Field> {
+    pub fn as_alias(&self) -> Option<&Field> {
         match self {
-            Top::Type(r#type) => Some(r#type),
+            Top::Alias(alias) => Some(alias),
             _ => None,
         }
     }
@@ -86,6 +91,13 @@ impl Top {
     pub fn as_source(&self) -> Option<&SourceConfig> {
         match self {
             Top::Source(source) => Some(source),
+            _ => None,
+        }
+    }
+
+    pub fn as_type(&self) -> Option<&TypeDefinition> {
+        match self {
+            Top::Type(type_def) => Some(type_def),
             _ => None,
         }
     }

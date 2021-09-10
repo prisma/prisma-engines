@@ -159,6 +159,10 @@ pub trait Connector: Send + Sync {
         self.has_capability(ConnectorCapability::CompoundIds)
     }
 
+    fn supports_types(&self) -> bool {
+        self.has_capability(ConnectorCapability::TypeDefinitions)
+    }
+
     fn allows_relation_fields_in_arbitrary_order(&self) -> bool {
         self.has_capability(ConnectorCapability::RelationFieldsInArbitraryOrder)
     }
@@ -237,6 +241,7 @@ capabilities!(
     AutoIncrement,
     RelationFieldsInArbitraryOrder,
     ForeignKeys,
+    TypeDefinitions, // PSL declarations with the `type` keyword.
     //Start of ME/IE only capabilities
     AutoIncrementAllowedOnNonId,
     AutoIncrementMultipleAllowed,

@@ -19,6 +19,7 @@ mod source_config;
 mod span;
 mod top;
 mod traits;
+mod type_definition;
 
 pub mod reformat;
 
@@ -38,6 +39,7 @@ pub(crate) use renderer::Renderer;
 pub(crate) use source_config::SourceConfig;
 pub(crate) use top::Top;
 pub(crate) use traits::{WithAttributes, WithDocumentation, WithIdentifier, WithName, WithSpan};
+pub(crate) use type_definition::TypeDefinition;
 
 /// AST representation of a prisma schema.
 ///
@@ -83,7 +85,8 @@ impl SchemaAst {
                 Top::Model(_) => TopId::Model(ModelId(top_idx as u32)),
                 Top::Source(_) => TopId::Source(SourceId(top_idx as u32)),
                 Top::Generator(_) => TopId::Generator(GeneratorId(top_idx as u32)),
-                Top::Type(_) => TopId::Alias(AliasId(top_idx as u32)),
+                Top::Alias(_) => TopId::Alias(AliasId(top_idx as u32)),
+                Top::Type(_) => TopId::Type(TypeId(top_idx as u32)),
             };
 
             (top_id, top)
@@ -133,7 +136,7 @@ impl std::ops::Index<AliasId> for SchemaAst {
     type Output = Field;
 
     fn index(&self, index: AliasId) -> &Self::Output {
-        self.tops[index.0 as usize].as_type_alias().unwrap()
+        self.tops[index.0 as usize].as_alias().unwrap()
     }
 }
 
@@ -145,6 +148,19 @@ pub(crate) struct GeneratorId(u32);
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub(crate) struct SourceId(u32);
 
+/// An opaque identifier for a type definition in a schema AST. Use the
+/// `schema[type_id]` syntax to resolve the id to an `ast::TypeDefinition`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub(crate) struct TypeId(u32);
+
+impl std::ops::Index<TypeId> for SchemaAst {
+    type Output = TypeDefinition;
+
+    fn index(&self, index: TypeId) -> &Self::Output {
+        self.tops[index.0 as usize].as_type().unwrap()
+    }
+}
+
 /// An identifier for a top-level item in a schema AST. Use the `schema[top_id]`
 /// syntax to resolve the id to an `ast::Top`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -154,6 +170,7 @@ pub(crate) enum TopId {
     Alias(AliasId),
     Generator(GeneratorId),
     Source(SourceId),
+    Type(TypeId),
 }
 
 impl TopId {
@@ -175,6 +192,7 @@ impl std::ops::Index<TopId> for SchemaAst {
             TopId::Alias(AliasId(idx)) => idx,
             TopId::Generator(GeneratorId(idx)) => idx,
             TopId::Source(SourceId(idx)) => idx,
+            TopId::Type(TypeId(idx)) => idx,
         };
 
         &self.tops[idx as usize]

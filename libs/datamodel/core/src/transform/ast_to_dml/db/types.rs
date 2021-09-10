@@ -1,4 +1,5 @@
 use super::{attributes, context::Context};
+use crate::ast::TypeDefinition;
 use crate::{ast, diagnostics::DatamodelError};
 use itertools::Itertools;
 use once_cell::sync::Lazy;
@@ -12,8 +13,9 @@ use std::{
 pub(super) fn resolve_types(ctx: &mut Context<'_>) {
     for (top_id, top) in ctx.db.ast.iter_tops() {
         match (top_id, top) {
-            (ast::TopId::Alias(alias_id), ast::Top::Type(type_alias)) => visit_type_alias(alias_id, type_alias, ctx),
+            (ast::TopId::Alias(alias_id), ast::Top::Alias(alias)) => visit_alias(alias_id, alias, ctx),
             (ast::TopId::Model(model_id), ast::Top::Model(model)) => visit_model(model_id, model, ctx),
+            (ast::TopId::Type(type_id), ast::Top::Type(type_def)) => visit_type(type_id, type_def, ctx),
             (ast::TopId::Enum(enum_id), ast::Top::Enum(enm)) => visit_enum(enum_id, enm, ctx),
             (_, ast::Top::Source(_)) | (_, ast::Top::Generator(_)) => (),
             _ => unreachable!(),
@@ -25,9 +27,10 @@ pub(super) fn resolve_types(ctx: &mut Context<'_>) {
 
 #[derive(Debug, Default)]
 pub(super) struct Types<'ast> {
-    pub(super) type_aliases: HashMap<ast::AliasId, ScalarFieldType>,
+    pub(super) aliases: HashMap<ast::AliasId, ScalarFieldType>,
     pub(super) scalar_fields: BTreeMap<(ast::ModelId, ast::FieldId), ScalarField<'ast>>,
     pub(super) models: HashMap<ast::ModelId, ModelData<'ast>>,
+    pub(super) type_defintions: HashMap<ast::TypeId, TypeDefinition>,
     /// This contains only the relation fields actually present in the schema
     /// source text.
     pub(super) relation_fields: BTreeMap<(ast::ModelId, ast::FieldId), RelationField<'ast>>,
@@ -66,6 +69,7 @@ enum FieldType {
 pub(crate) enum ScalarFieldType {
     Enum(ast::EnumId),
     BuiltInScalar(dml::scalars::ScalarType),
+    ComplexType(ast::TypeId),
     Alias(ast::AliasId),
     Unsupported,
 }
@@ -232,6 +236,74 @@ fn visit_model<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::Model, ctx: &
     ctx.db.types.models.insert(model_id, model_data);
 }
 
+fn visit_type<'ast>(type_id: ast::TypeId, ast_type: &'ast ast::TypeDefinition, ctx: &mut Context<'ast>) {
+    if !ctx.db.active_connector().supports_types() {
+        ctx.push_error(DatamodelError::new_validation_error(
+            &format!("The current connector does not support type declarations.",),
+            ast_type.span,
+        ));
+
+        return;
+    }
+
+    for (field_id, ast_field) in ast_type.iter_fields() {
+        match field_type(ast_field, ctx) {
+            Ok(FieldType::Model(referenced_model)) => {
+                ctx.push_error(DatamodelError::new_field_validation_error(
+                    &format!(
+                        "Field `{}` in type `{}` is a relation field. Types can't have relation fields.",
+                        &ast_field.name.name, &ast_type.name.name
+                    ),
+                    &ast_type.name.name,
+                    &ast_field.name.name,
+                    ast_field.span,
+                ));
+            }
+            Ok(FieldType::Scalar(scalar_field_type)) => {
+                let field_data = ScalarField {
+                    r#type: scalar_field_type,
+                    is_ignored: false,
+                    is_updated_at: false,
+                    default: None,
+                    mapped_name: None,
+                    native_type: None,
+                };
+
+                if matches!(scalar_field_type, ScalarFieldType::BuiltInScalar(t) if t.is_json())
+                    && !ctx.db.active_connector().supports_json()
+                {
+                    ctx.push_error(DatamodelError::new_field_validation_error(
+                        &format!("Field `{}` in type `{}` can't be of type Json. The current connector does not support the Json type.", &ast_field.name.name, &ast_type.name.name),
+                        &ast_type.name.name,
+                        &ast_field.name.name,
+                        ast_field.span,
+                    ));
+                }
+
+                if ast_field.arity.is_list() && !ctx.db.active_connector().supports_scalar_lists() {
+                    ctx.push_error(DatamodelError::new_scalar_list_fields_are_not_supported(
+                        &ast_type.name.name,
+                        &ast_field.name.name,
+                        ast_field.span,
+                    ));
+                }
+
+                if matches!(scalar_field_type, ScalarFieldType::Unsupported) {
+                    validate_unsupported_field_type(ast_field, ast_field.field_type.as_unsupported().unwrap().0, ctx);
+                }
+
+                ctx.db.types.scalar_fields.insert((type_id, field_id), field_data);
+            }
+            Err(supported) => ctx.push_error(DatamodelError::new_type_not_found_error(
+                supported,
+                ast_field.field_type.span(),
+            )),
+        }
+    }
+
+    ctx.db.types.types.insert(model_id, model_data);
+}
+
 /// Detect self-referencing type aliases, possibly indirectly. We loop
 /// through each type alias in the schema. If it references another type
 /// alias — which may in turn reference another type alias —, we check that
@@ -340,7 +412,7 @@ fn visit_enum<'ast>(enum_id: ast::EnumId, enm: &'ast ast::Enum, ctx: &mut Contex
     ctx.db.types.enums.insert(enum_id, enum_data);
 }
 
-fn visit_type_alias<'ast>(alias_id: ast::AliasId, alias: &'ast ast::Field, ctx: &mut Context<'ast>) {
+fn visit_alias<'ast>(alias_id: ast::AliasId, alias: &'ast ast::Field, ctx: &mut Context<'ast>) {
     match field_type(alias, ctx) {
         Ok(FieldType::Scalar(scalar_field_type)) => {
             ctx.db.types.type_aliases.insert(alias_id, scalar_field_type);

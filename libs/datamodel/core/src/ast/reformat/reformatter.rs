@@ -200,19 +200,20 @@ impl<'a> Reformatter<'a> {
 
     fn reformat_top(&self, target: &mut Renderer<'_>, token: &Token<'_>) {
         let mut types_table = TableFormat::new();
-        let mut types_mode = false;
+        let mut alias_mode = false;
         let mut seen_at_least_one_top_level_element = false;
 
         for current in token.clone().into_inner() {
             match current.as_rule() {
                 Rule::WHITESPACE => {}
                 Rule::doc_comment | Rule::doc_comment_and_new_line => {}
-                Rule::type_alias => {
-                    types_mode = true;
+                Rule::alias => {
+                    alias_mode = true;
                 }
                 _ => {
-                    if types_mode {
-                        types_mode = false;
+                    if alias_mode {
+                        alias_mode = false;
+
                         // For all other ones, reset types_table.
                         types_table.render(target);
                         types_table = TableFormat::new();
@@ -234,7 +235,7 @@ impl<'a> Reformatter<'a> {
 
             match current.as_rule() {
                 Rule::doc_comment | Rule::doc_comment_and_new_line => {
-                    if types_mode {
+                    if alias_mode {
                         comment(&mut types_table.interleave_writer(), current.as_str());
                     } else {
                         comment(target, current.as_str());
@@ -242,13 +243,14 @@ impl<'a> Reformatter<'a> {
                 }
                 Rule::model_declaration => self.reformat_model(target, &current),
                 Rule::enum_declaration => self.reformat_enum(target, &current),
+                Rule::type_declaration => self.reformat_type(target, &current),
                 Rule::source_block => self.reformat_datasource(target, &current),
                 Rule::generator_block => self.reformat_generator(target, &current),
-                Rule::type_alias => {
-                    if !types_mode {
-                        panic!("Renderer not in type mode.");
+                Rule::alias => {
+                    if !alias_mode {
+                        panic!("Renderer not in alias mode.");
                     }
-                    Self::reformat_type_alias(&mut types_table, &current);
+                    Self::reformat_alias(&mut types_table, &current);
                 }
                 Rule::comment_block => {
                     for comment_token in current.clone().into_inner() {
@@ -336,6 +338,19 @@ impl<'a> Reformatter<'a> {
                     }
                 }
             }),
+        );
+    }
+
+    fn reformat_type(&self, target: &mut Renderer<'_>, token: &Token<'_>) {
+        self.reformat_block_element_internal(
+            "type",
+            target,
+            token,
+            Box::new(|table, renderer, token, model_name| match token.as_rule() {
+                Rule::field_declaration => self.reformat_field(table, token, model_name),
+                _ => Self::reformat_generic_token(table, token),
+            }),
+            Box::new(|table, _, model_name| ()),
         );
     }
 
@@ -530,7 +545,7 @@ impl<'a> Reformatter<'a> {
                 Rule::field_type => {
                     target.write(&Self::reformat_field_type(&current));
                 }
-                //todo special case field attribute to pass model and field name and probably attribute name  and down to the args
+                // Todo: Special case field attribute to pass model and field name and probably attribute name and down to the args
                 Rule::attribute => {
                     if let Ok(missing_relation_attribute_args) = self.missing_relation_attribute_args.as_ref() {
                         let missing_relation_args: Vec<&MissingRelationAttributeArg> = missing_relation_attribute_args
@@ -550,7 +565,7 @@ impl<'a> Reformatter<'a> {
                 }
                 // This is a comment at the end of a field.
                 Rule::doc_comment | Rule::comment => target.append_suffix_to_current_row(current.as_str()),
-                // This is a comment before the field declaration. Hence it must be interlevaed.
+                // This is a comment before the field declaration. Hence it must be interleaved.
                 Rule::doc_comment_and_new_line => comment(&mut target.interleave_writer(), current.as_str()),
                 Rule::NEWLINE => {} // we do the new lines ourselves
                 _ => Self::reformat_generic_token(target, &current),
@@ -571,7 +586,7 @@ impl<'a> Reformatter<'a> {
         target.maybe_end_line();
     }
 
-    fn reformat_type_alias(target: &mut TableFormat, token: &Token<'_>) {
+    fn reformat_alias(target: &mut TableFormat, token: &Token<'_>) {
         let mut identifier = None;
 
         for current in token.clone().into_inner() {

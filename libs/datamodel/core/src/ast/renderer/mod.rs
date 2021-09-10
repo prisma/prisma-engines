@@ -42,7 +42,7 @@ impl<'a> Renderer<'a> {
         for (i, top) in datamodel.tops.iter().enumerate() {
             match &top {
                 // TODO: This is super ugly. Goal is that type groups get formatted together.
-                ast::Top::Type(custom_type) => {
+                ast::Top::Alias(custom_type) => {
                     if type_renderer.is_none() {
                         if i != 0 {
                             // We put an extra line break in between top level structs.
@@ -68,9 +68,10 @@ impl<'a> Renderer<'a> {
                     match other {
                         ast::Top::Model(model) => self.render_model(model),
                         ast::Top::Enum(enm) => self.render_enum(enm),
+                        ast::Top::Type(type_def) => self.render_type(type_def),
                         ast::Top::Source(source) => self.render_source_block(source),
                         ast::Top::Generator(generator) => self.render_generator_block(generator),
-                        ast::Top::Type(_) => unreachable!(),
+                        ast::Top::Alias(_) => unreachable!(),
                     }
                 }
             };
@@ -199,6 +200,34 @@ impl<'a> Renderer<'a> {
                 self.render_block_attribute(&attribute, comment_out.clone());
             }
         }
+
+        self.indent_down();
+        self.write(format!("{}{}", comment_out, "}").as_ref());
+        self.end_line();
+    }
+
+    fn render_type(&mut self, type_def: &ast::TypeDefinition) {
+        let comment_out = if type_def.commented_out {
+            "// ".to_string()
+        } else {
+            "".to_string()
+        };
+
+        Self::render_documentation(self, type_def);
+
+        self.write(format!("{}type ", comment_out).as_ref());
+        self.write(&type_def.name.name);
+        self.write(" {");
+        self.end_line();
+        self.indent_up();
+
+        let mut field_formatter = TableFormat::new();
+
+        for field in &type_def.fields {
+            Self::render_field(&mut field_formatter, field, type_def.commented_out);
+        }
+
+        field_formatter.render(self);
 
         self.indent_down();
         self.write(format!("{}{}", comment_out, "}").as_ref());

@@ -8,7 +8,7 @@ use crate::ast::parser::parse_expression::parse_expression;
 use crate::ast::*;
 use crate::diagnostics::DatamodelError;
 
-pub fn parse_type_alias(token: &Token<'_>) -> Field {
+pub fn parse_alias(token: &Token<'_>) -> Field {
     let mut name: Option<Identifier> = None;
     let mut attributes: Vec<Attribute> = vec![];
     let mut base_type: Option<FieldType> = None;

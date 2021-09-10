@@ -161,7 +161,7 @@ impl OrderByBuilder {
             let field = if is_group_by {
                 // Explanation: All group by fields go into the _id key of the result document.
                 // As it is the only point where the flat scalars are contained for the group,
-                // we beed to refer to the object
+                // we need to refer to the _id object.
                 format!("_id.{}", data.scalar_field_name())
             } else {
                 data.full_reference_path(false)

@@ -2,7 +2,7 @@ use super::Context;
 use crate::{
     ast::{self, Argument, FieldId, TopId, WithAttributes, WithIdentifier},
     diagnostics::DatamodelError,
-    reserved_model_names::{validate_enum_name, validate_model_name},
+    reserved_model_names::{validate_enum_name, validate_model_name, validate_type_definition_name},
 };
 use dml::scalars::ScalarType;
 use std::{
@@ -29,6 +29,7 @@ pub(super) struct Names<'ast> {
     /// Datasources have their own namespace.
     pub(super) datasources: HashMap<&'ast str, TopId>,
     pub(super) model_fields: BTreeMap<(ast::ModelId, &'ast str), FieldId>,
+    pub(super) type_fields: BTreeMap<(ast::TypeId, &'ast str), FieldId>,
 }
 
 pub(super) fn resolve_names(ctx: &mut Context<'_>) {
@@ -75,7 +76,41 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
                         .is_some()
                     {
                         ctx.push_error(DatamodelError::new_duplicate_field_error(
+                            "model",
                             &model.name.name,
+                            &field.name.name,
+                            field.identifier().span,
+                        ))
+                    }
+                }
+
+                &mut names.tops
+            }
+            (ast::TopId::Type(type_id), ast::Top::Type(type_def)) => {
+                type_def.name.validate("Type", &mut ctx.diagnostics);
+                validate_type_definition_name(type_def, &mut ctx.diagnostics);
+
+                for (field_id, field) in type_def.iter_fields() {
+                    field.name.validate("Field", &mut ctx.diagnostics);
+
+                    if !field.attributes().is_empty() {
+                        ctx.diagnostics.push_error(DatamodelError::new_field_validation_error(
+                            "Type fields do not support attributes",
+                            "type",
+                            &type_def.name.name,
+                            &field.name.name,
+                            field.span,
+                        ))
+                    }
+
+                    if names
+                        .type_fields
+                        .insert((type_id, &field.name.name), field_id)
+                        .is_some()
+                    {
+                        ctx.push_error(DatamodelError::new_duplicate_field_error(
+                            "type",
+                            &type_def.name.name,
                             &field.name.name,
                             field.identifier().span,
                         ))
