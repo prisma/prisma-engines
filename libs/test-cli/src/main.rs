@@ -4,7 +4,7 @@ mod diagnose_migration_history;
 
 use anyhow::Context;
 use colored::Colorize;
-use migration_core::commands::SchemaPushInput;
+use migration_core::commands::{ApplyMigrationsInput, CreateMigrationInput, SchemaPushInput};
 use std::{fmt, fs::File, io::Read, str::FromStr};
 use structopt::*;
 
@@ -20,9 +20,9 @@ enum Command {
         #[structopt(long = "file-path")]
         file_path: Option<String>,
     },
-    /// Generate DMMF from a schema, or directly from a database URl.
+    /// Generate DMMF from a schema, or directly from a database URL.
     Dmmf(DmmfCommand),
-    /// Push a prisma schema directly to the database, without interacting with migrations.
+    /// Push a prisma schema directly to the database.
     SchemaPush(SchemaPush),
     /// DiagnoseMigrationHistory wrapper
     DiagnoseMigrationHistory(DiagnoseMigrationHistory),
@@ -32,6 +32,10 @@ enum Command {
     ValidateDatamodel(ValidateDatamodel),
     /// Clear the data and DDL of the given database.
     ResetDatabase(ResetDatabase),
+    /// Create a new migration to the given directory.
+    CreateMigration(CreateMigration),
+    /// Apply all unapplied migrations from the given directory.
+    ApplyMigrations(ApplyMigrations),
 }
 
 #[derive(Debug, StructOpt)]
@@ -120,6 +124,32 @@ struct ResetDatabase {
     schema_path: String,
 }
 
+#[derive(StructOpt, Debug)]
+struct CreateMigration {
+    /// The filesystem path of the migrations directory to use
+    migrations_path: String,
+    /// The current prisma schema to use as a target for the generated migration
+    schema_path: String,
+    /// The user-given name for the migration.
+    name: String,
+}
+
+#[derive(StructOpt, Debug)]
+struct ApplyMigrations {
+    /// The location of the migrations directory.
+    migrations_directory_path: String,
+    /// The current prisma schema to use as a target for the generated migration
+    schema_path: String,
+}
+
+impl From<ApplyMigrations> for ApplyMigrationsInput {
+    fn from(am: ApplyMigrations) -> Self {
+        Self {
+            migrations_directory_path: am.migrations_directory_path,
+        }
+    }
+}
+
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     init_logger();
@@ -168,6 +198,28 @@ async fn main() -> anyhow::Result<()> {
             let api = migration_core::migration_api(&schema).await?;
 
             api.reset().await?;
+        }
+        Command::CreateMigration(cmd) => {
+            let prisma_schema =
+                read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
+
+            let api = migration_core::migration_api(&prisma_schema).await?;
+
+            let input = CreateMigrationInput {
+                migrations_directory_path: cmd.migrations_path,
+                prisma_schema,
+                migration_name: cmd.name,
+                draft: true,
+            };
+
+            api.create_migration(&input).await?;
+        }
+        Command::ApplyMigrations(cmd) => {
+            let prisma_schema =
+                read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
+
+            let api = migration_core::migration_api(&prisma_schema).await?;
+            api.apply_migrations(&cmd.into()).await?;
         }
     }
 
