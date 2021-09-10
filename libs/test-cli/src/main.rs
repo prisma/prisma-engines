@@ -30,6 +30,8 @@ enum Command {
     MigrateDiff(MigrateDiff),
     /// Validate the given data model.
     ValidateDatamodel(ValidateDatamodel),
+    /// Clear the data and DDL of the given database.
+    ResetDatabase(ResetDatabase),
 }
 
 #[derive(Debug, StructOpt)]
@@ -112,6 +114,12 @@ struct ValidateDatamodel {
     schema_path: String,
 }
 
+#[derive(StructOpt, Debug)]
+struct ResetDatabase {
+    /// Path to the prisma data model.
+    schema_path: String,
+}
+
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     init_logger();
@@ -154,6 +162,12 @@ async fn main() -> anyhow::Result<()> {
 
             datamodel::parse_schema(&datamodel)
                 .map_err(|diagnostics| io::Error::new(io::ErrorKind::InvalidInput, diagnostics))?;
+        }
+        Command::ResetDatabase(cmd) => {
+            let schema = read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
+            let api = migration_core::migration_api(&schema).await?;
+
+            api.reset().await?;
         }
     }
 
