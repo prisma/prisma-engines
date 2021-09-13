@@ -4,8 +4,14 @@ mod diagnose_migration_history;
 
 use anyhow::Context;
 use colored::Colorize;
+use migration_connector::{DestructiveChangeDiagnostics, DiffTarget};
 use migration_core::commands::{ApplyMigrationsInput, CreateMigrationInput, SchemaPushInput};
-use std::{fmt, fs::File, io::Read, str::FromStr};
+use std::{
+    fmt,
+    fs::File,
+    io::{self, Read},
+    str::FromStr,
+};
 use structopt::*;
 
 #[derive(Debug, StructOpt)]
@@ -360,19 +366,31 @@ async fn schema_push(cmd: &SchemaPush) -> anyhow::Result<()> {
 }
 
 async fn migrate_diff(cmd: &MigrateDiff) -> anyhow::Result<()> {
-    let schema = read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
-    let api = migration_core::migration_api(&schema).await?;
+    let datamodel = read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
+    let api = migration_core::migration_api(&datamodel).await?;
+
+    let (configuration, datamodel) = datamodel::parse_schema(&datamodel)
+        .map_err(|diagnostics| io::Error::new(io::ErrorKind::InvalidInput, diagnostics))?;
+
+    let migration = api
+        .connector()
+        .diff(
+            DiffTarget::Database,
+            DiffTarget::Datamodel((&configuration, &datamodel)),
+        )
+        .await?;
 
     match cmd.output_type {
         DiffOutputType::Summary => {
-            let summary = api.migration_diff(&schema).await?;
+            let summary = api.connector().migration_summary(&migration);
 
             if !summary.is_empty() {
                 println!("{}", summary);
             }
         }
         DiffOutputType::Ddl => {
-            let ddl = api.migration_ddl(&schema).await?;
+            let applier = api.connector().database_migration_step_applier();
+            let ddl = applier.render_script(&migration, &DestructiveChangeDiagnostics::default());
 
             if !ddl.is_empty() {
                 println!("{}", ddl);

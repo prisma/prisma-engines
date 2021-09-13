@@ -4409,6 +4409,7 @@ dependencies = [
  "datamodel",
  "enumflags2",
  "introspection-core",
+ "migration-connector",
  "migration-core",
  "serde_json",
  "structopt",
