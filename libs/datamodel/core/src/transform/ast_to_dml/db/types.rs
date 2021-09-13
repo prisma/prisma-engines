@@ -30,7 +30,7 @@ pub(super) struct Types<'ast> {
     /// This contains only the relation fields actually present in the schema
     /// source text.
     pub(super) relation_fields: BTreeMap<(ast::ModelId, ast::FieldId), RelationField<'ast>>,
-    pub(super) enums: HashMap<ast::EnumId, EnumData<'ast>>,
+    pub(super) enum_attributes: HashMap<ast::EnumId, EnumAttributes<'ast>>,
 }
 
 impl<'ast> Types<'ast> {
@@ -162,7 +162,7 @@ pub(super) struct PrimaryKeyData<'ast> {
 }
 
 #[derive(Debug, Default)]
-pub(super) struct EnumData<'ast> {
+pub(super) struct EnumAttributes<'ast> {
     pub(super) mapped_name: Option<&'ast str>,
     /// @map on enum values.
     pub(super) mapped_values: HashMap<u32, &'ast str>,
@@ -281,7 +281,7 @@ fn detect_alias_cycles(ctx: &mut Context<'_>) {
 }
 
 fn visit_enum<'ast>(enum_id: ast::EnumId, enm: &'ast ast::Enum, ctx: &mut Context<'ast>) {
-    let mut enum_data = EnumData::default();
+    let mut enum_data = EnumAttributes::default();
 
     if !ctx.db.active_connector().supports_enums() {
         ctx.push_error(DatamodelError::new_validation_error(
@@ -323,7 +323,7 @@ fn visit_enum<'ast>(enum_id: ast::EnumId, enm: &'ast ast::Enum, ctx: &mut Contex
         })
     });
 
-    ctx.db.types.enums.insert(enum_id, enum_data);
+    ctx.db.types.enum_attributes.insert(enum_id, enum_data);
 }
 
 fn visit_type_alias<'ast>(alias_id: ast::AliasId, alias: &'ast ast::Field, ctx: &mut Context<'ast>) {

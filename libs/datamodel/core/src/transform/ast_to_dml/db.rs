@@ -120,11 +120,14 @@ impl<'ast> ParserDatabase<'ast> {
     }
 
     pub(crate) fn get_enum_database_name(&self, enum_id: ast::EnumId) -> Option<&'ast str> {
-        self.types.enums[&enum_id].mapped_name
+        self.types.enum_attributes[&enum_id].mapped_name
     }
 
     pub(crate) fn get_enum_value_database_name(&self, enum_id: ast::EnumId, value_idx: u32) -> Option<&'ast str> {
-        self.types.enums[&enum_id].mapped_values.get(&value_idx).cloned()
+        self.types.enum_attributes[&enum_id]
+            .mapped_values
+            .get(&value_idx)
+            .cloned()
     }
 
     pub(super) fn active_connector(&self) -> &dyn Connector {
