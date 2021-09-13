@@ -48,6 +48,7 @@ pub async fn rpc_api(datamodel: &str) -> CoreResult<IoHandler> {
     Ok(io_handler)
 }
 
+#[allow(clippy::redundant_allocation)]
 async fn run_command(
     executor: Arc<Box<dyn GenericApi>>,
     cmd: &str,

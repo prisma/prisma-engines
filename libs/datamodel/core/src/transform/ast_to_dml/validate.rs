@@ -110,8 +110,13 @@ impl<'a> Validator<'a> {
                     // Only for SQL Server for now...
                     if constraint_names.is_duplicate(name) {
                         let span = ast_model.id_attribute().span;
-                        let message = "Given constraint name is already in use in the data model.";
-                        let error = DatamodelError::new_attribute_validation_error(message, "id", span);
+
+                        let message = format!(
+                            "The given constraint name `{}` is already in use in the data model. Please provide a different name using the `map` argument.",
+                            name
+                        );
+
+                        let error = DatamodelError::new_attribute_validation_error(&message, "id", span);
 
                         diagnostics.push_error(error);
                     }
@@ -125,9 +130,13 @@ impl<'a> Validator<'a> {
                     let ast_field = ast_model.find_field_bang(field.name());
 
                     if constraint_names.is_duplicate(name) {
-                        let message = "Given constraint name is already in use in the data model.";
-                        let span = ast_field.span_for_argument("default", "map");
-                        let error = DatamodelError::new_attribute_validation_error(message, "default", span);
+                        let message = format!(
+                            "The given constraint name `{}` is already in use in the data model. Please provide a different name using the `map` argument.",
+                            name
+                        );
+
+                        let span = ast_field.span_for_argument("default", "map").unwrap_or(ast_field.span);
+                        let error = DatamodelError::new_attribute_validation_error(&message, "default", span);
 
                         diagnostics.push_error(error);
                     }
@@ -425,12 +434,15 @@ impl<'a> Validator<'a> {
                 // Only for SQL Server for now...
                 if constraint_names.is_duplicate(name) {
                     let span = ast_field
-                        .map(|f| f.span_for_argument("relation", "map"))
-                        .unwrap_or_else(ast::Span::empty);
+                        .and_then(|f| f.span_for_argument("relation", "map"))
+                        .unwrap_or(field_span);
 
-                    let message = "Given constraint name is already in use in the data model.";
-                    let error = DatamodelError::new_attribute_validation_error(message, RELATION_ATTRIBUTE_NAME, span);
+                    let message = format!(
+                        "The given constraint name `{}` is already in use in the data model. Please provide a different name using the `map` argument.",
+                        name
+                    );
 
+                    let error = DatamodelError::new_attribute_validation_error(&message, RELATION_ATTRIBUTE_NAME, span);
                     errors.push_error(error);
                 }
             }
