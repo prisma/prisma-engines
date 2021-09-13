@@ -84,3 +84,9 @@ pub struct IntrospectionContext {
     pub source: Datasource,
     pub preview_features: BitFlags<PreviewFeature>,
 }
+
+impl IntrospectionContext {
+    pub fn foreign_keys_enabled(&self) -> bool {
+        self.source.referential_integrity.uses_foreign_keys()
+    }
+}

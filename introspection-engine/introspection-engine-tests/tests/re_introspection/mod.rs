@@ -1,6 +1,7 @@
 mod mssql;
 mod mysql;
 mod sqlite;
+mod vitess;
 
 use barrel::types;
 use expect_test::expect;

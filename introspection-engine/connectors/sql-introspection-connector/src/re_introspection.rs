@@ -1,12 +1,44 @@
 use crate::introspection_helpers::replace_field_names;
 use crate::{warnings::*, SqlFamilyTrait};
-use datamodel::{Datamodel, DefaultValue, FieldType, Ignorable, ValueGenerator};
+use datamodel::{Datamodel, DefaultValue, Field, FieldType, Ignorable, ValueGenerator, WithName};
 use introspection_connector::{IntrospectionContext, Warning};
 use prisma_value::PrismaValue;
 use std::cmp::Ordering::{self, Equal, Greater, Less};
+use std::collections::{HashMap, HashSet};
 
 pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, ctx: &IntrospectionContext) -> Vec<Warning> {
     let mut warnings = vec![];
+
+    // Keep @relation attributes even if the database doesn't use foreign keys
+    if !ctx.foreign_keys_enabled() {
+        let models: HashSet<String> = new_data_model.models().map(|m| m.name().to_string()).collect();
+
+        for old_model in old_data_model.models() {
+            if let Some(new_model) = new_data_model.models_mut().find(|m| m.name == *old_model.name()) {
+                let mut ordering: HashMap<String, usize> = old_model
+                    .fields()
+                    .enumerate()
+                    .map(|(i, field)| (field.name().to_string(), i))
+                    .collect();
+
+                for (i, field) in new_model.fields().enumerate() {
+                    if !ordering.contains_key(field.name()) {
+                        ordering.insert(field.name().to_string(), i);
+                    }
+                }
+
+                for field in old_model.relation_fields() {
+                    if models.contains(&field.relation_info.to) {
+                        new_model.add_field(Field::RelationField(field.clone()));
+                    }
+                }
+
+                new_model
+                    .fields
+                    .sort_by_cached_key(|field| *ordering.get(field.name()).unwrap_or(&usize::MAX));
+            }
+        }
+    }
 
     //@@map on models
     let mut changed_model_names = vec![];

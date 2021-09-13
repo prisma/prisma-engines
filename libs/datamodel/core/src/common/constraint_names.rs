@@ -127,7 +127,12 @@ impl ConstraintNames {
         let column_names: Vec<&str> = ri
             .fields
             .iter()
-            .map(|field_name| model.find_scalar_field(field_name).unwrap().final_database_name())
+            .map(|field_name| {
+                model
+                    .find_scalar_field(field_name)
+                    .map(|field| field.final_database_name())
+                    .unwrap_or(field_name)
+            })
             .collect();
 
         ri.fk_name.as_ref().unwrap()
