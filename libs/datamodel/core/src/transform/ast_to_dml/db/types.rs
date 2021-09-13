@@ -1,4 +1,4 @@
-use super::{attributes, context::Context};
+use super::context::Context;
 use crate::{ast, diagnostics::DatamodelError};
 use itertools::Itertools;
 use once_cell::sync::Lazy;
@@ -13,7 +13,7 @@ pub(super) fn resolve_types(ctx: &mut Context<'_>) {
         match (top_id, top) {
             (ast::TopId::Alias(alias_id), ast::Top::Type(type_alias)) => visit_type_alias(alias_id, type_alias, ctx),
             (ast::TopId::Model(model_id), ast::Top::Model(model)) => visit_model(model_id, model, ctx),
-            (ast::TopId::Enum(enum_id), ast::Top::Enum(enm)) => visit_enum(enum_id, enm, ctx),
+            (ast::TopId::Enum(_), ast::Top::Enum(enm)) => visit_enum(enm, ctx),
             (_, ast::Top::Source(_)) | (_, ast::Top::Generator(_)) => (),
             _ => unreachable!(),
         }
@@ -280,9 +280,7 @@ fn detect_alias_cycles(ctx: &mut Context<'_>) {
     }
 }
 
-fn visit_enum<'ast>(enum_id: ast::EnumId, enm: &'ast ast::Enum, ctx: &mut Context<'ast>) {
-    let mut enum_data = EnumAttributes::default();
-
+fn visit_enum<'ast>(enm: &'ast ast::Enum, ctx: &mut Context<'ast>) {
     if !ctx.db.active_connector().supports_enums() {
         ctx.push_error(DatamodelError::new_validation_error(
             &format!(
@@ -299,31 +297,6 @@ fn visit_enum<'ast>(enum_id: ast::EnumId, enm: &'ast ast::Enum, ctx: &mut Contex
             enm.span,
         ))
     }
-
-    for (field_idx, field) in enm.values.iter().enumerate() {
-        ctx.visit_attributes(&field.attributes, |attributes, ctx| {
-            // @map
-            attributes.visit_optional_single("map", ctx, |map_args, ctx| {
-                if let Some(mapped_name) = attributes::visit_map_attribute(map_args, ctx) {
-                    enum_data.mapped_values.insert(field_idx as u32, mapped_name);
-                    ctx.mapped_enum_value_names
-                        .insert((enum_id, mapped_name), field_idx as u32);
-                }
-            })
-        });
-    }
-
-    ctx.visit_attributes(&enm.attributes, |attributes, ctx| {
-        // @@map
-        attributes.visit_optional_single("map", ctx, |map_args, ctx| {
-            if let Some(mapped_name) = attributes::visit_map_attribute(map_args, ctx) {
-                enum_data.mapped_name = Some(mapped_name);
-                ctx.mapped_enum_names.insert(mapped_name, enum_id);
-            }
-        })
-    });
-
-    ctx.db.types.enum_attributes.insert(enum_id, enum_data);
 }
 
 fn visit_type_alias<'ast>(alias_id: ast::AliasId, alias: &'ast ast::Field, ctx: &mut Context<'ast>) {

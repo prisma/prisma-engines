@@ -17,8 +17,7 @@ fn id_should_error_if_the_field_is_not_required() {
           [1;94m-->[0m  [4mschema.prisma:2[0m
         [1;94m   | [0m
         [1;94m 1 | [0mmodel Model {
-        [1;94m 2 | [0m  [1;91mid Int? @id[0m
-        [1;94m 3 | [0m}
+        [1;94m 2 | [0m  id Int? @[1;91mid[0m
         [1;94m   | [0m
     "#]];
 

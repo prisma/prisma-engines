@@ -5,7 +5,7 @@ mod relation;
 
 use super::{
     context::{Arguments, Context},
-    types::{IndexData, ModelAttributes, PrimaryKeyData, RelationField, ScalarField, ScalarFieldType},
+    types::{EnumAttributes, IndexData, ModelAttributes, PrimaryKeyData, RelationField, ScalarField, ScalarFieldType},
 };
 use crate::{
     ast::{self, WithName},
@@ -17,11 +17,46 @@ use crate::{
 use prisma_value::PrismaValue;
 use std::collections::HashSet;
 
-pub(super) fn resolve_model_and_field_attributes<'ast>(
-    model_id: ast::ModelId,
-    ast_model: &'ast ast::Model,
-    ctx: &mut Context<'ast>,
-) {
+pub(super) fn resolve_attributes(ctx: &mut Context<'_>) {
+    for top in ctx.db.ast.iter_tops() {
+        match top {
+            (ast::TopId::Model(model_id), ast::Top::Model(model)) => resolve_model_attributes(model_id, model, ctx),
+            (ast::TopId::Enum(enum_id), ast::Top::Enum(ast_enum)) => resolve_enum_attributes(enum_id, ast_enum, ctx),
+            _ => (),
+        }
+    }
+}
+
+fn resolve_enum_attributes<'ast>(enum_id: ast::EnumId, ast_enum: &'ast ast::Enum, ctx: &mut Context<'ast>) {
+    let mut enum_attributes = EnumAttributes::default();
+
+    for (field_idx, field) in ast_enum.values.iter().enumerate() {
+        ctx.visit_attributes(&field.attributes, |attributes, ctx| {
+            // @map
+            attributes.visit_optional_single("map", ctx, |map_args, ctx| {
+                if let Some(mapped_name) = visit_map_attribute(map_args, ctx) {
+                    enum_attributes.mapped_values.insert(field_idx as u32, mapped_name);
+                    ctx.mapped_enum_value_names
+                        .insert((enum_id, mapped_name), field_idx as u32);
+                }
+            })
+        });
+    }
+
+    ctx.visit_attributes(&ast_enum.attributes, |attributes, ctx| {
+        // @@map
+        attributes.visit_optional_single("map", ctx, |map_args, ctx| {
+            if let Some(mapped_name) = visit_map_attribute(map_args, ctx) {
+                enum_attributes.mapped_name = Some(mapped_name);
+                ctx.mapped_enum_names.insert(mapped_name, enum_id);
+            }
+        })
+    });
+
+    ctx.db.types.enum_attributes.insert(enum_id, enum_attributes);
+}
+
+fn resolve_model_attributes<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::Model, ctx: &mut Context<'ast>) {
     let mut model_attributes = ModelAttributes::default();
 
     // First resolve all the attributes defined on fields **in isolation**.
@@ -1001,8 +1036,7 @@ fn resolve_field_array<'ast>(
     }
 }
 
-//helpers
-pub(super) fn visit_map_attribute<'ast>(map_args: &mut Arguments<'ast>, ctx: &mut Context<'ast>) -> Option<&'ast str> {
+fn visit_map_attribute<'ast>(map_args: &mut Arguments<'ast>, ctx: &mut Context<'ast>) -> Option<&'ast str> {
     match map_args.default_arg("name").map(|value| value.as_str()) {
         Ok(Ok(name)) => return Some(name),
         Err(err) => ctx.push_error(err), // not flattened for error handing legacy reasons
