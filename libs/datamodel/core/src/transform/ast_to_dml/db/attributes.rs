@@ -248,7 +248,7 @@ fn visit_scalar_field_attributes<'ast>(
                      ctx.push_error(args.new_attribute_validation_error("The `map` argument cannot be an empty string."));
                      None
                  },
-                 Some(Ok(name)) => Some(name.into()),
+                 Some(Ok(name)) => Some(name),
                  Some(Err(err)) => {
                      ctx.push_error(err); None
                  },
@@ -279,7 +279,7 @@ fn primary_key_constraint_name<'ast>(
             ctx.push_error(args.new_attribute_validation_error("The `map` argument cannot be an empty string."));
             None
         }
-        Some(Ok(name)) => Some(name.into()),
+        Some(Ok(name)) => Some(name),
         Some(Err(err)) => {
             ctx.push_error(err);
             None
@@ -328,7 +328,7 @@ fn default_value_constraint_name<'ast>(
         None => None,
     };
 
-    validate_db_name(ast_model, args, db_name.as_ref().map(|s| s.as_str()), "@default", ctx);
+    validate_db_name(ast_model, args, db_name.as_deref(), "@default", ctx);
 
     if db_name.is_some() && !ctx.db.active_connector().supports_named_default_values() {
         ctx.push_error(args.new_attribute_validation_error(
@@ -336,7 +336,7 @@ fn default_value_constraint_name<'ast>(
         ));
     }
 
-    db_name.map(|cow| cow.to_string())
+    db_name
 }
 
 fn visit_relation_field_attributes<'ast>(
@@ -665,7 +665,7 @@ fn model_index<'ast>(
             ctx.push_error(args.new_attribute_validation_error("The `map` argument cannot be an empty string."));
             None
         }
-        Some(Ok(name)) => Some(name.into()),
+        Some(Ok(name)) => Some(name),
         Some(Err(err)) => {
             ctx.push_error(err);
             None
@@ -694,8 +694,8 @@ fn model_index<'ast>(
             None
         }
         // backwards compatibility, accept name arg on normal indexes and use it as map arg.
-        (Some(name), None) => Some(name.into()),
-        (None, Some(map)) => Some(&map),
+        (Some(name), None) => Some(name),
+        (None, Some(map)) => Some(map),
         (None, None) => None,
     };
 
@@ -735,7 +735,7 @@ fn model_unique<'ast>(
                 ctx.push_error(args.new_attribute_validation_error("The `map` argument cannot be an empty string."));
                 None
             }
-            Some(Ok(name)) => Some(name.into()),
+            Some(Ok(name)) => Some(name),
             Some(Err(err)) => {
                 ctx.push_error(err);
                 None

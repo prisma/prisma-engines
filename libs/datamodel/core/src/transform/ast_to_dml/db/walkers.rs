@@ -34,14 +34,16 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
         self.model_attributes
     }
 
+    #[allow(clippy::unnecessary_lazy_evaluations)] // respectfully disagree
     fn final_database_name(&self) -> &'ast str {
         self.model_attributes
             .mapped_name
             .unwrap_or_else(|| &self.db.ast[self.model_id].name.name)
     }
 
+    #[allow(clippy::unnecessary_lazy_evaluations)] // respectfully disagree
     fn get_field_db_names<'a>(&'a self, fields: &'a [ast::FieldId]) -> impl Iterator<Item = &'ast str> + 'a {
-        fields.into_iter().map(move |&field_id| {
+        fields.iter().map(move |&field_id| {
             self.db.types.scalar_fields[&(self.model_id, field_id)]
                 .mapped_name
                 .unwrap_or_else(|| &self.db.ast[self.model_id][field_id].name.name)
@@ -147,7 +149,7 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
             let fields = self.relation_field.fields.as_ref()?;
             let model = self.db.walk_model(self.model_id);
             let table_name = model.final_database_name();
-            let column_names: Vec<&str> = model.get_field_db_names(&fields).collect();
+            let column_names: Vec<&str> = model.get_field_db_names(fields).collect();
 
             Some(
                 ConstraintNames::foreign_key_constraint_name(table_name, &column_names, self.db.active_connector())

@@ -126,7 +126,7 @@ pub(crate) struct ModelData<'ast> {
     /// @@ignore
     pub(crate) is_ignored: bool,
     /// @@index and @(@)unique.
-    pub(crate) indexes: Vec<(&'ast ast::Attribute, IndexData<'ast>)>,
+    pub(super) indexes: Vec<(&'ast ast::Attribute, IndexData<'ast>)>,
     /// @@map
     pub(crate) mapped_name: Option<&'ast str>,
 }
