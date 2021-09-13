@@ -35,7 +35,7 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
     }
 
     #[allow(clippy::unnecessary_lazy_evaluations)] // respectfully disagree
-    fn final_database_name(&self) -> &'ast str {
+    pub(crate) fn final_database_name(&self) -> &'ast str {
         self.model_attributes
             .mapped_name
             .unwrap_or_else(|| &self.db.ast[self.model_id].name.name)

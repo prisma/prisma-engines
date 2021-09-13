@@ -89,13 +89,16 @@ impl<'ast> ParserDatabase<'ast> {
             return ctx.finish();
         }
 
-        // Third pass: validate model and field attributes.
+        // Third pass: validate model and field attributes. All these
+        // validations should be _order independent_ and only rely on
+        // information from previous steps, not from other attributes.
         for (model_id, model) in ast.iter_models() {
             attributes::resolve_model_and_field_attributes(model_id, model, &mut ctx)
         }
 
         // Fourth step: global validations
         attributes::validate_index_names(&mut ctx);
+        attributes::fill_in_default_constraint_names(&mut ctx);
 
         ctx.finish()
     }

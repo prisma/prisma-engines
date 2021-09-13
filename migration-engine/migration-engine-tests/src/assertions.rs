@@ -356,9 +356,10 @@ impl<'a> ColumnAssertion<'a> {
     pub fn assert_default(self, expected: Option<DefaultValue>) -> Self {
         let this = self.assert_default_kind(expected.clone().map(|val| val.into_kind()));
         let found = &this.column.default.as_ref().map(|d| d.constraint_name());
+        let expected = expected.as_ref().map(|d| d.constraint_name());
 
         assert!(
-            found == &expected.as_ref().map(|d| d.constraint_name()),
+            found == &expected,
             "Assertion failed. Expected default constraint name: {:?}, but found {:?}",
             expected,
             found

@@ -231,7 +231,7 @@ fn visit_scalar_field_attributes<'ast>(
 
          // @default
          attributes.visit_optional_single("default", ctx, |args, ctx| {
-            visit_field_default(args, model_data, scalar_field_data, model_id, field_id, ctx);
+            visit_field_default(args, scalar_field_data, model_id, field_id, ctx);
          });
 
         if let ScalarFieldType::BuiltInScalar(scalar_type) = scalar_field_data.r#type {
@@ -302,9 +302,6 @@ fn primary_key_constraint_name<'ast>(
 fn default_value_constraint_name<'ast>(
     args: &mut Arguments<'ast>,
     ast_model: &'ast ast::Model,
-    model_data: &ModelData<'ast>,
-    ast_field: &'ast ast::Field,
-    field_data: &ScalarField<'ast>,
     ctx: &mut Context<'ast>,
 ) -> Option<String> {
     let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
@@ -316,14 +313,6 @@ fn default_value_constraint_name<'ast>(
         Some(Err(err)) => {
             ctx.push_error(err);
             None
-        }
-        None if ctx.db.active_connector().supports_named_default_values() => {
-            let model_name = model_data.mapped_name.unwrap_or_else(|| ast_model.name());
-            let field_name = field_data.mapped_name.unwrap_or_else(|| ast_field.name());
-
-            let generated_name = ConstraintNames::default_name(model_name, field_name, ctx.db.active_connector());
-
-            Some(generated_name)
         }
         None => None,
     };
@@ -419,7 +408,6 @@ fn visit_relation_field_attributes<'ast>(
 /// @default on scalar fields
 fn visit_field_default<'ast>(
     args: &mut Arguments<'ast>,
-    model_data: &mut ModelData<'ast>,
     field_data: &mut ScalarField<'ast>,
     model_id: ast::ModelId,
     field_id: ast::FieldId,
@@ -457,9 +445,7 @@ fn visit_field_default<'ast>(
                         if ctx.db.ast[enum_id].values.iter().any(|v| v.name() == value) {
                             let mut default = dml::DefaultValue::new_single(PrismaValue::Enum(value.to_owned()));
 
-                            if let Some(name) =
-                                default_value_constraint_name(args, ast_model, model_data, ast_field, field_data, ctx)
-                            {
+                            if let Some(name) = default_value_constraint_name(args, ast_model, ctx) {
                                 default.set_db_name(name);
                             }
 
@@ -475,9 +461,7 @@ fn visit_field_default<'ast>(
                             Ok(generator) if generator.is_dbgenerated() => {
                                 let mut default = dml::DefaultValue::new_expression(generator);
 
-                                if let Some(name) = default_value_constraint_name(
-                                    args, ast_model, model_data, ast_field, field_data, ctx,
-                                ) {
+                                if let Some(name) = default_value_constraint_name(args, ast_model, ctx) {
                                     default.set_db_name(name);
                                 }
 
@@ -497,9 +481,7 @@ fn visit_field_default<'ast>(
                             ))
                         }
 
-                        if let Some(name) =
-                            default_value_constraint_name(args, ast_model, model_data, ast_field, field_data, ctx)
-                        {
+                        if let Some(name) = default_value_constraint_name(args, ast_model, ctx) {
                             default.set_db_name(name);
                         }
 
@@ -1065,5 +1047,37 @@ fn validate_db_name(
         ctx.db.active_connector(),
     ) {
         ctx.push_error(err);
+    }
+}
+
+pub(super) fn fill_in_default_constraint_names(ctx: &mut Context<'_>) {
+    if !ctx.db.active_connector().supports_named_default_values() {
+        return;
+    }
+
+    let mut names: Vec<(ast::ModelId, ast::FieldId, String)> = Vec::new();
+
+    for ((model_id, field_id), field_attributes) in &ctx.db.types.scalar_fields {
+        if field_attributes.default.is_none() {
+            continue;
+        }
+
+        if field_attributes.default.as_ref().and_then(|d| d.db_name()).is_some() {
+            continue;
+        }
+
+        let model_name = ctx.db.walk_model(*model_id).final_database_name();
+        let field_name = field_attributes
+            .mapped_name
+            .unwrap_or(&ctx.db.ast[*model_id][*field_id].name.name);
+
+        let generated_name = ConstraintNames::default_name(model_name, field_name, ctx.db.active_connector());
+
+        names.push((*model_id, *field_id, generated_name))
+    }
+
+    for (model_id, field_id, generated_name) in names {
+        let field_attributes = ctx.db.types.scalar_fields.get_mut(&(model_id, field_id)).unwrap();
+        field_attributes.default.as_mut().unwrap().set_db_name(generated_name)
     }
 }
