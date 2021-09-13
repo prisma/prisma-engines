@@ -6,8 +6,7 @@ mod set_inside_update {
     use query_test_macros::relation_link_test;
 
     // "a PM to C1  relation with the child already in a relation" should "be setable through a nested mutation by unique"
-    // TODO:(dom): Not working on mongo. Failing from 18-26
-    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneOpt", exclude(MongoDb))]
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneOpt")]
     async fn pm_c1_child_inrel(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         run_query!(
             runner,
@@ -63,8 +62,7 @@ mod set_inside_update {
     }
 
     // "a PM to C1  relation with the child without a relation" should "be setable through a nested mutation by unique"
-    // TODO:(dom): Not working on mongo. Failing from 18-26
-    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneOpt", exclude(MongoDb))]
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneOpt")]
     async fn pm_c1_child_wo_rel(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let child = t.child().parse(
             run_query_json!(

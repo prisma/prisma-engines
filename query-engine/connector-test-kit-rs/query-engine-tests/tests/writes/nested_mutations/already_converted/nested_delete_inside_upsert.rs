@@ -6,7 +6,7 @@ mod delete_inside_upsert {
     use query_test_macros::relation_link_test;
 
     // "a P1 to C1  relation " should "work through a nested mutation by id"
-    // TODO:(dom): Not working on mongo. Failing from 9-26
+    // TODO:(dom): Not working on mongo. Failing from 9-17
     #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt", exclude(MongoDb))]
     async fn p1_c1_should_work(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = t.parent().parse(
@@ -54,8 +54,7 @@ mod delete_inside_upsert {
     }
 
     // "a P1 to C1  relation" should "error if the nodes are not connected"
-    // TODO:(dom): Not working on mongo. Failing from 18-26
-    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt", exclude(MongoDb))]
+    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt")]
     async fn p1_c1_error_if_not_connected(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = t.parent().parse(
             run_query_json!(
@@ -96,8 +95,7 @@ mod delete_inside_upsert {
     }
 
     // "a PM to C1!  relation " should "work"
-    // TODO:(dom): Not working on mongo. Failing from 18-26
-    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneReq", exclude(MongoDb))]
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneReq")]
     async fn pm_c1_req_should_req(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = t.parent().parse(
             run_query_json!(
@@ -142,8 +140,7 @@ mod delete_inside_upsert {
     }
 
     // "a P1 to C1!  relation " should "work"
-    // TODO:(dom): Not working on mongo. Failing from 18-26
-    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneReq", exclude(MongoDb))]
+    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneReq")]
     async fn p1_c1_req_should_work(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = t.parent().parse(
             run_query_json!(
@@ -189,8 +186,7 @@ mod delete_inside_upsert {
     }
 
     // "a PM to C1 " should "work"
-    // TODO:(dom): Not working on mongo. Failing from 18-26
-    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneOpt", exclude(MongoDb))]
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneOpt")]
     async fn pm_c1_should_work(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = t.parent().parse(
             run_query_json!(
@@ -236,8 +232,7 @@ mod delete_inside_upsert {
     }
 
     // "a P1! to CM  relation" should "error"
-    // TODO:(dom): Not working on mongo. Failing from 18-26
-    #[relation_link_test(on_parent = "ToOneReq", on_child = "ToMany", exclude(MongoDb))]
+    #[relation_link_test(on_parent = "ToOneReq", on_child = "ToMany")]
     async fn p1_req_cm_should_error(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = t.parent().parse(
             run_query_json!(
@@ -289,8 +284,7 @@ mod delete_inside_upsert {
     }
 
     // "a P1 to CM  relation " should "work"
-    // TODO:(dom): Not working on mongo. Failing from 18-26
-    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToMany", exclude(MongoDb))]
+    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToMany")]
     async fn p1_cm_should_work(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = t.parent().parse(
             run_query_json!(
