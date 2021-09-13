@@ -1,18 +1,17 @@
 use crate::ast::Span;
 use crate::diagnostics::DatamodelError;
-use crate::{IndexType, PrimaryKeyDefinition, WithDatabaseName};
+use crate::{PrimaryKeyDefinition, WithDatabaseName};
 use datamodel_connector::Connector;
 use dml::model::{IndexDefinition, Model};
 use dml::relation_info::RelationInfo;
 use once_cell::sync::Lazy;
 use regex::Regex;
-use std::borrow::Cow;
 
-pub(crate) struct ConstraintNames {}
+pub(crate) struct ConstraintNames;
 
 impl ConstraintNames {
-    ///Aligned with PG, to maximize the amount of times where we do not need
-    ///to render names because they already align with our convention.
+    /// Aligned with PG, to maximize the amount of times where we do not need
+    /// to render names because they already align with our convention.
     ///
     /// We always take the database names of entities. So if a model is remapped to
     /// a different name in the datamodel, the default name generation will still take
@@ -66,33 +65,49 @@ impl ConstraintNames {
             .map(|field_name| model.find_scalar_field(field_name).unwrap().final_database_name())
             .collect();
 
-        idx.db_name.as_ref().unwrap()
-            == &ConstraintNames::index_name(model.final_database_name(), &column_names, idx.tpe, connector)
-    }
-
-    pub(crate) fn index_name(
-        table_name: &str,
-        column_names: &[&str],
-        tpe: IndexType,
-        connector: &dyn Connector,
-    ) -> String {
-        let index_suffix = "_idx";
-        let unique_suffix = "_key";
-
-        let limit = connector.constraint_name_length();
-
-        let joined = format!("{}_{}", table_name, column_names.join("_"));
-
-        let trimmed = if joined.len() >= limit - 4 {
-            joined.split_at(limit - 4).0
+        let expected = if idx.is_unique() {
+            Self::unique_index_name(model.final_database_name(), &column_names, connector)
         } else {
-            joined.as_str()
+            Self::non_unique_index_name(model.final_database_name(), &column_names, connector)
         };
 
-        match tpe {
-            IndexType::Unique => format!("{}{}", trimmed, unique_suffix),
-            IndexType::Normal => format!("{}{}", trimmed, index_suffix),
-        }
+        idx.db_name.as_deref().unwrap() == expected
+    }
+
+    pub(crate) fn unique_index_name(table_name: &str, column_names: &[&str], connector: &dyn Connector) -> String {
+        const UNIQUE_SUFFIX: &str = "_key";
+        Self::index_name_impl(table_name, column_names, UNIQUE_SUFFIX, connector)
+    }
+
+    pub(crate) fn non_unique_index_name(table_name: &str, column_names: &[&str], connector: &dyn Connector) -> String {
+        const INDEX_SUFFIX: &str = "_idx";
+        Self::index_name_impl(table_name, column_names, INDEX_SUFFIX, connector)
+    }
+
+    fn index_name_impl(
+        table_name: &str,
+        column_names: &[&str],
+        suffix: &'static str,
+        connector: &dyn Connector,
+    ) -> String {
+        let limit = connector.constraint_name_length();
+
+        let mut out = String::with_capacity(table_name.len() + column_names.len() + suffix.len());
+
+        out.push_str(table_name);
+        out.push('_');
+
+        let colnames = column_names.join("_");
+
+        out.push_str(&colnames);
+
+        if out.len() >= limit - suffix.len() {
+            out.truncate(limit - suffix.len());
+        };
+
+        out.push_str(suffix);
+
+        out
     }
 
     pub(crate) fn default_name(table_name: &str, column_name: &str, connector: &dyn Connector) -> String {
@@ -160,10 +175,10 @@ impl ConstraintNames {
         None
     }
 
-    pub(crate) fn is_db_name_too_long<'ast>(
+    pub(crate) fn is_db_name_too_long(
         span: Span,
         object_name: &str,
-        name: &Option<Cow<'ast, str>>,
+        name: Option<&str>,
         attribute: &str,
         connector: &dyn Connector,
     ) -> Option<DatamodelError> {

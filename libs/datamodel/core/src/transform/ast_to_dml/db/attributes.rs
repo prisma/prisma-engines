@@ -6,21 +6,15 @@ use super::{
     context::{Arguments, Context},
     types::{IndexData, ModelData, RelationField, ScalarField},
 };
-use crate::ast::{FieldId, Model, ModelId};
 use crate::common::constraint_names::ConstraintNames;
-
+use crate::transform::ast_to_dml::db::types::PrimaryKeyData;
 use crate::{
     ast::{self, WithName},
     diagnostics::DatamodelError,
     dml,
     transform::{ast_to_dml::db::ScalarFieldType, helpers::ValueValidator},
-    IndexType,
 };
-
-use crate::transform::ast_to_dml::db::types::PrimaryKeyData;
-use itertools::Itertools;
 use prisma_value::PrismaValue;
-use std::borrow::Cow;
 use std::collections::HashSet;
 
 pub(super) fn resolve_model_and_field_attributes<'ast>(
@@ -34,28 +28,8 @@ pub(super) fn resolve_model_and_field_attributes<'ast>(
         .take_model_data(&model_id)
         .expect("Broken invariant: no ModelData for model in visit_model_attributes.");
 
-    {
-        // set database name already if possible without validating against other names / unused args / other errors
-        let map = &ast_model.attributes.iter().find(|a| a.name.name == "map");
-        if let Some(map_attribute) = map {
-            let mapped_name = match (
-                map_attribute.arguments.iter().find(|a| a.name() == "name"),
-                map_attribute.arguments.iter().find(|a| a.name() == ""),
-            ) {
-                (Some(arg), None) => Some(ValueValidator::new(&arg.value).as_str().unwrap()),
-                (None, Some(arg)) => Some(ValueValidator::new(&arg.value).as_str().unwrap()),
-                _ => None,
-            };
-
-            model_data.mapped_name = mapped_name;
-        }
-    }
-
-    //first go over all scalars since relations depend on them
-    let mut seen_scalars = vec![];
     for (field_id, ast_field) in ast_model.iter_fields() {
         if let Some(mut scalar_field) = ctx.db.types.take_scalar_field(model_id, field_id) {
-            seen_scalars.push((model_id, field_id));
             visit_scalar_field_attributes(
                 model_id,
                 field_id,
@@ -67,14 +41,10 @@ pub(super) fn resolve_model_and_field_attributes<'ast>(
             );
 
             ctx.db.types.scalar_fields.insert((model_id, field_id), scalar_field);
-        }
-    }
-
-    for (field_id, ast_field) in ast_model.iter_fields() {
-        if let Some(mut rf) = ctx.db.types.take_relation_field(model_id, field_id) {
-            visit_relation_field_attributes(model_id, field_id, ast_field, &model_data, &mut rf, ctx);
+        } else if let Some(mut rf) = ctx.db.types.take_relation_field(model_id, field_id) {
+            visit_relation_field_attributes(model_id, field_id, ast_field, &mut rf, ctx);
             ctx.db.types.relation_fields.insert((model_id, field_id), rf);
-        } else if !seen_scalars.contains(&(model_id, field_id)) {
+        } else {
             unreachable!(
                 "{}.{} is neither a scalar field nor a relation field",
                 ast_model.name(),
@@ -146,16 +116,8 @@ pub(super) fn validate_index_names(ctx: &mut Context<'_>) {
     let mut index_names = HashSet::new();
     let mut errors = Vec::new();
 
-    for (attr, index) in ctx
-        .db
-        .ast
-        .iter_models()
-        .flat_map(|(model_id, _)| ctx.db.types.models[&model_id].indexes.iter())
-    {
-        let index_name = match &index.db_name {
-            Some(index_name) => index_name.to_string(),
-            None => continue,
-        };
+    for index in ctx.db.walk_models().flat_map(|model| model.walk_indexes()) {
+        let index_name = index.final_database_name();
 
         if index_names.insert(index_name.clone()) {
             continue; // true means this name hasn't been seen before
@@ -163,7 +125,7 @@ pub(super) fn validate_index_names(ctx: &mut Context<'_>) {
 
         errors.push(DatamodelError::new_multiple_indexes_with_same_name_are_not_supported(
             &index_name,
-            attr.span,
+            index.ast_attribute().span,
         ))
     }
 
@@ -233,9 +195,7 @@ fn visit_scalar_field_attributes<'ast>(
                     ast_model.span,
                 )),
                 None => {
-                    let db_name =
-                        primary_key_constraint_name(ast_model, model_data, args,  "@id", ctx)
-                    ;
+                    let db_name = primary_key_constraint_name(ast_model, args,  "@id", ctx);
 
                     model_data.primary_key = Some(PrimaryKeyData{
                         name: None,
@@ -271,7 +231,7 @@ fn visit_scalar_field_attributes<'ast>(
 
          // @default
          attributes.visit_optional_single("default", ctx, |args, ctx| {
-            visit_field_default(args, model_data, scalar_field_data, model_id, field_id, ctx);
+            visit_field_default(args, scalar_field_data, model_id, field_id, ctx);
          });
 
         if let ScalarFieldType::BuiltInScalar(scalar_type) = scalar_field_data.r#type {
@@ -283,19 +243,19 @@ fn visit_scalar_field_attributes<'ast>(
 
          // @unique
          attributes.visit_optional_single("unique", ctx, |args, ctx| {
-
-             let model_db_name = model_data.mapped_name.unwrap_or(&ast_model.name.name);
-             let field_db_name = scalar_field_data.mapped_name.unwrap_or(&ast_field.name.name);
-
-             let db_name : Option<Cow<'ast, str>> = {
-
-                 let generated_name = ConstraintNames::index_name(model_db_name, &[field_db_name], IndexType::Unique, ctx.db.active_connector());
-                 let db_name = get_map_argument(args,  generated_name,ctx);
-                 validate_db_name(ast_model, args, &db_name, "@unique", ctx);
-
-                 db_name
-
+             let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
+                 Some(Ok("")) => {
+                     ctx.push_error(args.new_attribute_validation_error("The `map` argument cannot be an empty string."));
+                     None
+                 },
+                 Some(Ok(name)) => Some(name),
+                 Some(Err(err)) => {
+                     ctx.push_error(err); None
+                 },
+                 None => None,
              };
+             validate_db_name(ast_model, args, db_name, "@unique", ctx);
+
 
             model_data.indexes.push((args.attribute(), IndexData {
                 is_unique: true,
@@ -309,26 +269,25 @@ fn visit_scalar_field_attributes<'ast>(
 }
 
 fn primary_key_constraint_name<'ast>(
-    ast_model: &'ast Model,
-    model_data: &mut ModelData<'ast>,
+    ast_model: &'ast ast::Model,
     args: &mut Arguments<'ast>,
     attribute: &'ast str,
     ctx: &mut Context<'ast>,
-) -> Option<Cow<'ast, str>> {
-    let generated_name = ConstraintNames::primary_key_name(
-        model_data.mapped_name.unwrap_or(&ast_model.name.name),
-        ctx.db.active_connector(),
-    );
-
+) -> Option<&'ast str> {
     let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
-        Some(Ok("")) => error_on_empty_string_cow(args, ctx),
-        Some(Ok(name)) => Some(name.into()),
-        Some(Err(err)) => push_error_cow(err, ctx),
-        None if ctx.db.active_connector().supports_named_primary_keys() => Some(generated_name.into()),
+        Some(Ok("")) => {
+            ctx.push_error(args.new_attribute_validation_error("The `map` argument cannot be an empty string."));
+            None
+        }
+        Some(Ok(name)) => Some(name),
+        Some(Err(err)) => {
+            ctx.push_error(err);
+            None
+        }
         None => None,
     };
 
-    validate_db_name(ast_model, args, &db_name, attribute, ctx);
+    validate_db_name(ast_model, args, db_name.as_deref(), attribute, ctx);
 
     if db_name.is_some() && !ctx.db.active_connector().supports_named_primary_keys() {
         ctx.push_error(DatamodelError::new_model_validation_error(
@@ -342,28 +301,23 @@ fn primary_key_constraint_name<'ast>(
 
 fn default_value_constraint_name<'ast>(
     args: &mut Arguments<'ast>,
-    ast_model: &'ast Model,
-    model_data: &ModelData<'ast>,
-    ast_field: &'ast ast::Field,
-    field_data: &ScalarField<'ast>,
+    ast_model: &'ast ast::Model,
     ctx: &mut Context<'ast>,
 ) -> Option<String> {
     let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
-        Some(Ok("")) => error_on_empty_string_cow(args, ctx),
+        Some(Ok("")) => {
+            ctx.push_error(args.new_attribute_validation_error("The `map` argument cannot be an empty string."));
+            None
+        }
         Some(Ok(name)) => Some(name.into()),
-        Some(Err(err)) => push_error_cow(err, ctx),
-        None if ctx.db.active_connector().supports_named_default_values() => {
-            let model_name = model_data.mapped_name.unwrap_or_else(|| ast_model.name());
-            let field_name = field_data.mapped_name.unwrap_or_else(|| ast_field.name());
-
-            let generated_name = ConstraintNames::default_name(model_name, field_name, ctx.db.active_connector());
-
-            Some(generated_name.into())
+        Some(Err(err)) => {
+            ctx.push_error(err);
+            None
         }
         None => None,
     };
 
-    validate_db_name(ast_model, args, &db_name, "@default", ctx);
+    validate_db_name(ast_model, args, db_name.as_deref(), "@default", ctx);
 
     if db_name.is_some() && !ctx.db.active_connector().supports_named_default_values() {
         ctx.push_error(args.new_attribute_validation_error(
@@ -371,14 +325,13 @@ fn default_value_constraint_name<'ast>(
         ));
     }
 
-    db_name.map(|cow| cow.to_string())
+    db_name
 }
 
 fn visit_relation_field_attributes<'ast>(
     model_id: ast::ModelId,
     field_id: ast::FieldId,
     ast_field: &'ast ast::Field,
-    model_data: &ModelData<'ast>,
     relation_field: &mut RelationField<'ast>,
     ctx: &mut Context<'ast>,
 ) {
@@ -386,7 +339,7 @@ fn visit_relation_field_attributes<'ast>(
         // @relation
         // Relation attributes are not required _yet_ at this stage. The schema has to be parseable for standardization.
         attributes.visit_optional_single("relation", ctx, |relation_args, ctx| {
-            visit_relation(relation_args, model_id, field_id, model_data, relation_field, ctx)
+            visit_relation(relation_args, model_id, field_id, relation_field, ctx)
         });
 
         // @id
@@ -455,7 +408,6 @@ fn visit_relation_field_attributes<'ast>(
 /// @default on scalar fields
 fn visit_field_default<'ast>(
     args: &mut Arguments<'ast>,
-    model_data: &mut ModelData<'ast>,
     field_data: &mut ScalarField<'ast>,
     model_id: ast::ModelId,
     field_id: ast::FieldId,
@@ -493,9 +445,7 @@ fn visit_field_default<'ast>(
                         if ctx.db.ast[enum_id].values.iter().any(|v| v.name() == value) {
                             let mut default = dml::DefaultValue::new_single(PrismaValue::Enum(value.to_owned()));
 
-                            if let Some(name) =
-                                default_value_constraint_name(args, ast_model, model_data, ast_field, field_data, ctx)
-                            {
+                            if let Some(name) = default_value_constraint_name(args, ast_model, ctx) {
                                 default.set_db_name(name);
                             }
 
@@ -511,9 +461,7 @@ fn visit_field_default<'ast>(
                             Ok(generator) if generator.is_dbgenerated() => {
                                 let mut default = dml::DefaultValue::new_expression(generator);
 
-                                if let Some(name) = default_value_constraint_name(
-                                    args, ast_model, model_data, ast_field, field_data, ctx,
-                                ) {
+                                if let Some(name) = default_value_constraint_name(args, ast_model, ctx) {
                                     default.set_db_name(name);
                                 }
 
@@ -533,9 +481,7 @@ fn visit_field_default<'ast>(
                             ))
                         }
 
-                        if let Some(name) =
-                            default_value_constraint_name(args, ast_model, model_data, ast_field, field_data, ctx)
-                        {
+                        if let Some(name) = default_value_constraint_name(args, ast_model, ctx) {
                             default.set_db_name(name);
                         }
 
@@ -604,7 +550,7 @@ fn visit_model_id<'ast>(
             }
 
             if !relation_fields.is_empty() {
-                ctx.push_error(DatamodelError::new_model_validation_error(&format!("The id definition refers to the relation fields {}. ID definitions must reference only scalar fields.", relation_fields.iter().map(|(f, _)| f.name()).join(", ")), ctx.db.ast[model_id].name(), args.span()));
+                ctx.push_error(DatamodelError::new_model_validation_error(&format!("The id definition refers to the relation fields {}. ID definitions must reference only scalar fields.", relation_fields.iter().map(|(f, _)| f.name()).collect::<Vec<_>>().join(", ")), ctx.db.ast[model_id].name(), args.span()));
             }
 
             return;
@@ -641,7 +587,7 @@ fn visit_model_id<'ast>(
     }
 
     let (name, db_name) = {
-        let db_name = primary_key_constraint_name(ast_model, model_data, args, "@@id", ctx);
+        let db_name = primary_key_constraint_name(ast_model, args, "@@id", ctx);
         let name = get_name_argument(args, ctx);
         if let Some(err) = ConstraintNames::is_client_name_valid(args.span(), &ast_model.name.name, name, "@@id") {
             ctx.push_error(err);
@@ -693,26 +639,23 @@ fn model_index<'ast>(
 
     common_index_validations(args, &mut index_data, model_id, ctx);
     let ast_model = &ctx.db.ast[model_id];
-    let model_db_name = data.mapped_name.unwrap_or(&ast_model.name.name);
 
-    let field_db_names = get_field_db_names(model_id, &index_data.fields, ctx);
     let name = get_name_argument(args, ctx);
 
-    let generated_name = ConstraintNames::index_name(
-        model_db_name,
-        &field_db_names,
-        IndexType::Normal,
-        ctx.db.active_connector(),
-    );
-
     let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
-        Some(Ok("")) => error_on_empty_string_cow(args, ctx),
-        Some(Ok(name)) => Some(name.into()),
-        Some(Err(err)) => push_error_cow(err, ctx),
+        Some(Ok("")) => {
+            ctx.push_error(args.new_attribute_validation_error("The `map` argument cannot be an empty string."));
+            None
+        }
+        Some(Ok(name)) => Some(name),
+        Some(Err(err)) => {
+            ctx.push_error(err);
+            None
+        }
         None => None,
     };
 
-    validate_db_name(ast_model, args, &db_name, "@@index", ctx);
+    validate_db_name(ast_model, args, db_name, "@@index", ctx);
 
     // We do not want to break existing datamodels for client purposes that
     // use the old `@@index([field], name: "onlydbname")` This would
@@ -733,9 +676,9 @@ fn model_index<'ast>(
             None
         }
         // backwards compatibility, accept name arg on normal indexes and use it as map arg.
-        (Some(name), None) => Some(name.into()),
+        (Some(name), None) => Some(name),
         (None, Some(map)) => Some(map),
-        (None, None) => Some(generated_name.into()),
+        (None, None) => None,
     };
 
     data.indexes.push((args.attribute(), index_data));
@@ -755,10 +698,6 @@ fn model_unique<'ast>(
     common_index_validations(args, &mut index_data, model_id, ctx);
 
     let ast_model = &ctx.db.ast[model_id];
-    let model_db_name = data.mapped_name.unwrap_or(&ast_model.name.name);
-
-    let field_db_names: Vec<&str> = get_field_db_names(model_id, &index_data.fields, ctx);
-
     let name = get_name_argument(args, ctx);
 
     let db_name = {
@@ -770,18 +709,23 @@ fn model_unique<'ast>(
         // name
         //
         // We are fine with that since this is not automatically breaking but
-        // rather prompts a migration upon the first run on migrate The client
+        // rather prompts a migration upon the first run on migrate. The client
         // is unaffected by this.
-        let generated_name = ConstraintNames::index_name(
-            model_db_name,
-            &field_db_names,
-            IndexType::Unique,
-            ctx.db.active_connector(),
-        );
 
-        let db_name = get_map_argument(args, generated_name, ctx);
+        let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
+            Some(Ok("")) => {
+                ctx.push_error(args.new_attribute_validation_error("The `map` argument cannot be an empty string."));
+                None
+            }
+            Some(Ok(name)) => Some(name),
+            Some(Err(err)) => {
+                ctx.push_error(err);
+                None
+            }
+            None => None,
+        };
 
-        validate_db_name(ast_model, args, &db_name, "@@unique", ctx);
+        validate_db_name(ast_model, args, db_name, "@@unique", ctx);
 
         if let Some(err) = ConstraintNames::is_client_name_valid(args.span(), &ast_model.name.name, name, "@@unique") {
             ctx.push_error(err);
@@ -854,7 +798,7 @@ fn common_index_validations<'ast>(
                     &format!(
                         "The {prefix}index definition refers to the relation fields {the_fields}. Index definitions must reference only scalar fields.{suggestion}",
                         prefix = if index_data.is_unique { "unique " } else { "" },
-                        the_fields = relation_fields.iter().map(|(f, _)| f.name()).join(", "),
+                        the_fields = relation_fields.iter().map(|(f, _)| f.name()).collect::<Vec<_>>().join(", "),
                         suggestion = suggestion
                     ),
                     ctx.db.ast[model_id].name(),
@@ -870,7 +814,6 @@ fn visit_relation<'ast>(
     args: &mut Arguments<'ast>,
     model_id: ast::ModelId,
     field_id: ast::FieldId,
-    model_data: &ModelData<'ast>,
     relation_field: &mut RelationField<'ast>,
     ctx: &mut Context<'ast>,
 ) {
@@ -887,7 +830,7 @@ fn visit_relation<'ast>(
                 }
 
                 if !relation_fields.is_empty() {
-                    ctx.push_error(DatamodelError::new_validation_error(&format!("The argument fields must refer only to scalar fields. But it is referencing the following relation fields: {}", relation_fields.iter().map(|(f, _)| f.name()).join(", ")), fields.span()));
+                    ctx.push_error(DatamodelError::new_validation_error(&format!("The argument fields must refer only to scalar fields. But it is referencing the following relation fields: {}", relation_fields.iter().map(|(f, _)| f.name()).collect::<Vec<_>>().join(", ")), fields.span()));
                 }
 
                 Vec::new()
@@ -920,7 +863,7 @@ fn visit_relation<'ast>(
                     let msg = format!(
                         "The argument `references` must refer only to scalar fields in the related model `{}`. But it is referencing the following relation fields: {}",
                         ctx.db.ast[relation_field.referenced_model].name(),
-                        relation_fields.iter().map(|(f, _)| f.name()).join(", "),
+                        relation_fields.iter().map(|(f, _)| f.name()).collect::<Vec<_>>().join(", "),
                     );
                     ctx.push_error(DatamodelError::new_validation_error(&msg, args.span()));
                 }
@@ -963,34 +906,28 @@ fn visit_relation<'ast>(
 
     let fk_name = {
         let ast_model = &ctx.db.ast[model_id];
-        //TODO(matthias) when is relationfield.fields populated exactly ????
-        let generated_name = if let Some(fields) = &relation_field.fields {
-            let table_name = model_data.mapped_name.unwrap_or(&ast_model.name.name);
-            let column_names = get_field_db_names(model_id, fields, ctx);
 
-            Some(
-                ConstraintNames::foreign_key_constraint_name(table_name, &column_names, ctx.db.active_connector())
-                    .into(),
-            )
-        } else {
-            None
-        };
-        //TODO(matthias) error when map given on the wrong side, thats why this is not dryed up
         let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
-            Some(Ok("")) => error_on_empty_string_cow(args, ctx),
+            Some(Ok("")) => {
+                ctx.push_error(args.new_attribute_validation_error("The `map` argument cannot be an empty string."));
+                None
+            }
             Some(Ok(name)) => {
                 if !ctx.db.active_connector().supports_named_foreign_keys() {
                     ctx.push_error(
                         args.new_attribute_validation_error("Your provider does not support named foreign keys."),
                     )
                 }
-                Some(name.into())
+                Some(name)
             }
-            Some(Err(err)) => push_error_cow(err, ctx),
-            None => generated_name,
+            Some(Err(err)) => {
+                ctx.push_error(err);
+                None
+            }
+            None => None,
         };
 
-        validate_db_name(ast_model, args, &db_name, "@relation", ctx);
+        validate_db_name(ast_model, args, db_name, "@relation", ctx);
 
         db_name
     };
@@ -1082,19 +1019,6 @@ pub(super) fn visit_map_attribute<'ast>(map_args: &mut Arguments<'ast>, ctx: &mu
     None
 }
 
-fn get_map_argument<'ast>(
-    args: &mut Arguments<'ast>,
-    generated_name: String,
-    ctx: &mut Context<'ast>,
-) -> Option<Cow<'ast, str>> {
-    match args.optional_arg("map").map(|name| name.as_str()) {
-        Some(Ok("")) => error_on_empty_string_cow(args, ctx),
-        Some(Ok(name)) => Some(name.into()),
-        Some(Err(err)) => push_error_cow(err, ctx),
-        None => Some(generated_name.into()),
-    }
-}
-
 fn get_name_argument<'ast>(args: &mut Arguments<'ast>, ctx: &mut Context<'ast>) -> Option<&'ast str> {
     match args.optional_arg("name").map(|name| name.as_str()) {
         Some(Ok("")) => {
@@ -1108,34 +1032,12 @@ fn get_name_argument<'ast>(args: &mut Arguments<'ast>, ctx: &mut Context<'ast>) 
     None
 }
 
-fn get_field_db_names<'ast>(model_id: ModelId, fields: &[FieldId], ctx: &mut Context<'ast>) -> Vec<&'ast str> {
-    fields
-        .iter()
-        .map(|&field_id| {
-            ctx.db
-                .get_field_database_name(model_id, field_id)
-                .unwrap_or(&ctx.db.ast[model_id][field_id].name.name)
-        })
-        .collect()
-}
-
-// errors
-fn push_error_cow<'ast>(err: DatamodelError, ctx: &mut Context<'ast>) -> Option<Cow<'ast, str>> {
-    ctx.push_error(err);
-    None
-}
-
-fn error_on_empty_string_cow<'ast>(args: &mut Arguments<'ast>, ctx: &mut Context<'ast>) -> Option<Cow<'ast, str>> {
-    ctx.push_error(args.new_attribute_validation_error("The `map` argument cannot be an empty string."));
-    None
-}
-
-fn validate_db_name<'ast>(
-    ast_model: &'ast Model,
-    args: &mut Arguments<'ast>,
-    db_name: &Option<Cow<'ast, str>>,
-    attribute: &'ast str,
-    ctx: &mut Context<'ast>,
+fn validate_db_name(
+    ast_model: &ast::Model,
+    args: &mut Arguments<'_>,
+    db_name: Option<&str>,
+    attribute: &str,
+    ctx: &mut Context<'_>,
 ) {
     if let Some(err) = ConstraintNames::is_db_name_too_long(
         args.span(),
@@ -1145,5 +1047,37 @@ fn validate_db_name<'ast>(
         ctx.db.active_connector(),
     ) {
         ctx.push_error(err);
+    }
+}
+
+pub(super) fn fill_in_default_constraint_names(ctx: &mut Context<'_>) {
+    if !ctx.db.active_connector().supports_named_default_values() {
+        return;
+    }
+
+    let mut names: Vec<(ast::ModelId, ast::FieldId, String)> = Vec::new();
+
+    for ((model_id, field_id), field_attributes) in &ctx.db.types.scalar_fields {
+        if field_attributes.default.is_none() {
+            continue;
+        }
+
+        if field_attributes.default.as_ref().and_then(|d| d.db_name()).is_some() {
+            continue;
+        }
+
+        let model_name = ctx.db.walk_model(*model_id).final_database_name();
+        let field_name = field_attributes
+            .mapped_name
+            .unwrap_or(&ctx.db.ast[*model_id][*field_id].name.name);
+
+        let generated_name = ConstraintNames::default_name(model_name, field_name, ctx.db.active_connector());
+
+        names.push((*model_id, *field_id, generated_name))
+    }
+
+    for (model_id, field_id, generated_name) in names {
+        let field_attributes = ctx.db.types.scalar_fields.get_mut(&(model_id, field_id)).unwrap();
+        field_attributes.default.as_mut().unwrap().set_db_name(generated_name)
     }
 }

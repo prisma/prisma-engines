@@ -6,6 +6,7 @@ mod attributes;
 mod context;
 mod names;
 mod types;
+mod walkers;
 
 pub(crate) use types::{ScalarField, ScalarFieldType};
 
@@ -88,13 +89,16 @@ impl<'ast> ParserDatabase<'ast> {
             return ctx.finish();
         }
 
-        // Third pass: validate model and field attributes.
+        // Third pass: validate model and field attributes. All these
+        // validations should be _order independent_ and only rely on
+        // information from previous steps, not from other attributes.
         for (model_id, model) in ast.iter_models() {
             attributes::resolve_model_and_field_attributes(model_id, model, &mut ctx)
         }
 
         // Fourth step: global validations
         attributes::validate_index_names(&mut ctx);
+        attributes::fill_in_default_constraint_names(&mut ctx);
 
         ctx.finish()
     }
@@ -123,14 +127,6 @@ impl<'ast> ParserDatabase<'ast> {
         self.types.enums[&enum_id].mapped_values.get(&value_idx).cloned()
     }
 
-    pub(crate) fn get_field_database_name(&self, model_id: ast::ModelId, field_id: ast::FieldId) -> Option<&'ast str> {
-        self.types.scalar_fields[&(model_id, field_id)].mapped_name
-    }
-
-    pub(crate) fn get_model_data(&self, model_id: &ast::ModelId) -> Option<&types::ModelData<'ast>> {
-        self.types.models.get(model_id)
-    }
-
     pub(super) fn active_connector(&self) -> &dyn Connector {
         self.datasource
             .map(|datasource| datasource.active_connector.as_ref())
@@ -140,7 +136,7 @@ impl<'ast> ParserDatabase<'ast> {
     /// Iterate all the relation fields in a given model in the order they were
     /// defined. Note that these are only the fields that were actually written
     /// in the schema.
-    pub(crate) fn iter_model_relation_fields(
+    fn iter_model_relation_fields(
         &self,
         model_id: ast::ModelId,
     ) -> impl Iterator<Item = (ast::FieldId, &RelationField<'ast>)> + '_ {
