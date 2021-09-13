@@ -109,13 +109,11 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
         let model_db_name = model.final_database_name();
         let field_db_names: Vec<&str> = model.get_field_db_names(&self.index_attribute.fields).collect();
 
-        ConstraintNames::index_name(
-            model_db_name,
-            &field_db_names,
-            self.index_attribute.is_unique,
-            self.db.active_connector(),
-        )
-        .into()
+        if self.index_attribute.is_unique {
+            ConstraintNames::unique_index_name(model_db_name, &field_db_names, self.db.active_connector()).into()
+        } else {
+            ConstraintNames::non_unique_index_name(model_db_name, &field_db_names, self.db.active_connector()).into()
+        }
     }
 
     pub(crate) fn attribute(&self) -> &'db super::types::IndexData<'ast> {
