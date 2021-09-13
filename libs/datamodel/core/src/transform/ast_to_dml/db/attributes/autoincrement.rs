@@ -11,7 +11,7 @@ pub(super) fn validate_auto_increment(model_id: ast::ModelId, ctx: &mut Context<
         return; // just don't try to validate without a datasource or autoincrement fields
     }
 
-    let model_data = &ctx.db.types.models[&model_id];
+    let model_data = &ctx.db.types.model_attributes[&model_id];
     let mut errors = Vec::new();
 
     // First check if the provider supports autoincrement at all. If yes, proceed with the detailed checks.

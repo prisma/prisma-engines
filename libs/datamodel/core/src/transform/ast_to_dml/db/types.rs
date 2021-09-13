@@ -26,7 +26,7 @@ pub(super) fn resolve_types(ctx: &mut Context<'_>) {
 pub(super) struct Types<'ast> {
     pub(super) type_aliases: HashMap<ast::AliasId, ScalarFieldType>,
     pub(super) scalar_fields: BTreeMap<(ast::ModelId, ast::FieldId), ScalarField<'ast>>,
-    pub(super) models: HashMap<ast::ModelId, ModelData<'ast>>,
+    pub(super) model_attributes: HashMap<ast::ModelId, ModelAttributes<'ast>>,
     /// This contains only the relation fields actually present in the schema
     /// source text.
     pub(super) relation_fields: BTreeMap<(ast::ModelId, ast::FieldId), RelationField<'ast>>,
@@ -34,10 +34,6 @@ pub(super) struct Types<'ast> {
 }
 
 impl<'ast> Types<'ast> {
-    pub(super) fn take_model_data(&mut self, model_id: &ast::ModelId) -> Option<ModelData<'ast>> {
-        self.models.remove(model_id)
-    }
-
     pub(super) fn take_scalar_field(
         &mut self,
         model_id: ast::ModelId,
@@ -120,7 +116,7 @@ impl RelationField<'_> {
 
 /// Information gathered from validating attributes on a model.
 #[derive(Default, Debug)]
-pub(crate) struct ModelData<'ast> {
+pub(crate) struct ModelAttributes<'ast> {
     /// @(@)id
     pub(super) primary_key: Option<PrimaryKeyData<'ast>>,
     /// @@ignore
@@ -131,7 +127,7 @@ pub(crate) struct ModelData<'ast> {
     pub(crate) mapped_name: Option<&'ast str>,
 }
 
-impl ModelData<'_> {
+impl ModelAttributes<'_> {
     /// Whether the field is the whole primary key. Will match `@id` and `@@id([fieldName])`.
     pub(super) fn field_is_single_pk(&self, field: ast::FieldId) -> bool {
         self.primary_key.as_ref().filter(|pk| pk.fields == [field]).is_some()
@@ -173,13 +169,6 @@ pub(super) struct EnumData<'ast> {
 }
 
 fn visit_model<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::Model, ctx: &mut Context<'ast>) {
-    let model_data = ModelData {
-        // This needs to be looked up first, because we want to skip some field
-        // validations when the model is ignored.
-        is_ignored: ast_model.attributes.iter().any(|attr| attr.name.name == "ignore"),
-        ..Default::default()
-    };
-
     for (field_id, ast_field) in ast_model.iter_fields() {
         match field_type(ast_field, ctx) {
             Ok(FieldType::Model(referenced_model)) => {
@@ -227,8 +216,6 @@ fn visit_model<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::Model, ctx: &
             )),
         }
     }
-
-    ctx.db.types.models.insert(model_id, model_data);
 }
 
 /// Detect self-referencing type aliases, possibly indirectly. We loop
