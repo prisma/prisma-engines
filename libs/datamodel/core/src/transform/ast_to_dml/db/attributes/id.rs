@@ -5,7 +5,7 @@ use crate::{
     diagnostics::DatamodelError,
     transform::ast_to_dml::db::{
         context::{Arguments, Context},
-        types::{ModelAttributes, PrimaryKeyData},
+        types::{IdAttribute, ModelAttributes},
     },
 };
 
@@ -94,7 +94,7 @@ pub(super) fn model<'ast>(
         (name, db_name)
     };
 
-    model_data.primary_key = Some(PrimaryKeyData {
+    model_data.primary_key = Some(IdAttribute {
         name,
         db_name,
         fields: resolved_fields,
@@ -117,7 +117,7 @@ pub(super) fn field<'ast>(
         None => {
             let db_name = primary_key_constraint_name(ast_model, args, "@id", ctx);
 
-            model_attributes.primary_key = Some(PrimaryKeyData {
+            model_attributes.primary_key = Some(IdAttribute {
                 name: None,
                 db_name,
                 fields: vec![field_id],

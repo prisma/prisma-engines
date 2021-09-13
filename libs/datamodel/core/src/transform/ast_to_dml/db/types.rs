@@ -26,11 +26,11 @@ pub(super) fn resolve_types(ctx: &mut Context<'_>) {
 pub(super) struct Types<'ast> {
     pub(super) type_aliases: HashMap<ast::AliasId, ScalarFieldType>,
     pub(super) scalar_fields: BTreeMap<(ast::ModelId, ast::FieldId), ScalarField<'ast>>,
-    pub(super) model_attributes: HashMap<ast::ModelId, ModelAttributes<'ast>>,
     /// This contains only the relation fields actually present in the schema
     /// source text.
     pub(super) relation_fields: BTreeMap<(ast::ModelId, ast::FieldId), RelationField<'ast>>,
     pub(super) enum_attributes: HashMap<ast::EnumId, EnumAttributes<'ast>>,
+    pub(super) model_attributes: HashMap<ast::ModelId, ModelAttributes<'ast>>,
 }
 
 impl<'ast> Types<'ast> {
@@ -118,11 +118,11 @@ impl RelationField<'_> {
 #[derive(Default, Debug)]
 pub(crate) struct ModelAttributes<'ast> {
     /// @(@)id
-    pub(super) primary_key: Option<PrimaryKeyData<'ast>>,
+    pub(super) primary_key: Option<IdAttribute<'ast>>,
     /// @@ignore
     pub(crate) is_ignored: bool,
     /// @@index and @(@)unique.
-    pub(super) indexes: Vec<(&'ast ast::Attribute, IndexData<'ast>)>,
+    pub(super) indexes: Vec<(&'ast ast::Attribute, IndexAttribute<'ast>)>,
     /// @@map
     pub(crate) mapped_name: Option<&'ast str>,
 }
@@ -145,7 +145,7 @@ impl ModelAttributes<'_> {
 }
 
 #[derive(Debug, Default)]
-pub(crate) struct IndexData<'ast> {
+pub(crate) struct IndexAttribute<'ast> {
     pub(crate) is_unique: bool,
     pub(crate) fields: Vec<ast::FieldId>,
     pub(crate) source_field: Option<ast::FieldId>,
@@ -154,7 +154,7 @@ pub(crate) struct IndexData<'ast> {
 }
 
 #[derive(Debug, Default)]
-pub(super) struct PrimaryKeyData<'ast> {
+pub(super) struct IdAttribute<'ast> {
     pub(super) fields: Vec<ast::FieldId>,
     pub(super) source_field: Option<ast::FieldId>,
     pub(super) name: Option<&'ast str>,

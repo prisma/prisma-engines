@@ -1,5 +1,5 @@
 use super::{
-    types::{ModelAttributes, PrimaryKeyData, RelationField},
+    types::{IdAttribute, ModelAttributes, RelationField},
     ParserDatabase,
 };
 use crate::{ast, common::constraint_names::ConstraintNames};
@@ -92,7 +92,7 @@ pub(crate) struct IndexWalker<'ast, 'db> {
     model_id: ast::ModelId,
     index: &'ast ast::Attribute,
     db: &'db ParserDatabase<'ast>,
-    index_attribute: &'db super::types::IndexData<'ast>,
+    index_attribute: &'db super::types::IndexAttribute<'ast>,
 }
 
 impl<'ast, 'db> IndexWalker<'ast, 'db> {
@@ -116,7 +116,7 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
         }
     }
 
-    pub(crate) fn attribute(&self) -> &'db super::types::IndexData<'ast> {
+    pub(crate) fn attribute(&self) -> &'db super::types::IndexAttribute<'ast> {
         self.index_attribute
     }
 }
@@ -159,7 +159,7 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
 
 pub(crate) struct PrimaryKeyWalker<'ast, 'db> {
     model_id: ast::ModelId,
-    attribute: &'db PrimaryKeyData<'ast>,
+    attribute: &'db IdAttribute<'ast>,
     db: &'db ParserDatabase<'ast>,
 }
 

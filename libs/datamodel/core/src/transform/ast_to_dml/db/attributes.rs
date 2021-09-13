@@ -6,7 +6,7 @@ mod relation;
 
 use super::{
     context::{Arguments, Context},
-    types::{EnumAttributes, IndexData, ModelAttributes, RelationField, ScalarField, ScalarFieldType},
+    types::{EnumAttributes, IndexAttribute, ModelAttributes, RelationField, ScalarField, ScalarFieldType},
 };
 use crate::{
     ast::{self, WithName},
@@ -222,7 +222,7 @@ fn visit_scalar_field_attributes<'ast>(
              validate_db_name(ast_model, args, db_name, "@unique", ctx);
 
 
-            model_attributes.indexes.push((args.attribute(), IndexData {
+            model_attributes.indexes.push((args.attribute(), IndexAttribute {
                 is_unique: true,
                 fields: vec![field_id],
                 source_field: Some(field_id),
@@ -473,12 +473,12 @@ fn model_index<'ast>(
     model_id: ast::ModelId,
     ctx: &mut Context<'ast>,
 ) {
-    let mut index_data = IndexData {
+    let mut index_attribute = IndexAttribute {
         is_unique: false,
         ..Default::default()
     };
 
-    common_index_validations(args, &mut index_data, model_id, ctx);
+    common_index_validations(args, &mut index_attribute, model_id, ctx);
     let ast_model = &ctx.db.ast[model_id];
 
     let name = get_name_argument(args, ctx);
@@ -510,7 +510,7 @@ fn model_index<'ast>(
     // accordingly. If the datamodel gets freshly rendered it will then be
     // rendered correctly as `map`. We will however error if both `map` and
     // `name` are being used.
-    index_data.db_name = match (name, db_name) {
+    index_attribute.db_name = match (name, db_name) {
         (Some(_), Some(_)) => {
             let error = args.new_attribute_validation_error("The `@@index` attribute accepts the `name` argument as an alias for the `map` argument for legacy reasons. It does not accept both though. Please use the `map` argument to specify the database name of the index.");
             ctx.push_error(error);
@@ -522,7 +522,7 @@ fn model_index<'ast>(
         (None, None) => None,
     };
 
-    data.indexes.push((args.attribute(), index_data));
+    data.indexes.push((args.attribute(), index_attribute));
 }
 
 /// Validate @@unique on models.
@@ -532,11 +532,11 @@ fn model_unique<'ast>(
     model_id: ast::ModelId,
     ctx: &mut Context<'ast>,
 ) {
-    let mut index_data = IndexData {
+    let mut index_attribute = IndexAttribute {
         is_unique: true,
         ..Default::default()
     };
-    common_index_validations(args, &mut index_data, model_id, ctx);
+    common_index_validations(args, &mut index_attribute, model_id, ctx);
 
     let ast_model = &ctx.db.ast[model_id];
     let name = get_name_argument(args, ctx);
@@ -552,7 +552,6 @@ fn model_unique<'ast>(
         // We are fine with that since this is not automatically breaking but
         // rather prompts a migration upon the first run on migrate. The client
         // is unaffected by this.
-
         let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
             Some(Ok("")) => {
                 ctx.push_error(args.new_attribute_validation_error("The `map` argument cannot be an empty string."));
@@ -575,15 +574,15 @@ fn model_unique<'ast>(
         db_name
     };
 
-    index_data.name = name;
-    index_data.db_name = db_name;
+    index_attribute.name = name;
+    index_attribute.db_name = db_name;
 
-    data.indexes.push((args.attribute(), index_data));
+    data.indexes.push((args.attribute(), index_attribute));
 }
 
 fn common_index_validations<'ast>(
     args: &mut Arguments<'ast>,
-    index_data: &mut IndexData<'ast>,
+    index_data: &mut IndexAttribute<'ast>,
     model_id: ast::ModelId,
     ctx: &mut Context<'ast>,
 ) {
@@ -880,6 +879,7 @@ fn validate_db_name(
     }
 }
 
+/// Fill in the generated Prisma constraint names for DEFAULT constraints.
 pub(super) fn fill_in_default_constraint_names(ctx: &mut Context<'_>) {
     if !ctx.db.active_connector().supports_named_default_values() {
         return;
