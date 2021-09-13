@@ -1,5 +1,5 @@
 use super::{
-    types::{ModelData, RelationField},
+    types::{ModelData, PrimaryKeyData, RelationField},
     ParserDatabase,
 };
 use crate::{ast, common::constraint_names::ConstraintNames};
@@ -45,6 +45,14 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
             self.db.types.scalar_fields[&(self.model_id, field_id)]
                 .mapped_name
                 .unwrap_or_else(|| &self.db.ast[self.model_id][field_id].name.name)
+        })
+    }
+
+    pub(crate) fn primary_key(&self) -> Option<PrimaryKeyWalker<'ast, 'db>> {
+        self.model_attributes.primary_key.as_ref().map(|pk| PrimaryKeyWalker {
+            model_id: self.model_id,
+            attribute: pk,
+            db: self.db,
         })
     }
 
@@ -146,5 +154,42 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
                     .into(),
             )
         })
+    }
+}
+
+pub(crate) struct PrimaryKeyWalker<'ast, 'db> {
+    model_id: ast::ModelId,
+    attribute: &'db PrimaryKeyData<'ast>,
+    db: &'db ParserDatabase<'ast>,
+}
+
+impl<'ast, 'db> PrimaryKeyWalker<'ast, 'db> {
+    pub(crate) fn final_database_name(&self) -> Option<Cow<'ast, str>> {
+        if !self.db.active_connector().supports_named_primary_keys() {
+            return None;
+        }
+
+        Some(self.attribute.db_name.map(Cow::Borrowed).unwrap_or_else(|| {
+            ConstraintNames::primary_key_name(
+                self.db.walk_model(self.model_id).final_database_name(),
+                self.db.active_connector(),
+            )
+            .into()
+        }))
+    }
+
+    pub(crate) fn is_defined_on_field(&self) -> bool {
+        self.attribute.source_field.is_some()
+    }
+
+    pub(crate) fn iter_ast_fields(&self) -> impl Iterator<Item = &'ast ast::Field> + '_ {
+        self.attribute
+            .fields
+            .iter()
+            .map(move |id| &self.db.ast[self.model_id][*id])
+    }
+
+    pub(crate) fn name(&self) -> Option<&'ast str> {
+        self.attribute.name
     }
 }

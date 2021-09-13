@@ -7,17 +7,14 @@ use super::{
     types::{IndexData, ModelData, RelationField, ScalarField},
 };
 use crate::common::constraint_names::ConstraintNames;
+use crate::transform::ast_to_dml::db::types::PrimaryKeyData;
 use crate::{
     ast::{self, WithName},
     diagnostics::DatamodelError,
     dml,
     transform::{ast_to_dml::db::ScalarFieldType, helpers::ValueValidator},
 };
-
-use crate::transform::ast_to_dml::db::types::PrimaryKeyData;
-use itertools::Itertools;
 use prisma_value::PrismaValue;
-use std::borrow::Cow;
 use std::collections::HashSet;
 
 pub(super) fn resolve_model_and_field_attributes<'ast>(
@@ -31,28 +28,8 @@ pub(super) fn resolve_model_and_field_attributes<'ast>(
         .take_model_data(&model_id)
         .expect("Broken invariant: no ModelData for model in visit_model_attributes.");
 
-    {
-        // set database name already if possible without validating against other names / unused args / other errors
-        let map = &ast_model.attributes.iter().find(|a| a.name.name == "map");
-        if let Some(map_attribute) = map {
-            let mapped_name = match (
-                map_attribute.arguments.iter().find(|a| a.name() == "name"),
-                map_attribute.arguments.iter().find(|a| a.name() == ""),
-            ) {
-                (Some(arg), None) => Some(ValueValidator::new(&arg.value).as_str().unwrap()),
-                (None, Some(arg)) => Some(ValueValidator::new(&arg.value).as_str().unwrap()),
-                _ => None,
-            };
-
-            model_data.mapped_name = mapped_name;
-        }
-    }
-
-    //first go over all scalars since relations depend on them
-    let mut seen_scalars = vec![];
     for (field_id, ast_field) in ast_model.iter_fields() {
         if let Some(mut scalar_field) = ctx.db.types.take_scalar_field(model_id, field_id) {
-            seen_scalars.push((model_id, field_id));
             visit_scalar_field_attributes(
                 model_id,
                 field_id,
@@ -64,14 +41,10 @@ pub(super) fn resolve_model_and_field_attributes<'ast>(
             );
 
             ctx.db.types.scalar_fields.insert((model_id, field_id), scalar_field);
-        }
-    }
-
-    for (field_id, ast_field) in ast_model.iter_fields() {
-        if let Some(mut rf) = ctx.db.types.take_relation_field(model_id, field_id) {
+        } else if let Some(mut rf) = ctx.db.types.take_relation_field(model_id, field_id) {
             visit_relation_field_attributes(model_id, field_id, ast_field, &mut rf, ctx);
             ctx.db.types.relation_fields.insert((model_id, field_id), rf);
-        } else if !seen_scalars.contains(&(model_id, field_id)) {
+        } else {
             unreachable!(
                 "{}.{} is neither a scalar field nor a relation field",
                 ast_model.name(),
@@ -222,9 +195,7 @@ fn visit_scalar_field_attributes<'ast>(
                     ast_model.span,
                 )),
                 None => {
-                    let db_name =
-                        primary_key_constraint_name(ast_model, model_data, args,  "@id", ctx)
-                    ;
+                    let db_name = primary_key_constraint_name(ast_model, args,  "@id", ctx);
 
                     model_data.primary_key = Some(PrimaryKeyData{
                         name: None,
@@ -299,16 +270,10 @@ fn visit_scalar_field_attributes<'ast>(
 
 fn primary_key_constraint_name<'ast>(
     ast_model: &'ast ast::Model,
-    model_data: &mut ModelData<'ast>,
     args: &mut Arguments<'ast>,
     attribute: &'ast str,
     ctx: &mut Context<'ast>,
-) -> Option<Cow<'ast, str>> {
-    let generated_name = ConstraintNames::primary_key_name(
-        model_data.mapped_name.unwrap_or(&ast_model.name.name),
-        ctx.db.active_connector(),
-    );
-
+) -> Option<&'ast str> {
     let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
         Some(Ok("")) => {
             ctx.push_error(args.new_attribute_validation_error("The `map` argument cannot be an empty string."));
@@ -319,7 +284,6 @@ fn primary_key_constraint_name<'ast>(
             ctx.push_error(err);
             None
         }
-        None if ctx.db.active_connector().supports_named_primary_keys() => Some(generated_name.into()),
         None => None,
     };
 
@@ -604,7 +568,7 @@ fn visit_model_id<'ast>(
             }
 
             if !relation_fields.is_empty() {
-                ctx.push_error(DatamodelError::new_model_validation_error(&format!("The id definition refers to the relation fields {}. ID definitions must reference only scalar fields.", relation_fields.iter().map(|(f, _)| f.name()).join(", ")), ctx.db.ast[model_id].name(), args.span()));
+                ctx.push_error(DatamodelError::new_model_validation_error(&format!("The id definition refers to the relation fields {}. ID definitions must reference only scalar fields.", relation_fields.iter().map(|(f, _)| f.name()).collect::<Vec<_>>().join(", ")), ctx.db.ast[model_id].name(), args.span()));
             }
 
             return;
@@ -641,7 +605,7 @@ fn visit_model_id<'ast>(
     }
 
     let (name, db_name) = {
-        let db_name = primary_key_constraint_name(ast_model, model_data, args, "@@id", ctx);
+        let db_name = primary_key_constraint_name(ast_model, args, "@@id", ctx);
         let name = get_name_argument(args, ctx);
         if let Some(err) = ConstraintNames::is_client_name_valid(args.span(), &ast_model.name.name, name, "@@id") {
             ctx.push_error(err);
@@ -852,7 +816,7 @@ fn common_index_validations<'ast>(
                     &format!(
                         "The {prefix}index definition refers to the relation fields {the_fields}. Index definitions must reference only scalar fields.{suggestion}",
                         prefix = if index_data.is_unique { "unique " } else { "" },
-                        the_fields = relation_fields.iter().map(|(f, _)| f.name()).join(", "),
+                        the_fields = relation_fields.iter().map(|(f, _)| f.name()).collect::<Vec<_>>().join(", "),
                         suggestion = suggestion
                     ),
                     ctx.db.ast[model_id].name(),
@@ -884,7 +848,7 @@ fn visit_relation<'ast>(
                 }
 
                 if !relation_fields.is_empty() {
-                    ctx.push_error(DatamodelError::new_validation_error(&format!("The argument fields must refer only to scalar fields. But it is referencing the following relation fields: {}", relation_fields.iter().map(|(f, _)| f.name()).join(", ")), fields.span()));
+                    ctx.push_error(DatamodelError::new_validation_error(&format!("The argument fields must refer only to scalar fields. But it is referencing the following relation fields: {}", relation_fields.iter().map(|(f, _)| f.name()).collect::<Vec<_>>().join(", ")), fields.span()));
                 }
 
                 Vec::new()
@@ -917,7 +881,7 @@ fn visit_relation<'ast>(
                     let msg = format!(
                         "The argument `references` must refer only to scalar fields in the related model `{}`. But it is referencing the following relation fields: {}",
                         ctx.db.ast[relation_field.referenced_model].name(),
-                        relation_fields.iter().map(|(f, _)| f.name()).join(", "),
+                        relation_fields.iter().map(|(f, _)| f.name()).collect::<Vec<_>>().join(", "),
                     );
                     ctx.push_error(DatamodelError::new_validation_error(&msg, args.span()));
                 }

@@ -44,20 +44,12 @@ impl<'a> LiftAstToDml<'a> {
         model.database_name = model_data.attributes().mapped_name.map(String::from);
         model.is_ignored = model_data.attributes().is_ignored;
 
-        model.primary_key = model_data
-            .attributes()
-            .primary_key
-            .as_ref()
-            .map(|pk_data| dml::PrimaryKeyDefinition {
-                name: pk_data.name.map(String::from),
-                db_name: pk_data.db_name.as_ref().map(|n| n.to_string()),
-                fields: pk_data
-                    .fields
-                    .iter()
-                    .map(|id| self.db.ast()[model_id][*id].name.name.clone())
-                    .collect(),
-                defined_on_field: pk_data.source_field.is_some(),
-            });
+        model.primary_key = model_data.primary_key().map(|pk| dml::PrimaryKeyDefinition {
+            name: pk.name().map(String::from),
+            db_name: pk.final_database_name().map(|c| c.into_owned()),
+            fields: pk.iter_ast_fields().map(|field| field.name.name.to_owned()).collect(),
+            defined_on_field: pk.is_defined_on_field(),
+        });
 
         model.indices = model_data
             .walk_indexes()
