@@ -1,5 +1,4 @@
 use super::{Argument, Identifier, Span, WithIdentifier, WithSpan};
-use std::ops::Index;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Attribute {
@@ -39,16 +38,5 @@ impl WithIdentifier for Attribute {
 impl WithSpan for Attribute {
     fn span(&self) -> &Span {
         &self.span
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub(crate) struct AttributeId(u32);
-
-impl Index<AttributeId> for super::Model {
-    type Output = Attribute;
-
-    fn index(&self, index: AttributeId) -> &Self::Output {
-        &self.attributes[index.0 as usize]
     }
 }
