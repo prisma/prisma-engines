@@ -1,6 +1,14 @@
-use crate::{ast, diagnostics::DatamodelError, transform::ast_to_dml::db::context::Context};
+use crate::{
+    ast,
+    diagnostics::DatamodelError,
+    transform::ast_to_dml::db::{context::Context, types::ModelAttributes},
+};
 
-pub(super) fn validate_auto_increment(model_id: ast::ModelId, ctx: &mut Context<'_>) {
+pub(super) fn validate_auto_increment(
+    model_id: ast::ModelId,
+    model_attributes: &ModelAttributes<'_>,
+    ctx: &mut Context<'_>,
+) {
     let autoincrement_fields = || {
         ctx.db
             .iter_model_scalar_fields(model_id)
@@ -11,7 +19,6 @@ pub(super) fn validate_auto_increment(model_id: ast::ModelId, ctx: &mut Context<
         return; // just don't try to validate without a datasource or autoincrement fields
     }
 
-    let model_data = &ctx.db.types.model_attributes[&model_id];
     let mut errors = Vec::new();
 
     // First check if the provider supports autoincrement at all. If yes, proceed with the detailed checks.
@@ -39,9 +46,10 @@ pub(super) fn validate_auto_increment(model_id: ast::ModelId, ctx: &mut Context<
 
     // go over all fields
     for (field_id, _scalar_field) in autoincrement_fields() {
-        let field_is_indexed = || model_data.field_is_indexed_for_autoincrement(field_id);
+        let field_is_indexed = || model_attributes.field_is_indexed_for_autoincrement(field_id);
 
-        if !ctx.db.active_connector().supports_non_id_auto_increment() && !model_data.field_is_single_pk(field_id) {
+        if !ctx.db.active_connector().supports_non_id_auto_increment() && !model_attributes.field_is_single_pk(field_id)
+        {
             errors.push(DatamodelError::new_attribute_validation_error(
                         "The `autoincrement()` default value is used on a non-id field even though the datasource does not support this.",
                         "default",

@@ -1,4 +1,5 @@
 mod autoincrement;
+mod id;
 mod native_types;
 mod relation;
 
@@ -21,13 +22,9 @@ pub(super) fn resolve_model_and_field_attributes<'ast>(
     ast_model: &'ast ast::Model,
     ctx: &mut Context<'ast>,
 ) {
-    let mut model_attributes = ModelAttributes {
-        // This needs to be looked up first, because we want to skip some field
-        // validations when the model is ignored.
-        is_ignored: ast_model.attributes.iter().any(|attr| attr.name.name == "ignore"),
-        ..Default::default()
-    };
+    let mut model_attributes = ModelAttributes::default();
 
+    // First resolve all the attributes defined on fields **in isolation**.
     for (field_id, ast_field) in ast_model.iter_fields() {
         if let Some(mut scalar_field) = ctx.db.types.take_scalar_field(model_id, field_id) {
             visit_scalar_field_attributes(
@@ -53,6 +50,7 @@ pub(super) fn resolve_model_and_field_attributes<'ast>(
         }
     }
 
+    // First resolve all the attributes defined on the model itself **in isolation**.
     ctx.visit_attributes(&ast_model.attributes, |attributes, ctx| {
         // @@ignore
         attributes.visit_optional_single("ignore", ctx, |_, ctx| {
@@ -103,9 +101,11 @@ pub(super) fn resolve_model_and_field_attributes<'ast>(
         });
     });
 
-    ctx.db.types.model_attributes.insert(model_id, model_attributes);
+    // Model-global validations
+    id::validate_id_field_arities(model_id, &model_attributes, ctx);
+    autoincrement::validate_auto_increment(model_id, &model_attributes, ctx);
 
-    autoincrement::validate_auto_increment(model_id, ctx);
+    ctx.db.types.model_attributes.insert(model_id, model_attributes);
 }
 
 pub(super) fn validate_index_names(ctx: &mut Context<'_>) {
@@ -204,13 +204,6 @@ fn visit_scalar_field_attributes<'ast>(
                         source_field: Some(field_id)
                     })
                 },
-            }
-
-            match (model_attributes.is_ignored, ast_field.arity) {
-                (true, _) |
-                (false, ast::FieldArity::Required) => (),
-                (false, ast::FieldArity::List) |
-                (false, ast::FieldArity::Optional) => ctx.push_error(args.new_attribute_validation_error("Fields that are marked as id must be required.")),
             }
         });
 
