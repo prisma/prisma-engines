@@ -56,10 +56,17 @@ pub trait GenericApi: Send + Sync + 'static {
 
     /// The command behind `prisma db push`.
     async fn schema_push(&self, input: &SchemaPushInput) -> CoreResult<SchemaPushOutput>;
+
+    /// Access to the migration connector.
+    fn connector(&self) -> &dyn MigrationConnector;
 }
 
 #[async_trait::async_trait]
 impl<C: MigrationConnector> GenericApi for C {
+    fn connector(&self) -> &dyn MigrationConnector {
+        self
+    }
+
     async fn version(&self) -> CoreResult<String> {
         Ok(self.version().await?)
     }
