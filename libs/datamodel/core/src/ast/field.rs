@@ -22,7 +22,6 @@ pub struct Field {
 
 impl Field {
     /// Finds the position span of the argument in the given field attribute.
-    /// If not found, returns an empty span.
     pub(crate) fn span_for_argument(&self, attribute: &str, argument: &str) -> Option<Span> {
         self.attributes
             .iter()
