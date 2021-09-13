@@ -1,5 +1,6 @@
 mod autoincrement;
 mod id;
+mod map;
 mod native_types;
 mod relation;
 
@@ -34,7 +35,7 @@ fn resolve_enum_attributes<'ast>(enum_id: ast::EnumId, ast_enum: &'ast ast::Enum
         ctx.visit_attributes(&field.attributes, |attributes, ctx| {
             // @map
             attributes.visit_optional_single("map", ctx, |map_args, ctx| {
-                if let Some(mapped_name) = visit_map_attribute(map_args, ctx) {
+                if let Some(mapped_name) = map::visit_map_attribute(map_args, ctx) {
                     enum_attributes.mapped_values.insert(field_idx as u32, mapped_name);
                     ctx.mapped_enum_value_names
                         .insert((enum_id, mapped_name), field_idx as u32);
@@ -46,7 +47,7 @@ fn resolve_enum_attributes<'ast>(enum_id: ast::EnumId, ast_enum: &'ast ast::Enum
     ctx.visit_attributes(&ast_enum.attributes, |attributes, ctx| {
         // @@map
         attributes.visit_optional_single("map", ctx, |map_args, ctx| {
-            if let Some(mapped_name) = visit_map_attribute(map_args, ctx) {
+            if let Some(mapped_name) = map::visit_map_attribute(map_args, ctx) {
                 enum_attributes.mapped_name = Some(mapped_name);
                 ctx.mapped_enum_names.insert(mapped_name, enum_id);
             }
@@ -99,30 +100,7 @@ fn resolve_model_attributes<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::
 
         // @@map
         attributes.visit_optional_single("map", ctx, |map_args, ctx| {
-            let mapped_name = match visit_map_attribute(map_args, ctx) {
-                Some(name) => name,
-                None => return,
-            };
-
-            model_attributes.mapped_name = Some(mapped_name);
-
-            if let Some(existing_model_id) = ctx.mapped_model_names.insert(mapped_name, model_id) {
-                let existing_model_name = ctx.db.ast[existing_model_id].name();
-                ctx.push_error(DatamodelError::new_duplicate_model_database_name_error(
-                    mapped_name.to_owned(),
-                    existing_model_name.to_owned(),
-                    ast_model.span,
-                ));
-            }
-
-            if let Some(existing_model_id) = ctx.db.names.tops.get(mapped_name).and_then(|id| id.as_model_id()) {
-                let existing_model_name = ctx.db.ast[existing_model_id].name();
-                ctx.push_error(DatamodelError::new_duplicate_model_database_name_error(
-                    mapped_name.to_owned(),
-                    existing_model_name.to_owned(),
-                    map_args.span(),
-                ));
-            }
+            map::model(&mut model_attributes, model_id, map_args, ctx)
         });
 
         // @@index
@@ -179,32 +157,7 @@ fn visit_scalar_field_attributes<'ast>(
     ctx.visit_scalar_field_attributes(model_id, field_id, scalar_field_data.r#type, |attributes, ctx| {
         // @map
          attributes.visit_optional_single("map", ctx, |map_args, ctx| {
-             let mapped_name = match visit_map_attribute(map_args, ctx) {
-                Some(name) => name,
-                None => return
-             };
-
-            scalar_field_data.mapped_name = Some(mapped_name);
-
-            if ctx.mapped_model_scalar_field_names.insert((model_id, mapped_name), field_id).is_some() {
-                ctx.push_error(DatamodelError::new_duplicate_field_error(
-                    ast_model.name(),
-                    ast_field.name(),
-                    ast_field.span,
-                ));
-            }
-
-            if let Some(field_id) = ctx.db.names.model_fields.get(&(model_id, mapped_name)) {
-                // @map only conflicts with _scalar_ fields
-                if !ctx.db.types.scalar_fields.contains_key(&(model_id, *field_id)) {
-                    return
-                }
-                ctx.push_error(DatamodelError::new_duplicate_field_error(
-                    ast_model.name(),
-                    ast_field.name(),
-                    ast_field.span,
-                ));
-            }
+             map::scalar_field(ast_model, ast_field, model_id, field_id, scalar_field_data, map_args, ctx)
         });
 
         // @ignore
@@ -1034,16 +987,6 @@ fn resolve_field_array<'ast>(
     } else {
         Ok(field_ids)
     }
-}
-
-fn visit_map_attribute<'ast>(map_args: &mut Arguments<'ast>, ctx: &mut Context<'ast>) -> Option<&'ast str> {
-    match map_args.default_arg("name").map(|value| value.as_str()) {
-        Ok(Ok(name)) => return Some(name),
-        Err(err) => ctx.push_error(err), // not flattened for error handing legacy reasons
-        Ok(Err(err)) => ctx.push_error(map_args.new_attribute_validation_error(&err.to_string())),
-    };
-
-    None
 }
 
 fn get_name_argument<'ast>(args: &mut Arguments<'ast>, ctx: &mut Context<'ast>) -> Option<&'ast str> {
