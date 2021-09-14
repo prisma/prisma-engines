@@ -4,40 +4,14 @@ use datamodel::{Datamodel, DefaultValue, Field, FieldType, Ignorable, ValueGener
 use introspection_connector::{IntrospectionContext, Warning};
 use prisma_value::PrismaValue;
 use std::cmp::Ordering::{self, Equal, Greater, Less};
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
 pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, ctx: &IntrospectionContext) -> Vec<Warning> {
     let mut warnings = vec![];
 
     // Keep @relation attributes even if the database doesn't use foreign keys
     if !ctx.foreign_keys_enabled() {
-        let models: HashSet<String> = new_data_model.models().map(|m| m.name().to_string()).collect();
-
-        for old_model in old_data_model.models() {
-            if let Some(new_model) = new_data_model.models_mut().find(|m| m.name == *old_model.name()) {
-                let mut ordering: HashMap<String, usize> = old_model
-                    .fields()
-                    .enumerate()
-                    .map(|(i, field)| (field.name().to_string(), i))
-                    .collect();
-
-                for (i, field) in new_model.fields().enumerate() {
-                    if !ordering.contains_key(field.name()) {
-                        ordering.insert(field.name().to_string(), i);
-                    }
-                }
-
-                for field in old_model.relation_fields() {
-                    if models.contains(&field.relation_info.to) {
-                        new_model.add_field(Field::RelationField(field.clone()));
-                    }
-                }
-
-                new_model
-                    .fields
-                    .sort_by_cached_key(|field| *ordering.get(field.name()).unwrap_or(&usize::MAX));
-            }
-        }
+        merge_relation_fields(old_data_model, new_data_model);
     }
 
     //@@map on models
@@ -619,5 +593,55 @@ fn re_order_putting_new_ones_last(enum_a_idx: Option<usize>, enum_b_idx: Option<
         (None, Some(_)) => Greater,
         (Some(_), None) => Less,
         (Some(a_idx), Some(b_idx)) => a_idx.cmp(&b_idx),
+    }
+}
+
+// Copies `@relation` attributes from the data model to the introspected
+// version. Needed, when the database does not support foreign key constraints,
+// but we still want to keep them in the PSL.
+fn merge_relation_fields(old_data_model: &Datamodel, new_data_model: &mut Datamodel) {
+    for old_model in old_data_model.models() {
+        let modifications = new_data_model
+            .models()
+            .find(|m| m.name == *old_model.name())
+            .map(|new_model| {
+                let mut ordering: HashMap<String, usize> = old_model
+                    .fields()
+                    .enumerate()
+                    .map(|(i, field)| (field.name().to_string(), i))
+                    .collect();
+
+                for (i, field) in new_model.fields().enumerate() {
+                    if !ordering.contains_key(field.name()) {
+                        ordering.insert(field.name().to_string(), i);
+                    }
+                }
+
+                let mut fields = Vec::new();
+
+                for field in old_model.relation_fields() {
+                    if new_data_model
+                        .models()
+                        .find(|m| m.name == field.relation_info.to)
+                        .is_some()
+                    {
+                        fields.push(Field::RelationField(field.clone()));
+                    }
+                }
+
+                (new_model.name().to_string(), fields, ordering)
+            });
+
+        if let Some((model_name, fields, ordering)) = modifications {
+            let new_model = new_data_model.find_model_mut(&model_name);
+
+            for field in fields.into_iter() {
+                new_model.add_field(field);
+            }
+
+            new_model
+                .fields
+                .sort_by_cached_key(|field| *ordering.get(field.name()).unwrap_or(&usize::MAX));
+        }
     }
 }
