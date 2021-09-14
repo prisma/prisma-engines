@@ -96,9 +96,6 @@ pub static GENERATOR: Lazy<FeatureMap> = Lazy::new(|| {
         ])
 });
 
-/// Datasource preview features.
-pub static DATASOURCE: Lazy<FeatureMap> = Lazy::new(FeatureMap::default);
-
 #[derive(Debug, Default)]
 pub struct FeatureMap {
     /// Valid, visible features.
