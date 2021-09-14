@@ -127,7 +127,17 @@ impl ConstraintNames {
         let column_names: Vec<&str> = ri
             .fields
             .iter()
-            .map(|field_name| model.find_scalar_field(field_name).unwrap().final_database_name())
+            .map(|field_name| {
+                // We cannot unwrap here, due to us re-introspecting relations
+                // and if we're not using foreign keys, we might copy a relation
+                // that is not valid anymore. We still want to write that to the
+                // file and let user fix it, but if we unwrap here, we will
+                // panic.
+                model
+                    .find_scalar_field(field_name)
+                    .map(|field| field.final_database_name())
+                    .unwrap_or(field_name)
+            })
             .collect();
 
         ri.fk_name.as_ref().unwrap()
