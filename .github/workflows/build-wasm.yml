@@ -46,4 +46,4 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: build
-          args: -p prisma-fmt --release --target=wasm32-unknown-unknown
+          args: -p prisma-fmt --lib --release --target=wasm32-unknown-unknown
