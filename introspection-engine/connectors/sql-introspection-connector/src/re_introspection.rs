@@ -620,11 +620,7 @@ fn merge_relation_fields(old_data_model: &Datamodel, new_data_model: &mut Datamo
                 let mut fields = Vec::new();
 
                 for field in old_model.relation_fields() {
-                    if new_data_model
-                        .models()
-                        .find(|m| m.name == field.relation_info.to)
-                        .is_some()
-                    {
+                    if new_data_model.models().any(|m| m.name == field.relation_info.to) {
                         fields.push(Field::RelationField(field.clone()));
                     }
                 }
