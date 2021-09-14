@@ -2337,27 +2337,10 @@ dependencies = [
 name = "mongodb-migration-connector"
 version = "0.1.0"
 dependencies = [
- "anyhow",
  "async-trait",
- "chrono",
- "connection-string",
- "datamodel",
- "datamodel-connector",
- "enumflags2",
- "indoc",
  "migration-connector",
  "mongodb",
- "native-types",
- "once_cell",
- "prisma-value",
- "regex",
- "serde_json",
- "tokio",
- "tracing",
- "tracing-futures",
  "url",
- "user-facing-errors",
- "uuid",
 ]
 
 [[package]]
