@@ -1,6 +1,6 @@
 use migration_engine_tests::test_api::*;
 
-#[test_connector]
+#[test_connector(preview_features("referentialIntegrity"))]
 fn typescript_starter_schema_is_idempotent_without_native_type_annotations(api: TestApi) {
     let dm = r#"
         model Post {
@@ -28,7 +28,7 @@ fn typescript_starter_schema_is_idempotent_without_native_type_annotations(api: 
     api.schema_push_w_datasource(dm).send().assert_green().assert_no_steps();
 }
 
-#[test_connector(exclude(Mssql))]
+#[test_connector(exclude(Mssql), preview_features("referentialIntegrity"))]
 // TODO (matthias) changing towards having a provider specified in the middle of the test messes with some weird hard-coded
 // Does this test even make sense? When using the migrate CLI you cannot NOT have a provider specified. This only works in our weird
 // test setup
@@ -51,8 +51,11 @@ fn typescript_starter_schema_starting_without_native_types_is_idempotent(api: Te
         }
     "#;
 
-    api.schema_push(dm).send().assert_green().assert_has_executed_steps();
-    api.schema_push(dm).send().assert_green().assert_no_steps();
+    api.schema_push_w_datasource(dm)
+        .send()
+        .assert_green()
+        .assert_has_executed_steps();
+    api.schema_push_w_datasource(dm).send().assert_green().assert_no_steps();
     api.schema_push_w_datasource(dm).send().assert_green().assert_no_steps();
 }
 

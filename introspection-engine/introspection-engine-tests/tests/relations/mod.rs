@@ -277,7 +277,7 @@ async fn a_one_req_to_many_relation(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(exclude(Vitess))]
 async fn a_prisma_many_to_many_relation(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -518,7 +518,7 @@ async fn default_values_on_relations(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(exclude(Mssql))]
+#[test_connector(exclude(Mssql), exclude(Vitess))]
 async fn prisma_1_0_relations(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -657,7 +657,7 @@ async fn one_to_many_relation_field_names_do_not_conflict_with_many_to_many_rela
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(exclude(Vitess))]
 async fn many_to_many_relation_field_names_do_not_conflict_with_themselves(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {

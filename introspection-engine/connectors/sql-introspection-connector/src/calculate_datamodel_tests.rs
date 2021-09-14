@@ -1,13 +1,12 @@
 #[cfg(test)]
 mod tests {
     use crate::calculate_datamodel::calculate_datamodel;
-    use datamodel::ast::Span;
     use datamodel::{
-        dml, Datamodel, Datasource, DefaultValue as DMLDefault, Field, FieldArity, FieldType, Model,
-        NativeTypeInstance, PrimaryKeyDefinition, ReferentialAction, RelationField, RelationInfo, ScalarField,
-        ScalarType, ValueGenerator,
+        ast::Span, dml, Datamodel, Datasource, DefaultValue as DMLDefault, Field, FieldArity, FieldType,
+        IndexDefinition, Model, NativeTypeInstance, PrimaryKeyDefinition, ReferentialAction, RelationField,
+        RelationInfo, ScalarField, ScalarType, StringFromEnvVar, ValueGenerator,
     };
-    use datamodel::{IndexDefinition, StringFromEnvVar};
+    use datamodel_connector::ReferentialIntegrity;
     use enumflags2::BitFlags;
     use expect_test::expect;
     use introspection_connector::IntrospectionContext;
@@ -26,10 +25,10 @@ mod tests {
             url: StringFromEnvVar::new_literal("test".to_string()),
             url_span: Span::empty(),
             documentation: None,
-            active_connector: Box::new(PostgresDatamodelConnector::new()),
+            active_connector: Box::new(PostgresDatamodelConnector::new(Default::default())),
             shadow_database_url: None,
             provider: "postgresql".to_string(),
-            planet_scale_mode: false,
+            referential_integrity: ReferentialIntegrity::ForeignKeys,
         };
 
         IntrospectionContext {

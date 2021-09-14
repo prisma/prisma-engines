@@ -3,6 +3,7 @@ use crate::{
     common::preview_features::PreviewFeature,
     diagnostics::{DatamodelError, Diagnostics},
 };
+use datamodel_connector::ReferentialIntegrity;
 
 #[derive(Debug)]
 pub struct Configuration {
@@ -23,12 +24,11 @@ impl Configuration {
         }
     }
 
-    /// Returns true if PlanetScale mode is enabled
-    pub fn planet_scale_mode(&self) -> bool {
+    pub fn referential_integrity(&self) -> ReferentialIntegrity {
         self.datasources
             .first()
-            .map(|source| source.planet_scale_mode)
-            .unwrap_or(false)
+            .map(|source| source.referential_integrity)
+            .unwrap_or_else(Default::default)
     }
 
     pub fn preview_features(&self) -> impl Iterator<Item = &PreviewFeature> {

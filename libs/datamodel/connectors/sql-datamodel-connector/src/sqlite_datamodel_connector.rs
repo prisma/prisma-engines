@@ -1,4 +1,4 @@
-use datamodel_connector::{connector_error::ConnectorError, Connector, ConnectorCapability};
+use datamodel_connector::{connector_error::ConnectorError, Connector, ConnectorCapability, ReferentialIntegrity};
 use dml::{
     field::Field, model::Model, native_type_constructor::NativeTypeConstructor,
     native_type_instance::NativeTypeInstance, relation_info::ReferentialAction, scalars::ScalarType,
@@ -9,30 +9,30 @@ use std::borrow::Cow;
 pub struct SqliteDatamodelConnector {
     capabilities: Vec<ConnectorCapability>,
     constructors: Vec<NativeTypeConstructor>,
-    referential_actions: BitFlags<ReferentialAction>,
+    referential_integrity: ReferentialIntegrity,
 }
 
 impl SqliteDatamodelConnector {
-    pub fn new() -> SqliteDatamodelConnector {
-        use ReferentialAction::*;
-
-        let capabilities = vec![
+    pub fn new(referential_integrity: ReferentialIntegrity) -> SqliteDatamodelConnector {
+        let mut capabilities = vec![
             ConnectorCapability::RelationFieldsInArbitraryOrder,
             ConnectorCapability::UpdateableId,
             ConnectorCapability::AutoIncrement,
             ConnectorCapability::CompoundIds,
-            ConnectorCapability::ForeignKeys,
             ConnectorCapability::AnyId,
             ConnectorCapability::QueryRaw,
         ];
 
+        if referential_integrity.uses_foreign_keys() {
+            capabilities.push(ConnectorCapability::ForeignKeys);
+        }
+
         let constructors: Vec<NativeTypeConstructor> = vec![];
-        let referential_actions = SetNull | SetDefault | Cascade | Restrict | NoAction;
 
         SqliteDatamodelConnector {
             capabilities,
             constructors,
-            referential_actions,
+            referential_integrity,
         }
     }
 }
@@ -51,7 +51,10 @@ impl Connector for SqliteDatamodelConnector {
     }
 
     fn referential_actions(&self) -> BitFlags<ReferentialAction> {
-        self.referential_actions
+        use ReferentialAction::*;
+
+        self.referential_integrity
+            .allowed_referential_actions(SetNull | SetDefault | Cascade | Restrict | NoAction)
     }
 
     fn scalar_type_for_native_type(&self, _native_type: serde_json::Value) -> ScalarType {
@@ -114,11 +117,5 @@ impl Connector for SqliteDatamodelConnector {
         }
 
         Ok(())
-    }
-}
-
-impl Default for SqliteDatamodelConnector {
-    fn default() -> Self {
-        Self::new()
     }
 }

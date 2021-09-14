@@ -2,7 +2,7 @@ use barrel::types;
 use indoc::indoc;
 use introspection_engine_tests::test_api::*;
 
-#[test_connector(tags(Mysql))]
+#[test_connector(tags(Mysql), exclude(Vitess))]
 async fn multiple_changed_relation_names(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -77,7 +77,7 @@ async fn multiple_changed_relation_names(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql))]
+#[test_connector(tags(Mysql), exclude(Vitess))]
 async fn mapped_model_and_field_name(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -148,7 +148,7 @@ async fn mapped_model_and_field_name(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql))]
+#[test_connector(tags(Mysql), exclude(Vitess))]
 async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {

@@ -1,4 +1,5 @@
 pub use crate::assertions::{MigrationsAssertions, ResultSetExt, SchemaAssertion};
+use datamodel::common::preview_features::PreviewFeature;
 pub use expect_test::expect;
 pub use test_macros::test_connector;
 pub use test_setup::{BitFlags, Capabilities, Tags};
@@ -10,7 +11,11 @@ use quaint::{
     Value,
 };
 use sql_migration_connector::SqlMigrationConnector;
-use std::{borrow::Cow, future::Future};
+use std::{
+    borrow::Cow,
+    fmt::{Display, Write},
+    future::Future,
+};
 use tempfile::TempDir;
 use test_setup::{DatasourceBlock, TestApiArgs};
 
@@ -249,27 +254,38 @@ impl TestApi {
 
     /// Render a valid datasource block, including database URL.
     pub fn write_datasource_block(&self, out: &mut dyn std::fmt::Write) {
+        let no_foreign_keys = self.is_vitess()
+            && self
+                .root
+                .preview_features()
+                .contains(PreviewFeature::ReferentialIntegrity);
+
+        let params = if no_foreign_keys {
+            vec![("referentialIntegrity", r#""prisma""#)]
+        } else {
+            Vec::new()
+        };
+
         write!(
             out,
             "{}",
-            self.root.args.datasource_block(self.root.args.database_url(), &[])
+            self.root.args.datasource_block(self.root.args.database_url(), &params)
         )
         .unwrap()
     }
 
     fn generator_block(&self) -> String {
-        let preview_features: Vec<String> = self
-            .root
-            .args
-            .preview_features()
-            .iter()
-            .map(|pf| format!(r#""{}""#, pf))
-            .collect();
-
-        let preview_feature_string = if preview_features.is_empty() {
+        let preview_feature_string = if self.root.preview_features().is_empty() {
             "".to_string()
         } else {
-            format!("\npreviewFeatures = [{}]", preview_features.join(", "))
+            let features = self
+                .root
+                .preview_features()
+                .iter()
+                .map(|f| format!(r#""{}""#, f))
+                .join(", ");
+
+            format!("\npreviewFeatures = [{}]", features)
         };
 
         let generator_block = format!(
@@ -285,6 +301,7 @@ impl TestApi {
         let mut out = String::with_capacity(320 + schema.len());
 
         self.write_datasource_block(&mut out);
+        out.push('\n');
         out.push_str(&self.generator_block());
         out.push_str(schema);
 
@@ -308,5 +325,31 @@ impl<'a> SingleRowInsert<'a> {
     /// Execute the request and return the result set.
     pub fn result_raw(self) -> quaint::connector::ResultSet {
         self.api.query(self.insert.into())
+    }
+}
+
+pub(crate) trait IteratorJoin {
+    fn join(self, sep: &str) -> String;
+}
+
+impl<T, I> IteratorJoin for T
+where
+    T: Iterator<Item = I>,
+    I: Display,
+{
+    fn join(mut self, sep: &str) -> String {
+        let (lower_bound, _) = self.size_hint();
+        let mut out = String::with_capacity(sep.len() * lower_bound);
+
+        if let Some(first_item) = self.next() {
+            write!(out, "{}", first_item).unwrap();
+        }
+
+        for item in self {
+            out.push_str(sep);
+            write!(out, "{}", item).unwrap();
+        }
+
+        out
     }
 }

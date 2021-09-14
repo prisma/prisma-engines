@@ -25,6 +25,7 @@ pub struct TestApi {
     database: Quaint,
     args: TestApiArgs,
     connection_string: String,
+    preview_features: BitFlags<PreviewFeature>,
 }
 
 impl TestApi {
@@ -73,6 +74,7 @@ impl TestApi {
             database,
             args,
             connection_string,
+            preview_features,
         }
     }
 
@@ -110,20 +112,22 @@ impl TestApi {
         self.tags().contains(Tags::Mysql8)
     }
 
+    /// Returns true only when testing on vitess.
+    pub fn is_vitess(&self) -> bool {
+        self.tags().contains(Tags::Vitess)
+    }
+
+    pub fn preview_features(&self) -> BitFlags<PreviewFeature> {
+        self.preview_features
+    }
+
     #[tracing::instrument(skip(self))]
     #[track_caller]
     async fn test_introspect_internal(&self, data_model: Datamodel) -> ConnectorResult<IntrospectionResult> {
         let config = self.configuration();
 
-        let preview_features = self
-            .args
-            .preview_features()
-            .iter()
-            .flat_map(|f| PreviewFeature::parse_opt(f))
-            .collect();
-
         let ctx = IntrospectionContext {
-            preview_features,
+            preview_features: self.preview_features(),
             source: config.datasources.into_iter().next().unwrap(),
         };
 
@@ -227,7 +231,15 @@ impl TestApi {
     }
 
     pub fn datasource_block(&self) -> DatasourceBlock<'_> {
-        self.args.datasource_block(&self.connection_string, &[])
+        let no_foreign_keys =
+            self.is_vitess() && self.preview_features().contains(PreviewFeature::ReferentialIntegrity);
+
+        if no_foreign_keys {
+            self.args
+                .datasource_block(&self.connection_string, &[("referentialIntegrity", r#""prisma""#)])
+        } else {
+            self.args.datasource_block(&self.connection_string, &[])
+        }
     }
 
     pub fn configuration(&self) -> Configuration {
@@ -281,7 +293,6 @@ impl TestApi {
 
     fn generator_block(&self) -> String {
         let preview_features: Vec<String> = self
-            .args
             .preview_features()
             .iter()
             .map(|pf| format!(r#""{}""#, pf))

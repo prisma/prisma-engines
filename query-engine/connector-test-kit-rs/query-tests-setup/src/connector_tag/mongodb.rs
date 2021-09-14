@@ -48,6 +48,10 @@ impl ConnectorTagInterface for MongoDbConnectorTag {
     fn is_versioned(&self) -> bool {
         true
     }
+
+    fn referential_integrity(&self) -> &'static str {
+        "prisma"
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]

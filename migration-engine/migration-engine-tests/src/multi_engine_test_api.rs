@@ -211,6 +211,11 @@ impl TestApi {
         write!(out, "{}", self.args.datasource_block(self.args.database_url(), &[])).unwrap()
     }
 
+    /// Currently enabled preview features.
+    pub fn preview_features(&self) -> BitFlags<PreviewFeature> {
+        self.preview_features
+    }
+
     fn generator_block(&self) -> String {
         let preview_features: Vec<String> = self
             .args

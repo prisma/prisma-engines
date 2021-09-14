@@ -1,0 +1,33 @@
+name: PSL
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+jobs:
+  test:
+    name: "Test Datamodel"
+
+    strategy:
+      fail-fast: false
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          default: true
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: datamodel-cache
+
+      - run: cargo test -p datamodel -p dml -p datamodel-connector -p sql-datamodel-connector
+        env:
+          CLICOLOR_FORCE: 1
