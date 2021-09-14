@@ -11,15 +11,6 @@ use std::{
 };
 
 /// Resolved names for use in the validation process.
-///
-/// `Names::new()` is also responsible for validating that there are no name
-/// collisions in the following namespaces:
-///
-/// - Model, enum and type alias names
-/// - Generators
-/// - Datasources
-/// - Model fields for each model
-/// - Enum variants for each enum
 #[derive(Default)]
 pub(super) struct Names<'ast> {
     /// Models, enums and type aliases
@@ -31,6 +22,14 @@ pub(super) struct Names<'ast> {
     pub(super) model_fields: BTreeMap<(ast::ModelId, &'ast str), FieldId>,
 }
 
+/// `resolve_names()` is responsible for populating `ParserDatabase.names` and
+/// validating that there are no name collisions in the following namespaces:
+///
+/// - Model, enum and type alias names
+/// - Generators
+/// - Datasources
+/// - Model fields for each model
+/// - Enum variants for each enum
 pub(super) fn resolve_names(ctx: &mut Context<'_>) {
     let mut tmp_names: HashSet<&str> = HashSet::new(); // throwaway container for duplicate checking
     let mut names = Names::default();
