@@ -108,3 +108,121 @@ fn create_migration_referential_integrity_prisma_works(api: TestApi) {
         .assert_table("User", |table| table.assert_foreign_keys_count(0))
         .assert_table("Comment", |table| table.assert_foreign_keys_count(0));
 }
+
+#[test_connector(exclude(Vitess))]
+fn switching_from_foreign_keys_to_prisma_integrity_drops_the_foreign_keys(api: TestApi) {
+    let dm = format!(
+        r#"
+        {datasource}
+
+        generator client {{
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialIntegrity"]
+        }}
+
+        model A {{
+            id          String  @id
+            bId         Int?
+            b           B? @relation(fields: [bId], references: [id])
+        }}
+
+        model B {{
+            id Int @id
+            as A[]
+        }}
+        "#,
+        datasource = api.datasource_block_with(&[("referentialIntegrity", "\"foreignKeys\"")]),
+    );
+
+    api.schema_push(&dm).send().assert_green();
+
+    api.assert_schema()
+        .assert_table("A", |table| table.assert_foreign_keys_count(1));
+
+    let dm = format!(
+        r#"
+        {datasource}
+
+        generator client {{
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialIntegrity"]
+        }}
+
+        model A {{
+            id          String  @id
+            bId         Int?
+            b           B? @relation(fields: [bId], references: [id])
+        }}
+
+        model B {{
+            id Int @id
+            as A[]
+        }}
+        "#,
+        datasource = api.datasource_block_with(&[("referentialIntegrity", "\"prisma\"")]),
+    );
+
+    api.schema_push(&dm).send().assert_green();
+
+    api.assert_schema()
+        .assert_table("A", |table| table.assert_foreign_keys_count(0));
+}
+
+#[test_connector(exclude(Vitess))]
+fn switching_from_prisma_integrity_to_foreign_keys_drops_the_foreign_keys(api: TestApi) {
+    let dm = format!(
+        r#"
+        {datasource}
+
+        generator client {{
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialIntegrity"]
+        }}
+
+        model A {{
+            id          String  @id
+            bId         Int?
+            b           B? @relation(fields: [bId], references: [id])
+        }}
+
+        model B {{
+            id Int @id
+            as A[]
+        }}
+        "#,
+        datasource = api.datasource_block_with(&[("referentialIntegrity", "\"prisma\"")]),
+    );
+
+    api.schema_push(&dm).send().assert_green();
+
+    api.assert_schema()
+        .assert_table("A", |table| table.assert_foreign_keys_count(0));
+
+    let dm = format!(
+        r#"
+        {datasource}
+
+        generator client {{
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialIntegrity"]
+        }}
+
+        model A {{
+            id          String  @id
+            bId         Int?
+            b           B? @relation(fields: [bId], references: [id])
+        }}
+
+        model B {{
+            id Int @id
+            as A[]
+        }}
+        "#,
+        datasource = api.datasource_block_with(&[("referentialIntegrity", "\"foreignKeys\"")]),
+    );
+
+    api.schema_push(&dm).send().assert_green();
+
+    api.assert_schema()
+        .assert_table("A", |table| table.assert_foreign_keys_count(1));
+}
