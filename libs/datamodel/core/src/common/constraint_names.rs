@@ -128,6 +128,11 @@ impl ConstraintNames {
             .fields
             .iter()
             .map(|field_name| {
+                // We cannot unwrap here, due to us re-introspecting relations
+                // and if we're not using foreign keys, we might copy a relation
+                // that is not valid anymore. We still want to write that to the
+                // file and let user fix it, but if we unwrap here, we will
+                // panic.
                 model
                     .find_scalar_field(field_name)
                     .map(|field| field.final_database_name())
