@@ -1,5 +1,5 @@
 use super::{
-    types::{ModelData, PrimaryKeyData, RelationField},
+    types::{ModelAttributes, PrimaryKeyData, RelationField},
     ParserDatabase,
 };
 use crate::{ast, common::constraint_names::ConstraintNames};
@@ -10,7 +10,7 @@ impl<'ast> ParserDatabase<'ast> {
         ModelWalker {
             model_id,
             db: self,
-            model_attributes: &self.types.models[&model_id],
+            model_attributes: &self.types.model_attributes[&model_id],
         }
     }
 
@@ -18,7 +18,7 @@ impl<'ast> ParserDatabase<'ast> {
         self.ast.iter_models().map(move |(model_id, _)| ModelWalker {
             model_id,
             db: self,
-            model_attributes: &self.types.models[&model_id],
+            model_attributes: &self.types.model_attributes[&model_id],
         })
     }
 }
@@ -26,11 +26,11 @@ impl<'ast> ParserDatabase<'ast> {
 pub(crate) struct ModelWalker<'ast, 'db> {
     pub(super) model_id: ast::ModelId,
     pub(super) db: &'db ParserDatabase<'ast>,
-    pub(super) model_attributes: &'db ModelData<'ast>,
+    pub(super) model_attributes: &'db ModelAttributes<'ast>,
 }
 
 impl<'ast, 'db> ModelWalker<'ast, 'db> {
-    pub(crate) fn attributes(&self) -> &'db ModelData<'ast> {
+    pub(crate) fn attributes(&self) -> &'db ModelAttributes<'ast> {
         self.model_attributes
     }
 

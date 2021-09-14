@@ -1,33 +1,65 @@
 mod autoincrement;
+mod id;
 mod native_types;
 mod relation;
 
 use super::{
     context::{Arguments, Context},
-    types::{IndexData, ModelData, RelationField, ScalarField},
+    types::{EnumAttributes, IndexData, ModelAttributes, PrimaryKeyData, RelationField, ScalarField, ScalarFieldType},
 };
-use crate::common::constraint_names::ConstraintNames;
-use crate::transform::ast_to_dml::db::types::PrimaryKeyData;
 use crate::{
     ast::{self, WithName},
+    common::constraint_names::ConstraintNames,
     diagnostics::DatamodelError,
     dml,
-    transform::{ast_to_dml::db::ScalarFieldType, helpers::ValueValidator},
+    transform::helpers::ValueValidator,
 };
 use prisma_value::PrismaValue;
 use std::collections::HashSet;
 
-pub(super) fn resolve_model_and_field_attributes<'ast>(
-    model_id: ast::ModelId,
-    ast_model: &'ast ast::Model,
-    ctx: &mut Context<'ast>,
-) {
-    let mut model_data = ctx
-        .db
-        .types
-        .take_model_data(&model_id)
-        .expect("Broken invariant: no ModelData for model in visit_model_attributes.");
+pub(super) fn resolve_attributes(ctx: &mut Context<'_>) {
+    for top in ctx.db.ast.iter_tops() {
+        match top {
+            (ast::TopId::Model(model_id), ast::Top::Model(model)) => resolve_model_attributes(model_id, model, ctx),
+            (ast::TopId::Enum(enum_id), ast::Top::Enum(ast_enum)) => resolve_enum_attributes(enum_id, ast_enum, ctx),
+            _ => (),
+        }
+    }
+}
 
+fn resolve_enum_attributes<'ast>(enum_id: ast::EnumId, ast_enum: &'ast ast::Enum, ctx: &mut Context<'ast>) {
+    let mut enum_attributes = EnumAttributes::default();
+
+    for (field_idx, field) in ast_enum.values.iter().enumerate() {
+        ctx.visit_attributes(&field.attributes, |attributes, ctx| {
+            // @map
+            attributes.visit_optional_single("map", ctx, |map_args, ctx| {
+                if let Some(mapped_name) = visit_map_attribute(map_args, ctx) {
+                    enum_attributes.mapped_values.insert(field_idx as u32, mapped_name);
+                    ctx.mapped_enum_value_names
+                        .insert((enum_id, mapped_name), field_idx as u32);
+                }
+            })
+        });
+    }
+
+    ctx.visit_attributes(&ast_enum.attributes, |attributes, ctx| {
+        // @@map
+        attributes.visit_optional_single("map", ctx, |map_args, ctx| {
+            if let Some(mapped_name) = visit_map_attribute(map_args, ctx) {
+                enum_attributes.mapped_name = Some(mapped_name);
+                ctx.mapped_enum_names.insert(mapped_name, enum_id);
+            }
+        })
+    });
+
+    ctx.db.types.enum_attributes.insert(enum_id, enum_attributes);
+}
+
+fn resolve_model_attributes<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::Model, ctx: &mut Context<'ast>) {
+    let mut model_attributes = ModelAttributes::default();
+
+    // First resolve all the attributes defined on fields **in isolation**.
     for (field_id, ast_field) in ast_model.iter_fields() {
         if let Some(mut scalar_field) = ctx.db.types.take_scalar_field(model_id, field_id) {
             visit_scalar_field_attributes(
@@ -35,7 +67,7 @@ pub(super) fn resolve_model_and_field_attributes<'ast>(
                 field_id,
                 ast_model,
                 ast_field,
-                &mut model_data,
+                &mut model_attributes,
                 &mut scalar_field,
                 ctx,
             );
@@ -53,15 +85,16 @@ pub(super) fn resolve_model_and_field_attributes<'ast>(
         }
     }
 
+    // First resolve all the attributes defined on the model itself **in isolation**.
     ctx.visit_attributes(&ast_model.attributes, |attributes, ctx| {
         // @@ignore
         attributes.visit_optional_single("ignore", ctx, |_, ctx| {
-            visit_model_ignore(model_id, &mut model_data, ctx);
+            visit_model_ignore(model_id, &mut model_attributes, ctx);
         });
 
         // @@id
         attributes.visit_optional_single("id", ctx, |id_args, ctx| {
-            visit_model_id(id_args, &mut model_data, model_id, ctx);
+            visit_model_id(id_args, &mut model_attributes, model_id, ctx);
         });
 
         // @@map
@@ -71,7 +104,7 @@ pub(super) fn resolve_model_and_field_attributes<'ast>(
                 None => return,
             };
 
-            model_data.mapped_name = Some(mapped_name);
+            model_attributes.mapped_name = Some(mapped_name);
 
             if let Some(existing_model_id) = ctx.mapped_model_names.insert(mapped_name, model_id) {
                 let existing_model_name = ctx.db.ast[existing_model_id].name();
@@ -94,18 +127,20 @@ pub(super) fn resolve_model_and_field_attributes<'ast>(
 
         // @@index
         attributes.visit_repeated("index", ctx, |args, ctx| {
-            model_index(args, &mut model_data, model_id, ctx);
+            model_index(args, &mut model_attributes, model_id, ctx);
         });
 
         // @@unique
         attributes.visit_repeated("unique", ctx, |args, ctx| {
-            model_unique(args, &mut model_data, model_id, ctx);
+            model_unique(args, &mut model_attributes, model_id, ctx);
         });
     });
 
-    ctx.db.types.models.insert(model_id, model_data);
+    // Model-global validations
+    id::validate_id_field_arities(model_id, &model_attributes, ctx);
+    autoincrement::validate_auto_increment(model_id, &model_attributes, ctx);
 
-    autoincrement::validate_auto_increment(model_id, ctx);
+    ctx.db.types.model_attributes.insert(model_id, model_attributes);
 }
 
 pub(super) fn validate_index_names(ctx: &mut Context<'_>) {
@@ -137,7 +172,7 @@ fn visit_scalar_field_attributes<'ast>(
     field_id: ast::FieldId,
     ast_model: &'ast ast::Model,
     ast_field: &'ast ast::Field,
-    model_data: &mut ModelData<'ast>,
+    model_attributes: &mut ModelAttributes<'ast>,
     scalar_field_data: &mut ScalarField<'ast>,
     ctx: &mut Context<'ast>,
 ) {
@@ -188,7 +223,7 @@ fn visit_scalar_field_attributes<'ast>(
 
         // @id
         attributes.visit_optional_single("id", ctx, |args, ctx| {
-            match model_data.primary_key {
+            match model_attributes.primary_key {
                 Some(_) => ctx.push_error(DatamodelError::new_model_validation_error(
                     "At most one field must be marked as the id field with the `@id` attribute.",
                     ast_model.name(),
@@ -197,20 +232,13 @@ fn visit_scalar_field_attributes<'ast>(
                 None => {
                     let db_name = primary_key_constraint_name(ast_model, args,  "@id", ctx);
 
-                    model_data.primary_key = Some(PrimaryKeyData{
+                    model_attributes.primary_key = Some(PrimaryKeyData{
                         name: None,
                         db_name,
                         fields: vec![field_id],
                         source_field: Some(field_id)
                     })
                 },
-            }
-
-            match (model_data.is_ignored, ast_field.arity) {
-                (true, _) |
-                (false, ast::FieldArity::Required) => (),
-                (false, ast::FieldArity::List) |
-                (false, ast::FieldArity::Optional) => ctx.push_error(args.new_attribute_validation_error("Fields that are marked as id must be required.")),
             }
         });
 
@@ -257,7 +285,7 @@ fn visit_scalar_field_attributes<'ast>(
              validate_db_name(ast_model, args, db_name, "@unique", ctx);
 
 
-            model_data.indexes.push((args.attribute(), IndexData {
+            model_attributes.indexes.push((args.attribute(), IndexData {
                 is_unique: true,
                 fields: vec![field_id],
                 source_field: Some(field_id),
@@ -514,7 +542,7 @@ fn visit_field_default<'ast>(
 /// @@id on models
 fn visit_model_id<'ast>(
     args: &mut Arguments<'ast>,
-    model_data: &mut ModelData<'ast>,
+    model_data: &mut ModelAttributes<'ast>,
     model_id: ast::ModelId,
     ctx: &mut Context<'ast>,
 ) {
@@ -604,7 +632,7 @@ fn visit_model_id<'ast>(
     });
 }
 
-fn visit_model_ignore(model_id: ast::ModelId, model_data: &mut ModelData<'_>, ctx: &mut Context<'_>) {
+fn visit_model_ignore(model_id: ast::ModelId, model_data: &mut ModelAttributes<'_>, ctx: &mut Context<'_>) {
     let ignored_field_errors: Vec<_> = ctx
         .db
         .iter_model_scalar_fields(model_id)
@@ -628,7 +656,7 @@ fn visit_model_ignore(model_id: ast::ModelId, model_data: &mut ModelData<'_>, ct
 /// Validate @@index on models.
 fn model_index<'ast>(
     args: &mut Arguments<'ast>,
-    data: &mut ModelData<'ast>,
+    data: &mut ModelAttributes<'ast>,
     model_id: ast::ModelId,
     ctx: &mut Context<'ast>,
 ) {
@@ -687,7 +715,7 @@ fn model_index<'ast>(
 /// Validate @@unique on models.
 fn model_unique<'ast>(
     args: &mut Arguments<'ast>,
-    data: &mut ModelData<'ast>,
+    data: &mut ModelAttributes<'ast>,
     model_id: ast::ModelId,
     ctx: &mut Context<'ast>,
 ) {
@@ -1008,8 +1036,7 @@ fn resolve_field_array<'ast>(
     }
 }
 
-//helpers
-pub(super) fn visit_map_attribute<'ast>(map_args: &mut Arguments<'ast>, ctx: &mut Context<'ast>) -> Option<&'ast str> {
+fn visit_map_attribute<'ast>(map_args: &mut Arguments<'ast>, ctx: &mut Context<'ast>) -> Option<&'ast str> {
     match map_args.default_arg("name").map(|value| value.as_str()) {
         Ok(Ok(name)) => return Some(name),
         Err(err) => ctx.push_error(err), // not flattened for error handing legacy reasons

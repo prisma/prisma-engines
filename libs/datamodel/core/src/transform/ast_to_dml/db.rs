@@ -92,9 +92,7 @@ impl<'ast> ParserDatabase<'ast> {
         // Third pass: validate model and field attributes. All these
         // validations should be _order independent_ and only rely on
         // information from previous steps, not from other attributes.
-        for (model_id, model) in ast.iter_models() {
-            attributes::resolve_model_and_field_attributes(model_id, model, &mut ctx)
-        }
+        attributes::resolve_attributes(&mut ctx);
 
         // Fourth step: global validations
         attributes::validate_index_names(&mut ctx);
@@ -120,11 +118,14 @@ impl<'ast> ParserDatabase<'ast> {
     }
 
     pub(crate) fn get_enum_database_name(&self, enum_id: ast::EnumId) -> Option<&'ast str> {
-        self.types.enums[&enum_id].mapped_name
+        self.types.enum_attributes[&enum_id].mapped_name
     }
 
     pub(crate) fn get_enum_value_database_name(&self, enum_id: ast::EnumId, value_idx: u32) -> Option<&'ast str> {
-        self.types.enums[&enum_id].mapped_values.get(&value_idx).cloned()
+        self.types.enum_attributes[&enum_id]
+            .mapped_values
+            .get(&value_idx)
+            .cloned()
     }
 
     pub(super) fn active_connector(&self) -> &dyn Connector {

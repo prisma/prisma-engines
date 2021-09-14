@@ -1,4 +1,4 @@
-use super::{attributes, context::Context};
+use super::context::Context;
 use crate::{ast, diagnostics::DatamodelError};
 use itertools::Itertools;
 use once_cell::sync::Lazy;
@@ -13,7 +13,7 @@ pub(super) fn resolve_types(ctx: &mut Context<'_>) {
         match (top_id, top) {
             (ast::TopId::Alias(alias_id), ast::Top::Type(type_alias)) => visit_type_alias(alias_id, type_alias, ctx),
             (ast::TopId::Model(model_id), ast::Top::Model(model)) => visit_model(model_id, model, ctx),
-            (ast::TopId::Enum(enum_id), ast::Top::Enum(enm)) => visit_enum(enum_id, enm, ctx),
+            (ast::TopId::Enum(_), ast::Top::Enum(enm)) => visit_enum(enm, ctx),
             (_, ast::Top::Source(_)) | (_, ast::Top::Generator(_)) => (),
             _ => unreachable!(),
         }
@@ -26,18 +26,14 @@ pub(super) fn resolve_types(ctx: &mut Context<'_>) {
 pub(super) struct Types<'ast> {
     pub(super) type_aliases: HashMap<ast::AliasId, ScalarFieldType>,
     pub(super) scalar_fields: BTreeMap<(ast::ModelId, ast::FieldId), ScalarField<'ast>>,
-    pub(super) models: HashMap<ast::ModelId, ModelData<'ast>>,
+    pub(super) model_attributes: HashMap<ast::ModelId, ModelAttributes<'ast>>,
     /// This contains only the relation fields actually present in the schema
     /// source text.
     pub(super) relation_fields: BTreeMap<(ast::ModelId, ast::FieldId), RelationField<'ast>>,
-    pub(super) enums: HashMap<ast::EnumId, EnumData<'ast>>,
+    pub(super) enum_attributes: HashMap<ast::EnumId, EnumAttributes<'ast>>,
 }
 
 impl<'ast> Types<'ast> {
-    pub(super) fn take_model_data(&mut self, model_id: &ast::ModelId) -> Option<ModelData<'ast>> {
-        self.models.remove(model_id)
-    }
-
     pub(super) fn take_scalar_field(
         &mut self,
         model_id: ast::ModelId,
@@ -120,7 +116,7 @@ impl RelationField<'_> {
 
 /// Information gathered from validating attributes on a model.
 #[derive(Default, Debug)]
-pub(crate) struct ModelData<'ast> {
+pub(crate) struct ModelAttributes<'ast> {
     /// @(@)id
     pub(super) primary_key: Option<PrimaryKeyData<'ast>>,
     /// @@ignore
@@ -131,7 +127,7 @@ pub(crate) struct ModelData<'ast> {
     pub(crate) mapped_name: Option<&'ast str>,
 }
 
-impl ModelData<'_> {
+impl ModelAttributes<'_> {
     /// Whether the field is the whole primary key. Will match `@id` and `@@id([fieldName])`.
     pub(super) fn field_is_single_pk(&self, field: ast::FieldId) -> bool {
         self.primary_key.as_ref().filter(|pk| pk.fields == [field]).is_some()
@@ -166,20 +162,13 @@ pub(super) struct PrimaryKeyData<'ast> {
 }
 
 #[derive(Debug, Default)]
-pub(super) struct EnumData<'ast> {
+pub(super) struct EnumAttributes<'ast> {
     pub(super) mapped_name: Option<&'ast str>,
     /// @map on enum values.
     pub(super) mapped_values: HashMap<u32, &'ast str>,
 }
 
 fn visit_model<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::Model, ctx: &mut Context<'ast>) {
-    let model_data = ModelData {
-        // This needs to be looked up first, because we want to skip some field
-        // validations when the model is ignored.
-        is_ignored: ast_model.attributes.iter().any(|attr| attr.name.name == "ignore"),
-        ..Default::default()
-    };
-
     for (field_id, ast_field) in ast_model.iter_fields() {
         match field_type(ast_field, ctx) {
             Ok(FieldType::Model(referenced_model)) => {
@@ -227,8 +216,6 @@ fn visit_model<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::Model, ctx: &
             )),
         }
     }
-
-    ctx.db.types.models.insert(model_id, model_data);
 }
 
 /// Detect self-referencing type aliases, possibly indirectly. We loop
@@ -293,9 +280,7 @@ fn detect_alias_cycles(ctx: &mut Context<'_>) {
     }
 }
 
-fn visit_enum<'ast>(enum_id: ast::EnumId, enm: &'ast ast::Enum, ctx: &mut Context<'ast>) {
-    let mut enum_data = EnumData::default();
-
+fn visit_enum<'ast>(enm: &'ast ast::Enum, ctx: &mut Context<'ast>) {
     if !ctx.db.active_connector().supports_enums() {
         ctx.push_error(DatamodelError::new_validation_error(
             &format!(
@@ -312,31 +297,6 @@ fn visit_enum<'ast>(enum_id: ast::EnumId, enm: &'ast ast::Enum, ctx: &mut Contex
             enm.span,
         ))
     }
-
-    for (field_idx, field) in enm.values.iter().enumerate() {
-        ctx.visit_attributes(&field.attributes, |attributes, ctx| {
-            // @map
-            attributes.visit_optional_single("map", ctx, |map_args, ctx| {
-                if let Some(mapped_name) = attributes::visit_map_attribute(map_args, ctx) {
-                    enum_data.mapped_values.insert(field_idx as u32, mapped_name);
-                    ctx.mapped_enum_value_names
-                        .insert((enum_id, mapped_name), field_idx as u32);
-                }
-            })
-        });
-    }
-
-    ctx.visit_attributes(&enm.attributes, |attributes, ctx| {
-        // @@map
-        attributes.visit_optional_single("map", ctx, |map_args, ctx| {
-            if let Some(mapped_name) = attributes::visit_map_attribute(map_args, ctx) {
-                enum_data.mapped_name = Some(mapped_name);
-                ctx.mapped_enum_names.insert(mapped_name, enum_id);
-            }
-        })
-    });
-
-    ctx.db.types.enums.insert(enum_id, enum_data);
 }
 
 fn visit_type_alias<'ast>(alias_id: ast::AliasId, alias: &'ast ast::Field, ctx: &mut Context<'ast>) {

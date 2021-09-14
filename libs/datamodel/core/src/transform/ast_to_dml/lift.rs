@@ -38,20 +38,20 @@ impl<'a> LiftAstToDml<'a> {
     /// Internal: Validates a model AST node and lifts it to a DML model.
     fn lift_model(&self, model_id: ast::ModelId, ast_model: &ast::Model) -> dml::Model {
         let mut model = dml::Model::new(ast_model.name.name.clone(), None);
-        let model_data = self.db.walk_model(model_id);
+        let model_attributes = self.db.walk_model(model_id);
 
         model.documentation = ast_model.documentation.clone().map(|comment| comment.text);
-        model.database_name = model_data.attributes().mapped_name.map(String::from);
-        model.is_ignored = model_data.attributes().is_ignored;
+        model.database_name = model_attributes.attributes().mapped_name.map(String::from);
+        model.is_ignored = model_attributes.attributes().is_ignored;
 
-        model.primary_key = model_data.primary_key().map(|pk| dml::PrimaryKeyDefinition {
+        model.primary_key = model_attributes.primary_key().map(|pk| dml::PrimaryKeyDefinition {
             name: pk.name().map(String::from),
             db_name: pk.final_database_name().map(|c| c.into_owned()),
             fields: pk.iter_ast_fields().map(|field| field.name.name.to_owned()).collect(),
             defined_on_field: pk.is_defined_on_field(),
         });
 
-        model.indices = model_data
+        model.indices = model_attributes
             .walk_indexes()
             .map(|idx| dml::IndexDefinition {
                 name: idx.attribute().name.map(String::from),
@@ -94,7 +94,7 @@ impl<'a> LiftAstToDml<'a> {
             model.add_field(dml::Field::ScalarField(field));
         }
 
-        for relation_field in model_data.walk_relation_fields() {
+        for relation_field in model_attributes.walk_relation_fields() {
             let ast_field = relation_field.ast_field();
             let arity = self.lift_field_arity(&ast_field.arity);
             let attributes = relation_field.attributes();
