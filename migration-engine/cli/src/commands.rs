@@ -1,7 +1,6 @@
 use crate::logger::log_error_and_exit;
-use enumflags2::BitFlags;
 use migration_connector::ConnectorError;
-use migration_core::{migration_api, qe_setup::QueryEngineFlags};
+use migration_core::migration_api;
 use structopt::StructOpt;
 use user_facing_errors::common::{InvalidConnectionString, SchemaParserError};
 
@@ -10,8 +9,6 @@ pub(crate) struct Cli {
     /// The connection string to the database
     #[structopt(long, short = "d", parse(try_from_str = parse_base64_string))]
     datasource: String,
-    #[structopt(long, short = "f", parse(try_from_str = parse_setup_flags))]
-    qe_test_setup_flags: Option<BitFlags<QueryEngineFlags>>,
     #[structopt(subcommand)]
     command: CliCommand,
 }
@@ -55,25 +52,6 @@ fn parse_base64_string(s: &str) -> Result<String, ConnectorError> {
         },
         Err(_) => Ok(String::from(s)),
     }
-}
-
-fn parse_setup_flags(s: &str) -> Result<BitFlags<QueryEngineFlags>, ConnectorError> {
-    let mut flags = BitFlags::empty();
-
-    for flag in s.split(',') {
-        match flag {
-            "database_creation_not_allowed" => flags.insert(QueryEngineFlags::DatabaseCreationNotAllowed),
-            "" => (),
-            flag => {
-                return Err(ConnectorError::from_msg(format!(
-                    "Invalid parameters: Unknown flag: {}",
-                    flag
-                )))
-            }
-        }
-    }
-
-    Ok(flags)
 }
 
 async fn connect_to_database(database_str: &str) -> Result<String, ConnectorError> {
