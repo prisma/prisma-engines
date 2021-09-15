@@ -92,7 +92,7 @@ mod update_many {
     }
 
     // "An updateMany mutation" should "update all items if the where clause is empty"
-    #[connector_test(exclude(MongoDb))]
+    #[connector_test]
     async fn update_all_items_if_where_empty(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, optStr: "str1" }"#).await?;
         create_row(&runner, r#"{ id: 2, optStr: "str2", optInt: 2 }"#).await?;

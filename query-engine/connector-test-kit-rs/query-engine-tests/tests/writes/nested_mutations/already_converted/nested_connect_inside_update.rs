@@ -6,9 +6,7 @@ mod connect_inside_update {
     use query_test_macros::relation_link_test;
 
     // "a P1 to C1  relation with the child already in a relation" should "be connectable through a nested mutation if the child is already in a relation"
-    // TODO(dom): Not working on mongo
-    // panicked at 'not implemented: Compound filter case.', query-engine/connectors/mongodb-query-connector/src/filter.rs:107:13
-    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt", exclude(SqlServer, MongoDb))]
+    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt", exclude(SqlServer))]
     async fn p1_c1_child_in_rel_connect_mut(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let loose_child = t.child().parse(
             run_query_json!(
