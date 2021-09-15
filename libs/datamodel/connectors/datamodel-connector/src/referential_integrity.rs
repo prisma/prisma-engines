@@ -28,7 +28,7 @@ impl ReferentialIntegrity {
         match self {
             Self::ForeignKeys => from_connector,
             // The emulated modes should be listed here.
-            Self::Prisma => Restrict | SetNull,
+            Self::Prisma => Restrict | SetNull | NoAction | Cascade,
         }
     }
 

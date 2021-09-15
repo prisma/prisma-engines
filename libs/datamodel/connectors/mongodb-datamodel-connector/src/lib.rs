@@ -2,7 +2,7 @@ mod mongodb_types;
 
 use datamodel_connector::{
     connector_error::{ConnectorError, ErrorKind},
-    Connector, ConnectorCapability,
+    Connector, ConnectorCapability, ReferentialIntegrity,
 };
 use dml::{
     default_value::DefaultKind, field::FieldType, native_type_constructor::NativeTypeConstructor,
@@ -18,13 +18,11 @@ type Result<T> = std::result::Result<T, ConnectorError>;
 pub struct MongoDbDatamodelConnector {
     capabilities: Vec<ConnectorCapability>,
     native_types: Vec<NativeTypeConstructor>,
-    referential_actions: BitFlags<ReferentialAction>,
+    referential_integrity: ReferentialIntegrity,
 }
 
 impl MongoDbDatamodelConnector {
     pub fn new() -> Self {
-        use ReferentialAction::*;
-
         let capabilities = vec![
             ConnectorCapability::RelationsOverNonUniqueCriteria,
             ConnectorCapability::Json,
@@ -37,12 +35,11 @@ impl MongoDbDatamodelConnector {
         ];
 
         let native_types = mongodb_types::available_types();
-        let referential_actions = Restrict | SetNull | NoAction | Cascade;
 
         Self {
             capabilities,
             native_types,
-            referential_actions,
+            referential_integrity: ReferentialIntegrity::Prisma,
         }
     }
 }
@@ -67,7 +64,8 @@ impl Connector for MongoDbDatamodelConnector {
     }
 
     fn referential_actions(&self) -> BitFlags<ReferentialAction> {
-        self.referential_actions
+        self.referential_integrity
+            .allowed_referential_actions(BitFlags::empty())
     }
 
     fn emulates_referential_actions(&self) -> bool {
