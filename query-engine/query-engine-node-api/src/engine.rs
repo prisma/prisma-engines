@@ -192,7 +192,7 @@ impl QueryEngine {
                             .first()
                             .ok_or_else(|| ApiError::configuration("No valid data source found"))?;
 
-                        let preview_features: Vec<_> = builder.config.subject.preview_features().cloned().collect();
+                        let preview_features: Vec<_> = builder.config.subject.preview_features().iter().collect();
                         let url = data_source
                             .load_url_with_config_dir(&builder.config_dir, |key| {
                                 builder.env.get(key).map(ToString::to_string)

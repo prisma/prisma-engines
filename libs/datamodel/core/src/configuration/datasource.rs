@@ -21,7 +21,8 @@ pub struct Datasource {
     /// An optional user-defined shadow database URL.
     pub shadow_database_url: Option<(StringFromEnvVar, Span)>,
     /// In which layer referential actions are handled.
-    pub referential_integrity: ReferentialIntegrity,
+    pub referential_integrity: Option<ReferentialIntegrity>,
+    pub default_referential_integrity: ReferentialIntegrity,
 }
 
 impl std::fmt::Debug for Datasource {
@@ -34,6 +35,7 @@ impl std::fmt::Debug for Datasource {
             .field("documentation", &self.documentation)
             .field("active_connector", &&"...")
             .field("shadow_database_url", &self.shadow_database_url)
+            .field("referential_integrity", &self.referential_integrity)
             .finish()
     }
 }
@@ -42,6 +44,10 @@ impl Datasource {
     pub fn capabilities(&self) -> ConnectorCapabilities {
         let capabilities = self.active_connector.capabilities().to_owned();
         ConnectorCapabilities::new(capabilities)
+    }
+
+    pub fn referential_integrity(&self) -> ReferentialIntegrity {
+        self.referential_integrity.unwrap_or(self.default_referential_integrity)
     }
 
     /// Load the database URL, validating it and resolving env vars in the

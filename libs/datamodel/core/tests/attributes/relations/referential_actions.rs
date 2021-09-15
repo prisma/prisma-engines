@@ -223,7 +223,7 @@ fn mongo_uses_prisma_referential_integrity_by_default() {
     "#};
 
     assert_eq!(
-        ReferentialIntegrity::Prisma,
+        Some(ReferentialIntegrity::Prisma),
         parse_config(dml).unwrap().subject.referential_integrity()
     );
 }
@@ -250,7 +250,7 @@ fn sql_databases_use_foreign_keys_referential_integrity_by_default() {
         "#, db = db};
 
         assert_eq!(
-            ReferentialIntegrity::ForeignKeys,
+            Some(ReferentialIntegrity::ForeignKeys),
             parse_config(&dml).unwrap().subject.referential_integrity()
         );
     }

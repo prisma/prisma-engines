@@ -181,33 +181,32 @@ impl DatasourceLoader {
             }
         };
 
-        let referential_integrity =
-            referential_integrity.unwrap_or_else(|| datasource_provider.default_referential_integrity());
-
-        if !datasource_provider
-            .allowed_referential_integrity_settings()
-            .contains(referential_integrity)
-        {
-            let span = args
-                .get("referentialIntegrity")
-                .map(|v| v.span())
-                .unwrap_or_else(Span::empty);
-
-            let supported_values = datasource_provider
+        if let Some(integrity) = referential_integrity {
+            if !datasource_provider
                 .allowed_referential_integrity_settings()
-                .iter()
-                .map(|v| format!(r#""{}""#, v))
-                .collect::<Vec<_>>()
-                .join(", ");
+                .contains(integrity)
+            {
+                let span = args
+                    .get("referentialIntegrity")
+                    .map(|v| v.span())
+                    .unwrap_or_else(Span::empty);
 
-            let message = format!(
-                "Invalid referential integrity setting: \"{}\". Supported values: {}",
-                referential_integrity, supported_values,
-            );
+                let supported_values = datasource_provider
+                    .allowed_referential_integrity_settings()
+                    .iter()
+                    .map(|v| format!(r#""{}""#, v))
+                    .collect::<Vec<_>>()
+                    .join(", ");
 
-            let error = DatamodelError::new_source_validation_error(&message, "referentialIntegrity", span);
+                let message = format!(
+                    "Invalid referential integrity setting: \"{}\". Supported values: {}",
+                    integrity, supported_values,
+                );
 
-            diagnostics.push_error(error);
+                let error = DatamodelError::new_source_validation_error(&message, "referentialIntegrity", span);
+
+                diagnostics.push_error(error);
+            }
         }
 
         Some(Datasource {
@@ -220,6 +219,7 @@ impl DatasourceLoader {
             active_connector: datasource_provider.connector(),
             shadow_database_url,
             referential_integrity,
+            default_referential_integrity: datasource_provider.default_referential_integrity(),
         })
     }
 }

@@ -145,7 +145,7 @@ impl<'a> LowerDmlToAst<'a> {
                 == RelationNames::name_for_unambiguous_relation(&relation_info.to, &parent_model.name);
 
             if !relation_info.name.is_empty() && (!has_default_name || parent_model.name == related_model.name) {
-                args.push(ast::Argument::new_string("", &relation_info.name));
+                args.push(ast::Argument::new_string("", relation_info.name.to_string()));
             }
 
             let mut relation_fields = relation_info.references.clone();

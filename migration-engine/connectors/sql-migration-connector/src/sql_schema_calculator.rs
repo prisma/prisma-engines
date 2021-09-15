@@ -24,7 +24,9 @@ pub(crate) fn calculate_sql_schema(
     let mut relation_tables: Vec<_> = calculate_relation_tables(datamodel, flavour, &schema).collect();
     schema.tables.append(&mut relation_tables);
 
-    if !configuration.referential_integrity().uses_foreign_keys() {
+    let referential_integrity = configuration.referential_integrity().unwrap_or_default();
+
+    if !referential_integrity.uses_foreign_keys() {
         for table in &mut schema.tables {
             table.foreign_keys.clear();
         }

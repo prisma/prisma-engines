@@ -51,7 +51,7 @@ impl<'a> LowerDmlToAst<'a> {
                 )];
 
                 if let Some(name) = &index_def.name {
-                    args.push(ast::Argument::new_string("name", name));
+                    args.push(ast::Argument::new_string("name", name.to_string()));
                 }
 
                 self.push_index_map_argument(model, index_def, &mut args);
