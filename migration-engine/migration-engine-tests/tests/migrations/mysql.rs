@@ -346,7 +346,7 @@ fn mysql_apply_migrations_errors_gives_the_failed_sql(api: TestApi) {
             Database error code: 1051
 
             Database error:
-            target: test.0.master: vttablet: rpc error: code = InvalidArgument desc = Unknown table 'vt_test_0.Emu' (errno 1051) (sqlstate 42S02) (CallerID: userData1): Sql: "drop table Emu", BindVars: {}
+            target: test.0.primary: vttablet: rpc error: code = InvalidArgument desc = Unknown table 'vt_test_0.Emu' (errno 1051) (sqlstate 42S02) (CallerID: userData1): Sql: "drop table Emu", BindVars: {}
 
             Please check the query number 2 from the migration file.
 
