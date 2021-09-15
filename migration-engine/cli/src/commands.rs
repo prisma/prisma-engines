@@ -33,6 +33,7 @@ impl Cli {
 }
 
 #[derive(Debug, StructOpt)]
+#[allow(clippy::enum_variant_names)] // disagee
 enum CliCommand {
     /// Create an empty database defined in the configuration string.
     CreateDatabase,
