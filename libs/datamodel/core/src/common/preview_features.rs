@@ -69,7 +69,6 @@ features!(
 pub static GENERATOR: Lazy<FeatureMap> = Lazy::new(|| {
     FeatureMap::default()
         .with_active(vec![
-            NApi,
             FilterJson,
             ReferentialIntegrity,
             MongoDb,
@@ -93,6 +92,7 @@ pub static GENERATOR: Lazy<FeatureMap> = Lazy::new(|| {
             OrderByAggregateGroup,
             OrderByRelation,
             ReferentialActions,
+            NApi,
         ])
 });
 
