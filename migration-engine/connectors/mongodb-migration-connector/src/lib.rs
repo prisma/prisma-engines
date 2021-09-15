@@ -17,7 +17,7 @@ use url::Url;
 
 /// The top-level MongoDB migration connector.
 pub struct MongoDbMigrationConnector {
-    client: Client,
+    pub client: Client,
     db_name: String,
 }
 
