@@ -48,7 +48,7 @@ impl<'a> GqlTypeRenderer<'a> {
                     ScalarType::Float => "Float",
                     ScalarType::Decimal => "Decimal",
                     ScalarType::DateTime => "DateTime",
-                    ScalarType::Json => "DateTime",
+                    ScalarType::Json => "Json",
                     ScalarType::UUID => "UUID",
                     ScalarType::JsonList => "Json",
                     ScalarType::Xml => "Xml",
