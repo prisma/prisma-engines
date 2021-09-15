@@ -93,7 +93,7 @@ use diagnostics::Diagnostics;
 use enumflags2::BitFlags;
 use transform::{
     ast_to_dml::{DatasourceLoader, GeneratorLoader, ValidationPipeline},
-    dml_to_ast::{DatasourceSerializer, GeneratorSerializer, LowerDmlToAst},
+    dml_to_ast::{self, GeneratorSerializer, LowerDmlToAst},
 };
 
 /// Parse and validate the whole schema
@@ -225,7 +225,7 @@ pub fn render_datamodel_to(
     let datasource = configuration.and_then(|c| c.datasources.first());
 
     let preview_features = configuration
-        .map(|c| c.preview_features().copied().collect())
+        .map(|c| c.preview_features())
         .unwrap_or_else(BitFlags::empty);
 
     let lowered = LowerDmlToAst::new(datasource, preview_features).lower(datamodel);
@@ -262,10 +262,9 @@ fn render_datamodel_and_config_to(
     datamodel: &dml::Datamodel,
     config: &configuration::Configuration,
 ) {
-    let features = config.preview_features().map(Clone::clone).collect();
-    let mut lowered = LowerDmlToAst::new(config.datasources.first(), features).lower(datamodel);
+    let mut lowered = LowerDmlToAst::new(config.datasources.first(), config.preview_features()).lower(datamodel);
 
-    DatasourceSerializer::add_sources_to_ast(config.datasources.as_slice(), &mut lowered);
+    dml_to_ast::add_sources_to_ast(config, &mut lowered);
     GeneratorSerializer::add_generators_to_ast(&config.generators, &mut lowered);
 
     render_schema_ast_to(stream, &lowered, 2);

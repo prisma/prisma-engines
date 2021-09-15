@@ -4,6 +4,7 @@ use crate::{
     diagnostics::{DatamodelError, Diagnostics},
 };
 use datamodel_connector::ReferentialIntegrity;
+use enumflags2::BitFlags;
 
 #[derive(Debug)]
 pub struct Configuration {
@@ -24,17 +25,14 @@ impl Configuration {
         }
     }
 
-    pub fn referential_integrity(&self) -> ReferentialIntegrity {
-        self.datasources
-            .first()
-            .map(|source| source.referential_integrity)
-            .unwrap_or_else(Default::default)
+    pub fn referential_integrity(&self) -> Option<ReferentialIntegrity> {
+        self.datasources.first().map(|source| source.referential_integrity())
     }
 
-    pub fn preview_features(&self) -> impl Iterator<Item = &PreviewFeature> {
+    pub fn preview_features(&self) -> BitFlags<PreviewFeature> {
         self.generators
             .iter()
-            .flat_map(|generator| generator.preview_features.iter())
+            .fold(BitFlags::empty(), |acc, generator| acc | generator.preview_features())
     }
 
     pub fn resolve_datasource_urls_from_env<F>(

@@ -87,6 +87,6 @@ pub struct IntrospectionContext {
 
 impl IntrospectionContext {
     pub fn foreign_keys_enabled(&self) -> bool {
-        self.source.referential_integrity.uses_foreign_keys()
+        self.source.referential_integrity().uses_foreign_keys()
     }
 }

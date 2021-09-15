@@ -23,7 +23,7 @@ impl RunnerInterface for DirectRunner {
         let parsed_datamodel = datamodel::parse_datamodel(&datamodel).unwrap().subject;
         let internal_datamodel = DatamodelConverter::convert(&parsed_datamodel);
         let data_source = config.datasources.first().expect("No valid data source found");
-        let preview_features: Vec<_> = config.preview_features().cloned().collect();
+        let preview_features: Vec<_> = config.preview_features().iter().collect();
         let url = data_source.load_url(|key| env::var(key).ok()).unwrap();
         let (db_name, executor) = executor::load(data_source, &preview_features, &url).await?;
         let internal_data_model = internal_datamodel.build(db_name);

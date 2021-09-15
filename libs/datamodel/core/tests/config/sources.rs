@@ -608,11 +608,7 @@ fn referential_integrity_with_preview_feature_works() {
 
     let config = parse_configuration(schema);
 
-    assert_eq!(
-        config.datasources[0].referential_integrity,
-        ReferentialIntegrity::Prisma
-    );
-    assert_eq!(config.referential_integrity(), ReferentialIntegrity::Prisma);
+    assert_eq!(config.referential_integrity(), Some(ReferentialIntegrity::Prisma));
 }
 
 #[test]
@@ -631,11 +627,7 @@ fn referential_integrity_default() {
 
     let config = parse_configuration(schema);
 
-    assert_eq!(
-        config.datasources[0].referential_integrity,
-        ReferentialIntegrity::ForeignKeys
-    );
-    assert_eq!(config.referential_integrity(), ReferentialIntegrity::ForeignKeys);
+    assert_eq!(config.referential_integrity(), Some(ReferentialIntegrity::ForeignKeys));
 }
 
 fn load_env_var(key: &str) -> Option<String> {

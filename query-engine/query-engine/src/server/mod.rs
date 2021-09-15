@@ -56,7 +56,7 @@ pub async fn listen(opts: PrismaOpt) -> PrismaResult<()> {
 
     let enable_itx = config
         .preview_features()
-        .any(|flag| *flag == PreviewFeature::InteractiveTransactions);
+        .contains(PreviewFeature::InteractiveTransactions);
 
     let datamodel = opts.datamodel()?;
     let cx = PrismaContext::builder(config, datamodel)

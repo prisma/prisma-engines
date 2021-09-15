@@ -101,7 +101,7 @@ impl CliCommand {
             request.build_mode,
             request.enable_raw_queries,
             capabilities,
-            request.config.preview_features().cloned().collect(),
+            request.config.preview_features().iter().collect(),
         ));
 
         let dmmf = dmmf::render_dmmf(&request.datamodel, query_schema);

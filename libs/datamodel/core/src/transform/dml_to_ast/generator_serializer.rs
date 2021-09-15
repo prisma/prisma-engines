@@ -43,7 +43,7 @@ impl GeneratorSerializer {
         }
 
         for (key, value) in &generator.config {
-            arguments.push(ast::Argument::new_string(key, value));
+            arguments.push(ast::Argument::new_string(key, value.to_string()));
         }
 
         ast::GeneratorConfig {
