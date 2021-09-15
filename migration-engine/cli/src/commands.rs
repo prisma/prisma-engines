@@ -31,14 +31,6 @@ impl Cli {
             CliCommand::CreateDatabase => create_database(&self.datasource).await,
             CliCommand::CanConnectToDatabase => connect_to_database(&self.datasource).await,
             CliCommand::DropDatabase => drop_database(&self.datasource).await,
-            CliCommand::QeSetup => {
-                qe_setup(
-                    &self.datasource,
-                    self.qe_test_setup_flags.unwrap_or_else(BitFlags::empty),
-                )
-                .await?;
-                Ok(String::new())
-            }
         }
     }
 }
@@ -51,8 +43,6 @@ enum CliCommand {
     CanConnectToDatabase,
     /// Drop the database.
     DropDatabase,
-    /// Set up the database for connector-test-kit.
-    QeSetup,
 }
 
 fn parse_base64_string(s: &str) -> Result<String, ConnectorError> {
@@ -104,12 +94,6 @@ async fn drop_database(database_str: &str) -> Result<String, ConnectorError> {
     migration_core::drop_database(&datamodel).await?;
 
     Ok("The database was successfully dropped.".to_string())
-}
-
-async fn qe_setup(prisma_schema: &str, flags: BitFlags<QueryEngineFlags>) -> Result<(), ConnectorError> {
-    migration_core::qe_setup::run(prisma_schema, flags).await?;
-
-    Ok(())
 }
 
 fn datasource_from_database_str(database_str: &str) -> Result<String, ConnectorError> {
