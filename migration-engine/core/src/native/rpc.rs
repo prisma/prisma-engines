@@ -12,7 +12,6 @@ const GET_DATABASE_VERSION: &str = "getDatabaseVersion";
 const LIST_MIGRATION_DIRECTORIES: &str = "listMigrationDirectories";
 const MARK_MIGRATION_APPLIED: &str = "markMigrationApplied";
 const MARK_MIGRATION_ROLLED_BACK: &str = "markMigrationRolledBack";
-const PLAN_MIGRATION: &str = "planMigration";
 const RESET: &str = "reset";
 const SCHEMA_PUSH: &str = "schemaPush";
 
@@ -27,7 +26,6 @@ const AVAILABLE_COMMANDS: &[&str] = &[
     LIST_MIGRATION_DIRECTORIES,
     MARK_MIGRATION_APPLIED,
     MARK_MIGRATION_ROLLED_BACK,
-    PLAN_MIGRATION,
     RESET,
     SCHEMA_PUSH,
 ];
@@ -66,7 +64,6 @@ async fn run_command(
         LIST_MIGRATION_DIRECTORIES => render(executor.list_migration_directories(&params.parse()?).await),
         MARK_MIGRATION_APPLIED => render(executor.mark_migration_applied(&params.parse()?).await),
         MARK_MIGRATION_ROLLED_BACK => render(executor.mark_migration_rolled_back(&params.parse()?).await),
-        PLAN_MIGRATION => render(executor.plan_migration().await),
         RESET => render(executor.reset().await),
         SCHEMA_PUSH => render(executor.schema_push(&params.parse()?).await),
         other => unreachable!("Unknown command {}", other),

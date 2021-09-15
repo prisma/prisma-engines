@@ -35,7 +35,7 @@ lazy_static! {
 
 /// Teardown & setup of everything as defined in the passed datamodel.
 pub async fn setup_project(datamodel: &str) -> TestResult<()> {
-    Ok(migration_core::qe_setup::run(datamodel, Default::default()).await?)
+    Ok(migration_core::qe_setup::run(datamodel).await?)
 }
 
 /// Helper method to allow a sync shell function to run the async test blocks.

@@ -48,9 +48,6 @@ pub trait GenericApi: Send + Sync + 'static {
         input: &MarkMigrationRolledBackInput,
     ) -> CoreResult<MarkMigrationRolledBackOutput>;
 
-    /// Prepare to create a migration.
-    async fn plan_migration(&self) -> CoreResult<()>;
-
     /// Reset a database to an empty state (no data, no schema).
     async fn reset(&self) -> CoreResult<()>;
 
@@ -149,10 +146,6 @@ impl<C: MigrationConnector> GenericApi for C {
                 migration_name = input.migration_name.as_str()
             ))
             .await
-    }
-
-    async fn plan_migration(&self) -> CoreResult<()> {
-        unreachable!("PlanMigration command")
     }
 
     async fn reset(&self) -> CoreResult<()> {
