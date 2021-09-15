@@ -59,6 +59,89 @@ async fn relations_are_not_removed(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Vitess), preview_features("referentialIntegrity"))]
+async fn warning_is_given_for_copied_relations(api: &TestApi) -> TestResult {
+    let dml = indoc! {r#"
+        CREATE TABLE `A` (
+            id INT AUTO_INCREMENT PRIMARY KEY
+        );
+
+        CREATE TABLE `B` (
+            id  INT AUTO_INCREMENT PRIMARY KEY,
+            aId INT NOT NULL
+        );
+    "#};
+
+    api.database().raw_cmd(dml).await?;
+
+    let input_dm = indoc! {r#"
+        model A {
+          id Int @id @default(autoincrement())
+          bs B[]
+        }
+
+        model B {
+          id  Int @id @default(autoincrement())
+          aId Int
+          a   A   @relation(fields: [aId], references: [id])
+        }
+    "#};
+
+    let expected = expect![[r#"
+        [
+          {
+            "code": 19,
+            "message": "Relations were copied from the previous data model due to not using foreign keys in the database. If any of the relation columns changed in the database, the relations might not be correct anymore.",
+            "affected": [
+              {
+                "model": "A"
+              },
+              {
+                "model": "B"
+              }
+            ]
+          }
+        ]"#]];
+
+    let warnings: serde_json::Value = serde_json::from_str(&api.re_introspect_warnings(input_dm).await?).unwrap();
+    expected.assert_eq(&serde_json::to_string_pretty(&warnings).unwrap());
+
+    Ok(())
+}
+
+#[test_connector(tags(Vitess), preview_features("referentialIntegrity"))]
+async fn no_warnings_are_given_for_if_no_relations_were_copied(api: &TestApi) -> TestResult {
+    let dml = indoc! {r#"
+        CREATE TABLE `A` (
+            id INT AUTO_INCREMENT PRIMARY KEY
+        );
+
+        CREATE TABLE `B` (
+            id  INT AUTO_INCREMENT PRIMARY KEY,
+            aId INT NOT NULL
+        );
+    "#};
+
+    api.database().raw_cmd(dml).await?;
+
+    let input_dm = indoc! {r#"
+        model A {
+          id Int @id @default(autoincrement())
+        }
+
+        model B {
+          id  Int @id @default(autoincrement())
+          aId Int
+        }
+    "#};
+
+    let expected = expect![["[]"]];
+    let warnings: serde_json::Value = serde_json::from_str(&api.re_introspect_warnings(input_dm).await?).unwrap();
+    expected.assert_eq(&serde_json::to_string_pretty(&warnings).unwrap());
+
+    Ok(())
+}
+
+#[test_connector(tags(Vitess), preview_features("referentialIntegrity"))]
 async fn relations_field_order_is_kept(api: &TestApi) -> TestResult {
     let dml = indoc! {r#"
         CREATE TABLE `A` (

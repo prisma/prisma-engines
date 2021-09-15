@@ -4,14 +4,14 @@ use datamodel::{Datamodel, DefaultValue, Field, FieldType, Ignorable, ValueGener
 use introspection_connector::{IntrospectionContext, Warning};
 use prisma_value::PrismaValue;
 use std::cmp::Ordering::{self, Equal, Greater, Less};
-use std::collections::HashMap;
+use std::collections::{BTreeSet, HashMap};
 
 pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, ctx: &IntrospectionContext) -> Vec<Warning> {
     let mut warnings = vec![];
 
     // Keep @relation attributes even if the database doesn't use foreign keys
     if !ctx.foreign_keys_enabled() {
-        merge_relation_fields(old_data_model, new_data_model);
+        merge_relation_fields(old_data_model, new_data_model, &mut warnings);
     }
 
     //@@map on models
@@ -599,7 +599,9 @@ fn re_order_putting_new_ones_last(enum_a_idx: Option<usize>, enum_b_idx: Option<
 // Copies `@relation` attributes from the data model to the introspected
 // version. Needed, when the database does not support foreign key constraints,
 // but we still want to keep them in the PSL.
-fn merge_relation_fields(old_data_model: &Datamodel, new_data_model: &mut Datamodel) {
+fn merge_relation_fields(old_data_model: &Datamodel, new_data_model: &mut Datamodel, warnings: &mut Vec<Warning>) {
+    let mut changed_models = BTreeSet::new();
+
     for old_model in old_data_model.models() {
         let modifications = new_data_model
             .models()
@@ -632,6 +634,7 @@ fn merge_relation_fields(old_data_model: &Datamodel, new_data_model: &mut Datamo
             let new_model = new_data_model.find_model_mut(&model_name);
 
             for field in fields.into_iter() {
+                changed_models.insert(new_model.name().to_string());
                 new_model.add_field(field);
             }
 
@@ -639,5 +642,10 @@ fn merge_relation_fields(old_data_model: &Datamodel, new_data_model: &mut Datamo
                 .fields
                 .sort_by_cached_key(|field| *ordering.get(field.name()).unwrap_or(&usize::MAX));
         }
+    }
+
+    if !changed_models.is_empty() {
+        let affected: Vec<_> = changed_models.into_iter().map(|model| Model { model }).collect();
+        warnings.push(warning_relations_added_from_the_previous_data_model(&affected));
     }
 }
