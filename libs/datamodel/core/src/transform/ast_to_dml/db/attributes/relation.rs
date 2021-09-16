@@ -1,8 +1,13 @@
 use crate::{
     ast,
     diagnostics::DatamodelError,
-    transform::ast_to_dml::db::{context::Context, types::RelationField},
+    transform::ast_to_dml::db::{
+        context::Context,
+        types::RelationField,
+        walkers::{ModelWalker, RelationFieldWalker},
+    },
 };
+use datamodel_connector::ReferentialIntegrity;
 use dml::relation_info::ReferentialAction;
 use itertools::Itertools;
 
@@ -47,17 +52,11 @@ pub(super) fn validate_relation_field_arity(
 /// This is temporary to the point until Query Engine supports `onUpdate`
 /// actions on emulations.
 pub(super) fn validate_on_update_without_foreign_keys(
-    model_id: ast::ModelId,
-    field_id: ast::FieldId,
+    field: RelationFieldWalker<'_, '_>,
     relation_field: &RelationField<'_>,
-    ctx: &mut Context<'_>,
+    referential_integrity: ReferentialIntegrity,
+    errors: &mut Vec<DatamodelError>,
 ) {
-    let referential_integrity = ctx
-        .db
-        .datasource()
-        .map(|ds| ds.referential_integrity())
-        .unwrap_or_default();
-
     if referential_integrity.uses_foreign_keys() {
         return;
     }
@@ -67,14 +66,13 @@ pub(super) fn validate_on_update_without_foreign_keys(
         .map(|act| act != ReferentialAction::NoAction)
         .unwrap_or(false)
     {
-        let ast_model = &ctx.db.ast[model_id];
-        let ast_field = &ast_model[field_id];
+        let ast_field = field.ast_field();
 
         let span = ast_field
             .span_for_argument("relation", "onUpdate")
             .unwrap_or(ast_field.span);
 
-        ctx.push_error(DatamodelError::new_validation_error(
+        errors.push(DatamodelError::new_validation_error(
             "Referential actions other than `NoAction` will not work for `onUpdate` without foreign keys. Please follow the issue: https://github.com/prisma/prisma/issues/9014",
             span
         ));
@@ -83,17 +81,15 @@ pub(super) fn validate_on_update_without_foreign_keys(
 
 /// Validates if the related model for the relation is ignored.
 pub(super) fn validate_ignored_related_model(
-    model_id: ast::ModelId,
-    field_id: ast::FieldId,
+    model: ModelWalker<'_, '_>,
+    related_model: ModelWalker<'_, '_>,
     relation_field: &RelationField<'_>,
-    ctx: &mut Context<'_>,
+    field_id: ast::FieldId,
+    errors: &mut Vec<DatamodelError>,
 ) {
-    let model = ctx.db.walk_model(model_id);
-    let related_model = ctx.db.walk_model(relation_field.referenced_model);
-
     if related_model.attributes().is_ignored && !relation_field.is_ignored && !model.attributes().is_ignored {
-        let ast_model = &ctx.db.ast[model_id];
-        let ast_related_model = &ctx.db.ast[relation_field.referenced_model];
+        let ast_model = model.ast_model();
+        let ast_related_model = related_model.ast_model();
         let ast_field = &ast_model[field_id];
 
         let message = format!(
@@ -101,7 +97,7 @@ pub(super) fn validate_ignored_related_model(
             ast_field.name(), ast_model.name(), ast_related_model.name()
         );
 
-        ctx.push_error(DatamodelError::new_attribute_validation_error(
+        errors.push(DatamodelError::new_attribute_validation_error(
             &message,
             "ignore",
             ast_field.span,

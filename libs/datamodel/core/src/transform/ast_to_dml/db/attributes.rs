@@ -146,17 +146,25 @@ pub(super) fn validate_index_names(ctx: &mut Context<'_>) {
 }
 
 pub(super) fn validate_relation_attributes(ctx: &mut Context<'_>) {
-    for (model_id, ast_model) in ctx.db.ast.iter_models() {
-        for (field_id, _) in ast_model.iter_fields() {
-            if let Some(relation_field) = ctx.db.types.take_relation_field(model_id, field_id) {
-                relation::validate_ignored_related_model(model_id, field_id, &relation_field, ctx);
+    let mut errors: Vec<DatamodelError> = Vec::new();
 
-                ctx.db
-                    .types
-                    .relation_fields
-                    .insert((model_id, field_id), relation_field);
-            }
-        }
+    let referential_integrity = ctx
+        .db
+        .datasource()
+        .map(|ds| ds.referential_integrity())
+        .unwrap_or_default();
+
+    for ((model_id, field_id), relation_field) in ctx.db.types.relation_fields.iter() {
+        let model = ctx.db.walk_model(*model_id);
+        let field = model.walk_relation_field(*field_id);
+        let related_model = ctx.db.walk_model(relation_field.referenced_model);
+
+        relation::validate_ignored_related_model(model, related_model, &relation_field, *field_id, &mut errors);
+        relation::validate_on_update_without_foreign_keys(field, &relation_field, referential_integrity, &mut errors);
+    }
+
+    for error in errors.into_iter() {
+        ctx.push_error(error);
     }
 }
 
@@ -758,8 +766,6 @@ fn visit_relation<'ast>(
             Err(err) => ctx.push_error(err),
         }
     }
-
-    relation::validate_on_update_without_foreign_keys(model_id, field_id, relation_field, ctx);
 
     let fk_name = {
         let ast_model = &ctx.db.ast[model_id];
