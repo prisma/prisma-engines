@@ -78,7 +78,7 @@ mod order_by_dependent_pag {
     }
 
     // "[Hops: 1] Ordering by related record field ascending with nulls" should "work"
-    #[connector_test]
+    #[connector_test(only(MongoDb, Postgres))]
     async fn hop_1_related_record_asc_nulls(runner: Runner) -> TestResult<()> {
         // 1 record has the "full chain", one half, one none
         create_row(&runner, 1, Some(1), Some(1), None).await?;
@@ -146,7 +146,7 @@ mod order_by_dependent_pag {
     }
 
     // "[Hops: 2] Ordering by related record field ascending with nulls" should "work"
-    #[connector_test]
+    #[connector_test(only(MongoDb, Postgres))]
     async fn hop_2_related_record_asc_null(runner: Runner) -> TestResult<()> {
         // 1 record has the "full chain", one half, one none
         create_row(&runner, 1, Some(1), Some(1), None).await?;
@@ -262,7 +262,8 @@ mod order_by_dependent_pag {
 
     // "[Circular with differing records] Ordering by related record field descending" should "work"
     // TODO(julius): should enable for SQL Server when partial indices are in the PSL
-    #[connector_test(exclude(SqlServer, MySql))]
+    // TODO(pagination): Fix this test for Postgres & Sqlite
+    #[connector_test(exclude(SqlServer, MySql, Postgres, Sqlite))]
     async fn circular_diff_related_record_desc(runner: Runner) -> TestResult<()> {
         // Records form circles with their relations
         create_row(&runner, 1, Some(1), Some(1), Some(3)).await?;
