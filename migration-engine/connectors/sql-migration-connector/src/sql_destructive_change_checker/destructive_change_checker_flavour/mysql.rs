@@ -52,7 +52,8 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
             return;
         }
 
-        let datamodel_connector = SqlDatamodelConnectors::mysql(false);
+        let datamodel_connector = SqlDatamodelConnectors::mysql(Default::default());
+
         let previous_type = match &columns.previous().column_type().native_type {
             Some(tpe) => datamodel_connector.render_native_type(tpe.clone()),
             _ => format!("{:?}", columns.previous().column_type_family()),

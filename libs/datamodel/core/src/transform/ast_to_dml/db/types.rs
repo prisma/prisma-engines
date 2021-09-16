@@ -1,10 +1,8 @@
-use super::{attributes, context::Context};
-use crate::ast::TypeDefinition;
+use super::context::Context;
 use crate::{ast, diagnostics::DatamodelError};
 use itertools::Itertools;
 use once_cell::sync::Lazy;
 use regex::Regex;
-use std::borrow::Cow;
 use std::{
     collections::{BTreeMap, HashMap},
     str::FromStr,
@@ -13,10 +11,9 @@ use std::{
 pub(super) fn resolve_types(ctx: &mut Context<'_>) {
     for (top_id, top) in ctx.db.ast.iter_tops() {
         match (top_id, top) {
-            (ast::TopId::Alias(alias_id), ast::Top::Alias(alias)) => visit_alias(alias_id, alias, ctx),
+            (ast::TopId::Alias(alias_id), ast::Top::Type(type_alias)) => visit_type_alias(alias_id, type_alias, ctx),
             (ast::TopId::Model(model_id), ast::Top::Model(model)) => visit_model(model_id, model, ctx),
-            (ast::TopId::Type(type_id), ast::Top::Type(type_def)) => visit_type(type_id, type_def, ctx),
-            (ast::TopId::Enum(enum_id), ast::Top::Enum(enm)) => visit_enum(enum_id, enm, ctx),
+            (ast::TopId::Enum(_), ast::Top::Enum(enm)) => visit_enum(enm, ctx),
             (_, ast::Top::Source(_)) | (_, ast::Top::Generator(_)) => (),
             _ => unreachable!(),
         }
@@ -27,21 +24,16 @@ pub(super) fn resolve_types(ctx: &mut Context<'_>) {
 
 #[derive(Debug, Default)]
 pub(super) struct Types<'ast> {
-    pub(super) aliases: HashMap<ast::AliasId, ScalarFieldType>,
+    pub(super) type_aliases: HashMap<ast::AliasId, ScalarFieldType>,
     pub(super) scalar_fields: BTreeMap<(ast::ModelId, ast::FieldId), ScalarField<'ast>>,
-    pub(super) models: HashMap<ast::ModelId, ModelData<'ast>>,
-    pub(super) type_defintions: HashMap<ast::TypeId, TypeDefinition>,
     /// This contains only the relation fields actually present in the schema
     /// source text.
     pub(super) relation_fields: BTreeMap<(ast::ModelId, ast::FieldId), RelationField<'ast>>,
-    pub(super) enums: HashMap<ast::EnumId, EnumData<'ast>>,
+    pub(super) enum_attributes: HashMap<ast::EnumId, EnumAttributes<'ast>>,
+    pub(super) model_attributes: HashMap<ast::ModelId, ModelAttributes<'ast>>,
 }
 
 impl<'ast> Types<'ast> {
-    pub(super) fn take_model_data(&mut self, model_id: &ast::ModelId) -> Option<ModelData<'ast>> {
-        self.models.remove(model_id)
-    }
-
     pub(super) fn take_scalar_field(
         &mut self,
         model_id: ast::ModelId,
@@ -69,7 +61,6 @@ enum FieldType {
 pub(crate) enum ScalarFieldType {
     Enum(ast::EnumId),
     BuiltInScalar(dml::scalars::ScalarType),
-    ComplexType(ast::TypeId),
     Alias(ast::AliasId),
     Unsupported,
 }
@@ -104,8 +95,8 @@ pub(crate) struct RelationField<'ast> {
     /// The name _explicitly present_ in the AST.
     pub(crate) name: Option<&'ast str>,
     pub(crate) is_ignored: bool,
-    /// The fk_name _explicitly present_ in the AST by using the map argument or the one being generated as default.
-    pub(crate) fk_name: Option<Cow<'ast, str>>,
+    /// The fk_name _explicitly present_ in the AST through the map argument.
+    pub(crate) fk_name: Option<&'ast str>,
 }
 
 impl RelationField<'_> {
@@ -125,18 +116,18 @@ impl RelationField<'_> {
 
 /// Information gathered from validating attributes on a model.
 #[derive(Default, Debug)]
-pub(crate) struct ModelData<'ast> {
+pub(crate) struct ModelAttributes<'ast> {
     /// @(@)id
-    pub(crate) primary_key: Option<PrimaryKeyData<'ast>>,
+    pub(super) primary_key: Option<IdAttribute<'ast>>,
     /// @@ignore
     pub(crate) is_ignored: bool,
     /// @@index and @(@)unique.
-    pub(crate) indexes: Vec<(&'ast ast::Attribute, IndexData<'ast>)>,
+    pub(super) indexes: Vec<(&'ast ast::Attribute, IndexAttribute<'ast>)>,
     /// @@map
     pub(crate) mapped_name: Option<&'ast str>,
 }
 
-impl ModelData<'_> {
+impl ModelAttributes<'_> {
     /// Whether the field is the whole primary key. Will match `@id` and `@@id([fieldName])`.
     pub(super) fn field_is_single_pk(&self, field: ast::FieldId) -> bool {
         self.primary_key.as_ref().filter(|pk| pk.fields == [field]).is_some()
@@ -154,37 +145,30 @@ impl ModelData<'_> {
 }
 
 #[derive(Debug, Default)]
-pub(crate) struct IndexData<'ast> {
+pub(crate) struct IndexAttribute<'ast> {
     pub(crate) is_unique: bool,
     pub(crate) fields: Vec<ast::FieldId>,
     pub(crate) source_field: Option<ast::FieldId>,
     pub(crate) name: Option<&'ast str>,
-    pub(crate) db_name: Option<Cow<'ast, str>>,
+    pub(crate) db_name: Option<&'ast str>,
 }
 
 #[derive(Debug, Default)]
-pub(crate) struct PrimaryKeyData<'ast> {
-    pub(crate) fields: Vec<ast::FieldId>,
-    pub(crate) source_field: Option<ast::FieldId>,
-    pub(crate) name: Option<&'ast str>,
-    pub(crate) db_name: Option<Cow<'ast, str>>,
+pub(super) struct IdAttribute<'ast> {
+    pub(super) fields: Vec<ast::FieldId>,
+    pub(super) source_field: Option<ast::FieldId>,
+    pub(super) name: Option<&'ast str>,
+    pub(super) db_name: Option<&'ast str>,
 }
 
 #[derive(Debug, Default)]
-pub(super) struct EnumData<'ast> {
+pub(super) struct EnumAttributes<'ast> {
     pub(super) mapped_name: Option<&'ast str>,
     /// @map on enum values.
     pub(super) mapped_values: HashMap<u32, &'ast str>,
 }
 
 fn visit_model<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::Model, ctx: &mut Context<'ast>) {
-    let model_data = ModelData {
-        // This needs to be looked up first, because we want to skip some field
-        // validations when the model is ignored.
-        is_ignored: ast_model.attributes.iter().any(|attr| attr.name.name == "ignore"),
-        ..Default::default()
-    };
-
     for (field_id, ast_field) in ast_model.iter_fields() {
         match field_type(ast_field, ctx) {
             Ok(FieldType::Model(referenced_model)) => {
@@ -232,76 +216,6 @@ fn visit_model<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::Model, ctx: &
             )),
         }
     }
-
-    ctx.db.types.models.insert(model_id, model_data);
-}
-
-fn visit_type<'ast>(type_id: ast::TypeId, ast_type: &'ast ast::TypeDefinition, ctx: &mut Context<'ast>) {
-    if !ctx.db.active_connector().supports_types() {
-        ctx.push_error(DatamodelError::new_validation_error(
-            &format!("The current connector does not support type declarations.",),
-            ast_type.span,
-        ));
-
-        return;
-    }
-
-    for (field_id, ast_field) in ast_type.iter_fields() {
-        match field_type(ast_field, ctx) {
-            Ok(FieldType::Model(referenced_model)) => {
-                ctx.push_error(DatamodelError::new_field_validation_error(
-                    &format!(
-                        "Field `{}` in type `{}` is a relation field. Types can't have relation fields.",
-                        &ast_field.name.name, &ast_type.name.name
-                    ),
-                    &ast_type.name.name,
-                    &ast_field.name.name,
-                    ast_field.span,
-                ));
-            }
-            Ok(FieldType::Scalar(scalar_field_type)) => {
-                let field_data = ScalarField {
-                    r#type: scalar_field_type,
-                    is_ignored: false,
-                    is_updated_at: false,
-                    default: None,
-                    mapped_name: None,
-                    native_type: None,
-                };
-
-                if matches!(scalar_field_type, ScalarFieldType::BuiltInScalar(t) if t.is_json())
-                    && !ctx.db.active_connector().supports_json()
-                {
-                    ctx.push_error(DatamodelError::new_field_validation_error(
-                        &format!("Field `{}` in type `{}` can't be of type Json. The current connector does not support the Json type.", &ast_field.name.name, &ast_type.name.name),
-                        &ast_type.name.name,
-                        &ast_field.name.name,
-                        ast_field.span,
-                    ));
-                }
-
-                if ast_field.arity.is_list() && !ctx.db.active_connector().supports_scalar_lists() {
-                    ctx.push_error(DatamodelError::new_scalar_list_fields_are_not_supported(
-                        &ast_type.name.name,
-                        &ast_field.name.name,
-                        ast_field.span,
-                    ));
-                }
-
-                if matches!(scalar_field_type, ScalarFieldType::Unsupported) {
-                    validate_unsupported_field_type(ast_field, ast_field.field_type.as_unsupported().unwrap().0, ctx);
-                }
-
-                ctx.db.types.scalar_fields.insert((type_id, field_id), field_data);
-            }
-            Err(supported) => ctx.push_error(DatamodelError::new_type_not_found_error(
-                supported,
-                ast_field.field_type.span(),
-            )),
-        }
-    }
-
-    ctx.db.types.types.insert(model_id, model_data);
 }
 
 /// Detect self-referencing type aliases, possibly indirectly. We loop
@@ -366,9 +280,7 @@ fn detect_alias_cycles(ctx: &mut Context<'_>) {
     }
 }
 
-fn visit_enum<'ast>(enum_id: ast::EnumId, enm: &'ast ast::Enum, ctx: &mut Context<'ast>) {
-    let mut enum_data = EnumData::default();
-
+fn visit_enum<'ast>(enm: &'ast ast::Enum, ctx: &mut Context<'ast>) {
     if !ctx.db.active_connector().supports_enums() {
         ctx.push_error(DatamodelError::new_validation_error(
             &format!(
@@ -385,34 +297,9 @@ fn visit_enum<'ast>(enum_id: ast::EnumId, enm: &'ast ast::Enum, ctx: &mut Contex
             enm.span,
         ))
     }
-
-    for (field_idx, field) in enm.values.iter().enumerate() {
-        ctx.visit_attributes(&field.attributes, |attributes, ctx| {
-            // @map
-            attributes.visit_optional_single("map", ctx, |map_args, ctx| {
-                if let Some(mapped_name) = attributes::visit_map_attribute(map_args, ctx) {
-                    enum_data.mapped_values.insert(field_idx as u32, mapped_name);
-                    ctx.mapped_enum_value_names
-                        .insert((enum_id, mapped_name), field_idx as u32);
-                }
-            })
-        });
-    }
-
-    ctx.visit_attributes(&enm.attributes, |attributes, ctx| {
-        // @@map
-        attributes.visit_optional_single("map", ctx, |map_args, ctx| {
-            if let Some(mapped_name) = attributes::visit_map_attribute(map_args, ctx) {
-                enum_data.mapped_name = Some(mapped_name);
-                ctx.mapped_enum_names.insert(mapped_name, enum_id);
-            }
-        })
-    });
-
-    ctx.db.types.enums.insert(enum_id, enum_data);
 }
 
-fn visit_alias<'ast>(alias_id: ast::AliasId, alias: &'ast ast::Field, ctx: &mut Context<'ast>) {
+fn visit_type_alias<'ast>(alias_id: ast::AliasId, alias: &'ast ast::Field, ctx: &mut Context<'ast>) {
     match field_type(alias, ctx) {
         Ok(FieldType::Scalar(scalar_field_type)) => {
             ctx.db.types.type_aliases.insert(alias_id, scalar_field_type);

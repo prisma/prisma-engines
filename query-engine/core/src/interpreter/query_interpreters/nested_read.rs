@@ -51,7 +51,7 @@ pub async fn m2m(
     // - there is no additional filter
     // - there is no aggregation selection
     // - the selection set is the child_link_id
-    let scalars =
+    let mut scalars =
         if query.args.do_nothing() && query.aggregation_selections.is_empty() && child_link_id == query.selected_fields
         {
             ManyRecords::from_projection(child_ids, &query.selected_fields).with_unique_records()
@@ -72,9 +72,6 @@ pub async fn m2m(
             )
             .await?
         };
-
-    let (mut scalars, aggregation_rows) =
-        read::extract_aggregation_rows_from_scalars(scalars.clone(), query.aggregation_selections.clone());
 
     // Child id to parent ids
     let mut id_map: HashMap<RecordProjection, Vec<RecordProjection>> = HashMap::new();
@@ -124,7 +121,11 @@ pub async fn m2m(
         }
     }
 
-    Ok((processor.apply(scalars), aggregation_rows))
+    let scalars = processor.apply(scalars);
+    let (scalars, aggregation_rows) =
+        read::extract_aggregation_rows_from_scalars(scalars, query.aggregation_selections.clone());
+
+    Ok((scalars, aggregation_rows))
 }
 
 // [DTODO] This is implemented in an inefficient fashion, e.g. too much Arc cloning going on.
@@ -200,7 +201,7 @@ pub async fn one2m(
     // - there is no additional filter
     // - there is no aggregation selection
     // - the selection set is the child_link_id
-    let scalars = if query_args.do_nothing() && aggr_selections.is_empty() && &child_link_id == selected_fields {
+    let mut scalars = if query_args.do_nothing() && aggr_selections.is_empty() && &child_link_id == selected_fields {
         ManyRecords::from_projection(uniq_projections, selected_fields).with_unique_records()
     } else {
         let filter = child_link_id.is_in(uniq_projections);
@@ -213,8 +214,6 @@ pub async fn one2m(
         tx.get_many_records(&parent_field.related_model(), args, selected_fields, &aggr_selections)
             .await?
     };
-
-    let (mut scalars, aggregation_rows) = read::extract_aggregation_rows_from_scalars(scalars.clone(), aggr_selections);
 
     // Inlining is done on the parent, this means that we need to write the primary parent ID
     // into the child records that we retrieved. The matching is done based on the parent link values.
@@ -262,5 +261,8 @@ pub async fn one2m(
         );
     }
 
-    Ok((processor.apply(scalars), aggregation_rows))
+    let scalars = processor.apply(scalars);
+    let (scalars, aggregation_rows) = read::extract_aggregation_rows_from_scalars(scalars, aggr_selections);
+
+    Ok((scalars, aggregation_rows))
 }

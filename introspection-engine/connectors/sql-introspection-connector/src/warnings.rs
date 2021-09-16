@@ -236,3 +236,11 @@ pub fn warning_enriched_with_custom_primary_key_names(affected: &[Model]) -> War
         affected: serde_json::to_value(&affected).unwrap(),
     }
 }
+
+pub fn warning_relations_added_from_the_previous_data_model(affected: &[Model]) -> Warning {
+    Warning {
+        code: 19,
+        message: "Relations were copied from the previous data model due to not using foreign keys in the database. If any of the relation columns changed in the database, the relations might not be correct anymore.".into(),
+        affected: serde_json::to_value(affected).unwrap(),
+    }
+}

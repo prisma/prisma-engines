@@ -48,18 +48,22 @@ pub trait GenericApi: Send + Sync + 'static {
         input: &MarkMigrationRolledBackInput,
     ) -> CoreResult<MarkMigrationRolledBackOutput>;
 
-    /// Prepare to create a migration.
-    async fn plan_migration(&self) -> CoreResult<()>;
-
     /// Reset a database to an empty state (no data, no schema).
     async fn reset(&self) -> CoreResult<()>;
 
     /// The command behind `prisma db push`.
     async fn schema_push(&self, input: &SchemaPushInput) -> CoreResult<SchemaPushOutput>;
+
+    /// Access to the migration connector.
+    fn connector(&self) -> &dyn MigrationConnector;
 }
 
 #[async_trait::async_trait]
 impl<C: MigrationConnector> GenericApi for C {
+    fn connector(&self) -> &dyn MigrationConnector {
+        self
+    }
+
     async fn version(&self) -> CoreResult<String> {
         Ok(self.version().await?)
     }
@@ -142,10 +146,6 @@ impl<C: MigrationConnector> GenericApi for C {
                 migration_name = input.migration_name.as_str()
             ))
             .await
-    }
-
-    async fn plan_migration(&self) -> CoreResult<()> {
-        unreachable!("PlanMigration command")
     }
 
     async fn reset(&self) -> CoreResult<()> {

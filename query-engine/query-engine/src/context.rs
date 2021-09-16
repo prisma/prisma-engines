@@ -58,7 +58,7 @@ impl PrismaContext {
         let url = data_source.load_url(|key| env::var(key).ok())?;
 
         // Load executor
-        let preview_features: Vec<_> = config.preview_features().cloned().collect();
+        let preview_features: Vec<_> = config.preview_features().iter().collect();
         let (db_name, executor) = executor::load(&data_source, &preview_features, &url).await?;
 
         // Build internal data model

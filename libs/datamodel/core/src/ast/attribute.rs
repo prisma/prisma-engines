@@ -1,4 +1,4 @@
-use super::*;
+use super::{Argument, Identifier, Span, WithIdentifier, WithSpan};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Attribute {

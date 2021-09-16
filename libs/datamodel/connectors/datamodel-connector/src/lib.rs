@@ -2,8 +2,10 @@ pub mod connector_error;
 pub mod helper;
 
 mod empty_connector;
+mod referential_integrity;
 
 pub use empty_connector::EmptyDatamodelConnector;
+pub use referential_integrity::ReferentialIntegrity;
 
 use crate::connector_error::{ConnectorError, ConnectorErrorFactory, ErrorKind};
 use dml::{

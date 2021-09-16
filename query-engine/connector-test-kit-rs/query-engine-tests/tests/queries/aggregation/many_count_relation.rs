@@ -410,6 +410,23 @@ mod many_count_rel {
         Ok(())
     }
 
+    // Regression test for: https://github.com/prisma/prisma/issues/8861
+    #[connector_test]
+    async fn count_one2m_dup_child_id(runner: Runner) -> TestResult<()> {
+        create_row(
+            &runner,
+            r#"{ id: 1, title: "hello", comments: { create: [{ id: 1 }, { id: 2 }] } }"#,
+        )
+        .await?;
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{ findManyComment { post { id _count { comments } } } }"#),
+          @r###"{"data":{"findManyComment":[{"post":{"id":1,"_count":{"comments":2}}},{"post":{"id":1,"_count":{"comments":2}}}]}}"###
+        );
+
+        Ok(())
+    }
+
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
             .query(format!("mutation {{ createOnePost(data: {}) {{ id }} }}", data))

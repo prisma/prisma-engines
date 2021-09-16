@@ -52,7 +52,7 @@ pub fn dmmf(ctx: CallContext) -> napi::Result<JsString> {
         BuildMode::Modern,
         true,
         capabilities,
-        config.subject.preview_features().cloned().collect(),
+        config.subject.preview_features().iter().collect(),
     ));
 
     let dmmf = dmmf::render_dmmf(&datamodel.subject, query_schema);

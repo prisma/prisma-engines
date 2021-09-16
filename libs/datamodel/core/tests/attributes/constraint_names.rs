@@ -188,7 +188,7 @@ fn constraint_names() {
     "#]];
 
     let datamodel = parse(input);
-    let preview_features = parse_configuration(input).preview_features().copied().collect();
+    let preview_features = parse_configuration(input).preview_features();
     let mut rendered = String::new();
 
     render_datamodel_to_with_preview_flags(

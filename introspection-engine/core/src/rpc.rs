@@ -66,7 +66,7 @@ impl RpcImpl {
         let config = datamodel::parse_configuration(schema)
             .map_err(|diagnostics| Error::DatamodelError(diagnostics.to_pretty_string("schema.prisma", schema)))?;
 
-        let preview_features = config.subject.preview_features().map(Clone::clone).collect();
+        let preview_features = config.subject.preview_features();
 
         let connection_string = config
             .subject
@@ -107,7 +107,7 @@ impl RpcImpl {
         let (config2, _, _) = RpcImpl::load_connector(&schema).await?;
 
         let ctx = IntrospectionContext {
-            preview_features: config2.preview_features().map(Clone::clone).collect(),
+            preview_features: config2.preview_features(),
             source: config2.datasources.into_iter().next().unwrap(),
         };
 

@@ -380,7 +380,7 @@ fn changing_a_column_from_optional_to_required_is_unexecutable(api: TestApi) {
     }
 }
 
-#[test_connector]
+#[test_connector(exclude(Vitess))]
 fn dropping_a_table_referenced_by_foreign_keys_must_work(api: TestApi) {
     use quaint::ast::*;
 
@@ -787,7 +787,7 @@ fn set_default_current_timestamp_on_existing_column_works(api: TestApi) {
     });
 }
 
-#[test_connector]
+#[test_connector(preview_features("referentialIntegrity"))]
 fn primary_key_migrations_do_not_cause_data_loss(api: TestApi) {
     let dm1 = r#"
         model Dog {

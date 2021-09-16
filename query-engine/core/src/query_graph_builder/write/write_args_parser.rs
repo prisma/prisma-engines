@@ -41,7 +41,7 @@ impl WriteArgsParser {
                     Field::Scalar(sf) => {
                         let expr: WriteExpression = match v {
                             ParsedInputValue::Single(PrismaValue::Enum(e))
-                                if &sf.type_identifier == &TypeIdentifier::Json =>
+                                if sf.type_identifier == TypeIdentifier::Json =>
                             {
                                 let val = match e.as_str() {
                                     json_null::DB_NULL => PrismaValue::Null,

@@ -4,8 +4,14 @@ mod diagnose_migration_history;
 
 use anyhow::Context;
 use colored::Colorize;
-use migration_core::commands::SchemaPushInput;
-use std::{fs::File, io::Read};
+use migration_connector::{DestructiveChangeDiagnostics, DiffTarget};
+use migration_core::commands::{ApplyMigrationsInput, CreateMigrationInput, SchemaPushInput};
+use std::{
+    fmt,
+    fs::File,
+    io::{self, Read},
+    str::FromStr,
+};
 use structopt::*;
 
 #[derive(Debug, StructOpt)]
@@ -20,12 +26,22 @@ enum Command {
         #[structopt(long = "file-path")]
         file_path: Option<String>,
     },
-    /// Generate DMMF from a schema, or directly from a database URl.
+    /// Generate DMMF from a schema, or directly from a database URL.
     Dmmf(DmmfCommand),
-    /// Push a prisma schema directly to the database, without interacting with migrations.
+    /// Push a prisma schema directly to the database.
     SchemaPush(SchemaPush),
     /// DiagnoseMigrationHistory wrapper
     DiagnoseMigrationHistory(DiagnoseMigrationHistory),
+    /// Output the difference between the data model and the database.
+    MigrateDiff(MigrateDiff),
+    /// Validate the given data model.
+    ValidateDatamodel(ValidateDatamodel),
+    /// Clear the data and DDL of the given database.
+    ResetDatabase(ResetDatabase),
+    /// Create a new migration to the given directory.
+    CreateMigration(CreateMigration),
+    /// Apply all unapplied migrations from the given directory.
+    ApplyMigrations(ApplyMigrations),
 }
 
 #[derive(Debug, StructOpt)]
@@ -57,6 +73,89 @@ struct DiagnoseMigrationHistory {
     migrations_directory_path: String,
 }
 
+#[derive(Debug, Clone, Copy)]
+enum DiffOutputType {
+    Summary,
+    Ddl,
+}
+
+impl Default for DiffOutputType {
+    fn default() -> Self {
+        Self::Summary
+    }
+}
+
+impl FromStr for DiffOutputType {
+    type Err = std::io::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "summary" => Ok(Self::Summary),
+            "ddl" => Ok(Self::Ddl),
+            _ => {
+                let kind = std::io::ErrorKind::InvalidInput;
+                Err(std::io::Error::new(kind, format!("Invalid output type: `{}`", s)))
+            }
+        }
+    }
+}
+
+impl fmt::Display for DiffOutputType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            DiffOutputType::Summary => write!(f, "summary"),
+            DiffOutputType::Ddl => write!(f, "ddl"),
+        }
+    }
+}
+
+#[derive(StructOpt, Debug)]
+struct MigrateDiff {
+    /// Path to the prisma data model.
+    schema_path: String,
+    /// `summary` for list of changes, `ddl` for database statements.
+    #[structopt(default_value, long = "output-type", short = "t")]
+    output_type: DiffOutputType,
+}
+
+#[derive(StructOpt, Debug)]
+struct ValidateDatamodel {
+    /// Path to the prisma data model.
+    schema_path: String,
+}
+
+#[derive(StructOpt, Debug)]
+struct ResetDatabase {
+    /// Path to the prisma data model.
+    schema_path: String,
+}
+
+#[derive(StructOpt, Debug)]
+struct CreateMigration {
+    /// The filesystem path of the migrations directory to use
+    migrations_path: String,
+    /// The current prisma schema to use as a target for the generated migration
+    schema_path: String,
+    /// The user-given name for the migration.
+    name: String,
+}
+
+#[derive(StructOpt, Debug)]
+struct ApplyMigrations {
+    /// The location of the migrations directory.
+    migrations_directory_path: String,
+    /// The current prisma schema to use as a target for the generated migration
+    schema_path: String,
+}
+
+impl From<ApplyMigrations> for ApplyMigrationsInput {
+    fn from(am: ApplyMigrations) -> Self {
+        Self {
+            migrations_directory_path: am.migrations_directory_path,
+        }
+    }
+}
+
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     init_logger();
@@ -65,6 +164,7 @@ async fn main() -> anyhow::Result<()> {
         Command::DiagnoseMigrationHistory(cmd) => cmd.execute().await?,
         Command::Dmmf(cmd) => generate_dmmf(&cmd).await?,
         Command::SchemaPush(cmd) => schema_push(&cmd).await?,
+        Command::MigrateDiff(cmd) => migrate_diff(&cmd).await?,
         Command::Introspect { url, file_path } => {
             if url.as_ref().xor(file_path.as_ref()).is_none() {
                 anyhow::bail!(
@@ -87,6 +187,45 @@ async fn main() -> anyhow::Result<()> {
                 .map_err(|err| anyhow::anyhow!("{:?}", err.data))?;
 
             println!("{}", introspected);
+        }
+        Command::ValidateDatamodel(cmd) => {
+            use std::io::{self, Read as _};
+
+            let mut file = std::fs::File::open(&cmd.schema_path).expect("error opening datamodel file");
+
+            let mut datamodel = String::new();
+            file.read_to_string(&mut datamodel).unwrap();
+
+            datamodel::parse_schema(&datamodel)
+                .map_err(|diagnostics| io::Error::new(io::ErrorKind::InvalidInput, diagnostics))?;
+        }
+        Command::ResetDatabase(cmd) => {
+            let schema = read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
+            let api = migration_core::migration_api(&schema).await?;
+
+            api.reset().await?;
+        }
+        Command::CreateMigration(cmd) => {
+            let prisma_schema =
+                read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
+
+            let api = migration_core::migration_api(&prisma_schema).await?;
+
+            let input = CreateMigrationInput {
+                migrations_directory_path: cmd.migrations_path,
+                prisma_schema,
+                migration_name: cmd.name,
+                draft: true,
+            };
+
+            api.create_migration(&input).await?;
+        }
+        Command::ApplyMigrations(cmd) => {
+            let prisma_schema =
+                read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
+
+            let api = migration_core::migration_api(&prisma_schema).await?;
+            api.apply_migrations(&cmd.into()).await?;
         }
     }
 
@@ -221,6 +360,42 @@ async fn schema_push(cmd: &SchemaPush) -> anyhow::Result<()> {
             "The schema was not pushed. Pass the --force flag to ignore warnings."
         );
         std::process::exit(1);
+    }
+
+    Ok(())
+}
+
+async fn migrate_diff(cmd: &MigrateDiff) -> anyhow::Result<()> {
+    let datamodel = read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
+    let api = migration_core::migration_api(&datamodel).await?;
+
+    let (configuration, datamodel) = datamodel::parse_schema(&datamodel)
+        .map_err(|diagnostics| io::Error::new(io::ErrorKind::InvalidInput, diagnostics))?;
+
+    let migration = api
+        .connector()
+        .diff(
+            DiffTarget::Database,
+            DiffTarget::Datamodel((&configuration, &datamodel)),
+        )
+        .await?;
+
+    match cmd.output_type {
+        DiffOutputType::Summary => {
+            let summary = api.connector().migration_summary(&migration);
+
+            if !summary.is_empty() {
+                println!("{}", summary);
+            }
+        }
+        DiffOutputType::Ddl => {
+            let applier = api.connector().database_migration_step_applier();
+            let ddl = applier.render_script(&migration, &DestructiveChangeDiagnostics::default());
+
+            if !ddl.is_empty() {
+                println!("{}", ddl);
+            }
+        }
     }
 
     Ok(())

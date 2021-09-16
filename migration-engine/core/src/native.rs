@@ -125,7 +125,7 @@ fn parse_configuration(datamodel: &str) -> CoreResult<(Datasource, String, BitFl
         .load_shadow_database_url()
         .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))?;
 
-    let preview_features = config.preview_features().map(Clone::clone).collect();
+    let preview_features = config.preview_features();
 
     let source = config
         .datasources

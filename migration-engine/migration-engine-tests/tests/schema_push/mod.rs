@@ -15,7 +15,7 @@ model Box {
 }
 "#;
 
-#[test_connector]
+#[test_connector(preview_features("referentialIntegrity"))]
 fn schema_push_happy_path(api: TestApi) {
     api.schema_push_w_datasource(SCHEMA)
         .send()
@@ -61,7 +61,7 @@ fn schema_push_happy_path(api: TestApi) {
         });
 }
 
-#[test_connector]
+#[test_connector(preview_features("referentialIntegrity"))]
 fn schema_push_warns_about_destructive_changes(api: TestApi) {
     api.schema_push_w_datasource(SCHEMA)
         .send()
@@ -96,7 +96,7 @@ fn schema_push_warns_about_destructive_changes(api: TestApi) {
         .assert_has_executed_steps();
 }
 
-#[test_connector]
+#[test_connector(preview_features("referentialIntegrity"))]
 fn schema_push_with_an_unexecutable_migration_returns_a_message_and_aborts(api: TestApi) {
     api.schema_push_w_datasource(SCHEMA)
         .send()
@@ -160,7 +160,7 @@ fn multi_column_indexes_and_unique_constraints_on_the_same_fields_do_not_collide
     api.schema_push_w_datasource(dm).send().assert_green();
 }
 
-#[test_connector]
+#[test_connector(exclude(Vitess))]
 fn alter_constraint_name_push(api: TestApi) {
     let plain_dm = r#"
          model A {

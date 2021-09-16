@@ -1,3 +1,5 @@
+mod vitess;
+
 use migration_engine_tests::test_api::*;
 use sql_schema_describer::{ColumnTypeFamily, DefaultKind};
 
@@ -49,7 +51,7 @@ fn adding_multiple_optional_fields_to_an_existing_model_works(api: TestApi) {
     });
 }
 
-#[test_connector]
+#[test_connector(preview_features("referentialIntegrity"))]
 fn a_model_can_be_removed(api: TestApi) {
     let directory = api.create_migrations_directory();
 
@@ -284,7 +286,7 @@ fn updating_db_name_of_a_scalar_field_must_work(api: TestApi) {
     });
 }
 
-#[test_connector]
+#[test_connector(exclude(Vitess))]
 fn reordering_and_altering_models_at_the_same_time_works(api: TestApi) {
     let dm1 = r#"
         model A {

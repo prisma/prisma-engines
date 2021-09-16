@@ -42,6 +42,13 @@ pub trait ConnectorTagInterface {
 
     /// Must return `true` if the connector family is versioned (e.g. Postgres9, Postgres10, ...), false otherwise.
     fn is_versioned(&self) -> bool;
+
+    /// Defines where relational constraints are handled:
+    ///   - "prisma" is handled in the Query Engine core
+    ///   - "foreignKeys" lets the database handle them
+    fn referential_integrity(&self) -> &'static str {
+        "foreignKeys"
+    }
 }
 
 #[enum_dispatch(ConnectorTagInterface)]
