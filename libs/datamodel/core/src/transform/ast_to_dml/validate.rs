@@ -659,6 +659,7 @@ impl<'a> Validator<'a> {
 
                     errors.push_error(DatamodelError::new_field_validation_error(
                         &message,
+                        "model",
                         &model.name,
                         &field.name,
                         field_span,
@@ -694,6 +695,7 @@ impl<'a> Validator<'a> {
 
                 errors.push_error(DatamodelError::new_field_validation_error(
                     &message,
+                    "model",
                     &model.name,
                     &field.name,
                     field_span,

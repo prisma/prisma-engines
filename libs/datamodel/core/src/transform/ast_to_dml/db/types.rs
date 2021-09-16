@@ -11,8 +11,9 @@ use std::{
 pub(super) fn resolve_types(ctx: &mut Context<'_>) {
     for (top_id, top) in ctx.db.ast.iter_tops() {
         match (top_id, top) {
-            (ast::TopId::Alias(alias_id), ast::Top::Type(type_alias)) => visit_type_alias(alias_id, type_alias, ctx),
+            (ast::TopId::Alias(alias_id), ast::Top::Alias(alias)) => visit_alias(alias_id, alias, ctx),
             (ast::TopId::Model(model_id), ast::Top::Model(model)) => visit_model(model_id, model, ctx),
+            (ast::TopId::Type(_type_id), ast::Top::Type(_type_def)) => todo!(),
             (ast::TopId::Enum(_), ast::Top::Enum(enm)) => visit_enum(enm, ctx),
             (_, ast::Top::Source(_)) | (_, ast::Top::Generator(_)) => (),
             _ => unreachable!(),
@@ -190,6 +191,7 @@ fn visit_model<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::Model, ctx: &
                 {
                     ctx.push_error(DatamodelError::new_field_validation_error(
                         &format!("Field `{}` in model `{}` can't be of type Json. The current connector does not support the Json type.", &ast_field.name.name, &ast_model.name.name),
+                        "model",
                         &ast_model.name.name,
                         &ast_field.name.name,
                         ast_field.span,
@@ -299,7 +301,7 @@ fn visit_enum<'ast>(enm: &'ast ast::Enum, ctx: &mut Context<'ast>) {
     }
 }
 
-fn visit_type_alias<'ast>(alias_id: ast::AliasId, alias: &'ast ast::Field, ctx: &mut Context<'ast>) {
+fn visit_alias<'ast>(alias_id: ast::AliasId, alias: &'ast ast::Field, ctx: &mut Context<'ast>) {
     match field_type(alias, ctx) {
         Ok(FieldType::Scalar(scalar_field_type)) => {
             ctx.db.types.type_aliases.insert(alias_id, scalar_field_type);

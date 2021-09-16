@@ -62,6 +62,7 @@ pub(super) fn scalar_field<'ast>(
         .is_some()
     {
         ctx.push_error(DatamodelError::new_duplicate_field_error(
+            "model",
             ast_model.name(),
             &ast_field.name.name,
             ast_field.span,
@@ -74,6 +75,7 @@ pub(super) fn scalar_field<'ast>(
             return;
         }
         ctx.push_error(DatamodelError::new_duplicate_field_error(
+            "model",
             &ast_model.name.name,
             &ast_field.name.name,
             ast_field.span,

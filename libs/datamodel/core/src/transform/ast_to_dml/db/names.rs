@@ -74,6 +74,7 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
                         .is_some()
                     {
                         ctx.push_error(DatamodelError::new_duplicate_field_error(
+                            "model",
                             &model.name.name,
                             &field.name.name,
                             field.identifier().span,
