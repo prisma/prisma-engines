@@ -97,7 +97,7 @@ impl<'ast> ParserDatabase<'ast> {
         // Fourth step: global validations
         attributes::validate_index_names(&mut ctx);
         attributes::fill_in_default_constraint_names(&mut ctx);
-        attributes::validate_relation_attributes(&mut ctx);
+        attributes::validate_relations(&mut ctx);
 
         ctx.finish()
     }

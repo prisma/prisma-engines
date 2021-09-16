@@ -145,7 +145,7 @@ pub(super) fn validate_index_names(ctx: &mut Context<'_>) {
     errors.into_iter().for_each(|err| ctx.push_error(err))
 }
 
-pub(super) fn validate_relation_attributes(ctx: &mut Context<'_>) {
+pub(super) fn validate_relations(ctx: &mut Context<'_>) {
     let mut errors: Vec<DatamodelError> = Vec::new();
 
     let referential_integrity = ctx
