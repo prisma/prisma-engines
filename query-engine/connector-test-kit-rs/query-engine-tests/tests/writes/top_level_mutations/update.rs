@@ -353,7 +353,7 @@ mod update {
     }
 
     // "An updateOne mutation" should "correctly apply all number operations for Float"
-    #[connector_test(schema(schema_6))]
+    #[connector_test(schema(schema_6), exclude(MongoDb))]
     async fn update_apply_number_ops_for_float(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1 }"#).await?;
         create_row(&runner, r#"{ id: 2, optFloat: 5.5}"#).await?;
