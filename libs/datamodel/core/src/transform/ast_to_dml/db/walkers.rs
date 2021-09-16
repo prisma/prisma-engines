@@ -2,7 +2,10 @@ use super::{
     types::{IdAttribute, ModelAttributes, RelationField},
     ParserDatabase,
 };
-use crate::{ast, common::constraint_names::ConstraintNames};
+use crate::{
+    ast::{self, FieldId, Model},
+    common::constraint_names::ConstraintNames,
+};
 use std::borrow::Cow;
 
 impl<'ast> ParserDatabase<'ast> {
@@ -24,6 +27,7 @@ impl<'ast> ParserDatabase<'ast> {
     }
 }
 
+#[derive(Copy, Clone)]
 pub(crate) struct ModelWalker<'ast, 'db> {
     pub(super) model_id: ast::ModelId,
     pub(super) db: &'db ParserDatabase<'ast>,
@@ -31,6 +35,10 @@ pub(crate) struct ModelWalker<'ast, 'db> {
 }
 
 impl<'ast, 'db> ModelWalker<'ast, 'db> {
+    pub(crate) fn ast_model(&self) -> &'db Model {
+        &self.db.ast[self.model_id]
+    }
+
     pub(crate) fn attributes(&self) -> &'db ModelAttributes<'ast> {
         self.model_attributes
     }
@@ -87,8 +95,18 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
                 relation_field,
             })
     }
+
+    pub(crate) fn walk_relation_field(&self, field_id: FieldId) -> RelationFieldWalker<'ast, 'db> {
+        RelationFieldWalker {
+            model_id: self.model_id,
+            field_id,
+            db: self.db,
+            relation_field: &self.db.types.relation_fields[&(self.model_id, field_id)],
+        }
+    }
 }
 
+#[derive(Copy, Clone)]
 pub(crate) struct IndexWalker<'ast, 'db> {
     model_id: ast::ModelId,
     index: &'ast ast::Attribute,
@@ -122,6 +140,7 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
     }
 }
 
+#[derive(Copy, Clone)]
 pub(crate) struct RelationFieldWalker<'ast, 'db> {
     model_id: ast::ModelId,
     field_id: ast::FieldId,
@@ -158,6 +177,7 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
     }
 }
 
+#[derive(Copy, Clone)]
 pub(crate) struct PrimaryKeyWalker<'ast, 'db> {
     model_id: ast::ModelId,
     attribute: &'db IdAttribute<'ast>,
