@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schema), exclude(MongoDb))]
+#[test_suite(schema(schema))]
 mod many_count_rel {
     use indoc::indoc;
     use query_engine_tests::run_query;
@@ -126,7 +126,7 @@ mod many_count_rel {
               title    String
               user     User      @relation(fields: [userId], references: [id])
               userId   Int
-              #m2m(comments, Comment[], Int)
+              comments Comment[]
               #m2m(tags, Tag[], Int)
             }
 
@@ -218,7 +218,7 @@ mod many_count_rel {
     fn m_n_self_rel() -> String {
         let schema = indoc! {
             r#"model User {
-              #id(id, Int, @id, @default(autoincrement()))
+              #id(id, Int, @id)
               name String
               #m2m(followers, User[], Int, followers)
               #m2m(following, User[], Int, followers)
@@ -234,13 +234,14 @@ mod many_count_rel {
         run_query!(
             runner,
             r#"mutation {
-          createOneUser(data: {
-            name: "Alice"
-            followers: { create: { name: "Bob"}},
-            following: { create: { name: "Justin"}},
-          }) {
-            id
-          }
+                createOneUser(data: {
+                  id: 1,
+                  name: "Alice"
+                  followers: { create: { id: 2, name: "Bob"}},
+                  following: { create: { id: 3, name: "Justin"}},
+              }) {
+               id
+            }
         }"#
         );
 
@@ -290,14 +291,14 @@ mod many_count_rel {
     fn schema_inmemory_process() -> String {
         let schema = indoc! {
             r#"model Post {
-              #id(id, Int, @id, @default(autoincrement()))
+              #id(id, Int, @id)
               comments  Comment[]
               createdAt DateTime  @default(now())
               updatedAt DateTime  @updatedAt
             }
             
             model Comment {
-              #id(id, Int, @id, @default(autoincrement()))
+              #id(id, Int, @id)
               post      Post     @relation(fields: [postId], references: [id])
               postId    Int
               createdAt DateTime @default(now())
@@ -312,10 +313,14 @@ mod many_count_rel {
     // Ensures aggregation rows are properly extracted even when in-memory processing is applied to the records
     #[connector_test(schema(schema_inmemory_process))]
     async fn works_with_inmemory_args_processing(runner: Runner) -> TestResult<()> {
-        create_row(&runner, r#"{ comments: { create: [{}, {}] } }"#).await?;
-        create_row(&runner, r#"{ comments: { create: [{}, {}, {}, {}] } }"#).await?;
-        create_row(&runner, r#"{}"#).await?;
-        create_row(&runner, r#"{}"#).await?;
+        create_row(&runner, r#"{ id: 1, comments: { create: [{id: 1}, {id: 2}] } }"#).await?;
+        create_row(
+            &runner,
+            r#"{ id: 2, comments: { create: [{id: 3}, {id: 4}, {id: 5}, {id: 6}] } }"#,
+        )
+        .await?;
+        create_row(&runner, r#"{ id: 3 }"#).await?;
+        create_row(&runner, r#"{ id: 4 }"#).await?;
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"query { findManyPost(
@@ -375,8 +380,8 @@ mod many_count_rel {
     }
 
     // Regression test for: https://github.com/prisma/prisma/issues/7299
-    #[connector_test(schema(schema_one2m_multi_fks))]
-    async fn count_one2m_multi_fks(runner: Runner) -> TestResult<()> {
+    #[connector_test(schema(schema_one2m_multi_fks), capabilities(CompoundIds))]
+    async fn count_one2m_compound_ids(runner: Runner) -> TestResult<()> {
         run_query!(
             runner,
             r#"mutation {
