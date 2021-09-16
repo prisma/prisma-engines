@@ -90,16 +90,6 @@ impl SqlMigrationConnector {
     }
 
     /// Made public for tests.
-    pub fn connection_info(&self) -> ConnectionInfo {
-        self.connection.connection_info()
-    }
-
-    /// Made public for tests.
-    pub fn schema_name(&self) -> &str {
-        self.connection.schema_name()
-    }
-
-    /// Made public for tests.
     pub async fn describe_schema(&self) -> ConnectorResult<SqlSchema> {
         self.flavour.describe_schema(&self.connection).await
     }

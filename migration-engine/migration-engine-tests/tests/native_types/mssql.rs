@@ -1915,7 +1915,7 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
 
             api.schema_push_w_datasource(dm1).send().assert_green();
 
-            let insert = Insert::single_into((api.schema_name(), "A")).value("x", seed.clone());
+            let insert = Insert::single_into((api.schema_name(), "A".to_owned())).value("x", seed.clone());
             api.query(insert.into());
 
             api.assert_schema().assert_table("A", |table| {
@@ -1973,7 +1973,7 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
 
             api.schema_push_w_datasource(dm1).send().assert_green();
 
-            let insert = Insert::single_into((api.schema_name(), "A")).value("x", seed.clone());
+            let insert = Insert::single_into((api.schema_name(), "A".to_owned())).value("x", seed.clone());
             api.query(insert.into());
 
             api.assert_schema().assert_table("A", |table| {
@@ -2042,7 +2042,7 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
 
             api.schema_push_w_datasource(dm1).send().assert_green();
 
-            let insert = Insert::single_into((api.schema_name(), "A")).value("x", seed.clone());
+            let insert = Insert::single_into((api.schema_name(), "A".to_owned())).value("x", seed.clone());
             api.query(insert.into());
 
             api.assert_schema().assert_table("A", |table| {

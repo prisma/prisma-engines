@@ -293,7 +293,7 @@ fn a_column_recreation_with_non_castable_type_change_should_trigger_warnings(api
     "#;
 
     api.schema_push_w_datasource(dm1).send().assert_green();
-    let insert = quaint::ast::Insert::single_into((api.schema_name(), "Blog"))
+    let insert = quaint::ast::Insert::single_into((api.schema_name(), "Blog".to_owned()))
         .value("id", 1)
         .value("float", Value::double(7.5));
 
