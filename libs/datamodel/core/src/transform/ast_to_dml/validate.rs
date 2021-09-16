@@ -450,17 +450,6 @@ impl<'a> Validator<'a> {
             if let Some((_rel_field_idx, related_field)) = datamodel.find_related_field(field) {
                 let related_field_rel_info = &related_field.relation_info;
 
-                if related_model.is_ignored && !field.is_ignored && !model.is_ignored {
-                    let message = format!(
-                        "The relation field `{}` on Model `{}` must specify the `@ignore` attribute, because the model {} it is pointing to is marked ignored.",
-                        &field.name, &model.name, &related_model.name
-                    );
-
-                    errors.push_error(DatamodelError::new_attribute_validation_error(
-                        &message, "ignore", field_span,
-                    ));
-                }
-
                 // ONE TO MANY
                 if field.is_singular() && related_field.is_list() {
                     if rel_info.fields.is_empty() {

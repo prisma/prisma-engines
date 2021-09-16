@@ -31,6 +31,11 @@ impl Field {
             .map(|a| a.span)
             .next()
     }
+
+    /// The name of the field
+    pub fn name(&self) -> &str {
+        &self.name.name
+    }
 }
 
 impl WithIdentifier for Field {

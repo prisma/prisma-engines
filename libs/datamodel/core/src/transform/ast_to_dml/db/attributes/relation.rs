@@ -80,3 +80,31 @@ pub(super) fn validate_on_update_without_foreign_keys(
         ));
     }
 }
+
+/// Validates if the related model for the relation is ignored.
+pub(super) fn validate_ignored_related_model(
+    model_id: ast::ModelId,
+    field_id: ast::FieldId,
+    relation_field: &RelationField<'_>,
+    ctx: &mut Context<'_>,
+) {
+    let model = ctx.db.walk_model(model_id);
+    let related_model = ctx.db.walk_model(relation_field.referenced_model);
+
+    if related_model.attributes().is_ignored && !relation_field.is_ignored && !model.attributes().is_ignored {
+        let ast_model = &ctx.db.ast[model_id];
+        let ast_related_model = &ctx.db.ast[relation_field.referenced_model];
+        let ast_field = &ast_model[field_id];
+
+        let message = format!(
+            "The relation field `{}` on Model `{}` must specify the `@ignore` attribute, because the model {} it is pointing to is marked ignored.",
+            ast_field.name(), ast_model.name(), ast_related_model.name()
+        );
+
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            &message,
+            "ignore",
+            ast_field.span,
+        ));
+    }
+}

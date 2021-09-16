@@ -145,6 +145,21 @@ pub(super) fn validate_index_names(ctx: &mut Context<'_>) {
     errors.into_iter().for_each(|err| ctx.push_error(err))
 }
 
+pub(super) fn validate_relation_attributes(ctx: &mut Context<'_>) {
+    for (model_id, ast_model) in ctx.db.ast.iter_models() {
+        for (field_id, _) in ast_model.iter_fields() {
+            if let Some(relation_field) = ctx.db.types.take_relation_field(model_id, field_id) {
+                relation::validate_ignored_related_model(model_id, field_id, &relation_field, ctx);
+
+                ctx.db
+                    .types
+                    .relation_fields
+                    .insert((model_id, field_id), relation_field);
+            }
+        }
+    }
+}
+
 fn visit_scalar_field_attributes<'ast>(
     model_id: ast::ModelId,
     field_id: ast::FieldId,
@@ -156,8 +171,8 @@ fn visit_scalar_field_attributes<'ast>(
 ) {
     ctx.visit_scalar_field_attributes(model_id, field_id, scalar_field_data.r#type, |attributes, ctx| {
         // @map
-         attributes.visit_optional_single("map", ctx, |map_args, ctx| {
-             map::scalar_field(ast_model, ast_field, model_id, field_id, scalar_field_data, map_args, ctx)
+        attributes.visit_optional_single("map", ctx, |map_args, ctx| {
+            map::scalar_field(ast_model, ast_field, model_id, field_id, scalar_field_data, map_args, ctx)
         });
 
         // @ignore
@@ -179,25 +194,25 @@ fn visit_scalar_field_attributes<'ast>(
             id::field(ast_model, field_id, model_attributes, args, ctx)
         });
 
-         // @updatedAt
-         attributes.visit_optional_single("updatedAt", ctx, |args, ctx| {
-             if !matches!(scalar_field_data.r#type, ScalarFieldType::BuiltInScalar(tpe) if tpe.is_datetime()) {
-                 ctx.push_error(args.new_attribute_validation_error(
+        // @updatedAt
+        attributes.visit_optional_single("updatedAt", ctx, |args, ctx| {
+            if !matches!(scalar_field_data.r#type, ScalarFieldType::BuiltInScalar(tpe) if tpe.is_datetime()) {
+                ctx.push_error(args.new_attribute_validation_error(
                     "Fields that are marked with @updatedAt must be of type DateTime." ));
 
-             }
+            }
 
-             if ast_field.arity.is_list() {
-                 ctx.push_error(args.new_attribute_validation_error("Fields that are marked with @updatedAt cannot be lists."));
-             }
+            if ast_field.arity.is_list() {
+                ctx.push_error(args.new_attribute_validation_error("Fields that are marked with @updatedAt cannot be lists."));
+            }
 
-             scalar_field_data.is_updated_at = true;
-         });
+            scalar_field_data.is_updated_at = true;
+        });
 
-         // @default
-         attributes.visit_optional_single("default", ctx, |args, ctx| {
+        // @default
+        attributes.visit_optional_single("default", ctx, |args, ctx| {
             visit_field_default(args, scalar_field_data, model_id, field_id, ctx);
-         });
+        });
 
         if let ScalarFieldType::BuiltInScalar(scalar_type) = scalar_field_data.r#type {
             // native type attributes
@@ -206,20 +221,20 @@ fn visit_scalar_field_attributes<'ast>(
             });
         }
 
-         // @unique
-         attributes.visit_optional_single("unique", ctx, |args, ctx| {
-             let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
-                 Some(Ok("")) => {
-                     ctx.push_error(args.new_attribute_validation_error("The `map` argument cannot be an empty string."));
-                     None
-                 },
-                 Some(Ok(name)) => Some(name),
-                 Some(Err(err)) => {
-                     ctx.push_error(err); None
-                 },
-                 None => None,
-             };
-             validate_db_name(ast_model, args, db_name, "@unique", ctx);
+        // @unique
+        attributes.visit_optional_single("unique", ctx, |args, ctx| {
+            let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
+                Some(Ok("")) => {
+                    ctx.push_error(args.new_attribute_validation_error("The `map` argument cannot be an empty string."));
+                    None
+                },
+                Some(Ok(name)) => Some(name),
+                Some(Err(err)) => {
+                    ctx.push_error(err); None
+                },
+                None => None,
+            };
+            validate_db_name(ast_model, args, db_name, "@unique", ctx);
 
 
             model_attributes.indexes.push((args.attribute(), IndexAttribute {
@@ -319,10 +334,10 @@ fn visit_relation_field_attributes<'ast>(
             let suggestion = match suggested_fields.len() {
                 0 => String::new(),
                 1 =>
-                format!(
-                    " Did you mean to put it on `{field}`?",
-                    field = suggested_fields[0],
-                ),
+                    format!(
+                        " Did you mean to put it on `{field}`?",
+                        field = suggested_fields[0],
+                    ),
                 _ => {
                     format!(" Did you mean to provide `@@unique([{}])`?", field = suggested_fields.join(", "))
                 }
