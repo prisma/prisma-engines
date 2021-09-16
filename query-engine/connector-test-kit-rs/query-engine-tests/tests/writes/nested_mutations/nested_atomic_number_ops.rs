@@ -110,7 +110,6 @@ mod atomic_number_ops {
     }
 
     //"An updateOne mutation with number operations on the top and updates on the child (inl. parent)" should "handle id changes correctly"
-    // TODO(dom): Not working for mongo
     #[connector_test(schema(schema_2), capabilities(UpdateableId))]
     async fn update_number_ops_on_parent(runner: Runner) -> TestResult<()> {
         run_query!(
