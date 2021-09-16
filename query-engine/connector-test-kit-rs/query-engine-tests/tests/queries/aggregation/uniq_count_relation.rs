@@ -126,7 +126,7 @@ mod uniq_count_rel {
             title    String
             user     User      @relation(fields: [userId], references: [id])
             userId   Int
-            #m2m(comments, Comment[], Int)
+            comments Comment[]
             #m2m(tags, Tag[], Int)
           }
 

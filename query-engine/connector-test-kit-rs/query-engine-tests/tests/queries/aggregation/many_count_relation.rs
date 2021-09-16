@@ -30,7 +30,7 @@ mod many_count_rel {
     }
 
     // "Counting with no records in the database" should "return 0"
-    #[connector_test] // TODO(dom): Not working on mongo
+    #[connector_test]
     async fn no_rel_records(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, title: "a" }"#).await?;
 
@@ -47,7 +47,7 @@ mod many_count_rel {
     }
 
     //"Counting one2m and m2m records" should "work"
-    #[connector_test] // TODO(dom): Not working on mongo
+    #[connector_test]
     async fn count_one2m_m2m(runner: Runner) -> TestResult<()> {
         // 1 comment / 2 categories
         create_row(
@@ -85,7 +85,7 @@ mod many_count_rel {
     }
 
     // "Counting with some records and filters" should "not affect the count"
-    #[connector_test] // TODO(dom): Not working on mongo
+    #[connector_test]
     async fn count_with_filters(runner: Runner) -> TestResult<()> {
         // 4 comment / 4 categories
         create_row(
@@ -150,7 +150,6 @@ mod many_count_rel {
     }
 
     // Counting nested one2m and m2m should work
-    // TODO(dom): Not working on mongo
     #[connector_test(schema(schema_nested))]
     async fn nested_count_one2m_m2m(runner: Runner) -> TestResult<()> {
         run_query!(
