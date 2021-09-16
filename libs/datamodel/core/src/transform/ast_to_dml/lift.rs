@@ -1,8 +1,4 @@
-use crate::{
-    ast::{self, WithName},
-    dml,
-    transform::ast_to_dml::db,
-};
+use crate::{ast, dml, transform::ast_to_dml::db};
 use std::collections::HashMap;
 
 /// Helper for lifting a datamodel.

@@ -1,6 +1,6 @@
 use super::{resolve_field_array, FieldResolutionError};
 use crate::{
-    ast::{self, WithName},
+    ast,
     common::constraint_names::ConstraintNames,
     diagnostics::DatamodelError,
     transform::ast_to_dml::db::{

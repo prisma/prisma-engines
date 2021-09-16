@@ -6,6 +6,7 @@ use crate::{ast, common::constraint_names::ConstraintNames};
 use std::borrow::Cow;
 
 impl<'ast> ParserDatabase<'ast> {
+    #[track_caller]
     pub(crate) fn walk_model(&self, model_id: ast::ModelId) -> ModelWalker<'ast, '_> {
         ModelWalker {
             model_id,
