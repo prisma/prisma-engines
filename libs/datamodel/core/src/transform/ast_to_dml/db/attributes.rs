@@ -159,6 +159,7 @@ pub(super) fn validate_relation_attributes(ctx: &mut Context<'_>) {
         let field = model.walk_relation_field(*field_id);
         let related_model = ctx.db.walk_model(relation_field.referenced_model);
 
+        relation::validate_relation_field_arity(model, field, relation_field, &mut errors);
         relation::validate_ignored_related_model(model, related_model, &relation_field, *field_id, &mut errors);
         relation::validate_on_update_without_foreign_keys(field, &relation_field, referential_integrity, &mut errors);
     }
@@ -702,8 +703,6 @@ fn visit_relation<'ast>(
 
         relation_field.fields = Some(fields);
     }
-
-    relation::validate_relation_field_arity(model_id, field_id, relation_field, ctx);
 
     if let Some(references) = args.optional_arg("references") {
         let references = match resolve_field_array(&references, args.span(), relation_field.referenced_model, ctx) {
