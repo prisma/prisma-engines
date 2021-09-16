@@ -1,6 +1,6 @@
 //! The migration connector ConnectorError type.
 
-use crate::{migrations_directory::ReadMigrationScriptError, ListMigrationsError};
+use crate::migrations_directory::{ListMigrationsError, ReadMigrationScriptError};
 use std::{
     error::Error as StdError,
     fmt::{Debug, Display, Write},
@@ -14,6 +14,10 @@ use user_facing_errors::{
 /// The general error reporting type for migration connectors.
 #[derive(Clone)]
 pub struct ConnectorError(Box<ConnectorErrorImpl>);
+
+/// Shorthand for a [Result](https://doc.rust-lang.org/std/result/enum.Result.html) where the error
+/// variant is a [ConnectorError](/error/enum.ConnectorError.html).
+pub type ConnectorResult<T> = Result<T, ConnectorError>;
 
 #[derive(Debug, Clone)]
 struct ConnectorErrorImpl {
@@ -167,7 +171,9 @@ impl ConnectorError {
 
     /// Construct an UrlParseError.
     pub fn url_parse_error(err: impl Display) -> Self {
-        Self::from_msg(format!("{} in database URL", err))
+        Self::user_facing(user_facing_errors::common::InvalidConnectionString {
+            details: err.to_string(),
+        })
     }
 }
 

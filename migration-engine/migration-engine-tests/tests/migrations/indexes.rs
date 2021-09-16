@@ -1,6 +1,6 @@
-use migration_engine_tests::sync_test_api::*;
+use migration_engine_tests::test_api::*;
 
-#[test_connector]
+#[test_connector(preview_features("referentialIntegrity"))]
 fn index_on_compound_relation_fields_must_work(api: TestApi) {
     let dm = r#"
         model User {
@@ -22,12 +22,12 @@ fn index_on_compound_relation_fields_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
-    api.assert_schema().assert_table_bang("Post", |table| {
+    api.assert_schema().assert_table("Post", |table| {
         table
-            .assert_has_column("authorName")?
-            .assert_has_column("authorEmail")?
+            .assert_has_column("authorName")
+            .assert_has_column("authorEmail")
             .assert_index_on_columns(&["authorEmail", "authorName"], |idx| idx.assert_name("testIndex"))
     });
 }
@@ -40,17 +40,17 @@ fn index_settings_must_be_migrated(api: TestApi) {
             name String
             followersCount Int
 
-            @@index([name, followersCount], name: "nameAndFollowers")
+            @@index([name, followersCount], map: "nameAndFollowers")
         }
     "#;
 
-    api.schema_push(dm).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
-    api.assert_schema().assert_table_bang("Test", |table| {
+    api.assert_schema().assert_table("Test", |table| {
         table
-            .assert_indexes_count(1)?
+            .assert_indexes_count(1)
             .assert_index_on_columns(&["name", "followersCount"], |idx| {
-                idx.assert_is_not_unique()?.assert_name("nameAndFollowers")
+                idx.assert_is_not_unique().assert_name("nameAndFollowers")
             })
     });
 
@@ -60,25 +60,25 @@ fn index_settings_must_be_migrated(api: TestApi) {
             name String
             followersCount Int
 
-            @@unique([name, followersCount], name: "nameAndFollowers")
+            @@unique([name, followersCount], map: "nameAndFollowers")
         }
     "#;
 
-    api.schema_push(dm2)
+    api.schema_push_w_datasource(dm2)
         .force(true)
-        .send_sync()
+        .send()
         .assert_warnings(&["A unique constraint covering the columns `[name,followersCount]` on the table `Test` will be added. If there are existing duplicate values, this will fail.".into()]);
 
-    api.assert_schema().assert_table_bang("Test", |table| {
+    api.assert_schema().assert_table("Test", |table| {
         table
-            .assert_indexes_count(1)?
+            .assert_indexes_count(1)
             .assert_index_on_columns(&["name", "followersCount"], |idx| {
-                idx.assert_is_unique()?.assert_name("nameAndFollowers")
+                idx.assert_is_unique().assert_name("nameAndFollowers")
             })
     });
 }
 
-#[test_connector]
+#[test_connector(preview_features("referentialIntegrity"))]
 fn unique_directive_on_required_one_to_one_relation_creates_one_index(api: TestApi) {
     // We want to test that only one index is created, because of the implicit unique index on
     // required 1:1 relations.
@@ -96,39 +96,38 @@ fn unique_directive_on_required_one_to_one_relation_creates_one_index(api: TestA
         }
     "#;
 
-    api.schema_push(dm).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     api.assert_schema()
-        .assert_table_bang("Cat", |table| table.assert_indexes_count(1));
+        .assert_table("Cat", |table| table.assert_indexes_count(1));
 }
 
-// TODO: Enable SQL Server when cascading rules are in PSL.
-#[test_connector(exclude(Mssql))]
+#[test_connector(exclude(Vitess))]
 fn one_to_many_self_relations_do_not_create_a_unique_index(api: TestApi) {
     let dm = r#"
         model Location {
             id        String      @id @default(cuid())
-            parent    Location?   @relation("LocationToLocation_parent", fields:[parentId], references: [id])
+            parent    Location?   @relation("LocationToLocation_parent", fields:[parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
             parentId  String?     @map("parent")
             children  Location[]  @relation("LocationToLocation_parent")
         }
     "#;
 
-    api.schema_push(dm).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     if api.is_mysql() {
         // MySQL creates an index for the FK.
-        api.assert_schema().assert_table_bang("Location", |t| {
-            t.assert_indexes_count(1)?
+        api.assert_schema().assert_table("Location", |t| {
+            t.assert_indexes_count(1)
                 .assert_index_on_columns(&["parent"], |idx| idx.assert_is_not_unique())
         });
     } else {
         api.assert_schema()
-            .assert_table_bang("Location", |t| t.assert_indexes_count(0));
+            .assert_table("Location", |t| t.assert_indexes_count(0));
     }
 }
 
-#[test_connector]
+#[test_connector(preview_features("referentialIntegrity"))]
 fn model_with_multiple_indexes_works(api: TestApi) {
     let dm = r#"
     model User {
@@ -161,9 +160,9 @@ fn model_with_multiple_indexes_works(api: TestApi) {
     }
     "#;
 
-    api.schema_push(dm).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
     api.assert_schema()
-        .assert_table_bang("Like", |table| table.assert_indexes_count(3));
+        .assert_table("Like", |table| table.assert_indexes_count(3));
 }
 
 #[test_connector]
@@ -178,9 +177,9 @@ fn removing_multi_field_unique_index_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
-    api.assert_schema().assert_table_bang("A", |table| {
+    api.assert_schema().assert_table("A", |table| {
         table.assert_index_on_columns(&["field", "secondField"], |idx| idx.assert_is_unique())
     });
 
@@ -192,10 +191,10 @@ fn removing_multi_field_unique_index_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green();
 
     api.assert_schema()
-        .assert_table_bang("A", |table| table.assert_indexes_count(0));
+        .assert_table("A", |table| table.assert_indexes_count(0));
 }
 
 #[test_connector]
@@ -206,20 +205,20 @@ fn index_renaming_must_work(api: TestApi) {
             field String
             secondField Int
 
-            @@unique([field, secondField], name: "customName")
+            @@unique([field, secondField], map: "customName")
             @@index([secondField, field], name: "customNameNonUnique")
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
-    api.assert_schema().assert_table_bang("A", |table| {
+    api.assert_schema().assert_table("A", |table| {
         table
             .assert_index_on_columns(&["field", "secondField"], |idx| {
-                idx.assert_is_unique()?.assert_name("customName")
-            })?
+                idx.assert_is_unique().assert_name("customName")
+            })
             .assert_index_on_columns(&["secondField", "field"], |idx| {
-                idx.assert_is_not_unique()?.assert_name("customNameNonUnique")
+                idx.assert_is_not_unique().assert_name("customNameNonUnique")
             })
     });
 
@@ -229,21 +228,21 @@ fn index_renaming_must_work(api: TestApi) {
             field String
             secondField Int
 
-            @@unique([field, secondField], name: "customNameA")
-            @@index([secondField, field], name: "customNameNonUniqueA")
+            @@unique([field, secondField], map: "customNameA")
+            @@index([secondField, field], map: "customNameNonUniqueA")
         }
     "#;
 
-    api.schema_push(dm2).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green();
 
-    api.assert_schema().assert_table_bang("A", |table| {
+    api.assert_schema().assert_table("A", |table| {
         table
-            .assert_indexes_count(2)?
+            .assert_indexes_count(2)
             .assert_index_on_columns(&["field", "secondField"], |idx| {
-                idx.assert_is_unique()?.assert_name("customNameA")
-            })?
+                idx.assert_is_unique().assert_name("customNameA")
+            })
             .assert_index_on_columns(&["secondField", "field"], |idx| {
-                idx.assert_is_not_unique()?.assert_name("customNameNonUniqueA")
+                idx.assert_is_not_unique().assert_name("customNameNonUniqueA")
             })
     });
 }
@@ -256,13 +255,15 @@ fn index_renaming_must_work_when_renaming_to_default(api: TestApi) {
             field String
             secondField Int
 
-            @@unique([field, secondField], name: "customName")
+            @@unique([field, secondField], map: "customName")
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
-    api.assert_schema().assert_table_bang("A", |t| {
-        t.assert_index_on_columns(&["field", "secondField"], |idx| idx.assert_is_unique())
+    api.schema_push_w_datasource(dm1).send().assert_green();
+    api.assert_schema().assert_table("A", |t| {
+        t.assert_index_on_columns(&["field", "secondField"], |idx| {
+            idx.assert_is_unique().assert_name("customName")
+        })
     });
 
     let dm2 = r#"
@@ -275,10 +276,10 @@ fn index_renaming_must_work_when_renaming_to_default(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send_sync();
-    api.assert_schema().assert_table_bang("A", |t| {
+    api.schema_push_w_datasource(dm2).send();
+    api.assert_schema().assert_table("A", |t| {
         t.assert_index_on_columns(&["field", "secondField"], |idx| {
-            idx.assert_is_unique()?.assert_name("A.field_secondField_unique")
+            idx.assert_is_unique().assert_name("A_field_secondField_key")
         })
     });
 }
@@ -295,11 +296,11 @@ fn index_renaming_must_work_when_renaming_to_custom(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
-    api.assert_schema().assert_table_bang("A", |table| {
+    api.assert_schema().assert_table("A", |table| {
         table
-            .assert_indexes_count(1)?
+            .assert_indexes_count(1)
             .assert_index_on_columns(&["field", "secondField"], |idx| idx.assert_is_unique())
     });
 
@@ -309,17 +310,17 @@ fn index_renaming_must_work_when_renaming_to_custom(api: TestApi) {
             field String
             secondField Int
 
-            @@unique([field, secondField], name: "somethingCustom")
+            @@unique([field, secondField], map: "somethingCustom")
         }
     "#;
 
-    api.schema_push(dm2).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green();
 
-    api.assert_schema().assert_table_bang("A", |table| {
+    api.assert_schema().assert_table("A", |table| {
         table
-            .assert_indexes_count(1)?
+            .assert_indexes_count(1)
             .assert_index_on_columns(&["field", "secondField"], |idx| {
-                idx.assert_name("somethingCustom")?.assert_is_unique()
+                idx.assert_name("somethingCustom").assert_is_unique()
             })
     });
 }
@@ -336,8 +337,8 @@ fn index_updates_with_rename_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
-    api.assert_schema().assert_table_bang("A", |t| {
+    api.schema_push_w_datasource(dm1).send().assert_green();
+    api.assert_schema().assert_table("A", |t| {
         t.assert_index_on_columns(&["field", "secondField"], |idx| idx.assert_is_unique())
     });
 
@@ -351,10 +352,11 @@ fn index_updates_with_rename_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).force(true).send_sync().assert_executable();
+    api.schema_push_w_datasource(dm2).force(true).send().assert_executable();
 
-    api.assert_schema().assert_table_bang("A", |t| {
-        t.assert_indexes_count(1)?.assert_index_on_columns(&["field", "id"], Ok)
+    api.assert_schema().assert_table("A", |t| {
+        t.assert_indexes_count(1)
+            .assert_index_on_columns(&["field", "id"], |idx| idx)
     });
 }
 
@@ -366,18 +368,18 @@ fn dropping_a_model_with_a_multi_field_unique_index_must_work(api: TestApi) {
             field String
             secondField Int
 
-            @@unique([field, secondField], name: "customName")
+            @@unique([field, secondField], map: "customName")
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
-    api.assert_schema().assert_table_bang("A", |t| {
+    api.schema_push_w_datasource(dm1).send().assert_green();
+    api.assert_schema().assert_table("A", |t| {
         t.assert_index_on_columns(&["field", "secondField"], |idx| {
-            idx.assert_name("customName")?.assert_is_unique()
+            idx.assert_name("customName").assert_is_unique()
         })
     });
 
-    api.schema_push("").send_sync().assert_green_bang();
+    api.schema_push_w_datasource("").send().assert_green();
 }
 
 #[test_connector(tags(Postgres, Mysql))]
@@ -393,32 +395,31 @@ fn indexes_with_an_automatically_truncated_name_are_idempotent(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
-    api.assert_schema()
-        .assert_table_bang("TestModelWithALongName", |table| {
-            table.assert_index_on_columns(
-                &[
-                    "looooooooooooongfield",
-                    "evenLongerFieldNameWth",
-                    "omgWhatEvenIsThatLongFieldName",
-                ],
-                |idx| {
-                    idx.assert_name(if api.is_mysql() {
-                        // The size limit of identifiers is 64 bytes on MySQL
-                        // and 63 on Postgres.
-                        "TestModelWithALongName.looooooooooooongfield_evenLongerFieldName"
-                    } else {
-                        "TestModelWithALongName.looooooooooooongfield_evenLongerFieldNam"
-                    })
-                },
-            )
-        });
+    api.assert_schema().assert_table("TestModelWithALongName", |table| {
+        table.assert_index_on_columns(
+            &[
+                "looooooooooooongfield",
+                "evenLongerFieldNameWth",
+                "omgWhatEvenIsThatLongFieldName",
+            ],
+            |idx| {
+                idx.assert_name(if api.is_mysql() {
+                    // The size limit of identifiers is 64 bytes on MySQL
+                    // and 63 on Postgres.
+                    "TestModelWithALongName_looooooooooooongfield_evenLongerField_idx"
+                } else {
+                    "TestModelWithALongName_looooooooooooongfield_evenLongerFiel_idx"
+                })
+            },
+        )
+    });
 
-    api.schema_push(dm).send_sync().assert_green_bang().assert_no_steps();
+    api.schema_push_w_datasource(dm).send().assert_green().assert_no_steps();
 }
 
-#[test_connector]
+#[test_connector(preview_features("referentialIntegrity"))]
 fn new_index_with_same_name_as_index_from_dropped_table_works(api: TestApi) {
     let dm1 = r#"
         model Cat {
@@ -442,9 +443,9 @@ fn new_index_with_same_name_as_index_from_dropped_table_works(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
-    api.assert_schema().assert_table_bang("Cat", |table| {
+    api.assert_schema().assert_table("Cat", |table| {
         table.assert_column("ownerid", |col| col.assert_is_required())
     });
 
@@ -463,17 +464,15 @@ fn new_index_with_same_name_as_index_from_dropped_table_works(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green();
 
-    api.assert_schema().assert_table_bang("Owner", |table| {
+    api.assert_schema().assert_table("Owner", |table| {
         table.assert_column("ownerid", |col| col.assert_is_required())
     });
 }
 
 #[test_connector]
 fn column_type_migrations_should_not_implicitly_drop_indexes(api: TestApi) {
-    let migrations_directory = api.create_migrations_directory();
-
     let dm1 = r#"
         model Cat {
             id Int @id @default(autoincrement())
@@ -483,7 +482,7 @@ fn column_type_migrations_should_not_implicitly_drop_indexes(api: TestApi) {
         }
     "#;
 
-    api.create_migration("01init", dm1, &migrations_directory).send_sync();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     let dm2 = r#"
         model Cat {
@@ -495,20 +494,15 @@ fn column_type_migrations_should_not_implicitly_drop_indexes(api: TestApi) {
     "#;
 
     // NOTE: we are relying on the fact that we will drop and recreate the column for that particular type migration.
-    api.create_migration("02change", dm2, &migrations_directory).send_sync();
-
-    api.apply_migrations(&migrations_directory).send_sync();
-
-    api.assert_schema().assert_table_bang("Cat", |cat| {
-        cat.assert_indexes_count(1)?
+    api.schema_push_w_datasource(dm2).send().assert_green();
+    api.assert_schema().assert_table("Cat", |cat| {
+        cat.assert_indexes_count(1)
             .assert_index_on_columns(&["name"], |idx| idx.assert_is_not_unique())
     });
 }
 
 #[test_connector]
 fn column_type_migrations_should_not_implicitly_drop_compound_indexes(api: TestApi) {
-    let migrations_directory = api.create_migrations_directory();
-
     let dm1 = r#"
         model Cat {
             id Int @id @default(autoincrement())
@@ -519,7 +513,7 @@ fn column_type_migrations_should_not_implicitly_drop_compound_indexes(api: TestA
         }
     "#;
 
-    api.create_migration("01init", dm1, &migrations_directory).send_sync();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     let dm2 = r#"
         model Cat {
@@ -532,12 +526,10 @@ fn column_type_migrations_should_not_implicitly_drop_compound_indexes(api: TestA
     "#;
 
     // NOTE: we are relying on the fact that we will drop and recreate the column for that particular type migration.
-    api.create_migration("02change", dm2, &migrations_directory).send_sync();
+    api.schema_push_w_datasource(dm2).send().assert_green();
 
-    api.apply_migrations(&migrations_directory).send_sync();
-
-    api.assert_schema().assert_table_bang("Cat", |cat| {
-        cat.assert_indexes_count(1)?
+    api.assert_schema().assert_table("Cat", |cat| {
+        cat.assert_indexes_count(1)
             .assert_index_on_columns(&["name", "age"], |idx| idx.assert_is_not_unique())
     });
 }

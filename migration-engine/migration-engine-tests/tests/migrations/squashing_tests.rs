@@ -1,5 +1,5 @@
 use migration_core::commands::{DiagnoseMigrationHistoryOutput, HistoryDiagnostic};
-use migration_engine_tests::sync_test_api::*;
+use migration_engine_tests::test_api::*;
 use std::io::Write;
 
 #[test_connector]
@@ -8,13 +8,16 @@ fn squashing_whole_migration_history_works(api: TestApi) {
 
     // Create and apply a bunch of migrations
     let _initial_migration_names = {
-        let dm1 = r#"
+        let dm1 = api.datamodel_with_provider(
+            r#"
             model Cat {
                 id Int @id
             }
-        "#;
+        "#,
+        );
 
-        let dm2 = r#"
+        let dm2 = api.datamodel_with_provider(
+            r#"
             model Cat {
                 id Int @id
             }
@@ -22,9 +25,11 @@ fn squashing_whole_migration_history_works(api: TestApi) {
             model Dog {
                 id Int @id
             }
-        "#;
+        "#,
+        );
 
-        let dm3 = r#"
+        let dm3 = api.datamodel_with_provider(
+            r#"
             model Cat {
                 id Int @id
             }
@@ -33,7 +38,8 @@ fn squashing_whole_migration_history_works(api: TestApi) {
                 id Int @id
                 laughterFrequency Float
             }
-        "#;
+        "#,
+        );
 
         let mut initial_migration_names: Vec<String> = Vec::with_capacity(3);
 
@@ -169,7 +175,7 @@ fn squashing_whole_migration_history_works(api: TestApi) {
     assert!(has_migrations_table);
     assert!(error_in_unapplied_migration.is_none());
 
-    api.assert_schema().assert_equals(&initial_schema).unwrap();
+    api.assert_schema().assert_equals(&initial_schema);
 
     // The following does not work because we validate that migrations are failed before marking them as rolled back.
     //
@@ -201,13 +207,16 @@ fn squashing_migrations_history_at_the_start_works(api: TestApi) {
 
     // Create and apply a bunch of migrations
     let _initial_migration_names = {
-        let dm1 = r#"
+        let dm1 = api.datamodel_with_provider(
+            r#"
             model Cat {
                 id Int @id
             }
-        "#;
+        "#,
+        );
 
-        let dm2 = r#"
+        let dm2 = api.datamodel_with_provider(
+            r#"
             model Cat {
                 id Int @id
             }
@@ -215,9 +224,11 @@ fn squashing_migrations_history_at_the_start_works(api: TestApi) {
             model Dog {
                 id Int @id
             }
-        "#;
+        "#,
+        );
 
-        let dm3 = r#"
+        let dm3 = api.datamodel_with_provider(
+            r#"
             model Cat {
                 id Int @id
             }
@@ -226,7 +237,8 @@ fn squashing_migrations_history_at_the_start_works(api: TestApi) {
                 id Int @id
                 laughterFrequency Float
             }
-        "#;
+        "#,
+        );
 
         let mut initial_migration_names: Vec<String> = Vec::with_capacity(3);
 
@@ -250,7 +262,6 @@ fn squashing_migrations_history_at_the_start_works(api: TestApi) {
         .assert_schema()
         .assert_tables_count(3)
         .assert_has_table("Hyena")
-        .unwrap()
         .into_schema();
 
     // Squash the files, mark migration applied, assert the schema is the same.
@@ -345,7 +356,7 @@ fn squashing_migrations_history_at_the_start_works(api: TestApi) {
     assert!(has_migrations_table);
     assert!(error_in_unapplied_migration.is_none());
 
-    api.assert_schema().assert_equals(&initial_schema).unwrap();
+    api.assert_schema().assert_equals(&initial_schema);
 }
 
 #[test_connector]
@@ -354,13 +365,16 @@ fn squashing_migrations_history_at_the_end_works(api: TestApi) {
 
     // Create and apply a bunch of migrations
     let _initial_migration_names = {
-        let dm1 = r#"
+        let dm1 = api.datamodel_with_provider(
+            r#"
             model Cat {
                 id Int @id
             }
-        "#;
+        "#,
+        );
 
-        let dm2 = r#"
+        let dm2 = api.datamodel_with_provider(
+            r#"
             model Cat {
                 id Int @id
             }
@@ -368,9 +382,11 @@ fn squashing_migrations_history_at_the_end_works(api: TestApi) {
             model Dog {
                 id Int @id
             }
-        "#;
+        "#,
+        );
 
-        let dm3 = r#"
+        let dm3 = api.datamodel_with_provider(
+            r#"
             model Cat {
                 id Int @id
             }
@@ -379,7 +395,8 @@ fn squashing_migrations_history_at_the_end_works(api: TestApi) {
                 id Int @id
                 laughterFrequency Float
             }
-        "#;
+        "#,
+        );
 
         let mut initial_migration_names: Vec<String> = Vec::with_capacity(3);
 
@@ -403,7 +420,6 @@ fn squashing_migrations_history_at_the_end_works(api: TestApi) {
         .assert_schema()
         .assert_tables_count(3)
         .assert_has_table("Hyena")
-        .unwrap()
         .into_schema();
 
     // Squash the files, mark migration applied, assert the schema is the same.
@@ -498,5 +514,5 @@ fn squashing_migrations_history_at_the_end_works(api: TestApi) {
     assert!(has_migrations_table);
     assert!(error_in_unapplied_migration.is_none());
 
-    api.assert_schema().assert_equals(&initial_schema).unwrap();
+    api.assert_schema().assert_equals(&initial_schema);
 }

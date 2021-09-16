@@ -1,9 +1,9 @@
-use super::{column::ColumnDiffer, ColumnTypeChange, SqlSchemaDiffer};
-use crate::{
-    pair::Pair,
-    sql_migration::{AlterEnum, AlterTable, CreateIndex, DropIndex, SqlMigrationStep},
+use super::{ColumnTypeChange, SqlSchemaDiffer};
+use crate::{pair::Pair, sql_migration::SqlMigrationStep, sql_schema_differ};
+use sql_schema_describer::{
+    walkers::{ColumnWalker, IndexWalker},
+    ColumnId,
 };
-use sql_schema_describer::walkers::IndexWalker;
 use std::collections::HashSet;
 
 mod mssql;
@@ -13,15 +13,10 @@ mod sqlite;
 
 /// Trait to specialize SQL schema diffing (resulting in migration steps) by SQL backend.
 pub(crate) trait SqlSchemaDifferFlavour {
-    /// Return potential `AlterEnum` steps.
-    fn alter_enums(&self, _differ: &SqlSchemaDiffer<'_>) -> Vec<AlterEnum> {
-        Vec::new()
-    }
-
     /// If this returns `true`, the differ will generate
     /// SqlMigrationStep::RedefineIndex steps instead of
     /// SqlMigrationStep::AlterIndex.
-    fn can_alter_index(&self) -> bool {
+    fn can_rename_index(&self) -> bool {
         true
     }
 
@@ -31,8 +26,11 @@ pub(crate) trait SqlSchemaDifferFlavour {
         true
     }
 
+    /// Controls whether we will generate `RenameForeignKey` steps for this flavour.
+    fn can_rename_foreign_key(&self) -> bool;
+
     /// Return whether a column's type needs to be migrated, and how.
-    fn column_type_change(&self, differ: &ColumnDiffer<'_>) -> Option<ColumnTypeChange> {
+    fn column_type_change(&self, differ: Pair<ColumnWalker<'_>>) -> Option<ColumnTypeChange> {
         if differ.previous.column_type_family() != differ.next.column_type_family() {
             Some(ColumnTypeChange::RiskyCast)
         } else {
@@ -40,11 +38,8 @@ pub(crate) trait SqlSchemaDifferFlavour {
         }
     }
 
-    /// Return potential `CreateEnum` steps.
-    fn create_enums(&self, _differ: &SqlSchemaDiffer<'_>, _steps: &mut Vec<SqlMigrationStep>) {}
-
-    /// Return potential `DropEnum` steps.
-    fn drop_enums(&self, _differ: &SqlSchemaDiffer<'_>, _steps: &mut Vec<SqlMigrationStep>) {}
+    /// Push enum-related steps.
+    fn push_enum_steps(&self, _differ: &SqlSchemaDiffer<'_>, _steps: &mut Vec<SqlMigrationStep>) {}
 
     /// Returns whether the underlying database implicitly drops indexes on dropped (and potentially recreated) columns.
     fn indexes_should_be_recreated_after_column_drop(&self) -> bool {
@@ -63,10 +58,10 @@ pub(crate) trait SqlSchemaDifferFlavour {
     /// Evaluate indexes/constraints that need to be dropped and re-created based on other changes in the schema
     fn push_index_changes_for_column_changes(
         &self,
-        _alter_tables: &[AlterTable],
-        _drop_indexes: &mut Vec<DropIndex>,
-        _create_indexes: &mut Vec<CreateIndex>,
-        _differ: &SqlSchemaDiffer<'_>,
+        _table: &sql_schema_differ::TableDiffer<'_, '_>,
+        _column_index: Pair<ColumnId>,
+        _column_changes: sql_schema_differ::ColumnChanges,
+        _steps: &mut Vec<SqlMigrationStep>,
     ) {
     }
 
@@ -80,6 +75,12 @@ pub(crate) trait SqlSchemaDifferFlavour {
     /// is dropped.
     fn should_drop_indexes_from_dropped_tables(&self) -> bool {
         false
+    }
+
+    /// Whether the foreign keys of dropped tables should be dropped before the table
+    /// is dropped.
+    fn should_drop_foreign_keys_from_dropped_tables(&self) -> bool {
+        true
     }
 
     /// Whether to skip diffing JSON defaults.
@@ -121,6 +122,15 @@ pub(crate) trait SqlSchemaDifferFlavour {
     /// By implementing this method, the flavour signals the differ that
     /// specific tables should be ignored. This is mostly for system tables.
     fn table_should_be_ignored(&self, _table_name: &str) -> bool {
+        false
+    }
+
+    fn view_should_be_ignored(&self, _view_name: &str) -> bool {
+        false
+    }
+
+    /// Supports named Foreign Keys.
+    fn has_unnamed_foreign_keys(&self) -> bool {
         false
     }
 }

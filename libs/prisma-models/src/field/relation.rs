@@ -1,5 +1,5 @@
 use crate::prelude::*;
-use datamodel::{FieldArity, RelationInfo};
+use datamodel::{FieldArity, ReferentialAction, RelationInfo};
 use once_cell::sync::OnceCell;
 use std::{
     fmt::Debug,
@@ -21,6 +21,8 @@ pub struct RelationFieldTemplate {
     pub relation_name: String,
     pub relation_side: RelationSide,
     pub relation_info: RelationInfo,
+    pub on_delete_default: ReferentialAction,
+    pub on_update_default: ReferentialAction,
 }
 
 #[derive(Clone)]
@@ -32,6 +34,9 @@ pub struct RelationField {
     pub relation_side: RelationSide,
     pub relation: OnceCell<RelationWeakRef>,
     pub relation_info: RelationInfo,
+
+    pub on_delete_default: ReferentialAction,
+    pub on_update_default: ReferentialAction,
 
     pub model: ModelWeakRef,
     pub(crate) fields: OnceCell<Vec<ScalarFieldWeak>>,
@@ -112,6 +117,8 @@ impl RelationFieldTemplate {
             relation: OnceCell::new(),
             relation_info: self.relation_info,
             fields: OnceCell::new(),
+            on_delete_default: self.on_delete_default,
+            on_update_default: self.on_update_default,
         })
     }
 }
@@ -298,5 +305,9 @@ impl RelationField {
 
     pub fn db_names(&self) -> impl Iterator<Item = String> {
         self.scalar_fields().into_iter().map(|f| f.db_name().to_owned())
+    }
+
+    pub fn on_delete(&self) -> Option<&ReferentialAction> {
+        self.relation_info.on_delete.as_ref()
     }
 }

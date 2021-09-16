@@ -1,5 +1,6 @@
 use indoc::indoc;
 use introspection_engine_tests::test_api::*;
+use quaint::prelude::Queryable;
 use test_macros::test_connector;
 
 #[test_connector(tags(Postgres))]
@@ -53,6 +54,34 @@ async fn dbgenerated_type_casts_should_work(api: &TestApi) -> TestResult {
     let dm = indoc! {r#"
         model A {
           id String @id @default(dbgenerated("(now())::text")) @db.VarChar(30)
+        }
+    "#};
+
+    let result = api.introspect().await?;
+    api.assert_eq_datamodels(dm, &result);
+
+    Ok(())
+}
+
+#[test_connector(tags(Postgres))]
+async fn pg_xml_indexes_are_skipped(api: &TestApi) -> TestResult {
+    let create_table = format!(
+        "CREATE TABLE \"{schema_name}\".xml_test (id SERIAL PRIMARY KEY, data XML)",
+        schema_name = api.schema_name()
+    );
+
+    let create_primary = format!(
+        "CREATE INDEX test_idx ON \"{schema_name}\".xml_test USING BTREE (cast(xpath('/book/title', data) as text[]));",
+        schema_name = api.schema_name(),
+    );
+
+    api.database().raw_cmd(&create_table).await?;
+    api.database().raw_cmd(&create_primary).await?;
+
+    let dm = indoc! {r#"
+        model xml_test {
+          id   Int @id @default(autoincrement())
+          data String? @db.Xml
         }
     "#};
 

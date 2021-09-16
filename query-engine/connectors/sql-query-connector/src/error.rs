@@ -139,6 +139,9 @@ pub enum SqlError {
 
     #[error("Server terminated the connection.")]
     ConnectionClosed,
+
+    #[error("{}", _0)]
+    TransactionAlreadyClosed(String),
 }
 
 impl SqlError {
@@ -221,6 +224,14 @@ impl SqlError {
                 )),
                 kind: ErrorKind::ConnectionClosed,
             },
+            SqlError::TransactionAlreadyClosed(message) => ConnectorError {
+                user_facing_error: Some(user_facing_errors::KnownError::new(
+                    user_facing_errors::common::TransactionAlreadyClosed {
+                        message: message.clone(),
+                    },
+                )),
+                kind: ErrorKind::TransactionAlreadyClosed { message },
+            },
         }
     }
 }
@@ -254,6 +265,7 @@ impl From<quaint::error::Error> for SqlError {
             QuaintKind::ColumnNotFound { column } => SqlError::ColumnDoesNotExist(format!("{}", column)),
             QuaintKind::TableDoesNotExist { table } => SqlError::TableDoesNotExist(format!("{}", table)),
             QuaintKind::ConnectionClosed => SqlError::ConnectionClosed,
+            e @ QuaintKind::TransactionAlreadyClosed(_) => SqlError::TransactionAlreadyClosed(format!("{}", e)),
             e @ QuaintKind::IncorrectNumberOfParameters { .. } => SqlError::QueryError(e.into()),
             e @ QuaintKind::ConversionError(_) => SqlError::ConversionError(e.into()),
             e @ QuaintKind::ResultIndexOutOfBounds { .. } => SqlError::QueryError(e.into()),

@@ -5,8 +5,7 @@
 //! It also contains multiple subfolders, named after the migration id, and each containing:
 //! - A migration script
 
-use crate::{ConnectorError, ConnectorResult, FormatChecksum, CHECKSUM_STR_LEN};
-use sha2::{Digest, Sha256, Sha512};
+use crate::{checksum, ConnectorError, ConnectorResult};
 use std::{
     error::Error,
     fmt::Display,
@@ -51,7 +50,7 @@ pub fn create_migration_directory(
     Ok(MigrationDirectory { path: directory_path })
 }
 
-/// Write the migration script to the directory.
+/// Write the migration_lock file to the directory.
 #[tracing::instrument]
 pub fn write_migration_lock_file(migrations_directory_path: &str, provider: &str) -> std::io::Result<()> {
     let directory_path = Path::new(migrations_directory_path);
@@ -162,6 +161,7 @@ pub struct MigrationDirectory {
     path: PathBuf,
 }
 
+/// Error while reading a migration script.
 #[derive(Debug)]
 pub struct ReadMigrationScriptError(pub(crate) io::Error, pub(crate) SpanTrace, pub(crate) String);
 
@@ -200,40 +200,11 @@ impl MigrationDirectory {
             .expect("Migration directory name is not valid UTF-8.")
     }
 
-    /// Write the checksum of the migration script file to `buf`.
-    pub fn checksum(&mut self, buf: &mut Vec<u8>) -> Result<(), ReadMigrationScriptError> {
-        let script = self.read_migration_script()?;
-        let mut hasher = Sha512::new();
-        hasher.update(&script);
-        let bytes = hasher.finalize();
-
-        buf.clear();
-        buf.extend_from_slice(bytes.as_ref());
-
-        Ok(())
-    }
-
     /// Check whether the checksum of the migration script matches the provided one.
     #[tracing::instrument]
     pub fn matches_checksum(&self, checksum_str: &str) -> Result<bool, ReadMigrationScriptError> {
         let filesystem_script = self.read_migration_script()?;
-        let mut hasher = Sha256::new();
-        hasher.update(&filesystem_script);
-        let filesystem_script_checksum: [u8; 32] = hasher.finalize().into();
-
-        // Due to an omission in a previous version of the migration engine,
-        // some migrations tables will have old migrations with checksum strings
-        // that have not been zero-padded.
-        //
-        // Corresponding issue:
-        // https://github.com/prisma/prisma-engines/issues/1887
-        let filesystem_script_checksum_str = if !checksum_str.is_empty() && checksum_str.len() != CHECKSUM_STR_LEN {
-            filesystem_script_checksum.format_checksum_old()
-        } else {
-            filesystem_script_checksum.format_checksum()
-        };
-
-        Ok(checksum_str == filesystem_script_checksum_str)
+        Ok(checksum::script_matches_checksum(&filesystem_script, checksum_str))
     }
 
     /// Write the migration script to the directory.
@@ -255,7 +226,7 @@ impl MigrationDirectory {
     #[tracing::instrument]
     pub fn read_migration_script(&self) -> Result<String, ReadMigrationScriptError> {
         let path = self.path.join("migration.sql"); // todo why is it hardcoded here?
-        Ok(std::fs::read_to_string(&path).map_err(|ioerr| ReadMigrationScriptError::new(ioerr, &path))?)
+        std::fs::read_to_string(&path).map_err(|ioerr| ReadMigrationScriptError::new(ioerr, &path))
     }
 
     /// The filesystem path to the directory.

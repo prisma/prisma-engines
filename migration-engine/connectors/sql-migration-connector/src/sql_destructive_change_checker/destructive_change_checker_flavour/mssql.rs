@@ -13,6 +13,7 @@ use datamodel_connector::Connector;
 use sql_datamodel_connector::SqlDatamodelConnectors;
 use sql_schema_describer::walkers::ColumnWalker;
 
+#[async_trait::async_trait]
 impl DestructiveChangeCheckerFlavour for MssqlFlavour {
     fn check_alter_column(
         &self,
@@ -22,7 +23,7 @@ impl DestructiveChangeCheckerFlavour for MssqlFlavour {
         step_index: usize,
     ) {
         let AlterColumn {
-            column_index: _,
+            column_id: _,
             changes,
             type_change,
         } = alter_column;
@@ -46,7 +47,7 @@ impl DestructiveChangeCheckerFlavour for MssqlFlavour {
         match type_change {
             Some(ColumnTypeChange::SafeCast) | None => (),
             Some(ColumnTypeChange::RiskyCast) => {
-                let datamodel_connector = SqlDatamodelConnectors::mssql();
+                let datamodel_connector = SqlDatamodelConnectors::mssql(Default::default());
                 let previous_type = match &columns.previous().column_type().native_type {
                     Some(tpe) => datamodel_connector.render_native_type(tpe.clone()),
                     _ => format!("{:?}", columns.previous().column_type_family()),
@@ -118,5 +119,30 @@ impl DestructiveChangeCheckerFlavour for MssqlFlavour {
                 step_index,
             )
         }
+    }
+
+    async fn count_rows_in_table(
+        &self,
+        table_name: &str,
+        conn: &crate::connection_wrapper::Connection,
+    ) -> migration_connector::ConnectorResult<i64> {
+        let query = format!("SELECT COUNT(*) FROM [{}].[{}]", conn.schema_name(), table_name);
+        let result_set = conn.query_raw(&query, &[]).await?;
+        super::extract_table_rows_count(table_name, result_set)
+    }
+
+    async fn count_values_in_column(
+        &self,
+        (table, column): (&str, &str),
+        conn: &crate::connection_wrapper::Connection,
+    ) -> migration_connector::ConnectorResult<i64> {
+        let query = format!(
+            "SELECT COUNT(*) FROM [{}].[{}] WHERE [{}] IS NOT NULL",
+            conn.schema_name(),
+            table,
+            column
+        );
+        let result_set = conn.query_raw(&query, &[]).await?;
+        super::extract_column_values_count(result_set)
     }
 }

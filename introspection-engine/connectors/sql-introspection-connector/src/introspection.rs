@@ -4,10 +4,10 @@ use crate::introspection_helpers::{
     is_prisma_1_point_1_or_2_join_table, is_relay_table,
 };
 use crate::version_checker::VersionChecker;
-use crate::Dedup;
 use crate::SqlError;
-use datamodel::{dml, walkers::find_model_by_db_name, Datamodel, Field, Model, RelationField};
-use quaint::connector::SqlFamily;
+use crate::{Dedup, SqlFamilyTrait};
+use datamodel::{dml, walkers::find_model_by_db_name, Datamodel, Field, Model, PrimaryKeyDefinition, RelationField};
+use introspection_connector::IntrospectionContext;
 use sql_schema_describer::{SqlSchema, Table};
 use tracing::debug;
 
@@ -15,23 +15,31 @@ pub fn introspect(
     schema: &SqlSchema,
     version_check: &mut VersionChecker,
     data_model: &mut Datamodel,
-    sql_family: SqlFamily,
+    ctx: &IntrospectionContext,
 ) -> Result<(), SqlError> {
+    // collect m2m table names
+    let m2m_tables: Vec<String> = schema
+        .tables
+        .iter()
+        .filter(|table| is_prisma_1_point_1_or_2_join_table(table) || is_prisma_1_point_0_join_table(table))
+        .map(|table| table.name[1..].to_string())
+        .collect();
+
     for table in schema
         .tables
         .iter()
-        .filter(|table| !is_old_migration_table(&table))
-        .filter(|table| !is_new_migration_table(&table))
-        .filter(|table| !is_prisma_1_point_1_or_2_join_table(&table))
-        .filter(|table| !is_prisma_1_point_0_join_table(&table))
-        .filter(|table| !is_relay_table(&table))
+        .filter(|table| !is_old_migration_table(table))
+        .filter(|table| !is_new_migration_table(table))
+        .filter(|table| !is_prisma_1_point_1_or_2_join_table(table))
+        .filter(|table| !is_prisma_1_point_0_join_table(table))
+        .filter(|table| !is_relay_table(table))
     {
         debug!("Calculating model: {}", table.name);
         let mut model = Model::new(table.name.clone(), None);
 
         for column in &table.columns {
-            version_check.check_column_for_type_and_default_value(&column);
-            let field = calculate_scalar_field(&table, &column, &sql_family);
+            version_check.check_column_for_type_and_default_value(column);
+            let field = calculate_scalar_field(table, column, ctx);
             model.add_field(Field::ScalarField(field));
         }
 
@@ -41,20 +49,25 @@ pub fn introspect(
         for foreign_key in &foreign_keys_copy {
             version_check.has_inline_relations(table);
             version_check.uses_on_delete(foreign_key, table);
-            let relation_field = calculate_relation_field(schema, table, foreign_key)?;
+
+            let mut relation_field = calculate_relation_field(schema, table, foreign_key, &m2m_tables)?;
+
+            relation_field.supports_restrict_action(!ctx.sql_family().is_mssql());
+
             model.add_field(Field::RelationField(relation_field));
         }
 
-        for index in table
-            .indices
-            .iter()
-            .filter(|i| !(i.columns.len() == 1 && i.is_unique()))
-        {
+        for index in &table.indices {
             model.add_index(calculate_index(index));
         }
 
-        if table.primary_key_columns().len() > 1 {
-            model.id_fields = table.primary_key_columns();
+        if let Some(pk) = &table.primary_key {
+            model.primary_key = Some(PrimaryKeyDefinition {
+                name: None,
+                db_name: pk.constraint_name.clone(),
+                fields: pk.columns.clone(),
+                defined_on_field: pk.columns.len() == 1,
+            });
         }
 
         version_check.always_has_created_at_updated_at(table, &model);
@@ -75,7 +88,7 @@ pub fn introspect(
         for relation_field in model.relation_fields() {
             let relation_info = &relation_field.relation_info;
             if data_model
-                .find_related_field_for_info(&relation_info, &relation_field.name)
+                .find_related_field_for_info(relation_info, &relation_field.name)
                 .is_none()
             {
                 let other_model = data_model.find_model(&relation_info.to).unwrap();
@@ -90,9 +103,9 @@ pub fn introspect(
     for table in schema
         .tables
         .iter()
-        .filter(|table| is_prisma_1_point_1_or_2_join_table(&table) || is_prisma_1_point_0_join_table(&table))
+        .filter(|table| is_prisma_1_point_1_or_2_join_table(table) || is_prisma_1_point_0_join_table(table))
     {
-        calculate_fields_for_prisma_join_table(&table, &mut fields_to_be_added, data_model)
+        calculate_fields_for_prisma_join_table(table, &mut fields_to_be_added, data_model)
     }
 
     for (model, field) in fields_to_be_added {
@@ -111,29 +124,10 @@ fn calculate_fields_for_prisma_join_table(
         let is_self_relation = fk_a.referenced_table == fk_b.referenced_table;
 
         for (fk, opposite_fk) in &[(fk_a, fk_b), (fk_b, fk_a)] {
-            let referenced_model = find_model_by_db_name(&data_model, &fk.referenced_table)
+            let referenced_model = find_model_by_db_name(data_model, &fk.referenced_table)
                 .expect("Could not find model referenced in relation table.");
 
-            let mut existing_relations = fields_to_be_added
-                .iter()
-                .filter(|(model_name, _)| model_name.as_str() == referenced_model.name())
-                .map(|(_, relation_field)| relation_field.relation_info.name.as_str())
-                .chain(
-                    referenced_model
-                        .relation_fields()
-                        .map(|relation_field| relation_field.relation_name()),
-                );
-
-            // Avoid duplicate field names, in case a generated relation field name is the same as the M2M relation table's name.
-            let relation_name = &join_table.name[1..];
-            let relation_name = if !is_self_relation
-                && existing_relations.any(|existing_relation| existing_relation == relation_name)
-            {
-                format!("{}ManyToMany", relation_name)
-            } else {
-                relation_name.to_owned()
-            };
-
+            let relation_name = join_table.name[1..].to_string();
             let field = calculate_many_to_many_field(opposite_fk, relation_name, is_self_relation);
 
             fields_to_be_added.push((referenced_model.name().to_owned(), field));

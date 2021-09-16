@@ -11,7 +11,7 @@ type TestResult = anyhow::Result<()>;
 static TODO: &str = indoc! {r#"
     generator js {
         provider = "prisma-client-js"
-        previewFeatures = ["microsoftSqlServer", "mongodb", "orderByRelation", "napi", "selectRelationCount", "orderByAggregateGroup"]
+        previewFeatures = ["mongodb"]
     }
 
     model Todo {
@@ -302,7 +302,7 @@ async fn syntactic_errors_bubbling_through_to_the_user(api: &TestApi) -> TestRes
 
 #[test_connector]
 async fn other_errors_bubbling_through_to_the_user(api: &TestApi) -> TestResult {
-    let query_engine = api.create_engine(&TODO).await?;
+    let query_engine = api.create_engine(TODO).await?;
 
     let mutation = indoc! {r#"
         mutation {

@@ -2,14 +2,13 @@ mod sql_schema_calculator_flavour;
 
 pub(super) use sql_schema_calculator_flavour::SqlSchemaCalculatorFlavour;
 
-use crate::{flavour::SqlFlavour, sql_renderer::IteratorJoin};
-use datamodel::{walkers::RelationFieldWalker, Configuration};
+use crate::flavour::SqlFlavour;
 use datamodel::{
     walkers::{walk_models, walk_relations, ModelWalker, ScalarFieldWalker, TypeWalker},
-    Datamodel, DefaultValue, FieldArity, IndexDefinition, IndexType, ScalarType,
+    Configuration, Datamodel, DefaultValue, FieldArity, IndexDefinition, IndexType, ScalarType,
 };
 use prisma_value::PrismaValue;
-use sql_schema_describer::{self as sql, walkers::SqlSchemaExt, ColumnType, ForeignKeyAction};
+use sql_schema_describer::{self as sql, walkers::SqlSchemaExt, ColumnType};
 
 pub(crate) fn calculate_sql_schema(
     (configuration, datamodel): (&Configuration, &Datamodel),
@@ -22,10 +21,12 @@ pub(crate) fn calculate_sql_schema(
     // Two types of tables: model tables and implicit M2M relation tables (a.k.a. join tables.).
     schema.tables.extend(calculate_model_tables(datamodel, flavour));
 
-    let relation_tables: Vec<_> = calculate_relation_tables(datamodel, flavour, &schema).collect();
-    schema.tables.extend(relation_tables.into_iter());
+    let mut relation_tables: Vec<_> = calculate_relation_tables(datamodel, flavour, &schema).collect();
+    schema.tables.append(&mut relation_tables);
 
-    if configuration.planet_scale_mode() {
+    let referential_integrity = configuration.referential_integrity().unwrap_or_default();
+
+    if !referential_integrity.uses_foreign_keys() {
         for table in &mut schema.tables {
             table.foreign_keys.clear();
         }
@@ -44,71 +45,61 @@ fn calculate_model_tables<'a>(
             .map(|field| column_for_scalar_field(&field, flavour))
             .collect();
 
-        let primary_key = Some(sql::PrimaryKey {
-            columns: model.id_fields().map(|field| field.db_name().to_owned()).collect(),
-            sequence: None,
-            constraint_name: None,
-        })
-        .filter(|pk| !pk.columns.is_empty());
-
-        let single_field_indexes = model.scalar_fields().filter(|f| f.is_unique()).map(|f| sql::Index {
-            name: flavour.single_field_index_name(model.db_name(), f.db_name()),
-            columns: vec![f.db_name().to_owned()],
-            tpe: sql::IndexType::Unique,
-        });
-
-        let multiple_field_indexes = model.indexes().map(|index_definition: &IndexDefinition| {
-            let referenced_fields: Vec<ScalarFieldWalker<'_>> = index_definition
+        let primary_key = model.get().primary_key.as_ref().map(|pk| sql::PrimaryKey {
+            columns: pk
                 .fields
                 .iter()
-                .map(|field_name| {
-                    model
-                        .find_scalar_field(field_name)
-                        .expect("Unknown field in index directive.")
-                })
-                .collect();
-
-            let index_type = match index_definition.tpe {
-                IndexType::Unique => sql::IndexType::Unique,
-                IndexType::Normal => sql::IndexType::Normal,
-            };
-
-            let index_name = index_definition.name.clone().unwrap_or_else(|| {
-                format!(
-                    "{table}.{fields}_{qualifier}",
-                    table = &model.db_name(),
-                    fields = referenced_fields.iter().map(|field| field.db_name()).join("_"),
-                    qualifier = if index_type.is_unique() { "unique" } else { "index" },
-                )
-            });
-
-            sql::Index {
-                name: index_name,
-                // The model index definition uses the model field names, but the SQL Index
-                // wants the column names.
-                columns: referenced_fields
-                    .iter()
-                    .map(|field| field.db_name().to_owned())
-                    .collect(),
-                tpe: index_type,
-            }
+                .map(|field| model.find_scalar_field(field).unwrap().db_name().to_string())
+                .collect(),
+            sequence: None,
+            constraint_name: pk.db_name.clone(),
         });
+
+        let indices = model
+            .indexes()
+            .map(|index_definition: &IndexDefinition| {
+                let referenced_fields: Vec<ScalarFieldWalker<'_>> = index_definition
+                    .fields
+                    .iter()
+                    .map(|field_name| {
+                        model
+                            .find_scalar_field(field_name)
+                            .expect("Unknown field in index directive.")
+                    })
+                    .collect();
+
+                let index_type = match index_definition.tpe {
+                    IndexType::Unique => sql::IndexType::Unique,
+                    IndexType::Normal => sql::IndexType::Normal,
+                };
+
+                sql::Index {
+                    name: index_definition.db_name.clone().unwrap(),
+                    // The model index definition uses the model field names, but the SQL Index wants the column names.
+                    columns: referenced_fields
+                        .iter()
+                        .map(|field| field.db_name().to_owned())
+                        .collect(),
+                    tpe: index_type,
+                }
+            })
+            .collect();
 
         let mut table = sql::Table {
             name: model.database_name().to_owned(),
             columns,
-            indices: single_field_indexes.chain(multiple_field_indexes).collect(),
+            indices,
             primary_key,
             foreign_keys: Vec::new(),
         };
 
-        push_inline_relations(model, &mut table);
+        push_inline_relations(model, &mut table, flavour);
 
         table
     })
 }
 
-fn push_inline_relations(model: ModelWalker<'_>, table: &mut sql::Table) {
+fn push_inline_relations(model: ModelWalker<'_>, table: &mut sql::Table, flavour: &dyn SqlFlavour) {
     let relation_fields = model
         .relation_fields()
         .filter(|relation_field| !relation_field.is_virtual());
@@ -124,24 +115,16 @@ fn push_inline_relations(model: ModelWalker<'_>, table: &mut sql::Table) {
         // Foreign key
         {
             let fk = sql::ForeignKey {
-                constraint_name: None,
+                constraint_name: relation_field.constraint_name(),
                 columns: fk_columns,
                 referenced_table: relation_field.referenced_model().database_name().to_owned(),
                 referenced_columns: relation_field.referenced_columns().map(String::from).collect(),
-                on_update_action: sql::ForeignKeyAction::Cascade,
-                on_delete_action: calculate_on_delete_action(relation_field),
+                on_update_action: flavour.on_update_action(&relation_field),
+                on_delete_action: flavour.on_delete_action(&relation_field),
             };
 
             table.foreign_keys.push(fk);
         }
-    }
-}
-
-fn calculate_on_delete_action(relation_field: RelationFieldWalker<'_>) -> ForeignKeyAction {
-    if relation_field.scalar_arities().any(|ar| ar.is_required()) {
-        sql::ForeignKeyAction::Cascade
-    } else {
-        sql::ForeignKeyAction::SetNull
     }
 }
 
@@ -278,13 +261,22 @@ fn column_for_scalar_field(field: &ScalarFieldWalker<'_>, flavour: &dyn SqlFlavo
                 tpe: flavour.enum_column_type(field, r#enum.db_name()),
                 default: field
                     .default_value()
-                    .and_then(|default| default.as_single().and_then(|v| v.as_enum_value()))
-                    .map(|value| {
+                    .and_then(|default| {
+                        let as_enum = default.as_single().and_then(|v| v.as_enum_value());
+                        as_enum.map(|enm| (enm, default.db_name()))
+                    })
+                    .map(|(value, db_name)| {
                         let corresponding_value = r#enum.value(value).expect("Could not find enum value");
 
-                        sql::DefaultValue::value(PrismaValue::Enum(
+                        let mut default = sql::DefaultValue::value(PrismaValue::Enum(
                             corresponding_value.final_database_name().to_owned(),
-                        ))
+                        ));
+
+                        if let Some(db_name) = db_name {
+                            default.set_constraint_name(db_name);
+                        }
+
+                        default
                     }),
                 auto_increment: false,
             }
@@ -292,6 +284,14 @@ fn column_for_scalar_field(field: &ScalarFieldWalker<'_>, flavour: &dyn SqlFlavo
         TypeWalker::Base(scalar_type) => (scalar_type, flavour.default_native_type_for_scalar_type(&scalar_type)),
         TypeWalker::NativeType(scalar_type, instance) => (scalar_type, instance.serialized_native_type.clone()),
         TypeWalker::Unsupported(description) => {
+            let default = field.default_value().and_then(|v| db_generated(v)).map(|mut default| {
+                if let Some(name) = field.default_value().and_then(|v| v.db_name()) {
+                    default.set_constraint_name(name);
+                }
+
+                default
+            });
+
             return sql::Column {
                 name: field.db_name().to_owned(),
                 tpe: ColumnType {
@@ -300,9 +300,9 @@ fn column_for_scalar_field(field: &ScalarFieldWalker<'_>, flavour: &dyn SqlFlavo
                     family: sql::ColumnTypeFamily::Unsupported(description),
                     arity: column_arity(field.arity()),
                 },
-                default: field.default_value().and_then(|v| db_generated(v)),
+                default,
                 auto_increment: false,
-            }
+            };
         }
     };
 
@@ -323,6 +323,22 @@ fn column_for_scalar_field(field: &ScalarFieldWalker<'_>, flavour: &dyn SqlFlavo
         ScalarType::BigInt => sql::ColumnTypeFamily::BigInt,
     };
 
+    let default = field.default_value().and_then(|v| {
+        let mut df = match v.kind() {
+            datamodel::DefaultKind::Single(v) => Some(sql::DefaultValue::value(v.clone())),
+            default if default.is_dbgenerated() => db_generated(v),
+            default if default.is_now() => Some(sql::DefaultValue::now()),
+            default if default.is_autoincrement() => Some(sql::DefaultValue::sequence(String::new())),
+            datamodel::DefaultKind::Expression(_) => None,
+        };
+
+        if let (Some(df), Some(db_name)) = (df.as_mut(), v.db_name()) {
+            df.set_constraint_name(db_name);
+        }
+
+        df
+    });
+
     sql::Column {
         auto_increment: has_auto_increment_default || flavour.field_is_implicit_autoincrement_primary_key(field),
         name: field.db_name().to_owned(),
@@ -332,13 +348,7 @@ fn column_for_scalar_field(field: &ScalarFieldWalker<'_>, flavour: &dyn SqlFlavo
             family,
             arity: column_arity(field.arity()),
         },
-        default: field.default_value().and_then(|v| match v {
-            datamodel::DefaultValue::Single(v) => Some(sql::DefaultValue::value(v.clone())),
-            default if default.is_dbgenerated() => db_generated(default),
-            default if default.is_now() => Some(sql::DefaultValue::now()),
-            default if default.is_autoincrement() => Some(sql::DefaultValue::sequence(String::new())),
-            datamodel::DefaultValue::Expression(_) => None,
-        }),
+        default,
     }
 }
 

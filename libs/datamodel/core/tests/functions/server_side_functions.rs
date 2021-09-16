@@ -18,7 +18,7 @@ fn correctly_handle_server_side_now_function() {
     user_model
         .assert_has_scalar_field("signupDate")
         .assert_base_type(&ScalarType::DateTime)
-        .assert_default_value(DefaultValue::Expression(ValueGenerator::new_now()));
+        .assert_default_value(DefaultValue::new_expression(ValueGenerator::new_now()));
 }
 
 #[test]
@@ -38,7 +38,7 @@ fn correctly_handle_server_side_cuid_function() {
     user_model
         .assert_has_scalar_field("someId")
         .assert_base_type(&ScalarType::String)
-        .assert_default_value(DefaultValue::Expression(ValueGenerator::new_cuid()));
+        .assert_default_value(DefaultValue::new_expression(ValueGenerator::new_cuid()));
 }
 
 #[test]
@@ -58,5 +58,5 @@ fn correctly_handle_server_side_uuid_function() {
     user_model
         .assert_has_scalar_field("someId")
         .assert_base_type(&ScalarType::String)
-        .assert_default_value(DefaultValue::Expression(ValueGenerator::new_uuid()));
+        .assert_default_value(DefaultValue::new_expression(ValueGenerator::new_uuid()));
 }

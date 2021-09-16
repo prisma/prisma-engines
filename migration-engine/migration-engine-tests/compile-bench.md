@@ -1,3 +1,3 @@
 | Command | Mean [s] | Min [s] | Max [s] | Relative |
 |:---|---:|---:|---:|---:|
-| `cargo build --tests` | 7.426 ± 0.088 | 7.288 | 7.573 | 1.00 |
+| `cargo build --tests` | 6.280 ± 0.065 | 6.211 | 6.449 | 1.00 |

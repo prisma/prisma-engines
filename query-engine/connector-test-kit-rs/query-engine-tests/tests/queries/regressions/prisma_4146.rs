@@ -18,7 +18,7 @@ mod prisma_4146 {
               tokens     Token[]
               updatedAt  DateTime @updatedAt
             }
-            
+
             model Token {
               #id(id, Int, @id)
               name         String
@@ -33,9 +33,9 @@ mod prisma_4146 {
 
     // "Updating a list of fields over a connect bound" should "change the update fields tagged with @updatedAt"
     #[connector_test]
-    async fn update_list_fields_connect_bound(runner: &Runner) -> TestResult<()> {
+    async fn update_list_fields_connect_bound(runner: Runner) -> TestResult<()> {
         run_query!(
-            runner,
+            &runner,
             r#"mutation {
                 createOneAccount(data: { id: 1 }) {
                   id
@@ -44,7 +44,7 @@ mod prisma_4146 {
         );
 
         let updated_at = run_query!(
-            runner,
+            &runner,
             r#"mutation {
           createOneToken(data: { id: 2, name: "test" }) {
             updatedAt
@@ -55,7 +55,7 @@ mod prisma_4146 {
         let updated_at = &updated_at["data"]["createOneToken"]["updatedAt"].to_string();
 
         let tokens = run_query!(
-            runner,
+            &runner,
             r#"mutation {
           updateOneAccount(
             where: { id: 1 }

@@ -137,30 +137,6 @@ pub fn common_list_types() -> String {
     schema.to_owned()
 }
 
-/// Basic Test model containing a single json field.
-pub fn json() -> String {
-    let schema = indoc! {
-        "model TestModel {
-            #id(id, Int, @id)
-            json Json
-        }"
-    };
-
-    schema.to_owned()
-}
-
-/// Basic Test model containing a single optional json field.
-pub fn json_opt() -> String {
-    let schema = indoc! {
-        "model TestModel {
-            #id(id, Int, @id)
-            json Json?
-        }"
-    };
-
-    schema.to_owned()
-}
-
 pub fn string_combination_unique() -> String {
     let schema = indoc! {
         r#"model TestModel {

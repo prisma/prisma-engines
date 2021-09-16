@@ -28,7 +28,7 @@ fn soft_resets_work_on_postgres(api: TestApi) {
             GRANT USAGE, CREATE ON SCHEMA "prisma-tests" TO softresetstestuser;
         "#;
 
-        api.raw_cmd(&create_user);
+        api.raw_cmd(create_user);
     }
 
     let test_user_connection_string = {
@@ -68,25 +68,14 @@ fn soft_resets_work_on_postgres(api: TestApi) {
             .assert_schema()
             .assert_tables_count(2)
             .assert_has_table("_prisma_migrations")
-            .unwrap()
-            .assert_has_table("Cat")
-            .unwrap();
+            .assert_has_table("Cat");
 
         engine.reset().send_sync();
         engine.assert_schema().assert_tables_count(0);
 
-        engine
-            .schema_push(dm)
-            .send_sync()
-            .assert_has_executed_steps()
-            .assert_green()
-            .unwrap();
+        engine.schema_push(dm).send().assert_has_executed_steps().assert_green();
 
-        engine
-            .assert_schema()
-            .assert_tables_count(1)
-            .assert_has_table("Cat")
-            .unwrap();
+        engine.assert_schema().assert_tables_count(1).assert_has_table("Cat");
 
         engine.reset().send_sync();
         engine.assert_schema().assert_tables_count(0);
@@ -99,18 +88,20 @@ fn soft_resets_work_on_sql_server(api: TestApi) {
 
     let mut url: JdbcString = format!("jdbc:{}", api.connection_string()).parse().unwrap();
 
-    let dm = r#"
+    let dm = api.datamodel_with_provider(
+        r#"
         model Cat {
             id Int @id
             litterConsumption Int
             hungry Boolean @default(true)
         }
-    "#;
+    "#,
+    );
 
     // Create the database, a first migration and the test user.
     {
         api.new_engine()
-            .create_migration("01init", dm, &migrations_directory)
+            .create_migration("01init", &dm, &migrations_directory)
             .send_sync();
 
         let create_database = r#"
@@ -198,27 +189,15 @@ fn soft_resets_work_on_sql_server(api: TestApi) {
             .assert_schema()
             .assert_tables_count(3)
             .assert_has_table("_prisma_migrations")
-            .unwrap()
             .assert_has_table("specialLitter")
-            .unwrap()
-            .assert_has_table("Cat")
-            .unwrap();
+            .assert_has_table("Cat");
 
         engine.reset().send_sync();
         engine.assert_schema().assert_tables_count(0);
 
-        engine
-            .schema_push(dm)
-            .send_sync()
-            .assert_has_executed_steps()
-            .assert_green()
-            .unwrap();
+        engine.schema_push(dm).send().assert_has_executed_steps().assert_green();
 
-        engine
-            .assert_schema()
-            .assert_tables_count(1)
-            .assert_has_table("Cat")
-            .unwrap();
+        engine.assert_schema().assert_tables_count(1).assert_has_table("Cat");
 
         engine.reset().send_sync();
         engine.assert_schema().assert_tables_count(0);
@@ -254,9 +233,7 @@ fn soft_resets_work_on_mysql(api: TestApi) {
             .assert_schema()
             .assert_tables_count(2)
             .assert_has_table("_prisma_migrations")
-            .unwrap()
-            .assert_has_table("Cat")
-            .unwrap();
+            .assert_has_table("Cat");
     }
 
     {
@@ -301,18 +278,9 @@ fn soft_resets_work_on_mysql(api: TestApi) {
         engine.reset().send_sync();
         engine.assert_schema().assert_tables_count(0);
 
-        engine
-            .schema_push(dm)
-            .send_sync()
-            .assert_has_executed_steps()
-            .assert_green()
-            .unwrap();
+        engine.schema_push(dm).send().assert_has_executed_steps().assert_green();
 
-        engine
-            .assert_schema()
-            .assert_tables_count(1)
-            .assert_has_table("Cat")
-            .unwrap();
+        engine.assert_schema().assert_tables_count(1).assert_has_table("Cat");
 
         engine.reset().send_sync();
         engine.assert_schema().assert_tables_count(0);

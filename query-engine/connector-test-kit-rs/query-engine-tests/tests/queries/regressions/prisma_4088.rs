@@ -21,11 +21,11 @@ mod prisma_4088 {
 
     // "FindMany queries with an OR condition and one filter" should "only apply one filter"
     #[connector_test]
-    async fn find_many_or_cond_one_filter(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn find_many_or_cond_one_filter(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query {
+          run_query!(&runner, r#"query {
             findManyTestModel(
               where: { OR: [{ str: { equals: "aa" } }]}
             ) {
@@ -40,11 +40,11 @@ mod prisma_4088 {
 
     // "FindMany queries with an OR condition and two filters, of which one is undefined" should "only apply one filter"
     #[connector_test]
-    async fn find_many_or_cond_two_filters(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn find_many_or_cond_two_filters(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query {
+          run_query!(&runner, r#"query {
             findManyTestModel(
               where: { OR: [{ str: { equals: "aa" }}, {str: {} }]}
             ) {
@@ -59,11 +59,11 @@ mod prisma_4088 {
 
     // "FindMany queries with an OR condition and no filters" should "return an empty list"
     #[connector_test]
-    async fn find_many_or_cond_no_filter(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn find_many_or_cond_no_filter(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query {
+          run_query!(&runner, r#"query {
             findManyTestModel(
               where: { OR: [] }
             ) {
@@ -78,11 +78,11 @@ mod prisma_4088 {
 
     // "FindMany queries with an AND condition and no filters" should "return all items"
     #[connector_test]
-    async fn find_many_and_cond_no_filter(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn find_many_and_cond_no_filter(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query {
+          run_query!(&runner, r#"query {
             findManyTestModel(
               where: { AND: [] }
             ) {
@@ -97,11 +97,11 @@ mod prisma_4088 {
 
     // "FindMany queries with an AND condition and one filter" should "only apply one filter"
     #[connector_test]
-    async fn find_many_and_cond_one_filter(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn find_many_and_cond_one_filter(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query {
+          run_query!(&runner, r#"query {
             findManyTestModel(
               where: { AND: [{ str: { equals: "aa" } }]}
             ) {
@@ -116,11 +116,11 @@ mod prisma_4088 {
 
     // "FindMany queries with an AND condition and two filters, of which one is undefined" should "only apply one filter"
     #[connector_test]
-    async fn find_many_and_cond_two_filters(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn find_many_and_cond_two_filters(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query {
+          run_query!(&runner, r#"query {
             findManyTestModel(
               where: { AND: [{ str: { equals: "aa" }}, {str: {} }]}
             ) {
@@ -135,11 +135,11 @@ mod prisma_4088 {
 
     // "FindMany queries with an NOT condition and no filters" should "return all items"
     #[connector_test]
-    async fn find_many_not_cond_no_filter(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn find_many_not_cond_no_filter(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query {
+          run_query!(&runner, r#"query {
             findManyTestModel(
               where: { NOT: [] }
             ) {
@@ -154,11 +154,11 @@ mod prisma_4088 {
 
     // "FindMany queries with an NOT condition and one filter " should "only apply one filter"
     #[connector_test]
-    async fn find_many_not_cond_one_filter(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn find_many_not_cond_one_filter(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query {
+          run_query!(&runner, r#"query {
             findManyTestModel(
               where: { NOT: [{ str: { equals: "aa" } }] }
             ) {
@@ -173,11 +173,11 @@ mod prisma_4088 {
 
     // "FindMany queries with an NOT condition and two filters, of which one is undefined" should "only apply one filter"
     #[connector_test]
-    async fn find_many_not_cond_two_filters(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn find_many_not_cond_two_filters(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query {
+          run_query!(&runner, r#"query {
             findManyTestModel(
               where: { NOT: [{ str: { equals: "aa" }}, {str: {} }]}
             ) {

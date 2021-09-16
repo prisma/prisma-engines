@@ -1,4 +1,6 @@
-use super::{Attribute, Comment, Identifier, Span, WithAttributes, WithDocumentation, WithIdentifier, WithSpan};
+use super::{
+    Attribute, Comment, Identifier, Span, WithAttributes, WithDocumentation, WithIdentifier, WithName, WithSpan,
+};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Field {
@@ -16,6 +18,19 @@ pub struct Field {
     pub span: Span,
     /// The location of this field in the text representation.
     pub is_commented_out: bool,
+}
+
+impl Field {
+    /// Finds the position span of the argument in the given field attribute.
+    pub(crate) fn span_for_argument(&self, attribute: &str, argument: &str) -> Option<Span> {
+        self.attributes
+            .iter()
+            .filter(|a| a.name() == attribute)
+            .flat_map(|a| a.arguments.iter())
+            .filter(|a| a.name() == argument)
+            .map(|a| a.span)
+            .next()
+    }
 }
 
 impl WithIdentifier for Field {
@@ -53,6 +68,20 @@ pub enum FieldArity {
     List,
 }
 
+impl FieldArity {
+    pub fn is_list(&self) -> bool {
+        matches!(self, &FieldArity::List)
+    }
+
+    pub fn is_optional(&self) -> bool {
+        matches!(self, &FieldArity::Optional)
+    }
+
+    pub fn is_required(&self) -> bool {
+        matches!(self, &FieldArity::Required)
+    }
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub enum FieldType {
     Supported(Identifier),
@@ -67,10 +96,10 @@ impl FieldType {
         }
     }
 
-    pub(crate) fn unwrap_supported(&self) -> &Identifier {
+    pub(crate) fn as_unsupported(&self) -> Option<(&str, &Span)> {
         match self {
-            FieldType::Supported(ident) => ident,
-            FieldType::Unsupported(_, _) => panic!("Unsupported in unwrap_supported()"),
+            FieldType::Unsupported(name, span) => Some((name, span)),
+            FieldType::Supported(_) => None,
         }
     }
 }

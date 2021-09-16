@@ -172,7 +172,7 @@ impl crate::UserFacingError for ShadowDbCreationError {
         };
 
         format!(
-            "Prisma Migrate could not create the shadow database. Please make sure the database user has permission to create databases. Read more at https://pris.ly/d/migrate-shadow\n\nOriginal error: {error_code}\n{inner_error}",
+            "Prisma Migrate could not create the shadow database. Please make sure the database user has permission to create databases. Read more about the shadow database (and workarounds) at https://pris.ly/d/migrate-shadow\n\nOriginal error: {error_code}\n{inner_error}",
             inner_error = self.inner_error.message(),
             error_code = error_code
         )
@@ -227,7 +227,7 @@ pub struct MigrationToMarkAppliedNotFound {
 #[derive(Debug, Serialize, UserFacingError)]
 #[user_facing(
     code = "P3018",
-    message = "A migration failed to apply. New migrations can not be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve\n\nMigration name: {migration_name}\n\nDatabase error code: {database_error_code}\n\nDatabase error:\n{database_error}
+    message = "A migration failed to apply. New migrations cannot be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve\n\nMigration name: {migration_name}\n\nDatabase error code: {database_error_code}\n\nDatabase error:\n{database_error}
 "
 )]
 pub struct ApplyMigrationError {
@@ -254,6 +254,20 @@ pub struct ProviderSwitchedError {
     message = "The automatic creation of shadow databases is disabled on Azure SQL. Please set up a shadow database using the `shadowDatabaseUrl` datasource attribute.\nRead the docs page for more details: https://pris.ly/d/migrate-shadow"
 )]
 pub struct AzureMssqlShadowDb;
+
+#[derive(Debug, Serialize, UserFacingError)]
+#[user_facing(
+    code = "P3021",
+    message = "Foreign keys cannot be created on this database. Learn more how to handle this: https://pris.ly/d/migrate-no-foreign-keys"
+)]
+pub struct ForeignKeyCreationNotAllowed;
+
+#[derive(Debug, Serialize, UserFacingError)]
+#[user_facing(
+    code = "P3022",
+    message = "Direct execution of DDL (Data Definition Language) SQL statements is disabled on this database. Please read more here how to handle this: https://pris.ly/d/migrate-no-direct-ddl"
+)]
+pub struct DirectDdlNotAllowed;
 
 #[cfg(test)]
 mod tests {

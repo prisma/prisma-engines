@@ -34,7 +34,7 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
 
     create_nested_inputs(ctx);
 
-    if ctx.enable_raw_queries {
+    if ctx.enable_raw_queries && ctx.capabilities.contains(ConnectorCapability::QueryRaw) {
         fields.push(create_execute_raw_field());
         fields.push(create_query_raw_field());
     }
@@ -48,8 +48,8 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
 // implementation note: these need to be in the same function, because these vecs interact: the create inputs will enqueue update inputs, and vice versa.
 #[tracing::instrument(skip(ctx))]
 fn create_nested_inputs(ctx: &mut BuilderContext) {
-    let mut nested_create_inputs_queue = std::mem::replace(&mut ctx.nested_create_inputs_queue, Vec::new());
-    let mut nested_update_inputs_queue = std::mem::replace(&mut ctx.nested_update_inputs_queue, Vec::new());
+    let mut nested_create_inputs_queue = std::mem::take(&mut ctx.nested_create_inputs_queue);
+    let mut nested_update_inputs_queue = std::mem::take(&mut ctx.nested_update_inputs_queue);
 
     while !(nested_create_inputs_queue.is_empty() && nested_update_inputs_queue.is_empty()) {
         // Create inputs.
@@ -106,7 +106,7 @@ fn create_execute_raw_field() -> OutputField {
             input_field(
                 PARAMETERS,
                 InputType::json_list(),
-                Some(dml::DefaultValue::Single(PrismaValue::String("[]".into()))),
+                Some(dml::DefaultValue::new_single(PrismaValue::String("[]".into()))),
             )
             .optional(),
         ],
@@ -126,7 +126,7 @@ fn create_query_raw_field() -> OutputField {
             input_field(
                 PARAMETERS,
                 InputType::json_list(),
-                Some(dml::DefaultValue::Single(PrismaValue::String("[]".into()))),
+                Some(dml::DefaultValue::new_single(PrismaValue::String("[]".into()))),
             )
             .optional(),
         ],

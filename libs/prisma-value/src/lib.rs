@@ -320,3 +320,14 @@ impl TryFrom<PrismaValue> for i64 {
         }
     }
 }
+
+impl TryFrom<PrismaValue> for String {
+    type Error = ConversionFailure;
+
+    fn try_from(pv: PrismaValue) -> PrismaValueResult<String> {
+        match pv {
+            PrismaValue::String(s) => Ok(s),
+            _ => Err(ConversionFailure::new("PrismaValue", "String")),
+        }
+    }
+}

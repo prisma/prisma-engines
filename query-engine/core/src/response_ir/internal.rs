@@ -289,7 +289,7 @@ fn serialize_objects(
 ) -> crate::Result<UncheckedItemsWithParents> {
     // The way our query execution works, we only need to look at nested + lists if we hit an object.
     // Move nested out of result for separate processing.
-    let nested = std::mem::replace(&mut result.nested, Vec::new());
+    let nested = std::mem::take(&mut result.nested);
 
     // { <nested field name> -> { parent ID -> items } }
     let mut nested_mapping: HashMap<String, CheckedItemsWithParents> = process_nested_results(nested, &typ)?;

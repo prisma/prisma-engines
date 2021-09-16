@@ -40,7 +40,7 @@ mod utils;
 use crate::schema::*;
 use cache::TypeRefCache;
 use datamodel::common::preview_features::PreviewFeature;
-use datamodel_connector::ConnectorCapabilities;
+use datamodel_connector::{ConnectorCapabilities, ConnectorCapability};
 use prisma_models::{Field as ModelField, Index, InternalDataModelRef, ModelRef, RelationFieldRef, TypeIdentifier};
 use std::sync::Arc;
 
@@ -91,6 +91,10 @@ impl BuilderContext {
 
     pub fn has_feature(&self, feature: &PreviewFeature) -> bool {
         self.preview_features.contains(feature)
+    }
+
+    pub fn has_capability(&self, capability: ConnectorCapability) -> bool {
+        self.capabilities.contains(capability)
     }
 
     // Just here for convenience, will be removed soon.
@@ -164,8 +168,9 @@ pub fn build(
         internal_data_model,
         enable_raw_queries,
         capabilities,
-        preview_features,
+        preview_features.clone(),
     );
+
     output_types::output_objects::initialize_model_object_type_cache(&mut ctx);
 
     let (query_type, query_object_ref) = output_types::query_type::build(&mut ctx);
@@ -185,6 +190,8 @@ pub fn build(
         input_objects,
         output_objects,
         ctx.internal_data_model,
+        ctx.capabilities.capabilities,
+        preview_features,
     )
 }
 

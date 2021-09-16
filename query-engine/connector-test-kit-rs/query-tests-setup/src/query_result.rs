@@ -30,9 +30,14 @@ impl QueryResult {
             );
         }
 
+        // 0 is the "do nothing marker"
+        if err_code == 0 {
+            return;
+        }
+
         let err_code = format!("P{}", err_code);
         let err_exists = self.errors().into_iter().any(|err| {
-            let code_matches = dbg!(err.code() == Some(&err_code));
+            let code_matches = err.code() == Some(&err_code);
             let msg_matches = match msg_contains.as_ref() {
                 Some(msg) => err.message().contains(msg),
                 None => true,

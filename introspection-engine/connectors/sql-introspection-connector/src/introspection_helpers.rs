@@ -2,13 +2,11 @@ use crate::Dedup;
 use crate::SqlError;
 use datamodel::{
     common::RelationNames, Datamodel, DefaultValue as DMLDef, FieldArity, FieldType, IndexDefinition, Model,
-    OnDeleteStrategy, RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator as VG,
+    ReferentialAction, RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator as VG,
 };
-use datamodel_connector::Connector;
-use quaint::connector::SqlFamily;
-use sql_datamodel_connector::SqlDatamodelConnectors;
-use sql_schema_describer::DefaultKind;
+use introspection_connector::IntrospectionContext;
 use sql_schema_describer::{Column, ColumnArity, ColumnTypeFamily, ForeignKey, Index, IndexType, SqlSchema, Table};
+use sql_schema_describer::{DefaultKind, ForeignKeyAction};
 use tracing::debug;
 
 //checks
@@ -78,7 +76,7 @@ fn common_prisma_m_to_n_relation_conditions(table: &Table) -> bool {
             i.columns.len() == 2
                 && is_a(&i.columns[0])
                 && is_b(&i.columns[1])
-                && i.tpe == IndexType::Unique
+                && i.is_unique()
         })
         //INDEX [B]
         && table
@@ -104,10 +102,12 @@ pub fn calculate_many_to_many_field(
 ) -> RelationField {
     let relation_info = RelationInfo {
         name: relation_name,
+        fk_name: None,
         fields: vec![],
         to: opposite_foreign_key.referenced_table.clone(),
         references: opposite_foreign_key.referenced_columns.clone(),
-        on_delete: OnDeleteStrategy::None,
+        on_delete: None,
+        on_update: None,
     };
 
     let basename = opposite_foreign_key.referenced_table.clone();
@@ -117,7 +117,7 @@ pub fn calculate_many_to_many_field(
         false => basename,
     };
 
-    RelationField::new(&name, FieldArity::List, relation_info)
+    RelationField::new(&name, FieldArity::List, FieldArity::List, relation_info)
 }
 
 pub(crate) fn calculate_index(index: &Index) -> IndexDefinition {
@@ -127,19 +127,26 @@ pub(crate) fn calculate_index(index: &Index) -> IndexDefinition {
         IndexType::Normal => datamodel::dml::IndexType::Normal,
     };
 
+    //We do not populate name in client by default. It increases datamodel noise,
+    //and we would need to sanitize it. Users can give their own names if they want
+    //and re-introspection will keep them. This is a change in introspection behaviour,
+    //but due to re-introspection previous datamodels and clients should keep working as before.
+
     IndexDefinition {
-        name: Some(index.name.clone()),
+        name: None,
+        db_name: Some(index.name.clone()),
         fields: index.columns.clone(),
         tpe,
+        defined_on_field: index.columns.len() == 1,
     }
 }
 
-pub(crate) fn calculate_scalar_field(table: &Table, column: &Column, family: &SqlFamily) -> ScalarField {
+pub(crate) fn calculate_scalar_field(table: &Table, column: &Column, ctx: &IntrospectionContext) -> ScalarField {
     debug!("Handling column {:?}", column);
 
-    let field_type = calculate_scalar_field_type_with_native_types(column, family);
+    let field_type = calculate_scalar_field_type_with_native_types(column, ctx);
 
-    let is_id = is_id(&column, &table);
+    let is_id = is_id(column, table);
     let arity = match column.tpe.arity {
         _ if is_id && column.auto_increment => FieldArity::Required,
         ColumnArity::Required => FieldArity::Required,
@@ -147,9 +154,7 @@ pub(crate) fn calculate_scalar_field(table: &Table, column: &Column, family: &Sq
         ColumnArity::List => FieldArity::List,
     };
 
-    let default_value = calculate_default(table, &column, &arity);
-
-    let is_unique = table.is_column_unique(&column.name) && !is_id;
+    let default_value = calculate_default(table, column, &arity);
 
     ScalarField {
         name: column.name.clone(),
@@ -157,8 +162,6 @@ pub(crate) fn calculate_scalar_field(table: &Table, column: &Column, family: &Sq
         field_type,
         database_name: None,
         default_value,
-        is_unique,
-        is_id,
         documentation: None,
         is_generated: false,
         is_updated_at: false,
@@ -171,15 +174,26 @@ pub(crate) fn calculate_relation_field(
     schema: &SqlSchema,
     table: &Table,
     foreign_key: &ForeignKey,
+    m2m_table_names: &[String],
 ) -> Result<RelationField, SqlError> {
     debug!("Handling foreign key  {:?}", foreign_key);
 
+    let map_action = |action: ForeignKeyAction| match action {
+        ForeignKeyAction::NoAction => ReferentialAction::NoAction,
+        ForeignKeyAction::Restrict => ReferentialAction::Restrict,
+        ForeignKeyAction::Cascade => ReferentialAction::Cascade,
+        ForeignKeyAction::SetNull => ReferentialAction::SetNull,
+        ForeignKeyAction::SetDefault => ReferentialAction::SetDefault,
+    };
+
     let relation_info = RelationInfo {
-        name: calculate_relation_name(schema, foreign_key, table)?,
+        name: calculate_relation_name(schema, foreign_key, table, m2m_table_names)?,
+        fk_name: foreign_key.constraint_name.clone(),
         fields: foreign_key.columns.clone(),
         to: foreign_key.referenced_table.clone(),
         references: foreign_key.referenced_columns.clone(),
-        on_delete: OnDeleteStrategy::None,
+        on_delete: Some(map_action(foreign_key.on_delete_action)),
+        on_update: Some(map_action(foreign_key.on_update_action)),
     };
 
     let columns: Vec<&Column> = foreign_key
@@ -193,7 +207,17 @@ pub(crate) fn calculate_relation_field(
         false => FieldArity::Required,
     };
 
-    Ok(RelationField::new(&foreign_key.referenced_table, arity, relation_info))
+    let calculated_arity = match columns.iter().any(|c| c.is_required()) {
+        true => FieldArity::Required,
+        false => arity,
+    };
+
+    Ok(RelationField::new(
+        &foreign_key.referenced_table,
+        arity,
+        calculated_arity,
+        relation_info,
+    ))
 }
 
 pub(crate) fn calculate_backrelation_field(
@@ -210,17 +234,19 @@ pub(crate) fn calculate_backrelation_field(
         Ok(table) => {
             let new_relation_info = RelationInfo {
                 name: relation_info.name.clone(),
+                fk_name: None,
                 to: model.name.clone(),
                 fields: vec![],
                 references: vec![],
-                on_delete: OnDeleteStrategy::None,
+                on_delete: None,
+                on_update: None,
             };
 
             // unique or id
             let other_is_unique = table
                 .indices
                 .iter()
-                .any(|i| columns_match(&i.columns, &relation_info.fields) && i.tpe == IndexType::Unique)
+                .any(|i| columns_match(&i.columns, &relation_info.fields) && i.is_unique())
                 || columns_match(&table.primary_key_columns(), &relation_info.fields);
 
             let arity = match relation_field.arity {
@@ -236,7 +262,7 @@ pub(crate) fn calculate_backrelation_field(
                 model.name.clone()
             };
 
-            Ok(RelationField::new(&name, arity, new_relation_info))
+            Ok(RelationField::new(&name, arity, arity, new_relation_info))
         }
     }
 }
@@ -244,20 +270,35 @@ pub(crate) fn calculate_backrelation_field(
 pub(crate) fn calculate_default(table: &Table, column: &Column, arity: &FieldArity) -> Option<DMLDef> {
     match (column.default.as_ref().map(|d| d.kind()), &column.tpe.family) {
         (_, _) if *arity == FieldArity::List => None,
-        (_, ColumnTypeFamily::Int) if column.auto_increment => Some(DMLDef::Expression(VG::new_autoincrement())),
-        (_, ColumnTypeFamily::BigInt) if column.auto_increment => Some(DMLDef::Expression(VG::new_autoincrement())),
-        (_, ColumnTypeFamily::Int) if is_sequence(column, table) => Some(DMLDef::Expression(VG::new_autoincrement())),
+        (_, ColumnTypeFamily::Int) if column.auto_increment => Some(DMLDef::new_expression(VG::new_autoincrement())),
+        (_, ColumnTypeFamily::BigInt) if column.auto_increment => Some(DMLDef::new_expression(VG::new_autoincrement())),
+        (_, ColumnTypeFamily::Int) if is_sequence(column, table) => {
+            Some(DMLDef::new_expression(VG::new_autoincrement()))
+        }
         (_, ColumnTypeFamily::BigInt) if is_sequence(column, table) => {
-            Some(DMLDef::Expression(VG::new_autoincrement()))
+            Some(DMLDef::new_expression(VG::new_autoincrement()))
         }
-        (Some(DefaultKind::Sequence(_)), _) => Some(DMLDef::Expression(VG::new_autoincrement())),
-        (Some(DefaultKind::Now), ColumnTypeFamily::DateTime) => Some(DMLDef::Expression(VG::new_now())),
-        (Some(DefaultKind::DbGenerated(default_string)), _) => {
-            Some(DMLDef::Expression(VG::new_dbgenerated(default_string.clone())))
+        (Some(DefaultKind::Sequence(_)), _) => Some(DMLDef::new_expression(VG::new_autoincrement())),
+        (Some(DefaultKind::Now), ColumnTypeFamily::DateTime) => {
+            Some(set_default(DMLDef::new_expression(VG::new_now()), column))
         }
-        (Some(DefaultKind::Value(val)), _) => Some(DMLDef::Single(val.clone())),
+        (Some(DefaultKind::DbGenerated(default_string)), _) => Some(set_default(
+            DMLDef::new_expression(VG::new_dbgenerated(default_string.clone())),
+            column,
+        )),
+        (Some(DefaultKind::Value(val)), _) => Some(set_default(DMLDef::new_single(val.clone()), column)),
         _ => None,
     }
+}
+
+fn set_default(mut default: DMLDef, column: &Column) -> DMLDef {
+    let db_name = column.default.as_ref().and_then(|df| df.constraint_name());
+
+    if let Some(name) = db_name {
+        default.set_db_name(name);
+    }
+
+    default
 }
 
 pub(crate) fn is_id(column: &Column, table: &Table) -> bool {
@@ -276,7 +317,12 @@ pub(crate) fn is_sequence(column: &Column, table: &Table) -> bool {
         .unwrap_or(false)
 }
 
-pub(crate) fn calculate_relation_name(schema: &SqlSchema, fk: &ForeignKey, table: &Table) -> Result<String, SqlError> {
+pub(crate) fn calculate_relation_name(
+    schema: &SqlSchema,
+    fk: &ForeignKey,
+    table: &Table,
+    m2m_table_names: &[String],
+) -> Result<String, SqlError> {
     //this is not called for prisma many to many relations. for them the name is just the name of the join table.
     let referenced_model = &fk.referenced_table;
     let model_with_fk = &table.name;
@@ -296,14 +342,19 @@ pub(crate) fn calculate_relation_name(schema: &SqlSchema, fk: &ForeignKey, table
             explanation: format!("Table {} not found.", table_name),
         }),
         Ok(other_table) => {
-            let fk_from_other_model_to_this: Vec<&ForeignKey> = other_table
+            let fk_from_other_model_to_this_exist = other_table
                 .foreign_keys
                 .iter()
-                .filter(|fk| &fk.referenced_table == model_with_fk)
-                .collect();
+                .any(|fk| &fk.referenced_table == model_with_fk);
 
-            let name = if fk_to_same_model.len() < 2 && fk_from_other_model_to_this.is_empty() {
-                RelationNames::name_for_unambiguous_relation(model_with_fk, referenced_model)
+            let unambiguous_name = RelationNames::name_for_unambiguous_relation(model_with_fk, referenced_model);
+
+            // this needs to know whether there are m2m relations and then use ambiguous name path
+            let name = if fk_to_same_model.len() < 2
+                && !fk_from_other_model_to_this_exist
+                && !m2m_table_names.contains(&unambiguous_name)
+            {
+                unambiguous_name
             } else {
                 RelationNames::name_for_ambiguous_relation(model_with_fk, referenced_model, &fk_column_name)
             };
@@ -318,39 +369,35 @@ pub(crate) fn calculate_scalar_field_type_for_native_type(column: &Column) -> Fi
     let fdt = column.tpe.full_data_type.to_owned();
 
     match &column.tpe.family {
-        ColumnTypeFamily::Int => FieldType::Base(ScalarType::Int, None),
-        ColumnTypeFamily::BigInt => FieldType::Base(ScalarType::BigInt, None),
-        ColumnTypeFamily::Float => FieldType::Base(ScalarType::Float, None),
-        ColumnTypeFamily::Decimal => FieldType::Base(ScalarType::Decimal, None),
-        ColumnTypeFamily::Boolean => FieldType::Base(ScalarType::Boolean, None),
-        ColumnTypeFamily::String => FieldType::Base(ScalarType::String, None),
-        ColumnTypeFamily::DateTime => FieldType::Base(ScalarType::DateTime, None),
-        ColumnTypeFamily::Json => FieldType::Base(ScalarType::Json, None),
-        ColumnTypeFamily::Uuid => FieldType::Base(ScalarType::String, None),
-        ColumnTypeFamily::Binary => FieldType::Base(ScalarType::Bytes, None),
+        ColumnTypeFamily::Int => FieldType::Scalar(ScalarType::Int, None, None),
+        ColumnTypeFamily::BigInt => FieldType::Scalar(ScalarType::BigInt, None, None),
+        ColumnTypeFamily::Float => FieldType::Scalar(ScalarType::Float, None, None),
+        ColumnTypeFamily::Decimal => FieldType::Scalar(ScalarType::Decimal, None, None),
+        ColumnTypeFamily::Boolean => FieldType::Scalar(ScalarType::Boolean, None, None),
+        ColumnTypeFamily::String => FieldType::Scalar(ScalarType::String, None, None),
+        ColumnTypeFamily::DateTime => FieldType::Scalar(ScalarType::DateTime, None, None),
+        ColumnTypeFamily::Json => FieldType::Scalar(ScalarType::Json, None, None),
+        ColumnTypeFamily::Uuid => FieldType::Scalar(ScalarType::String, None, None),
+        ColumnTypeFamily::Binary => FieldType::Scalar(ScalarType::Bytes, None, None),
         ColumnTypeFamily::Enum(name) => FieldType::Enum(name.to_owned()),
         ColumnTypeFamily::Unsupported(_) => FieldType::Unsupported(fdt),
     }
 }
 
-pub(crate) fn calculate_scalar_field_type_with_native_types(column: &Column, family: &SqlFamily) -> FieldType {
+pub(crate) fn calculate_scalar_field_type_with_native_types(column: &Column, ctx: &IntrospectionContext) -> FieldType {
     debug!("Calculating native field type for '{}'", column.name);
     let scalar_type = calculate_scalar_field_type_for_native_type(column);
 
-    //fixme move this out of function
-    let connector: Box<dyn Connector> = match family {
-        SqlFamily::Mysql => Box::new(SqlDatamodelConnectors::mysql()),
-        SqlFamily::Postgres => Box::new(SqlDatamodelConnectors::postgres()),
-        SqlFamily::Sqlite => Box::new(SqlDatamodelConnectors::sqlite()),
-        SqlFamily::Mssql => Box::new(SqlDatamodelConnectors::mssql()),
-    };
-
     match scalar_type {
-        FieldType::Base(scal_type, _) => match &column.tpe.native_type {
+        FieldType::Scalar(scal_type, _, _) => match &column.tpe.native_type {
             None => scalar_type,
             Some(native_type) => {
-                let native_type_instance = connector.introspect_native_type(native_type.clone()).unwrap();
-                FieldType::NativeType(scal_type, native_type_instance)
+                let native_type_instance = ctx
+                    .source
+                    .active_connector
+                    .introspect_native_type(native_type.clone())
+                    .unwrap();
+                FieldType::Scalar(scal_type, None, Some(native_type_instance))
             }
         },
         field_type => field_type,

@@ -1,20 +1,26 @@
 use super::SqlFlavour;
 use crate::{
-    connect,
-    connection_wrapper::Connection,
-    error::{quaint_error_to_connector_error, SystemDatabase},
+    connection_wrapper::{connect, quaint_error_to_connector_error, Connection},
+    error::SystemDatabase,
     SqlMigrationConnector,
 };
-use datamodel::{walkers::walk_scalar_fields, Datamodel};
+use datamodel::{common::preview_features::PreviewFeature, walkers::walk_scalar_fields, Datamodel};
 use enumflags2::BitFlags;
 use indoc::indoc;
-use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
+use migration_connector::{migrations_directory::MigrationDirectory, ConnectorError, ConnectorResult};
 use once_cell::sync::Lazy;
-use quaint::connector::MysqlUrl;
+use quaint::connector::{
+    mysql_async::{self as my, prelude::Query},
+    MysqlUrl,
+};
 use regex::{Regex, RegexSet};
 use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
 use std::sync::atomic::{AtomicU8, Ordering};
 use url::Url;
+use user_facing_errors::{
+    migration_engine::{ApplyMigrationError, DirectDdlNotAllowed, ForeignKeyCreationNotAllowed},
+    KnownError,
+};
 
 const ADVISORY_LOCK_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(10);
 static QUALIFIED_NAME_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"`[^ ]+`\.`[^ ]+`"#).unwrap());
@@ -23,6 +29,7 @@ pub(crate) struct MysqlFlavour {
     url: MysqlUrl,
     /// See the [Circumstances] enum.
     circumstances: AtomicU8,
+    preview_features: BitFlags<PreviewFeature>,
 }
 
 impl std::fmt::Debug for MysqlFlavour {
@@ -32,10 +39,11 @@ impl std::fmt::Debug for MysqlFlavour {
 }
 
 impl MysqlFlavour {
-    pub(crate) fn new(url: MysqlUrl) -> Self {
+    pub(crate) fn new(url: MysqlUrl, preview_features: BitFlags<PreviewFeature>) -> Self {
         MysqlFlavour {
             url,
             circumstances: Default::default(),
+            preview_features,
         }
     }
 
@@ -100,11 +108,28 @@ impl MysqlFlavour {
 
         let mut shadow_database_url = self.url.url().clone();
         shadow_database_url.set_path(&format!("/{}", database_name));
+        let host = shadow_database_url.host();
         let shadow_database_url = shadow_database_url.to_string();
 
-        tracing::debug!("Connecting to shadow database at {:?}", shadow_database_url);
+        tracing::debug!("Connecting to shadow database at {:?}/{}", host, database_name);
 
         Ok(crate::connect(&shadow_database_url).await?)
+    }
+
+    fn convert_server_error(&self, error: &my::Error) -> Option<KnownError> {
+        if self.is_vitess() {
+            match error {
+                my::Error::Server(se) if se.code == 1317 => Some(KnownError::new(ForeignKeyCreationNotAllowed)),
+                // sigh, this code is for unknown error, so we have the ddl
+                // error and other stuff, such as typos in the same category...
+                my::Error::Server(se) if se.code == 1105 && se.message == "direct DDL is disabled" => {
+                    Some(KnownError::new(DirectDdlNotAllowed))
+                }
+                _ => None,
+            }
+        } else {
+            None
+        }
     }
 }
 
@@ -114,6 +139,90 @@ impl SqlFlavour for MysqlFlavour {
         // https://dev.mysql.com/doc/refman/8.0/en/locking-functions.html
         let query = format!("SELECT GET_LOCK('prisma_migrate', {})", ADVISORY_LOCK_TIMEOUT.as_secs());
         Ok(connection.raw_cmd(&query).await?)
+    }
+
+    async fn run_query_script(&self, sql: &str, connection: &Connection) -> ConnectorResult<()> {
+        let convert_error = |error: my::Error| match self.convert_server_error(&error) {
+            Some(e) => ConnectorError::from(e),
+            None => quaint_error_to_connector_error(quaint::error::Error::from(error), &connection.connection_info()),
+        };
+
+        let (client, _url) = connection.unwrap_mysql();
+        let mut conn = client.conn().lock().await;
+
+        let mut result = sql.run(&mut *conn).await.map_err(convert_error)?;
+
+        loop {
+            match result.map(drop).await {
+                Ok(_) => {
+                    if result.is_empty() {
+                        result.map(drop).await.map_err(convert_error)?;
+                        return Ok(());
+                    }
+                }
+                Err(e) => {
+                    return Err(convert_error(e));
+                }
+            }
+        }
+    }
+
+    async fn apply_migration_script(
+        &self,
+        migration_name: &str,
+        script: &str,
+        connection: &Connection,
+    ) -> ConnectorResult<()> {
+        let convert_error = |migration_idx: usize, error: my::Error| {
+            let position = format!(
+                "Please check the query number {} from the migration file.",
+                migration_idx + 1
+            );
+
+            let (code, error) = match (&error, self.convert_server_error(&error)) {
+                (my::Error::Server(se), Some(error)) => {
+                    let message = format!("{}\n\n{}", error.message, position);
+                    (Some(se.code), message)
+                }
+                (my::Error::Server(se), None) => {
+                    let message = format!("{}\n\n{}", se.message, position);
+                    (Some(se.code), message)
+                }
+                _ => (None, error.to_string()),
+            };
+
+            ConnectorError::user_facing(ApplyMigrationError {
+                migration_name: migration_name.to_owned(),
+                database_error_code: code.map(|c| c.to_string()).unwrap_or_else(|| String::from("none")),
+                database_error: error,
+            })
+        };
+
+        let (client, _url) = connection.unwrap_mysql();
+        let mut conn = client.conn().lock().await;
+
+        let mut migration_idx = 0_usize;
+
+        let mut result = script
+            .run(&mut *conn)
+            .await
+            .map_err(|e| convert_error(migration_idx, e))?;
+
+        loop {
+            match result.map(drop).await {
+                Ok(_) => {
+                    migration_idx += 1;
+
+                    if result.is_empty() {
+                        result.map(drop).await.map_err(|e| convert_error(migration_idx, e))?;
+                        return Ok(());
+                    }
+                }
+                Err(e) => {
+                    return Err(convert_error(migration_idx, e));
+                }
+            }
+        }
     }
 
     fn check_database_version_compatibility(
@@ -177,16 +286,16 @@ impl SqlFlavour for MysqlFlavour {
             ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
         "#};
 
-        Ok(connection.raw_cmd(sql).await?)
+        Ok(self.run_query_script(sql, connection).await?)
     }
 
     async fn describe_schema<'a>(&'a self, connection: &Connection) -> ConnectorResult<SqlSchema> {
-        sql_schema_describer::mysql::SqlSchemaDescriber::new(connection.quaint().clone())
+        sql_schema_describer::mysql::SqlSchemaDescriber::new(connection.queryable())
             .describe(connection.connection_info().schema_name())
             .await
             .map_err(|err| match err.into_kind() {
                 DescriberErrorKind::QuaintError(err) => {
-                    quaint_error_to_connector_error(err, connection.connection_info())
+                    quaint_error_to_connector_error(err, &connection.connection_info())
                 }
                 DescriberErrorKind::CrossSchemaReference { .. } => {
                     unreachable!("No schemas in MySQL")
@@ -196,7 +305,8 @@ impl SqlFlavour for MysqlFlavour {
 
     async fn drop_database(&self, database_url: &str) -> ConnectorResult<()> {
         let connection = connect(database_url).await?;
-        let db_name = connection.connection_info().dbname().unwrap();
+        let connection_info = connection.connection_info();
+        let db_name = connection_info.dbname().unwrap();
 
         connection.raw_cmd(&format!("DROP DATABASE `{}`", db_name)).await?;
 
@@ -220,7 +330,7 @@ impl SqlFlavour for MysqlFlavour {
             .unwrap()
         });
 
-        let db_name = connection.connection_info().schema_name();
+        let db_name = connection.schema_name();
 
         if MYSQL_SYSTEM_DATABASES.is_match(db_name) {
             return Err(SystemDatabase(db_name.to_owned()).into());
@@ -238,7 +348,7 @@ impl SqlFlavour for MysqlFlavour {
         let mut circumstances = BitFlags::<Circumstances>::default();
 
         if let Some(version) = version {
-            if version.contains("vitess") {
+            if version.contains("vitess") || version.contains("Vitess") {
                 circumstances |= Circumstances::IsVitess;
             }
         }
@@ -294,13 +404,18 @@ impl SqlFlavour for MysqlFlavour {
             ));
         }
 
-        let db_name = connection.connection_info().dbname().unwrap();
+        let connection_info = connection.connection_info();
+        let db_name = connection_info.dbname().unwrap();
 
         connection.raw_cmd(&format!("DROP DATABASE `{}`", db_name)).await?;
         connection.raw_cmd(&format!("CREATE DATABASE `{}`", db_name)).await?;
         connection.raw_cmd(&format!("USE `{}`", db_name)).await?;
 
         Ok(())
+    }
+
+    fn preview_features(&self) -> BitFlags<PreviewFeature> {
+        self.preview_features
     }
 
     fn scan_migration_script(&self, script: &str) {
@@ -344,10 +459,8 @@ impl SqlFlavour for MysqlFlavour {
 
                 self.scan_migration_script(&script);
 
-                temp_database
-                    .raw_cmd(&script)
+                self.apply_migration_script(migration.migration_name(), &script, &temp_database)
                     .await
-                    .map_err(ConnectorError::from)
                     .map_err(|connector_error| {
                         connector_error.into_migration_does_not_apply_cleanly(migration.migration_name().to_owned())
                     })?;
@@ -369,7 +482,7 @@ impl SqlFlavour for MysqlFlavour {
 #[enumflags2::bitflags]
 #[derive(Debug, Clone, Copy, PartialEq)]
 #[repr(u8)]
-pub enum Circumstances {
+pub(crate) enum Circumstances {
     LowerCasesTableNames,
     IsMysql56,
     IsMariadb,
@@ -396,7 +509,7 @@ mod tests {
     fn debug_impl_does_not_leak_connection_info() {
         let url = "mysql://myname:mypassword@myserver:8765/mydbname";
 
-        let flavour = MysqlFlavour::new(MysqlUrl::new(url.parse().unwrap()).unwrap());
+        let flavour = MysqlFlavour::new(MysqlUrl::new(url.parse().unwrap()).unwrap(), BitFlags::empty()); // unwrap this
         let debugged = format!("{:?}", flavour);
 
         let words = &["myname", "mypassword", "myserver", "8765", "mydbname"];

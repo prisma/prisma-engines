@@ -1,5 +1,5 @@
 use crate::IntoConnectorResult;
-use migration_connector::DatabaseMigrationStepApplier;
+use migration_connector::{DatabaseMigrationStepApplier, DestructiveChangeDiagnostics, Migration};
 use mongodb_migration::MongoDbMigrationStep;
 
 use crate::{
@@ -8,14 +8,12 @@ use crate::{
 };
 
 #[async_trait::async_trait]
-impl DatabaseMigrationStepApplier<MongoDbMigration> for MongoDbMigrationConnector {
-    async fn apply_migration(
-        &self,
-        database_migration: &MongoDbMigration,
-    ) -> migration_connector::ConnectorResult<u32> {
+impl DatabaseMigrationStepApplier for MongoDbMigrationConnector {
+    async fn apply_migration(&self, migration: &Migration) -> migration_connector::ConnectorResult<u32> {
         let db = self.client.database(&self.db_name);
+        let migration: &MongoDbMigration = migration.downcast_ref();
 
-        for step in database_migration.steps.iter() {
+        for step in migration.steps.iter() {
             match step {
                 MongoDbMigrationStep::CreateCollection(name) => db
                     .create_collection(name.as_str(), None)
@@ -24,21 +22,10 @@ impl DatabaseMigrationStepApplier<MongoDbMigration> for MongoDbMigrationConnecto
             }
         }
 
-        Ok(database_migration.steps.len() as u32)
+        Ok(migration.steps.len() as u32)
     }
 
-    fn render_steps_pretty(
-        &self,
-        _database_migration: &MongoDbMigration,
-    ) -> migration_connector::ConnectorResult<Vec<migration_connector::PrettyDatabaseMigrationStep>> {
-        todo!()
-    }
-
-    fn render_script(
-        &self,
-        _database_migration: &MongoDbMigration,
-        _diagnostics: &migration_connector::DestructiveChangeDiagnostics,
-    ) -> String {
+    fn render_script(&self, _migration: &Migration, _diagnostics: &DestructiveChangeDiagnostics) -> String {
         todo!()
     }
 

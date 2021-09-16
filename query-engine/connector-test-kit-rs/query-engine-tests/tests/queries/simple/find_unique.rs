@@ -5,8 +5,8 @@ mod find_unique {
     use query_engine_tests::assert_query;
 
     #[connector_test]
-    async fn fetch_unique_by_id(runner: &Runner) -> TestResult<()> {
-        test_user(runner).await?;
+    async fn fetch_unique_by_id(runner: Runner) -> TestResult<()> {
+        test_user(&runner).await?;
 
         assert_query!(
             runner,
@@ -18,11 +18,11 @@ mod find_unique {
     }
 
     #[connector_test]
-    async fn fetch_unique_by_single_unique(runner: &Runner) -> TestResult<()> {
-        test_user(runner).await?;
+    async fn fetch_unique_by_single_unique(runner: Runner) -> TestResult<()> {
+        test_user(&runner).await?;
 
         assert_query!(
-            runner,
+            &runner,
             r#"query { findUniqueUser(where: { email: "a@b.com" }) { id } }"#,
             r#"{"data":{"findUniqueUser":{"id":1}}}"#
         );
@@ -31,11 +31,11 @@ mod find_unique {
     }
 
     #[connector_test]
-    async fn fetch_unique_by_multi_unique(runner: &Runner) -> TestResult<()> {
-        test_user(runner).await?;
+    async fn fetch_unique_by_multi_unique(runner: Runner) -> TestResult<()> {
+        test_user(&runner).await?;
 
         assert_query!(
-            runner,
+            &runner,
             r#"query { findUniqueUser(where: { first_name_last_name: { first_name: "Elongated", last_name: "Muskrat" } }) { id } }"#,
             r#"{"data":{"findUniqueUser":{"id":1}}}"#
         );
@@ -44,8 +44,8 @@ mod find_unique {
     }
 
     #[connector_test]
-    async fn no_result_fetch_unique_by_id(runner: &Runner) -> TestResult<()> {
-        test_user(runner).await?;
+    async fn no_result_fetch_unique_by_id(runner: Runner) -> TestResult<()> {
+        test_user(&runner).await?;
 
         assert_query!(
             runner,
@@ -57,11 +57,11 @@ mod find_unique {
     }
 
     #[connector_test]
-    async fn no_result_fetch_unique_by_single_unique(runner: &Runner) -> TestResult<()> {
-        test_user(runner).await?;
+    async fn no_result_fetch_unique_by_single_unique(runner: Runner) -> TestResult<()> {
+        test_user(&runner).await?;
 
         assert_query!(
-            runner,
+            &runner,
             r#"query { findUniqueUser(where: { email: "b@a.com" }) { id } }"#,
             r#"{"data":{"findUniqueUser":null}}"#
         );
@@ -70,11 +70,11 @@ mod find_unique {
     }
 
     #[connector_test]
-    async fn no_result_fetch_unique_by_multi_unique(runner: &Runner) -> TestResult<()> {
-        test_user(runner).await?;
+    async fn no_result_fetch_unique_by_multi_unique(runner: Runner) -> TestResult<()> {
+        test_user(&runner).await?;
 
         assert_query!(
-            runner,
+            &runner,
             r#"query { findUniqueUser(where: { first_name_last_name: { first_name: "Doesn't", last_name: "Exist" } }) { id } }"#,
             r#"{"data":{"findUniqueUser":null}}"#
         );

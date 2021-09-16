@@ -19,13 +19,13 @@ mod delete {
 
     // "A Delete Mutation" should "delete and return item"
     #[connector_test]
-    async fn should_delete_and_return_item(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ id: 1, string: "test" }"#).await?;
+    async fn should_delete_and_return_item(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, string: "test" }"#).await?;
 
-        run_query!(runner, r#"mutation { deleteOneScalarModel(where: {id: 1}) { id } }"#);
+        run_query!(&runner, r#"mutation { deleteOneScalarModel(where: {id: 1}) { id } }"#);
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyScalarModel { id }}"#),
+          run_query!(&runner, r#"query { findManyScalarModel { id }}"#),
           @r###"{"data":{"findManyScalarModel":[]}}"###
         );
 
@@ -34,8 +34,8 @@ mod delete {
 
     // "A Delete Mutation" should "gracefully fail on non-existing id"
     #[connector_test]
-    async fn should_fail_non_exist_id(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ id: 1, string: "test" }"#).await?;
+    async fn should_fail_non_exist_id(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, string: "test" }"#).await?;
 
         assert_error!(
           runner,
@@ -45,7 +45,7 @@ mod delete {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyScalarModel { string }}"#),
+          run_query!(&runner, r#"query { findManyScalarModel { string }}"#),
           @r###"{"data":{"findManyScalarModel":[{"string":"test"}]}}"###
         );
 
@@ -54,17 +54,17 @@ mod delete {
 
     // "A Delete Mutation" should "delete and return item on non id unique field"
     #[connector_test]
-    async fn should_delete_return_non_id_uniq_field(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ id: 1, unicorn: "a" }"#).await?;
-        create_row(runner, r#"{ id: 2, unicorn: "b" }"#).await?;
+    async fn should_delete_return_non_id_uniq_field(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, unicorn: "a" }"#).await?;
+        create_row(&runner, r#"{ id: 2, unicorn: "b" }"#).await?;
 
         run_query!(
-            runner,
+            &runner,
             r#"mutation { deleteOneScalarModel(where: { unicorn: "a" }) { unicorn }}"#
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyScalarModel{ unicorn } }"#),
+          run_query!(&runner, r#"query { findManyScalarModel{ unicorn } }"#),
           @r###"{"data":{"findManyScalarModel":[{"unicorn":"b"}]}}"###
         );
 
@@ -73,8 +73,8 @@ mod delete {
 
     // "A Delete Mutation" should "gracefully fail when trying to delete on non-existent value for non id unique field"
     #[connector_test]
-    async fn should_fail_non_existent_value_non_id_uniq_field(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{id: 1, unicorn: "a"}"#).await?;
+    async fn should_fail_non_existent_value_non_id_uniq_field(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{id: 1, unicorn: "a"}"#).await?;
 
         assert_error!(
           runner,
@@ -84,7 +84,7 @@ mod delete {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyScalarModel { unicorn } }"#),
+          run_query!(&runner, r#"query { findManyScalarModel { unicorn } }"#),
           @r###"{"data":{"findManyScalarModel":[{"unicorn":"a"}]}}"###
         );
 
@@ -93,18 +93,18 @@ mod delete {
 
     // "A Delete Mutation" should "gracefully fail when trying to delete on null value for unique field"
     #[connector_test]
-    async fn should_fail_delete_null_value(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{id: 1, unicorn: "a"}"#).await?;
+    async fn should_fail_delete_null_value(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{id: 1, unicorn: "a"}"#).await?;
 
         assert_error!(
-            runner,
+            &runner,
             r#"mutation { deleteOneScalarModel(where: {unicorn: null}) { unicorn }}"#,
             2012,
             "Missing a required value at `Mutation.deleteOneScalarModel.where.ScalarModelWhereUniqueInput.unicorn`"
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyScalarModel { unicorn }}"#),
+          run_query!(&runner, r#"query { findManyScalarModel { unicorn }}"#),
           @r###"{"data":{"findManyScalarModel":[{"unicorn":"a"}]}}"###
         );
 
@@ -113,18 +113,18 @@ mod delete {
 
     // "A Delete Mutation" should "gracefully fail when referring to a non-unique field"
     #[connector_test]
-    async fn should_fail_referring_non_uniq_field(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{id: 1, string: "a"}"#).await?;
+    async fn should_fail_referring_non_uniq_field(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{id: 1, string: "a"}"#).await?;
 
         assert_error!(
-            runner,
+            &runner,
             r#"mutation {deleteOneScalarModel(where: {string: "a"}) { string }}"#,
             2009,
             "`Field does not exist on enclosing type.` at `Mutation.deleteOneScalarModel.where.ScalarModelWhereUniqueInput.string`"
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyScalarModel { string }}"#),
+          run_query!(&runner, r#"query { findManyScalarModel { string }}"#),
           @r###"{"data":{"findManyScalarModel":[{"string":"a"}]}}"###
         );
 

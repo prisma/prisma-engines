@@ -1,12 +1,7 @@
 //! The external facing programmatic API to the migration engine.
 
-mod error_rendering;
-mod rpc;
-
-pub use rpc::RpcApi;
-
 use crate::{commands::*, CoreResult};
-use migration_connector::MigrationConnector;
+use migration_connector::{migrations_directory, MigrationConnector};
 use std::path::Path;
 use tracing_futures::Instrument;
 
@@ -53,30 +48,34 @@ pub trait GenericApi: Send + Sync + 'static {
         input: &MarkMigrationRolledBackInput,
     ) -> CoreResult<MarkMigrationRolledBackOutput>;
 
-    /// Prepare to create a migration.
-    async fn plan_migration(&self, input: &PlanMigrationInput) -> CoreResult<PlanMigrationOutput>;
-
     /// Reset a database to an empty state (no data, no schema).
     async fn reset(&self) -> CoreResult<()>;
 
     /// The command behind `prisma db push`.
     async fn schema_push(&self, input: &SchemaPushInput) -> CoreResult<SchemaPushOutput>;
+
+    /// Access to the migration connector.
+    fn connector(&self) -> &dyn MigrationConnector;
 }
 
 #[async_trait::async_trait]
 impl<C: MigrationConnector> GenericApi for C {
+    fn connector(&self) -> &dyn MigrationConnector {
+        self
+    }
+
     async fn version(&self) -> CoreResult<String> {
         Ok(self.version().await?)
     }
 
     async fn apply_migrations(&self, input: &ApplyMigrationsInput) -> CoreResult<ApplyMigrationsOutput> {
-        ApplyMigrationsCommand::execute(input, self)
+        apply_migrations(input, self)
             .instrument(tracing::info_span!("ApplyMigrations"))
             .await
     }
 
     async fn create_migration(&self, input: &CreateMigrationInput) -> CoreResult<CreateMigrationOutput> {
-        CreateMigrationCommand::execute(input, self)
+        create_migration(input, self)
             .instrument(tracing::info_span!(
                 "CreateMigration",
                 migration_name = input.migration_name.as_str(),
@@ -99,13 +98,13 @@ impl<C: MigrationConnector> GenericApi for C {
         &self,
         input: &DiagnoseMigrationHistoryInput,
     ) -> CoreResult<DiagnoseMigrationHistoryOutput> {
-        DiagnoseMigrationHistoryCommand::execute(input, self)
+        diagnose_migration_history(input, self)
             .instrument(tracing::info_span!("DiagnoseMigrationHistory"))
             .await
     }
 
     async fn evaluate_data_loss(&self, input: &EvaluateDataLossInput) -> CoreResult<EvaluateDataLossOutput> {
-        EvaluateDataLoss::execute(input, self)
+        evaluate_data_loss(input, self)
             .instrument(tracing::info_span!("EvaluateDataLoss"))
             .await
     }
@@ -115,7 +114,7 @@ impl<C: MigrationConnector> GenericApi for C {
         input: &ListMigrationDirectoriesInput,
     ) -> CoreResult<ListMigrationDirectoriesOutput> {
         let migrations_from_filesystem =
-            migration_connector::list_migrations(&Path::new(&input.migrations_directory_path))?;
+            migrations_directory::list_migrations(Path::new(&input.migrations_directory_path))?;
 
         let migrations = migrations_from_filesystem
             .iter()
@@ -129,7 +128,7 @@ impl<C: MigrationConnector> GenericApi for C {
         &self,
         input: &MarkMigrationAppliedInput,
     ) -> CoreResult<MarkMigrationAppliedOutput> {
-        MarkMigrationAppliedCommand::execute(input, self)
+        mark_migration_applied(input, self)
             .instrument(tracing::info_span!(
                 "MarkMigrationApplied",
                 migration_name = input.migration_name.as_str()
@@ -149,12 +148,6 @@ impl<C: MigrationConnector> GenericApi for C {
             .await
     }
 
-    async fn plan_migration(&self, input: &PlanMigrationInput) -> CoreResult<PlanMigrationOutput> {
-        PlanMigrationCommand::execute(input, self)
-            .instrument(tracing::info_span!("PlanMigration"))
-            .await
-    }
-
     async fn reset(&self) -> CoreResult<()> {
         tracing::debug!("Resetting the database.");
 
@@ -164,7 +157,7 @@ impl<C: MigrationConnector> GenericApi for C {
     }
 
     async fn schema_push(&self, input: &SchemaPushInput) -> CoreResult<SchemaPushOutput> {
-        SchemaPushCommand::execute(input, self)
+        schema_push(input, self)
             .instrument(tracing::info_span!("SchemaPush"))
             .await
     }

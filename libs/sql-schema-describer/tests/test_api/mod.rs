@@ -30,12 +30,7 @@ impl TestApi {
             let (db_name, q, _) = rt.block_on(args.create_postgres_database());
             (db_name, q)
         } else if tags.contains(Tags::Mssql) {
-            let (q, _cs) = rt
-                .block_on(test_setup::init_mssql_database(
-                    args.database_url(),
-                    args.test_function_name(),
-                ))
-                .unwrap();
+            let (q, _cs) = rt.block_on(args.create_mssql_database());
             (args.test_function_name(), q)
         } else if tags.contains(Tags::Sqlite) {
             let url = sqlite_test_url(args.test_function_name());
@@ -61,30 +56,34 @@ impl TestApi {
     }
 
     pub(crate) fn describe(&self) -> SqlSchema {
-        self.rt.block_on(self.describer().describe(self.schema_name())).unwrap()
+        self.describe_with_schema(self.schema_name())
+    }
+
+    pub(crate) fn describe_with_schema(&self, schema: &str) -> SqlSchema {
+        self.rt
+            .block_on(self.describer(&self.database).describe(schema))
+            .unwrap()
     }
 
     pub(crate) fn describe_error(&self) -> DescriberError {
         self.rt
-            .block_on(self.describer().describe(self.schema_name()))
+            .block_on(self.describer(&self.database).describe(self.schema_name()))
             .unwrap_err()
     }
 
-    pub(crate) fn describer(&self) -> Box<dyn SqlSchemaDescriberBackend> {
-        let db = self.database.clone();
-
+    fn describer<'a>(&self, connection: &'a dyn Queryable) -> Box<dyn SqlSchemaDescriberBackend + 'a> {
         match self.sql_family() {
             SqlFamily::Postgres => Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(
-                db,
+                connection,
                 if self.tags.contains(Tags::Cockroach) {
                     Circumstances::Cockroach.into()
                 } else {
                     Default::default()
                 },
             )),
-            SqlFamily::Sqlite => Box::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(db)),
-            SqlFamily::Mysql => Box::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(db)),
-            SqlFamily::Mssql => Box::new(sql_schema_describer::mssql::SqlSchemaDescriber::new(db)),
+            SqlFamily::Sqlite => Box::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(connection)),
+            SqlFamily::Mysql => Box::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(connection)),
+            SqlFamily::Mssql => Box::new(sql_schema_describer::mssql::SqlSchemaDescriber::new(connection)),
         }
     }
 

@@ -11,7 +11,7 @@ use itertools::Itertools;
 use mongodb::{
     bson::{doc, Bson, Document},
     options::{AggregateOptions, FindOptions},
-    Collection,
+    ClientSession, Collection,
 };
 use prisma_models::{ModelProjection, ModelRef, ScalarFieldRef};
 
@@ -24,11 +24,15 @@ pub enum MongoReadQuery {
 }
 
 impl MongoReadQuery {
-    pub async fn execute(self, on_collection: Collection) -> crate::Result<Vec<Document>> {
+    pub async fn execute(
+        self,
+        on_collection: Collection,
+        with_session: &mut ClientSession,
+    ) -> crate::Result<Vec<Document>> {
         log_query(on_collection.name(), &self);
         match self {
-            MongoReadQuery::Find(q) => q.execute(on_collection).await,
-            MongoReadQuery::Pipeline(q) => q.execute(on_collection).await,
+            MongoReadQuery::Find(q) => q.execute(on_collection, with_session).await,
+            MongoReadQuery::Pipeline(q) => q.execute(on_collection, with_session).await,
         }
     }
 }
@@ -38,11 +42,17 @@ pub struct PipelineQuery {
 }
 
 impl PipelineQuery {
-    pub async fn execute(self, on_collection: Collection) -> crate::Result<Vec<Document>> {
+    pub async fn execute(
+        self,
+        on_collection: Collection,
+        with_session: &mut ClientSession,
+    ) -> crate::Result<Vec<Document>> {
         let opts = AggregateOptions::builder().allow_disk_use(true).build();
-        let cursor = on_collection.aggregate(self.stages, opts).await?;
+        let cursor = on_collection
+            .aggregate_with_session(self.stages, opts, with_session)
+            .await?;
 
-        Ok(vacuum_cursor(cursor).await?)
+        Ok(vacuum_cursor(cursor, with_session).await?)
     }
 }
 
@@ -52,10 +62,16 @@ pub struct FindQuery {
 }
 
 impl FindQuery {
-    pub async fn execute(self, on_collection: Collection) -> crate::Result<Vec<Document>> {
-        let cursor = on_collection.find(self.filter, self.options).await?;
+    pub async fn execute(
+        self,
+        on_collection: Collection,
+        with_session: &mut ClientSession,
+    ) -> crate::Result<Vec<Document>> {
+        let cursor = on_collection
+            .find_with_session(self.filter, self.options, with_session)
+            .await?;
 
-        Ok(vacuum_cursor(cursor).await?)
+        Ok(vacuum_cursor(cursor, with_session).await?)
     }
 }
 
@@ -113,7 +129,7 @@ pub(crate) struct MongoReadQueryBuilder {
 }
 
 impl MongoReadQueryBuilder {
-    pub fn _new(model: ModelRef) -> Self {
+    pub fn new(model: ModelRef) -> Self {
         Self {
             model,
             query: None,

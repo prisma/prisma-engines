@@ -44,6 +44,7 @@ pub fn render_test_datamodel(config: &TestConfig, test_database: &str, template:
             datasource test {{
                 provider = "{}"
                 url = "{}"
+                referentialIntegrity = "{}"
             }}
 
             generator client {{
@@ -53,6 +54,7 @@ pub fn render_test_datamodel(config: &TestConfig, test_database: &str, template:
         "#},
         tag.datamodel_provider(),
         tag.connection_string(test_database, config.is_ci()),
+        tag.referential_integrity(),
         all_features
     );
 

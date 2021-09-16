@@ -1,6 +1,6 @@
 use connector_interface::error::{ConnectorError, ErrorKind, MultiError};
 use itertools::Itertools;
-use mongodb::error::Error as DriverError;
+use mongodb::error::{CommandError, Error as DriverError};
 use regex::Regex;
 use thiserror::Error;
 use user_facing_errors::query_engine::DatabaseConstraint;
@@ -57,6 +57,13 @@ impl MongoError {
                     ConnectorError::from_kind(ErrorKind::AuthenticationFailed { user: message.clone() })
                 }
 
+                // Transaction aborted error.
+                mongodb::error::ErrorKind::Command(CommandError { code, message, .. }) if *code == 251 => {
+                    ConnectorError::from_kind(ErrorKind::TransactionAborted {
+                        message: message.to_owned(),
+                    })
+                }
+
                 mongodb::error::ErrorKind::Write(write_failure) => match write_failure {
                     mongodb::error::WriteFailure::WriteConcernError(concern_error) => match concern_error.code {
                         11000 => ConnectorError::from_kind(unique_violation_error(concern_error.message.as_str())),
@@ -108,7 +115,11 @@ impl MongoError {
                         errors.push(kind);
                     };
 
-                    ConnectorError::from_kind(ErrorKind::MultiError(MultiError { errors }))
+                    if errors.len() == 1 {
+                        ConnectorError::from_kind(errors.into_iter().next().unwrap())
+                    } else {
+                        ConnectorError::from_kind(ErrorKind::MultiError(MultiError { errors }))
+                    }
                 }
 
                 mongodb::error::ErrorKind::BsonDeserialization(err) => ConnectorError::from_kind(

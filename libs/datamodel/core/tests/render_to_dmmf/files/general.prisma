@@ -1,3 +1,14 @@
+
+datasource pg1 {
+  provider = "postgresql"
+  url      = "postgresql://"
+}
+
+generator foo {
+  provider = "bar"
+  previewFeatures = ["namedConstraints"]
+}
+
 model User {
   id        Int      @id
   createdAt DateTime
@@ -50,9 +61,10 @@ model PostToCategory {
   post          Post     @relation(fields: [postTitle, postCreatedAt], references: [title, createdAt])
   category      Category @relation(fields: [categoryId], references: [id])
 
-  @@unique([postTitle, categoryId], name: "MyUniqueIndex")
+  @@unique([postTitle, categoryId])
   @@map("post_to_category")
 }
+
 
 model A {
   id  Int @id
@@ -63,6 +75,21 @@ model A {
 model B {
   id Int @id
   a  A?
+}
+
+model NamedCompounds {
+  a             Int
+  b             Int
+  c             Int
+  d             Int
+
+  @@id([a, b], name: "MyPrimary", map: "DbPrimary")
+  @@unique([c, d], name: "MyUnique", map: "DbUnique")
+}
+
+model MappedSingles{
+  a             Int @id(map: "Primary")
+  b             Int @unique(map: "Unique")
 }
 
 enum CategoryEnum {

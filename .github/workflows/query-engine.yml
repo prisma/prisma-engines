@@ -5,53 +5,6 @@ on:
       - master
   pull_request:
 jobs:
-  scala-vitess-tests:
-    name: "Scala test suite: ${{ matrix.database }} on Linux"
-    runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: false
-      matrix:
-        database:
-          - vitess_5_7
-          - vitess_8_0
-
-    env:
-      TEST_CONNECTOR: ${{ matrix.database }}
-      LOG_LEVEL: "info"
-      LOG_QUERIES: "y"
-      RUST_LOG_FORMAT: "devel"
-      RUST_BACKTRACE: 1
-      CLICOLOR_FORCE: 1
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: "Start ${{ matrix.database }}"
-        run: make start-${{ matrix.database }}
-
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: "1.51.0"
-          default: true
-
-      - uses: olafurpg/setup-scala@v10
-        with:
-          java-version: adopt@1.8
-
-      - uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: query-engine-${{ runner.os }}-${{ matrix.database}}-cargo-${{ hashFiles('**/Cargo.lock') }}
-
-      - run: export SERVER_ROOT=$(pwd) && cd query-engine/connector-test-kit && sbt test
-        name: Run tests
-        env:
-          CLICOLOR_FORCE: 1
-
   rust-vitess-tests:
     name: "Rust test suite: ${{ matrix.database }} on Linux"
 
@@ -78,7 +31,7 @@ jobs:
 
       - uses: actions-rs/toolchain@v1
         with:
-          toolchain: "1.51.0"
+          toolchain: stable
           default: true
 
       - uses: actions/cache@v2

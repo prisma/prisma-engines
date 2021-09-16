@@ -1,5 +1,5 @@
 use chrono::Duration;
-use migration_engine_tests::sync_test_api::*;
+use migration_engine_tests::test_api::*;
 use pretty_assertions::assert_eq;
 
 #[test_connector]

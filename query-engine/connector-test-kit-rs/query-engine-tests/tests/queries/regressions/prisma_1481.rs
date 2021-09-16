@@ -20,7 +20,7 @@ mod element {
     }
 
     #[connector_test]
-    async fn prisma_1481(runner: &Runner) -> TestResult<()> {
+    async fn prisma_1481(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
         runner.batch(vec![
           r#"mutation {
@@ -28,7 +28,7 @@ mod element {
                 query: "UPDATE User SET name = ? WHERE id = ?;"
                 parameters: "[\"blub1\", \"THIS_DOES_NOT_EXIST1\"]"
               )
-            }"#,
+            }"#.to_string(),
           r#"mutation {
               updateManyUser(
                 where: { name: "A" }
@@ -36,8 +36,8 @@ mod element {
               ) {
                 count
               }
-            }"#,
-        ].into_iter(), true).await?.to_string(),
+            }"#.to_string(),
+        ], true).await?.to_string(),
           @r###"{"batchResult":[{"data":{"executeRaw":0}},{"data":{"updateManyUser":{"count":0}}}]}"###
         );
 

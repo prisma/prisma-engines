@@ -1,3 +1,7 @@
+use std::fmt;
+
+use itertools::Itertools;
+
 use super::*;
 
 /// Represents arbitrary, even nested, expressions.
@@ -16,6 +20,21 @@ pub enum Expression {
     Function(String, Vec<Expression>, Span),
     /// An array of other values.
     Array(Vec<Expression>, Span),
+}
+
+impl fmt::Display for Expression {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Expression::NumericValue(val, _) => write!(f, "{}", val),
+            Expression::BooleanValue(val, _) => write!(f, "{}", val),
+            Expression::StringValue(val, _) => write!(f, "\"{}\"", val),
+            Expression::ConstantValue(val, _) => write!(f, "{}", val),
+            Expression::Function(fun, args, _) => {
+                write!(f, "{}({})", fun, args.iter().map(|arg| format!("{}", arg)).join(","))
+            }
+            Expression::Array(vals, _) => write!(f, "[{}]", vals.iter().map(|arg| format!("{}", arg)).join(",")),
+        }
+    }
 }
 
 impl Expression {
@@ -80,18 +99,5 @@ impl Expression {
 
     pub fn is_array(&self) -> bool {
         matches!(self, Expression::Array(_, _))
-    }
-}
-
-impl ToString for Expression {
-    fn to_string(&self) -> String {
-        match self {
-            Expression::StringValue(x, _) => x.clone(),
-            Expression::NumericValue(x, _) => x.clone(),
-            Expression::BooleanValue(x, _) => x.clone(),
-            Expression::ConstantValue(x, _) => x.clone(),
-            Expression::Function(x, _, _) => x.clone(),
-            Expression::Array(_, _) => String::from("(array)"),
-        }
     }
 }

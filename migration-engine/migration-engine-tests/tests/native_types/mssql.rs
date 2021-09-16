@@ -1,6 +1,6 @@
 use bigdecimal::BigDecimal;
 use chrono::Utc;
-use migration_engine_tests::sync_test_api::*;
+use migration_engine_tests::test_api::*;
 use once_cell::sync::Lazy;
 use quaint::{prelude::Insert, Value};
 use std::{collections::HashMap, str::FromStr};
@@ -1902,58 +1902,52 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
 
             let kind = from.split('(').next().unwrap();
 
-            let dm1 = format!(
+            let dm1 = &format!(
                 r#"
-                {}
-
-                model A {{
+               model A {{
                     id Int @id @default(autoincrement()) @db.Int
                     x  {} @db.{}
                 }}
                 "#,
-                api.datasource_block(),
                 TYPE_MAPS.get(kind).unwrap(),
                 from,
             );
 
-            api.schema_push(&dm1).send_sync().assert_green_bang();
+            api.schema_push_w_datasource(dm1).send().assert_green();
 
-            let insert = Insert::single_into((api.connection_info().schema_name(), "A")).value("x", seed.clone());
+            let insert = Insert::single_into((api.schema_name(), "A".to_owned())).value("x", seed.clone());
             api.query(insert.into());
 
-            api.assert_schema().assert_table_bang("A", |table| {
-                table.assert_columns_count(2)?.assert_column("x", |c| {
-                    c.assert_is_required()?
+            api.assert_schema().assert_table("A", |table| {
+                table.assert_columns_count(2).assert_column("x", |c| {
+                    c.assert_is_required()
                         .assert_full_data_type(&with_params(from).to_lowercase())
                 })
             });
 
             let kind = to.split('(').next().unwrap();
 
-            let dm2 = format!(
+            let dm2 = &format!(
                 r#"
-                {}
-
-                model A {{
+               model A {{
                     id Int @id @default(autoincrement()) @db.Int
                     x  {} @db.{}
                 }}
                 "#,
-                api.datasource_block(),
                 TYPE_MAPS.get(kind).unwrap(),
                 to,
             );
 
-            api.schema_push(&dm2).send_sync().assert_green_bang();
+            api.schema_push_w_datasource(dm2).send().assert_green();
 
-            api.assert_schema().assert_table_bang("A", |table| {
-                table.assert_columns_count(2)?.assert_column("x", |c| {
-                    c.assert_is_required()?
+            api.assert_schema().assert_table("A", |table| {
+                table.assert_columns_count(2).assert_column("x", |c| {
+                    c.assert_is_required()
                         .assert_full_data_type(&with_params(to).to_lowercase())
                 })
             });
 
-            api.raw_cmd(&format!("DROP TABLE [{}].[A]", api.connection_info().schema_name()));
+            api.raw_cmd(&format!("DROP TABLE [{}].[A]", api.schema_name()));
         }
     }
 }
@@ -1966,44 +1960,38 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
 
             let kind = from.split('(').next().unwrap();
 
-            let dm1 = format!(
+            let dm1 = &format!(
                 r#"
-                {}
-
                 model A {{
                     id Int @id @default(autoincrement()) @db.Int
                     x  {} @db.{}
                 }}
                 "#,
-                api.datasource_block(),
                 TYPE_MAPS.get(kind).unwrap(),
                 from,
             );
 
-            api.schema_push(&dm1).send_sync().assert_green_bang();
+            api.schema_push_w_datasource(dm1).send().assert_green();
 
-            let insert = Insert::single_into((api.connection_info().schema_name(), "A")).value("x", seed.clone());
+            let insert = Insert::single_into((api.schema_name(), "A".to_owned())).value("x", seed.clone());
             api.query(insert.into());
 
-            api.assert_schema().assert_table_bang("A", |table| {
-                table.assert_columns_count(2)?.assert_column("x", |c| {
-                    c.assert_is_required()?
+            api.assert_schema().assert_table("A", |table| {
+                table.assert_columns_count(2).assert_column("x", |c| {
+                    c.assert_is_required()
                         .assert_full_data_type(&with_params(from).to_lowercase())
                 })
             });
 
             let kind = to.split('(').next().unwrap();
 
-            let dm2 = format!(
+            let dm2 = &format!(
                 r#"
-                {}
-
                 model A {{
                     id Int @id @default(autoincrement()) @db.Int
                     x  {} @db.{}
                 }}
                 "#,
-                api.datasource_block(),
                 TYPE_MAPS.get(kind).unwrap(),
                 to
             );
@@ -2014,16 +2002,18 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
                 to,
             );
 
-            api.schema_push(&dm2).send_sync().assert_warnings(&[warning.into()]);
+            api.schema_push_w_datasource(dm2)
+                .send()
+                .assert_warnings(&[warning.into()]);
 
-            api.assert_schema().assert_table_bang("A", |table| {
-                table.assert_columns_count(2)?.assert_column("x", |c| {
-                    c.assert_is_required()?
+            api.assert_schema().assert_table("A", |table| {
+                table.assert_columns_count(2).assert_column("x", |c| {
+                    c.assert_is_required()
                         .assert_full_data_type(&with_params(from).to_lowercase())
                 })
             });
 
-            api.raw_cmd(&format!("DROP TABLE [{}].[A]", api.connection_info().schema_name()));
+            api.raw_cmd(&format!("DROP TABLE [{}].[A]", api.schema_name()));
         }
     }
 }
@@ -2039,196 +2029,172 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
                 _ => unreachable!(),
             };
 
-            let dm1 = format!(
+            let dm1 = &format!(
                 r#"
-                {}
-
                 model A {{
                     id Int @id @default(autoincrement()) @db.Int
                     x  {} @db.{}
                 }}
                 "#,
-                api.datasource_block(),
                 TYPE_MAPS.get(kind).unwrap(),
                 from,
             );
 
-            api.schema_push(&dm1).send_sync().assert_green_bang();
+            api.schema_push_w_datasource(dm1).send().assert_green();
 
-            let insert = Insert::single_into((api.connection_info().schema_name(), "A")).value("x", seed.clone());
+            let insert = Insert::single_into((api.schema_name(), "A".to_owned())).value("x", seed.clone());
             api.query(insert.into());
 
-            api.assert_schema().assert_table_bang("A", |table| {
-                table.assert_columns_count(2)?.assert_column("x", |c| {
-                    c.assert_is_required()?
+            api.assert_schema().assert_table("A", |table| {
+                table.assert_columns_count(2).assert_column("x", |c| {
+                    c.assert_is_required()
                         .assert_full_data_type(&with_params(from).to_lowercase())
                 })
             });
 
             let kind = to.split('(').next().unwrap();
 
-            let dm2 = format!(
+            let dm2 = &format!(
                 r#"
-                {}
-
                 model A {{
                     id Int @id @default(autoincrement()) @db.Int
                     x  {} @db.{}
                 }}
                 "#,
-                api.datasource_block(),
                 TYPE_MAPS.get(kind).unwrap(),
                 to
             );
 
             let warning = "Changed the type of `x` on the `A` table. No cast exists, the column would be dropped and recreated, which cannot be done since the column is required and there is data in the table.";
 
-            api.schema_push(&dm2).send_sync().assert_unexecutable(&[warning.into()]);
+            api.schema_push_w_datasource(dm2)
+                .send()
+                .assert_unexecutable(&[warning.into()]);
 
-            api.assert_schema().assert_table_bang("A", |table| {
-                table.assert_columns_count(2)?.assert_column("x", |c| {
-                    c.assert_is_required()?
+            api.assert_schema().assert_table("A", |table| {
+                table.assert_columns_count(2).assert_column("x", |c| {
+                    c.assert_is_required()
                         .assert_full_data_type(&with_params(from).to_lowercase())
                 })
             });
 
-            api.raw_cmd(&format!("DROP TABLE [{}].[A]", api.connection_info().schema_name()));
+            api.raw_cmd(&format!("DROP TABLE [{}].[A]", api.schema_name()));
         }
     }
 }
 
 #[test_connector(tags(Mssql))]
 fn typescript_starter_schema_with_native_types_is_idempotent(api: TestApi) {
-    let dm = format!(
-        r#"
-        {}
-
-        model Post {{
+    let dm = r#"
+        model Post {
             id        Int     @id @default(autoincrement())
             title     String
             content   String?
             published Boolean @default(false)
             author    User?   @relation(fields: [authorId], references: [id])
             authorId  Int?
-        }}
+        }
 
-        model User {{
+        model User {
             id    Int     @id @default(autoincrement())
             email String  @unique
             name  String?
             posts Post[]
-        }}
-        "#,
-        api.datasource_block(),
-    );
+        }
+        "#;
 
-    let dm2 = format!(
-        r#"
-        {}
-
-        model Post {{
+    let dm2 = r#"
+        model Post {
             id        Int     @id @default(autoincrement()) @db.Int
             title     String  @db.NVarChar(1000)
             content   String? @db.NVarChar(1000)
             published Boolean @default(false) @db.Bit
             author    User?   @relation(fields: [authorId], references: [id])
             authorId  Int?    @db.Int
-        }}
+        }
 
-        model User {{
+        model User {
             id    Int     @id @default(autoincrement()) @db.Int
             email String  @unique @db.NVarChar(1000)
             name  String? @db.NVarChar(1000)
             posts Post[]
-        }}
-        "#,
-        api.datasource_block()
-    );
+        }
+        "#;
 
-    api.schema_push(&dm)
+    api.schema_push_w_datasource(dm)
         .migration_id(Some("first"))
-        .send_sync()
-        .assert_green_bang()
+        .send()
+        .assert_green()
         .assert_has_executed_steps();
-    api.schema_push(&dm)
+    api.schema_push_w_datasource(dm)
         .migration_id(Some("second"))
-        .send_sync()
-        .assert_green_bang()
+        .send()
+        .assert_green()
         .assert_no_steps();
-    api.schema_push(&dm2)
+    api.schema_push_w_datasource(dm2)
         .migration_id(Some("third"))
-        .send_sync()
-        .assert_green_bang()
+        .send()
+        .assert_green()
         .assert_no_steps();
 }
 
 #[test_connector(tags(Mssql))]
 fn typescript_starter_schema_with_different_native_types_is_idempotent(api: TestApi) {
-    let dm = format!(
-        r#"
-        {}
-
-        model Post {{
+    let dm = r#"
+        model Post {
             id        Int     @id @default(autoincrement())
             title     String
             content   String?
             published Boolean @default(false)
             author    User?   @relation(fields: [authorId], references: [id])
             authorId  Int?
-        }}
+        }
 
-        model User {{
+        model User {
             id    Int     @id @default(autoincrement())
             email String  @unique
             name  String?
             posts Post[]
-        }}
-        "#,
-        api.datasource_block()
-    );
+        }
+        "#;
 
-    let dm2 = format!(
-        r#"
-        {}
-
-        model Post {{
+    let dm2 = r#"
+        model Post {
             id        Int     @id @default(autoincrement()) @db.Int
             title     String  @db.NVarChar(1000)
             content   String? @db.NVarChar(MAX)
             published Boolean @default(false) @db.Bit
             author    User?   @relation(fields: [authorId], references: [id])
             authorId  Int?    @db.Int
-        }}
+        }
 
-        model User {{
+        model User {
             id    Int     @id @default(autoincrement()) @db.Int
             email String  @unique @db.NVarChar(1000)
             name  String? @db.NVarChar(100)
             posts Post[]
-        }}
-        "#,
-        api.datasource_block()
-    );
+        }
+        "#;
 
-    api.schema_push(&dm)
+    api.schema_push_w_datasource(dm)
         .migration_id(Some("first"))
-        .send_sync()
-        .assert_green_bang()
+        .send()
+        .assert_green()
         .assert_has_executed_steps();
-    api.schema_push(&dm)
+    api.schema_push_w_datasource(dm)
         .migration_id(Some("second"))
-        .send_sync()
-        .assert_green_bang()
+        .send()
+        .assert_green()
         .assert_no_steps();
 
-    api.schema_push(&dm2)
+    api.schema_push_w_datasource(dm2)
         .migration_id(Some("third"))
-        .send_sync()
-        .assert_green_bang()
+        .send()
+        .assert_green()
         .assert_has_executed_steps();
-    api.schema_push(&dm2)
+    api.schema_push_w_datasource(dm2)
         .migration_id(Some("fourth"))
-        .send_sync()
-        .assert_green_bang()
+        .send()
+        .assert_green()
         .assert_no_steps();
 }

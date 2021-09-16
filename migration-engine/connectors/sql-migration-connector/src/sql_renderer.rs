@@ -33,8 +33,12 @@ pub(crate) trait SqlRenderer {
 
     fn render_alter_enum(&self, alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema>) -> Vec<String>;
 
-    fn render_alter_index(&self, _indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
+    fn render_rename_index(&self, _indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
         unreachable!("unreachable render_alter_index")
+    }
+
+    fn render_rename_primary_key(&self, _tables: Pair<&TableWalker<'_>>) -> Vec<String> {
+        unreachable!("unreachable render_rename_index")
     }
 
     fn render_alter_table(&self, alter_table: &AlterTable, schemas: &Pair<&SqlSchema>) -> Vec<String>;
@@ -67,7 +71,7 @@ pub(crate) trait SqlRenderer {
 
     /// Render a `DropTable` step.
     fn render_drop_table(&self, table_name: &str) -> Vec<String> {
-        vec![format!("DROP TABLE {}", self.quote(&table_name))]
+        vec![format!("DROP TABLE {}", self.quote(table_name))]
     }
 
     /// Render a `RedefineTables` step.
@@ -81,4 +85,17 @@ pub(crate) trait SqlRenderer {
 
     /// Render a drop type step.
     fn render_drop_user_defined_type(&self, udt: &UserDefinedTypeWalker<'_>) -> String;
+
+    /// Render a transaction start.
+    fn render_begin_transaction(&self) -> Option<&'static str> {
+        None
+    }
+
+    /// Render a transaction commit.
+    fn render_commit_transaction(&self) -> Option<&'static str> {
+        None
+    }
+
+    /// Render a `RenameForeignKey` step.
+    fn render_rename_foreign_key(&self, fks: &Pair<ForeignKeyWalker<'_>>) -> String;
 }

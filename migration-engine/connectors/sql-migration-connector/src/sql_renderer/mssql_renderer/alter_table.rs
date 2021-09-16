@@ -1,16 +1,18 @@
 use super::render_default;
+use crate::sql_renderer::common::Quoted;
 use crate::{
     flavour::MssqlFlavour,
     pair::Pair,
+    sql_migration::AlterColumn,
     sql_migration::TableChange,
-    sql_migration::{AddColumn, AlterColumn, DropColumn},
     sql_renderer::{common::IteratorJoin, SqlRenderer},
     sql_schema_differ::ColumnChanges,
 };
 use sql_schema_describer::{
     walkers::{ColumnWalker, TableWalker},
-    DefaultValue,
+    ColumnId, DefaultValue,
 };
+use std::borrow::Cow;
 use std::collections::BTreeSet;
 
 /// Creates a set of `ALTER TABLE` statements in a correct execution order.
@@ -25,6 +27,7 @@ pub(crate) fn create_statements(
         changes,
         drop_constraints: BTreeSet::new(),
         add_constraints: BTreeSet::new(),
+        rename_primary_key: false,
         add_columns: Vec::new(),
         drop_columns: Vec::new(),
         column_mods: Vec::new(),
@@ -39,6 +42,7 @@ struct AlterTableConstructor<'a> {
     changes: &'a [TableChange],
     drop_constraints: BTreeSet<String>,
     add_constraints: BTreeSet<String>,
+    rename_primary_key: bool,
     add_columns: Vec<String>,
     drop_columns: Vec<String>,
     column_mods: Vec<String>,
@@ -51,24 +55,27 @@ impl<'a> AlterTableConstructor<'a> {
                 TableChange::DropPrimaryKey => {
                     self.drop_primary_key();
                 }
-                TableChange::AddPrimaryKey { columns } => {
-                    self.add_primary_key(&columns);
+                TableChange::RenamePrimaryKey => {
+                    self.rename_primary_key = true;
                 }
-                TableChange::AddColumn(AddColumn { column_index }) => {
-                    self.add_column(*column_index);
+                TableChange::AddPrimaryKey => {
+                    self.add_primary_key();
                 }
-                TableChange::DropColumn(DropColumn { index }) => {
-                    self.drop_column(*index);
+                TableChange::AddColumn { column_id } => {
+                    self.add_column(*column_id);
                 }
-                TableChange::DropAndRecreateColumn { column_index, .. } => {
-                    self.drop_and_recreate_column(*column_index);
+                TableChange::DropColumn { column_id } => {
+                    self.drop_column(*column_id);
+                }
+                TableChange::DropAndRecreateColumn { column_id, .. } => {
+                    self.drop_and_recreate_column(*column_id);
                 }
                 TableChange::AlterColumn(AlterColumn {
-                    column_index,
+                    column_id,
                     changes,
                     type_change: _,
                 }) => {
-                    self.alter_column(*column_index, &changes);
+                    self.alter_column(*column_id, changes);
                 }
             };
         }
@@ -81,6 +88,34 @@ impl<'a> AlterTableConstructor<'a> {
                 "ALTER TABLE {} DROP CONSTRAINT {}",
                 self.renderer.quote_with_schema(self.tables.previous().name()),
                 self.drop_constraints.iter().join(",\n"),
+            ));
+        }
+
+        if self.rename_primary_key {
+            let with_schema = format!(
+                "{}.{}",
+                self.renderer.schema_name(),
+                self.tables
+                    .previous()
+                    .primary_key()
+                    .unwrap()
+                    .constraint_name
+                    .as_ref()
+                    .unwrap()
+            );
+
+            statements.push(format!(
+                "EXEC SP_RENAME N{}, N{}",
+                Quoted::Single(with_schema),
+                Quoted::Single(
+                    self.tables
+                        .next()
+                        .primary_key()
+                        .unwrap()
+                        .constraint_name
+                        .as_ref()
+                        .unwrap()
+                ),
             ));
         }
 
@@ -116,7 +151,7 @@ impl<'a> AlterTableConstructor<'a> {
     }
 
     fn drop_primary_key(&mut self) {
-        let constraint = self
+        let constraint_name = self
             .tables
             .previous()
             .primary_key()
@@ -124,11 +159,18 @@ impl<'a> AlterTableConstructor<'a> {
             .expect("Missing constraint name in DropPrimaryKey on MSSQL");
 
         self.drop_constraints
-            .insert(format!("{}", self.renderer.quote(constraint)));
+            .insert(format!("{}", self.renderer.quote(constraint_name)));
     }
 
-    fn add_primary_key(&mut self, columns: &[String]) {
-        let non_quoted_columns = columns.iter();
+    fn add_primary_key(&mut self) {
+        let constraint_name = self
+            .tables
+            .next()
+            .primary_key()
+            .and_then(|pk| pk.constraint_name.as_ref())
+            .expect("Missing constraint name in AddPrimaryKey on MSSQL");
+
+        let columns = self.tables.next().primary_key_column_names().unwrap();
         let mut quoted_columns = Vec::with_capacity(columns.len());
 
         for colname in columns {
@@ -136,27 +178,24 @@ impl<'a> AlterTableConstructor<'a> {
         }
 
         self.add_constraints.insert(format!(
-            "CONSTRAINT PK__{}__{} PRIMARY KEY ({})",
-            self.tables.next().name(),
-            non_quoted_columns.join("__"),
+            "CONSTRAINT {} PRIMARY KEY ({})",
+            constraint_name,
             quoted_columns.join(","),
         ));
     }
 
-    fn add_column(&mut self, column_index: usize) {
-        let column = self.tables.next().column_at(column_index);
+    fn add_column(&mut self, column_id: ColumnId) {
+        let column = self.tables.next().column_at(column_id);
         self.add_columns.push(self.renderer.render_column(&column));
     }
 
-    fn drop_column(&mut self, column_index: usize) {
-        let name = self
-            .renderer
-            .quote(self.tables.previous().column_at(column_index).name());
+    fn drop_column(&mut self, column_id: ColumnId) {
+        let name = self.renderer.quote(self.tables.previous().column_at(column_id).name());
 
         self.drop_columns.push(format!("{}", name));
     }
 
-    fn drop_and_recreate_column(&mut self, columns: Pair<usize>) {
+    fn drop_and_recreate_column(&mut self, columns: Pair<ColumnId>) {
         let columns = self.tables.columns(&columns);
 
         self.drop_columns
@@ -165,7 +204,7 @@ impl<'a> AlterTableConstructor<'a> {
         self.add_columns.push(self.renderer.render_column(columns.next()));
     }
 
-    fn alter_column(&mut self, columns: Pair<usize>, changes: &ColumnChanges) {
+    fn alter_column(&mut self, columns: Pair<ColumnId>, changes: &ColumnChanges) {
         let columns = self.tables.columns(&columns);
         let expanded = expand_alter_column(&columns, changes);
 
@@ -176,11 +215,16 @@ impl<'a> AlterTableConstructor<'a> {
                     self.drop_constraints.insert(escaped);
                 }
                 MsSqlAlterColumn::SetDefault(default) => {
+                    let constraint_name = default.constraint_name().map(Cow::from).unwrap_or_else(|| {
+                        let old_default = format!("DF__{}__{}", self.tables.next().name(), columns.next().name());
+                        Cow::from(old_default)
+                    });
+
                     let default = render_default(&default);
 
                     self.add_constraints.insert(format!(
-                        "CONSTRAINT [DF__{table}__{column}] DEFAULT {default} FOR [{column}]",
-                        table = self.tables.next().name(),
+                        "CONSTRAINT [{constraint}] DEFAULT {default} FOR [{column}]",
+                        constraint = constraint_name,
                         column = columns.next().name(),
                         default = default,
                     ));
@@ -195,7 +239,7 @@ impl<'a> AlterTableConstructor<'a> {
                     self.column_mods.push(format!(
                         "ALTER TABLE {table} ALTER COLUMN {column_name} {column_type} {nullability}",
                         table = self.renderer.quote_with_schema(self.tables.previous().name()),
-                        column_name = self.renderer.quote(&columns.next().name()),
+                        column_name = self.renderer.quote(columns.next().name()),
                         column_type = super::render_column_type(columns.next()),
                         nullability = nullability,
                     ));

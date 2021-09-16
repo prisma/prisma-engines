@@ -32,7 +32,7 @@ pub fn compute_aggr_join(
 
 fn compute_aggr_join_one2m(
     rf: &RelationFieldRef,
-    sort_aggregation: AggregationType,
+    aggregation: AggregationType,
     aggregator_alias: &str,
     join_alias: &str,
     previous_join: Option<&AliasedJoin>,
@@ -49,7 +49,7 @@ fn compute_aggr_join_one2m(
 
     // + SELECT A.fk FROM A
     let query = Select::from_table(rf.related_model().as_table()).columns(select_columns);
-    let aggr_expr = match sort_aggregation {
+    let aggr_expr = match aggregation {
         AggregationType::Count { _all } => count(asterisk()),
     };
 
@@ -63,7 +63,7 @@ fn compute_aggr_join_one2m(
     let query = right_fields.iter().fold(query, |acc, f| acc.group_by(f.as_column()));
 
     let pairs = left_fields.into_iter().zip(right_fields.into_iter());
-    let on_conditions = pairs
+    let on_conditions: Vec<Expression> = pairs
         .map(|(a, b)| {
             let col_a = match previous_join {
                 Some(prev_join) => Column::from((prev_join.alias.to_owned(), a.db_name().to_owned())),
@@ -71,7 +71,7 @@ fn compute_aggr_join_one2m(
             };
             let col_b = Column::from((join_alias.to_owned(), b.db_name().to_owned()));
 
-            col_a.equals(col_b)
+            col_a.equals(col_b).into()
         })
         .collect::<Vec<_>>();
 
@@ -81,7 +81,7 @@ fn compute_aggr_join_one2m(
     // + ) AS <ORDER_JOIN_PREFIX> ON (<A | previous_join_alias>.<fk> = <ORDER_JOIN_PREFIX>.<fk>)
     let join = Table::from(query)
         .alias(join_alias.to_owned())
-        .on(ConditionTree::single(on_conditions));
+        .on(ConditionTree::And(on_conditions));
 
     AliasedJoin {
         data: join,
@@ -97,42 +97,41 @@ fn compute_aggr_join_m2m(
     previous_join: Option<&AliasedJoin>,
 ) -> AliasedJoin {
     let relation_table = rf.as_table();
+    let model_a = rf.model();
     let a_ids = rf.model().primary_identifier();
+    let a_columns: Vec<_> = a_ids.as_columns().collect();
     let b_ids = rf.related_model().primary_identifier();
 
-    // + SELECT A.id FROM _AtoB
-    let query = Select::from_table(relation_table).columns(a_ids.as_columns());
+    // + SELECT A.id FROM A
+    let query = Select::from_table(model_a.as_table()).columns(a_columns.clone());
 
     let aggr_expr = match aggregation {
-        AggregationType::Count { _all } => count(asterisk()),
+        AggregationType::Count { _all } => count(rf.related_field().m2m_columns()),
     };
+
     // SELECT A.id,
-    // + COUNT(*) AS <AGGREGATOR_ALIAS>
-    // FROM _AtoB
+    // + COUNT(_AtoB.B) AS <AGGREGATOR_ALIAS>
+    // FROM A
     let query = query.value(aggr_expr.alias(aggregator_alias.to_owned()));
 
-    let conditions_a: Vec<_> = a_ids
-        .as_columns()
-        .map(|c| c.equals(rf.related_field().m2m_columns()))
+    let left_join_conditions: Vec<Expression> = a_columns
+        .clone()
+        .into_iter()
+        .map(|c| c.equals(rf.related_field().m2m_columns()).into())
         .collect();
-    let conditions_b: Vec<_> = b_ids.as_columns().map(|c| c.equals(rf.m2m_columns())).collect();
 
-    // SELECT A.id, COUNT(*) AS <AGGREGATOR_ALIAS> FROM _AtoB
-    // + INNER JOIN A ON A.id = _AtoB.A
-    // + INNER JOIN B ON B.id = _AtoB.B
-    let query = query
-        .inner_join(rf.model().as_table().on(ConditionTree::single(conditions_a)))
-        .inner_join(rf.related_model().as_table().on(ConditionTree::single(conditions_b)));
+    // SELECT A.id, COUNT(_AtoB.B) AS <AGGREGATOR_ALIAS> FROM A
+    // + LEFT JOIN _AtoB ON (A.id = _AtoB.B)
+    let query = query.left_join(relation_table.on(ConditionTree::And(left_join_conditions)));
 
-    // SELECT A.id, COUNT(*) AS <AGGREGATOR_ALIAS> FROM _AtoB
-    // INNER JOIN A ON A.id = _AtoB.A
-    // INNER JOIN B ON B.id = _AtoB.B
+    // SELECT A.id, COUNT(_AtoB.B) AS <AGGREGATOR_ALIAS> FROM A
+    // LEFT JOIN _AtoB ON (A.id = _AtoB.B)
     // + GROUP BY A.id
-    let query = a_ids.as_columns().fold(query, |acc, f| acc.group_by(f.clone()));
+    let query = a_columns.into_iter().fold(query, |acc, f| acc.group_by(f.clone()));
 
     let (left_fields, right_fields) = (a_ids.scalar_fields(), b_ids.scalar_fields());
     let pairs = left_fields.zip(right_fields);
-    let on_conditions = pairs
+    let on_conditions: Vec<Expression> = pairs
         .map(|(a, b)| {
             let col_a = match previous_join {
                 Some(prev_join) => Column::from((prev_join.alias.to_owned(), a.db_name().to_owned())),
@@ -140,19 +139,18 @@ fn compute_aggr_join_m2m(
             };
             let col_b = Column::from((join_alias.to_owned(), b.db_name().to_owned()));
 
-            col_a.equals(col_b)
+            col_a.equals(col_b).into()
         })
         .collect::<Vec<_>>();
 
     // + LEFT JOIN (
-    //     SELECT A.id, COUNT(*) AS <AGGREGATOR_ALIAS> FROM _AtoB
-    //       INNER JOIN A ON (A.id = _AtoB.A)
-    //       INNER JOIN B ON (B.id = _AtoB.B)
+    //     SELECT A.id, COUNT(_AtoB.B) AS <AGGREGATOR_ALIAS> FROM A
+    //     LEFT JOIN _AtoB ON (A.id = _AtoB.B)
     //     GROUP BY A.id
-    // + ) AS <ORDER_JOIN_PREFIX> ON (<A | previous_join_alias >.id = <ORDER_JOIN_PREFIX>.id)
+    // + ) AS <ORDER_JOIN_PREFIX> ON (<A | previous_join_alias>.id = <ORDER_JOIN_PREFIX>.id)
     let join = Table::from(query)
         .alias(join_alias.to_owned())
-        .on(ConditionTree::single(on_conditions));
+        .on(ConditionTree::And(on_conditions));
 
     AliasedJoin {
         alias: join_alias.to_owned(),
@@ -182,7 +180,7 @@ pub fn compute_one2m_join(base_model: &ModelRef, rf: &RelationFieldRef, join_pre
     let related_model = rf.related_model();
     let pairs = left_fields.into_iter().zip(right_fields.into_iter());
 
-    let on_conditions = pairs
+    let on_conditions: Vec<Expression> = pairs
         .map(|(a, b)| {
             let a_col = if let Some(alias) = left_table_alias.clone() {
                 Column::from((alias, a.db_name().to_owned()))
@@ -192,7 +190,7 @@ pub fn compute_one2m_join(base_model: &ModelRef, rf: &RelationFieldRef, join_pre
 
             let b_col = Column::from((right_table_alias.clone(), b.db_name().to_owned()));
 
-            a_col.equals(b_col)
+            a_col.equals(b_col).into()
         })
         .collect::<Vec<_>>();
 
@@ -201,6 +199,6 @@ pub fn compute_one2m_join(base_model: &ModelRef, rf: &RelationFieldRef, join_pre
         data: related_model
             .as_table()
             .alias(right_table_alias)
-            .on(ConditionTree::single(on_conditions)),
+            .on(ConditionTree::And(on_conditions)),
     }
 }

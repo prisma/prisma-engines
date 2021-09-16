@@ -1,17 +1,13 @@
 use crate::error::{ConnectorError, ErrorKind};
 use chrono::Utc;
+use indexmap::{map::Keys, IndexMap};
 use prisma_models::{ModelProjection, ModelRef, PrismaValue, RecordProjection, ScalarFieldRef};
-use std::{
-    borrow::Borrow,
-    collections::{hash_map::Keys, HashMap},
-    convert::TryInto,
-    ops::Deref,
-};
+use std::{borrow::Borrow, convert::TryInto, ops::Deref};
 
 /// WriteArgs represent data to be written to an underlying data source.
 #[derive(Debug, PartialEq, Clone, Default)]
 pub struct WriteArgs {
-    pub args: HashMap<DatasourceFieldName, WriteExpression>,
+    pub args: IndexMap<DatasourceFieldName, WriteExpression>,
 }
 
 /// Wrapper struct to force a bit of a reflection whether or not the string passed
@@ -83,16 +79,16 @@ impl TryInto<PrismaValue> for WriteExpression {
     }
 }
 
-impl From<HashMap<DatasourceFieldName, PrismaValue>> for WriteArgs {
-    fn from(args: HashMap<DatasourceFieldName, PrismaValue>) -> Self {
+impl From<IndexMap<DatasourceFieldName, PrismaValue>> for WriteArgs {
+    fn from(args: IndexMap<DatasourceFieldName, PrismaValue>) -> Self {
         Self {
             args: args.into_iter().map(|(k, v)| (k, WriteExpression::Value(v))).collect(),
         }
     }
 }
 
-impl From<HashMap<DatasourceFieldName, WriteExpression>> for WriteArgs {
-    fn from(args: HashMap<DatasourceFieldName, WriteExpression>) -> Self {
+impl From<IndexMap<DatasourceFieldName, WriteExpression>> for WriteArgs {
+    fn from(args: IndexMap<DatasourceFieldName, WriteExpression>) -> Self {
         Self { args }
     }
 }
@@ -115,7 +111,7 @@ impl From<Vec<(DatasourceFieldName, WriteExpression)>> for WriteArgs {
 
 impl WriteArgs {
     pub fn new() -> Self {
-        Self { args: HashMap::new() }
+        Self { args: IndexMap::new() }
     }
 
     pub fn insert<T, V>(&mut self, key: T, arg: V)
@@ -228,7 +224,7 @@ pub fn merge_write_args(loaded_ids: Vec<RecordProjection>, incoming_args: WriteA
     }
 
     // Contains all positions that need to be updated with the given expression.
-    let positions: HashMap<usize, &WriteExpression> = loaded_ids
+    let positions: IndexMap<usize, &WriteExpression> = loaded_ids
         .first()
         .unwrap()
         .pairs

@@ -9,17 +9,19 @@ fn advisory_locking_works(api: TestApi) {
     let first_me = api.new_engine();
     let migrations_directory = Arc::new(api.create_migrations_directory());
 
-    let dm = r#"
+    let dm = api.datamodel_with_provider(
+        r#"
         model Cat {
             id Int @id
             inBox Boolean
         }
-    "#;
+    "#,
+    );
 
     let output = api
         .block_on(first_me.generic_api().create_migration(&CreateMigrationInput {
             migrations_directory_path: migrations_directory.path().to_string_lossy().into(),
-            prisma_schema: dm.into(),
+            prisma_schema: dm,
             migration_name: "01initial".into(),
             draft: true,
         }))

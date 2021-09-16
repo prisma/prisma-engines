@@ -13,13 +13,13 @@ mod upsert {
               alias          String  @unique
               anotherIDField String? @unique
             }
-            
+
             model WithDefaultValue {
               #id(id, Int, @id)
               reqString String @default(value: "defaultValue")
               title     String
             }
-            
+
             model MultipleFields {
               #id(id, Int, @id)
               reqString  String
@@ -34,11 +34,11 @@ mod upsert {
 
     // "an item" should "be created if it does not exist yet"
     #[connector_test]
-    async fn item_should_be_upserted(runner: &Runner) -> TestResult<()> {
-        assert_eq!(count_todo(runner).await?, 0);
+    async fn item_should_be_upserted(runner: Runner) -> TestResult<()> {
+        assert_eq!(count_todo(&runner).await?, 0);
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             upsertOneTodo(
               where: {id: 1}
               create: {
@@ -57,16 +57,16 @@ mod upsert {
           @r###"{"data":{"upsertOneTodo":{"id":1,"title":"new title"}}}"###
         );
 
-        assert_eq!(count_todo(runner).await?, 1);
+        assert_eq!(count_todo(&runner).await?, 1);
 
         Ok(())
     }
 
     // "an item" should "be created with multiple fields of different types"
     #[connector_test]
-    async fn create_with_many_fields_of_diff_types(runner: &Runner) -> TestResult<()> {
+    async fn create_with_many_fields_of_diff_types(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             upsertOneMultipleFields(
               where: {id: 1}
               create: {
@@ -98,9 +98,9 @@ mod upsert {
 
     // "an item" should "be created if it does not exist yet and use the defaultValue if necessary"
     #[connector_test]
-    async fn create_if_not_exist_with_default_val(runner: &Runner) -> TestResult<()> {
+    async fn create_if_not_exist_with_default_val(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             upsertOneWithDefaultValue(
               where: {id: 1}
               create: {
@@ -123,7 +123,7 @@ mod upsert {
 
     // "an item" should "not be created when trying to set a required value to null even if there is a default value for that field"
     #[connector_test]
-    async fn no_create_required_val_null(runner: &Runner) -> TestResult<()> {
+    async fn no_create_required_val_null(runner: Runner) -> TestResult<()> {
         assert_error!(
           runner,
           r#"mutation {
@@ -151,9 +151,9 @@ mod upsert {
 
     // "an item" should "be updated if it already exists (by id)"
     #[connector_test]
-    async fn update_if_already_exists(runner: &Runner) -> TestResult<()> {
+    async fn update_if_already_exists(runner: Runner) -> TestResult<()> {
         run_query!(
-            runner,
+            &runner,
             r#"mutation {
                 createOneTodo(
                   data: {
@@ -167,10 +167,10 @@ mod upsert {
             }"#
         );
 
-        assert_eq!(count_todo(runner).await?, 1);
+        assert_eq!(count_todo(&runner).await?, 1);
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             upsertOneTodo(
               where: {id: 1}
               create: {
@@ -189,16 +189,16 @@ mod upsert {
           @r###"{"data":{"upsertOneTodo":{"id":1,"title":"updated title"}}}"###
         );
 
-        assert_eq!(count_todo(runner).await?, 1);
+        assert_eq!(count_todo(&runner).await?, 1);
 
         Ok(())
     }
 
     // "an item" should "be updated using shorthands if it already exists (by id)"
     #[connector_test]
-    async fn update_shorthand_already_exists(runner: &Runner) -> TestResult<()> {
+    async fn update_shorthand_already_exists(runner: Runner) -> TestResult<()> {
         run_query!(
-            runner,
+            &runner,
             r#"mutation {
                 createOneTodo(
                   data: {
@@ -212,10 +212,10 @@ mod upsert {
           }"#
         );
 
-        assert_eq!(count_todo(runner).await?, 1);
+        assert_eq!(count_todo(&runner).await?, 1);
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             upsertOneTodo(
               where: {id: 1}
               create: {
@@ -234,16 +234,16 @@ mod upsert {
           @r###"{"data":{"upsertOneTodo":{"id":1,"title":"updated title"}}}"###
         );
 
-        assert_eq!(count_todo(runner).await?, 1);
+        assert_eq!(count_todo(&runner).await?, 1);
 
         Ok(())
     }
 
     // "an item" should "be updated if it already exists (by any unique argument)"
     #[connector_test]
-    async fn should_update_if_uniq_already_exists(runner: &Runner) -> TestResult<()> {
+    async fn should_update_if_uniq_already_exists(runner: Runner) -> TestResult<()> {
         run_query!(
-            runner,
+            &runner,
             r#"mutation {
                 createOneTodo(
                   data: {
@@ -257,10 +257,10 @@ mod upsert {
             }"#
         );
 
-        assert_eq!(count_todo(runner).await?, 1);
+        assert_eq!(count_todo(&runner).await?, 1);
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             upsertOneTodo(
               where: {alias: "todo1"}
               create: {
@@ -279,16 +279,16 @@ mod upsert {
           @r###"{"data":{"upsertOneTodo":{"id":1,"title":"updated title"}}}"###
         );
 
-        assert_eq!(count_todo(runner).await?, 1);
+        assert_eq!(count_todo(&runner).await?, 1);
 
         Ok(())
     }
 
     // "An upsert" should "perform only an update if the update changes the unique field used in the where clause"
     #[connector_test]
-    async fn only_update_if_uniq_field_change(runner: &Runner) -> TestResult<()> {
+    async fn only_update_if_uniq_field_change(runner: Runner) -> TestResult<()> {
         run_query!(
-            runner,
+            &runner,
             r#"mutation {
                 createOneTodo(
                   data: {
@@ -302,10 +302,10 @@ mod upsert {
             }"#
         );
 
-        assert_eq!(count_todo(runner).await?, 1);
+        assert_eq!(count_todo(&runner).await?, 1);
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             upsertOneTodo(
               where: {alias: "todo1"}
               create: {
@@ -325,11 +325,11 @@ mod upsert {
           @r###"{"data":{"upsertOneTodo":{"id":1,"title":"updated title"}}}"###
         );
 
-        assert_eq!(count_todo(runner).await?, 1);
+        assert_eq!(count_todo(&runner).await?, 1);
 
         // the original node has been updated
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findUniqueTodo(where: {id: 1}){
               title
             }
@@ -342,9 +342,9 @@ mod upsert {
 
     // "An upsert" should "perform only an update if the update changes nothing"
     #[connector_test]
-    async fn only_update_if_update_changes_nothing(runner: &Runner) -> TestResult<()> {
+    async fn only_update_if_update_changes_nothing(runner: Runner) -> TestResult<()> {
         run_query!(
-            runner,
+            &runner,
             r#"mutation {
                 createOneTodo(
                   data: {
@@ -358,10 +358,10 @@ mod upsert {
             }"#
         );
 
-        assert_eq!(count_todo(runner).await?, 1);
+        assert_eq!(count_todo(&runner).await?, 1);
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             upsertOneTodo(
               where: {alias: "todo1"}
               create: {
@@ -381,11 +381,11 @@ mod upsert {
           @r###"{"data":{"upsertOneTodo":{"id":1,"title":"title"}}}"###
         );
 
-        assert_eq!(count_todo(runner).await?, 1);
+        assert_eq!(count_todo(&runner).await?, 1);
 
         // the original node has been updated
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findUniqueTodo(where: {id: 1}){
               title
             }
@@ -413,67 +413,67 @@ mod upsert {
     //-{"data":{"upsertOneTestModel":{"optInt":null}}}
     //+{"data":{"upsertOneTestModel":{"optInt":10}}}
     #[connector_test(schema(schema_number), exclude(MongoDb))]
-    async fn upsert_apply_number_ops_for_int(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ id: 1 }"#).await?;
-        create_row(runner, r#"{ id: 2, optInt: 3}"#).await?;
+    async fn upsert_apply_number_ops_for_int(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1 }"#).await?;
+        create_row(&runner, r#"{ id: 2, optInt: 3}"#).await?;
 
         // Increment
         insta::assert_snapshot!(
-          query_number_operation(runner, "1", "optInt", "increment", "10").await?,
+          query_number_operation(&runner, "1", "optInt", "increment", "10").await?,
           @r###"{"data":{"upsertOneTestModel":{"optInt":null}}}"###
         );
         insta::assert_snapshot!(
-          query_number_operation(runner, "2", "optInt", "increment", "10").await?,
+          query_number_operation(&runner, "2", "optInt", "increment", "10").await?,
           @r###"{"data":{"upsertOneTestModel":{"optInt":13}}}"###
         );
 
         // Decrement
         insta::assert_snapshot!(
-          query_number_operation(runner, "1", "optInt", "decrement", "10").await?,
+          query_number_operation(&runner, "1", "optInt", "decrement", "10").await?,
           @r###"{"data":{"upsertOneTestModel":{"optInt":null}}}"###
         );
         insta::assert_snapshot!(
-          query_number_operation(runner, "2", "optInt", "decrement", "10").await?,
+          query_number_operation(&runner, "2", "optInt", "decrement", "10").await?,
           @r###"{"data":{"upsertOneTestModel":{"optInt":3}}}"###
         );
 
         // Multiply
         insta::assert_snapshot!(
-          query_number_operation(runner, "1", "optInt", "multiply", "2").await?,
+          query_number_operation(&runner, "1", "optInt", "multiply", "2").await?,
           @r###"{"data":{"upsertOneTestModel":{"optInt":null}}}"###
         );
         insta::assert_snapshot!(
-          query_number_operation(runner, "2", "optInt", "multiply", "2").await?,
+          query_number_operation(&runner, "2", "optInt", "multiply", "2").await?,
           @r###"{"data":{"upsertOneTestModel":{"optInt":6}}}"###
         );
 
         // Divide
         insta::assert_snapshot!(
-          query_number_operation(runner, "1", "optInt", "divide", "3").await?,
+          query_number_operation(&runner, "1", "optInt", "divide", "3").await?,
           @r###"{"data":{"upsertOneTestModel":{"optInt":null}}}"###
         );
         insta::assert_snapshot!(
-          query_number_operation(runner, "2", "optInt", "divide", "3").await?,
+          query_number_operation(&runner, "2", "optInt", "divide", "3").await?,
           @r###"{"data":{"upsertOneTestModel":{"optInt":2}}}"###
         );
 
         // Set
         insta::assert_snapshot!(
-          query_number_operation(runner, "1", "optInt", "set", "5").await?,
+          query_number_operation(&runner, "1", "optInt", "set", "5").await?,
           @r###"{"data":{"upsertOneTestModel":{"optInt":5}}}"###
         );
         insta::assert_snapshot!(
-          query_number_operation(runner, "2", "optInt", "set", "5").await?,
+          query_number_operation(&runner, "2", "optInt", "set", "5").await?,
           @r###"{"data":{"upsertOneTestModel":{"optInt":5}}}"###
         );
 
         // Set null
         insta::assert_snapshot!(
-          query_number_operation(runner, "1", "optInt", "set", "null").await?,
+          query_number_operation(&runner, "1", "optInt", "set", "null").await?,
           @r###"{"data":{"upsertOneTestModel":{"optInt":null}}}"###
         );
         insta::assert_snapshot!(
-          query_number_operation(runner, "2", "optInt", "set", "null").await?,
+          query_number_operation(&runner, "2", "optInt", "set", "null").await?,
           @r###"{"data":{"upsertOneTestModel":{"optInt":null}}}"###
         );
 
@@ -485,67 +485,67 @@ mod upsert {
     // -{"data":{"upsertOneTestModel":{"optFloat":null}}}
     // +{"data":{"upsertOneTestModel":{"optFloat":4.600000000000001}}}
     #[connector_test(schema(schema_number), exclude(MongoDb))]
-    async fn upsert_apply_number_ops_for_float(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ id: 1 }"#).await?;
-        create_row(runner, r#"{ id: 2, optFloat: 5.5}"#).await?;
+    async fn upsert_apply_number_ops_for_float(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1 }"#).await?;
+        create_row(&runner, r#"{ id: 2, optFloat: 5.5}"#).await?;
 
         // Increment
         insta::assert_snapshot!(
-          query_number_operation(runner, "1", "optFloat", "increment", "4.6").await?,
+          query_number_operation(&runner, "1", "optFloat", "increment", "4.6").await?,
           @r###"{"data":{"upsertOneTestModel":{"optFloat":null}}}"###
         );
         insta::assert_snapshot!(
-          query_number_operation(runner, "2", "optFloat", "increment", "4.6").await?,
+          query_number_operation(&runner, "2", "optFloat", "increment", "4.6").await?,
           @r###"{"data":{"upsertOneTestModel":{"optFloat":10.1}}}"###
         );
 
         // Decrement
         insta::assert_snapshot!(
-          query_number_operation(runner, "1", "optFloat", "decrement", "4.6").await?,
+          query_number_operation(&runner, "1", "optFloat", "decrement", "4.6").await?,
           @r###"{"data":{"upsertOneTestModel":{"optFloat":null}}}"###
         );
         insta::assert_snapshot!(
-          query_number_operation(runner, "2", "optFloat", "decrement", "4.6").await?,
+          query_number_operation(&runner, "2", "optFloat", "decrement", "4.6").await?,
           @r###"{"data":{"upsertOneTestModel":{"optFloat":5.5}}}"###
         );
 
         // Multiply
         insta::assert_snapshot!(
-          query_number_operation(runner, "1", "optFloat", "multiply", "2").await?,
+          query_number_operation(&runner, "1", "optFloat", "multiply", "2").await?,
           @r###"{"data":{"upsertOneTestModel":{"optFloat":null}}}"###
         );
         insta::assert_snapshot!(
-          query_number_operation(runner, "2", "optFloat", "multiply", "2").await?,
+          query_number_operation(&runner, "2", "optFloat", "multiply", "2").await?,
           @r###"{"data":{"upsertOneTestModel":{"optFloat":11.0}}}"###
         );
 
         // Divide
         insta::assert_snapshot!(
-          query_number_operation(runner, "1", "optFloat", "divide", "2").await?,
+          query_number_operation(&runner, "1", "optFloat", "divide", "2").await?,
           @r###"{"data":{"upsertOneTestModel":{"optFloat":null}}}"###
         );
         insta::assert_snapshot!(
-          query_number_operation(runner, "2", "optFloat", "divide", "2").await?,
+          query_number_operation(&runner, "2", "optFloat", "divide", "2").await?,
           @r###"{"data":{"upsertOneTestModel":{"optFloat":5.5}}}"###
         );
 
         // Set
         insta::assert_snapshot!(
-          query_number_operation(runner, "1", "optFloat", "set", "5.1").await?,
+          query_number_operation(&runner, "1", "optFloat", "set", "5.1").await?,
           @r###"{"data":{"upsertOneTestModel":{"optFloat":5.1}}}"###
         );
         insta::assert_snapshot!(
-          query_number_operation(runner, "2", "optFloat", "set", "5.1").await?,
+          query_number_operation(&runner, "2", "optFloat", "set", "5.1").await?,
           @r###"{"data":{"upsertOneTestModel":{"optFloat":5.1}}}"###
         );
 
         // Set null
         insta::assert_snapshot!(
-          query_number_operation(runner, "1", "optFloat", "set", "null").await?,
+          query_number_operation(&runner, "1", "optFloat", "set", "null").await?,
           @r###"{"data":{"upsertOneTestModel":{"optFloat":null}}}"###
         );
         insta::assert_snapshot!(
-          query_number_operation(runner, "2", "optFloat", "set", "null").await?,
+          query_number_operation(&runner, "2", "optFloat", "set", "null").await?,
           @r###"{"data":{"upsertOneTestModel":{"optFloat":null}}}"###
         );
 

@@ -24,7 +24,7 @@ pub trait MigrationPersistence: Send + Sync {
     /// Connectors should implement mark_migration_applied_impl to avoid doing
     /// the checksuming themselves.
     async fn mark_migration_applied(&self, migration_name: &str, script: &str) -> ConnectorResult<String> {
-        self.mark_migration_applied_impl(migration_name, &checksum(script))
+        self.mark_migration_applied_impl(migration_name, &checksum::render_checksum(script))
             .await
     }
 
@@ -43,7 +43,7 @@ pub trait MigrationPersistence: Send + Sync {
     /// This is a default method that computes the checksum. Implementors should
     /// implement record_migration_started_impl.
     async fn record_migration_started(&self, migration_name: &str, script: &str) -> ConnectorResult<String> {
-        self.record_migration_started_impl(migration_name, &checksum(script))
+        self.record_migration_started_impl(migration_name, &checksum::render_checksum(script))
             .await
     }
 

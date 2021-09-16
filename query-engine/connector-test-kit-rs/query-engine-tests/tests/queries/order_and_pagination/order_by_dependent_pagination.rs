@@ -10,7 +10,7 @@ mod order_by_dependent_pag {
             r#"model ModelA {
               #id(id, Int, @id)
               b_id Int?
-              b    ModelB? @relation(fields: [b_id], references: [id])
+              b    ModelB? @relation(fields: [b_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
               c    ModelC?
             }
 
@@ -34,13 +34,14 @@ mod order_by_dependent_pag {
     }
 
     // "[Hops: 1] Ordering by related record field ascending" should "work"
+    // TODO(julius): should enable for SQL Server when partial indices are in the PSL
     #[connector_test(exclude(SqlServer))]
-    async fn hop_1_related_record_asc(runner: &Runner) -> TestResult<()> {
-        create_row(runner, 1, Some(2), Some(3), None).await?;
-        create_row(runner, 4, Some(5), Some(6), None).await?;
+    async fn hop_1_related_record_asc(runner: Runner) -> TestResult<()> {
+        create_row(&runner, 1, Some(2), Some(3), None).await?;
+        create_row(&runner, 4, Some(5), Some(6), None).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyModelA(orderBy: { b: { id: asc }}, cursor: { id: 1 }, take: 2) {
               id
               b {
@@ -55,13 +56,14 @@ mod order_by_dependent_pag {
     }
 
     // "[Hops: 1] Ordering by related record field descending" should "work"
+    // TODO(julius): should enable for SQL Server when partial indices are in the PSL
     #[connector_test(exclude(SqlServer))]
-    async fn hop_1_related_record_desc(runner: &Runner) -> TestResult<()> {
-        create_row(runner, 1, Some(2), Some(3), None).await?;
-        create_row(runner, 4, Some(5), Some(6), None).await?;
+    async fn hop_1_related_record_desc(runner: Runner) -> TestResult<()> {
+        create_row(&runner, 1, Some(2), Some(3), None).await?;
+        create_row(&runner, 4, Some(5), Some(6), None).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyModelA(orderBy: { b: { id: desc }}, cursor: { id: 4 }, take: 2) {
               id
               b {
@@ -79,15 +81,15 @@ mod order_by_dependent_pag {
     // TODO(dom): Not working on mongo
     // TODO(dom): Query result: {"data":{"findManyModelA":[{"id":1,"b":{"id":1}},{"id":2,"b":{"id":2}}]}}
     // TODO(dom): is not part of the expected results: ["{\"data\":{\"findManyModelA\":[{\"id\":3,\"b\":null},{\"id\":1,\"b\":{\"id\":1}},{\"id\":2,\"b\":{\"id\":2}}]}}", "{\"data\":{\"findManyModelA\":[{\"id\":1,\"b\":{\"id\":1}},{\"id\":2,\"b\":{\"id\":2}},{\"id\":3,\"b\":null}]}}"]
-    #[connector_test(exclude(SqlServer, MongoDb))]
-    async fn hop_1_related_record_asc_nulls(runner: &Runner) -> TestResult<()> {
+    #[connector_test(exclude(MongoDb))]
+    async fn hop_1_related_record_asc_nulls(runner: Runner) -> TestResult<()> {
         // 1 record has the "full chain", one half, one none
-        create_row(runner, 1, Some(1), Some(1), None).await?;
-        create_row(runner, 2, Some(2), None, None).await?;
-        create_row(runner, 3, None, None, None).await?;
+        create_row(&runner, 1, Some(1), Some(1), None).await?;
+        create_row(&runner, 2, Some(2), None, None).await?;
+        create_row(&runner, 3, None, None, None).await?;
 
         assert_query_many!(
-            runner,
+            &runner,
             r#"{
               findManyModelA(orderBy: { b: { id: asc }}, cursor: { id: 1 }, take: 3) {
                 id
@@ -107,13 +109,14 @@ mod order_by_dependent_pag {
     }
 
     // "[Hops: 2] Ordering by related record field ascending" should "work"
+    // TODO(julius): should enable for SQL Server when partial indices are in the PSL
     #[connector_test(exclude(SqlServer))]
-    async fn hop_2_related_record_asc(runner: &Runner) -> TestResult<()> {
-        create_row(runner, 1, Some(2), Some(3), None).await?;
-        create_row(runner, 4, Some(5), Some(6), None).await?;
+    async fn hop_2_related_record_asc(runner: Runner) -> TestResult<()> {
+        create_row(&runner, 1, Some(2), Some(3), None).await?;
+        create_row(&runner, 4, Some(5), Some(6), None).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyModelA(orderBy: { b: { c: { id: asc }}}, cursor: { id: 1 }, take: 2) {
               id
               b { c { id }}
@@ -126,13 +129,14 @@ mod order_by_dependent_pag {
     }
 
     // "[Hops: 2] Ordering by related record field descending" should "work"
+    // TODO(julius): should enable for SQL Server when partial indices are in the PSL
     #[connector_test(exclude(SqlServer))]
-    async fn hop_2_related_record_desc(runner: &Runner) -> TestResult<()> {
-        create_row(runner, 1, Some(2), Some(3), None).await?;
-        create_row(runner, 4, Some(5), Some(6), None).await?;
+    async fn hop_2_related_record_desc(runner: Runner) -> TestResult<()> {
+        create_row(&runner, 1, Some(2), Some(3), None).await?;
+        create_row(&runner, 4, Some(5), Some(6), None).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyModelA(orderBy: { b: { c: { id: desc }}}, cursor: { id: 1 }, take: 2) {
               id
               b { c { id }}
@@ -148,15 +152,15 @@ mod order_by_dependent_pag {
     // TODO(dom): Not working on mongo
     // TODO(dom): Query result: {"data":{"findManyModelA":[{"id":1,"b":{"c":{"id":1}}}]}}
     // TODO(dom): is not part of the expected results: ["{\"data\":{\"findManyModelA\":[{\"id\":2,\"b\":{\"c\":null}},{\"id\":3,\"b\":null},{\"id\":1,\"b\":{\"c\":{\"id\":1}}}]}}", "{\"data\":{\"findManyModelA\":[{\"id\":3,\"b\":null},{\"id\":2,\"b\":{\"c\":null}},{\"id\":1,\"b\":{\"c\":{\"id\":1}}}]}}", "{\"data\":{\"findManyModelA\":[{\"id\":1,\"b\":{\"c\":{\"id\":1}}},{\"id\":2,\"b\":{\"c\":null}},{\"id\":3,\"b\":null}]}}"]
-    #[connector_test(exclude(SqlServer, MongoDb))]
-    async fn hop_2_related_record_asc_null(runner: &Runner) -> TestResult<()> {
+    #[connector_test(exclude(MongoDb))]
+    async fn hop_2_related_record_asc_null(runner: Runner) -> TestResult<()> {
         // 1 record has the "full chain", one half, one none
-        create_row(runner, 1, Some(1), Some(1), None).await?;
-        create_row(runner, 2, Some(2), None, None).await?;
-        create_row(runner, 3, None, None, None).await?;
+        create_row(&runner, 1, Some(1), Some(1), None).await?;
+        create_row(&runner, 2, Some(2), None, None).await?;
+        create_row(&runner, 3, None, None, None).await?;
 
         assert_query_many!(
-            runner,
+            &runner,
             r#"{
               findManyModelA(orderBy: { b: { c: { id: asc }}}, cursor: { id: 1 }, take: 3) {
                 id
@@ -179,14 +183,14 @@ mod order_by_dependent_pag {
     }
 
     // "[Circular] Ordering by related record field ascending" should "work"
-    #[connector_test(exclude(SqlServer))]
-    async fn circular_related_record_asc(runner: &Runner) -> TestResult<()> {
+    #[connector_test]
+    async fn circular_related_record_asc(runner: Runner) -> TestResult<()> {
         // Records form circles with their relations
-        create_row(runner, 1, Some(1), Some(1), Some(1)).await?;
-        create_row(runner, 2, Some(2), Some(2), Some(2)).await?;
+        create_row(&runner, 1, Some(1), Some(1), Some(1)).await?;
+        create_row(&runner, 2, Some(2), Some(2), Some(2)).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyModelA(orderBy: { b: { c: { a: { id: asc }}}}, cursor: { id: 1 }, take: 2) {
               id
               b {
@@ -205,14 +209,14 @@ mod order_by_dependent_pag {
     }
 
     // "[Circular] Ordering by related record field descending" should "work"
-    #[connector_test(exclude(SqlServer))]
-    async fn circular_related_record_desc(runner: &Runner) -> TestResult<()> {
+    #[connector_test]
+    async fn circular_related_record_desc(runner: Runner) -> TestResult<()> {
         // Records form circles with their relations
-        create_row(runner, 1, Some(1), Some(1), Some(1)).await?;
-        create_row(runner, 2, Some(2), Some(2), Some(2)).await?;
+        create_row(&runner, 1, Some(1), Some(1), Some(1)).await?;
+        create_row(&runner, 2, Some(2), Some(2), Some(2)).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyModelA(orderBy: { b: { c: { a: { id: desc }}}}, cursor: { id: 1 }, take: 2) {
               id
               b {
@@ -234,14 +238,15 @@ mod order_by_dependent_pag {
     // TODO(dom): Not working on mongo
     // TODO(dom): Query result {"data":{"findManyModelA":[{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}}]}}
     // TODO(dom): is not part of the expected results: ["{\"data\":{\"findManyModelA\":[{\"id\":3,\"b\":null},{\"id\":4,\"b\":null},{\"id\":1,\"b\":{\"c\":{\"a\":{\"id\":3}}}},{\"id\":2,\"b\":{\"c\":{\"a\":{\"id\":4}}}}]}}", "{\"data\":{\"findManyModelA\":[{\"id\":1,\"b\":{\"c\":{\"a\":{\"id\":3}}}},{\"id\":2,\"b\":{\"c\":{\"a\":{\"id\":4}}}},{\"id\":3,\"b\":null},{\"id\":4,\"b\":null}]}}"]
+    // TODO(julius): should enable for SQL Server when partial indices are in the PSL
     #[connector_test(exclude(SqlServer, MySql, MongoDb))]
-    async fn circular_diff_related_record_asc(runner: &Runner) -> TestResult<()> {
+    async fn circular_diff_related_record_asc(runner: Runner) -> TestResult<()> {
         // Records form circles with their relations
-        create_row(runner, 1, Some(1), Some(1), Some(3)).await?;
-        create_row(runner, 2, Some(2), Some(2), Some(4)).await?;
+        create_row(&runner, 1, Some(1), Some(1), Some(3)).await?;
+        create_row(&runner, 2, Some(2), Some(2), Some(4)).await?;
 
         assert_query_many!(
-            runner,
+            &runner,
             r#"{
               findManyModelA(orderBy: { b: { c: { a: { id: asc }}}}, cursor: { id: 1 }, take: 4) {
                 id
@@ -265,14 +270,15 @@ mod order_by_dependent_pag {
     }
 
     // "[Circular with differing records] Ordering by related record field descending" should "work"
+    // TODO(julius): should enable for SQL Server when partial indices are in the PSL
     #[connector_test(exclude(SqlServer, MySql))]
-    async fn circular_diff_related_record_desc(runner: &Runner) -> TestResult<()> {
+    async fn circular_diff_related_record_desc(runner: Runner) -> TestResult<()> {
         // Records form circles with their relations
-        create_row(runner, 1, Some(1), Some(1), Some(3)).await?;
-        create_row(runner, 2, Some(2), Some(2), Some(4)).await?;
+        create_row(&runner, 1, Some(1), Some(1), Some(3)).await?;
+        create_row(&runner, 2, Some(2), Some(2), Some(4)).await?;
 
         assert_query_many!(
-            runner,
+            &runner,
             r#"{
               findManyModelA(orderBy: { b: { c: { a: { id: desc }}}}, cursor: { id: 2 }, take: 4) {
                 id
@@ -301,7 +307,7 @@ mod order_by_dependent_pag {
           #id(id, Int, @id)
 
           b1_id Int?
-          b1    ModelB? @relation(fields: [b1_id], references: [id], name: "1")
+          b1    ModelB? @relation(fields: [b1_id], references: [id], name: "1", onDelete: NoAction, onUpdate: NoAction)
 
           b2_id Int?
           b2    ModelB? @relation(fields: [b2_id], references: [id], name: "2")
@@ -318,24 +324,24 @@ mod order_by_dependent_pag {
         schema.to_string()
     }
 
-    #[connector_test(schema(multiple_rel_same_model), exclude(SqlServer, MongoDb))] // Mongo is excluded due to CI issues (version drift?).
-    async fn multiple_rel_same_model_order_by(runner: &Runner) -> TestResult<()> {
+    #[connector_test(schema(multiple_rel_same_model), exclude(MongoDb))] // Mongo is excluded due to CI issues (version drift?).
+    async fn multiple_rel_same_model_order_by(runner: Runner) -> TestResult<()> {
         // test data
         run_query!(
-            runner,
+            &runner,
             r#"mutation { createOneModelA(data: { id: 1, b1: { create: { id: 1 } }, b2: { create: { id: 10 } } }) { id }}"#
         );
         run_query!(
-            runner,
+            &runner,
             r#"mutation { createOneModelA(data: { id: 2, b1: { connect: { id: 1 } }, b2: { create: { id: 5 } } }) { id }}"#
         );
         run_query!(
-            runner,
+            &runner,
             r#"mutation { createOneModelA(data: { id: 3, b1: { create: { id: 2 } }, b2: { create: { id: 7 } } }) { id }}"#
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyModelA(orderBy: [{ b1: { id: asc } }, { b2: { id: desc } }], cursor: { id: 1 }, take: 3) {
               id
               b1 { id }

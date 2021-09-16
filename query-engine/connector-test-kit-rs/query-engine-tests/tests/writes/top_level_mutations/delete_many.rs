@@ -18,14 +18,14 @@ mod delete_many {
 
     // "The delete many Mutation" should "delete the items matching the where clause"
     #[connector_test]
-    async fn should_delete_items(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ id: 1, title: "title1" }"#).await?;
-        create_row(runner, r#"{ id: 2, title: "title2" }"#).await?;
+    async fn should_delete_items(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, title: "title1" }"#).await?;
+        create_row(&runner, r#"{ id: 2, title: "title2" }"#).await?;
 
-        assert_todo_count(runner, 2).await?;
+        assert_todo_count(&runner, 2).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             deleteManyTodo(
               where: { title: { equals: "title1" }}
             ){
@@ -35,21 +35,21 @@ mod delete_many {
           @r###"{"data":{"deleteManyTodo":{"count":1}}}"###
         );
 
-        assert_todo_count(runner, 1).await?;
+        assert_todo_count(&runner, 1).await?;
 
         Ok(())
     }
 
     // "The delete many Mutation" should "delete all items if the where clause is empty"
     #[connector_test]
-    async fn should_delete_all_if_where_empty(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ id: 1, title: "title1" }"#).await?;
-        create_row(runner, r#"{ id: 2, title: "title2" }"#).await?;
-        create_row(runner, r#"{ id: 3, title: "title3" }"#).await?;
-        assert_todo_count(runner, 3).await?;
+    async fn should_delete_all_if_where_empty(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, title: "title1" }"#).await?;
+        create_row(&runner, r#"{ id: 2, title: "title2" }"#).await?;
+        create_row(&runner, r#"{ id: 3, title: "title3" }"#).await?;
+        assert_todo_count(&runner, 3).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             deleteManyTodo(where: {}){
               count
             }
@@ -57,22 +57,22 @@ mod delete_many {
           @r###"{"data":{"deleteManyTodo":{"count":3}}}"###
         );
 
-        assert_todo_count(runner, 0).await?;
+        assert_todo_count(&runner, 0).await?;
 
         Ok(())
     }
 
     // "The delete many Mutation" should "delete all items using in"
     #[connector_test]
-    async fn should_delete_all_using_in(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ id: 1, title: "title1" }"#).await?;
-        create_row(runner, r#"{ id: 2, title: "title2" }"#).await?;
-        create_row(runner, r#"{ id: 3, title: "title3" }"#).await?;
+    async fn should_delete_all_using_in(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, title: "title1" }"#).await?;
+        create_row(&runner, r#"{ id: 2, title: "title2" }"#).await?;
+        create_row(&runner, r#"{ id: 3, title: "title3" }"#).await?;
 
-        assert_todo_count(runner, 3).await?;
+        assert_todo_count(&runner, 3).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             deleteManyTodo(where: { title: { in: [ "title1", "title2" ] }}) {
               count
             }
@@ -80,20 +80,20 @@ mod delete_many {
           @r###"{"data":{"deleteManyTodo":{"count":2}}}"###
         );
 
-        assert_todo_count(runner, 1).await?;
+        assert_todo_count(&runner, 1).await?;
 
         Ok(())
     }
 
     // "The delete many Mutation" should "delete all items using notin"
     #[connector_test]
-    async fn should_delete_all_using_notin(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ id: 1, title: "title1" }"#).await?;
-        create_row(runner, r#"{ id: 2, title: "title2" }"#).await?;
-        create_row(runner, r#"{ id: 3, title: "title3" }"#).await?;
+    async fn should_delete_all_using_notin(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, title: "title1" }"#).await?;
+        create_row(&runner, r#"{ id: 2, title: "title2" }"#).await?;
+        create_row(&runner, r#"{ id: 3, title: "title3" }"#).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             deleteManyTodo(
               where: { title: { not: { in: [ "DoesNotExist", "AlsoDoesntExist" ] }}}
             ){
@@ -103,20 +103,20 @@ mod delete_many {
           @r###"{"data":{"deleteManyTodo":{"count":3}}}"###
         );
 
-        assert_todo_count(runner, 0).await?;
+        assert_todo_count(&runner, 0).await?;
 
         Ok(())
     }
 
     // "The delete many Mutation" should "delete items using OR"
     #[connector_test]
-    async fn should_delete_using_or(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ id: 1, title: "title1" }"#).await?;
-        create_row(runner, r#"{ id: 2, title: "title2" }"#).await?;
-        create_row(runner, r#"{ id: 3, title: "title3" }"#).await?;
+    async fn should_delete_using_or(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, title: "title1" }"#).await?;
+        create_row(&runner, r#"{ id: 2, title: "title2" }"#).await?;
+        create_row(&runner, r#"{ id: 3, title: "title3" }"#).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query {
+          run_query!(&runner, r#"query {
             findManyTodo(
               where: { OR: [{ title: { equals: "title1" } }, { title: { equals: "title2" }}]}
             ) {
@@ -127,7 +127,7 @@ mod delete_many {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             deleteManyTodo(
               where: { OR: [{ title: { equals: "title1" }}, { title: { equals: "title2" }}]}
             ){
@@ -137,20 +137,20 @@ mod delete_many {
           @r###"{"data":{"deleteManyTodo":{"count":2}}}"###
         );
 
-        assert_todo_count(runner, 1).await?;
+        assert_todo_count(&runner, 1).await?;
 
         Ok(())
     }
 
     // "The delete many Mutation" should "delete items using  AND"
     #[connector_test]
-    async fn should_delete_using_and(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ id: 1, title: "title1" }"#).await?;
-        create_row(runner, r#"{ id: 2, title: "title2" }"#).await?;
-        create_row(runner, r#"{ id: 3, title: "title3" }"#).await?;
+    async fn should_delete_using_and(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, title: "title1" }"#).await?;
+        create_row(&runner, r#"{ id: 2, title: "title2" }"#).await?;
+        create_row(&runner, r#"{ id: 3, title: "title3" }"#).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query {
+          run_query!(&runner, r#"query {
             findManyTodo(
               where: { AND: [{ title: { equals: "title1" }}, { title: { equals: "title2" }}]}
             ){
@@ -161,7 +161,7 @@ mod delete_many {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             deleteManyTodo(
               where: { AND: [{ title: { equals: "title1" }}, { title: { equals: "title2" }}]}
             ){
@@ -171,7 +171,7 @@ mod delete_many {
           @r###"{"data":{"deleteManyTodo":{"count":0}}}"###
         );
 
-        assert_todo_count(runner, 3).await?;
+        assert_todo_count(&runner, 3).await?;
 
         Ok(())
     }
@@ -199,9 +199,9 @@ mod delete_many {
 
     // "nested DeleteMany" should "work"
     #[connector_test(schema(nested_del_many))]
-    async fn nested_delete_many(runner: &Runner) -> TestResult<()> {
+    async fn nested_delete_many(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneParent(data: {
               id: "1",
               name: "Dad",
@@ -214,7 +214,7 @@ mod delete_many {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneParent(
               where: { name: "Dad" }
               data: { children: { deleteMany: [

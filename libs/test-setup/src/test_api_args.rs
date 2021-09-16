@@ -102,15 +102,21 @@ pub(crate) fn db_under_test() -> &'static DbUnderTest {
 #[derive(Debug)]
 pub struct TestApiArgs {
     test_function_name: &'static str,
+    preview_features: &'static [&'static str],
     db: &'static DbUnderTest,
 }
 
 impl TestApiArgs {
-    pub fn new(test_function_name: &'static str) -> Self {
+    pub fn new(test_function_name: &'static str, preview_features: &'static [&'static str]) -> Self {
         TestApiArgs {
             test_function_name,
+            preview_features,
             db: db_under_test(),
         }
+    }
+
+    pub fn preview_features(&self) -> &'static [&'static str] {
+        self.preview_features
     }
 
     pub fn test_function_name(&self) -> &'static str {
@@ -119,6 +125,12 @@ impl TestApiArgs {
 
     pub fn capabilities(&self) -> BitFlags<Capabilities> {
         self.db.capabilities
+    }
+
+    pub async fn create_mssql_database(&self) -> (Quaint, String) {
+        mssql::init_mssql_database(self.database_url(), self.test_function_name)
+            .await
+            .unwrap()
     }
 
     pub async fn create_mysql_database(&self) -> (&'static str, String) {

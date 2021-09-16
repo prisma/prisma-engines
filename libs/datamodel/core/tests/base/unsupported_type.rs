@@ -1,4 +1,5 @@
 use crate::common::*;
+use datamodel::ValueGenerator;
 use dml::default_value::DefaultValue;
 use dml::field::FieldArity;
 
@@ -33,13 +34,15 @@ fn parse_unsupported_types() {
         .assert_has_scalar_field("ip")
         .assert_unsupported_type("ip4r")
         .assert_arity(&FieldArity::Optional)
-        .assert_default_value(DefaultValue::new_db_generated("'173.201.95.24'".to_string()));
+        .assert_default_value(DefaultValue::new_expression(ValueGenerator::new_dbgenerated(
+            "'173.201.95.24'".to_string(),
+        )));
     user_model
         .assert_has_scalar_field("with_space")
         .assert_unsupported_type("something weird with spaces")
         .assert_arity(&FieldArity::List);
 
-    let rendered_dml = datamodel::render_datamodel_to_string(&schema);
+    let rendered_dml = datamodel::render_datamodel_to_string(&schema, None);
 
     assert_eq!(rendered_dml.replace(' ', ""), dml.replace(' ', ""));
 }

@@ -10,9 +10,12 @@ use connector_interface::{
     Connector,
 };
 use datamodel::Datasource;
+use futures::Future;
 use mongodb::{options::ClientOptions, Client};
 use prisma_models::prelude::*;
 use url::Url;
+
+use crate::error::MongoError;
 
 /// The MongoDB connector struct.
 pub struct MongoDb {
@@ -57,12 +60,28 @@ impl Connector for MongoDb {
     async fn get_connection(
         &self,
     ) -> connector_interface::Result<Box<dyn connector_interface::Connection + Send + Sync>> {
+        let session = self
+            .client
+            .start_session(None)
+            .await
+            .map_err(|err| MongoError::from(err).into_connector_error())?;
+
         Ok(Box::new(MongoDbConnection {
+            session,
             database: self.client.database(&self.database),
         }))
     }
 
     fn name(&self) -> String {
         "mongodb".to_owned()
+    }
+}
+
+async fn catch<O>(
+    fut: impl Future<Output = Result<O, MongoError>>,
+) -> Result<O, connector_interface::error::ConnectorError> {
+    match fut.await {
+        Ok(o) => Ok(o),
+        Err(err) => Err(err.into_connector_error()),
     }
 }

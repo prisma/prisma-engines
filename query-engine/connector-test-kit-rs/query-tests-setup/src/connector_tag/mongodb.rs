@@ -22,11 +22,14 @@ impl ConnectorTagInterface for MongoDbConnectorTag {
     fn connection_string(&self, database: &str, is_ci: bool) -> String {
         match self.version {
             Some(MongoDbVersion::V4) if is_ci => format!(
-                "mongodb://prisma:prisma@test-db-mongodb-4:27017/{}?authSource=admin",
+                "mongodb://prisma:prisma@test-db-mongodb-4:27017/{}?authSource=admin&retryWrites=true",
                 database
             ),
             Some(MongoDbVersion::V4) => {
-                format!("mongodb://prisma:prisma@127.0.0.1:27017/{}?authSource=admin", database)
+                format!(
+                    "mongodb://prisma:prisma@127.0.0.1:27017/{}?authSource=admin&retryWrites=true",
+                    database
+                )
             }
 
             None => unreachable!("A versioned connector must have a concrete version to run."),
@@ -44,6 +47,10 @@ impl ConnectorTagInterface for MongoDbConnectorTag {
 
     fn is_versioned(&self) -> bool {
         true
+    }
+
+    fn referential_integrity(&self) -> &'static str {
+        "prisma"
     }
 }
 
@@ -107,5 +114,5 @@ impl ToString for MongoDbVersion {
 
 fn mongo_capabilities() -> Vec<ConnectorCapability> {
     let dm_connector = MongoDbDatamodelConnector::default();
-    dm_connector.capabilities().clone()
+    dm_connector.capabilities().to_owned()
 }

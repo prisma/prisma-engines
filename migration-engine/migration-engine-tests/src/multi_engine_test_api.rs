@@ -3,10 +3,16 @@
 //! A TestApi that is initialized without IO or async code and can instantiate
 //! multiple migration engines.
 
+use datamodel::common::preview_features::PreviewFeature;
+use quaint::prelude::ConnectionInfo;
 pub use test_macros::test_connector;
+pub use test_setup::sqlite_test_url;
 pub use test_setup::{BitFlags, Capabilities, Tags};
 
-use crate::{ApplyMigrations, CreateMigration, DiagnoseMigrationHistory, Reset, SchemaAssertion, SchemaPush};
+use crate::{
+    assertions::SchemaAssertion,
+    commands::{ApplyMigrations, CreateMigration, DiagnoseMigrationHistory, Reset, SchemaPush},
+};
 use migration_core::GenericApi;
 use quaint::{
     prelude::{Queryable, ResultSet},
@@ -23,6 +29,7 @@ pub struct TestApi {
     connection_string: String,
     pub(crate) admin_conn: Quaint,
     pub(crate) rt: tokio::runtime::Runtime,
+    preview_features: BitFlags<PreviewFeature>,
 }
 
 impl TestApi {
@@ -31,6 +38,12 @@ impl TestApi {
         let rt = test_setup::runtime::test_tokio_runtime();
         let tags = args.tags();
 
+        let preview_features = args
+            .preview_features()
+            .iter()
+            .flat_map(|f| PreviewFeature::parse_opt(f))
+            .collect();
+
         let (admin_conn, connection_string) = if tags.contains(Tags::Postgres) {
             let (_, q, cs) = rt.block_on(args.create_postgres_database());
             (q, cs)
@@ -38,6 +51,7 @@ impl TestApi {
             let conn = rt
                 .block_on(SqlMigrationConnector::new(
                     args.database_url(),
+                    preview_features,
                     args.shadow_database_url().map(String::from),
                 ))
                 .unwrap();
@@ -51,11 +65,7 @@ impl TestApi {
             let (_, cs) = rt.block_on(args.create_mysql_database());
             (rt.block_on(Quaint::new(&cs)).unwrap(), cs)
         } else if tags.contains(Tags::Mssql) {
-            rt.block_on(test_setup::init_mssql_database(
-                args.database_url(),
-                args.test_function_name(),
-            ))
-            .unwrap()
+            rt.block_on(args.create_mssql_database())
         } else if tags.contains(Tags::Sqlite) {
             let url = test_setup::sqlite_test_url(args.test_function_name());
 
@@ -69,6 +79,7 @@ impl TestApi {
             connection_string,
             admin_conn,
             rt,
+            preview_features,
         }
     }
 
@@ -90,6 +101,11 @@ impl TestApi {
     /// The connection string for the database associated with the test.
     pub fn connection_string(&self) -> &str {
         &self.connection_string
+    }
+
+    /// The ConnectionInfo based on the connection string
+    pub fn connection_info(&self) -> ConnectionInfo {
+        ConnectionInfo::from_url(self.connection_string()).unwrap()
     }
 
     /// Create a temporary directory to serve as a test migrations directory.
@@ -163,13 +179,15 @@ impl TestApi {
         let connector = self
             .rt
             .block_on(SqlMigrationConnector::new(
-                &connection_string,
+                connection_string,
+                self.preview_features,
                 shadow_db_connection_string,
             ))
             .unwrap();
 
         EngineTestApi {
             connector,
+            connection_info: ConnectionInfo::from_url(connection_string).unwrap(),
             tags: self.args.tags(),
             rt: &self.rt,
         }
@@ -183,12 +201,57 @@ impl TestApi {
     pub fn test_fn_name(&self) -> &str {
         self.args.test_function_name()
     }
+
+    /// Render a datamodel including provider and generator block.
+    pub fn datamodel_with_provider(&self, schema: &str) -> String {
+        let mut out = String::with_capacity(320 + schema.len());
+
+        self.write_datasource_block(&mut out);
+        out.push_str(&self.generator_block());
+        out.push_str(schema);
+
+        out
+    }
+
+    /// Render a valid datasource block, including database URL.
+    pub fn write_datasource_block(&self, out: &mut dyn std::fmt::Write) {
+        write!(out, "{}", self.args.datasource_block(self.args.database_url(), &[])).unwrap()
+    }
+
+    /// Currently enabled preview features.
+    pub fn preview_features(&self) -> BitFlags<PreviewFeature> {
+        self.preview_features
+    }
+
+    fn generator_block(&self) -> String {
+        let preview_features: Vec<String> = self
+            .args
+            .preview_features()
+            .iter()
+            .map(|pf| format!(r#""{}""#, pf))
+            .collect();
+
+        let preview_feature_string = if preview_features.is_empty() {
+            "".to_string()
+        } else {
+            format!("\npreviewFeatures = [{}]", preview_features.join(", "))
+        };
+
+        let generator_block = format!(
+            r#"generator client {{
+                 provider = "prisma-client-js"{}
+               }}"#,
+            preview_feature_string
+        );
+        generator_block
+    }
 }
 
 /// A wrapper around a migration engine instance optimized for convenience in
 /// writing tests.
 pub struct EngineTestApi<'a> {
     pub(crate) connector: SqlMigrationConnector,
+    connection_info: ConnectionInfo,
     tags: BitFlags<Tags>,
     rt: &'a tokio::runtime::Runtime,
 }
@@ -196,7 +259,7 @@ pub struct EngineTestApi<'a> {
 impl EngineTestApi<'_> {
     /// Plan an `applyMigrations` command
     pub fn apply_migrations<'a>(&'a self, migrations_directory: &'a TempDir) -> ApplyMigrations<'a> {
-        ApplyMigrations::new_sync(&self.connector, migrations_directory, &self.rt)
+        ApplyMigrations::new_sync(&self.connector, migrations_directory, self.rt)
     }
 
     /// Plan a `createMigration` command
@@ -206,7 +269,7 @@ impl EngineTestApi<'_> {
         schema: &'a str,
         migrations_directory: &'a TempDir,
     ) -> CreateMigration<'a> {
-        CreateMigration::new_sync(&self.connector, name, schema, migrations_directory, &self.rt)
+        CreateMigration::new_sync(&self.connector, name, schema, migrations_directory, self.rt)
     }
 
     /// Builder and assertions to call the DiagnoseMigrationHistory command.
@@ -226,22 +289,22 @@ impl EngineTestApi<'_> {
 
     /// Plan a `reset` command
     pub fn reset(&self) -> Reset<'_> {
-        Reset::new_sync(&self.connector, &self.rt)
+        Reset::new_sync(&self.connector, self.rt)
     }
 
     /// Plan a `schemaPush` command
     pub fn schema_push(&self, dm: impl Into<String>) -> SchemaPush<'_> {
-        SchemaPush::new_sync(&self.connector, dm.into(), &self.rt)
+        SchemaPush::new(&self.connector, dm.into(), self.rt)
     }
 
     /// The schema name of the current connected database.
     pub fn schema_name(&self) -> &str {
-        self.connector.quaint().connection_info().schema_name()
+        self.connection_info.schema_name()
     }
 
     /// Execute a raw SQL command and expect it to succeed.
     #[track_caller]
     pub fn raw_cmd(&self, cmd: &str) {
-        self.rt.block_on(self.connector.quaint().raw_cmd(cmd)).unwrap()
+        self.rt.block_on(self.connector.queryable().raw_cmd(cmd)).unwrap()
     }
 }

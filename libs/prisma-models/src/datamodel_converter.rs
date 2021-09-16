@@ -1,5 +1,6 @@
+use crate::pk::PrimaryKeyTemplate;
 use crate::*;
-use datamodel::{dml, DefaultValue, Ignorable, NativeTypeInstance, WithDatabaseName};
+use datamodel::{dml, Ignorable, NativeTypeInstance, WithDatabaseName};
 use itertools::Itertools;
 
 pub struct DatamodelConverter<'a> {
@@ -60,10 +61,10 @@ impl<'a> DatamodelConverter<'a> {
             .map(|model| ModelTemplate {
                 name: model.name.clone(),
                 is_embedded: model.is_embedded,
-                fields: self.convert_fields(&model),
+                fields: self.convert_fields(model),
                 manifestation: model.database_name().map(|s| s.to_owned()),
-                id_field_names: model.id_fields.clone(),
-                indexes: self.convert_indexes(&model),
+                primary_key: self.convert_pk(model),
+                indexes: self.convert_indexes(model),
                 supports_create_operation: model.supports_create_operation(),
                 dml_model: model.clone(),
             })
@@ -98,6 +99,8 @@ impl<'a> DatamodelConverter<'a> {
                         relation_name: relation.name.clone(),
                         relation_side: relation.relation_side(rf),
                         relation_info: rf.relation_info.clone(),
+                        on_delete_default: rf.default_on_delete_action(),
+                        on_update_default: rf.default_on_update_action(),
                     }))
                 }
                 dml::Field::ScalarField(sf) => {
@@ -110,9 +113,9 @@ impl<'a> DatamodelConverter<'a> {
                         type_identifier: sf.type_identifier(),
                         is_required: sf.is_required(),
                         is_list: sf.is_list(),
-                        is_unique: sf.is_unique(&model),
-                        is_id: sf.is_id(&model),
-                        is_auto_generated_int_id: sf.is_auto_generated_int_id(),
+                        is_unique: model.field_is_unique(&sf.name),
+                        is_id: model.field_is_primary(&sf.name),
+                        is_auto_generated_int_id: model.field_is_auto_generated_int_id(&sf.name),
                         is_autoincrement: sf.is_auto_increment(),
                         behaviour: sf.behaviour(),
                         internal_enum: sf.internal_enum(self.datamodel),
@@ -132,8 +135,6 @@ impl<'a> DatamodelConverter<'a> {
             .filter(|r| r.model_a.is_relation_supported(&r.field_a) && r.model_b.is_relation_supported(&r.field_b))
             .map(|r| RelationTemplate {
                 name: r.name(),
-                model_a_on_delete: OnDelete::SetNull,
-                model_b_on_delete: OnDelete::SetNull,
                 manifestation: r.manifestation(),
                 model_a_name: r.model_a.name.clone(),
                 model_b_name: r.model_b.name.clone(),
@@ -157,6 +158,13 @@ impl<'a> DatamodelConverter<'a> {
             .collect()
     }
 
+    fn convert_pk(&self, model: &dml::Model) -> Option<PrimaryKeyTemplate> {
+        model.primary_key.as_ref().map(|pk| PrimaryKeyTemplate {
+            fields: pk.fields.to_owned(),
+            alias: pk.name.to_owned(),
+        })
+    }
+
     pub fn calculate_relations(datamodel: &dml::Datamodel) -> Vec<TempRelationHolder> {
         let mut result = Vec::new();
         for model in datamodel.models().filter(|model| !model.is_ignored) {
@@ -166,10 +174,10 @@ impl<'a> DatamodelConverter<'a> {
                 } = &field.relation_info;
 
                 let related_model = datamodel
-                    .find_model(&to)
+                    .find_model(to)
                     .unwrap_or_else(|| panic!("Related model {} not found", to));
 
-                let (_, related_field) = datamodel.find_related_field_bang(&field);
+                let (_, related_field) = datamodel.find_related_field_bang(field);
 
                 let related_field_info: &dml::RelationInfo = &related_field.relation_info;
 
@@ -428,9 +436,6 @@ impl ModelConverterUtilities for dml::Model {
 
 trait DatamodelFieldExtensions {
     fn type_identifier(&self) -> TypeIdentifier;
-    fn is_unique(&self, model: &dml::Model) -> bool;
-    fn is_id(&self, model: &dml::Model) -> bool;
-    fn is_auto_generated_int_id(&self) -> bool;
     fn behaviour(&self) -> Option<FieldBehaviour>;
     fn internal_enum(&self, datamodel: &dml::Datamodel) -> Option<InternalEnum>;
     fn internal_enum_value(&self, enum_value: &dml::EnumValue) -> InternalEnumValue;
@@ -442,51 +447,13 @@ impl DatamodelFieldExtensions for dml::ScalarField {
         match &self.field_type {
             dml::FieldType::Enum(x) => TypeIdentifier::Enum(x.clone()),
             dml::FieldType::Relation(_) => TypeIdentifier::String, // Todo: Unused
-            dml::FieldType::Base(scalar, _) => match scalar {
-                dml::ScalarType::Boolean => TypeIdentifier::Boolean,
-                dml::ScalarType::DateTime => TypeIdentifier::DateTime,
-                dml::ScalarType::Float => TypeIdentifier::Float,
-                dml::ScalarType::Decimal => TypeIdentifier::Decimal,
-                dml::ScalarType::Int => TypeIdentifier::Int,
-                dml::ScalarType::String => TypeIdentifier::String,
-                dml::ScalarType::Json => TypeIdentifier::Json,
-                dml::ScalarType::Bytes => TypeIdentifier::Bytes,
-                dml::ScalarType::BigInt => TypeIdentifier::BigInt,
-            },
+            dml::FieldType::Scalar(scalar, _, _) => (*scalar).into(),
             dml::FieldType::Unsupported(_) => TypeIdentifier::Unsupported,
-            dml::FieldType::NativeType(scalar_type, _) => (*scalar_type).into(),
         }
-    }
-
-    fn is_unique(&self, model: &dml::Model) -> bool {
-        // transform @@unique for 1 field to is_unique
-        let is_declared_as_unique_through_multi_field_unique = model
-            .indices
-            .iter()
-            .any(|ixd| ixd.is_unique() && ixd.fields == vec![self.name.clone()]);
-
-        self.is_unique || is_declared_as_unique_through_multi_field_unique
-    }
-
-    fn is_id(&self, model: &dml::Model) -> bool {
-        // transform @@id for 1 field to is_id
-        self.is_id || model.id_fields == vec![self.name.clone()]
-    }
-
-    fn is_auto_generated_int_id(&self) -> bool {
-        let is_autogenerated_id = matches!(self.default_value, Some(DefaultValue::Expression(_)) if self.is_id);
-
-        let is_an_int = self.type_identifier() == TypeIdentifier::Int;
-
-        is_autogenerated_id && is_an_int
     }
 
     fn behaviour(&self) -> Option<FieldBehaviour> {
-        if self.is_updated_at {
-            Some(FieldBehaviour::UpdatedAt)
-        } else {
-            None
-        }
+        self.is_updated_at.then(|| FieldBehaviour::UpdatedAt)
     }
 
     fn internal_enum(&self, datamodel: &dml::Datamodel) -> Option<InternalEnum> {
@@ -513,7 +480,7 @@ impl DatamodelFieldExtensions for dml::ScalarField {
 
     fn native_type(&self) -> Option<NativeTypeInstance> {
         match &self.field_type {
-            datamodel::FieldType::NativeType(_, nt) => Some(nt.clone()),
+            datamodel::FieldType::Scalar(_, _, nt) => nt.clone(),
             _ => None,
         }
     }

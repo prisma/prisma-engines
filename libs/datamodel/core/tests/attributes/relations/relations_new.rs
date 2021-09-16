@@ -1,6 +1,4 @@
 use crate::common::*;
-use datamodel::ast::Span;
-use datamodel::diagnostics::DatamodelError;
 use datamodel::dml;
 use indoc::indoc;
 
@@ -55,8 +53,16 @@ fn relation_must_error_when_base_field_does_not_exist() {
     }
     "#;
 
-    let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_validation_error("The argument fields must refer only to existing fields. The following fields do not exist in this model: userId", Span::new(154, 210)));
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError validating: The argument fields must refer only to existing fields. The following fields do not exist in this model: userId[0m
+          [1;94m-->[0m  [4mschema.prisma:11[0m
+        [1;94m   | [0m
+        [1;94m10 | [0m        text String
+        [1;94m11 | [0m        user User @relation(fields: [1;91m[userId][0m, references: [id])
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 #[test]
@@ -84,9 +90,16 @@ fn relation_must_error_when_base_field_is_not_scalar() {
     }
     "#;
 
-    let errors = parse_error(dml);
-    errors.assert_is_at(0,DatamodelError::new_validation_error("The argument fields must refer only to scalar fields. But it is referencing the following relation fields: other", Span::new(194, 249)));
-    errors.assert_is_at(1,DatamodelError::new_attribute_validation_error("The type of the field `other` in the model `Post` is not matching the type of the referenced field `id` in model `User`.", "relation", Span::new(194, 249)));
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError validating: The argument fields must refer only to scalar fields. But it is referencing the following relation fields: other[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m        user User @relation(fields: [1;91m[other][0m, references: [id])
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 #[test]
@@ -137,8 +150,17 @@ fn required_relation_field_must_error_when_one_underlying_field_is_optional() {
     }
     "#;
 
-    let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_validation_error("The relation field `user` uses the scalar fields userFirstName, userLastName. At least one of those fields is optional. Hence the relation field must be optional as well.", Span::new(320, 426)));
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError validating: The relation field `user` uses the scalar fields userFirstName, userLastName. At least one of those fields is optional. Hence the relation field must be optional as well.[0m
+          [1;94m-->[0m  [4mschema.prisma:17[0m
+        [1;94m   | [0m
+        [1;94m16 | [0m
+        [1;94m17 | [0m        [1;91muser          User    @relation(fields: [userFirstName, userLastName], references: [firstName, lastName])[0m
+        [1;94m18 | [0m    }
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 #[test]
@@ -189,8 +211,17 @@ fn required_relation_field_must_error_when_all_underlying_fields_are_optional() 
     }
     "#;
 
-    let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_validation_error("The relation field `user` uses the scalar fields userFirstName, userLastName. At least one of those fields is optional. Hence the relation field must be optional as well.", Span::new(322, 428)));
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError validating: The relation field `user` uses the scalar fields userFirstName, userLastName. At least one of those fields is optional. Hence the relation field must be optional as well.[0m
+          [1;94m-->[0m  [4mschema.prisma:17[0m
+        [1;94m   | [0m
+        [1;94m16 | [0m
+        [1;94m17 | [0m        [1;91muser          User    @relation(fields: [userFirstName, userLastName], references: [firstName, lastName])[0m
+        [1;94m18 | [0m    }
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 #[test]
@@ -208,12 +239,17 @@ fn required_relation_field_must_error_if_it_is_virtual() {
     }
     "#;
 
-    let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_attribute_validation_error(
-        "The relation field `address` on Model `User` is required. This is no longer valid because it\'s not possible to enforce this constraint on the database level. Please change the field type from `Address` to `Address?` to fix this.",
-        "relation",
-        Span::new(54, 70),
-    ));
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@relation": The relation field `address` on Model `User` is required. This is no longer valid because it's not possible to enforce this constraint on the database level. Please change the field type from `Address` to `Address?` to fix this.[0m
+          [1;94m-->[0m  [4mschema.prisma:4[0m
+        [1;94m   | [0m
+        [1;94m 3 | [0m        id      Int     @id
+        [1;94m 4 | [0m        [1;91maddress Address[0m
+        [1;94m 5 | [0m    }
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 #[test]
@@ -233,8 +269,16 @@ fn relation_must_error_when_referenced_field_does_not_exist() {
     }
     "#;
 
-    let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer only to existing fields in the related model `User`. The following fields do not exist in the related model: fooBar", Span::new(173, 233)));
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError validating: The argument `references` must refer only to existing fields in the related model `User`. The following fields do not exist in the related model: fooBar[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;94m   | [0m
+        [1;94m11 | [0m        userId Int
+        [1;94m12 | [0m        user User @[1;91mrelation(fields: [userId], references: [fooBar])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 #[test]
@@ -254,8 +298,16 @@ fn relation_must_error_when_referenced_field_is_not_scalar() {
     }
     "#;
 
-    let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer only to scalar fields in the related model `User`. But it is referencing the following relation fields: posts", Span::new(173, 232)));
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError validating: The argument `references` must refer only to scalar fields in the related model `User`. But it is referencing the following relation fields: posts[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;94m   | [0m
+        [1;94m11 | [0m        userId Int
+        [1;94m12 | [0m        user User @[1;91mrelation(fields: [userId], references: [posts])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 #[test]
@@ -275,13 +327,43 @@ fn relation_must_error_when_referenced_fields_are_not_a_unique_criteria() {
     }
     "#;
 
-    let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer to a unique criteria in the related model `User`. But it is referencing the following fields that are not a unique criteria: firstName", Span::new(205, 276)));
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError validating: The argument `references` must refer to a unique criteria in the related model `User`. But it is referencing the following fields that are not a unique criteria: firstName[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;94m   | [0m
+        [1;94m11 | [0m        userName String
+        [1;94m12 | [0m        [1;91muser     User   @relation(fields: [userName], references: [firstName])[0m
+        [1;94m13 | [0m    }
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
-#[allow(non_snake_case)]
 #[test]
-fn relation_must_NOT_error_when_referenced_fields_are_not_a_unique_criteria_on_mysql() {
+fn relation_must_succeed_when_referenced_fields_are_a_unique_criteria() {
+    let dml = r#"
+    model User {
+        id        Int    @id
+        firstName String
+        posts     Post[]
+        
+        @@unique([firstName])
+    }
+
+    model Post {
+        id       Int    @id
+        text     String
+        userName String
+        user     User   @relation(fields: [userName], references: [firstName])
+    }
+    "#;
+
+    assert!(datamodel::parse_datamodel(dml).is_ok());
+}
+
+#[test]
+fn relation_must_not_error_when_referenced_fields_are_not_a_unique_criteria_on_mysql() {
     // MySQL allows foreign key to references a non unique criteria
     // https://stackoverflow.com/questions/588741/can-a-foreign-key-reference-a-non-unique-index
     let dml = r#"
@@ -326,8 +408,17 @@ fn relation_must_error_when_referenced_fields_are_multiple_uniques() {
     }
     "#;
 
-    let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer to a unique criteria in the related model `User`. But it is referencing the following fields that are not a unique criteria: id, firstName", Span::new(290, 367)));
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError validating: The argument `references` must refer to a unique criteria in the related model `User`. But it is referencing the following fields that are not a unique criteria: id, firstName[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m        // the relation is referencing two uniques. That is too much.
+        [1;94m14 | [0m        [1;91muser User @relation(fields: [userId, userName], references: [id, firstName])[0m
+        [1;94m15 | [0m    }
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 #[test]
@@ -346,8 +437,17 @@ fn relation_must_error_when_types_of_base_field_and_referenced_field_do_not_matc
     }
     "#;
 
-    let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_attribute_validation_error("The type of the field `userId` in the model `Post` is not matching the type of the referenced field `id` in model `User`.", "relation", Span::new(204, 265)));
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@relation": The type of the field `userId` in the model `Post` is not matching the type of the referenced field `id` in model `User`.[0m
+          [1;94m-->[0m  [4mschema.prisma:11[0m
+        [1;94m   | [0m
+        [1;94m10 | [0m        userId String  // this type does not match
+        [1;94m11 | [0m        [1;91muser   User    @relation(fields: [userId], references: [id])[0m
+        [1;94m12 | [0m    }
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 #[test]
@@ -367,12 +467,17 @@ fn relation_must_error_when_number_of_fields_and_references_is_not_equal() {
     }
     "#;
 
-    let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_attribute_validation_error(
-        "You must specify the same number of fields in `fields` and `references`.",
-        "relation",
-        Span::new(200, 273),
-    ));
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@relation": You must specify the same number of fields in `fields` and `references`.[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;94m   | [0m
+        [1;94m11 | [0m        userName String
+        [1;94m12 | [0m        [1;91muser     User    @relation(fields: [userId, userName], references: [id])[0m
+        [1;94m13 | [0m    }
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 #[test]
@@ -412,12 +517,17 @@ fn must_error_when_references_argument_is_missing_for_one_to_many() {
     }
     "#;
 
-    let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_attribute_validation_error(
-        "The relation field `user` on Model `Post` must specify the `references` argument in the @relation attribute.",
-        "relation",
-        Span::new(172, 215),
-    ));
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@relation": The relation field `user` on Model `Post` must specify the `references` argument in the @relation attribute.[0m
+          [1;94m-->[0m  [4mschema.prisma:11[0m
+        [1;94m   | [0m
+        [1;94m10 | [0m        userId Int
+        [1;94m11 | [0m        [1;91muser   User    @relation(fields: [userId])[0m
+        [1;94m12 | [0m    }
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 #[test]
@@ -441,13 +551,17 @@ fn must_error_fields_or_references_argument_is_placed_on_wrong_side_for_one_to_m
         }
     "#;
 
-    let errors = parse_error(dml);
-    errors.assert_is(
-        DatamodelError::new_attribute_validation_error(
-            "The relation field `posts` on Model `User` must not specify the `fields` or `references` argument in the @relation attribute. You must only specify it on the opposite field `user` on model `Post`.",
-            "relation", Span::new(200, 260)
-        ),
-    );
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@relation": The relation field `posts` on Model `User` must not specify the `fields` or `references` argument in the @relation attribute. You must only specify it on the opposite field `user` on model `Post`.[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
+        [1;94m   | [0m
+        [1;94m 9 | [0m          postId Int[]
+        [1;94m10 | [0m          [1;91mposts  Post[] @relation(fields: [postId], references: [id])[0m
+        [1;94m11 | [0m        }
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 #[test]
@@ -466,20 +580,24 @@ fn must_error_when_both_arguments_are_missing_for_one_to_many() {
     }
     "#;
 
-    let errors = parse_error(dml);
-    errors.assert_is_at(
-        0,
-        DatamodelError::new_attribute_validation_error(
-            "The relation field `user` on Model `Post` must specify the `fields` argument in the @relation attribute. You can run `prisma format` to fix this automatically.",
-            "relation",
-            Span::new(172, 184),
-        ),
-    );
-    errors.assert_is_at(1, DatamodelError::new_attribute_validation_error(
-        "The relation field `user` on Model `Post` must specify the `references` argument in the @relation attribute.",
-        "relation",
-        Span::new(172, 184),
-    ));
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@relation": The relation field `user` on Model `Post` must specify the `fields` argument in the @relation attribute. You can run `prisma format` to fix this automatically.[0m
+          [1;94m-->[0m  [4mschema.prisma:11[0m
+        [1;94m   | [0m
+        [1;94m10 | [0m        userId Int
+        [1;94m11 | [0m        [1;91muser   User[0m
+        [1;94m12 | [0m    }
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": The relation field `user` on Model `Post` must specify the `references` argument in the @relation attribute.[0m
+          [1;94m-->[0m  [4mschema.prisma:11[0m
+        [1;94m   | [0m
+        [1;94m10 | [0m        userId Int
+        [1;94m11 | [0m        [1;91muser   User[0m
+        [1;94m12 | [0m    }
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 #[test]
@@ -498,12 +616,24 @@ fn must_error_when_fields_argument_is_missing_for_one_to_one() {
     }
     "#;
 
-    let errors = parse_error(dml);
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `post` on Model `User` and `user` on Model `Post` do not provide the `fields` argument in the @relation attribute. You have to provide it on one of the two fields.[0m
+          [1;94m-->[0m  [4mschema.prisma:5[0m
+        [1;94m   | [0m
+        [1;94m 4 | [0m        firstName String
+        [1;94m 5 | [0m        [1;91mpost      Post?[0m
+        [1;94m 6 | [0m    }
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `user` on Model `Post` and `post` on Model `User` do not provide the `fields` argument in the @relation attribute. You have to provide it on one of the two fields.[0m
+          [1;94m-->[0m  [4mschema.prisma:11[0m
+        [1;94m   | [0m
+        [1;94m10 | [0m        userId Int
+        [1;94m11 | [0m        [1;91muser   User    @relation(references: [id])[0m
+        [1;94m12 | [0m    }
+        [1;94m   | [0m
+    "#]];
 
-    errors.assert_are(
-        &[DatamodelError::new_attribute_validation_error("The relation fields `post` on Model `User` and `user` on Model `Post` do not provide the `fields` argument in the @relation attribute. You have to provide it on one of the two fields.", "relation",Span::new(77, 93)), 
-            DatamodelError::new_attribute_validation_error("The relation fields `user` on Model `Post` and `post` on Model `User` do not provide the `fields` argument in the @relation attribute. You have to provide it on one of the two fields.", "relation",Span::new(171, 214))],
-    );
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 #[test]
@@ -522,21 +652,24 @@ fn must_error_when_references_argument_is_missing_for_one_to_one() {
     }
     "#;
 
-    let errors = parse_error(dml);
-    errors.assert_is_at(
-        0,
-        DatamodelError::new_attribute_validation_error(
-            "The relation fields `post` on Model `User` and `user` on Model `Post` do not provide the `references` argument in the @relation attribute. You have to provide it on one of the two fields.",
-            "relation", Span::new(77, 92)
-        ),
-    );
-    errors.assert_is_at(
-        1,
-        DatamodelError::new_attribute_validation_error(
-            "The relation fields `user` on Model `Post` and `post` on Model `User` do not provide the `references` argument in the @relation attribute. You have to provide it on one of the two fields.",
-            "relation", Span::new(170, 213)
-        ),
-    );
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `post` on Model `User` and `user` on Model `Post` do not provide the `references` argument in the @relation attribute. You have to provide it on one of the two fields.[0m
+          [1;94m-->[0m  [4mschema.prisma:5[0m
+        [1;94m   | [0m
+        [1;94m 4 | [0m        firstName String
+        [1;94m 5 | [0m        [1;91mpost      Post[0m
+        [1;94m 6 | [0m    }
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `user` on Model `Post` and `post` on Model `User` do not provide the `references` argument in the @relation attribute. You have to provide it on one of the two fields.[0m
+          [1;94m-->[0m  [4mschema.prisma:11[0m
+        [1;94m   | [0m
+        [1;94m10 | [0m        userId Int
+        [1;94m11 | [0m        [1;91muser   User    @relation(fields: [userId])[0m
+        [1;94m12 | [0m    }
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 #[test]
@@ -556,21 +689,24 @@ fn must_error_when_fields_and_references_argument_are_placed_on_different_sides_
     }
     "#;
 
-    let errors = parse_error(dml);
-    errors.assert_is_at(
-        0,
-        DatamodelError::new_attribute_validation_error(
-            "The relation field `post` on Model `User` provides the `references` argument in the @relation attribute. And the related field `user` on Model `Post` provides the `fields` argument. You must provide both arguments on the same side.",
-            "relation", Span::new(99, 142)
-        ),
-    );
-    errors.assert_is_at(
-        1,
-        DatamodelError::new_attribute_validation_error(
-            "The relation field `user` on Model `Post` provides the `fields` argument in the @relation attribute. And the related field `post` on Model `User` provides the `references` argument. You must provide both arguments on the same side.",
-            "relation", Span::new(220, 263)
-        ),
-    );
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@relation": The relation field `post` on Model `User` provides the `references` argument in the @relation attribute. And the related field `user` on Model `Post` provides the `fields` argument. You must provide both arguments on the same side.[0m
+          [1;94m-->[0m  [4mschema.prisma:6[0m
+        [1;94m   | [0m
+        [1;94m 5 | [0m        postId    Int
+        [1;94m 6 | [0m        [1;91mpost      Post @relation(references: [id])[0m
+        [1;94m 7 | [0m    }
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": The relation field `user` on Model `Post` provides the `fields` argument in the @relation attribute. And the related field `post` on Model `User` provides the `references` argument. You must provide both arguments on the same side.[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;94m   | [0m
+        [1;94m11 | [0m        userId Int
+        [1;94m12 | [0m        [1;91muser   User    @relation(fields: [userId])[0m
+        [1;94m13 | [0m    }
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 #[test]
@@ -590,54 +726,62 @@ fn must_error_when_fields_or_references_argument_is_placed_on_both_sides_for_one
     }
     "#;
 
-    let errors = parse_error(dml);
-    errors.assert_is_at(
-            0,
-            DatamodelError::new_attribute_validation_error(
-                "The relation fields `post` on Model `User` and `user` on Model `Post` both provide the `references` argument in the @relation attribute. You have to provide it only on one of the two fields.",
-                "relation", Span::new(99, 160)
-            ),
-        );
-    errors.assert_is_at(
-            1,
-            DatamodelError::new_attribute_validation_error(
-                "The relation fields `post` on Model `User` and `user` on Model `Post` both provide the `fields` argument in the @relation attribute. You have to provide it only on one of the two fields.",
-                "relation", Span::new(99, 160)
-            ),
-        );
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `post` on Model `User` and `user` on Model `Post` both provide the `references` argument in the @relation attribute. You have to provide it only on one of the two fields.[0m
+          [1;94m-->[0m  [4mschema.prisma:6[0m
+        [1;94m   | [0m
+        [1;94m 5 | [0m        postId    Int
+        [1;94m 6 | [0m        [1;91mpost      Post @relation(fields: [postId], references: [id])[0m
+        [1;94m 7 | [0m    }
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `post` on Model `User` and `user` on Model `Post` both provide the `fields` argument in the @relation attribute. You have to provide it only on one of the two fields.[0m
+          [1;94m-->[0m  [4mschema.prisma:6[0m
+        [1;94m   | [0m
+        [1;94m 5 | [0m        postId    Int
+        [1;94m 6 | [0m        [1;91mpost      Post @relation(fields: [postId], references: [id])[0m
+        [1;94m 7 | [0m    }
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `user` on Model `Post` and `post` on Model `User` both provide the `references` argument in the @relation attribute. You have to provide it only on one of the two fields.[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;94m   | [0m
+        [1;94m11 | [0m        userId Int
+        [1;94m12 | [0m        [1;91muser   User    @relation(fields: [userId], references: [id])[0m
+        [1;94m13 | [0m    }
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `user` on Model `Post` and `post` on Model `User` both provide the `fields` argument in the @relation attribute. You have to provide it only on one of the two fields.[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;94m   | [0m
+        [1;94m11 | [0m        userId Int
+        [1;94m12 | [0m        [1;91muser   User    @relation(fields: [userId], references: [id])[0m
+        [1;94m13 | [0m    }
+        [1;94m   | [0m
+    "#]];
 
-    errors.assert_is_at(
-        2,
-        DatamodelError::new_attribute_validation_error(
-            "The relation fields `user` on Model `Post` and `post` on Model `User` both provide the `references` argument in the @relation attribute. You have to provide it only on one of the two fields.",
-            "relation", Span::new(238, 299)
-        ),
-    );
-
-    errors.assert_is_at(
-        3,
-        DatamodelError::new_attribute_validation_error(
-            "The relation fields `user` on Model `Post` and `post` on Model `User` both provide the `fields` argument in the @relation attribute. You have to provide it only on one of the two fields.",
-            "relation", Span::new(238,299)
-        ),
-    );
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 #[test]
 fn must_error_for_required_one_to_one_self_relations() {
     let dml = r#"
-        model User {
-          id       Int  @id
-          friendId Int
-          friend   User @relation("Friends", fields: friendId, references: id)
-          friendOf User @relation("Friends")
-        }
+    model User {
+      id       Int  @id
+      friendId Int
+      friend   User @relation("Friends", fields: friendId, references: id)
+      friendOf User @relation("Friends")
+    }
     "#;
-    let errors = parse_error(dml);
-    errors.assert_is(
 
-        DatamodelError::new_attribute_validation_error("The relation field `friendOf` on Model `User` is required. This is no longer valid because it\'s not possible to enforce this constraint on the database level. Please change the field type from `User` to `User?` to fix this.", "relation",  Span::new(162, 197)),
-    );
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@relation": The relation field `friendOf` on Model `User` is required. This is no longer valid because it's not possible to enforce this constraint on the database level. Please change the field type from `User` to `User?` to fix this.[0m
+          [1;94m-->[0m  [4mschema.prisma:6[0m
+        [1;94m   | [0m
+        [1;94m 5 | [0m      friend   User @relation("Friends", fields: friendId, references: id)
+        [1;94m 6 | [0m      [1;91mfriendOf User @relation("Friends")[0m
+        [1;94m 7 | [0m    }
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 #[test]
@@ -647,21 +791,62 @@ fn must_error_when_non_id_field_is_referenced_in_a_many_to_many() {
       id         Int        @id
       slug       Int        @unique
       categories Category[] @relation(references: [id])
-   }
+    }
 
-   model Category {
-     id    Int    @id @default(autoincrement())
-     posts Post[] @relation(references: [slug])
-   }"#;
+    model Category {
+      id    Int    @id @default(autoincrement())
+      posts Post[] @relation(references: [slug])
+    }
+    "#;
 
-    let errors = parse_error(dml);
-    errors.assert_is_at(
-        0,
-        DatamodelError::new_validation_error(
-            "Many to many relations must always reference the id field of the related model. Change the argument `references` to use the id field of the related model `Post`. But it is referencing the following fields that are not the id: slug",
-            Span::new(221, 264)
-        ),
-    );
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError validating: Many to many relations must always reference the id field of the related model. Change the argument `references` to use the id field of the related model `Post`. But it is referencing the following fields that are not the id: slug[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
+        [1;94m   | [0m
+        [1;94m 9 | [0m      id    Int    @id @default(autoincrement())
+        [1;94m10 | [0m      [1;91mposts Post[] @relation(references: [slug])[0m
+        [1;94m11 | [0m    }
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+}
+
+#[test]
+fn must_succeed_when_id_field_is_referenced_in_a_many_to_many() {
+    let dml = r#"
+    model Post {
+      id_post    Int @id        
+      slug       Int        @unique
+      categories Category[] @relation(references: [id_category])
+    }
+
+    model Category {
+      id_category    Int    @default(autoincrement()) @id
+      posts          Post[] @relation(references: [id_post])
+    }
+    "#;
+
+    assert!(datamodel::parse_datamodel(dml).is_ok());
+
+    let dml2 = r#"
+    model Post {
+      id_post         Int
+      slug            Int        @unique
+      categories      Category[] @relation(references: [id_category])
+
+      @@id([id_post])
+    }
+
+    model Category {
+      id_category     Int    @default(autoincrement())
+      posts           Post[] @relation(references: [id_post])
+
+      @@id([id_category])
+    }
+    "#;
+
+    assert!(datamodel::parse_datamodel(dml2).is_ok());
 }
 
 #[test]
@@ -674,20 +859,24 @@ fn must_error_nicely_when_a_many_to_many_is_not_possible() {
       categories Category[] @relation(references: [id])
 
       @@id([id, slug])
-   }
+    }
 
-   model Category {
-     id    Int    @id @default(autoincrement())
-     posts Post[] @relation(references: [slug])
-   }"#;
+    model Category {
+      id    Int    @id @default(autoincrement())
+      posts Post[] @relation(references: [slug])
+    }"#;
 
-    let errors = parse_error(dml);
-    errors.assert_is_at(0, DatamodelError::new_field_validation_error(
-        "The relation field `posts` on Model `Category` references `Post` which does not have an `@id` field. Models without `@id` can not be part of a many to many relation. Use an explicit intermediate Model to represent this relationship.",
-        "Category",
-        "posts",
-        Span::new(234, 277)
-    ));
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError validating field `posts` in model `Category`: The relation field `posts` on Model `Category` references `Post` which does not have an `@id` field. Models without `@id` cannot be part of a many to many relation. Use an explicit intermediate Model to represent this relationship.[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;94m   | [0m
+        [1;94m11 | [0m      id    Int    @id @default(autoincrement())
+        [1;94m12 | [0m      [1;91mposts Post[] @relation(references: [slug])[0m
+        [1;94m13 | [0m    }
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 #[test]
@@ -695,25 +884,27 @@ fn must_error_when_many_to_many_is_not_possible_due_to_missing_id() {
     let dml = r#"
     // Post does not have @id
     model Post {
-     slug       Int        @unique
-     categories Category[]
-   }
+      slug       Int        @unique
+      categories Category[]
+    }
 
-   model Category {
-     id    Int    @id @default(autoincrement())
-     posts Post[]
-   }"#;
+    model Category {
+      id    Int    @id @default(autoincrement())
+      posts Post[]
+    }
+    "#;
 
-    let errors = parse_error(dml);
-    errors.assert_is_at(
-        0,
-        DatamodelError::new_field_validation_error(
-            "The relation field `posts` on Model `Category` references `Post` which does not have an `@id` field. Models without `@id` can not be part of a many to many relation. Use an explicit intermediate Model to represent this relationship.",
-            "Category",
-            "posts",
-            Span::new(189, 202)
-        ),
-    );
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError validating field `posts` in model `Category`: The relation field `posts` on Model `Category` references `Post` which does not have an `@id` field. Models without `@id` cannot be part of a many to many relation. Use an explicit intermediate Model to represent this relationship.[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
+        [1;94m   | [0m
+        [1;94m 9 | [0m      id    Int    @id @default(autoincrement())
+        [1;94m10 | [0m      [1;91mposts Post[][0m
+        [1;94m11 | [0m    }
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 #[test]

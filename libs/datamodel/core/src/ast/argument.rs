@@ -18,10 +18,10 @@ impl WithIdentifier for Argument {
 }
 
 impl Argument {
-    pub fn new_string(name: &str, value: &str) -> Argument {
+    pub fn new_string(name: &str, value: String) -> Argument {
         Argument {
             name: Identifier::new(name),
-            value: Expression::StringValue(String::from(value), Span::empty()),
+            value: Expression::StringValue(value, Span::empty()),
             span: Span::empty(),
         }
     }

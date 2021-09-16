@@ -1,11 +1,14 @@
 use super::Filter;
-use crate::{compare::ScalarCompare, JsonFilterPath, JsonTargetType, MAX_BATCH_SIZE};
+use crate::{compare::ScalarCompare, JsonFilterPath, JsonTargetType};
 use prisma_models::{ModelProjection, PrismaListValue, PrismaValue, ScalarFieldRef};
 use std::{collections::BTreeSet, sync::Arc};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ScalarProjection {
+    /// A single field projection.
     Single(ScalarFieldRef),
+
+    /// A tuple projection, e.g. if (a, b) <in> ((1, 2), (1, 3), ...) is supposed to be queried.
     Compound(Vec<ScalarFieldRef>),
 }
 
@@ -24,7 +27,7 @@ impl ScalarProjection {
 ///
 /// ```graphql
 /// findManyUser(where: { id: 5 })
-/// ````
+/// ```
 ///
 /// This translates to a projection of one column `id` with a condition where
 /// the column value equals `5`.
@@ -58,21 +61,21 @@ impl ScalarFilter {
 
     /// If `true`, the filter should be split into smaller filters executed in
     /// separate queries.
-    pub fn should_batch(&self) -> bool {
-        self.len() > *MAX_BATCH_SIZE
+    pub fn should_batch(&self, chunk_size: usize) -> bool {
+        self.len() > chunk_size
     }
 
     /// If possible, converts the filter into multiple smaller filters.
-    pub fn batched(self) -> Vec<ScalarFilter> {
-        fn inner(mut list: PrismaListValue) -> Vec<PrismaListValue> {
+    pub fn batched(self, chunk_size: usize) -> Vec<ScalarFilter> {
+        fn inner(mut list: PrismaListValue, chunk_size: usize) -> Vec<PrismaListValue> {
             let dedup_list: BTreeSet<_> = list.drain(..).collect();
 
-            let mut batches = Vec::with_capacity(list.len() % *MAX_BATCH_SIZE + 1);
-            batches.push(Vec::with_capacity(*MAX_BATCH_SIZE));
+            let mut batches = Vec::with_capacity(list.len() % chunk_size + 1);
+            batches.push(Vec::with_capacity(chunk_size));
 
             for (idx, item) in dedup_list.into_iter().enumerate() {
-                if idx != 0 && idx % *MAX_BATCH_SIZE == 0 {
-                    batches.push(Vec::with_capacity(*MAX_BATCH_SIZE));
+                if idx != 0 && idx % chunk_size == 0 {
+                    batches.push(Vec::with_capacity(chunk_size));
                 }
 
                 batches.last_mut().unwrap().push(item);
@@ -87,7 +90,7 @@ impl ScalarFilter {
             ScalarCondition::In(list) => {
                 let projection = self.projection;
 
-                inner(list)
+                inner(list, chunk_size)
                     .into_iter()
                     .map(|batch| ScalarFilter {
                         projection: projection.clone(),
@@ -100,7 +103,7 @@ impl ScalarFilter {
             ScalarCondition::NotIn(list) => {
                 let projection = self.projection;
 
-                inner(list)
+                inner(list, chunk_size)
                     .into_iter()
                     .map(|batch| ScalarFilter {
                         projection: projection.clone(),
@@ -131,6 +134,8 @@ pub enum ScalarCondition {
     In(PrismaListValue),
     NotIn(PrismaListValue),
     JsonCompare(JsonCondition),
+    Search(PrismaValue, Vec<ScalarProjection>),
+    NotSearch(PrismaValue, Vec<ScalarProjection>),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -167,6 +172,8 @@ impl ScalarCondition {
                         target_type: json_compare.target_type,
                     })
                 }
+                Self::Search(v, fields) => Self::NotSearch(v, fields),
+                Self::NotSearch(v, fields) => Self::Search(v, fields),
             }
         } else {
             self
@@ -342,6 +349,28 @@ impl ScalarCompare for ScalarFieldRef {
             mode: QueryMode::Default,
         })
     }
+
+    fn search<T>(&self, val: T) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Single(Arc::clone(self)),
+            condition: ScalarCondition::Search(val.into(), vec![]),
+            mode: QueryMode::Default,
+        })
+    }
+
+    fn not_search<T>(&self, val: T) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Single(Arc::clone(self)),
+            condition: ScalarCondition::NotSearch(val.into(), vec![]),
+            mode: QueryMode::Default,
+        })
+    }
 }
 
 impl ScalarCompare for ModelProjection {
@@ -509,6 +538,28 @@ impl ScalarCompare for ModelProjection {
         Filter::from(ScalarFilter {
             projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::GreaterThanOrEquals(val.into()),
+            mode: QueryMode::Default,
+        })
+    }
+
+    fn search<T>(&self, val: T) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.scalar_fields().collect()),
+            condition: ScalarCondition::Search(val.into(), vec![]),
+            mode: QueryMode::Default,
+        })
+    }
+
+    fn not_search<T>(&self, val: T) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.scalar_fields().collect()),
+            condition: ScalarCondition::NotSearch(val.into(), vec![]),
             mode: QueryMode::Default,
         })
     }

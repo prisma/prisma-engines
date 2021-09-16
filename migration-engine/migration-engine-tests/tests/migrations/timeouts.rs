@@ -1,4 +1,4 @@
-use migration_engine_tests::sync_test_api::*;
+use migration_engine_tests::test_api::*;
 
 #[test_connector(
     tags(Postgres),
@@ -36,5 +36,5 @@ fn migrations_can_last_more_than_a_minute_and_succeed(api: TestApi) {
         .send_sync()
         .assert_applied_migrations(&["01long_migration", "02short_migration"]);
 
-    api.assert_schema().assert_has_table("cat").unwrap();
+    api.assert_schema().assert_has_table("cat");
 }

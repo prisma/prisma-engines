@@ -4,11 +4,11 @@ use bigdecimal::ToPrimitive;
 use common::purge_dangling_foreign_keys;
 use indoc::indoc;
 use native_types::{MySqlType, NativeType};
-use quaint::{prelude::Queryable, single::Quaint, Value};
+use quaint::{prelude::Queryable, Value};
 use serde_json::from_str;
 use std::{
     borrow::Cow,
-    collections::{BTreeMap, HashMap, HashSet},
+    collections::{BTreeMap, HashSet},
 };
 use tracing::trace;
 
@@ -31,19 +31,19 @@ impl Flavour {
     }
 }
 
-pub struct SqlSchemaDescriber {
-    conn: Quaint,
+pub struct SqlSchemaDescriber<'a> {
+    conn: &'a dyn Queryable,
 }
 
 #[async_trait::async_trait]
-impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
+impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
     async fn list_databases(&self) -> DescriberResult<Vec<String>> {
         self.get_databases().await
     }
 
     async fn get_metadata(&self, schema: &str) -> DescriberResult<SqlMetadata> {
-        let table_count = self.get_table_names(&schema).await?.len();
-        let size_in_bytes = self.get_size(&schema).await?;
+        let table_count = self.get_table_names(schema).await?.len();
+        let size_in_bytes = self.get_size(schema).await?;
 
         Ok(SqlMetadata {
             table_count,
@@ -61,9 +61,9 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
 
         let table_names = self.get_table_names(schema).await?;
         let mut tables = Vec::with_capacity(table_names.len());
-        let mut columns = Self::get_all_columns(&self.conn, schema, &flavour).await?;
-        let mut indexes = Self::get_all_indexes(&self.conn, schema).await?;
-        let mut fks = Self::get_foreign_keys(&self.conn, schema).await?;
+        let mut columns = Self::get_all_columns(self.conn, schema, &flavour).await?;
+        let mut indexes = Self::get_all_indexes(self.conn, schema).await?;
+        let mut fks = Self::get_foreign_keys(self.conn, schema).await?;
 
         let mut enums = vec![];
         for table_name in &table_names {
@@ -93,11 +93,11 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
     }
 }
 
-impl Parser for SqlSchemaDescriber {}
+impl Parser for SqlSchemaDescriber<'_> {}
 
-impl SqlSchemaDescriber {
+impl<'a> SqlSchemaDescriber<'a> {
     /// Constructor.
-    pub fn new(conn: Quaint) -> SqlSchemaDescriber {
+    pub fn new(conn: &'a dyn Queryable) -> SqlSchemaDescriber<'a> {
         SqlSchemaDescriber { conn }
     }
 
@@ -205,9 +205,9 @@ impl SqlSchemaDescriber {
     fn get_table(
         &self,
         name: &str,
-        columns: &mut HashMap<String, (Vec<Column>, Vec<Enum>)>,
-        indexes: &mut HashMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)>,
-        foreign_keys: &mut HashMap<String, Vec<ForeignKey>>,
+        columns: &mut BTreeMap<String, (Vec<Column>, Vec<Enum>)>,
+        indexes: &mut BTreeMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)>,
+        foreign_keys: &mut BTreeMap<String, Vec<ForeignKey>>,
     ) -> (Table, Vec<Enum>) {
         let (columns, enums) = columns.remove(name).unwrap_or((vec![], vec![]));
         let (indices, primary_key) = indexes.remove(name).unwrap_or_else(|| (BTreeMap::new(), None));
@@ -230,7 +230,7 @@ impl SqlSchemaDescriber {
         conn: &dyn Queryable,
         schema_name: &str,
         flavour: &Flavour,
-    ) -> DescriberResult<HashMap<String, (Vec<Column>, Vec<Enum>)>> {
+    ) -> DescriberResult<BTreeMap<String, (Vec<Column>, Vec<Enum>)>> {
         // We alias all the columns because MySQL column names are case-insensitive in queries, but the
         // information schema column names became upper-case in MySQL 8, causing the code fetching
         // the result values by column name below to fail.
@@ -252,7 +252,7 @@ impl SqlSchemaDescriber {
             ORDER BY ordinal_position
         ";
 
-        let mut map = HashMap::new();
+        let mut map = BTreeMap::new();
 
         let rows = conn.query_raw(sql, &[schema_name.into()]).await?;
 
@@ -406,7 +406,7 @@ impl SqlSchemaDescriber {
         } else {
             let mut introspected_default = String::with_capacity(default_string.len());
             introspected_default.push('(');
-            introspected_default.push_str(&default_string);
+            introspected_default.push_str(default_string);
             introspected_default.push(')');
             DefaultValue::db_generated(introspected_default)
         }
@@ -415,8 +415,8 @@ impl SqlSchemaDescriber {
     async fn get_all_indexes(
         conn: &dyn Queryable,
         schema_name: &str,
-    ) -> DescriberResult<HashMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)>> {
-        let mut map = HashMap::new();
+    ) -> DescriberResult<BTreeMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)>> {
+        let mut map = BTreeMap::new();
         let mut indexes_with_expressions: HashSet<(String, String)> = HashSet::new();
         let mut indexes_with_partially_covered_columns: HashSet<(String, String)> = HashSet::new();
 
@@ -523,10 +523,10 @@ impl SqlSchemaDescriber {
     async fn get_foreign_keys(
         conn: &dyn Queryable,
         schema_name: &str,
-    ) -> DescriberResult<HashMap<String, Vec<ForeignKey>>> {
+    ) -> DescriberResult<BTreeMap<String, Vec<ForeignKey>>> {
         // Foreign keys covering multiple columns will return multiple rows, which we need to
         // merge.
-        let mut map: HashMap<String, HashMap<String, ForeignKey>> = HashMap::new();
+        let mut map: BTreeMap<String, BTreeMap<String, ForeignKey>> = BTreeMap::new();
 
         // XXX: Is constraint_name unique? Need a way to uniquely associate rows with foreign keys
         // One should think it's unique since it's used to join information_schema.key_column_usage

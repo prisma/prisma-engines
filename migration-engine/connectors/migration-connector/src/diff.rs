@@ -1,4 +1,4 @@
-use crate::MigrationDirectory;
+use crate::migrations_directory::MigrationDirectory;
 use std::fmt::Debug;
 
 /// Diffable things

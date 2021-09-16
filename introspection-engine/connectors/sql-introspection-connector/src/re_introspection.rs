@@ -1,21 +1,25 @@
 use crate::introspection_helpers::replace_field_names;
-use crate::warnings::*;
-use datamodel::{Datamodel, DefaultValue, FieldType, Ignorable, ValueGenerator};
-use introspection_connector::Warning;
+use crate::{warnings::*, SqlFamilyTrait};
+use datamodel::{Datamodel, DefaultValue, Field, FieldType, Ignorable, ValueGenerator, WithName};
+use introspection_connector::{IntrospectionContext, Warning};
 use prisma_value::PrismaValue;
-use quaint::connector::SqlFamily;
-use std::cmp::Ordering;
-use std::cmp::Ordering::{Equal, Greater, Less};
+use std::cmp::Ordering::{self, Equal, Greater, Less};
+use std::collections::{BTreeSet, HashMap};
 
-pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family: &SqlFamily) -> Vec<Warning> {
+pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, ctx: &IntrospectionContext) -> Vec<Warning> {
     let mut warnings = vec![];
+
+    // Keep @relation attributes even if the database doesn't use foreign keys
+    if !ctx.foreign_keys_enabled() {
+        merge_relation_fields(old_data_model, new_data_model, &mut warnings);
+    }
 
     //@@map on models
     let mut changed_model_names = vec![];
     {
         for model in new_data_model.models() {
             if let Some(old_model) =
-                old_data_model.find_model_db_name(&model.database_name.as_ref().unwrap_or(&model.name))
+                old_data_model.find_model_db_name(model.database_name.as_ref().unwrap_or(&model.name))
             {
                 if new_data_model.find_model(&old_model.name).is_none() {
                     changed_model_names.push((Model::new(&model.name), Model::new(&old_model.name)))
@@ -43,6 +47,66 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
         }
     }
 
+    let mut changed_index_names = vec![];
+    let mut changed_primary_key_names = vec![];
+    //custom index names
+    {
+        for model in new_data_model.models() {
+            if let Some(old_model) = &old_data_model.find_model(&model.name) {
+                for index in &model.indices {
+                    if let Some(old_index) = old_model.indices.iter().find(|old| old.db_name == index.db_name) {
+                        if old_index.name.is_some() {
+                            let mf = ModelAndIndex::new(&model.name, old_index.db_name.as_ref().unwrap());
+                            changed_index_names.push((mf, old_index.name.clone()))
+                        }
+                    }
+                }
+            }
+        }
+
+        //change index name
+        for changed_index_name in &changed_index_names {
+            let index = new_data_model
+                .find_model_mut(&changed_index_name.0.model)
+                .indices
+                .iter_mut()
+                .find(|i| i.db_name == Some(changed_index_name.0.index_db_name.clone()))
+                .unwrap();
+            index.name = changed_index_name.1.clone();
+        }
+    }
+
+    //custom primary key names
+    {
+        for model in new_data_model.models() {
+            if let Some(old_model) = &old_data_model.find_model(&model.name) {
+                if let Some(primary_key) = &model.primary_key {
+                    if let Some(old_primary_key) = &old_model.primary_key {
+                        if old_primary_key.fields == primary_key.fields
+                            && (old_primary_key.db_name == primary_key.db_name || primary_key.db_name.is_none())
+                            && old_primary_key.name.is_some()
+                        {
+                            let mf = Model::new(&model.name);
+                            changed_primary_key_names.push((mf, old_primary_key.name.clone()))
+                        }
+                    }
+                }
+            }
+        }
+
+        //change primary key names
+        for changed_primary_key_name in &changed_primary_key_names {
+            let pk = new_data_model
+                .find_model_mut(&changed_primary_key_name.0.model)
+                .primary_key
+                .as_mut();
+
+            if let Some(primary_key) = pk {
+                primary_key.name = changed_primary_key_name.1.clone()
+            }
+        }
+    }
+
     // @map on fields
     let mut changed_scalar_field_names = vec![];
     {
@@ -50,7 +114,7 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
             if let Some(old_model) = &old_data_model.find_model(&model.name) {
                 for field in model.scalar_fields() {
                     if let Some(old_field) =
-                        old_model.find_scalar_field_db_name(&field.database_name.as_ref().unwrap_or(&field.name))
+                        old_model.find_scalar_field_db_name(field.database_name.as_ref().unwrap_or(&field.name))
                     {
                         if model.find_scalar_field(&old_field.name).is_none() {
                             let mf = ModelAndField::new(&model.name, &field.name);
@@ -74,7 +138,10 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
         for changed_field_name in &changed_scalar_field_names {
             let model = new_data_model.find_model_mut(&changed_field_name.0.model);
 
-            replace_field_names(&mut model.id_fields, &changed_field_name.0.field, &changed_field_name.1);
+            if let Some(pk) = &mut model.primary_key {
+                replace_field_names(&mut pk.fields, &changed_field_name.0.field, &changed_field_name.1);
+            }
+
             for index in &mut model.indices {
                 replace_field_names(&mut index.fields, &changed_field_name.0.field, &changed_field_name.1);
             }
@@ -108,11 +175,11 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
             for new_field in new_model.relation_fields() {
                 if let Some(old_model) = old_data_model.find_model(&new_model.name) {
                     for old_field in old_model.relation_fields() {
-                        let (_, old_related_field) = &old_data_model.find_related_field_bang(&old_field);
+                        let (_, old_related_field) = &old_data_model.find_related_field_bang(old_field);
                         let is_many_to_many = old_field.is_list() && old_related_field.is_list();
                         let is_self_relation = old_field.relation_info.to == old_related_field.relation_info.to;
 
-                        let (_, related_field) = &new_data_model.find_related_field_bang(&new_field);
+                        let (_, related_field) = &new_data_model.find_related_field_bang(new_field);
 
                         //the relationinfos of both sides need to be compared since the relationinfo of the
                         // non-fk side does not contain enough information to uniquely identify the correct relationfield
@@ -154,8 +221,8 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
             for field in model.relation_fields() {
                 if let Some(old_model) = old_data_model.find_model(&model.name) {
                     for old_field in old_model.relation_fields() {
-                        let (_, related_field) = &new_data_model.find_related_field_bang(&field);
-                        let (_, old_related_field) = &old_data_model.find_related_field_bang(&old_field);
+                        let (_, related_field) = &new_data_model.find_related_field_bang(field);
+                        let (_, old_related_field) = &old_data_model.find_related_field_bang(old_field);
                         //the relationinfos of both sides need to be compared since the relationinfo of the
                         // non-fk side does not contain enough information to uniquely identify the correct relationfield
 
@@ -186,7 +253,7 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
     let mut changed_enum_names = vec![];
     {
         for enm in new_data_model.enums() {
-            if let Some(old_enum) = old_data_model.find_enum_db_name(&enm.database_name.as_ref().unwrap_or(&enm.name)) {
+            if let Some(old_enum) = old_data_model.find_enum_db_name(enm.database_name.as_ref().unwrap_or(&enm.name)) {
                 if new_data_model.find_enum(&old_enum.name).is_none() {
                     changed_enum_names.push((Enum { enm: enm.name.clone() }, old_enum.name.clone()))
                 }
@@ -242,11 +309,13 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
             for field in fields_to_be_changed {
                 let field = new_data_model.find_scalar_field_mut(&field.0, &field.1);
                 if field.default_value
-                    == Some(DefaultValue::Single(PrismaValue::Enum(
+                    == Some(DefaultValue::new_single(PrismaValue::Enum(
                         changed_enum_value.0.value.clone(),
                     )))
                 {
-                    field.default_value = Some(DefaultValue::Single(PrismaValue::Enum(changed_enum_value.1.clone())));
+                    field.default_value = Some(DefaultValue::new_single(PrismaValue::Enum(
+                        changed_enum_value.1.clone(),
+                    )));
                 }
             }
         }
@@ -255,7 +324,7 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
     //mysql enum names
     let mut changed_mysql_enum_names = vec![];
     {
-        if family.is_mysql() {
+        if ctx.sql_family().is_mysql() {
             for enm in new_data_model.enums() {
                 if let Some((model_name, field_name)) = &new_data_model.find_enum_fields(&enm.name).first() {
                     if let Some(old_model) = old_data_model.find_model(model_name) {
@@ -304,11 +373,13 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
                 if let Some(old_model) = old_data_model.find_model(&model.name) {
                     if let Some(old_field) = old_model.find_scalar_field(&field.name) {
                         if field.default_value.is_none() && field.field_type.is_string() {
-                            if old_field.default_value == Some(DefaultValue::Expression(ValueGenerator::new_cuid())) {
+                            if old_field.default_value == Some(DefaultValue::new_expression(ValueGenerator::new_cuid()))
+                            {
                                 re_introspected_prisma_level_cuids.push(ModelAndField::new(&model.name, &field.name));
                             }
 
-                            if old_field.default_value == Some(DefaultValue::Expression(ValueGenerator::new_uuid())) {
+                            if old_field.default_value == Some(DefaultValue::new_expression(ValueGenerator::new_uuid()))
+                            {
                                 re_introspected_prisma_level_uuids.push(ModelAndField::new(&model.name, &field.name));
                             }
                         }
@@ -324,13 +395,13 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
         for cuid in &re_introspected_prisma_level_cuids {
             new_data_model
                 .find_scalar_field_mut(&cuid.model, &cuid.field)
-                .default_value = Some(DefaultValue::Expression(ValueGenerator::new_cuid()));
+                .default_value = Some(DefaultValue::new_expression(ValueGenerator::new_cuid()));
         }
 
         for uuid in &re_introspected_prisma_level_uuids {
             new_data_model
                 .find_scalar_field_mut(&uuid.model, &uuid.field)
-                .default_value = Some(DefaultValue::Expression(ValueGenerator::new_uuid()));
+                .default_value = Some(DefaultValue::new_expression(ValueGenerator::new_uuid()));
         }
 
         for updated_at in &re_introspected_updated_at {
@@ -381,10 +452,10 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
                         if old_model.documentation.is_some() {
                             re_introspected_model_comments.push((Model::new(&model.name), &old_model.documentation))
                         }
-                        if let Some(old_field) = old_model.find_field(&field.name()) {
+                        if let Some(old_field) = old_model.find_field(field.name()) {
                             if old_field.documentation().is_some() {
                                 re_introspected_field_comments.push((
-                                    ModelAndField::new(&model.name, &field.name()),
+                                    ModelAndField::new(&model.name, field.name()),
                                     old_field.documentation().map(|s| s.to_string()),
                                 ))
                             }
@@ -461,6 +532,16 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
         warnings.push(warning_enriched_with_map_on_model(&models));
     }
 
+    if !changed_index_names.is_empty() {
+        let index: Vec<_> = changed_index_names.iter().map(|c| c.0.clone()).collect();
+        warnings.push(warning_enriched_with_custom_index_names(&index));
+    }
+
+    if !changed_primary_key_names.is_empty() {
+        let pk: Vec<_> = changed_primary_key_names.iter().map(|c| c.0.clone()).collect();
+        warnings.push(warning_enriched_with_custom_primary_key_names(&pk));
+    }
+
     if !changed_scalar_field_names.is_empty() {
         let models_and_fields: Vec<_> = changed_scalar_field_names
             .iter()
@@ -512,5 +593,59 @@ fn re_order_putting_new_ones_last(enum_a_idx: Option<usize>, enum_b_idx: Option<
         (None, Some(_)) => Greater,
         (Some(_), None) => Less,
         (Some(a_idx), Some(b_idx)) => a_idx.cmp(&b_idx),
+    }
+}
+
+// Copies `@relation` attributes from the data model to the introspected
+// version. Needed, when the database does not support foreign key constraints,
+// but we still want to keep them in the PSL.
+fn merge_relation_fields(old_data_model: &Datamodel, new_data_model: &mut Datamodel, warnings: &mut Vec<Warning>) {
+    let mut changed_models = BTreeSet::new();
+
+    for old_model in old_data_model.models() {
+        let modifications = new_data_model
+            .models()
+            .find(|m| m.name == *old_model.name())
+            .map(|new_model| {
+                let mut ordering: HashMap<String, usize> = old_model
+                    .fields()
+                    .enumerate()
+                    .map(|(i, field)| (field.name().to_string(), i))
+                    .collect();
+
+                for (i, field) in new_model.fields().enumerate() {
+                    if !ordering.contains_key(field.name()) {
+                        ordering.insert(field.name().to_string(), i);
+                    }
+                }
+
+                let mut fields = Vec::new();
+
+                for field in old_model.relation_fields() {
+                    if new_data_model.models().any(|m| m.name == field.relation_info.to) {
+                        fields.push(Field::RelationField(field.clone()));
+                    }
+                }
+
+                (new_model.name().to_string(), fields, ordering)
+            });
+
+        if let Some((model_name, fields, ordering)) = modifications {
+            let new_model = new_data_model.find_model_mut(&model_name);
+
+            for field in fields.into_iter() {
+                changed_models.insert(new_model.name().to_string());
+                new_model.add_field(field);
+            }
+
+            new_model
+                .fields
+                .sort_by_cached_key(|field| *ordering.get(field.name()).unwrap_or(&usize::MAX));
+        }
+    }
+
+    if !changed_models.is_empty() {
+        let affected: Vec<_> = changed_models.into_iter().map(|model| Model { model }).collect();
+        warnings.push(warning_relations_added_from_the_previous_data_model(&affected));
     }
 }

@@ -3,11 +3,11 @@ use crate::warnings::{
     warning_models_without_identifier, warning_unsupported_types, EnumAndValue, Model, ModelAndField,
     ModelAndFieldAndType,
 };
+use crate::SqlFamilyTrait;
 use datamodel::{Datamodel, FieldType};
-use introspection_connector::Warning;
-use quaint::connector::SqlFamily;
+use introspection_connector::{IntrospectionContext, Warning};
 
-pub fn commenting_out_guardrails(datamodel: &mut Datamodel, family: &SqlFamily) -> Vec<Warning> {
+pub fn commenting_out_guardrails(datamodel: &mut Datamodel, ctx: &IntrospectionContext) -> Vec<Warning> {
     let mut models_without_identifiers = vec![];
     let mut models_without_columns = vec![];
     let mut fields_with_empty_names = vec![];
@@ -70,10 +70,10 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel, family: &SqlFamily) 
     for model in datamodel.models_mut() {
         if model.fields.is_empty() {
             model.is_commented_out = true;
-            let comment = match family {
-                SqlFamily::Postgres =>
+            let comment = match ctx.sql_family().is_postgres() {
+                true =>
                     "We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.".to_string(),
-                _ => "We could not retrieve columns for the underlying table. You probably have no rights to see them. Please check your privileges.".to_string(),
+               false=> "We could not retrieve columns for the underlying table. You probably have no rights to see them. Please check your privileges.".to_string(),
 
             };
             //postgres could be valid, or privileges, commenting out because we cannot handle it.

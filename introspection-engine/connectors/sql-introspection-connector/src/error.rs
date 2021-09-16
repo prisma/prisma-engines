@@ -143,7 +143,7 @@ impl SqlError {
                 kind: ErrorKind::DatabaseSchemaInconsistent { explanation },
             },
             SqlError::DatabaseUrlIsInvalid(reason) => {
-                let user_facing_error = Some(KnownError::new(common::InvalidDatabaseString {
+                let user_facing_error = Some(KnownError::new(common::InvalidConnectionString {
                     details: reason.clone(),
                 }));
 

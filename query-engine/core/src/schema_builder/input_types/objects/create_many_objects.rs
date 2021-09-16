@@ -1,6 +1,5 @@
 use super::*;
 use datamodel_connector::ConnectorCapability;
-use prisma_models::dml::DefaultValue;
 
 /// Create many data input type.
 /// Input type allows to write all scalar fields except if in a nested case,
@@ -55,13 +54,7 @@ pub(crate) fn create_many_object_type(
     let fields = input_fields::scalar_input_fields(
         ctx,
         scalar_fields,
-        |ctx, f: ScalarFieldRef, default: Option<DefaultValue>| {
-            let typ = map_scalar_input_type_for_field(ctx, &f);
-
-            input_field(f.name.clone(), typ, default)
-                .optional_if(!f.is_required || f.default_value.is_some() || f.is_created_at() || f.is_updated_at())
-                .nullable_if(!f.is_required)
-        },
+        create_one_objects::field_create_input,
         |ctx, f, _| input_fields::scalar_list_input_field_mapper(ctx, model.name.clone(), "CreateMany", f, true),
         true,
     );

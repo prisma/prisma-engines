@@ -34,9 +34,9 @@ impl ConnectorError {
                 }))
             }
             ErrorKind::InvalidDatabaseUrl { details, url: _ } => {
-                let details = user_facing_errors::quaint::invalid_url_description(details);
+                let details = user_facing_errors::quaint::invalid_connection_string_description(details);
 
-                Some(KnownError::new(user_facing_errors::common::InvalidDatabaseString {
+                Some(KnownError::new(user_facing_errors::common::InvalidConnectionString {
                     details,
                 }))
             }
@@ -192,6 +192,12 @@ pub enum ErrorKind {
 
     #[error("Server terminated the connection.")]
     ConnectionClosed,
+
+    #[error("Transaction aborted: {}", message)]
+    TransactionAborted { message: String },
+
+    #[error("{}", message)]
+    TransactionAlreadyClosed { message: String },
 }
 
 impl From<DomainError> for ConnectorError {

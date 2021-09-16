@@ -1,5 +1,5 @@
 use crate::{CoreError, CoreResult};
-use migration_connector::{DatabaseMigrationMarker, MigrationConnector};
+use migration_connector::MigrationConnector;
 use serde::Deserialize;
 use std::collections::HashMap;
 use user_facing_errors::migration_engine::{CannotRollBackSucceededMigration, CannotRollBackUnappliedMigration};
@@ -16,12 +16,9 @@ pub struct MarkMigrationRolledBackInput {
 pub type MarkMigrationRolledBackOutput = HashMap<(), ()>;
 
 /// Mark a migration as rolled back.
-pub(crate) async fn mark_migration_rolled_back<
-    M: DatabaseMigrationMarker + 'static,
-    C: MigrationConnector<DatabaseMigration = M>,
->(
+pub(crate) async fn mark_migration_rolled_back(
     input: &MarkMigrationRolledBackInput,
-    connector: &C,
+    connector: &dyn MigrationConnector,
 ) -> CoreResult<MarkMigrationRolledBackOutput> {
     let persistence = connector.migration_persistence();
 

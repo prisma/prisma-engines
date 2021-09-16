@@ -1,4 +1,5 @@
 pub mod avg;
+mod combination_spec;
 pub mod count;
 pub mod group_by;
 pub mod group_by_having;

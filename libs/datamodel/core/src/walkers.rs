@@ -7,7 +7,7 @@ use crate::{
     },
     NativeTypeInstance, RelationField,
 };
-use dml::scalars::ScalarType;
+use dml::{relation_info::ReferentialAction, scalars::ScalarType};
 use itertools::Itertools;
 
 /// Iterator over all the models in the schema.
@@ -61,7 +61,7 @@ impl<'a> ModelWalker<'a> {
         self.get().final_database_name()
     }
 
-    fn get(&self) -> &'a Model {
+    pub fn get(&self) -> &'a Model {
         &self.datamodel.models[self.model_idx]
     }
 
@@ -119,21 +119,20 @@ impl<'a> ModelWalker<'a> {
         let model_idx = self.model_idx;
         let datamodel = self.datamodel;
 
-        self.scalar_fields()
-            // Single-id models
-            .filter(|field| field.is_id())
-            // Compound id models
-            .chain(
-                self.get()
-                    .id_fields
-                    .iter()
-                    .filter_map(move |field_name| walker.find_scalar_field(field_name)),
-            )
-            .map(move |field| ScalarFieldWalker {
-                datamodel,
-                model_idx,
-                field_idx: field.field_idx,
-            })
+        let x = if let Some(pk) = &walker.get().primary_key {
+            pk.fields
+                .iter()
+                .map(|field_name| walker.find_scalar_field(field_name).unwrap())
+                .map(move |field| ScalarFieldWalker {
+                    datamodel,
+                    model_idx,
+                    field_idx: field.field_idx,
+                })
+                .collect()
+        } else {
+            vec![]
+        };
+        x.into_iter()
     }
 
     pub fn unique_indexes<'b>(&'b self) -> impl Iterator<Item = IndexWalker<'a>> + 'b {
@@ -144,7 +143,7 @@ impl<'a> ModelWalker<'a> {
             .map(move |index| IndexWalker {
                 model: *self,
                 index,
-                datamodel: &self.datamodel,
+                datamodel: self.datamodel,
             })
     }
 }
@@ -175,8 +174,8 @@ impl<'a> ScalarFieldWalker<'a> {
                 datamodel: self.datamodel,
                 r#enum: self.datamodel.find_enum(name).unwrap(),
             }),
-            FieldType::Base(scalar_type, _) => TypeWalker::Base(*scalar_type),
-            FieldType::NativeType(scalar_type, native_type) => TypeWalker::NativeType(*scalar_type, native_type),
+            FieldType::Scalar(scalar_type, _, None) => TypeWalker::Base(*scalar_type),
+            FieldType::Scalar(scalar_type, _, Some(nt)) => TypeWalker::NativeType(*scalar_type, nt),
             FieldType::Unsupported(description) => TypeWalker::Unsupported(description.clone()),
             FieldType::Relation(_) => unreachable!("FieldType::Relation in ScalarFieldWalker"),
         }
@@ -188,16 +187,8 @@ impl<'a> ScalarFieldWalker<'a> {
             .unwrap()
     }
 
-    pub fn is_id(&self) -> bool {
-        self.get().is_id
-    }
-
     pub fn is_required(&self) -> bool {
         self.get().is_required()
-    }
-
-    pub fn is_unique(&self) -> bool {
-        self.get().is_unique
     }
 
     pub fn model(&self) -> ModelWalker<'a> {
@@ -327,7 +318,7 @@ impl<'a> RelationFieldWalker<'a> {
 
     pub fn referenced_model(&self) -> ModelWalker<'a> {
         ModelWalker {
-            datamodel: &self.datamodel,
+            datamodel: self.datamodel,
             model_idx: self
                 .datamodel
                 .models
@@ -340,6 +331,25 @@ impl<'a> RelationFieldWalker<'a> {
                     )
                 }),
         }
+    }
+    pub fn constraint_name(&self) -> Option<String> {
+        self.get().relation_info.fk_name.clone()
+    }
+
+    pub fn on_update_action(&self) -> Option<ReferentialAction> {
+        self.get().relation_info.on_update
+    }
+
+    pub fn on_delete_action(&self) -> Option<ReferentialAction> {
+        self.get().relation_info.on_delete
+    }
+
+    pub fn default_on_update_action(&self) -> ReferentialAction {
+        self.get().default_on_update_action()
+    }
+
+    pub fn default_on_delete_action(&self) -> ReferentialAction {
+        self.get().default_on_delete_action()
     }
 }
 

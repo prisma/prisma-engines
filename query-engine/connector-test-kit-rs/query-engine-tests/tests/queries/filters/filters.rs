@@ -1,8 +1,10 @@
-use indoc::indoc;
 use query_engine_tests::*;
 
 #[test_suite(schema(schema))]
 mod filter_spec {
+    use indoc::indoc;
+    use query_engine_tests::assert_error;
+
     fn schema() -> String {
         let schema = indoc! {
             r#"
@@ -39,21 +41,21 @@ mod filter_spec {
     }
 
     #[connector_test]
-    async fn no_filter(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn no_filter(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          &user_uniques(runner, "").await?,
+          &user_uniques(&runner, "").await?,
           @r###"{"data":{"findManyUser":[{"unique":1},{"unique":2},{"unique":3},{"unique":4}]}}"###
         );
 
         insta::assert_snapshot!(
-          &vehicle_uniques(runner, "").await?,
+          &vehicle_uniques(&runner, "").await?,
           @r###"{"data":{"findManyVehicle":[{"unique":1},{"unique":2},{"unique":3}]}}"###
         );
 
         insta::assert_snapshot!(
-          &lot_uniques(runner, "").await?,
+          &lot_uniques(&runner, "").await?,
           @r###"{"data":{"findManyParkingLot":[{"unique":1},{"unique":2}]}}"###
         );
 
@@ -61,11 +63,11 @@ mod filter_spec {
     }
 
     #[connector_test]
-    async fn simple(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn simple(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          &user_uniques(runner, r#"(where: { name: { equals: "John" }})"#).await?,
+          &user_uniques(&runner, r#"(where: { name: { equals: "John" }})"#).await?,
           @r###"{"data":{"findManyUser":[{"unique":4}]}}"###
         );
 
@@ -73,11 +75,11 @@ mod filter_spec {
     }
 
     #[connector_test]
-    async fn inverted_simple(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn inverted_simple(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          &user_uniques(runner, r#"(where: { name: { not: { equals: "John" }}})"#).await?,
+          &user_uniques(&runner, r#"(where: { name: { not: { equals: "John" }}})"#).await?,
           @r###"{"data":{"findManyUser":[{"unique":1},{"unique":2},{"unique":3}]}}"###
         );
 
@@ -85,11 +87,11 @@ mod filter_spec {
     }
 
     #[connector_test]
-    async fn implicit_not_equals(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn implicit_not_equals(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          &user_uniques(runner, r#"(where: { name: { not: "John" }})"#).await?,
+          &user_uniques(&runner, r#"(where: { name: { not: "John" }})"#).await?,
           @r###"{"data":{"findManyUser":[{"unique":1},{"unique":2},{"unique":3}]}}"###
         );
 
@@ -97,11 +99,11 @@ mod filter_spec {
     }
 
     #[connector_test]
-    async fn implicit_equals(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn implicit_equals(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          &user_uniques(runner, r#"(where: { name: "John" })"#).await?,
+          &user_uniques(&runner, r#"(where: { name: "John" })"#).await?,
           @r###"{"data":{"findManyUser":[{"unique":4}]}}"###
         );
 
@@ -109,11 +111,11 @@ mod filter_spec {
     }
 
     #[connector_test]
-    async fn implicit_equals_null(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn implicit_equals_null(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          &user_uniques(runner, r#"(where: { name: null })"#).await?,
+          &user_uniques(&runner, r#"(where: { name: null })"#).await?,
           @r###"{"data":{"findManyUser":[]}}"###
         );
 
@@ -121,11 +123,11 @@ mod filter_spec {
     }
 
     #[connector_test]
-    async fn in_null(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn in_null(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          &user_uniques(runner, r#"(where: { optional: { in: null }})"#).await?,
+          &user_uniques(&runner, r#"(where: { optional: { in: null }})"#).await?,
           @r###"{"data":{"findManyUser":[{"unique":1},{"unique":2},{"unique":3},{"unique":4}]}}"###
         );
 
@@ -133,11 +135,11 @@ mod filter_spec {
     }
 
     #[connector_test]
-    async fn in_list(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn in_list(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          &user_uniques(runner, r#"(where: { name: { in: ["Bernd", "Paul"] }})"#).await?,
+          &user_uniques(&runner, r#"(where: { name: { in: ["Bernd", "Paul"] }})"#).await?,
           @r###"{"data":{"findManyUser":[{"unique":1},{"unique":2}]}}"###
         );
 
@@ -145,11 +147,11 @@ mod filter_spec {
     }
 
     #[connector_test]
-    async fn not_in_list(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn not_in_list(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          &user_uniques(runner, r#"(where: { name: { notIn: ["Bernd", "Paul"] }})"#).await?,
+          &user_uniques(&runner, r#"(where: { name: { notIn: ["Bernd", "Paul"] }})"#).await?,
           @r###"{"data":{"findManyUser":[{"unique":3},{"unique":4}]}}"###
         );
 
@@ -157,11 +159,11 @@ mod filter_spec {
     }
 
     #[connector_test]
-    async fn not_in_null(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn not_in_null(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          &user_uniques(runner, r#"(where: { name: { notIn: null }})"#).await?,
+          &user_uniques(&runner, r#"(where: { name: { notIn: null }})"#).await?,
           @r###"{"data":{"findManyUser":[{"unique":1},{"unique":2},{"unique":3},{"unique":4}]}}"###
         );
 
@@ -169,11 +171,11 @@ mod filter_spec {
     }
 
     #[connector_test]
-    async fn relation_null(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn relation_null(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          &user_uniques(runner, r#"(where: { ride: { is: null }})"#).await?,
+          &user_uniques(&runner, r#"(where: { ride: { is: null }})"#).await?,
           @r###"{"data":{"findManyUser":[{"unique":4}]}}"###
         );
 
@@ -181,11 +183,11 @@ mod filter_spec {
     }
 
     #[connector_test]
-    async fn and(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn and(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          &user_uniques(runner, r#"(where: { AND: [ { unique: { gt: 2 }},{ name: { startsWith: "P" }}]})"#).await?,
+          &user_uniques(&runner, r#"(where: { AND: [ { unique: { gt: 2 }},{ name: { startsWith: "P" }}]})"#).await?,
           @r###"{"data":{"findManyUser":[]}}"###
         );
 
@@ -193,11 +195,11 @@ mod filter_spec {
     }
 
     #[connector_test]
-    async fn empty_and(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn empty_and(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          &user_uniques(runner, r#"(where: { AND: []})"#).await?,
+          &user_uniques(&runner, r#"(where: { AND: []})"#).await?,
           @r###"{"data":{"findManyUser":[{"unique":1},{"unique":2},{"unique":3},{"unique":4}]}}"###
         );
 
@@ -205,11 +207,11 @@ mod filter_spec {
     }
 
     #[connector_test]
-    async fn or(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn or(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          &user_uniques(runner, r#"(where: { OR: [{ unique: { gt: 2 }}, { name: { startsWith: "P" }}]})"#).await?,
+          &user_uniques(&runner, r#"(where: { OR: [{ unique: { gt: 2 }}, { name: { startsWith: "P" }}]})"#).await?,
           @r###"{"data":{"findManyUser":[{"unique":1},{"unique":3},{"unique":4}]}}"###
         );
 
@@ -217,11 +219,11 @@ mod filter_spec {
     }
 
     #[connector_test]
-    async fn empty_or(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn empty_or(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          &user_uniques(runner, r#"(where: { OR: [] })"#).await?,
+          &user_uniques(&runner, r#"(where: { OR: [] })"#).await?,
           @r###"{"data":{"findManyUser":[]}}"###
         );
 
@@ -229,11 +231,11 @@ mod filter_spec {
     }
 
     #[connector_test]
-    async fn empty_not(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn empty_not(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          &user_uniques(runner, r#"(where: { NOT: [] })"#).await?,
+          &user_uniques(&runner, r#"(where: { NOT: [] })"#).await?,
           @r###"{"data":{"findManyUser":[{"unique":1},{"unique":2},{"unique":3},{"unique":4}]}}"###
         );
 
@@ -241,11 +243,11 @@ mod filter_spec {
     }
 
     #[connector_test]
-    async fn not(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn not(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          &user_uniques(runner, r#"(where: { NOT: { name: { startsWith: "P" }}})"#).await?,
+          &user_uniques(&runner, r#"(where: { NOT: { name: { startsWith: "P" }}})"#).await?,
           @r###"{"data":{"findManyUser":[{"unique":2},{"unique":3},{"unique":4}]}}"###
         );
 
@@ -253,11 +255,23 @@ mod filter_spec {
     }
 
     #[connector_test]
-    async fn not_list(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn not_not(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          &user_uniques(runner, r#"(where: { NOT: [{ name: { contains: "e" } }, { unique: { equals: 1 } }]})"#).await?,
+          &user_uniques(&runner, r#"(where: { NOT: { NOT: { name: { startsWith: "P" }} }})"#).await?,
+          @r###"{"data":{"findManyUser":[{"unique":1}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn not_list(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
+
+        insta::assert_snapshot!(
+          &user_uniques(&runner, r#"(where: { NOT: [{ name: { contains: "e" } }, { unique: { equals: 1 } }]})"#).await?,
           @r###"{"data":{"findManyUser":[{"unique":4}]}}"###
         );
 
@@ -265,11 +279,11 @@ mod filter_spec {
     }
 
     #[connector_test]
-    async fn nested_filter(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn nested_filter(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          &user_uniques(runner, r#"(where: { ride: { is: { brand: { startsWith: "P" }}}})"#).await?,
+          &user_uniques(&runner, r#"(where: { ride: { is: { brand: { startsWith: "P" }}}})"#).await?,
           @r###"{"data":{"findManyUser":[{"unique":1}]}}"###
         );
 
@@ -277,11 +291,11 @@ mod filter_spec {
     }
 
     #[connector_test]
-    async fn starts_with(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn starts_with(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          &user_uniques(runner, r#"(where: { name: { startsWith: "P"}})"#).await?,
+          &user_uniques(&runner, r#"(where: { name: { startsWith: "P"}})"#).await?,
           @r###"{"data":{"findManyUser":[{"unique":1}]}}"###
         );
 
@@ -289,11 +303,11 @@ mod filter_spec {
     }
 
     #[connector_test]
-    async fn contains(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn contains(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          &user_uniques(runner, r#"(where: { name: { contains: "n" }})"#).await?,
+          &user_uniques(&runner, r#"(where: { name: { contains: "n" }})"#).await?,
           @r###"{"data":{"findManyUser":[{"unique":2},{"unique":4}]}}"###
         );
 
@@ -301,11 +315,11 @@ mod filter_spec {
     }
 
     #[connector_test]
-    async fn greater_than(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn greater_than(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          &lot_uniques(runner, r#"(where: {size: { gt: 100.500000000001 }})"#).await?,
+          &lot_uniques(&runner, r#"(where: {size: { gt: 100.500000000001 }})"#).await?,
           @r###"{"data":{"findManyParkingLot":[{"unique":1}]}}"###
         );
 
@@ -313,11 +327,11 @@ mod filter_spec {
     }
 
     #[connector_test]
-    async fn inverted_null(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn inverted_null(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          &user_uniques(runner, r#"(where: { name: { not: null }})"#).await?,
+          &user_uniques(&runner, r#"(where: { name: { not: null }})"#).await?,
           @r###"{"data":{"findManyUser":[{"unique":1},{"unique":2},{"unique":3},{"unique":4}]}}"###
         );
 
@@ -325,8 +339,8 @@ mod filter_spec {
     }
 
     #[connector_test]
-    async fn inverted_null_required(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn inverted_null_required(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         assert_error!(
             runner,

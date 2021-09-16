@@ -2,13 +2,13 @@ use crate::ast::Span;
 use crate::diagnostics::helper::pretty_print;
 use thiserror::Error;
 
-// No format for this file, on purpose.
-// Line breaks make the declarations very hard to read.
-#[rustfmt::skip]
 /// Enum for different errors which can happen during parsing or validation.
 ///
 /// For fancy printing, please use the `pretty_print_error` function.
+// No format for this file, on purpose.
+// Line breaks make the declarations very hard to read.
 #[derive(Debug, Error, Clone, PartialEq)]
+#[rustfmt::skip]
 pub enum DatamodelError {
   #[error("Argument \"{}\" is missing.", argument_name)]
   ArgumentNotFound { argument_name: String, span: Span },
@@ -34,7 +34,7 @@ pub enum DatamodelError {
   #[error("The model with database name \"{}\" could not be defined because another model with this name exists: \"{}\"", model_database_name, existing_model_name)]
   DuplicateModelDatabaseNameError { model_database_name: String, existing_model_name: String, span: Span },
 
-  #[error("\"{}\" is a reserved scalar type name and can not be used.", type_name)]
+  #[error("\"{}\" is a reserved scalar type name and cannot be used.", type_name)]
   ReservedScalarTypeError { type_name: String, span: Span },
 
   #[error("The {} \"{}\" cannot be defined because a {} with that name already exists.", top_type, name, existing_top_type)]
@@ -104,7 +104,7 @@ pub enum DatamodelError {
   #[error("Environment variable not found: {}.", var_name)]
   EnvironmentFunctionalEvaluationError { var_name: String, span: Span },
 
-  #[error("Expected a {} value, but received {} value \"{}\".", expected_type, received_type, raw)]
+  #[error("Expected a {} value, but received {} value `{}`.", expected_type, received_type, raw)]
   TypeMismatchError { expected_type: String, received_type: String, raw: String, span: Span },
 
   #[error("Expected a {} value, but failed while parsing \"{}\": {}.", expected_type, raw, parser_error)]
@@ -126,312 +126,360 @@ pub enum DatamodelError {
   ValidationError { message: String, span: Span },
 }
 
-#[rustfmt::skip]
 impl DatamodelError {
-  pub fn new_literal_parser_error(literal_type: &str, raw_value: &str, span: Span) -> DatamodelError {
-    DatamodelError::LiteralParseError {
-      literal_type: String::from(literal_type),
-      raw_value: String::from(raw_value),
-      span,
+    pub fn new_literal_parser_error(literal_type: &str, raw_value: &str, span: Span) -> DatamodelError {
+        DatamodelError::LiteralParseError {
+            literal_type: String::from(literal_type),
+            raw_value: String::from(raw_value),
+            span,
+        }
     }
-  }
 
-  pub fn new_argument_not_found_error(argument_name: &str, span: Span) -> DatamodelError {
-    DatamodelError::ArgumentNotFound { argument_name: String::from(argument_name), span }
-  }
-
-  pub fn new_argument_count_missmatch_error(function_name: &str, required_count: usize, given_count: usize, span: Span) -> DatamodelError {
-    DatamodelError::ArgumentCountMissmatch {
-      function_name: String::from(function_name),
-      required_count,
-      given_count,
-      span,
+    pub fn new_argument_not_found_error(argument_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::ArgumentNotFound {
+            argument_name: String::from(argument_name),
+            span,
+        }
     }
-  }
 
-  pub fn new_attribute_argument_not_found_error(argument_name: &str, attribute_name: &str, span: Span) -> DatamodelError {
-    DatamodelError::AttributeArgumentNotFound {
-      argument_name: String::from(argument_name),
-      attribute_name: String::from(attribute_name),
-      span,
+    pub fn new_argument_count_missmatch_error(
+        function_name: &str,
+        required_count: usize,
+        given_count: usize,
+        span: Span,
+    ) -> DatamodelError {
+        DatamodelError::ArgumentCountMissmatch {
+            function_name: String::from(function_name),
+            required_count,
+            given_count,
+            span,
+        }
     }
-  }
 
-  pub fn new_source_argument_not_found_error(argument_name: &str, source_name: &str, span: Span) -> DatamodelError {
-    DatamodelError::SourceArgumentNotFound {
-      argument_name: String::from(argument_name),
-      source_name: String::from(source_name),
-      span,
+    pub fn new_attribute_argument_not_found_error(
+        argument_name: &str,
+        attribute_name: &str,
+        span: Span,
+    ) -> DatamodelError {
+        DatamodelError::AttributeArgumentNotFound {
+            argument_name: String::from(argument_name),
+            attribute_name: String::from(attribute_name),
+            span,
+        }
     }
-  }
 
-  pub fn new_generator_argument_not_found_error(argument_name: &str, generator_name: &str, span: Span) -> DatamodelError {
-    DatamodelError::GeneratorArgumentNotFound {
-      argument_name: String::from(argument_name),
-      generator_name: String::from(generator_name),
-      span,
+    pub fn new_source_argument_not_found_error(argument_name: &str, source_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::SourceArgumentNotFound {
+            argument_name: String::from(argument_name),
+            source_name: String::from(source_name),
+            span,
+        }
     }
-  }
 
-  pub fn new_attribute_validation_error(message: &str, attribute_name: &str, span: Span) -> DatamodelError {
-    DatamodelError::AttributeValidationError {
-      message: String::from(message),
-      attribute_name: String::from(attribute_name),
-      span,
+    pub fn new_generator_argument_not_found_error(
+        argument_name: &str,
+        generator_name: &str,
+        span: Span,
+    ) -> DatamodelError {
+        DatamodelError::GeneratorArgumentNotFound {
+            argument_name: String::from(argument_name),
+            generator_name: String::from(generator_name),
+            span,
+        }
     }
-  }
 
-  pub fn new_duplicate_attribute_error(attribute_name: &str, span: Span) -> DatamodelError {
-    DatamodelError::DuplicateAttributeError {
-      attribute_name: String::from(attribute_name),
-      span,
+    pub fn new_attribute_validation_error(message: &str, attribute_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::AttributeValidationError {
+            message: String::from(message),
+            attribute_name: String::from(attribute_name),
+            span,
+        }
     }
-  }
 
-  pub fn new_reserved_scalar_type_error(type_name: &str, span: Span) -> DatamodelError {
-    DatamodelError::ReservedScalarTypeError {
-      type_name: String::from(type_name),
-      span,
+    pub fn new_duplicate_attribute_error(attribute_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::DuplicateAttributeError {
+            attribute_name: String::from(attribute_name),
+            span,
+        }
     }
-  }
 
-  pub fn new_duplicate_model_database_name_error(model_database_name: String, existing_model_name: String, span: Span) -> DatamodelError {
-    DatamodelError::DuplicateModelDatabaseNameError {
-      model_database_name,
-      existing_model_name,
-      span,
+    pub fn new_reserved_scalar_type_error(type_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::ReservedScalarTypeError {
+            type_name: String::from(type_name),
+            span,
+        }
     }
-  }
 
-  pub fn new_duplicate_top_error(name: &str, top_type: &str, existing_top_type: &str, span: Span) -> DatamodelError {
-    DatamodelError::DuplicateTopError {
-      name: String::from(name),
-      top_type: String::from(top_type),
-      existing_top_type: String::from(existing_top_type),
-      span,
+    pub fn new_duplicate_model_database_name_error(
+        model_database_name: String,
+        existing_model_name: String,
+        span: Span,
+    ) -> DatamodelError {
+        DatamodelError::DuplicateModelDatabaseNameError {
+            model_database_name,
+            existing_model_name,
+            span,
+        }
     }
-  }
 
-  pub fn new_duplicate_config_key_error(conf_block_name: &str, key_name: &str, span: Span) -> DatamodelError {
-    DatamodelError::DuplicateConfigKeyError {
-      conf_block_name: String::from(conf_block_name),
-      key_name: String::from(key_name),
-      span,
+    pub fn new_duplicate_top_error(name: &str, top_type: &str, existing_top_type: &str, span: Span) -> DatamodelError {
+        DatamodelError::DuplicateTopError {
+            name: String::from(name),
+            top_type: String::from(top_type),
+            existing_top_type: String::from(existing_top_type),
+            span,
+        }
     }
-  }
 
-  pub fn new_duplicate_argument_error(arg_name: &str, span: Span) -> DatamodelError {
-    DatamodelError::DuplicateArgumentError {
-      arg_name: String::from(arg_name),
-      span,
+    pub fn new_duplicate_config_key_error(conf_block_name: &str, key_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::DuplicateConfigKeyError {
+            conf_block_name: String::from(conf_block_name),
+            key_name: String::from(key_name),
+            span,
+        }
     }
-  }
 
-  pub fn new_unused_argument_error(arg_name: &str, span: Span) -> DatamodelError {
-    DatamodelError::UnusedArgumentError {
-      arg_name: String::from(arg_name),
-      span,
+    pub fn new_duplicate_argument_error(arg_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::DuplicateArgumentError {
+            arg_name: String::from(arg_name),
+            span,
+        }
     }
-  }
 
-  pub fn new_duplicate_default_argument_error(arg_name: &str, span: Span) -> DatamodelError {
-    DatamodelError::DuplicateDefaultArgumentError {
-      arg_name: String::from(arg_name),
-      span,
+    pub fn new_unused_argument_error(arg_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::UnusedArgumentError {
+            arg_name: String::from(arg_name),
+            span,
+        }
     }
-  }
 
-  pub fn new_duplicate_enum_value_error(enum_name: &str, value_name: &str,  span: Span) -> DatamodelError {
-    DatamodelError::DuplicateEnumValueError {
-      enum_name: String::from(enum_name),
-      value_name: String::from(value_name),
-      span,
+    pub fn new_duplicate_default_argument_error(arg_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::DuplicateDefaultArgumentError {
+            arg_name: String::from(arg_name),
+            span,
+        }
     }
-  }
 
-  pub fn new_duplicate_field_error(model_name: &str, field_name: &str, span: Span) -> DatamodelError {
-    DatamodelError::DuplicateFieldError {
-      model_name: String::from(model_name),
-      field_name: String::from(field_name),
-      span,
+    pub fn new_duplicate_enum_value_error(enum_name: &str, value_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::DuplicateEnumValueError {
+            enum_name: String::from(enum_name),
+            value_name: String::from(value_name),
+            span,
+        }
     }
-  }
 
-  pub fn new_scalar_list_fields_are_not_supported (model_name: &str, field_name: &str, span: Span) -> DatamodelError {
-    DatamodelError::ScalarListFieldsAreNotSupported {
-      model_name: String::from(model_name),
-      field_name: String::from(field_name),
-      span,
+    pub fn new_duplicate_field_error(model_name: &str, field_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::DuplicateFieldError {
+            model_name: String::from(model_name),
+            field_name: String::from(field_name),
+            span,
+        }
     }
-  }
 
-  pub fn new_multiple_indexes_with_same_name_are_not_supported(index_name: &str, span: Span) -> DatamodelError {
-    DatamodelError::MultipleIndexesWithSameNameAreNotSupported {
-      index_name: String::from(index_name),
-      span
+    pub fn new_scalar_list_fields_are_not_supported(model_name: &str, field_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::ScalarListFieldsAreNotSupported {
+            model_name: String::from(model_name),
+            field_name: String::from(field_name),
+            span,
+        }
     }
-  }
 
-
-  pub fn new_model_validation_error(message: &str, model_name: &str, span: Span) -> DatamodelError {
-    DatamodelError::ModelValidationError {
-      message: String::from(message),
-      model_name: String::from(model_name),
-      span,
+    pub fn new_multiple_indexes_with_same_name_are_not_supported(index_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::MultipleIndexesWithSameNameAreNotSupported {
+            index_name: String::from(index_name),
+            span,
+        }
     }
-  }
 
-  pub fn new_enum_validation_error(message: &str, enum_name: &str, span: Span) -> DatamodelError {
-    DatamodelError::EnumValidationError {
-      message: String::from(message),
-      r#enum_name: String::from(enum_name),
-      span,
+    pub fn new_model_validation_error(message: &str, model_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::ModelValidationError {
+            message: String::from(message),
+            model_name: String::from(model_name),
+            span,
+        }
     }
-  }
 
-  pub fn new_field_validation_error(message: &str, model: &str, field: &str, span: Span) -> DatamodelError {
-    DatamodelError::FieldValidationError {
-      message: message.to_owned(),
-      model: model.to_owned(),
-      field: field.to_owned(),
-      span,
+    pub fn new_enum_validation_error(message: &str, enum_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::EnumValidationError {
+            message: String::from(message),
+            r#enum_name: String::from(enum_name),
+            span,
+        }
     }
-  }
 
-  pub fn new_source_validation_error(message: &str, source: &str, span: Span) -> DatamodelError {
-    DatamodelError::SourceValidationError {
-      message: message.to_owned(),
-      datasource: source.to_owned(),
-      span,
+    pub fn new_field_validation_error(message: &str, model: &str, field: &str, span: Span) -> DatamodelError {
+        DatamodelError::FieldValidationError {
+            message: message.to_owned(),
+            model: model.to_owned(),
+            field: field.to_owned(),
+            span,
+        }
     }
-  }
 
-  pub fn new_validation_error(message: &str, span: Span) -> DatamodelError {
-    DatamodelError::ValidationError {
-      message: String::from(message),
-      span,
+    pub fn new_source_validation_error(message: &str, source: &str, span: Span) -> DatamodelError {
+        DatamodelError::SourceValidationError {
+            message: message.to_owned(),
+            datasource: source.to_owned(),
+            span,
+        }
     }
-  }
 
-  pub fn new_legacy_parser_error(message: &str, span: Span) -> DatamodelError {
-    DatamodelError::LegacyParserError {
-      message: String::from(message),
-      span,
+    pub fn new_validation_error(message: &str, span: Span) -> DatamodelError {
+        DatamodelError::ValidationError {
+            message: String::from(message),
+            span,
+        }
     }
-  }
 
-  pub fn new_connector_error(message: &str, span: Span) -> DatamodelError {
-    DatamodelError::ConnectorError {
-      message: String::from(message),
-      span,
+    pub fn new_legacy_parser_error(message: &str, span: Span) -> DatamodelError {
+        DatamodelError::LegacyParserError {
+            message: String::from(message),
+            span,
+        }
     }
-  }
 
-  pub fn new_parser_error(expected: &[&'static str], span: Span) -> DatamodelError {
-    DatamodelError::ParserError { expected: expected.to_owned(), expected_str: expected.join(", "), span }
-  }
-
-  pub fn new_functional_evaluation_error(message: &str, span: Span) -> DatamodelError {
-    DatamodelError::FunctionalEvaluationError { message: String::from(message), span }
-  }
-
-  pub fn new_environment_functional_evaluation_error(var_name: String, span: Span) -> DatamodelError {
-    DatamodelError::EnvironmentFunctionalEvaluationError { var_name, span }
-  }
-
-  pub fn new_type_not_found_error(type_name: &str, span: Span) -> DatamodelError {
-    DatamodelError::TypeNotFoundError { type_name: String::from(type_name), span }
-  }
-
-  pub fn new_scalar_type_not_found_error(type_name: &str, span: Span) -> DatamodelError {
-    DatamodelError::ScalarTypeNotFoundError { type_name: String::from(type_name), span }
-  }
-
-  pub fn new_attribute_not_known_error(attribute_name: &str, span: Span) -> DatamodelError {
-    DatamodelError::AttributeNotKnownError { attribute_name: String::from(attribute_name), span }
-  }
-
-  pub fn new_function_not_known_error(function_name: &str, span: Span) -> DatamodelError {
-    DatamodelError::FunctionNotKnownError { function_name: String::from(function_name), span }
-  }
-
-  pub fn new_datasource_provider_not_known_error(provider: &str, span: Span) -> DatamodelError {
-    DatamodelError::DatasourceProviderNotKnownError { provider: String::from(provider), span }
-  }
-
-  pub fn new_shadow_database_is_same_as_main_url_error(source_name: String, span: Span) -> DatamodelError {
-    DatamodelError::ShadowDatabaseUrlIsSameAsMainUrl { source_name, span }
-  }
-
-  pub fn new_preview_feature_not_known_error(preview_feature: &str, expected_preview_features: String, span: Span) -> DatamodelError {
-    DatamodelError::PreviewFeatureNotKnownError { preview_feature: String::from(preview_feature), expected_preview_features, span}
-  }
-
-  pub fn new_value_parser_error(expected_type: &str, parser_error: &str, raw: &str, span: Span) -> DatamodelError {
-    DatamodelError::ValueParserError {
-      expected_type: String::from(expected_type),
-      parser_error: String::from(parser_error),
-      raw: String::from(raw),
-      span,
+    pub fn new_connector_error(message: &str, span: Span) -> DatamodelError {
+        DatamodelError::ConnectorError {
+            message: String::from(message),
+            span,
+        }
     }
-  }
 
-  pub fn new_type_mismatch_error(expected_type: &str, received_type: &str, raw: &str, span: Span) -> DatamodelError {
-    DatamodelError::TypeMismatchError {
-      expected_type: String::from(expected_type),
-      received_type: String::from(received_type),
-      raw: String::from(raw),
-      span,
+    pub fn new_parser_error(expected: &[&'static str], span: Span) -> DatamodelError {
+        DatamodelError::ParserError {
+            expected: expected.to_owned(),
+            expected_str: expected.join(", "),
+            span,
+        }
     }
-  }
 
-  pub fn span(&self) -> Span {
-    match self {
-      DatamodelError::ArgumentNotFound { span, .. } => *span,
-      DatamodelError::AttributeArgumentNotFound { span, .. } => *span,
-      DatamodelError::ArgumentCountMissmatch { span, .. } => *span,
-      DatamodelError::SourceArgumentNotFound { span, .. } => *span,
-      DatamodelError::GeneratorArgumentNotFound { span, .. } => *span,
-      DatamodelError::AttributeValidationError { span, .. } => *span,
-      DatamodelError::AttributeNotKnownError { span, .. } => *span,
-      DatamodelError::ReservedScalarTypeError { span, .. } => *span,
-      DatamodelError::FunctionNotKnownError { span, .. } => *span,
-      DatamodelError::DatasourceProviderNotKnownError { span, .. } => *span,
-      DatamodelError::LiteralParseError { span, .. } => *span,
-      DatamodelError::TypeNotFoundError { span, .. } => *span,
-      DatamodelError::ScalarTypeNotFoundError { span, .. } => *span,
-      DatamodelError::ParserError { span, .. } => *span,
-      DatamodelError::FunctionalEvaluationError { span, .. } => *span,
-      DatamodelError::EnvironmentFunctionalEvaluationError { span, .. } => *span,
-      DatamodelError::TypeMismatchError { span, .. } => *span,
-      DatamodelError::ValueParserError { span, .. } => *span,
-      DatamodelError::ValidationError { span, .. } => *span,
-      DatamodelError::LegacyParserError { span, .. } => *span,
-      DatamodelError::ModelValidationError { span, .. } => *span,
-      DatamodelError::DuplicateAttributeError { span, .. } => *span,
-      DatamodelError::DuplicateConfigKeyError { span, .. } => *span,
-      DatamodelError::DuplicateTopError { span, .. } => *span,
-      DatamodelError::DuplicateFieldError { span, .. } => *span,
-      DatamodelError::DuplicateEnumValueError { span, .. } => *span,
-      DatamodelError::DuplicateArgumentError { span, .. } => *span,
-      DatamodelError::DuplicateModelDatabaseNameError { span, .. } => *span,
-      DatamodelError::DuplicateDefaultArgumentError { span, .. } => *span,
-      DatamodelError::UnusedArgumentError { span, .. } => *span,
-      DatamodelError::ScalarListFieldsAreNotSupported {span, ..} => *span,
-      DatamodelError::MultipleIndexesWithSameNameAreNotSupported {span, ..} => *span,
-      DatamodelError::FieldValidationError {span , ..} => *span,
-      DatamodelError::SourceValidationError {span, ..} => *span,
-      DatamodelError::EnumValidationError {span, ..} => *span,
-      DatamodelError::ConnectorError { span, .. } => *span,
-      DatamodelError::PreviewFeatureNotKnownError {span, ..} => *span,
-      DatamodelError::ShadowDatabaseUrlIsSameAsMainUrl { span, .. } => *span,
+    pub fn new_functional_evaluation_error(message: &str, span: Span) -> DatamodelError {
+        DatamodelError::FunctionalEvaluationError {
+            message: String::from(message),
+            span,
+        }
     }
-  }
-  pub fn description(&self) -> String {
-    format!("{}", self)
-  }
 
-  pub fn pretty_print(&self, f: &mut dyn std::io::Write, file_name: &str, text: &str) -> std::io::Result<()> {
-    pretty_print(f, file_name, text, self.span(), self.description().as_str())
-  }
+    pub fn new_environment_functional_evaluation_error(var_name: String, span: Span) -> DatamodelError {
+        DatamodelError::EnvironmentFunctionalEvaluationError { var_name, span }
+    }
+
+    pub fn new_type_not_found_error(type_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::TypeNotFoundError {
+            type_name: String::from(type_name),
+            span,
+        }
+    }
+
+    pub fn new_scalar_type_not_found_error(type_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::ScalarTypeNotFoundError {
+            type_name: String::from(type_name),
+            span,
+        }
+    }
+
+    pub fn new_attribute_not_known_error(attribute_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::AttributeNotKnownError {
+            attribute_name: String::from(attribute_name),
+            span,
+        }
+    }
+
+    pub fn new_function_not_known_error(function_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::FunctionNotKnownError {
+            function_name: String::from(function_name),
+            span,
+        }
+    }
+
+    pub fn new_datasource_provider_not_known_error(provider: &str, span: Span) -> DatamodelError {
+        DatamodelError::DatasourceProviderNotKnownError {
+            provider: String::from(provider),
+            span,
+        }
+    }
+
+    pub fn new_shadow_database_is_same_as_main_url_error(source_name: String, span: Span) -> DatamodelError {
+        DatamodelError::ShadowDatabaseUrlIsSameAsMainUrl { source_name, span }
+    }
+
+    pub fn new_preview_feature_not_known_error(
+        preview_feature: &str,
+        expected_preview_features: String,
+        span: Span,
+    ) -> DatamodelError {
+        DatamodelError::PreviewFeatureNotKnownError {
+            preview_feature: String::from(preview_feature),
+            expected_preview_features,
+            span,
+        }
+    }
+
+    pub fn new_value_parser_error(expected_type: &str, parser_error: &str, raw: &str, span: Span) -> DatamodelError {
+        DatamodelError::ValueParserError {
+            expected_type: String::from(expected_type),
+            parser_error: String::from(parser_error),
+            raw: String::from(raw),
+            span,
+        }
+    }
+
+    pub fn new_type_mismatch_error(expected_type: &str, received_type: &str, raw: &str, span: Span) -> DatamodelError {
+        DatamodelError::TypeMismatchError {
+            expected_type: String::from(expected_type),
+            received_type: String::from(received_type),
+            raw: String::from(raw),
+            span,
+        }
+    }
+
+    pub fn span(&self) -> Span {
+        match self {
+            DatamodelError::ArgumentNotFound { span, .. } => *span,
+            DatamodelError::AttributeArgumentNotFound { span, .. } => *span,
+            DatamodelError::ArgumentCountMissmatch { span, .. } => *span,
+            DatamodelError::SourceArgumentNotFound { span, .. } => *span,
+            DatamodelError::GeneratorArgumentNotFound { span, .. } => *span,
+            DatamodelError::AttributeValidationError { span, .. } => *span,
+            DatamodelError::AttributeNotKnownError { span, .. } => *span,
+            DatamodelError::ReservedScalarTypeError { span, .. } => *span,
+            DatamodelError::FunctionNotKnownError { span, .. } => *span,
+            DatamodelError::DatasourceProviderNotKnownError { span, .. } => *span,
+            DatamodelError::LiteralParseError { span, .. } => *span,
+            DatamodelError::TypeNotFoundError { span, .. } => *span,
+            DatamodelError::ScalarTypeNotFoundError { span, .. } => *span,
+            DatamodelError::ParserError { span, .. } => *span,
+            DatamodelError::FunctionalEvaluationError { span, .. } => *span,
+            DatamodelError::EnvironmentFunctionalEvaluationError { span, .. } => *span,
+            DatamodelError::TypeMismatchError { span, .. } => *span,
+            DatamodelError::ValueParserError { span, .. } => *span,
+            DatamodelError::ValidationError { span, .. } => *span,
+            DatamodelError::LegacyParserError { span, .. } => *span,
+            DatamodelError::ModelValidationError { span, .. } => *span,
+            DatamodelError::DuplicateAttributeError { span, .. } => *span,
+            DatamodelError::DuplicateConfigKeyError { span, .. } => *span,
+            DatamodelError::DuplicateTopError { span, .. } => *span,
+            DatamodelError::DuplicateFieldError { span, .. } => *span,
+            DatamodelError::DuplicateEnumValueError { span, .. } => *span,
+            DatamodelError::DuplicateArgumentError { span, .. } => *span,
+            DatamodelError::DuplicateModelDatabaseNameError { span, .. } => *span,
+            DatamodelError::DuplicateDefaultArgumentError { span, .. } => *span,
+            DatamodelError::UnusedArgumentError { span, .. } => *span,
+            DatamodelError::ScalarListFieldsAreNotSupported { span, .. } => *span,
+            DatamodelError::MultipleIndexesWithSameNameAreNotSupported { span, .. } => *span,
+            DatamodelError::FieldValidationError { span, .. } => *span,
+            DatamodelError::SourceValidationError { span, .. } => *span,
+            DatamodelError::EnumValidationError { span, .. } => *span,
+            DatamodelError::ConnectorError { span, .. } => *span,
+            DatamodelError::PreviewFeatureNotKnownError { span, .. } => *span,
+            DatamodelError::ShadowDatabaseUrlIsSameAsMainUrl { span, .. } => *span,
+        }
+    }
+    pub fn description(&self) -> String {
+        format!("{}", self)
+    }
+
+    pub fn pretty_print(&self, f: &mut dyn std::io::Write, file_name: &str, text: &str) -> std::io::Result<()> {
+        pretty_print(f, file_name, text, self.span(), self.description().as_str())
+    }
 }

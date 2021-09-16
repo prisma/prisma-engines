@@ -1,11 +1,11 @@
 datasource chinook {
   provider = "sqlite"
-  url      = "file:./db/Chinook.db?connection_limit=1&socket_timeout=20"
+  url      = "file:./db/Chinook.db?connection_limit=5&socket_timeout=20"
 }
 
 generator js {
   provider        = "prisma-client-js"
-  previewFeatures = ["microsoftSqlServer", "mongodb", "orderByRelation", "napi", "selectRelationCount", "orderByAggregateGroup"]
+  previewFeatures = ["mongodb", "orderByRelation", "napi", "selectRelationCount", "orderByAggregateGroup", "interactiveTransactions"]
 }
 
 model Album {

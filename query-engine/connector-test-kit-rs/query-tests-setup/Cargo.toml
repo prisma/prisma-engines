@@ -12,7 +12,7 @@ sql-datamodel-connector = { path = "../../../libs/datamodel/connectors/sql-datam
 prisma-models = { path = "../../../libs/prisma-models" }
 lazy_static = "1.4"
 enum_dispatch = "0.3"
-migration-core = { path = "../../../migration-engine/core" }
+migration-core = { path = "../../../migration-engine/core", features = ["sql", "mongodb"] }
 request-handlers = { path = "../../request-handlers" }
 tokio = "1.0"
 query-core = { path = "../../core" }
@@ -24,6 +24,7 @@ itertools = "0.10"
 regex = "1"
 serde = "1.0"
 tracing = "0.1.12"
+tracing-futures = "0.2.1"
 tracing-subscriber = { version = "0.2", features = ["fmt"] }
 tracing-error = "0.1.2"
 colored = "2"

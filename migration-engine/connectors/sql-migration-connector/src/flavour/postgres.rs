@@ -1,22 +1,28 @@
 use crate::{
-    connect, connection_wrapper::Connection, error::quaint_error_to_connector_error, SqlFlavour, SqlMigrationConnector,
+    connection_wrapper::{connect, quaint_error_to_connector_error, Connection},
+    sql_renderer::IteratorJoin,
+    SqlFlavour, SqlMigrationConnector,
 };
+use datamodel::common::preview_features::PreviewFeature;
+use enumflags2::BitFlags;
 use indoc::indoc;
-use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
-use quaint::{connector::PostgresUrl, error::ErrorKind as QuaintKind};
+use migration_connector::{migrations_directory::MigrationDirectory, ConnectorError, ConnectorResult};
+use quaint::connector::{tokio_postgres::error::ErrorPosition, PostgresUrl};
 use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
 use std::collections::HashMap;
 use url::Url;
 use user_facing_errors::{
     common::{DatabaseAccessDenied, DatabaseDoesNotExist},
     introspection_engine::DatabaseSchemaInconsistent,
-    migration_engine, KnownError, UserFacingError,
+    migration_engine::{self, ApplyMigrationError},
+    KnownError, UserFacingError,
 };
 
 const ADVISORY_LOCK_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(10);
 
 pub(crate) struct PostgresFlavour {
     url: PostgresUrl,
+    preview_features: BitFlags<PreviewFeature>,
 }
 
 impl std::fmt::Debug for PostgresFlavour {
@@ -26,8 +32,8 @@ impl std::fmt::Debug for PostgresFlavour {
 }
 
 impl PostgresFlavour {
-    pub fn new(url: PostgresUrl) -> Self {
-        Self { url }
+    pub fn new(url: PostgresUrl, preview_features: BitFlags<PreviewFeature>) -> Self {
+        Self { url, preview_features }
     }
 
     pub(crate) fn schema_name(&self) -> &str {
@@ -72,9 +78,10 @@ impl PostgresFlavour {
 
         let mut shadow_database_url = self.url.url().clone();
         shadow_database_url.set_path(&format!("/{}", database_name));
+        let host = shadow_database_url.host();
         let shadow_database_url = shadow_database_url.to_string();
 
-        tracing::debug!("Connecting to shadow database at {}", shadow_database_url);
+        tracing::debug!("Connecting to shadow database at {:?}/{}", host, database_name);
 
         let shadow_database_conn = crate::connect(&shadow_database_url).await?;
 
@@ -113,6 +120,90 @@ impl SqlFlavour for PostgresFlavour {
         Ok(())
     }
 
+    async fn run_query_script(&self, sql: &str, connection: &Connection) -> ConnectorResult<()> {
+        Ok(connection.raw_cmd(sql).await?)
+    }
+
+    async fn apply_migration_script(
+        &self,
+        migration_name: &str,
+        script: &str,
+        conn: &Connection,
+    ) -> ConnectorResult<()> {
+        let (client, _url) = conn.unwrap_postgres();
+        let inner_client = client.client();
+
+        match inner_client.simple_query(script).await {
+            Ok(_) => Ok(()),
+            Err(err) => {
+                let (database_error_code, database_error): (Option<&str>, _) = if let Some(db_error) = err.as_db_error()
+                {
+                    let position = if let Some(ErrorPosition::Original(position)) = db_error.position() {
+                        let mut previous_lines = [""; 5];
+                        let mut byte_index = 0;
+                        let mut error_position = String::new();
+
+                        for (line_idx, line) in script.lines().enumerate() {
+                            // Line numbers start at 1, not 0.
+                            let line_number = line_idx + 1;
+                            byte_index += line.len() + 1; // + 1 for the \n character.
+
+                            if *position as usize <= byte_index {
+                                let numbered_lines = previous_lines
+                                    .iter()
+                                    .enumerate()
+                                    .filter_map(|(idx, line)| {
+                                        line_number
+                                            .checked_sub(previous_lines.len() - idx)
+                                            .map(|idx| (idx, line))
+                                    })
+                                    .map(|(idx, line)| {
+                                        format!(
+                                            "\x1b[1m{:>3}\x1b[0m{}{}",
+                                            idx,
+                                            if line.is_empty() { "" } else { " " },
+                                            line
+                                        )
+                                    })
+                                    .join("\n");
+
+                                error_position = format!(
+                                    "\n\nPosition:\n{}\n\x1b[1m{:>3}\x1b[1;31m {}\x1b[0m",
+                                    numbered_lines, line_number, line
+                                );
+                                break;
+                            } else {
+                                previous_lines = [
+                                    previous_lines[1],
+                                    previous_lines[2],
+                                    previous_lines[3],
+                                    previous_lines[4],
+                                    line,
+                                ];
+                            }
+                        }
+
+                        error_position
+                    } else {
+                        String::new()
+                    };
+
+                    let database_error = format!("{}{}\n\n{:?}", db_error, position, db_error);
+
+                    (Some(db_error.code().code()), database_error)
+                } else {
+                    (err.code().map(|c| c.code()), err.to_string())
+                };
+
+                Err(ConnectorError::user_facing(ApplyMigrationError {
+                    migration_name: migration_name.to_owned(),
+                    database_error_code: database_error_code.unwrap_or("none").to_owned(),
+                    database_error,
+                }))
+            }
+        }
+    }
+
     #[tracing::instrument(skip(database_str))]
     async fn create_database(&self, database_str: &str) -> ConnectorResult<String> {
         let mut url = Url::parse(database_str).map_err(ConnectorError::url_parse_error)?;
@@ -128,10 +219,10 @@ impl SqlFlavour for PostgresFlavour {
 
         match conn.raw_cmd(&query).await {
             Ok(_) => (),
-            Err(err) if matches!(err.kind(), QuaintKind::DatabaseAlreadyExists { .. }) => {
+            Err(err) if err.is_user_facing_error::<user_facing_errors::common::DatabaseAlreadyExists>() => {
                 database_already_exists_error = Some(err)
             }
-            Err(err) if matches!(err.kind(), QuaintKind::UniqueConstraintViolation { .. }) => {
+            Err(err) if err.is_user_facing_error::<user_facing_errors::query_engine::UniqueKeyViolation>() => {
                 database_already_exists_error = Some(err)
             }
             Err(err) => return Err(err.into()),
@@ -171,12 +262,12 @@ impl SqlFlavour for PostgresFlavour {
     }
 
     async fn describe_schema<'a>(&'a self, connection: &Connection) -> ConnectorResult<SqlSchema> {
-        sql_schema_describer::postgres::SqlSchemaDescriber::new(connection.quaint().clone(), Default::default())
+        sql_schema_describer::postgres::SqlSchemaDescriber::new(connection.queryable(), Default::default())
             .describe(connection.connection_info().schema_name())
             .await
             .map_err(|err| match err.into_kind() {
                 DescriberErrorKind::QuaintError(err) => {
-                    quaint_error_to_connector_error(err, connection.connection_info())
+                    quaint_error_to_connector_error(err, &connection.connection_info())
                 }
                 e @ DescriberErrorKind::CrossSchemaReference { .. } => {
                     let err = KnownError::new(DatabaseSchemaInconsistent {
@@ -209,7 +300,7 @@ impl SqlFlavour for PostgresFlavour {
 
     #[tracing::instrument]
     async fn ensure_connection_validity(&self, connection: &Connection) -> ConnectorResult<()> {
-        let schema_name = connection.connection_info().schema_name();
+        let schema_name = connection.schema_name();
         let schema_exists_result = connection
             .query_raw(
                 "SELECT EXISTS(SELECT 1 FROM pg_namespace WHERE nspname = $1)",
@@ -262,7 +353,7 @@ impl SqlFlavour for PostgresFlavour {
     }
 
     async fn reset(&self, connection: &Connection) -> ConnectorResult<()> {
-        let schema_name = connection.connection_info().schema_name();
+        let schema_name = connection.schema_name();
 
         connection
             .raw_cmd(&format!("DROP SCHEMA \"{}\" CASCADE", schema_name))
@@ -273,6 +364,10 @@ impl SqlFlavour for PostgresFlavour {
             .await?;
 
         Ok(())
+    }
+
+    fn preview_features(&self) -> BitFlags<PreviewFeature> {
+        self.preview_features
     }
 
     #[tracing::instrument(skip(self, migrations, connection, connector))]
@@ -380,7 +475,7 @@ mod tests {
     fn debug_impl_does_not_leak_connection_info() {
         let url = "postgresql://myname:mypassword@myserver:8765/mydbname";
 
-        let flavour = PostgresFlavour::new(PostgresUrl::new(url.parse().unwrap()).unwrap());
+        let flavour = PostgresFlavour::new(PostgresUrl::new(url.parse().unwrap()).unwrap(), BitFlags::empty());
         let debugged = format!("{:?}", flavour);
 
         let words = &["myname", "mypassword", "myserver", "8765", "mydbname"];

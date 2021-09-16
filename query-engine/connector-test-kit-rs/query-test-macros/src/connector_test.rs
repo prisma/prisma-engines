@@ -1,9 +1,9 @@
-use crate::ConnectorTestArgs;
+use super::*;
+use crate::utils::quote_connector;
 use darling::FromMeta;
 use itertools::Itertools;
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
-use query_tests_setup::{ConnectorTag, ConnectorTagInterface};
 use quote::quote;
 use syn::{parse_macro_input, AttributeArgs, ItemFn};
 
@@ -34,7 +34,7 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
     if test_function.sig.inputs.len() != 1 {
         return syn::Error::new_spanned(
             test_function.sig,
-            "connector test functions must take exactly one argument: `runner: &Runner`.",
+            "connector test functions must take exactly one argument: `runner: Runner`.",
         )
         .to_compile_error()
         .into();
@@ -89,10 +89,10 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
                 let connector = config.test_connector_tag().unwrap();
 
                 query_tests_setup::run_with_tokio(async move {
-                    tracing::debug!("Used datamodel:\n {}", datamodel.clone().yellow());
+                    tracing::debug!("Used datamodel:\n {}", datamodel.yellow());
                     let runner = Runner::load(config.runner(), datamodel.clone(), connector).await.unwrap();
                     query_tests_setup::setup_project(&datamodel).await.unwrap();
-                    #runner_fn_ident(&runner).await.unwrap();
+                    #runner_fn_ident(runner).await.unwrap();
                 }.with_subscriber(test_tracing_subscriber(std::env::var("LOG_LEVEL").unwrap_or("info".to_string()))));
             }
         }
@@ -101,17 +101,4 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
     };
 
     test.into()
-}
-
-fn quote_connector(tag: ConnectorTag) -> proc_macro2::TokenStream {
-    let (connector, version) = tag.as_parse_pair();
-
-    match version {
-        Some(version) => quote! {
-            ConnectorTag::try_from((#connector, Some(#version))).unwrap()
-        },
-        None => quote! {
-            ConnectorTag::try_from(#connector).unwrap()
-        },
-    }
 }

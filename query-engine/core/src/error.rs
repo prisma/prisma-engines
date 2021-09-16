@@ -1,6 +1,6 @@
 use crate::{
     InterpreterError, QueryGraphBuilderError, QueryGraphError, QueryParserError, QueryParserErrorKind,
-    RelationViolation,
+    RelationViolation, TransactionError,
 };
 use connector::error::ConnectorError;
 use prisma_models::DomainError;
@@ -38,6 +38,9 @@ pub enum CoreError {
 
     #[error("{}", _0)]
     ConfigurationError(String),
+
+    #[error("{}", _0)]
+    TransactionError(#[from] TransactionError),
 }
 
 impl CoreError {
@@ -100,6 +103,12 @@ impl From<connection_string::Error> for CoreError {
 impl From<CoreError> for user_facing_errors::Error {
     fn from(err: CoreError) -> user_facing_errors::Error {
         match err {
+            CoreError::TransactionError(err) => {
+                user_facing_errors::KnownError::new(user_facing_errors::query_engine::InteractiveTransactionError {
+                    error: err.to_string(),
+                })
+                .into()
+            }
             CoreError::ConnectorError(ConnectorError {
                 user_facing_error: Some(user_facing_error),
                 ..

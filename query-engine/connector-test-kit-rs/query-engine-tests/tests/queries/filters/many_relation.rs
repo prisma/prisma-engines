@@ -1,8 +1,10 @@
-use indoc::indoc;
 use query_engine_tests::*;
 
 #[test_suite(schema(schema))]
 mod many_relation {
+    use indoc::indoc;
+    use query_engine_tests::run_query;
+
     fn schema() -> String {
         let schema = indoc! {
             r#"
@@ -35,11 +37,11 @@ mod many_relation {
     }
 
     #[connector_test]
-    async fn simple_scalar_filter(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn simple_scalar_filter(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyBlog { posts(where: { popularity: { gte: 5 }}, orderBy: { id: asc }) { title }}}"#),
+          run_query!(&runner, r#"query { findManyBlog { posts(where: { popularity: { gte: 5 }}, orderBy: { id: asc }) { title }}}"#),
           @r###"{"data":{"findManyBlog":[{"posts":[{"title":"post 1"}]},{"posts":[{"title":"post 3"}]}]}}"###
         );
 
@@ -48,11 +50,11 @@ mod many_relation {
 
     // 1 level to-one-relation filter
     #[connector_test]
-    async fn l1_1_rel(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn l1_1_rel(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyPost(where: { blog: { is: { name: { equals: "blog 1" }}}}, orderBy: { id: asc }) { title }}"#),
+          run_query!(&runner, r#"query { findManyPost(where: { blog: { is: { name: { equals: "blog 1" }}}}, orderBy: { id: asc }) { title }}"#),
           @r###"{"data":{"findManyPost":[{"title":"post 1"},{"title":"post 2"}]}}"###
         );
 
@@ -61,26 +63,26 @@ mod many_relation {
 
     // 1 level to-many-relation filter, `some` operation.
     #[connector_test]
-    async fn l1_m_rel_some(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn l1_m_rel_some(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyBlog(where: { posts: { some: { popularity: { gte: 5 }}}}, orderBy: { id: asc }) { name }}"#),
+          run_query!(&runner, r#"query { findManyBlog(where: { posts: { some: { popularity: { gte: 5 }}}}, orderBy: { id: asc }) { name }}"#),
           @r###"{"data":{"findManyBlog":[{"name":"blog 1"},{"name":"blog 2"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyBlog(where: { posts: { some: { popularity: { gte: 50 }}}}) { name }}"#),
+          run_query!(&runner, r#"query { findManyBlog(where: { posts: { some: { popularity: { gte: 50 }}}}) { name }}"#),
           @r###"{"data":{"findManyBlog":[{"name":"blog 2"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyBlog(where: { posts: { some: { AND: [{ title: { equals: "post 1" }}, { title: { equals: "post 2" }}]}}}) { name }}"#),
+          run_query!(&runner, r#"query { findManyBlog(where: { posts: { some: { AND: [{ title: { equals: "post 1" }}, { title: { equals: "post 2" }}]}}}) { name }}"#),
           @r###"{"data":{"findManyBlog":[]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, indoc!{ r#"
+          run_query!(&runner, indoc!{ r#"
               query {
                 findManyBlog(
                   where: {
@@ -98,7 +100,7 @@ mod many_relation {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, indoc!{ r#"
+          run_query!(&runner, indoc!{ r#"
               query {
                 findManyBlog(
                   where: {
@@ -121,21 +123,21 @@ mod many_relation {
 
     // 1 level to-many-relation filter, `every` operation.
     #[connector_test]
-    async fn l1_m_rel_every(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn l1_m_rel_every(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyBlog(where: { posts: { every: { popularity: { gte: 2 }}}}, orderBy: { id: asc }) { name }}"#),
+          run_query!(&runner, r#"query { findManyBlog(where: { posts: { every: { popularity: { gte: 2 }}}}, orderBy: { id: asc }) { name }}"#),
           @r###"{"data":{"findManyBlog":[{"name":"blog 1"},{"name":"blog 2"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyBlog(where: { posts: { every: { popularity: { gte: 3 }}}}) { name }}"#),
+          run_query!(&runner, r#"query { findManyBlog(where: { posts: { every: { popularity: { gte: 3 }}}}) { name }}"#),
           @r###"{"data":{"findManyBlog":[{"name":"blog 2"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyBlog(where: { posts: { some: { AND: [{ title: { equals: "post 1" }}, { title: { equals: "post 2" }}]}}}) { name }}"#),
+          run_query!(&runner, r#"query { findManyBlog(where: { posts: { some: { AND: [{ title: { equals: "post 1" }}, { title: { equals: "post 2" }}]}}}) { name }}"#),
           @r###"{"data":{"findManyBlog":[]}}"###
         );
 
@@ -144,16 +146,16 @@ mod many_relation {
 
     // 1 level to-many-relation filter, `none` operation.
     #[connector_test]
-    async fn l1_m_rel_none(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn l1_m_rel_none(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyBlog(where: { posts: { none: { popularity: { gte: 50 }}}}) { name }}"#),
+          run_query!(&runner, r#"query { findManyBlog(where: { posts: { none: { popularity: { gte: 50 }}}}) { name }}"#),
           @r###"{"data":{"findManyBlog":[{"name":"blog 1"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyBlog(where: { posts: { none: { popularity: { gte: 5 }}}}) { name }}"#),
+          run_query!(&runner, r#"query { findManyBlog(where: { posts: { none: { popularity: { gte: 5 }}}}) { name }}"#),
           @r###"{"data":{"findManyBlog":[]}}"###
         );
 
@@ -162,16 +164,16 @@ mod many_relation {
 
     // 2 levels to-many-relation filter, `some`/`some` combination.
     #[connector_test]
-    async fn l2_m_rel_some_some(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn l2_m_rel_some_some(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyBlog(where: { posts: { some: { comments: { some: { likes: { equals: 0 }}}}}}) { name }}"#),
+          run_query!(&runner, r#"query { findManyBlog(where: { posts: { some: { comments: { some: { likes: { equals: 0 }}}}}}) { name }}"#),
           @r###"{"data":{"findManyBlog":[{"name":"blog 1"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyBlog(where: { posts: { some: { comments: { some: { likes: { equals: 1 }}}}}}) { name }}"#),
+          run_query!(&runner, r#"query { findManyBlog(where: { posts: { some: { comments: { some: { likes: { equals: 1 }}}}}}) { name }}"#),
           @r###"{"data":{"findManyBlog":[]}}"###
         );
 
@@ -180,94 +182,94 @@ mod many_relation {
 
     // 2 levels to-many-relation filter, all combinations.
     #[connector_test]
-    async fn l2_m_rel_all(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn l2_m_rel_all(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         // some|every
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyBlog(where: { posts: { some: { comments: { every: { likes: { gte: 0 }}}}}}, orderBy: { id: asc }) { name }}"#),
+          run_query!(&runner, r#"query { findManyBlog(where: { posts: { some: { comments: { every: { likes: { gte: 0 }}}}}}, orderBy: { id: asc }) { name }}"#),
           @r###"{"data":{"findManyBlog":[{"name":"blog 1"},{"name":"blog 2"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query {findManyBlog(where: { posts: { some: { comments: { every: { likes: { equals: 0 }}}}}}) { name }}"#),
+          run_query!(&runner, r#"query {findManyBlog(where: { posts: { some: { comments: { every: { likes: { equals: 0 }}}}}}) { name }}"#),
           @r###"{"data":{"findManyBlog":[]}}"###
         );
 
         // some|none
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyBlog(where: { posts: { some: { comments: { none: { likes: { equals: 0 }}}}}}, orderBy: { id: asc }) { name }}"#),
+          run_query!(&runner, r#"query { findManyBlog(where: { posts: { some: { comments: { none: { likes: { equals: 0 }}}}}}, orderBy: { id: asc }) { name }}"#),
           @r###"{"data":{"findManyBlog":[{"name":"blog 1"},{"name":"blog 2"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyBlog(where: { posts: { some: { comments: { none: { likes: { gte: 0 }}}}}}) { name }}"#),
+          run_query!(&runner, r#"query { findManyBlog(where: { posts: { some: { comments: { none: { likes: { gte: 0 }}}}}}) { name }}"#),
           @r###"{"data":{"findManyBlog":[]}}"###
         );
 
         // every|some
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyBlog(where: { posts: { every: { comments: { some: { likes: { equals: 10 }}}}}}) { name }}"#),
+          run_query!(&runner, r#"query { findManyBlog(where: { posts: { every: { comments: { some: { likes: { equals: 10 }}}}}}) { name }}"#),
           @r###"{"data":{"findManyBlog":[{"name":"blog 1"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyBlog(where: { posts: { every: { comments: { some: { likes: { equals: 0 }}}}}}) { name }}"#),
+          run_query!(&runner, r#"query { findManyBlog(where: { posts: { every: { comments: { some: { likes: { equals: 0 }}}}}}) { name }}"#),
           @r###"{"data":{"findManyBlog":[]}}"###
         );
 
         // every|every
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyBlog(where: { posts: { every: { comments: { every: { likes: { gte: 0 }}}}}}, orderBy: { id: asc }) { name }}"#),
+          run_query!(&runner, r#"query { findManyBlog(where: { posts: { every: { comments: { every: { likes: { gte: 0 }}}}}}, orderBy: { id: asc }) { name }}"#),
           @r###"{"data":{"findManyBlog":[{"name":"blog 1"},{"name":"blog 2"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyBlog(where: { posts: { every: { comments: { every: { likes: { equals: 0 }}}}}}) { name }}"#),
+          run_query!(&runner, r#"query { findManyBlog(where: { posts: { every: { comments: { every: { likes: { equals: 0 }}}}}}) { name }}"#),
           @r###"{"data":{"findManyBlog":[]}}"###
         );
 
         // every|none
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyBlog(where: { posts: { every: { comments: { none: { likes: { gte: 100 }}}}}}) { name }}"#),
+          run_query!(&runner, r#"query { findManyBlog(where: { posts: { every: { comments: { none: { likes: { gte: 100 }}}}}}) { name }}"#),
           @r###"{"data":{"findManyBlog":[{"name":"blog 1"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyBlog(where: { posts: { every: { comments: { none: { likes: { equals: 0 }}}}}}) { name }}"#),
+          run_query!(&runner, r#"query { findManyBlog(where: { posts: { every: { comments: { none: { likes: { equals: 0 }}}}}}) { name }}"#),
           @r###"{"data":{"findManyBlog":[{"name":"blog 2"}]}}"###
         );
 
         // none|some
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyBlog(where: { posts: { none: { comments: { some: { likes: { gte: 100 }}}}}}) { name }}"#),
+          run_query!(&runner, r#"query { findManyBlog(where: { posts: { none: { comments: { some: { likes: { gte: 100 }}}}}}) { name }}"#),
           @r###"{"data":{"findManyBlog":[{"name":"blog 1"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyBlog(where: { posts: { none: { comments: { some: { likes: { equals: 0 }}}}}}) { name }}"#),
+          run_query!(&runner, r#"query { findManyBlog(where: { posts: { none: { comments: { some: { likes: { equals: 0 }}}}}}) { name }}"#),
           @r###"{"data":{"findManyBlog":[{"name":"blog 2"}]}}"###
         );
 
         // none|every
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyBlog(where: { posts: { none: { comments: { every: { likes: { gte: 11 }}}}}}) { name }}"#),
+          run_query!(&runner, r#"query { findManyBlog(where: { posts: { none: { comments: { every: { likes: { gte: 11 }}}}}}) { name }}"#),
           @r###"{"data":{"findManyBlog":[{"name":"blog 1"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyBlog(where: { posts: { none: { comments: { every: { likes: { gte: 0 }}}}}}) { name }}"#),
+          run_query!(&runner, r#"query { findManyBlog(where: { posts: { none: { comments: { every: { likes: { gte: 0 }}}}}}) { name }}"#),
           @r###"{"data":{"findManyBlog":[]}}"###
         );
 
         // none|none
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyBlog(where: { posts: { none: { comments: { none: { likes: { gte: 0 }}}}}}, orderBy: { id: asc }) { name }}"#),
+          run_query!(&runner, r#"query { findManyBlog(where: { posts: { none: { comments: { none: { likes: { gte: 0 }}}}}}, orderBy: { id: asc }) { name }}"#),
           @r###"{"data":{"findManyBlog":[{"name":"blog 1"},{"name":"blog 2"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyBlog(where: { posts: { none: { comments: { none: { likes: { gte: 11 }}}}}}) { name }}"#),
+          run_query!(&runner, r#"query { findManyBlog(where: { posts: { none: { comments: { none: { likes: { gte: 11 }}}}}}) { name }}"#),
           @r###"{"data":{"findManyBlog":[{"name":"blog 2"}]}}"###
         );
 
@@ -276,11 +278,11 @@ mod many_relation {
 
     // Note: Only the original author knows why this is considered crazy.
     #[connector_test]
-    async fn crazy_filters(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn crazy_filters(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, indoc! { r#"
+          run_query!(&runner, indoc! { r#"
             query {
               findManyPost(
                 where: {
@@ -327,7 +329,7 @@ mod many_relation {
     }
 
     #[connector_test(schema(special_case_schema))]
-    async fn m2m_join_relation_1level(runner: &Runner) -> TestResult<()> {
+    async fn m2m_join_relation_1level(runner: Runner) -> TestResult<()> {
         runner
             .query(r#"mutation { createOnePost(data: { title: "Title1" }) { title }}"#)
             .await?
@@ -359,17 +361,17 @@ mod many_relation {
             .assert_success();
 
         insta::assert_snapshot!(
-            run_query!(runner, r#"query { findManyAUser (orderBy: { id: asc }){ name, posts(orderBy: { id: asc }) { title }}}"#),
+            run_query!(&runner, r#"query { findManyAUser (orderBy: { id: asc }){ name, posts(orderBy: { id: asc }) { title }}}"#),
             @r###"{"data":{"findManyAUser":[{"name":"Author1","posts":[{"title":"Title1"},{"title":"Title2"}]},{"name":"Author2","posts":[{"title":"Title1"},{"title":"Title2"}]}]}}"###
         );
 
         insta::assert_snapshot!(
-            run_query!(runner, r#"query { findManyPost(orderBy: { id: asc }) { title, authors (orderBy: { id: asc }){ name }}}"#),
+            run_query!(&runner, r#"query { findManyPost(orderBy: { id: asc }) { title, authors (orderBy: { id: asc }){ name }}}"#),
             @r###"{"data":{"findManyPost":[{"title":"Title1","authors":[{"name":"Author1"},{"name":"Author2"}]},{"title":"Title2","authors":[{"name":"Author1"},{"name":"Author2"}]}]}}"###
         );
 
         insta::assert_snapshot!(
-            run_query!(runner, r#"query { findManyAUser(where: { name: { startsWith: "Author2" }, posts: { some: { title: { endsWith: "1" }}}}, orderBy: { id: asc }) { name, posts(orderBy: { id: asc }) { title }}}"#),
+            run_query!(&runner, r#"query { findManyAUser(where: { name: { startsWith: "Author2" }, posts: { some: { title: { endsWith: "1" }}}}, orderBy: { id: asc }) { name, posts(orderBy: { id: asc }) { title }}}"#),
             @r###"{"data":{"findManyAUser":[{"name":"Author2","posts":[{"title":"Title1"},{"title":"Title2"}]}]}}"###
         );
 

@@ -1,5 +1,6 @@
 use super::{Datamodel, Enum, EnumValue, Field, Function, Model, UniqueIndex};
-use crate::{dml, FieldType, Ignorable, IndexType, ScalarType};
+use crate::json::dmmf::PrimaryKey;
+use crate::{dml, FieldType, Ignorable, ScalarType};
 use bigdecimal::ToPrimitive;
 use prisma_value::PrismaValue;
 
@@ -20,11 +21,11 @@ fn schema_to_dmmf(schema: &dml::Datamodel) -> Datamodel {
     };
 
     for enum_model in schema.enums() {
-        datamodel.enums.push(enum_to_dmmf(&enum_model));
+        datamodel.enums.push(enum_to_dmmf(enum_model));
     }
 
     for model in schema.models().filter(|model| !model.is_ignored) {
-        datamodel.models.push(model_to_dmmf(&model));
+        datamodel.models.push(model_to_dmmf(model));
     }
 
     datamodel
@@ -53,6 +54,15 @@ fn enum_value_to_dmmf(en: &dml::EnumValue) -> EnumValue {
 }
 
 fn model_to_dmmf(model: &dml::Model) -> Model {
+    let primary_key = if let Some(pk) = &model.primary_key {
+        (!pk.defined_on_field).then(|| PrimaryKey {
+            name: pk.name.clone(),
+            fields: pk.fields.clone(),
+        })
+    } else {
+        None
+    };
+
     Model {
         name: model.name.clone(),
         db_name: model.database_name.clone(),
@@ -64,30 +74,20 @@ fn model_to_dmmf(model: &dml::Model) -> Model {
             .collect(),
         is_generated: Some(model.is_generated),
         documentation: model.documentation.clone(),
-        id_fields: model.id_fields.clone(),
+        primary_key,
         unique_fields: model
             .indices
             .iter()
-            .filter_map(|i| {
-                if i.tpe == IndexType::Unique {
-                    Some(i.fields.clone())
-                } else {
-                    None
-                }
-            })
+            .filter_map(|i| (i.is_unique() && !i.defined_on_field).then(|| i.fields.clone()))
             .collect(),
         unique_indexes: model
             .indices
             .iter()
             .filter_map(|i| {
-                if i.tpe == IndexType::Unique {
-                    Some(UniqueIndex {
-                        name: i.name.clone(),
-                        fields: i.fields.clone(),
-                    })
-                } else {
-                    None
-                }
+                (i.is_unique() && !i.defined_on_field).then(|| UniqueIndex {
+                    name: i.name.clone(),
+                    fields: i.fields.clone(),
+                })
             })
             .collect(),
     }
@@ -103,11 +103,11 @@ fn field_to_dmmf(model: &dml::Model, field: &dml::Field) -> Field {
         kind: get_field_kind(field),
         is_required: *field.arity() == dml::FieldArity::Required || *field.arity() == dml::FieldArity::List,
         is_list: *field.arity() == dml::FieldArity::List,
-        is_id: field.is_id(),
+        is_id: model.field_is_primary(field.name()),
         is_read_only: a_relation_field_is_based_on_this_field,
         has_default_value: field.default_value().is_some(),
         default: default_value_to_serde(&field.default_value().cloned()),
-        is_unique: field.is_unique(),
+        is_unique: model.field_is_unique(field.name()),
         relation_name: get_relation_name(field),
         relation_from_fields: get_relation_from_fields(field),
         relation_to_fields: get_relation_to_fields(field),
@@ -123,16 +123,15 @@ fn get_field_kind(field: &dml::Field) -> String {
     match field.field_type() {
         dml::FieldType::Relation(_) => String::from("object"),
         dml::FieldType::Enum(_) => String::from("enum"),
-        dml::FieldType::Base(_, _) => String::from("scalar"),
-        dml::FieldType::NativeType(_, _) => String::from("scalar"),
+        dml::FieldType::Scalar(_, _, _) => String::from("scalar"),
         dml::FieldType::Unsupported(_) => String::from("unsupported"),
     }
 }
 
 fn default_value_to_serde(dv_opt: &Option<dml::DefaultValue>) -> Option<serde_json::Value> {
-    dv_opt.as_ref().map(|dv| match dv {
-        dml::DefaultValue::Single(value) => prisma_value_to_serde(&value.clone()),
-        dml::DefaultValue::Expression(vg) => function_to_serde(&vg.name, &vg.args),
+    dv_opt.as_ref().map(|dv| match dv.kind() {
+        dml::DefaultKind::Single(value) => prisma_value_to_serde(&value.clone()),
+        dml::DefaultKind::Expression(vg) => function_to_serde(vg.name(), vg.args()),
     })
 }
 
@@ -172,8 +171,7 @@ fn get_field_type(field: &dml::Field) -> String {
         dml::FieldType::Relation(relation_info) => relation_info.to.clone(),
         dml::FieldType::Enum(t) => t.clone(),
         dml::FieldType::Unsupported(t) => t.clone(),
-        dml::FieldType::Base(t, _) => type_to_string(t),
-        dml::FieldType::NativeType(t, _) => type_to_string(t),
+        dml::FieldType::Scalar(t, _, _) => type_to_string(t),
     }
 }
 
@@ -204,7 +202,7 @@ fn get_relation_to_fields(field: &dml::Field) -> Option<Vec<String>> {
 
 fn get_relation_delete_strategy(field: &dml::Field) -> Option<String> {
     match &field {
-        dml::Field::RelationField(rf) => Some(rf.relation_info.on_delete.to_string()),
+        dml::Field::RelationField(rf) => rf.relation_info.on_delete.map(|ri| ri.to_string()),
         _ => None,
     }
 }

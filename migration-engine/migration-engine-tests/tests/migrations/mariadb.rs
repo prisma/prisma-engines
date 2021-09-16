@@ -1,4 +1,4 @@
-use migration_engine_tests::sync_test_api::*;
+use migration_engine_tests::test_api::*;
 use quaint::ast as quaint_ast;
 
 #[test_connector(tags(Mariadb))]
@@ -9,7 +9,7 @@ fn foreign_keys_to_indexes_being_renamed_must_work(api: TestApi) {
             name String
             posts Post[]
 
-            @@unique([name], name: "idxname")
+            @@unique([name], name: "idxname", map: "idxname")
         }
 
         model Post {
@@ -19,17 +19,15 @@ fn foreign_keys_to_indexes_being_renamed_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.assert_schema()
         .assert_table("User", |table| {
-            table.assert_index_on_columns(&["name"], |idx| idx.assert_name("idxname"))
+            table.assert_index_on_columns(&["name"], |idx| idx.assert_is_unique().assert_name("idxname"))
         })
-        .unwrap()
         .assert_table("Post", |table| {
             table.assert_fk_on_columns(&["author"], |fk| fk.assert_references("User", &["name"]))
-        })
-        .unwrap();
+        });
 
     let insert_post = quaint_ast::Insert::single_into(api.render_table_name("Post"))
         .value("id", "the-post-id")
@@ -48,7 +46,7 @@ fn foreign_keys_to_indexes_being_renamed_must_work(api: TestApi) {
             name String
             posts Post[]
 
-            @@unique([name], name: "idxrenamed")
+            @@unique([name], name: "idxrenamed", map: "idxrenamed")
         }
 
         model Post {
@@ -58,15 +56,13 @@ fn foreign_keys_to_indexes_being_renamed_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green();
 
     api.assert_schema()
         .assert_table("User", |table| {
-            table.assert_index_on_columns(&["name"], |idx| idx.assert_name("idxrenamed"))
+            table.assert_index_on_columns(&["name"], |idx| idx.assert_is_unique().assert_name("idxrenamed"))
         })
-        .unwrap()
         .assert_table("Post", |table| {
             table.assert_fk_on_columns(&["author"], |fk| fk.assert_references("User", &["name"]))
-        })
-        .unwrap();
+        });
 }

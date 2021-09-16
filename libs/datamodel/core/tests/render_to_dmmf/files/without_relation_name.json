@@ -32,13 +32,12 @@
           "relationName": "PostToUser",
           "relationFromFields": [],
           "relationToFields": [],
-          "relationOnDelete": "NONE",
           "isGenerated": false,
           "isUpdatedAt": false
         }
       ],
       "isGenerated": false,
-      "idFields": [],
+      "primaryKey": null,
       "uniqueFields": [],
       "uniqueIndexes": []
     },
@@ -90,13 +89,12 @@
           "relationToFields": [
             "id"
           ],
-          "relationOnDelete": "NONE",
           "isGenerated": false,
           "isUpdatedAt": false
         }
       ],
       "isGenerated": false,
-      "idFields": [],
+      "primaryKey": null,
       "uniqueFields": [],
       "uniqueIndexes": []
     }

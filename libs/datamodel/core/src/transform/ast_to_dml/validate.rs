@@ -1,14 +1,17 @@
+#![allow(clippy::suspicious_operation_groupings)] // clippy is wrong there
+
+mod names;
+mod referential_actions;
+
 use crate::{
-    ast, configuration,
+    ast,
+    common::constraint_names::ConstraintNames,
+    configuration,
     diagnostics::{DatamodelError, Diagnostics},
     dml,
-    walkers::ModelWalker,
-    DefaultValue, FieldType,
 };
-use crate::{ast::WithAttributes, walkers::walk_models};
-use itertools::Itertools;
-use prisma_value::PrismaValue;
-use std::collections::{HashMap, HashSet};
+use datamodel_connector::ConnectorCapability;
+use names::NamesValidator;
 
 /// Helper for validating a datamodel.
 ///
@@ -29,358 +32,125 @@ impl<'a> Validator<'a> {
         Self { source }
     }
 
-    pub fn validate(&self, ast_schema: &ast::SchemaAst, schema: &mut dml::Datamodel) -> Result<(), Diagnostics> {
-        let mut all_errors = Diagnostics::new();
-
-        if let Err(ref mut errs) = self.validate_names(ast_schema) {
-            all_errors.append(errs);
-        }
-
-        if let Err(ref mut errs) = self.validate_names_for_indexes(ast_schema, schema) {
-            all_errors.append(errs);
-        }
-
-        // Model level validations.
+    pub(crate) fn validate(&self, ast: &ast::SchemaAst, schema: &dml::Datamodel, diagnostics: &mut Diagnostics) {
         for model in schema.models() {
-            // Having a separate error collection allows checking whether any error has occurred for a model.
-            let mut errors_for_model = Diagnostics::new();
+            let ast_model = ast.find_model(&model.name).expect(STATE_ERROR);
 
-            if let Some(sf) = model.scalar_fields().find(|f| f.is_id && !f.is_required()) {
-                if !model.is_ignored {
-                    let span = ast_schema
-                        .models()
-                        .iter()
-                        .find(|ast_model| ast_model.name.name == model.name)
-                        .unwrap()
-                        .fields
-                        .iter()
-                        .find(|f| f.name.name == sf.name)
-                        .map(|f| f.attributes.iter().find(|att| att.name.name == "id").unwrap().span)
-                        .unwrap_or_else(ast::Span::empty);
-
-                    all_errors.push_error(DatamodelError::new_attribute_validation_error(
-                        "Fields that are marked as id must be required.",
-                        "id",
-                        span,
-                    ));
+            //doing this here for now since I want to have all field names already generated
+            // it might be possible to move this
+            if let Some(pk) = &model.primary_key {
+                if let Some(name) = &pk.name {
+                    for field in model.fields() {
+                        if let Some(err) = ConstraintNames::client_name_already_in_use(
+                            name,
+                            field.name(),
+                            &model.name,
+                            ast_model.span,
+                            "@@id",
+                        ) {
+                            diagnostics.push_error(err);
+                        }
+                    }
                 }
             }
 
-            let ast_model = ast_schema.find_model(&model.name).expect(STATE_ERROR);
-
-            if let Err(err) = self.validate_model_compound_ids(ast_model, model) {
-                errors_for_model.push_error(err);
+            for index in &model.indices {
+                //doing this here for now since I want to have all field names already generated
+                // it might be possible to move this
+                if let Some(name) = &index.name {
+                    for field in model.fields() {
+                        if let Some(err) = ConstraintNames::client_name_already_in_use(
+                            name,
+                            field.name(),
+                            &model.name,
+                            ast_model.span,
+                            "@@unique",
+                        ) {
+                            diagnostics.push_error(err);
+                        }
+                    }
+                }
             }
 
             if let Err(err) = self.validate_model_has_strict_unique_criteria(ast_model, model) {
-                errors_for_model.push_error(err);
+                diagnostics.push_error(err);
             }
 
-            if let Err(err) = self.validate_model_name(ast_model, model) {
-                errors_for_model.push_error(err);
-            }
-
-            if let Err(err) = self.validate_relations_not_ambiguous(ast_schema, model) {
-                errors_for_model.push_error(err);
-            }
-
-            if let Err(ref mut the_errors) = self.validate_field_arities(ast_model, model) {
-                errors_for_model.append(the_errors);
-            }
-
-            if let Err(ref mut the_errors) = self.validate_field_types(ast_model, model) {
-                errors_for_model.append(the_errors);
+            if let Err(err) = self.validate_relations_not_ambiguous(ast, model) {
+                diagnostics.push_error(err);
             }
 
             if let Err(ref mut the_errors) = self.validate_field_connector_specific(ast_model, model) {
-                errors_for_model.append(the_errors)
+                diagnostics.append(the_errors)
             }
 
             if let Err(ref mut the_errors) = self.validate_model_connector_specific(ast_model, model) {
-                errors_for_model.append(the_errors)
-            }
-
-            if let Err(ref mut the_errors) = self.validate_enum_default_values(schema, ast_model, model) {
-                errors_for_model.append(the_errors);
-            }
-
-            if let Err(ref mut the_errors) = self.validate_auto_increment(ast_model, model) {
-                errors_for_model.append(the_errors);
-            }
-
-            if let Err(ref mut the_errors) = self.validate_base_fields_for_relation(schema, ast_model, model) {
-                errors_for_model.append(the_errors);
+                diagnostics.append(the_errors)
             }
 
             if let Err(ref mut the_errors) = self.validate_referenced_fields_for_relation(schema, ast_model, model) {
-                errors_for_model.append(the_errors);
+                diagnostics.append(the_errors);
             }
-
-            all_errors.append(&mut errors_for_model);
-        }
-
-        validate_name_collisions_with_map(schema, ast_schema, &mut all_errors);
-
-        // Enum level validations.
-        for declared_enum in schema.enums() {
-            let mut errors_for_enum = Diagnostics::new();
-            if let Err(err) = self.validate_enum_name(
-                ast_schema.find_enum(&declared_enum.name).expect(STATE_ERROR),
-                declared_enum,
-            ) {
-                errors_for_enum.push_error(err);
-            }
-
-            all_errors.append(&mut errors_for_enum);
-        }
-
-        if all_errors.has_errors() {
-            Err(all_errors)
-        } else {
-            Ok(())
         }
     }
 
-    pub fn post_standardisation_validate(
-        &self,
-        ast_schema: &ast::SchemaAst,
-        schema: &mut dml::Datamodel,
-    ) -> Result<(), Diagnostics> {
-        let mut all_errors = Diagnostics::new();
-
-        // Model level validations.
-        for model in schema.models() {
-            // Having a separate error collection allows checking whether any error has occurred for a model.
-            let mut errors_for_model = Diagnostics::new();
-
-            if !errors_for_model.has_errors() {
-                let mut new_errors = self.validate_relation_arguments_bla(
-                    schema,
-                    ast_schema.find_model(&model.name).expect(STATE_ERROR),
-                    model,
-                );
-                errors_for_model.append(&mut new_errors);
-            }
-
-            all_errors.append(&mut errors_for_model);
-        }
-
-        if all_errors.has_errors() {
-            Err(all_errors)
-        } else {
-            Ok(())
-        }
-    }
-
-    fn validate_names(&self, ast_schema: &ast::SchemaAst) -> Result<(), Diagnostics> {
-        let mut errors = Diagnostics::new();
-
-        for model in ast_schema.models() {
-            errors.push_opt_error(model.name.validate("Model").err());
-            errors.append(&mut model.validate_attributes());
-
-            for field in model.fields.iter() {
-                errors.push_opt_error(field.name.validate("Field").err());
-                errors.append(&mut field.validate_attributes());
-            }
-        }
-
-        for enum_decl in ast_schema.enums() {
-            errors.push_opt_error(enum_decl.name.validate("Enum").err());
-            errors.append(&mut enum_decl.validate_attributes());
-
-            for enum_value in enum_decl.values.iter() {
-                errors.push_opt_error(enum_value.name.validate("Enum Value").err());
-                errors.append(&mut enum_value.validate_attributes());
-            }
-        }
-
-        errors.to_result()
-    }
-
-    fn validate_names_for_indexes(
+    pub(crate) fn post_standardisation_validate(
         &self,
         ast_schema: &ast::SchemaAst,
         schema: &dml::Datamodel,
-    ) -> Result<(), Diagnostics> {
-        let mut errors = Diagnostics::new();
-        let mut index_names = HashSet::new();
-
-        let multiple_indexes_with_same_name_are_supported = self
-            .source
-            .map(|source| source.active_connector.supports_multiple_indexes_with_same_name())
-            .unwrap_or(false);
+        diagnostics: &mut Diagnostics,
+    ) {
+        let constraint_names = NamesValidator::new(schema, self.source);
 
         for model in schema.models() {
-            if let Some(ast_model) = ast_schema.find_model(&model.name) {
-                for index in model.indices.iter() {
-                    if let Some(index_name) = &index.name {
-                        if index_names.contains(index_name) && !multiple_indexes_with_same_name_are_supported {
-                            let ast_index = ast_model
-                                .attributes
-                                .iter()
-                                .find(|attribute| attribute.is_index())
-                                .unwrap();
+            let ast_model = ast_schema.find_model(&model.name).expect(STATE_ERROR);
 
-                            errors.push_error(DatamodelError::new_multiple_indexes_with_same_name_are_not_supported(
-                                index_name,
-                                ast_index.span,
-                            ));
-                        }
-                        index_names.insert(index_name);
+            if let Some(pk) = &model.primary_key {
+                if let Some(name) = &pk.db_name {
+                    // Only for SQL Server for now...
+                    if constraint_names.is_duplicate(name) {
+                        let span = ast_model.id_attribute().span;
+
+                        let message = format!(
+                            "The given constraint name `{}` is already in use in the data model. Please provide a different name using the `map` argument.",
+                            name
+                        );
+
+                        let error = DatamodelError::new_attribute_validation_error(&message, "id", span);
+
+                        diagnostics.push_error(error);
                     }
                 }
             }
-        }
 
-        errors.to_result()
-    }
+            // TODO: Extend this check for other constraints. Now only used
+            // for SQL Server default constraint names.
+            for field in model.fields().filter(|f| f.is_scalar_field()) {
+                if let Some(name) = field.default_value().and_then(|d| d.db_name()) {
+                    let ast_field = ast_model.find_field_bang(field.name());
 
-    fn validate_field_arities(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {
-        let mut errors = Diagnostics::new();
+                    if constraint_names.is_duplicate(name) {
+                        let message = format!(
+                            "The given constraint name `{}` is already in use in the data model. Please provide a different name using the `map` argument.",
+                            name
+                        );
 
-        // TODO: this is really ugly
-        let scalar_lists_are_supported = match self.source {
-            Some(source) => source.active_connector.supports_scalar_lists(),
-            None => false,
-        };
+                        let span = ast_field.span_for_argument("default", "map").unwrap_or(ast_field.span);
+                        let error = DatamodelError::new_attribute_validation_error(&message, "default", span);
 
-        for field in model.scalar_fields() {
-            if field.is_list() && !scalar_lists_are_supported {
-                errors.push_error(DatamodelError::new_scalar_list_fields_are_not_supported(
-                    &model.name,
-                    &field.name,
-                    ast_model.find_field(&field.name).span,
-                ));
-            }
-        }
-
-        if errors.has_errors() {
-            Err(errors)
-        } else {
-            Ok(())
-        }
-    }
-
-    fn validate_field_types(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {
-        let mut errors = Diagnostics::new();
-
-        for field in model.scalar_fields() {
-            if let Some(dml::ScalarType::Json) = field.field_type.scalar_type() {
-                // TODO: this is really ugly
-                let supports_json_type = match self.source {
-                    Some(source) => source.active_connector.supports_json(),
-                    None => false,
-                };
-                if !supports_json_type {
-                    errors.push_error(DatamodelError::new_field_validation_error(
-                        &format!("Field `{}` in model `{}` can't be of type Json. The current connector does not support the Json type.", &field.name, &model.name),
-                        &model.name,
-                        &field.name,
-                        ast_model.find_field(&field.name).span,
-                    ));
-                }
-            }
-        }
-
-        if errors.has_errors() {
-            Err(errors)
-        } else {
-            Ok(())
-        }
-    }
-
-    fn validate_enum_default_values(
-        &self,
-        data_model: &dml::Datamodel,
-        ast_model: &ast::Model,
-        model: &dml::Model,
-    ) -> Result<(), Diagnostics> {
-        let mut errors = Diagnostics::new();
-
-        for field in model.scalar_fields() {
-            if let Some(DefaultValue::Single(PrismaValue::Enum(enum_value))) = &field.default_value {
-                if let FieldType::Enum(enum_name) = &field.field_type {
-                    if let Some(dml_enum) = data_model.find_enum(&enum_name) {
-                        if !dml_enum.values.iter().any(|value| &value.name == enum_value) {
-                            errors.push_error(DatamodelError::new_attribute_validation_error(
-                                &"The defined default value is not a valid value of the enum specified for the field."
-                                    .to_string(),
-                                "default",
-                                ast_model.find_field(&field.name).span,
-                            ))
-                        }
+                        diagnostics.push_error(error);
                     }
                 }
             }
-        }
 
-        if errors.has_errors() {
-            Err(errors)
-        } else {
-            Ok(())
-        }
-    }
+            let mut new_errors = self.validate_relation_arguments_bla(
+                schema,
+                ast_schema.find_model(&model.name).expect(STATE_ERROR),
+                model,
+                &constraint_names,
+            );
 
-    fn validate_auto_increment(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {
-        let mut errors = Diagnostics::new();
-
-        if let Some(data_source) = self.source {
-            let autoinc_fields = model.auto_increment_fields().collect_vec();
-
-            // First check if the provider supports autoincrement at all, if yes, proceed with the detailed checks.
-            if !autoinc_fields.is_empty() && !data_source.active_connector.supports_auto_increment() {
-                for field in autoinc_fields {
-                    let ast_field = ast_model.find_field(&field.name);
-
-                    // Add an error for all autoincrement fields on the model.
-                    errors.push_error(DatamodelError::new_attribute_validation_error(
-                        &"The `autoincrement()` default value is used with a datasource that does not support it."
-                            .to_string(),
-                        "default",
-                        ast_field.span,
-                    ));
-                }
-            } else {
-                if !data_source.active_connector.supports_multiple_auto_increment()
-                    && model.auto_increment_fields().count() > 1
-                {
-                    errors.push_error(DatamodelError::new_attribute_validation_error(
-                        &"The `autoincrement()` default value is used multiple times on this model even though the underlying datasource only supports one instance per table.".to_string(),
-                        "default",
-                        ast_model.span,
-                    ))
-                }
-
-                // go over all fields
-                for field in autoinc_fields {
-                    let ast_field = ast_model.find_field(&field.name);
-
-                    if !field.is_id && !data_source.active_connector.supports_non_id_auto_increment() {
-                        errors.push_error(DatamodelError::new_attribute_validation_error(
-                            &"The `autoincrement()` default value is used on a non-id field even though the datasource does not support this.".to_string(),
-                            "default",
-                            ast_field.span,
-                        ))
-                    }
-
-                    if !model.field_is_indexed(&field.name)
-                        && !data_source.active_connector.supports_non_indexed_auto_increment()
-                    {
-                        errors.push_error(DatamodelError::new_attribute_validation_error(
-                            &"The `autoincrement()` default value is used on a non-indexed field even though the datasource does not support this.".to_string(),
-                            "default",
-                            ast_field.span,
-                        ))
-                    }
-                }
-            }
-        }
-
-        if errors.has_errors() {
-            Err(errors)
-        } else {
-            Ok(())
+            diagnostics.append(&mut new_errors);
         }
     }
 
@@ -389,29 +159,6 @@ impl<'a> Validator<'a> {
         ast_model: &ast::Model,
         model: &dml::Model,
     ) -> Result<(), DatamodelError> {
-        let multiple_single_field_id_error = Err(DatamodelError::new_model_validation_error(
-            "At most one field must be marked as the id field with the `@id` attribute.",
-            &model.name,
-            ast_model.span,
-        ));
-
-        let multiple_id_criteria_error = Err(DatamodelError::new_model_validation_error(
-            "Each model must have at most one id criteria. You can't have `@id` and `@@id` at the same time.",
-            &model.name,
-            ast_model.span,
-        ));
-
-        let has_single_field_id = model.singular_id_fields().next().is_some();
-        let has_multi_field_id = !model.id_fields.is_empty();
-
-        if model.singular_id_fields().count() > 1 {
-            return multiple_single_field_id_error;
-        }
-
-        if has_single_field_id && has_multi_field_id {
-            return multiple_id_criteria_error;
-        }
-
         let loose_criterias = model.loose_unique_criterias();
         let suffix = if loose_criterias.is_empty() {
             "".to_string()
@@ -443,62 +190,6 @@ impl<'a> Validator<'a> {
         Ok(())
     }
 
-    fn validate_model_compound_ids(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), DatamodelError> {
-        if let Some(source) = self.source {
-            if !model.id_fields.is_empty() && !source.active_connector.supports_compound_ids() {
-                let ast_attr = ast_model
-                    .attributes()
-                    .iter()
-                    .find(|attr| &attr.name.name == "id")
-                    .unwrap();
-
-                Err(DatamodelError::new_model_validation_error(
-                    "The current connector does not support compound ids.",
-                    &model.name,
-                    ast_attr.span,
-                ))
-            } else {
-                Ok(())
-            }
-        } else {
-            Ok(())
-        }
-    }
-
-    fn validate_model_name(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), DatamodelError> {
-        let validator = super::reserved_model_names::TypeNameValidator::new();
-
-        if validator.is_reserved(&model.name) {
-            Err(DatamodelError::new_model_validation_error(
-                &format!(
-                    "The model name `{}` is invalid. It is a reserved name. Please change it. Read more at https://pris.ly/d/naming-models",
-                    &model.name
-                ),
-                &model.name,
-                ast_model.span,
-            ))
-        } else {
-            Ok(())
-        }
-    }
-
-    fn validate_enum_name(&self, ast_enum: &ast::Enum, dml_enum: &dml::Enum) -> Result<(), DatamodelError> {
-        let validator = super::reserved_model_names::TypeNameValidator::new();
-
-        if validator.is_reserved(&dml_enum.name) {
-            Err(DatamodelError::new_enum_validation_error(
-        &format!(
-          "The enum name `{}` is invalid. It is a reserved name. Please change it. Read more at https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-schema/data-model#naming-enums",
-          &dml_enum.name
-        ),
-        &dml_enum.name,
-        ast_enum.span,
-      ))
-        } else {
-            Ok(())
-        }
-    }
-
     fn validate_field_connector_specific(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {
         let mut diagnostics = Diagnostics::new();
 
@@ -508,17 +199,39 @@ impl<'a> Validator<'a> {
                 if let Err(err) = connector.validate_field(field) {
                     diagnostics.push_error(DatamodelError::new_connector_error(
                         &err.to_string(),
-                        ast_model.find_field(&field.name()).span,
+                        ast_model.find_field_bang(field.name()).span,
                     ));
+                }
+
+                if let dml::Field::RelationField(ref rf) = field {
+                    let actions = &[rf.relation_info.on_delete, rf.relation_info.on_update];
+
+                    actions.iter().flatten().for_each(|action| {
+                        if !connector.supports_referential_action(*action) {
+                            let allowed_values: Vec<_> = connector
+                                .referential_actions()
+                                .iter()
+                                .map(|f| format!("`{}`", f))
+                                .collect();
+
+                            let message = format!(
+                                "Invalid referential action: `{}`. Allowed values: ({})",
+                                action,
+                                allowed_values.join(", "),
+                            );
+
+                            diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+                                &message,
+                                "relation",
+                                ast_model.find_field_bang(field.name()).span,
+                            ));
+                        }
+                    });
                 }
             }
         }
 
-        if diagnostics.has_errors() {
-            Err(diagnostics)
-        } else {
-            Ok(())
-        }
+        diagnostics.to_result()
     }
 
     fn validate_model_connector_specific(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {
@@ -531,76 +244,7 @@ impl<'a> Validator<'a> {
             }
         }
 
-        if diagnostics.has_errors() {
-            Err(diagnostics)
-        } else {
-            Ok(())
-        }
-    }
-
-    fn validate_base_fields_for_relation(
-        &self,
-        _datamodel: &dml::Datamodel,
-        ast_model: &ast::Model,
-        model: &dml::Model,
-    ) -> Result<(), Diagnostics> {
-        let mut errors = Diagnostics::new();
-
-        for field in model.relation_fields() {
-            let ast_field = ast_model.find_field(&field.name);
-
-            let rel_info = &field.relation_info;
-            let unknown_fields: Vec<String> = rel_info
-                .fields
-                .iter()
-                .filter(|base_field| model.find_field(&base_field).is_none())
-                .cloned()
-                .collect();
-
-            let referenced_relation_fields: Vec<String> = rel_info
-                .fields
-                .iter()
-                .filter(|base_field| model.find_relation_field(&base_field).is_some())
-                .cloned()
-                .collect();
-
-            let at_least_one_underlying_field_is_optional = rel_info
-                .fields
-                .iter()
-                .filter_map(|base_field| model.find_scalar_field(&base_field))
-                .any(|f| f.is_optional());
-
-            if !unknown_fields.is_empty() {
-                errors.push_error(DatamodelError::new_validation_error(
-                        &format!("The argument fields must refer only to existing fields. The following fields do not exist in this model: {}", unknown_fields.join(", ")),
-                        ast_field.span)
-                    );
-            }
-
-            if !referenced_relation_fields.is_empty() {
-                errors.push_error(DatamodelError::new_validation_error(
-                        &format!("The argument fields must refer only to scalar fields. But it is referencing the following relation fields: {}", referenced_relation_fields.join(", ")),
-                        ast_field.span)
-                    );
-            }
-
-            if at_least_one_underlying_field_is_optional && field.is_required() {
-                errors.push_error(DatamodelError::new_validation_error(
-                        &format!(
-                            "The relation field `{}` uses the scalar fields {}. At least one of those fields is optional. Hence the relation field must be optional as well.",
-                            &field.name,
-                            rel_info.fields.join(", ")
-                        ),
-                        ast_field.span)
-                    );
-            }
-        }
-
-        if errors.has_errors() {
-            Err(errors)
-        } else {
-            Ok(())
-        }
+        diagnostics.to_result()
     }
 
     fn validate_referenced_fields_for_relation(
@@ -612,29 +256,15 @@ impl<'a> Validator<'a> {
         let mut errors = Diagnostics::new();
 
         for field in model.relation_fields() {
-            let ast_field = ast_model.find_field(&field.name);
+            let ast_field = ast_model.find_field_bang(&field.name);
 
             let rel_info = &field.relation_info;
             let related_model = datamodel.find_model(&rel_info.to).expect(STATE_ERROR);
 
-            let unknown_fields: Vec<String> = rel_info
-                .references
-                .iter()
-                .filter(|referenced_field| related_model.find_field(&referenced_field).is_none())
-                .cloned()
-                .collect();
-
-            let referenced_relation_fields: Vec<String> = rel_info
-                .references
-                .iter()
-                .filter(|base_field| related_model.find_relation_field(&base_field).is_some())
-                .cloned()
-                .collect();
-
             let fields_with_wrong_type: Vec<DatamodelError> = rel_info.fields.iter().zip(rel_info.references.iter())
                     .filter_map(|(base_field, referenced_field)| {
-                        let base_field = model.find_field(&base_field)?;
-                        let referenced_field = related_model.find_field(&referenced_field)?;
+                        let base_field = model.find_field(base_field)?;
+                        let referenced_field = related_model.find_field(referenced_field)?;
 
                         if base_field.field_type().is_compatible_with(&referenced_field.field_type()) {
                             return None
@@ -646,14 +276,14 @@ impl<'a> Validator<'a> {
                         if let Some(connector) = self.source.map(|source| &source.active_connector) {
                             let base_native_type = base_field.field_type().as_native_type().map(|(scalar, native)| (*scalar, native.serialized_native_type.clone())).or_else(|| -> Option<_> {
                                 let field_type = base_field.field_type();
-                                let scalar_type = field_type.as_base()?;
+                                let scalar_type = field_type.as_scalar()?;
 
                                 Some((*scalar_type, connector.default_native_type_for_scalar_type(scalar_type)))
                             });
 
                             let referenced_native_type = referenced_field.field_type().as_native_type().map(|(scalar, native)| (*scalar, native.serialized_native_type.clone())).or_else(|| -> Option<_> {
                                 let field_type = referenced_field.field_type();
-                                let scalar_type = field_type.as_base()?;
+                                let scalar_type = field_type.as_scalar()?;
 
                                 Some((*scalar_type, connector.default_native_type_for_scalar_type(scalar_type)))
                             });
@@ -676,24 +306,6 @@ impl<'a> Validator<'a> {
                         ))
                     })
                     .collect();
-
-            if !unknown_fields.is_empty() {
-                errors.push_error(DatamodelError::new_validation_error(
-                        &format!("The argument `references` must refer only to existing fields in the related model `{}`. The following fields do not exist in the related model: {}",
-                                 &related_model.name,
-                                 unknown_fields.join(", ")),
-                        ast_field.span)
-                    );
-            }
-
-            if !referenced_relation_fields.is_empty() {
-                errors.push_error(DatamodelError::new_validation_error(
-                        &format!("The argument `references` must refer only to scalar fields in the related model `{}`. But it is referencing the following relation fields: {}",
-                                 &related_model.name,
-                                 referenced_relation_fields.join(", ")),
-                        ast_field.span)
-                    );
-            }
 
             if !rel_info.references.is_empty() && !errors.has_errors() {
                 let strict_relation_field_order = self
@@ -726,18 +338,12 @@ impl<'a> Validator<'a> {
                     true
                 };
 
-                let references_singular_id_field = if rel_info.references.len() == 1 {
-                    let field_name = rel_info.references.first().unwrap();
-                    // the unwrap is safe. We error out earlier if an unknown field is referenced.
-                    let referenced_field = related_model.find_scalar_field(&field_name).unwrap();
-                    referenced_field.is_id
-                } else {
-                    false
-                };
+                let references_singular_id_field = rel_info.references.len() == 1
+                    && related_model.field_is_primary(rel_info.references.first().unwrap());
 
                 let is_many_to_many = {
                     // Back relation fields have not been added yet. So we must calculate this on our own.
-                    match datamodel.find_related_field(&field) {
+                    match datamodel.find_related_field(field) {
                         Some((_, related_field)) => field.is_list() && related_field.is_list(),
                         None => false,
                     }
@@ -766,7 +372,11 @@ impl<'a> Validator<'a> {
 
                 // TODO: This error is only valid for connectors that don't support native many to manys.
                 // We only render this error if there's a singular id field. Otherwise we render a better error in a different function.
-                if is_many_to_many && !references_singular_id_field && related_model.has_single_id_field() {
+                if is_many_to_many
+                    && !references_singular_id_field
+                    && related_model.has_single_id_field()
+                    && model.has_single_id_field()
+                {
                     errors.push_error(DatamodelError::new_validation_error(
                             &format!(
                                 "Many to many relations must always reference the id field of the related model. Change the argument `references` to use the id field of the related model `{}`. But it is referencing the following fields that are not the id: {}",
@@ -789,61 +399,80 @@ impl<'a> Validator<'a> {
                 ));
             }
 
-            if !fields_with_wrong_type.is_empty() && !errors.has_errors() {
+            if !errors.has_errors() {
                 // don't output too much errors
-                errors.append_error_vec(fields_with_wrong_type);
+                for err in fields_with_wrong_type {
+                    errors.push_error(err);
+                }
             }
         }
 
-        if errors.has_errors() {
-            Err(errors)
-        } else {
-            Ok(())
-        }
+        errors.to_result()
     }
 
-    fn validate_relation_arguments_bla(
+    fn validate_relation_arguments_bla<'dml>(
         &self,
-        datamodel: &dml::Datamodel,
+        datamodel: &'dml dml::Datamodel,
         ast_model: &ast::Model,
         model: &dml::Model,
+        constraint_names: &NamesValidator<'dml>,
     ) -> Diagnostics {
         let mut errors = Diagnostics::new();
 
         for field in model.relation_fields() {
-            let field_span = ast_model
+            let ast_field = ast_model
                 .fields
                 .iter()
-                .find(|ast_field| ast_field.name.name == field.name)
-                .map(|ast_field| ast_field.span)
-                .unwrap_or_else(ast::Span::empty);
+                .find(|ast_field| ast_field.name.name == field.name);
+
+            let field_span = ast_field.map(|f| f.span).unwrap_or_else(ast::Span::empty);
 
             let rel_info = &field.relation_info;
             let related_model = datamodel.find_model(&rel_info.to).expect(STATE_ERROR);
-            if let Some((_rel_field_idx, related_field)) = datamodel.find_related_field(&field) {
+
+            if let Some(name) = field.relation_info.fk_name.as_ref() {
+                // Only for SQL Server for now...
+                if constraint_names.is_duplicate(name) {
+                    let span = ast_field
+                        .and_then(|f| f.span_for_argument("relation", "map"))
+                        .unwrap_or(field_span);
+
+                    let message = format!(
+                        "The given constraint name `{}` is already in use in the data model. Please provide a different name using the `map` argument.",
+                        name
+                    );
+
+                    let error = DatamodelError::new_attribute_validation_error(&message, RELATION_ATTRIBUTE_NAME, span);
+                    errors.push_error(error);
+                }
+            }
+
+            if let Some((_rel_field_idx, related_field)) = datamodel.find_related_field(field) {
                 let related_field_rel_info = &related_field.relation_info;
 
                 if related_model.is_ignored && !field.is_ignored && !model.is_ignored {
-                    errors.push_error(DatamodelError::new_attribute_validation_error(
-                    &format!(
+                    let message = format!(
                         "The relation field `{}` on Model `{}` must specify the `@ignore` attribute, because the model {} it is pointing to is marked ignored.",
                         &field.name, &model.name, &related_model.name
-                    ),
-                    "ignore",
-                    field_span,
-                ));
+                    );
+
+                    errors.push_error(DatamodelError::new_attribute_validation_error(
+                        &message, "ignore", field_span,
+                    ));
                 }
 
                 // ONE TO MANY
                 if field.is_singular() && related_field.is_list() {
                     if rel_info.fields.is_empty() {
-                        errors.push_error(DatamodelError::new_attribute_validation_error(
-                        &format!(
+                        let message = format!(
                             "The relation field `{}` on Model `{}` must specify the `fields` argument in the {} attribute. {}",
                             &field.name, &model.name, RELATION_ATTRIBUTE_NAME_WITH_AT, PRISMA_FORMAT_HINT
-                            ),
-                        RELATION_ATTRIBUTE_NAME,
-                        field_span,
+                        );
+
+                        errors.push_error(DatamodelError::new_attribute_validation_error(
+                            &message,
+                            RELATION_ATTRIBUTE_NAME,
+                            field_span,
                         ));
                     }
 
@@ -863,92 +492,156 @@ impl<'a> Validator<'a> {
                     && !related_field.is_list()
                     && (!rel_info.fields.is_empty() || !rel_info.references.is_empty())
                 {
-                    errors.push_error(DatamodelError::new_attribute_validation_error(
-                    &format!(
+                    let message = format!(
                         "The relation field `{}` on Model `{}` must not specify the `fields` or `references` argument in the {} attribute. You must only specify it on the opposite field `{}` on model `{}`.",
+                        &field.name,
+                        &model.name,
+                        RELATION_ATTRIBUTE_NAME_WITH_AT,
+                        &related_field.name,
+                        &related_model.name
+                    );
+
+                    errors.push_error(DatamodelError::new_attribute_validation_error(
+                        &message,
+                        RELATION_ATTRIBUTE_NAME,
+                        field_span,
+                    ));
+                }
+
+                if field.is_list()
+                    && !related_field.is_list()
+                    && (rel_info.on_delete.is_some() || rel_info.on_update.is_some())
+                {
+                    let message = &format!(
+                        "The relation field `{}` on Model `{}` must not specify the `onDelete` or `onUpdate` argument in the {} attribute. You must only specify it on the opposite field `{}` on model `{}`, or in case of a many to many relation, in an explicit join table.",
                         &field.name, &model.name, RELATION_ATTRIBUTE_NAME_WITH_AT, &related_field.name, &related_model.name
-                            ),
-                    RELATION_ATTRIBUTE_NAME,
-                    field_span,
-                        ));
+                    );
+
+                    errors.push_error(DatamodelError::new_attribute_validation_error(
+                        message,
+                        RELATION_ATTRIBUTE_NAME,
+                        field_span,
+                    ));
                 }
 
                 // ONE TO ONE
                 if field.is_singular() && related_field.is_singular() {
                     if rel_info.fields.is_empty() && related_field_rel_info.fields.is_empty() {
-                        errors.push_error(DatamodelError::new_attribute_validation_error(
-                        &format!(
+                        let message = format!(
                             "The relation fields `{}` on Model `{}` and `{}` on Model `{}` do not provide the `fields` argument in the {} attribute. You have to provide it on one of the two fields.",
                             &field.name, &model.name, &related_field.name, &related_model.name, RELATION_ATTRIBUTE_NAME_WITH_AT
-                            ),
-                        RELATION_ATTRIBUTE_NAME,
-                        field_span,
+                        );
+
+                        errors.push_error(DatamodelError::new_attribute_validation_error(
+                            &message,
+                            RELATION_ATTRIBUTE_NAME,
+                            field_span,
                         ));
                     }
 
                     if rel_info.references.is_empty() && related_field_rel_info.references.is_empty() {
-                        errors.push_error(DatamodelError::new_attribute_validation_error(
-                        &format!(
+                        let message = format!(
                             "The relation fields `{}` on Model `{}` and `{}` on Model `{}` do not provide the `references` argument in the {} attribute. You have to provide it on one of the two fields.",
                             &field.name, &model.name, &related_field.name, &related_model.name, RELATION_ATTRIBUTE_NAME_WITH_AT
-                            ),
-                        RELATION_ATTRIBUTE_NAME,
-                        field_span,
+                        );
+
+                        errors.push_error(DatamodelError::new_attribute_validation_error(
+                            &message,
+                            RELATION_ATTRIBUTE_NAME,
+                            field_span,
                         ));
                     }
 
                     if !rel_info.references.is_empty() && !related_field_rel_info.references.is_empty() {
-                        errors.push_error(DatamodelError::new_attribute_validation_error(
-                        &format!(
+                        let message = format!(
                             "The relation fields `{}` on Model `{}` and `{}` on Model `{}` both provide the `references` argument in the {} attribute. You have to provide it only on one of the two fields.",
                             &field.name, &model.name, &related_field.name, &related_model.name, RELATION_ATTRIBUTE_NAME_WITH_AT
-                            ),
-                        RELATION_ATTRIBUTE_NAME,
-                        field_span,
+                        );
+
+                        errors.push_error(DatamodelError::new_attribute_validation_error(
+                            &message,
+                            RELATION_ATTRIBUTE_NAME,
+                            field_span,
+                        ));
+                    }
+
+                    if (rel_info.on_delete.is_some() || rel_info.on_update.is_some())
+                        && (related_field_rel_info.on_delete.is_some() || related_field_rel_info.on_update.is_some())
+                    {
+                        let message = format!(
+                            "The relation fields `{}` on Model `{}` and `{}` on Model `{}` both provide the `onDelete` or `onUpdate` argument in the {} attribute. You have to provide it only on one of the two fields.",
+                            &field.name, &model.name, &related_field.name, &related_model.name, RELATION_ATTRIBUTE_NAME_WITH_AT
+                        );
+
+                        errors.push_error(DatamodelError::new_attribute_validation_error(
+                            &message,
+                            RELATION_ATTRIBUTE_NAME,
+                            field_span,
+                        ));
+                    } else if rel_info.fields.is_empty()
+                        && (rel_info.on_delete.is_some() || rel_info.on_update.is_some())
+                    {
+                        let message = &format!(
+                            "The relation field `{}` on Model `{}` must not specify the `onDelete` or `onUpdate` argument in the {} attribute. You must only specify it on the opposite field `{}` on model `{}`.",
+                            &field.name, &model.name, RELATION_ATTRIBUTE_NAME_WITH_AT, &related_field.name, &related_model.name
+                        );
+
+                        errors.push_error(DatamodelError::new_attribute_validation_error(
+                            message,
+                            RELATION_ATTRIBUTE_NAME,
+                            field_span,
                         ));
                     }
 
                     if !rel_info.fields.is_empty() && !related_field_rel_info.fields.is_empty() {
-                        errors.push_error(DatamodelError::new_attribute_validation_error(
-                        &format!(
+                        let message = format!(
                             "The relation fields `{}` on Model `{}` and `{}` on Model `{}` both provide the `fields` argument in the {} attribute. You have to provide it only on one of the two fields.",
                             &field.name, &model.name, &related_field.name, &related_model.name, RELATION_ATTRIBUTE_NAME_WITH_AT
-                            ),
-                        RELATION_ATTRIBUTE_NAME,
-                        field_span,
+                        );
+
+                        errors.push_error(DatamodelError::new_attribute_validation_error(
+                            &message,
+                            RELATION_ATTRIBUTE_NAME,
+                            field_span,
                         ));
                     }
 
                     if !errors.has_errors() {
                         if !rel_info.fields.is_empty() && !related_field_rel_info.references.is_empty() {
-                            errors.push_error(DatamodelError::new_attribute_validation_error(
-                            &format!(
+                            let message = format!(
                                 "The relation field `{}` on Model `{}` provides the `fields` argument in the {} attribute. And the related field `{}` on Model `{}` provides the `references` argument. You must provide both arguments on the same side.",
                                 &field.name, &model.name, RELATION_ATTRIBUTE_NAME_WITH_AT, &related_field.name, &related_model.name,
-                            ),
-                            RELATION_ATTRIBUTE_NAME,
-                            field_span,
+                            );
+
+                            errors.push_error(DatamodelError::new_attribute_validation_error(
+                                &message,
+                                RELATION_ATTRIBUTE_NAME,
+                                field_span,
                             ));
                         }
 
                         if !rel_info.references.is_empty() && !related_field_rel_info.fields.is_empty() {
-                            errors.push_error(DatamodelError::new_attribute_validation_error(
-                            &format!(
+                            let message = format!(
                                 "The relation field `{}` on Model `{}` provides the `references` argument in the {} attribute. And the related field `{}` on Model `{}` provides the `fields` argument. You must provide both arguments on the same side.",
                                 &field.name, &model.name, RELATION_ATTRIBUTE_NAME_WITH_AT, &related_field.name, &related_model.name,
-                                ),
-                            RELATION_ATTRIBUTE_NAME,
-                            field_span,
+                            );
+
+                            errors.push_error(DatamodelError::new_attribute_validation_error(
+                                &message,
+                                RELATION_ATTRIBUTE_NAME,
+                                field_span,
                             ));
                         }
                     }
 
                     if !errors.has_errors() && field.is_required() && !related_field_rel_info.references.is_empty() {
+                        let message = format!(
+                            "The relation field `{}` on Model `{}` is required. This is no longer valid because it's not possible to enforce this constraint on the database level. Please change the field type from `{}` to `{}?` to fix this.",
+                            &field.name, &model.name, &related_model.name, &related_model.name,
+                        );
+
                         errors.push_error(DatamodelError::new_attribute_validation_error(
-                            &format!(
-                                "The relation field `{}` on Model `{}` is required. This is no longer valid because it's not possible to enforce this constraint on the database level. Please change the field type from `{}` to `{}?` to fix this.",
-                                &field.name, &model.name, &related_model.name, &related_model.name,
-                            ),
+                            &message,
                             RELATION_ATTRIBUTE_NAME,
                             field_span,
                         ));
@@ -957,26 +650,50 @@ impl<'a> Validator<'a> {
 
                 // MANY TO MANY
                 if field.is_list() && related_field.is_list() && !related_model.has_single_id_field() {
-                    errors.push_error(DatamodelError::new_field_validation_error(
-                            &format!(
-                                "The relation field `{}` on Model `{}` references `{}` which does not have an `@id` field. Models without `@id` can not be part of a many to many relation. Use an explicit intermediate Model to represent this relationship.",
-                                &field.name,
-                                &model.name,
-                                &related_model.name,
-                            ),
-                            &model.name,
-                            &field.name,
-                            field_span,
-                        ));
-                }
-            } else {
-                errors.push_error(DatamodelError::new_field_validation_error(
-                    &format!(
-                        "The relation field `{}` on Model `{}` is missing an opposite relation field on the model `{}`. Either run `prisma format` or add it manually.",
+                    let message = format!(
+                        "The relation field `{}` on Model `{}` references `{}` which does not have an `@id` field. Models without `@id` cannot be part of a many to many relation. Use an explicit intermediate Model to represent this relationship.",
                         &field.name,
                         &model.name,
                         &related_model.name,
-                    ),
+                    );
+
+                    errors.push_error(DatamodelError::new_field_validation_error(
+                        &message,
+                        &model.name,
+                        &field.name,
+                        field_span,
+                    ));
+                }
+
+                if !field.is_list()
+                    && !field.relation_info.fields.is_empty()
+                    && !field.relation_info.references.is_empty()
+                    && self
+                        .source
+                        .map(|source| &source.active_connector)
+                        .filter(|connector| connector.has_capability(ConnectorCapability::ReferenceCycleDetection))
+                        .map(|connector| connector.has_capability(ConnectorCapability::ForeignKeys))
+                        .unwrap_or_default()
+                {
+                    referential_actions::detect_cycles(datamodel, model, field, field_span, &mut errors);
+                    referential_actions::detect_multiple_cascading_paths(
+                        datamodel,
+                        model,
+                        field,
+                        field_span,
+                        &mut errors,
+                    );
+                }
+            } else {
+                let message = format!(
+                    "The relation field `{}` on Model `{}` is missing an opposite relation field on the model `{}`. Either run `prisma format` or add it manually.",
+                    &field.name,
+                    &model.name,
+                    &related_model.name,
+                );
+
+                errors.push_error(DatamodelError::new_field_validation_error(
+                    &message,
                     &model.name,
                     &field.name,
                     field_span,
@@ -1004,36 +721,40 @@ impl<'a> Validator<'a> {
                         // and also no names set.
                         if rel_a.to == rel_b.to && rel_a.name == rel_b.name {
                             if rel_a.name.is_empty() {
+                                let message = format!(
+                                    "Ambiguous relation detected. The fields `{}` and `{}` in model `{}` both refer to `{}`. Please provide different relation names for them by adding `@relation(<name>).",
+                                    &field_a.name,
+                                    &field_b.name,
+                                    &model.name,
+                                    &rel_a.to
+                                );
+
                                 // unnamed relation
                                 return Err(DatamodelError::new_model_validation_error(
-                                            &format!(
-                                                "Ambiguous relation detected. The fields `{}` and `{}` in model `{}` both refer to `{}`. Please provide different relation names for them by adding `@relation(<name>).",
-                                                &field_a.name,
-                                                &field_b.name,
-                                                &model.name,
-                                                &rel_a.to
-                                            ),
-                                            &model.name,
-                                            ast_schema
-                                                .find_field(&model.name, &field_a.name)
-                                                .expect(STATE_ERROR)
-                                                .span,
-                                        ));
+                                    &message,
+                                    &model.name,
+                                    ast_schema
+                                        .find_field(&model.name, &field_a.name)
+                                        .expect(STATE_ERROR)
+                                        .span,
+                                ));
                             } else {
+                                let message = format!(
+                                    "Wrongly named relation detected. The fields `{}` and `{}` in model `{}` both use the same relation name. Please provide different relation names for them through `@relation(<name>).",
+                                    &field_a.name,
+                                    &field_b.name,
+                                    &model.name,
+                                );
+
                                 // explicitly named relation
                                 return Err(DatamodelError::new_model_validation_error(
-                                            &format!(
-                                                "Wrongly named relation detected. The fields `{}` and `{}` in model `{}` both use the same relation name. Please provide different relation names for them through `@relation(<name>).",
-                                                &field_a.name,
-                                                &field_b.name,
-                                                &model.name,
-                                            ),
-                                            &model.name,
-                                            ast_schema
-                                                .find_field(&model.name, &field_a.name)
-                                                .expect(STATE_ERROR)
-                                                .span,
-                                        ));
+                                    &message,
+                                    &model.name,
+                                    ast_schema
+                                        .find_field(&model.name, &field_a.name)
+                                        .expect(STATE_ERROR)
+                                        .span,
+                                ));
                             }
                         }
                     } else if rel_a.to == model.name && rel_b.to == model.name {
@@ -1062,19 +783,19 @@ impl<'a> Validator<'a> {
                                                     ));
                                     } else {
                                         return Err(DatamodelError::new_model_validation_error(
-                                                        &format!(
-                                                        "Wrongly named self relation detected. The fields `{}`, `{}` and `{}` in model `{}` have the same relation name. At most two relation fields can belong to the same relation and therefore have the same name. Please assign a different relation name to one of them.",
-                                                            &field_a.name,
-                                                            &field_b.name,
-                                                            &field_c.name,
-                                                            &model.name
-                                                        ),
-                                                        &model.name,
-                                                        ast_schema
-                                                            .find_field(&model.name, &field_a.name)
-                                                            .expect(STATE_ERROR)
-                                                            .span,
-                                                    ));
+                                            &format!(
+                                                "Wrongly named self relation detected. The fields `{}`, `{}` and `{}` in model `{}` have the same relation name. At most two relation fields can belong to the same relation and therefore have the same name. Please assign a different relation name to one of them.",
+                                                &field_a.name,
+                                                &field_b.name,
+                                                &field_c.name,
+                                                &model.name
+                                            ),
+                                            &model.name,
+                                            ast_schema
+                                                .find_field(&model.name, &field_a.name)
+                                                .expect(STATE_ERROR)
+                                                .span,
+                                        ));
                                     }
                                 }
                             }
@@ -1084,19 +805,19 @@ impl<'a> Validator<'a> {
                         if rel_a.name.is_empty() && rel_b.name.is_empty() {
                             // A self relation, but there are at least two fields without a name.
                             return Err(DatamodelError::new_model_validation_error(
-                                        &format!(
-                                            "Ambiguous self relation detected. The fields `{}` and `{}` in model `{}` both refer to `{}`. If they are part of the same relation add the same relation name for them with `@relation(<name>)`.",
-                                            &field_a.name,
-                                            &field_b.name,
-                                            &model.name,
-                                            &rel_a.to
-                                        ),
-                                        &model.name,
-                                        ast_schema
-                                            .find_field(&model.name, &field_a.name)
-                                            .expect(STATE_ERROR)
-                                            .span,
-                                    ));
+                                &format!(
+                                    "Ambiguous self relation detected. The fields `{}` and `{}` in model `{}` both refer to `{}`. If they are part of the same relation add the same relation name for them with `@relation(<name>)`.",
+                                    &field_a.name,
+                                    &field_b.name,
+                                    &model.name,
+                                    &rel_a.to
+                                ),
+                                &model.name,
+                                ast_schema
+                                    .find_field(&model.name, &field_a.name)
+                                    .expect(STATE_ERROR)
+                                    .span,
+                            ));
                         }
                     }
                 }
@@ -1104,32 +825,5 @@ impl<'a> Validator<'a> {
         }
 
         Ok(())
-    }
-}
-
-fn validate_name_collisions_with_map(schema: &dml::Datamodel, ast: &ast::SchemaAst, diagnostics: &mut Diagnostics) {
-    let mut used_model_names: HashMap<&str, ModelWalker<'_>> = HashMap::with_capacity(schema.models.len());
-    let mut used_field_names: HashSet<&str> = HashSet::with_capacity(4);
-
-    for model in walk_models(schema) {
-        for field in model.scalar_fields() {
-            if !used_field_names.insert(field.db_name()) {
-                diagnostics.push_error(DatamodelError::new_duplicate_field_error(
-                    model.name(),
-                    field.name(),
-                    ast.find_model(model.name()).unwrap().find_field(field.name()).span,
-                ));
-            }
-        }
-
-        used_field_names.clear();
-
-        if let Some(existing_model) = used_model_names.insert(model.database_name(), model) {
-            diagnostics.push_error(DatamodelError::new_duplicate_model_database_name_error(
-                model.database_name().into(),
-                existing_model.name().into(),
-                ast.find_model(model.name()).unwrap().span,
-            ));
-        }
     }
 }

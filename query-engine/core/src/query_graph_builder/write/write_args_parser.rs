@@ -1,10 +1,10 @@
 use super::*;
 use crate::{
-    constants::operations,
+    constants::{json_null, operations},
     query_document::{ParsedInputMap, ParsedInputValue},
 };
 use connector::{WriteArgs, WriteExpression};
-use prisma_models::{Field, ModelRef, PrismaValue, RelationFieldRef};
+use prisma_models::{Field, ModelRef, PrismaValue, RelationFieldRef, TypeIdentifier};
 use std::{convert::TryInto, sync::Arc};
 
 #[derive(Default, Debug)]
@@ -40,6 +40,17 @@ impl WriteArgsParser {
 
                     Field::Scalar(sf) => {
                         let expr: WriteExpression = match v {
+                            ParsedInputValue::Single(PrismaValue::Enum(e))
+                                if sf.type_identifier == TypeIdentifier::Json =>
+                            {
+                                let val = match e.as_str() {
+                                    json_null::DB_NULL => PrismaValue::Null,
+                                    json_null::JSON_NULL => PrismaValue::Json("null".to_owned()),
+                                    _ => unreachable!(), // Validation guarantees correct enum values.
+                                };
+
+                                val.into()
+                            }
                             ParsedInputValue::Single(v) => v.into(),
                             ParsedInputValue::Map(map) => {
                                 let (operation, value) = map.into_iter().next().unwrap();

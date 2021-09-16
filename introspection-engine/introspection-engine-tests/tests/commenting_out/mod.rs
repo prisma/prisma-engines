@@ -1,10 +1,15 @@
+mod mssql;
+mod mysql;
+mod sqlite;
+
 use barrel::types;
+use expect_test::expect;
 use indoc::indoc;
 use introspection_engine_tests::{assert_eq_json, test_api::*, TestResult};
 use serde_json::json;
 use test_macros::test_connector;
 
-#[test_connector]
+#[test_connector(exclude(Mssql, Mysql))]
 async fn a_table_without_uniques_should_ignore(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -14,47 +19,30 @@ async fn a_table_without_uniques_should_ignore(api: &TestApi) -> TestResult {
             migration.create_table("Post", |t| {
                 t.add_column("id", types::integer());
                 t.add_column("user_id", types::integer().nullable(false));
+                t.add_index("Post_user_id_idx", types::index(&["user_id"]));
                 t.add_foreign_key(&["user_id"], "User", &["id"]);
             });
         })
         .await?;
 
-    let dm = if api.sql_family().is_mysql() {
-        indoc! {r#"
-            /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
-            model Post {
-              id      Int
-              user_id Int
-              User    User @relation(fields: [user_id], references: [id])
+    let expected = expect![[r#"
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        model Post {
+          id      Int
+          user_id Int
+          User    User @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
-              @@index([user_id], name: "user_id")
-              @@ignore
-            }
+          @@index([user_id])
+          @@ignore
+        }
 
-            model User {
-              id   Int    @id @default(autoincrement())
-              Post Post[] @ignore
-            }
-        "#}
-    } else {
-        indoc! {r#"
-            /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
-            model Post {
-              id      Int
-              user_id Int
-              User    User @relation(fields: [user_id], references: [id])
+        model User {
+          id   Int    @id @default(autoincrement())
+          Post Post[] @ignore
+        }
+    "#]];
 
-              @@ignore
-            }
-
-            model User {
-              id   Int    @id @default(autoincrement())
-              Post Post[] @ignore
-            }
-        "#}
-    };
-
-    api.assert_eq_datamodels(&dm, &api.introspect().await?);
+    expected.assert_eq(&api.introspect_dml().await?);
 
     Ok(())
 }
@@ -74,52 +62,54 @@ async fn relations_between_ignored_models_should_not_have_field_level_ignores(ap
         })
         .await?;
 
-    let dm = indoc! {r#"
-            /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
-            model Post {
-              id      Unsupported("macaddr") @id
-              user_id Unsupported("macaddr")
-              User    User                   @relation(fields: [user_id], references: [id])
+    let expected = expect![[r#"
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        model Post {
+          id      Unsupported("macaddr") @id
+          user_id Unsupported("macaddr")
+          User    User                   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
-              @@ignore
-            }
+          @@ignore
+        }
 
-            /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
-            model User {
-              id   Unsupported("macaddr") @id
-              Post Post[]
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        model User {
+          id   Unsupported("macaddr") @id
+          Post Post[]
 
-              @@ignore
-            }
-        "#};
+          @@ignore
+        }
+    "#]];
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    expected.assert_eq(&api.introspect_dml().await?);
 
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(exclude(Sqlite, Mysql))]
 async fn a_table_without_required_uniques(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Post", |t| {
                 t.add_column("id", types::integer());
-                t.add_column("opt_unique", types::integer().unique(true).nullable(true));
+                t.add_column("opt_unique", types::integer().nullable(true));
+
+                t.add_constraint("sqlite_autoindex_Post_1", types::unique_constraint(vec!["opt_unique"]));
             });
         })
         .await?;
 
-    let dm = indoc! {r#"
+    let expected = expect![[r#"
         /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
         model Post {
           id         Int
-          opt_unique Int? @unique
+          opt_unique Int? @unique(map: "sqlite_autoindex_Post_1")
 
           @@ignore
         }
-    "#};
+    "#]];
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    expected.assert_eq(&api.introspect_dml().await?);
 
     Ok(())
 }
@@ -141,19 +131,20 @@ async fn a_table_without_fully_required_compound_unique(api: &TestApi) -> TestRe
         })
         .await?;
 
-    let dm = indoc! {r#"
+    let dm = expect![[r#"
         /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
         model Post {
           id         Int
           opt_unique Int?
           req_unique Int
 
-          @@unique([opt_unique, req_unique], name: "sqlite_autoindex_Post_1")
+          @@unique([opt_unique, req_unique], map: "sqlite_autoindex_Post_1")
           @@ignore
         }
-    "#};
+    "#]];
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    let result = api.introspect_dml().await?;
+    dm.assert_eq(&result);
 
     Ok(())
 }
@@ -187,19 +178,21 @@ async fn unsupported_type_keeps_its_usages(api: &TestApi) -> TestResult {
 
     assert_eq_json!(expected, api.introspection_warnings().await?);
 
-    let dm = indoc! {r#"
-        modelTest{
-            id          Int     @unique
-            dummy       Int
-            broken Unsupported("macaddr")
+    let dm = expect![[r#"
+        model Test {
+          id     Int                    @unique
+          dummy  Int
+          broken Unsupported("macaddr")
 
-            @@id([broken, dummy])
-            @@unique([broken, dummy], name: "unique")
-            @@index([broken, dummy], name: "non_unique")
+          @@id([broken, dummy])
+          @@unique([broken, dummy], map: "unique")
+          @@index([broken, dummy], map: "non_unique")
         }
-    "#};
+    "#]];
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    let result = api.introspect_dml().await?;
+
+    dm.assert_eq(&result);
 
     Ok(())
 }
@@ -270,21 +263,21 @@ async fn a_table_with_unsupported_types_in_a_relation(api: &TestApi) -> TestResu
         })
         .await?;
 
-    let dm = indoc! {r#"
-            model Post {
-              id            Int                     @id @default(autoincrement())
-              user_ip       Unsupported("cidr")
-              User          User                    @relation(fields: [user_ip], references: [ip])
-            }
+    let expected = expect![[r#"
+        model Post {
+          id      Int                 @id @default(autoincrement())
+          user_ip Unsupported("cidr")
+          User    User                @relation(fields: [user_ip], references: [ip], onDelete: NoAction, onUpdate: NoAction)
+        }
 
-            model User {
-              id            Int                     @id @default(autoincrement())
-              ip            Unsupported("cidr")  @unique
-              Post          Post[]
-            }
-        "#};
+        model User {
+          id   Int                 @id @default(autoincrement())
+          ip   Unsupported("cidr") @unique
+          Post Post[]
+        }
+    "#]];
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    expected.assert_eq(&api.introspect_dml().await?);
 
     Ok(())
 }
@@ -295,7 +288,9 @@ async fn remapping_field_names_to_empty(api: &TestApi) -> TestResult {
         .execute(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("1", types::text());
-                t.add_column("last", types::primary());
+                t.add_column("last", types::integer().increments(true));
+
+                t.add_constraint("User_pkey", types::primary_constraint(vec!["last"]));
             });
         })
         .await?;
@@ -308,7 +303,7 @@ async fn remapping_field_names_to_empty(api: &TestApi) -> TestResult {
         }
     "#};
 
-    api.assert_eq_datamodels(&dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -316,17 +311,14 @@ async fn remapping_field_names_to_empty(api: &TestApi) -> TestResult {
 #[test_connector(tags(Postgres), exclude(Cockroach))]
 async fn dbgenerated_in_unsupported(api: &TestApi) -> TestResult {
     api.barrel()
-        .execute_with_schema(
-            |migration| {
-                migration.create_table("Blog", move |t| {
-                    t.add_column("id", types::primary());
-                    t.inject_custom("number Integer Default 1");
-                    t.inject_custom("bigger_number Integer DEFAULT sqrt(4)");
-                    t.inject_custom("point Point DEFAULT Point(0, 0)");
-                });
-            },
-            api.schema_name(),
-        )
+        .execute(|migration| {
+            migration.create_table("Blog", move |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("number Integer Default 1");
+                t.inject_custom("bigger_number Integer DEFAULT sqrt(4)");
+                t.inject_custom("point Point DEFAULT Point(0, 0)");
+            });
+        })
         .await?;
 
     let dm = indoc! {r##"
@@ -390,69 +382,24 @@ async fn ignore_on_back_relation_field_if_pointing_to_ignored_model(api: &TestAp
         })
         .await?;
 
-    let dm = indoc! {r#"
-            ///The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
-            model Post {
-                id      Int
-                user_ip Int
-                User    User @relation(fields: [user_ip], references: [ip])
+    let expected = expect![[r#"
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        model Post {
+          id      Int
+          user_ip Int
+          User    User @relation(fields: [user_ip], references: [ip], onDelete: NoAction, onUpdate: NoAction)
 
-                @@ignore
-            }
+          @@ignore
+        }
 
-            model User {
-                id      Int  @id @default(autoincrement())
-                ip      Int  @unique
-                Post  Post[] @ignore
-            }
-        "#};
+        model User {
+          id   Int    @id @default(autoincrement())
+          ip   Int    @unique
+          Post Post[] @ignore
+        }
+    "#]];
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
-
-    Ok(())
-}
-
-#[test_connector(tags(Sqlite))]
-async fn ignore_on_model_with_only_optional_id(api: &TestApi) -> TestResult {
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("ValidId", |t| {
-                t.inject_custom("id Text Primary Key Not Null");
-            });
-
-            migration.create_table("OnlyOptionalId", |t| {
-                t.inject_custom("id Text Primary Key");
-            });
-
-            migration.create_table("OptionalIdAndOptionalUnique", |t| {
-                t.inject_custom("id Text Primary Key");
-                t.add_column("unique", types::integer().unique(true).nullable(true));
-            });
-        })
-        .await?;
-
-    let dm = indoc! {r#"
-            /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
-            model OnlyOptionalId {
-              id     String? @id
-
-              @@ignore
-            }
-
-            /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
-            model OptionalIdAndOptionalUnique {
-              id     String? @id
-              unique Int? @unique
-
-              @@ignore
-            }
-
-            model ValidId {
-              id     String @id
-            }
-        "#};
-
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    expected.assert_eq(&api.introspect_dml().await?);
 
     Ok(())
 }

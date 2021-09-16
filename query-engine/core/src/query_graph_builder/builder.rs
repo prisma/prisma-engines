@@ -4,8 +4,6 @@ use super::*;
 use crate::{constants::args, query_document::*, query_graph::*, schema::*, IrSerializer};
 use prisma_value::PrismaValue;
 
-// TODO: Think about if this is really necessary here, or if the whole code should move into
-// the query_document module, possibly already as part of the parser.
 pub struct QueryGraphBuilder {
     pub query_schema: QuerySchemaRef,
 }
@@ -85,9 +83,11 @@ impl QueryGraphBuilder {
     }
 
     #[tracing::instrument(skip(self, field_pair))]
+    #[rustfmt::skip]
     fn dispatch_build(&self, field_pair: FieldPair) -> QueryGraphBuilderResult<QueryGraph> {
         let query_info = field_pair.schema_field.query_info.as_ref().unwrap();
         let parsed_field = field_pair.parsed_field;
+        let connector_ctx = self.query_schema.context();
 
         let mut graph = match (&query_info.tag, query_info.model.clone()) {
             (QueryTag::FindUnique, Some(m)) => read::find_unique(parsed_field, m).map(Into::into),
@@ -95,13 +95,13 @@ impl QueryGraphBuilder {
             (QueryTag::FindMany, Some(m)) => read::find_many(parsed_field, m).map(Into::into),
             (QueryTag::Aggregate, Some(m)) => read::aggregate(parsed_field, m).map(Into::into),
             (QueryTag::GroupBy, Some(m)) => read::group_by(parsed_field, m).map(Into::into),
-            (QueryTag::CreateOne, Some(m)) => QueryGraph::root(|g| write::create_record(g, m, parsed_field)),
-            (QueryTag::CreateMany, Some(m)) => QueryGraph::root(|g| write::create_many_records(g, m, parsed_field)),
-            (QueryTag::UpdateOne, Some(m)) => QueryGraph::root(|g| write::update_record(g, m, parsed_field)),
-            (QueryTag::UpdateMany, Some(m)) => QueryGraph::root(|g| write::update_many_records(g, m, parsed_field)),
-            (QueryTag::UpsertOne, Some(m)) => QueryGraph::root(|g| write::upsert_record(g, m, parsed_field)),
-            (QueryTag::DeleteOne, Some(m)) => QueryGraph::root(|g| write::delete_record(g, m, parsed_field)),
-            (QueryTag::DeleteMany, Some(m)) => QueryGraph::root(|g| write::delete_many_records(g, m, parsed_field)),
+            (QueryTag::CreateOne, Some(m)) => QueryGraph::root(|g| write::create_record(g, connector_ctx, m, parsed_field)),
+            (QueryTag::CreateMany, Some(m)) => QueryGraph::root(|g| write::create_many_records(g,  connector_ctx,m, parsed_field)),
+            (QueryTag::UpdateOne, Some(m)) => QueryGraph::root(|g| write::update_record(g, connector_ctx, m, parsed_field)),
+            (QueryTag::UpdateMany, Some(m)) => QueryGraph::root(|g| write::update_many_records(g, connector_ctx, m, parsed_field)),
+            (QueryTag::UpsertOne, Some(m)) => QueryGraph::root(|g| write::upsert_record(g, connector_ctx, m, parsed_field)),
+            (QueryTag::DeleteOne, Some(m)) => QueryGraph::root(|g| write::delete_record(g, connector_ctx, m, parsed_field)),
+            (QueryTag::DeleteMany, Some(m)) => QueryGraph::root(|g| write::delete_many_records(g, connector_ctx, m, parsed_field)),
             (QueryTag::ExecuteRaw, _) => QueryGraph::root(|g| write::execute_raw(g, parsed_field)),
             (QueryTag::QueryRaw, _) => QueryGraph::root(|g| write::query_raw(g, parsed_field)),
             _ => unreachable!("Query builder dispatching failed."),

@@ -18,9 +18,9 @@ fn should_apply_a_custom_type() {
     let user_model = datamodel.assert_has_model("Model");
     user_model
         .assert_has_scalar_field("id")
-        .assert_is_id()
+        .assert_is_id(user_model)
         .assert_base_type(&ScalarType::String)
-        .assert_default_value(DefaultValue::Expression(ValueGenerator::new_cuid()));
+        .assert_default_value(DefaultValue::new_expression(ValueGenerator::new_cuid()));
 }
 
 #[test]
@@ -39,9 +39,9 @@ fn should_recursively_apply_a_custom_type() {
     let user_model = datamodel.assert_has_model("Model");
     user_model
         .assert_has_scalar_field("id")
-        .assert_is_id()
+        .assert_is_id(user_model)
         .assert_base_type(&ScalarType::String)
-        .assert_default_value(DefaultValue::Expression(ValueGenerator::new_cuid()));
+        .assert_default_value(DefaultValue::new_expression(ValueGenerator::new_cuid()));
 }
 
 #[test]
@@ -65,7 +65,7 @@ fn should_be_able_to_handle_native_type_combined_with_default_autoincrement_attr
 
     user_model
         .assert_has_scalar_field("name")
-        .assert_default_value(DefaultValue::Expression(ValueGenerator::new_autoincrement()));
+        .assert_default_value(DefaultValue::new_expression(ValueGenerator::new_autoincrement()));
 
     let sft = user_model.assert_has_scalar_field("name").assert_native_type();
 
@@ -93,7 +93,7 @@ fn should_be_able_to_handle_native_type_combined_with_default_attribute() {
 
     user_model
         .assert_has_scalar_field("test")
-        .assert_default_value(DefaultValue::Single(PrismaValue::Float(
+        .assert_default_value(DefaultValue::new_single(PrismaValue::Float(
             BigDecimal::from_f64(1.00).unwrap(),
         )));
 
@@ -122,19 +122,20 @@ fn should_be_able_to_handle_multiple_types() {
     let user_model = datamodel.assert_has_model("User");
     user_model
         .assert_has_scalar_field("id")
-        .assert_is_id()
+        .assert_is_id(user_model)
         .assert_base_type(&ScalarType::String)
-        .assert_default_value(DefaultValue::Expression(ValueGenerator::new_cuid()));
+        .assert_default_value(DefaultValue::new_expression(ValueGenerator::new_cuid()));
 
     user_model
         .assert_has_scalar_field("email")
-        .assert_is_unique(true)
         .assert_base_type(&ScalarType::String);
+
+    assert!(user_model.field_is_unique("email"));
 
     user_model
         .assert_has_scalar_field("balance")
         .assert_base_type(&ScalarType::Int)
-        .assert_default_value(DefaultValue::Single(PrismaValue::Int(0)));
+        .assert_default_value(DefaultValue::new_single(PrismaValue::Int(0)));
 }
 
 #[test]
@@ -161,7 +162,7 @@ fn should_be_able_to_define_custom_enum_types() {
     user_model
         .assert_has_scalar_field("role")
         .assert_enum_type("Role")
-        .assert_default_value(DefaultValue::Single(PrismaValue::Enum(String::from("USER"))));
+        .assert_default_value(DefaultValue::new_single(PrismaValue::Enum(String::from("USER"))));
 }
 
 #[test]

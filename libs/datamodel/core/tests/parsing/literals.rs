@@ -4,6 +4,10 @@ use crate::common::parse;
 use indoc::indoc;
 use pretty_assertions::assert_eq;
 
+fn from_env(key: &str) -> Option<String> {
+    std::env::var(key).ok()
+}
+
 #[test]
 fn strings_with_quotes_are_unescaped() {
     let input = indoc!(
@@ -22,9 +26,9 @@ fn strings_with_quotes_are_unescaped() {
         name.default_value
             .as_ref()
             .unwrap()
-            .get()
+            .as_single()
             .unwrap()
-            .into_string()
+            .as_string()
             .unwrap(),
         "a \" b\"c d"
     );
@@ -48,9 +52,9 @@ fn strings_with_newlines_are_unescpaed() {
         name.default_value
             .as_ref()
             .unwrap()
-            .get()
+            .as_single()
             .unwrap()
-            .into_string()
+            .as_string()
             .unwrap(),
         "Jean\nClaude\nVan\nDamme"
     );
@@ -67,7 +71,7 @@ fn relative_sqlite_paths_can_be_modified() {
     );
 
     let config = datamodel::parse_configuration(schema).unwrap();
-    let url = config.subject.datasources[0].load_url_with_config_dir(Path::new("/path/to/prisma"));
+    let url = config.subject.datasources[0].load_url_with_config_dir(Path::new("/path/to/prisma"), from_env);
 
     assert_eq!("file:/path/to/prisma/dev.db", url.unwrap())
 }
@@ -83,7 +87,7 @@ fn absolute_sqlite_paths_are_not_modified() {
     );
 
     let config = datamodel::parse_configuration(schema).unwrap();
-    let url = config.subject.datasources[0].load_url_with_config_dir(Path::new("/path/to/prisma"));
+    let url = config.subject.datasources[0].load_url_with_config_dir(Path::new("/path/to/prisma"), from_env);
 
     assert_eq!("file:/foo/bar/dev.db", url.unwrap())
 }
@@ -99,7 +103,7 @@ fn postgres_relative_sslidentity_can_be_modified() {
     );
 
     let config = datamodel::parse_configuration(schema).unwrap();
-    let url = config.subject.datasources[0].load_url_with_config_dir(Path::new("/path/to/prisma"));
+    let url = config.subject.datasources[0].load_url_with_config_dir(Path::new("/path/to/prisma"), from_env);
 
     assert_eq!(
         "postgres://localhost:420/?foo=bar&sslidentity=%2Fpath%2Fto%2Fprisma%2Fwe%2Fare%2Fhere.key",
@@ -119,7 +123,7 @@ fn postgres_absolute_sslidentity_should_not_be_modified() {
 
     let config = datamodel::parse_configuration(schema).unwrap();
     let url = config.subject.datasources[0]
-        .load_url_with_config_dir(Path::new("/path/to/prisma"))
+        .load_url_with_config_dir(Path::new("/path/to/prisma"), from_env)
         .unwrap();
 
     assert_eq!(
@@ -140,7 +144,7 @@ fn mysql_relative_sslidentity_can_be_modified() {
 
     let config = datamodel::parse_configuration(schema).unwrap();
     let url = config.subject.datasources[0]
-        .load_url_with_config_dir(Path::new("/path/to/prisma"))
+        .load_url_with_config_dir(Path::new("/path/to/prisma"), from_env)
         .unwrap();
 
     assert_eq!(
@@ -161,7 +165,7 @@ fn mysql_absolute_sslidentity_should_not_be_modified() {
 
     let config = datamodel::parse_configuration(schema).unwrap();
     let url = config.subject.datasources[0]
-        .load_url_with_config_dir(Path::new("/path/to/prisma"))
+        .load_url_with_config_dir(Path::new("/path/to/prisma"), from_env)
         .unwrap();
 
     assert_eq!("mysql://localhost:420/?foo=bar&sslidentity=%2Fwe%2Fare%2Fhere.key", url)
@@ -179,7 +183,7 @@ fn postgres_relative_sslcert_can_be_modified() {
 
     let config = datamodel::parse_configuration(schema).unwrap();
     let url = config.subject.datasources[0]
-        .load_url_with_config_dir(Path::new("/path/to/prisma"))
+        .load_url_with_config_dir(Path::new("/path/to/prisma"), from_env)
         .unwrap();
 
     assert_eq!(
@@ -200,7 +204,7 @@ fn postgres_absolute_sslcert_should_not_be_modified() {
 
     let config = datamodel::parse_configuration(schema).unwrap();
     let url = config.subject.datasources[0]
-        .load_url_with_config_dir(Path::new("/path/to/prisma"))
+        .load_url_with_config_dir(Path::new("/path/to/prisma"), from_env)
         .unwrap();
 
     assert_eq!("postgres://localhost:420/?foo=bar&sslcert=%2Fwe%2Fare%2Fhere.crt", url)
@@ -218,7 +222,7 @@ fn mysql_relative_sslcert_can_be_modified() {
 
     let config = datamodel::parse_configuration(schema).unwrap();
     let url = config.subject.datasources[0]
-        .load_url_with_config_dir(Path::new("/path/to/prisma"))
+        .load_url_with_config_dir(Path::new("/path/to/prisma"), from_env)
         .unwrap();
 
     assert_eq!(
@@ -239,7 +243,7 @@ fn mysql_absolute_sslcert_should_not_be_modified() {
 
     let config = datamodel::parse_configuration(schema).unwrap();
     let url = config.subject.datasources[0]
-        .load_url_with_config_dir(Path::new("/path/to/prisma"))
+        .load_url_with_config_dir(Path::new("/path/to/prisma"), from_env)
         .unwrap();
 
     assert_eq!("mysql://localhost:420/?foo=bar&sslcert=%2Fwe%2Fare%2Fhere.crt", url)

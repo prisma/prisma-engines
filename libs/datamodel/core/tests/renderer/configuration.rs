@@ -18,9 +18,7 @@ fn shadow_database_url_round_trips() {
         "#
     );
 
-    let parsed = parse_schema(schema_str).unwrap();
-    let (ref config, ref datamodel) = parsed.subject;
-
+    let (ref config, ref datamodel) = parse_schema(schema_str).unwrap();
     let rendered = render_datamodel_and_config_to_string(datamodel, config);
 
     assert_eq!(schema_str, rendered);

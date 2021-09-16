@@ -126,18 +126,18 @@ impl QueryArguments {
     }
 
     pub fn take_abs(&self) -> Option<i64> {
-        self.take.clone().map(|t| if t < 0 { -t } else { t })
+        self.take.map(|t| if t < 0 { -t } else { t })
     }
 
-    pub fn should_batch(&self) -> bool {
+    pub fn should_batch(&self, chunk_size: usize) -> bool {
         self.filter
             .as_ref()
-            .map(|filter| filter.should_batch())
+            .map(|filter| filter.should_batch(chunk_size))
             .unwrap_or(false)
             && self.cursor.is_none()
     }
 
-    pub fn batched(self) -> Vec<Self> {
+    pub fn batched(self, chunk_size: usize) -> Vec<Self> {
         match self.filter {
             Some(filter) => {
                 let model = self.model;
@@ -150,7 +150,7 @@ impl QueryArguments {
                 let ignore_take = self.ignore_take;
 
                 filter
-                    .batched()
+                    .batched(chunk_size)
                     .into_iter()
                     .map(|filter| QueryArguments {
                         model: model.clone(),

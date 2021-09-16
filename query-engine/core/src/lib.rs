@@ -9,7 +9,11 @@
     clippy::from_over_into,
     clippy::or_fun_call,
     clippy::needless_question_mark,
-    clippy::ptr_arg
+    clippy::ptr_arg,
+    clippy::mem_replace_with_default,
+    clippy::clone_on_copy,
+    clippy::needless_borrow,
+    clippy::needless_collect
 )]
 #![warn(warnings)] // Todo deny warnings once done
 
@@ -17,7 +21,6 @@
 extern crate tracing;
 
 pub mod error;
-pub mod exec_loader;
 pub mod executor;
 pub mod interpreter;
 pub mod query_ast;

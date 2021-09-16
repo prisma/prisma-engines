@@ -2,7 +2,7 @@ use crate::ast;
 use crate::diagnostics::DatamodelError;
 use crate::transform::helpers::ValueValidator;
 
-pub struct EnvFunction {
+pub(crate) struct EnvFunction {
     var_name: String,
 }
 

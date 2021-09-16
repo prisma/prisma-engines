@@ -1,29 +1,30 @@
-use indoc::indoc;
+use expect_test::expect;
 use introspection_engine_tests::{test_api::*, TestResult};
 use quaint::prelude::Queryable;
 use test_macros::test_connector;
 
 #[test_connector(tags(Mssql))]
 async fn geometry_should_be_unsupported(api: &TestApi) -> TestResult {
-    api.barrel()
-        .execute(move |migration| {
-            migration.create_table("A", move |t| {
-                t.inject_custom("id int identity primary key");
-                t.inject_custom("location geography");
-            });
-        })
-        .await?;
+    let setup = r#"
+        CREATE TABLE [geometry_should_be_unsupported].[A] (
+            id INT IDENTITY,
+            location GEOGRAPHY,
+            CONSTRAINT [A_pkey] PRIMARY KEY (id)
+        );
+    "#;
 
-    let result = api.introspect().await?;
+    api.raw_cmd(setup).await;
 
-    let dm = indoc! {r#"
+    let result = api.introspect_dml().await?;
+
+    let expected = expect![[r#"
         model A {
-          id       Int @id @default(autoincrement())
+          id       Int                       @id @default(autoincrement())
           location Unsupported("geography")?
         }
-    "#};
+    "#]];
 
-    api.assert_eq_datamodels(&dm, &result);
+    expected.assert_eq(&result);
 
     Ok(())
 }
@@ -34,22 +35,57 @@ async fn user_defined_type_aliases_should_map_to_the_system_type(api: &TestApi) 
     api.database().raw_cmd(&create_type).await?;
 
     let create_table = format!(
-        "CREATE TABLE [{schema_name}].[A] (id int identity primary key, name [{schema_name}].[Name])",
+        r#"
+        CREATE TABLE [{schema_name}].[A] (
+            id INT IDENTITY,
+            name [{schema_name}].[Name],
+            CONSTRAINT [A_pkey] PRIMARY KEY (id),
+        )"#,
         schema_name = api.schema_name()
     );
 
     api.database().raw_cmd(&create_table).await?;
 
-    let dm = indoc! {r#"
+    let result = api.introspect_dml().await?;
+
+    let expected = expect![[r#"
         model A {
-          id       Int @id @default(autoincrement())
-          name     String? @db.NVarChar(50)
+          id   Int     @id @default(autoincrement())
+          name String? @db.NVarChar(50)
         }
-    "#};
+    "#]];
 
-    let result = api.introspect().await?;
+    expected.assert_eq(&result);
 
-    api.assert_eq_datamodels(&dm, &result);
+    Ok(())
+}
+
+#[test_connector(tags(Mssql))]
+async fn ms_xml_indexes_are_skipped(api: &TestApi) -> TestResult {
+    let setup = r#"
+        CREATE TABLE [$schema].[xml_test] (
+            id INT IDENTITY,
+            data XML,
+
+            CONSTRAINT [xml_test_pkey] PRIMARY KEY (id)
+        );
+
+        CREATE PRIMARY XML INDEX primaryIndex ON [$schema].[xml_test] (data);
+        CREATE XML INDEX secondaryIndex ON [$schema].[xml_test] (data) USING XML INDEX primaryIndex FOR PATH;
+    "#
+    .replace("$schema", api.schema_name());
+
+    api.raw_cmd(&setup).await;
+
+    let expected = expect![[r#"
+        model xml_test {
+          id   Int     @id @default(autoincrement())
+          data String? @db.Xml
+        }
+    "#]];
+
+    let result = api.introspect_dml().await?;
+    expected.assert_eq(&result);
 
     Ok(())
 }

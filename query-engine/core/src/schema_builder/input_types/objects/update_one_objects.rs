@@ -114,11 +114,24 @@ pub(super) fn scalar_input_fields_for_unchecked_update(
         vec![]
     };
 
+    let id_fields = model.fields().id().map(|pk| pk.fields());
     let scalar_fields: Vec<ScalarFieldRef> = model
         .fields()
         .scalar()
         .into_iter()
         .filter(|sf| !linking_fields.contains(sf))
+        .filter(|sf| {
+            if let Some(ref id_fields) = &id_fields {
+                // Exclude @@id or @id fields if not updatable
+                if id_fields.contains(sf) {
+                    ctx.capabilities.contains(ConnectorCapability::UpdateableId)
+                } else {
+                    true
+                }
+            } else {
+                true
+            }
+        })
         .collect();
 
     input_fields::scalar_input_fields(
@@ -152,14 +165,26 @@ fn non_list_scalar_update_field_mapper(
         TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
     };
 
-    let input_field = if field.type_identifier != TypeIdentifier::Json {
-        let types = vec![map_scalar_input_type_for_field(ctx, field), base_update_type];
-        input_field(field.name.clone(), types, default)
-    } else {
-        input_field(field.name.clone(), base_update_type, default)
-    };
+    let has_adv_json = ctx.has_capability(ConnectorCapability::AdvancedJsonNullability);
+    match &field.type_identifier {
+        TypeIdentifier::Json if has_adv_json => {
+            let enum_type = json_null_input_enum(!field.is_required);
+            let input_field = input_field(
+                field.name.clone(),
+                vec![InputType::Enum(enum_type), base_update_type],
+                default,
+            );
 
-    input_field.optional().nullable_if(!field.is_required)
+            input_field.optional()
+        }
+
+        _ => {
+            let types = vec![map_scalar_input_type_for_field(ctx, field), base_update_type];
+
+            let input_field = input_field(field.name.clone(), types, default);
+            input_field.optional().nullable_if(!field.is_required)
+        }
+    }
 }
 
 #[tracing::instrument(skip(ctx, prefix, field, with_number_operators))]

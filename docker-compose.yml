@@ -35,7 +35,7 @@ services:
       - "5431:5432"
     networks:
       - databases
-    tmpfs: /pgtmpfs9
+    tmpfs: /pgtmpfs9:size=4g
 
   postgres10:
     image: postgres:10
@@ -48,7 +48,7 @@ services:
       - "5432:5432"
     networks:
       - databases
-    tmpfs: /pgtmpfs10
+    tmpfs: /pgtmpfs10:size=4g
 
   postgres11:
     image: postgres:11
@@ -61,7 +61,7 @@ services:
       - "5433:5432"
     networks:
       - databases
-    tmpfs: /pgtmpfs11
+    tmpfs: /pgtmpfs11:size=4g
 
   postgres12:
     image: postgres:12
@@ -74,7 +74,7 @@ services:
       - "5434:5432"
     networks:
       - databases
-    tmpfs: /pgtmpfs12
+    tmpfs: /pgtmpfs12:size=4g
 
   postgres13:
     image: postgres:13
@@ -87,7 +87,7 @@ services:
       - "5435:5432"
     networks:
       - databases
-    tmpfs: /pgtmpfs12
+    tmpfs: /pgtmpfs13:size=4g
 
   mysql-5-6:
     image: mysql:5.6.50
@@ -145,7 +145,7 @@ services:
     tmpfs: /var/lib/mariadb
 
   vitess-test-5_7:
-    image: vitess/vttestserver:mysql57
+    image: vitess/vttestserver:mysql57@sha256:b1f8eed5d43e3836a65e2cb4b373441a92989bb44af0c352b195f058ce139c08
     restart: always
     ports:
       - 33577:33577
@@ -154,9 +154,10 @@ services:
       KEYSPACES: "test"
       NUM_SHARDS: "1"
       MYSQL_BIND_HOST: "0.0.0.0"
+      FOREIGN_KEY_MODE: "disallow"
 
   vitess-test-8_0:
-    image: vitess/vttestserver:mysql80
+    image: vitess/vttestserver:mysql80@sha256:5fec546e3f2ba50237b78938982a72bf17eacbc97f18ab877774f22d6e2e9682
     restart: always
     ports:
       - 33807:33807
@@ -165,9 +166,10 @@ services:
       KEYSPACES: "test"
       NUM_SHARDS: "1"
       MYSQL_BIND_HOST: "0.0.0.0"
+      FOREIGN_KEY_MODE: "disallow"
 
   vitess-shadow-5_7:
-    image: vitess/vttestserver:mysql57
+    image: vitess/vttestserver:mysql57@sha256:b1f8eed5d43e3836a65e2cb4b373441a92989bb44af0c352b195f058ce139c08
     restart: always
     ports:
       - 33578:33577
@@ -176,9 +178,10 @@ services:
       KEYSPACES: "shadow"
       NUM_SHARDS: "1"
       MYSQL_BIND_HOST: "0.0.0.0"
+      FOREIGN_KEY_MODE: "disallow"
 
   vitess-shadow-8_0:
-    image: vitess/vttestserver:mysql80
+    image: vitess/vttestserver:mysql80@sha256:5fec546e3f2ba50237b78938982a72bf17eacbc97f18ab877774f22d6e2e9682
     restart: always
     ports:
       - 33808:33807
@@ -187,6 +190,7 @@ services:
       KEYSPACES: "shadow"
       NUM_SHARDS: "1"
       MYSQL_BIND_HOST: "0.0.0.0"
+      FOREIGN_KEY_MODE: "disallow"
 
   mssql-2019:
     image: mcr.microsoft.com/mssql/server:2019-latest
@@ -211,7 +215,7 @@ services:
       - databases
 
   mongo4:
-    image: mongo:4.4.3-bionic
+    image: prismagraphql/mongo-single-replica:4.4.3-bionic
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: "prisma"

@@ -1,18 +1,17 @@
 use super::{inmemory_record_processor::InMemoryRecordProcessor, read};
 use crate::{interpreter::InterpretationResult, query_ast::*};
 use connector::{
-    self, filter::Filter, ConnectionLike, QueryArguments, ReadOperations, RelAggregationRow, RelAggregationSelection,
-    ScalarCompare,
+    self, filter::Filter, ConnectionLike, QueryArguments, RelAggregationRow, RelAggregationSelection, ScalarCompare,
 };
 use prisma_models::{ManyRecords, ModelProjection, Record, RecordProjection, RelationFieldRef};
 use prisma_value::PrismaValue;
 use std::collections::HashMap;
 
 #[tracing::instrument(skip(tx, query, parent_result, processor))]
-pub async fn m2m<'a, 'b>(
-    tx: &'a ConnectionLike<'a, 'b>,
+pub async fn m2m(
+    tx: &mut dyn ConnectionLike,
     query: &RelatedRecordsQuery,
-    parent_result: Option<&'a ManyRecords>,
+    parent_result: Option<&ManyRecords>,
     processor: InMemoryRecordProcessor,
 ) -> InterpretationResult<(ManyRecords, Option<Vec<RelAggregationRow>>)> {
     let parent_field = &query.parent_field;
@@ -52,7 +51,7 @@ pub async fn m2m<'a, 'b>(
     // - there is no additional filter
     // - there is no aggregation selection
     // - the selection set is the child_link_id
-    let scalars =
+    let mut scalars =
         if query.args.do_nothing() && query.aggregation_selections.is_empty() && child_link_id == query.selected_fields
         {
             ManyRecords::from_projection(child_ids, &query.selected_fields).with_unique_records()
@@ -73,9 +72,6 @@ pub async fn m2m<'a, 'b>(
             )
             .await?
         };
-
-    let (mut scalars, aggregation_rows) =
-        read::extract_aggregation_rows_from_scalars(scalars.clone(), query.aggregation_selections.clone());
 
     // Child id to parent ids
     let mut id_map: HashMap<RecordProjection, Vec<RecordProjection>> = HashMap::new();
@@ -125,7 +121,11 @@ pub async fn m2m<'a, 'b>(
         }
     }
 
-    Ok((processor.apply(scalars), aggregation_rows))
+    let scalars = processor.apply(scalars);
+    let (scalars, aggregation_rows) =
+        read::extract_aggregation_rows_from_scalars(scalars, query.aggregation_selections.clone());
+
+    Ok((scalars, aggregation_rows))
 }
 
 // [DTODO] This is implemented in an inefficient fashion, e.g. too much Arc cloning going on.
@@ -138,11 +138,12 @@ pub async fn m2m<'a, 'b>(
     selected_fields,
     processor
 ))]
-pub async fn one2m<'a, 'b>(
-    tx: &'a ConnectionLike<'a, 'b>,
+#[allow(clippy::too_many_arguments)]
+pub async fn one2m(
+    tx: &mut dyn ConnectionLike,
     parent_field: &RelationFieldRef,
     parent_projections: Option<Vec<RecordProjection>>,
-    parent_result: Option<&'a ManyRecords>,
+    parent_result: Option<&ManyRecords>,
     query_args: QueryArguments,
     selected_fields: &ModelProjection,
     aggr_selections: Vec<RelAggregationSelection>,
@@ -200,7 +201,7 @@ pub async fn one2m<'a, 'b>(
     // - there is no additional filter
     // - there is no aggregation selection
     // - the selection set is the child_link_id
-    let scalars = if query_args.do_nothing() && aggr_selections.is_empty() && &child_link_id == selected_fields {
+    let mut scalars = if query_args.do_nothing() && aggr_selections.is_empty() && &child_link_id == selected_fields {
         ManyRecords::from_projection(uniq_projections, selected_fields).with_unique_records()
     } else {
         let filter = child_link_id.is_in(uniq_projections);
@@ -213,8 +214,6 @@ pub async fn one2m<'a, 'b>(
         tx.get_many_records(&parent_field.related_model(), args, selected_fields, &aggr_selections)
             .await?
     };
-
-    let (mut scalars, aggregation_rows) = read::extract_aggregation_rows_from_scalars(scalars.clone(), aggr_selections);
 
     // Inlining is done on the parent, this means that we need to write the primary parent ID
     // into the child records that we retrieved. The matching is done based on the parent link values.
@@ -262,5 +261,8 @@ pub async fn one2m<'a, 'b>(
         );
     }
 
-    Ok((processor.apply(scalars), aggregation_rows))
+    let scalars = processor.apply(scalars);
+    let (scalars, aggregation_rows) = read::extract_aggregation_rows_from_scalars(scalars, aggr_selections);
+
+    Ok((scalars, aggregation_rows))
 }

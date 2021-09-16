@@ -1,5 +1,5 @@
 use super::*;
-use constants::{aggregations, deprecation, ordering};
+use constants::{aggregations, ordering};
 use output_types::aggregation;
 
 /// Builds "<Model>OrderByInput" object types.
@@ -192,17 +192,12 @@ fn order_by_object_type_rel_aggregate(
     let input_object = Arc::new(input_object);
     ctx.cache_input_type(ident, input_object.clone());
 
-    let fields = vec![
-        input_field(
-            aggregations::UNDERSCORE_COUNT,
-            InputType::Enum(ordering_enum.clone()),
-            None,
-        )
-        .optional(),
-        input_field(aggregations::COUNT, InputType::Enum(ordering_enum.clone()), None)
-            .deprecate(deprecation::AGGR_DEPRECATION, "2.23", None)
-            .optional(),
-    ];
+    let fields = vec![input_field(
+        aggregations::UNDERSCORE_COUNT,
+        InputType::Enum(ordering_enum.clone()),
+        None,
+    )
+    .optional()];
 
     input_object.set_fields(fields);
 

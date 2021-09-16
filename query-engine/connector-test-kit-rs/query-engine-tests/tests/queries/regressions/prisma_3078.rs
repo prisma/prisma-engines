@@ -12,8 +12,7 @@ use query_engine_tests::*;
 // /!\ rel_filter_1_m_a and rel_filter_1_m_z must always expect the same results
 // /!\ rel_filter_n_m_a and rel_filter_n_m_z must always expect the same results
 
-// TODO: Bring back SqlServer when cascading rules can be set!
-#[test_suite(exclude(SqlServer))]
+#[test_suite]
 mod prisma_3078 {
     use indoc::indoc;
     use query_engine_tests::run_query;
@@ -24,7 +23,7 @@ mod prisma_3078 {
               #id(id, Int, @id)
               name       String?
               field_b    User?    @relation("UserfriendOf")
-              field_a    User?    @relation("UserfriendOf", fields: [field_aId], references: [id])
+              field_a    User?    @relation("UserfriendOf", fields: [field_aId], references: [id], onDelete: NoAction, onUpdate: NoAction)
               field_aId  Int?
             }"#
         };
@@ -38,7 +37,7 @@ mod prisma_3078 {
             #id(id, Int, @id)
             name       String?
             field_b    User?    @relation("UserfriendOf")
-            field_z    User?    @relation("UserfriendOf", fields: [field_zId], references: [id])
+            field_z    User?    @relation("UserfriendOf", fields: [field_zId], references: [id], onDelete: NoAction, onUpdate: NoAction)
             field_zId  Int?
           }"#
         };
@@ -52,7 +51,7 @@ mod prisma_3078 {
               #id(id, Int, @id)
               name      String?
               field_b   User[]  @relation("UserfriendOf")
-              field_a   User?   @relation("UserfriendOf", fields: [field_aId], references: [id])
+              field_a   User?   @relation("UserfriendOf", fields: [field_aId], references: [id], onDelete: NoAction, onUpdate: NoAction)
               field_aId Int?
             }"#
         };
@@ -66,7 +65,7 @@ mod prisma_3078 {
             #id(id, Int, @id)
             name      String?
             field_b   User[]  @relation("UserfriendOf")
-            field_z   User?   @relation("UserfriendOf", fields: [field_zId], references: [id])
+            field_z   User?   @relation("UserfriendOf", fields: [field_zId], references: [id], onDelete: NoAction, onUpdate: NoAction)
             field_zId Int?
           }"#
         };
@@ -107,10 +106,10 @@ mod prisma_3078 {
     }
 
     // "A relation filter on a 1:1 self relation " should "work" (with field_a)
-    #[connector_test(schema(rel_filter_1_1_a))]
-    async fn relation_filter_1_1_a(runner: &Runner) -> TestResult<()> {
+    #[connector_test(schema(rel_filter_1_1_a), exclude(SqlServer))]
+    async fn relation_filter_1_1_a(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation{createOneUser(data: { id: 1, name: "A", field_a:{ create:{ id: 10, name: "AA"}}}){
+          run_query!(&runner, r#"mutation{createOneUser(data: { id: 1, name: "A", field_a:{ create:{ id: 10, name: "AA"}}}){
             id
             field_b { id }
             field_a { id }
@@ -120,7 +119,7 @@ mod prisma_3078 {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation{createOneUser(data: { id: 2, name: "B", field_a:{ create:{ id: 20, name: "BB"}}}){
+          run_query!(&runner, r#"mutation{createOneUser(data: { id: 2, name: "B", field_a:{ create:{ id: 20, name: "BB"}}}){
             id
             field_b { id }
             field_a { id }
@@ -130,7 +129,7 @@ mod prisma_3078 {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{findManyUser(where: { field_a:{ is:{ name: {contains: "B"}}}}){
+          run_query!(&runner, r#"{findManyUser(where: { field_a:{ is:{ name: {contains: "B"}}}}){
             id
             field_b { id, name}
             field_a { id, name }
@@ -140,7 +139,7 @@ mod prisma_3078 {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{findManyUser(where: { field_b:{ is:{ name: {contains: "B"}}}}){
+          run_query!(&runner, r#"{findManyUser(where: { field_b:{ is:{ name: {contains: "B"}}}}){
             id
             field_b { id, name}
             field_a { id, name }
@@ -153,10 +152,10 @@ mod prisma_3078 {
     }
 
     // "A relation filter on a 1:1 self relation " should "work" (with field_z)
-    #[connector_test(schema(rel_filter_1_1_z))]
-    async fn relation_filter_1_1_z(runner: &Runner) -> TestResult<()> {
+    #[connector_test(schema(rel_filter_1_1_z), exclude(SqlServer))]
+    async fn relation_filter_1_1_z(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation{createOneUser(data: { id: 1, name: "A", field_z:{ create:{ id: 10, name: "AA"}}}){
+          run_query!(&runner, r#"mutation{createOneUser(data: { id: 1, name: "A", field_z:{ create:{ id: 10, name: "AA"}}}){
                 id
                 field_b { id }
                 field_z { id }
@@ -166,7 +165,7 @@ mod prisma_3078 {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation{createOneUser(data: { id: 2, name: "B", field_z:{ create:{ id: 20, name: "BB"}}}){
+          run_query!(&runner, r#"mutation{createOneUser(data: { id: 2, name: "B", field_z:{ create:{ id: 20, name: "BB"}}}){
                 id
                 field_b { id }
                 field_z { id }
@@ -176,7 +175,7 @@ mod prisma_3078 {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{findManyUser(where: { field_z:{ is:{ name: {contains: "B"}}}}){
+          run_query!(&runner, r#"{findManyUser(where: { field_z:{ is:{ name: {contains: "B"}}}}){
                 id
                 field_b { id, name}
                 field_z { id, name }
@@ -186,7 +185,7 @@ mod prisma_3078 {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{findManyUser(where: { field_b:{ is:{ name: {contains: "B"}}}}){
+          run_query!(&runner, r#"{findManyUser(where: { field_b:{ is:{ name: {contains: "B"}}}}){
                 id
                 field_b { id, name}
                 field_z { id, name }
@@ -200,9 +199,9 @@ mod prisma_3078 {
 
     //"A relation filter on a 1:M self relation " should "work"
     #[connector_test(schema(rel_filter_1_m_a))]
-    async fn relation_filter_1_m_a(runner: &Runner) -> TestResult<()> {
+    async fn relation_filter_1_m_a(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation{createOneUser(data: { id: 1, name: "A" field_a:{ create:{ id: 10, name: "AA"}}}){
+          run_query!(&runner, r#"mutation{createOneUser(data: { id: 1, name: "A" field_a:{ create:{ id: 10, name: "AA"}}}){
             id
             field_b { id }
             field_a { id }
@@ -212,7 +211,7 @@ mod prisma_3078 {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation{createOneUser(data: { id: 2, name: "B" field_a:{ create:{ id: 20, name: "BB"}}}){
+          run_query!(&runner, r#"mutation{createOneUser(data: { id: 2, name: "B" field_a:{ create:{ id: 20, name: "BB"}}}){
             id
             field_b { id }
             field_a { id }
@@ -222,7 +221,7 @@ mod prisma_3078 {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{findManyUser(where: { field_a:{ is:{ name: {contains: "B"}}}}){
+          run_query!(&runner, r#"{findManyUser(where: { field_a:{ is:{ name: {contains: "B"}}}}){
             id
             field_b { id, name}
             field_a { id, name }
@@ -232,7 +231,7 @@ mod prisma_3078 {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{findManyUser(where: { field_b:{ some:{ name: {contains: "B"}}}}){
+          run_query!(&runner, r#"{findManyUser(where: { field_b:{ some:{ name: {contains: "B"}}}}){
             id
             field_b { id, name}
             field_a { id, name }
@@ -246,9 +245,9 @@ mod prisma_3078 {
 
     //"A relation filter on a 1:M self relation " should "work"
     #[connector_test(schema(rel_filter_1_m_z))]
-    async fn relation_filter_1_m_z(runner: &Runner) -> TestResult<()> {
+    async fn relation_filter_1_m_z(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation{createOneUser(data: { id: 1, name: "A" field_z:{ create:{ id: 10, name: "AA"}}}){
+          run_query!(&runner, r#"mutation{createOneUser(data: { id: 1, name: "A" field_z:{ create:{ id: 10, name: "AA"}}}){
             id
             field_b { id }
             field_z { id }
@@ -258,7 +257,7 @@ mod prisma_3078 {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation{createOneUser(data: { id: 2, name: "B" field_z:{ create:{ id: 20, name: "BB"}}}){
+          run_query!(&runner, r#"mutation{createOneUser(data: { id: 2, name: "B" field_z:{ create:{ id: 20, name: "BB"}}}){
             id
             field_b { id }
             field_z { id }
@@ -268,7 +267,7 @@ mod prisma_3078 {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{findManyUser(where: { field_z:{ is:{ name: {contains: "B"}}}}){
+          run_query!(&runner, r#"{findManyUser(where: { field_z:{ is:{ name: {contains: "B"}}}}){
             id
             field_b { id, name}
             field_z { id, name }
@@ -278,7 +277,7 @@ mod prisma_3078 {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{findManyUser(where: { field_b:{ some:{ name: {contains: "B"}}}}){
+          run_query!(&runner, r#"{findManyUser(where: { field_b:{ some:{ name: {contains: "B"}}}}){
             id
             field_b { id, name}
             field_z { id, name }
@@ -292,9 +291,9 @@ mod prisma_3078 {
 
     // "A relation filter on a N:M self relation " should "work"
     #[connector_test(schema(rel_filter_n_m_a))]
-    async fn relation_filter_n_m_a(runner: &Runner) -> TestResult<()> {
+    async fn relation_filter_n_m_a(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation{createOneUser(data: { id: 1, name: "A" field_a:{ create:{ id: 10, name: "AA"}}}){
+          run_query!(&runner, r#"mutation{createOneUser(data: { id: 1, name: "A" field_a:{ create:{ id: 10, name: "AA"}}}){
             id
             field_b { id }
             field_a { id }
@@ -304,7 +303,7 @@ mod prisma_3078 {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation{createOneUser(data: { id: 2, name: "B" field_a:{ create:{ id: 20, name: "BB"}}}){
+          run_query!(&runner, r#"mutation{createOneUser(data: { id: 2, name: "B" field_a:{ create:{ id: 20, name: "BB"}}}){
             id
             field_b { id }
             field_a { id }
@@ -314,7 +313,7 @@ mod prisma_3078 {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{findManyUser(where: { field_a:{ some:{ name: {contains: "B"}}}}){
+          run_query!(&runner, r#"{findManyUser(where: { field_a:{ some:{ name: {contains: "B"}}}}){
             id
             field_b { id, name}
             field_a { id, name }
@@ -324,7 +323,7 @@ mod prisma_3078 {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{findManyUser(where: { field_b:{ some:{ name: {contains: "B"}}}}){
+          run_query!(&runner, r#"{findManyUser(where: { field_b:{ some:{ name: {contains: "B"}}}}){
             id
             field_b { id, name}
             field_a { id, name }
@@ -338,9 +337,9 @@ mod prisma_3078 {
 
     // "A relation filter on a N:M self relation " should "work"
     #[connector_test(schema(rel_filter_n_m_z))]
-    async fn relation_filter_n_m_z(runner: &Runner) -> TestResult<()> {
+    async fn relation_filter_n_m_z(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation{createOneUser(data: { id: 1, name: "A" field_z:{ create:{ id: 10, name: "AA"}}}){
+          run_query!(&runner, r#"mutation{createOneUser(data: { id: 1, name: "A" field_z:{ create:{ id: 10, name: "AA"}}}){
                 id
                 field_b { id }
                 field_z { id }
@@ -350,7 +349,7 @@ mod prisma_3078 {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation{createOneUser(data: { id: 2, name: "B" field_z:{ create:{ id: 20, name: "BB"}}}){
+          run_query!(&runner, r#"mutation{createOneUser(data: { id: 2, name: "B" field_z:{ create:{ id: 20, name: "BB"}}}){
                 id
                 field_b { id }
                 field_z { id }
@@ -360,7 +359,7 @@ mod prisma_3078 {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{findManyUser(where: { field_z:{ some:{ name: {contains: "B"}}}}){
+          run_query!(&runner, r#"{findManyUser(where: { field_z:{ some:{ name: {contains: "B"}}}}){
                 id
                 field_b { id, name}
                 field_z { id, name }
@@ -370,7 +369,7 @@ mod prisma_3078 {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{findManyUser(where: { field_b:{ some:{ name: {contains: "B"}}}}){
+          run_query!(&runner, r#"{findManyUser(where: { field_b:{ some:{ name: {contains: "B"}}}}){
                 id
                 field_b { id, name}
                 field_z { id, name }

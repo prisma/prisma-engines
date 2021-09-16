@@ -13,7 +13,7 @@ const TEXT_TYPES: &[&str] = &["Text", "LongText", "MediumText", "TinyText"];
 fn text_and_blob_data_types_should_fail_on_index() {
     fn error_msg(type_name: &str) -> String {
         format!(
-            "You can not define an index on fields with Native type {} of MySQL.",
+            "You cannot define an index on fields with Native type {} of MySQL.",
             type_name
         )
     }
@@ -30,7 +30,7 @@ fn text_and_blob_data_types_should_fail_on_index() {
 #[test]
 fn text_and_blob_data_types_can_not_be_unique() {
     fn error_msg(type_name: &str) -> String {
-        format!("Native type {} can not be unique in MySQL.", type_name)
+        format!("Native type {} cannot be unique in MySQL.", type_name)
     }
 
     for tpe in BLOB_TYPES {
@@ -48,7 +48,7 @@ fn text_and_blob_data_types_can_not_be_unique() {
 fn text_and_blob_data_types_should_fail_on_id_attribute() {
     fn error_msg(type_name: &str) -> String {
         format!(
-            "Native type {} of MySQL can not be used on a field that is `@id` or `@@id`.",
+            "Native type {} of MySQL cannot be used on a field that is `@id` or `@@id`.",
             type_name
         )
     }
@@ -85,7 +85,7 @@ fn test_block_attribute_support(native_type: &str, scalar_type: &str, attribute_
         attribute_name = attribute_name
     );
 
-    test_native_types_compatibility(&dml, &error_msg, MYSQL_SOURCE);
+    test_native_types_compatibility(&dml, error_msg, MYSQL_SOURCE);
 }
 
 #[test]
@@ -104,7 +104,7 @@ fn should_only_allow_bit_one_for_booleans() {
     let expected_error =
         "Argument M is out of range for Native type Bit(2) of MySQL: only Bit(1) can be used as Boolean.";
 
-    test_native_types_without_attributes("Bit(2)", "Boolean", &expected_error, MYSQL_SOURCE);
+    test_native_types_without_attributes("Bit(2)", "Boolean", expected_error, MYSQL_SOURCE);
 }
 
 #[test]

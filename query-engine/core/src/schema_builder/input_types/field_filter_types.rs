@@ -1,5 +1,7 @@
+use crate::constants::json_null;
+
 use super::*;
-use constants::{aggregations, deprecation, filters};
+use constants::{aggregations, filters};
 use datamodel_connector::ConnectorCapability;
 use prisma_models::{dml::DefaultValue, PrismaValue};
 
@@ -139,6 +141,7 @@ fn full_scalar_filter_type(
         scalar_filter_name(typ, list, nullable, nested, include_aggregates),
         PRISMA_NAMESPACE,
     );
+
     return_cached_input!(ctx, &ident);
 
     let object = Arc::new(init_input_object_type(ident.clone()));
@@ -150,7 +153,7 @@ fn full_scalar_filter_type(
         TypeIdentifier::String | TypeIdentifier::UUID => equality_filters(mapped_scalar_type.clone(), nullable)
             .chain(inclusion_filters(mapped_scalar_type.clone(), nullable))
             .chain(alphanumeric_filters(mapped_scalar_type.clone()))
-            .chain(string_filters(mapped_scalar_type.clone()))
+            .chain(string_filters(ctx, mapped_scalar_type.clone()))
             .chain(query_mode_field(ctx, nested))
             .collect(),
 
@@ -168,12 +171,12 @@ fn full_scalar_filter_type(
                 && (ctx.capabilities.contains(ConnectorCapability::JsonFilteringJsonPath)
                     || ctx.capabilities.contains(ConnectorCapability::JsonFilteringArrayPath))
             {
-                equality_filters(mapped_scalar_type.clone(), nullable)
+                json_equality_filters(ctx, mapped_scalar_type.clone(), nullable)
                     .chain(alphanumeric_filters(mapped_scalar_type.clone()))
                     .chain(json_filters(ctx))
                     .collect()
             } else {
-                equality_filters(mapped_scalar_type.clone(), nullable).collect()
+                json_equality_filters(ctx, mapped_scalar_type.clone(), nullable).collect()
             }
         }
 
@@ -184,28 +187,18 @@ fn full_scalar_filter_type(
         TypeIdentifier::Enum(_) => equality_filters(mapped_scalar_type.clone(), nullable)
             .chain(inclusion_filters(mapped_scalar_type.clone(), nullable))
             .collect(),
+
         TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
     };
 
-    // Shorthand `not equals` filter, skips the nested object filter.
-    let mut not_types = vec![mapped_scalar_type];
-
-    if typ != &TypeIdentifier::Json {
-        // Full nested filter. Only available on non-JSON fields.
-        not_types.push(InputType::object(full_scalar_filter_type(
-            ctx,
-            typ,
-            list,
-            nullable,
-            true,
-            include_aggregates,
-        )));
-    }
-
-    let not_field = input_field(filters::NOT_LOWERCASE, not_types, None)
-        .optional()
-        .nullable_if(nullable);
-    fields.push(not_field);
+    fields.push(not_filter_field(
+        ctx,
+        typ,
+        mapped_scalar_type,
+        nullable,
+        include_aggregates,
+        list,
+    ));
 
     if include_aggregates {
         fields.push(aggregate_filter_field(
@@ -215,14 +208,6 @@ fn full_scalar_filter_type(
             nullable,
             list,
         ));
-
-        fields.push(
-            aggregate_filter_field(ctx, aggregations::COUNT, &TypeIdentifier::Int, nullable, list).deprecate(
-                deprecation::AGGR_DEPRECATION,
-                "2.23",
-                None,
-            ),
-        );
 
         if typ.is_numeric() {
             let avg_type = map_avg_type_ident(typ.clone());
@@ -234,14 +219,6 @@ fn full_scalar_filter_type(
                 list,
             ));
 
-            fields.push(
-                aggregate_filter_field(ctx, aggregations::AVG, &avg_type, nullable, list).deprecate(
-                    deprecation::AGGR_DEPRECATION,
-                    "2.23",
-                    None,
-                ),
-            );
-
             fields.push(aggregate_filter_field(
                 ctx,
                 aggregations::UNDERSCORE_SUM,
@@ -249,14 +226,6 @@ fn full_scalar_filter_type(
                 nullable,
                 list,
             ));
-
-            fields.push(
-                aggregate_filter_field(ctx, aggregations::SUM, typ, nullable, list).deprecate(
-                    deprecation::AGGR_DEPRECATION,
-                    "2.23",
-                    None,
-                ),
-            );
         }
 
         if !list {
@@ -267,13 +236,6 @@ fn full_scalar_filter_type(
                 nullable,
                 list,
             ));
-            fields.push(
-                aggregate_filter_field(ctx, aggregations::MIN, typ, nullable, list).deprecate(
-                    deprecation::AGGR_DEPRECATION,
-                    "2.23",
-                    None,
-                ),
-            );
 
             fields.push(aggregate_filter_field(
                 ctx,
@@ -282,13 +244,6 @@ fn full_scalar_filter_type(
                 nullable,
                 list,
             ));
-            fields.push(
-                aggregate_filter_field(ctx, aggregations::MAX, typ, nullable, list).deprecate(
-                    deprecation::AGGR_DEPRECATION,
-                    "2.23",
-                    None,
-                ),
-            );
         }
     }
 
@@ -297,10 +252,39 @@ fn full_scalar_filter_type(
 }
 
 fn equality_filters(mapped_type: InputType, nullable: bool) -> impl Iterator<Item = InputField> {
-    vec![input_field(filters::EQUALS, mapped_type, None)
-        .optional()
-        .nullable_if(nullable)]
-    .into_iter()
+    std::iter::once(
+        input_field(filters::EQUALS, mapped_type, None)
+            .optional()
+            .nullable_if(nullable),
+    )
+}
+
+fn json_equality_filters(
+    ctx: &BuilderContext,
+    mapped_type: InputType,
+    nullable: bool,
+) -> impl Iterator<Item = InputField> {
+    let field = if ctx.has_capability(ConnectorCapability::AdvancedJsonNullability) {
+        let enum_type = json_null_filter_enum();
+        input_field(filters::EQUALS, vec![InputType::Enum(enum_type), mapped_type], None).optional()
+    } else {
+        input_field(filters::EQUALS, vec![mapped_type], None)
+            .optional()
+            .nullable_if(nullable)
+    };
+
+    std::iter::once(field)
+}
+
+fn json_null_filter_enum() -> EnumTypeRef {
+    Arc::new(string_enum_type(
+        json_null::FILTER_ENUM_NAME,
+        vec![
+            json_null::DB_NULL.to_owned(),
+            json_null::JSON_NULL.to_owned(),
+            json_null::ANY_NULL.to_owned(),
+        ],
+    ))
 }
 
 fn inclusion_filters(mapped_type: InputType, nullable: bool) -> impl Iterator<Item = InputField> {
@@ -325,13 +309,20 @@ fn alphanumeric_filters(mapped_type: InputType) -> impl Iterator<Item = InputFie
     .into_iter()
 }
 
-fn string_filters(mapped_type: InputType) -> impl Iterator<Item = InputField> {
-    vec![
+fn string_filters(ctx: &mut BuilderContext, mapped_type: InputType) -> impl Iterator<Item = InputField> {
+    let mut string_filters = vec![
         input_field(filters::CONTAINS, mapped_type.clone(), None).optional(),
         input_field(filters::STARTS_WITH, mapped_type.clone(), None).optional(),
-        input_field(filters::ENDS_WITH, mapped_type, None).optional(),
-    ]
-    .into_iter()
+        input_field(filters::ENDS_WITH, mapped_type.clone(), None).optional(),
+    ];
+
+    if ctx.has_feature(&PreviewFeature::FullTextSearch)
+        && ctx.has_capability(ConnectorCapability::FullTextSearchWithoutIndex)
+    {
+        string_filters.push(input_field(filters::SEARCH, mapped_type, None).optional());
+    }
+
+    string_filters.into_iter()
 }
 
 fn json_filters(ctx: &mut BuilderContext) -> impl Iterator<Item = InputField> {
@@ -350,9 +341,15 @@ fn json_filters(ctx: &mut BuilderContext) -> impl Iterator<Item = InputField> {
         input_field(filters::STRING_CONTAINS, InputType::string(), None).optional(),
         input_field(filters::STRING_STARTS_WITH, InputType::string(), None).optional(),
         input_field(filters::STRING_ENDS_WITH, InputType::string(), None).optional(),
-        input_field(filters::ARRAY_CONTAINS, InputType::json(), None).optional(),
-        input_field(filters::ARRAY_STARTS_WITH, InputType::json(), None).optional(),
-        input_field(filters::ARRAY_ENDS_WITH, InputType::json(), None).optional(),
+        input_field(filters::ARRAY_CONTAINS, InputType::json(), None)
+            .optional()
+            .nullable(),
+        input_field(filters::ARRAY_STARTS_WITH, InputType::json(), None)
+            .optional()
+            .nullable(),
+        input_field(filters::ARRAY_ENDS_WITH, InputType::json(), None)
+            .optional()
+            .nullable(),
     ]
     .into_iter()
 }
@@ -369,7 +366,7 @@ fn query_mode_field(ctx: &BuilderContext, nested: bool) -> impl Iterator<Item = 
         let field = input_field(
             filters::MODE,
             InputType::enum_type(enum_type),
-            Some(DefaultValue::Single(PrismaValue::Enum(filters::DEFAULT.to_owned()))),
+            Some(DefaultValue::new_single(PrismaValue::Enum(filters::DEFAULT.to_owned()))),
         )
         .optional();
 
@@ -425,5 +422,51 @@ fn map_avg_type_ident(typ: TypeIdentifier) -> TypeIdentifier {
     match &typ {
         TypeIdentifier::Int | TypeIdentifier::BigInt | TypeIdentifier::Float => TypeIdentifier::Float,
         _ => typ,
+    }
+}
+
+// Shorthand `not equals` filter input field, skips the nested object filter.
+fn not_filter_field(
+    ctx: &mut BuilderContext,
+    typ: &TypeIdentifier,
+    mapped_scalar_type: InputType,
+    is_nullable: bool,
+    include_aggregates: bool,
+    is_list: bool,
+) -> InputField {
+    let has_adv_json = ctx.has_capability(ConnectorCapability::AdvancedJsonNullability);
+
+    match typ {
+        // Json is not nullable on dbs with `AdvancedJsonNullability`, only by proxy through an enum.
+        TypeIdentifier::Json if has_adv_json => {
+            let enum_type = json_null_filter_enum();
+
+            input_field(
+                filters::NOT_LOWERCASE,
+                vec![InputType::Enum(enum_type), mapped_scalar_type],
+                None,
+            )
+            .optional()
+        }
+
+        TypeIdentifier::Json => input_field(filters::NOT_LOWERCASE, vec![mapped_scalar_type], None)
+            .optional()
+            .nullable_if(is_nullable),
+
+        _ => {
+            // Full nested filter. Only available on non-JSON fields.
+            let shorthand = InputType::object(full_scalar_filter_type(
+                ctx,
+                typ,
+                is_list,
+                is_nullable,
+                true,
+                include_aggregates,
+            ));
+
+            input_field(filters::NOT_LOWERCASE, vec![mapped_scalar_type, shorthand], None)
+                .optional()
+                .nullable_if(is_nullable)
+        }
     }
 }

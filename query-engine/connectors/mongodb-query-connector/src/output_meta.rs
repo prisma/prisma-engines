@@ -38,8 +38,8 @@ pub fn from_field(field: &ScalarFieldRef) -> OutputMeta {
     let (ident, field_arity) = field.type_identifier_with_arity();
 
     // Only add a possible default return if the field is required.
-    let default = field.default_value.clone().and_then(|dv| match dv {
-        datamodel::DefaultValue::Single(pv) if field.is_required => Some(pv),
+    let default = field.default_value.clone().and_then(|dv| match dv.into_kind() {
+        datamodel::DefaultKind::Single(pv) if field.is_required => Some(pv),
         _ => None,
     });
 

@@ -1,5 +1,5 @@
 use indoc::formatdoc;
-use migration_engine_tests::{sync_test_api::*, MigrationsAssertions};
+use migration_engine_tests::test_api::*;
 use pretty_assertions::assert_eq;
 use user_facing_errors::{migration_engine::ApplyMigrationError, UserFacingError};
 
@@ -12,16 +12,18 @@ fn apply_migrations_with_an_empty_migrations_folder_works(api: TestApi) {
 
 #[test_connector]
 fn applying_a_single_migration_should_work(api: TestApi) {
-    let dm = r#"
+    let dm = api.datamodel_with_provider(
+        r#"
         model Cat {
             id Int @id
             name String
         }
-    "#;
+    "#,
+    );
 
     let dir = api.create_migrations_directory();
 
-    api.create_migration("init", dm, &dir).send_sync();
+    api.create_migration("init", &dm, &dir).send_sync();
 
     api.apply_migrations(&dir)
         .send_sync()
@@ -32,26 +34,30 @@ fn applying_a_single_migration_should_work(api: TestApi) {
 
 #[test_connector]
 fn applying_two_migrations_works(api: TestApi) {
-    let dm1 = r#"
+    let dm1 = api.datamodel_with_provider(
+        r#"
         model Cat {
             id      Int @id
             name    String
         }
-    "#;
+    "#,
+    );
 
     let migrations_directory = api.create_migrations_directory();
 
-    api.create_migration("initial", dm1, &migrations_directory).send_sync();
+    api.create_migration("initial", &dm1, &migrations_directory).send_sync();
 
-    let dm2 = r#"
+    let dm2 = api.datamodel_with_provider(
+        r#"
         model Cat {
             id          Int @id
             name        String
             fluffiness  Float
         }
-    "#;
+    "#,
+    );
 
-    api.create_migration("second-migration", dm2, &migrations_directory)
+    api.create_migration("second-migration", &dm2, &migrations_directory)
         .send_sync();
 
     api.apply_migrations(&migrations_directory)
@@ -65,27 +71,31 @@ fn applying_two_migrations_works(api: TestApi) {
 
 #[test_connector]
 fn migrations_should_fail_when_the_script_is_invalid(api: TestApi) {
-    let dm1 = r#"
+    let dm1 = api.datamodel_with_provider(
+        r#"
         model Cat {
             id      Int @id
             name    String
         }
-    "#;
+    "#,
+    );
 
     let migrations_directory = api.create_migrations_directory();
 
-    api.create_migration("initial", dm1, &migrations_directory).send_sync();
+    api.create_migration("initial", &dm1, &migrations_directory).send_sync();
 
-    let dm2 = r#"
+    let dm2 = api.datamodel_with_provider(
+        r#"
         model Cat {
             id          Int @id
             name        String
             fluffiness  Float
         }
-    "#;
+    "#,
+    );
 
     let second_migration_name = api
-        .create_migration("second-migration", dm2, &migrations_directory)
+        .create_migration("second-migration", &dm2, &migrations_directory)
         .send_sync()
         .modify_migration(|contents| contents.push_str("\nSELECT (^.^)_n;\n"))
         .into_output()
@@ -102,7 +112,7 @@ fn migrations_should_fail_when_the_script_is_invalid(api: TestApi) {
     {
         let expected_error_message = formatdoc!(
             r#"
-                A migration failed to apply. New migrations can not be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve
+                A migration failed to apply. New migrations cannot be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve
 
                 Migration name: {second_migration_name}
 
@@ -125,14 +135,19 @@ fn migrations_should_fail_when_the_script_is_invalid(api: TestApi) {
                 t if t.contains(Tags::Mariadb) => "You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near \'^.^)_n\' at line 1",
                 t if t.contains(Tags::Mysql) => "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near \'^.^)_n\' at line 1",
                 t if t.contains(Tags::Mssql) => "Incorrect syntax near \'^\'.",
-                t if t.contains(Tags::Postgres) => "db error: ERROR: syntax error at or near \"^\"",
+                t if t.contains(Tags::Postgres) => "ERROR: syntax error at or near \"^\"",
                 t if t.contains(Tags::Sqlite) => "unrecognized token: \"^\"",
                 _ => todo!(),
             },
         );
 
         assert_eq!(error.error_code, ApplyMigrationError::ERROR_CODE);
-        assert_eq!(error.message, expected_error_message);
+        assert!(
+            error.message.starts_with(&expected_error_message),
+            "Actual:\n{}\n\nExpected:\n{}",
+            error.message,
+            expected_error_message
+        );
     }
 
     let mut migrations = api
@@ -147,47 +162,45 @@ fn migrations_should_fail_when_the_script_is_invalid(api: TestApi) {
 
     first
         .assert_migration_name("initial")
-        .unwrap()
         .assert_applied_steps_count(1)
-        .unwrap()
-        .assert_success()
-        .unwrap();
+        .assert_success();
 
     second
         .assert_migration_name("second-migration")
-        .unwrap()
         .assert_applied_steps_count(0)
-        .unwrap()
-        .assert_failed()
-        .unwrap();
+        .assert_failed();
 }
 
 #[test_connector]
 fn migrations_should_not_reapply_modified_migrations(api: TestApi) {
-    let dm1 = r#"
+    let dm1 = api.datamodel_with_provider(
+        r#"
         model Cat {
             id      Int @id
             name    String
         }
-    "#;
+    "#,
+    );
 
     let migrations_directory = api.create_migrations_directory();
 
-    let assertions = api.create_migration("initial", dm1, &migrations_directory).send_sync();
+    let assertions = api.create_migration("initial", &dm1, &migrations_directory).send_sync();
 
     api.apply_migrations(&migrations_directory).send_sync();
 
     assertions.modify_migration(|script| *script = format!("/* this is just a harmless comment */\n{}", script));
 
-    let dm2 = r#"
+    let dm2 = api.datamodel_with_provider(
+        r#"
         model Cat {
             id          Int @id
             name        String
             fluffiness  Float
         }
-    "#;
+    "#,
+    );
 
-    api.create_migration("second-migration", dm2, &migrations_directory)
+    api.create_migration("second-migration", &dm2, &migrations_directory)
         .send_sync();
 
     api.apply_migrations(&migrations_directory)
@@ -197,18 +210,20 @@ fn migrations_should_not_reapply_modified_migrations(api: TestApi) {
 
 #[test_connector]
 fn migrations_should_fail_on_an_uninitialized_nonempty_database(api: TestApi) {
-    let dm = r#"
+    let dm = api.datamodel_with_provider(
+        r#"
         model Cat {
             id      Int @id
             name    String
         }
-    "#;
+    "#,
+    );
 
-    api.schema_push(dm).send_sync().assert_green_bang();
+    api.schema_push(dm.clone()).send().assert_green();
 
     let directory = api.create_migrations_directory();
 
-    api.create_migration("01-init", dm, &directory)
+    api.create_migration("01-init", &dm, &directory)
         .send_sync()
         .assert_migration_directories_count(1);
 
@@ -227,12 +242,14 @@ fn migrations_should_fail_on_an_uninitialized_nonempty_database(api: TestApi) {
 // Reference for the tables created by PostGIS: https://postgis.net/docs/manual-1.4/ch04.html#id418599
 #[test_connector(tags(Postgres))]
 fn migrations_should_succeed_on_an_uninitialized_nonempty_database_with_postgis_tables(api: TestApi) {
-    let dm = r#"
+    let dm = api.datamodel_with_provider(
+        r#"
         model Cat {
             id      Int @id
             name    String
         }
-    "#;
+    "#,
+    );
 
     let create_spatial_ref_sys_table = "CREATE TABLE IF NOT EXISTS \"spatial_ref_sys\" ( id SERIAL PRIMARY KEY )";
     // The capitalized Geometry is intentional here, because we want the matching to be case-insensitive.
@@ -243,7 +260,7 @@ fn migrations_should_succeed_on_an_uninitialized_nonempty_database_with_postgis_
 
     let directory = api.create_migrations_directory();
 
-    api.create_migration("01-init", dm, &directory)
+    api.create_migration("01-init", &dm, &directory)
         .send_sync()
         .assert_migration_directories_count(1);
 

@@ -14,7 +14,8 @@ pub fn run(_opts: LintOpts) {
     match datamodel_result {
         Err(err) => {
             let mut mini_errors: Vec<MiniError> = err
-                .to_error_iter()
+                .errors()
+                .iter()
                 .map(|err: &DatamodelError| MiniError {
                     start: err.span().start,
                     end: err.span().end,
@@ -24,7 +25,8 @@ pub fn run(_opts: LintOpts) {
                 .collect();
 
             let mut mini_warnings: Vec<MiniError> = err
-                .to_warning_iter()
+                .warnings()
+                .iter()
                 .map(|warn: &DatamodelWarning| MiniError {
                     start: warn.span().start,
                     end: warn.span().end,
