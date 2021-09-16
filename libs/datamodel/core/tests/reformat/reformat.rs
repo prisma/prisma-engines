@@ -815,9 +815,9 @@ fn multiple_new_lines_between_top_level_elements_must_be_reduced_to_a_single_one
         // free floating comment
         /// free floating doc comment
 
-        // type alias comment
-        /// type alias doc comment
-        type MyString = String          @default("FooBar")
+        // alias comment
+        /// alias doc comment
+        alias MyString = String          @default("FooBar")
 
 
         // free floating comment
@@ -840,7 +840,7 @@ fn multiple_new_lines_between_top_level_elements_must_be_reduced_to_a_single_one
         }
     "#};
 
-    // TODO: the formatting of the type alias is not nice
+    // TODO: the formatting of the alias is not nice
     let expected = expect![[r#"
         model Post {
           id Int @id
@@ -878,9 +878,9 @@ fn multiple_new_lines_between_top_level_elements_must_be_reduced_to_a_single_one
         // free floating comment
         /// free floating doc comment
 
-        // type alias comment
-        /// type alias doc comment
-        type                       MyString = String @default("FooBar")
+        // alias comment
+        /// alias doc comment
+        alias                 MyString = String @default("FooBar")
 
         // free floating comment
         /// free floating doc comment

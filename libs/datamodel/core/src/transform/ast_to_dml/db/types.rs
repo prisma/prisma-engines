@@ -25,7 +25,7 @@ pub(super) fn resolve_types(ctx: &mut Context<'_>) {
 
 #[derive(Debug, Default)]
 pub(super) struct Types<'ast> {
-    pub(super) type_aliases: HashMap<ast::AliasId, ScalarFieldType>,
+    pub(super) aliases: HashMap<ast::AliasId, ScalarFieldType>,
     pub(super) scalar_fields: BTreeMap<(ast::ModelId, ast::FieldId), ScalarField<'ast>>,
     /// This contains only the relation fields actually present in the schema
     /// source text.
@@ -220,34 +220,34 @@ fn visit_model<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::Model, ctx: &
     }
 }
 
-/// Detect self-referencing type aliases, possibly indirectly. We loop
-/// through each type alias in the schema. If it references another type
-/// alias — which may in turn reference another type alias —, we check that
-/// it is not self-referencing. If a type alias ends up transitively
+/// Detect self-referencing aliases, possibly indirectly. We loop
+/// through each alias in the schema. If it references another
+/// alias — which may in turn reference another alias —, we check that
+/// it is not self-referencing. If an alias ends up transitively
 /// referencing itself, we create an error diagnostic.
 fn detect_alias_cycles(ctx: &mut Context<'_>) {
-    // The IDs of the type aliases we traversed to get to the current type alias.
+    // The IDs of the aliases we traversed to get to the current alias.
     let mut path = Vec::new();
     // We accumulate the errors here because we want to sort them at the end.
     let mut errors: Vec<(ast::AliasId, DatamodelError)> = Vec::new();
 
-    for (alias_id, ty) in &ctx.db.types.type_aliases {
-        // Loop variable. This is the "tip" of the sequence of type aliases.
+    for (alias_id, ty) in &ctx.db.types.aliases {
+        // Loop variable. This is the "tip" of the sequence of aliases.
         let mut current = (*alias_id, ty);
         path.clear();
 
-        // Follow the chain of type aliases referencing other type aliases.
+        // Follow the chain of aliases referencing other aliases.
         while let ScalarFieldType::Alias(next_alias_id) = current.1 {
             path.push(current.0);
             let next_alias = &ctx.db.ast[*next_alias_id];
-            // Detect a cycle where next type is also the root. In that
+            // Detect a cycle where next alias is also the root. In that
             // case, we want to report an error.
             if path.len() > 1 && &path[0] == next_alias_id {
                 errors.push((
                     *alias_id,
                     DatamodelError::new_validation_error(
                         &format!(
-                            "Recursive type definitions are not allowed. Recursive path was: {} -> {}.",
+                            "Recursive alias definitions are not allowed. Recursive path was: {} -> {}.",
                             path.iter().map(|id| &ctx.db.ast[*id].name.name).join(" -> "),
                             &next_alias.name.name,
                         ),
@@ -257,14 +257,14 @@ fn detect_alias_cycles(ctx: &mut Context<'_>) {
                 break;
             }
 
-            // We detect a cycle anywhere else in the chain of type aliases.
+            // We detect a cycle anywhere else in the chain of aliases.
             // In that case, the error will be reported somewhere else, and
             // we can just move on from this alias.
             if path.contains(next_alias_id) {
                 break;
             }
 
-            match ctx.db.types.type_aliases.get(next_alias_id) {
+            match ctx.db.types.aliases.get(next_alias_id) {
                 Some(next_alias_type) => {
                     current = (*next_alias_id, next_alias_type);
                 }
@@ -304,7 +304,7 @@ fn visit_enum<'ast>(enm: &'ast ast::Enum, ctx: &mut Context<'ast>) {
 fn visit_alias<'ast>(alias_id: ast::AliasId, alias: &'ast ast::Field, ctx: &mut Context<'ast>) {
     match field_type(alias, ctx) {
         Ok(FieldType::Scalar(scalar_field_type)) => {
-            ctx.db.types.type_aliases.insert(alias_id, scalar_field_type);
+            ctx.db.types.aliases.insert(alias_id, scalar_field_type);
         }
         Ok(FieldType::Model(_)) => ctx.push_error(DatamodelError::new_validation_error(
             "Only scalar types can be used for defining custom types.",
@@ -336,7 +336,7 @@ fn field_type<'ast>(field: &'ast ast::Field, ctx: &mut Context<'ast>) -> Result<
     {
         Some((ast::TopId::Model(model_id), ast::Top::Model(_))) => Ok(FieldType::Model(model_id)),
         Some((ast::TopId::Enum(enum_id), ast::Top::Enum(_))) => Ok(FieldType::Scalar(ScalarFieldType::Enum(enum_id))),
-        Some((ast::TopId::Alias(id), ast::Top::Type(_))) => Ok(FieldType::Scalar(ScalarFieldType::Alias(id))),
+        Some((ast::TopId::Alias(id), ast::Top::Alias(_))) => Ok(FieldType::Scalar(ScalarFieldType::Alias(id))),
         Some((_, ast::Top::Generator(_))) | Some((_, ast::Top::Source(_))) => unreachable!(),
         None => Err(supported),
         _ => unreachable!(),

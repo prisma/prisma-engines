@@ -4,7 +4,7 @@ use datamodel::{ast, diagnostics::DatamodelError};
 #[test]
 fn shound_fail_on_attribute_duplication() {
     let dml = r#"
-    type ID = String @id @default(cuid())
+    alias ID = String @id @default(cuid())
 
     model Model {
         id ID @id
@@ -15,19 +15,19 @@ fn shound_fail_on_attribute_duplication() {
 
     error.assert_is_at(
         1,
-        DatamodelError::new_duplicate_attribute_error("id", ast::Span::new(23, 25)),
+        DatamodelError::new_duplicate_attribute_error("id", ast::Span::new(24, 26)),
     );
     error.assert_is_at(
         0,
-        DatamodelError::new_duplicate_attribute_error("id", ast::Span::new(77, 79)),
+        DatamodelError::new_duplicate_attribute_error("id", ast::Span::new(78, 80)),
     );
 }
 
 #[test]
 fn shound_fail_on_attribute_duplication_recursive() {
     let dml = r#"
-    type MyStringWithDefault = String @default(cuid())
-    type ID = MyStringWithDefault @id
+    alias MyStringWithDefault = String @default(cuid())
+    alias ID = MyStringWithDefault @id
 
     model Model {
         id ID @default(cuid())
@@ -38,20 +38,20 @@ fn shound_fail_on_attribute_duplication_recursive() {
 
     error.assert_is_at(
         1,
-        DatamodelError::new_duplicate_attribute_error("default", ast::Span::new(40, 55)),
+        DatamodelError::new_duplicate_attribute_error("default", ast::Span::new(41, 56)),
     );
     error.assert_is_at(
         0,
-        DatamodelError::new_duplicate_attribute_error("default", ast::Span::new(128, 143)),
+        DatamodelError::new_duplicate_attribute_error("default", ast::Span::new(130, 145)),
     );
 }
 
 #[test]
 fn should_fail_on_endless_recursive_type_def() {
     let dml = r#"
-    type MyString = ID
-    type MyStringWithDefault = MyString
-    type ID = MyStringWithDefault
+    alias MyString = ID
+    alias MyStringWithDefault = MyString
+    alias ID = MyStringWithDefault
 
     model Model {
         id ID
@@ -60,23 +60,23 @@ fn should_fail_on_endless_recursive_type_def() {
 
     let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError validating: Recursive type definitions are not allowed. Recursive path was: MyString -> ID -> MyStringWithDefault -> MyString.[0m
+        [1;91merror[0m: [1mError validating: Recursive alias definitions are not allowed. Recursive path was: MyString -> ID -> MyStringWithDefault -> MyString.[0m
           [1;94m-->[0m  [4mschema.prisma:2[0m
         [1;94m   | [0m
         [1;94m 1 | [0m
-        [1;94m 2 | [0m    type MyString = [1;91mID[0m
+        [1;94m 2 | [0m    alias MyString = [1;91mID[0m
         [1;94m   | [0m
-        [1;91merror[0m: [1mError validating: Recursive type definitions are not allowed. Recursive path was: MyStringWithDefault -> MyString -> ID -> MyStringWithDefault.[0m
+        [1;91merror[0m: [1mError validating: Recursive alias definitions are not allowed. Recursive path was: MyStringWithDefault -> MyString -> ID -> MyStringWithDefault.[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
-        [1;94m 2 | [0m    type MyString = ID
-        [1;94m 3 | [0m    type MyStringWithDefault = [1;91mMyString[0m
+        [1;94m 2 | [0m    alias MyString = ID
+        [1;94m 3 | [0m    alias MyStringWithDefault = [1;91mMyString[0m
         [1;94m   | [0m
-        [1;91merror[0m: [1mError validating: Recursive type definitions are not allowed. Recursive path was: ID -> MyStringWithDefault -> MyString -> ID.[0m
+        [1;91merror[0m: [1mError validating: Recursive alias definitions are not allowed. Recursive path was: ID -> MyStringWithDefault -> MyString -> ID.[0m
           [1;94m-->[0m  [4mschema.prisma:4[0m
         [1;94m   | [0m
-        [1;94m 3 | [0m    type MyStringWithDefault = MyString
-        [1;94m 4 | [0m    type ID = [1;91mMyStringWithDefault[0m
+        [1;94m 3 | [0m    alias MyStringWithDefault = MyString
+        [1;94m 4 | [0m    alias ID = [1;91mMyStringWithDefault[0m
         [1;94m   | [0m
     "#]];
 
@@ -86,9 +86,9 @@ fn should_fail_on_endless_recursive_type_def() {
 #[test]
 fn shound_fail_on_unresolvable_type() {
     let dml = r#"
-    type MyString = Hugo
-    type MyStringWithDefault = MyString
-    type ID = MyStringWithDefault
+    alias MyString = Hugo
+    alias MyStringWithDefault = MyString
+    alias ID = MyStringWithDefault
 
     model Model {
         id ID
@@ -97,14 +97,14 @@ fn shound_fail_on_unresolvable_type() {
 
     let error = parse_error(dml);
 
-    error.assert_is(DatamodelError::new_type_not_found_error("Hugo", ast::Span::new(21, 25)));
+    error.assert_is(DatamodelError::new_type_not_found_error("Hugo", ast::Span::new(22, 26)));
 }
 
 #[test]
 fn should_fail_on_custom_related_types() {
     let dml = r#"
-    type UserViaEmail = User @relation(references: email)
-    type UniqueString = String @unique
+    alias UserViaEmail = User @relation(references: email)
+    alias UniqueString = String @unique
 
     model User {
         id Int @id
@@ -122,7 +122,7 @@ fn should_fail_on_custom_related_types() {
 
     error.assert_is(DatamodelError::new_validation_error(
         "Only scalar types can be used for defining custom types.",
-        ast::Span::new(25, 29),
+        ast::Span::new(26, 30),
     ));
 }
 

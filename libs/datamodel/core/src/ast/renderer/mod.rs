@@ -149,7 +149,7 @@ impl<'a> Renderer<'a> {
     fn render_custom_type(target: &mut TableFormat, field: &ast::Field) {
         Self::render_documentation(&mut target.interleave_writer(), field);
 
-        target.write("type ");
+        target.write("alias ");
         target.write(&field.name.name);
         target.write(" = ");
         Self::render_field_type(target, &field.field_type);

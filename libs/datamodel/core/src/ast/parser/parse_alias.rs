@@ -16,7 +16,7 @@ pub fn parse_alias(token: &Token<'_>) -> Field {
 
     for current in token.relevant_children() {
         match current.as_rule() {
-            Rule::TYPE_KEYWORD => {}
+            Rule::ALIAS_KEYWORD => {}
             Rule::non_empty_identifier => name = Some(current.to_id()),
             Rule::base_type => base_type = Some(parse_base_type(&current)),
             Rule::attribute => attributes.push(parse_attribute(&current)),

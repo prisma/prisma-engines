@@ -7,7 +7,7 @@ use prisma_value::PrismaValue;
 #[test]
 fn should_apply_a_custom_type() {
     let dml = r#"
-    type ID = String @id @default(cuid())
+    alias ID = String @id @default(cuid())
 
     model Model {
         id ID
@@ -26,9 +26,9 @@ fn should_apply_a_custom_type() {
 #[test]
 fn should_recursively_apply_a_custom_type() {
     let dml = r#"
-        type MyString = String
-        type MyStringWithDefault = MyString @default(cuid())
-        type ID = MyStringWithDefault @id
+        alias MyString = String
+        alias MyStringWithDefault = MyString @default(cuid())
+        alias ID = MyStringWithDefault @id
 
         model Model {
             id ID
@@ -107,9 +107,9 @@ fn should_be_able_to_handle_native_type_combined_with_default_attribute() {
 #[test]
 fn should_be_able_to_handle_multiple_types() {
     let dml = r#"
-    type ID = String @id @default(cuid())
-    type UniqueString = String @unique
-    type Cash = Int @default(0)
+    alias ID = String @id @default(cuid())
+    alias UniqueString = String @unique
+    alias Cash = Int @default(0)
 
     model User {
         id       ID
@@ -141,7 +141,7 @@ fn should_be_able_to_handle_multiple_types() {
 #[test]
 fn should_be_able_to_define_custom_enum_types() {
     let dml = r#"
-    type RoleWithDefault = Role @default(USER)
+    alias RoleWithDefault = Role @default(USER)
 
     model User {
         id Int @id

@@ -74,7 +74,7 @@ impl<'ast> Context<'ast> {
         while let ScalarFieldType::Alias(alias_id) = scalar_field_type {
             let alias = &self.db.ast[alias_id];
             self.attributes.extend_attributes(&alias.attributes);
-            scalar_field_type = self.db.types.type_aliases[&alias_id];
+            scalar_field_type = self.db.types.aliases[&alias_id];
         }
 
         self.visit_attributes_impl(f)

@@ -425,7 +425,7 @@ fn visit_field_default<'ast>(
                 }
             }
             ScalarFieldType::Alias(alias_id) => {
-                r#type = ctx.db.types.type_aliases[&alias_id];
+                r#type = ctx.db.types.aliases[&alias_id];
                 continue;
             }
             ScalarFieldType::Unsupported => {

@@ -102,7 +102,7 @@ impl<'ast> ParserDatabase<'ast> {
     }
 
     pub(super) fn alias_scalar_field_type(&self, alias_id: &ast::AliasId) -> &ScalarFieldType {
-        &self.types.type_aliases[alias_id]
+        &self.types.aliases[alias_id]
     }
 
     pub(super) fn ast(&self) -> &'ast ast::SchemaAst {

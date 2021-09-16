@@ -102,7 +102,7 @@ model Post {
 
 #[test]
 fn test_parser_renderer_types_via_ast() {
-    let input = r#"type ID = Int @id
+    let input = r#"alias ID = Int @id
 
 model Author {
   id      ID

@@ -27,7 +27,7 @@ impl<'a> LiftAstToDml<'a> {
                 (ast::TopId::Model(model_id), ast::Top::Model(ty)) => schema.add_model(self.lift_model(model_id, ty)),
                 (_, ast::Top::Source(_)) => { /* Source blocks are explicitly ignored by the validator */ }
                 (_, ast::Top::Generator(_)) => { /* Generator blocks are explicitly ignored by the validator */ }
-                (_, ast::Top::Type(_)) => { /* Type blocks are inlined */ }
+                (_, ast::Top::Alias(_)) => { /* Type blocks are inlined */ }
                 _ => unreachable!(),
             }
         }

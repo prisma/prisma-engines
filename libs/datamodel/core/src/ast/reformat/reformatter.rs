@@ -591,12 +591,12 @@ impl<'a> Reformatter<'a> {
 
         for current in token.clone().into_inner() {
             match current.as_rule() {
-                Rule::TYPE_KEYWORD => {}
+                Rule::ALIAS_KEYWORD => {}
                 Rule::non_empty_identifier | Rule::maybe_empty_identifier => {
                     identifier = Some(String::from(current.as_str()))
                 }
                 Rule::base_type => {
-                    target.write("type");
+                    target.write("alias");
                     target.write(&identifier.clone().expect("Unknown field identifier."));
                     target.write("=");
                     target.write(Self::get_identifier(current));
