@@ -28,7 +28,8 @@ mod tests {
             active_connector: Box::new(PostgresDatamodelConnector::new(Default::default())),
             shadow_database_url: None,
             provider: "postgresql".to_string(),
-            referential_integrity: ReferentialIntegrity::ForeignKeys,
+            referential_integrity: None,
+            default_referential_integrity: ReferentialIntegrity::ForeignKeys,
         };
 
         IntrospectionContext {

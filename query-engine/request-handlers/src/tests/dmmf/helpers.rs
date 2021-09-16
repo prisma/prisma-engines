@@ -21,7 +21,7 @@ pub fn get_query_schema(datamodel_string: &str) -> (QuerySchema, datamodel::dml:
         BuildMode::Modern,
         false,
         capabilities,
-        config.subject.preview_features().cloned().collect(),
+        config.subject.preview_features().iter().collect(),
     );
 
     (schema, dm)
