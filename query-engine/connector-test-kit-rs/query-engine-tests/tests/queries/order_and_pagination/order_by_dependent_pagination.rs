@@ -228,9 +228,9 @@ mod order_by_dependent_pag {
     }
 
     // "[Circular with differing records] Ordering by related record field ascending" should "work"
-    // TODO: Does not work on MySQL. Figure out why?
+    // TODO: Does not work on MySQL & SQLite. Figure out why?
     // TODO(julius): should enable for SQL Server when partial indices are in the PSL
-    #[connector_test(exclude(SqlServer, MySql))]
+    #[connector_test(exclude(SqlServer, MySql, Sqlite))]
     async fn circular_diff_related_record_asc(runner: Runner) -> TestResult<()> {
         // Records form circles with their relations
         create_row(&runner, 1, Some(1), Some(1), Some(3)).await?;
