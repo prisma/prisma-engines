@@ -10,7 +10,6 @@ use crate::{
     diagnostics::{DatamodelError, Diagnostics},
     dml,
 };
-use ::dml::relation_info::ReferentialAction;
 use datamodel_connector::ConnectorCapability;
 use names::NamesValidator;
 
@@ -506,29 +505,6 @@ impl<'a> Validator<'a> {
                         &message,
                         RELATION_ATTRIBUTE_NAME,
                         field_span,
-                    ));
-                }
-
-                let referential_integrity = self.source.map(|ds| ds.referential_integrity()).unwrap_or_default();
-
-                if !referential_integrity.uses_foreign_keys()
-                    && rel_info
-                        .on_update
-                        .map(|act| act != ReferentialAction::NoAction)
-                        .unwrap_or(false)
-                {
-                    let ast_field = ast_model.find_field_bang(&field.name);
-                    let message =
-                        "Referential actions other than `NoAction` will not work for `onUpdate` without foreign keys. Please follow the issue: https://github.com/prisma/prisma/issues/9014";
-
-                    let span = ast_field
-                        .span_for_argument("relation", "onUpdate")
-                        .unwrap_or(ast_field.span);
-
-                    errors.push_error(DatamodelError::new_attribute_validation_error(
-                        message,
-                        RELATION_ATTRIBUTE_NAME,
-                        span,
                     ));
                 }
 
