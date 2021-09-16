@@ -744,6 +744,8 @@ fn visit_relation<'ast>(
         }
     }
 
+    relation::validate_on_update_without_foreign_keys(model_id, field_id, relation_field, ctx);
+
     let fk_name = {
         let ast_model = &ctx.db.ast[model_id];
 
