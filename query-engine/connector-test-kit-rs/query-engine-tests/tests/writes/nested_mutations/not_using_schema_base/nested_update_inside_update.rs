@@ -7,8 +7,7 @@ mod update_inside_update {
     use query_test_macros::relation_link_test;
 
     // "A P1 to CM relation relation" should "work"
-    // TODO:(dom): Not working on mongo. Failing from 18-26
-    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToMany", exclude(MongoDb))]
+    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToMany")]
     async fn p1_cm_should_work(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = t.parent().parse(
             run_query_json!(
@@ -56,8 +55,7 @@ mod update_inside_update {
     }
 
     // "A PM to C1 relation relation" should "work"
-    // TODO:(dom): Not working on mongo. Failing from 18-26
-    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneOpt", exclude(MongoDb))]
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneOpt")]
     async fn pm_c1_should_work(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let res = run_query_json!(
             runner,

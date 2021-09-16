@@ -144,46 +144,73 @@ pub async fn update_records<'conn>(
     }
 
     let filter = doc! { id_field.db_name(): { "$in": ids.clone() } };
-    let mut update_doc = Document::new();
     let fields = model.fields().scalar();
+    let mut update_docs: Vec<Document> = vec![];
 
     for (field_name, write_expr) in args.args {
         let DatasourceFieldName(name) = field_name;
 
         // Todo: This is inefficient.
         let field = fields.iter().find(|f| f.db_name() == name).unwrap();
+        let field_name = field.db_name();
+        let dollar_field_name = format!("${}", field.db_name());
 
-        let (op_key, val) = match write_expr {
+        let doc = match write_expr {
             WriteExpression::Add(rhs) if field.is_list => match rhs {
                 PrismaValue::List(vals) => {
                     let vals = vals
                         .into_iter()
                         .map(|val| (field, val).into_bson())
                         .collect::<crate::Result<Vec<_>>>()?;
+                    let bson_array = Bson::Array(vals);
 
-                    let doc = doc! {
-                        "$each": Bson::Array(vals)
-                    };
-
-                    ("$push", Bson::Document(doc))
+                    doc! {
+                        "$set": { field_name: {
+                            "$ifNull": [
+                                { "$concatArrays": [dollar_field_name, bson_array.clone()] },
+                                bson_array
+                            ]
+                        } }
+                    }
                 }
-                val => ("$push", (field, val).into_bson()?),
-            },
+                val => {
+                    let bson_val = (field, val).into_bson()?;
 
+                    doc! {
+                        "$set": { field_name: {
+                            "$ifNull": [
+                                { "$concatArrays": [dollar_field_name, [bson_val.clone()]] },
+                                [bson_val]
+                            ]
+                        } }
+                    }
+                }
+            },
+            // We use $literal to enable the set of empty object, which is otherwise considered a syntax error
+            WriteExpression::Value(rhs) => doc! {
+                "$set": { field_name: { "$literal": (field, rhs).into_bson()? } }
+            },
+            WriteExpression::Add(rhs) => doc! {
+                "$set": { field_name: { "$add": [dollar_field_name, (field, rhs).into_bson()?] } }
+            },
+            WriteExpression::Substract(rhs) => doc! {
+                "$set": { field_name: { "$subtract": [dollar_field_name, (field, rhs).into_bson()?] } }
+            },
+            WriteExpression::Multiply(rhs) => doc! {
+                "$set": { field_name: { "$multiply": [dollar_field_name, (field, rhs).into_bson()?] } }
+            },
+            WriteExpression::Divide(rhs) => doc! {
+                "$set": { field_name: { "$divide": [dollar_field_name, (field, rhs).into_bson()?] } }
+            },
             WriteExpression::Field(_) => unimplemented!(),
-            WriteExpression::Value(rhs) => ("$set", (field, rhs).into_bson()?),
-            WriteExpression::Add(rhs) => ("$inc", (field, rhs).into_bson()?),
-            WriteExpression::Substract(rhs) => ("$inc", (field, (rhs * PrismaValue::Int(-1))).into_bson()?),
-            WriteExpression::Multiply(rhs) => ("$mul", (field, rhs).into_bson()?),
-            WriteExpression::Divide(rhs) => ("$mul", (field, (PrismaValue::new_float(1.0) / rhs)).into_bson()?),
         };
 
-        let entry = update_doc.entry(op_key.to_owned()).or_insert(Document::new().into());
-        entry.as_document_mut().unwrap().insert(name, val);
+        update_docs.push(doc);
     }
 
-    if !update_doc.is_empty() {
-        coll.update_many_with_session(filter, update_doc, None, session).await?;
+    if !update_docs.is_empty() {
+        coll.update_many_with_session(filter, update_docs, None, session)
+            .await?;
     }
 
     let ids = ids

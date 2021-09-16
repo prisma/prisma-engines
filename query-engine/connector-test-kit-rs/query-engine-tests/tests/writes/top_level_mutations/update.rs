@@ -284,7 +284,7 @@ mod update {
     // TODO(dom): Not working on Mongo (first snapshot)
     // -{"data":{"updateOneTestModel":{"optInt":null}}}
     // +{"data":{"updateOneTestModel":{"optInt":10}}}
-    #[connector_test(schema(schema_6), exclude(MongoDb))]
+    #[connector_test(schema(schema_6))]
     async fn update_apply_number_ops_for_int(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1 }"#).await?;
         create_row(&runner, r#"{ id: 2, optInt: 3}"#).await?;
@@ -353,9 +353,6 @@ mod update {
     }
 
     // "An updateOne mutation" should "correctly apply all number operations for Float"
-    // TODO(dom): Not working on Mongo (first snapshot)
-    // -{"data":{"updateOneTestModel":{"optFloat":null}}}
-    // +{"data":{"updateOneTestModel":{"optFloat":4.600000000000001}}}
     #[connector_test(schema(schema_6), exclude(MongoDb))]
     async fn update_apply_number_ops_for_float(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1 }"#).await?;
@@ -424,9 +421,79 @@ mod update {
         Ok(())
     }
 
+    // TODO(mongo, precision): Suffers from precision issues on Float
+    // These precision issues should be gone once the floating point fixes effort is done
+    // Note: These precision issues are created within Prisma's MongoDB connector, not within MongoDB.
+    #[connector_test(schema(schema_6), only(MongoDb))]
+    async fn update_apply_number_ops_for_float_mongo(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1 }"#).await?;
+        create_row(&runner, r#"{ id: 2, optFloat: 5.5}"#).await?;
+
+        // Increment
+        insta::assert_snapshot!(
+          query_number_operation(&runner, "1", "optFloat", "increment", "4.6").await?,
+          @r###"{"data":{"updateOneTestModel":{"optFloat":null}}}"###
+        );
+        insta::assert_snapshot!(
+          query_number_operation(&runner, "2", "optFloat", "increment", "4.6").await?,
+          @r###"{"data":{"updateOneTestModel":{"optFloat":10.1}}}"###
+        );
+
+        // Decrement
+        insta::assert_snapshot!(
+          query_number_operation(&runner, "1", "optFloat", "decrement", "4.6").await?,
+          @r###"{"data":{"updateOneTestModel":{"optFloat":null}}}"###
+        );
+        insta::assert_snapshot!(
+          query_number_operation(&runner, "2", "optFloat", "decrement", "4.6").await?,
+          @r###"{"data":{"updateOneTestModel":{"optFloat":5.500000000000001}}}"###
+        );
+
+        // Multiply
+        insta::assert_snapshot!(
+          query_number_operation(&runner, "1", "optFloat", "multiply", "2").await?,
+          @r###"{"data":{"updateOneTestModel":{"optFloat":null}}}"###
+        );
+        insta::assert_snapshot!(
+          query_number_operation(&runner, "2", "optFloat", "multiply", "2").await?,
+          @r###"{"data":{"updateOneTestModel":{"optFloat":11.0}}}"###
+        );
+
+        // Divide
+        insta::assert_snapshot!(
+          query_number_operation(&runner, "1", "optFloat", "divide", "2").await?,
+          @r###"{"data":{"updateOneTestModel":{"optFloat":null}}}"###
+        );
+        insta::assert_snapshot!(
+          query_number_operation(&runner, "2", "optFloat", "divide", "2").await?,
+          @r###"{"data":{"updateOneTestModel":{"optFloat":5.500000000000001}}}"###
+        );
+
+        // Set
+        insta::assert_snapshot!(
+          query_number_operation(&runner, "1", "optFloat", "set", "5.1").await?,
+          @r###"{"data":{"updateOneTestModel":{"optFloat":5.100000000000001}}}"###
+        );
+        insta::assert_snapshot!(
+          query_number_operation(&runner, "2", "optFloat", "set", "5.1").await?,
+          @r###"{"data":{"updateOneTestModel":{"optFloat":5.100000000000001}}}"###
+        );
+
+        // Set null
+        insta::assert_snapshot!(
+          query_number_operation(&runner, "1", "optFloat", "set", "null").await?,
+          @r###"{"data":{"updateOneTestModel":{"optFloat":null}}}"###
+        );
+        insta::assert_snapshot!(
+          query_number_operation(&runner, "2", "optFloat", "set", "null").await?,
+          @r###"{"data":{"updateOneTestModel":{"optFloat":null}}}"###
+        );
+
+        Ok(())
+    }
+
     // "An updateOne mutation with number operations" should "handle id changes correctly"
-    // TODO(dom): Support @@id ?
-    #[connector_test(schema(schema_7), exclude(Mongodb))]
+    #[connector_test(schema(schema_7), capabilities(CompoundIds))]
     async fn update_number_ops_handle_id_change(runner: Runner) -> TestResult<()> {
         run_query!(
             &runner,

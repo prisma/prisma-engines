@@ -6,8 +6,7 @@ mod upsert_inside_update {
     use query_test_macros::relation_link_test;
 
     // "a PM to C1!  relation with a child already in a relation" should "work with create"
-    // TODO:(dom): Not working on mongo. Failing from 18-26
-    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneReq", exclude(MongoDb))]
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneReq")]
     async fn pm_c1req_child_in_req(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = t.parent().parse(
             run_query_json!(
@@ -55,8 +54,7 @@ mod upsert_inside_update {
     }
 
     // "a PM to C1  relation with the parent already in a relation" should "work through a nested mutation by unique for create"
-    // TODO:(dom): Not working on mongo. Failing from 18-26
-    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneOpt", exclude(MongoDb))]
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneOpt")]
     async fn pm_c1_parnt_in_rel_create(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = t.parent().parse(
             run_query_json!(
@@ -104,8 +102,7 @@ mod upsert_inside_update {
     }
 
     // "a PM to C1  relation with the parent already in a relation" should "work through a nested mutation by unique for update"
-    // TODO:(dom): Not working on mongo. Failing from 18-26
-    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneOpt", exclude(MongoDb))]
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneOpt")]
     async fn pm_c1_parnt_in_rel_update(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = t.parent().parse(
             run_query_json!(

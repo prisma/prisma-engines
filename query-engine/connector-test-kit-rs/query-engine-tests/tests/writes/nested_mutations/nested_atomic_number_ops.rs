@@ -25,8 +25,7 @@ mod atomic_number_ops {
     }
 
     // "An updateOne mutation with number operations on the top and updates on the child (inl. child)" should "handle id changes correctly"
-    // TODO(dom): Not working for mongo
-    #[connector_test(schema(schema_1), exclude(MongoDb))]
+    #[connector_test(schema(schema_1), capabilities(UpdateableId))]
     async fn update_number_ops_on_child(runner: Runner) -> TestResult<()> {
         run_query!(
             &runner,
@@ -111,8 +110,7 @@ mod atomic_number_ops {
     }
 
     //"An updateOne mutation with number operations on the top and updates on the child (inl. parent)" should "handle id changes correctly"
-    // TODO(dom): Not working for mongo
-    #[connector_test(schema(schema_2), exclude(MongoDb))]
+    #[connector_test(schema(schema_2), capabilities(UpdateableId))]
     async fn update_number_ops_on_parent(runner: Runner) -> TestResult<()> {
         run_query!(
             &runner,
@@ -197,8 +195,7 @@ mod atomic_number_ops {
     }
 
     // "A nested updateOne mutation" should "correctly apply all number operations for Int"
-    // TODO(dom): Not working for mongo
-    #[connector_test(schema(schema_3), exclude(MongoDb))]
+    #[connector_test(schema(schema_3))]
     async fn nested_update_int_ops(runner: Runner) -> TestResult<()> {
         create_test_model(&runner, 1, None, None).await?;
         create_test_model(&runner, 2, Some(3), None).await?;
@@ -267,7 +264,6 @@ mod atomic_number_ops {
     }
 
     // "A nested updateOne mutation" should "correctly apply all number operations for Int"
-    // TODO(dom): Not working for mongo
     #[connector_test(schema(schema_3), exclude(MongoDb))]
     async fn nested_update_float_ops(runner: Runner) -> TestResult<()> {
         create_test_model(&runner, 1, None, None).await?;
@@ -321,6 +317,77 @@ mod atomic_number_ops {
         insta::assert_snapshot!(
           query_nested_number_ops(&runner, 2, "optFloat", "set", "5.1").await?,
           @r###"{"optFloat":5.1}"###
+        );
+
+        // Set null
+        insta::assert_snapshot!(
+          query_nested_number_ops(&runner, 1, "optFloat", "set", "null").await?,
+          @r###"{"optFloat":null}"###
+        );
+        insta::assert_snapshot!(
+          query_nested_number_ops(&runner, 2, "optFloat", "set", "null").await?,
+          @r###"{"optFloat":null}"###
+        );
+
+        Ok(())
+    }
+
+    // TODO(mongo, precision): Suffers from precision issues on Float
+    // These precision issues should be gone once the floating point fixes effort is done
+    // Note: These precision issues are created within Prisma's MongoDB connector, not within MongoDB.
+    #[connector_test(schema(schema_3), only(MongoDb))]
+    async fn nested_update_float_ops_mongo(runner: Runner) -> TestResult<()> {
+        create_test_model(&runner, 1, None, None).await?;
+        create_test_model(&runner, 2, None, Some("5.5")).await?;
+
+        // Increment
+        insta::assert_snapshot!(
+          query_nested_number_ops(&runner, 1, "optFloat", "increment", "4.6").await?,
+          @r###"{"optFloat":null}"###
+        );
+        insta::assert_snapshot!(
+          query_nested_number_ops(&runner, 2, "optFloat", "increment", "4.6").await?,
+          @r###"{"optFloat":10.1}"###
+        );
+
+        // Decrement
+        insta::assert_snapshot!(
+          query_nested_number_ops(&runner, 1, "optFloat", "decrement", "4.6").await?,
+          @r###"{"optFloat":null}"###
+        );
+        insta::assert_snapshot!(
+          query_nested_number_ops(&runner, 2, "optFloat", "decrement", "4.6").await?,
+          @r###"{"optFloat":5.500000000000001}"###
+        );
+
+        // Multiply
+        insta::assert_snapshot!(
+          query_nested_number_ops(&runner, 1, "optFloat", "multiply", "2").await?,
+          @r###"{"optFloat":null}"###
+        );
+        insta::assert_snapshot!(
+          query_nested_number_ops(&runner, 2, "optFloat", "multiply", "2").await?,
+          @r###"{"optFloat":11.0}"###
+        );
+
+        // Divide
+        insta::assert_snapshot!(
+          query_nested_number_ops(&runner, 1, "optFloat", "divide", "2").await?,
+          @r###"{"optFloat":null}"###
+        );
+        insta::assert_snapshot!(
+          query_nested_number_ops(&runner, 2, "optFloat", "divide", "2").await?,
+          @r###"{"optFloat":5.500000000000001}"###
+        );
+
+        // Set
+        insta::assert_snapshot!(
+          query_nested_number_ops(&runner, 1, "optFloat", "set", "5.1").await?,
+          @r###"{"optFloat":5.100000000000001}"###
+        );
+        insta::assert_snapshot!(
+          query_nested_number_ops(&runner, 2, "optFloat", "set", "5.1").await?,
+          @r###"{"optFloat":5.100000000000001}"###
         );
 
         // Set null

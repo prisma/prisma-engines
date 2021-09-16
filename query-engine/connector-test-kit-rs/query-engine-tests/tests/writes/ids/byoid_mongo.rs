@@ -67,8 +67,6 @@ mod byoi_mongo {
     }
 
     // "A Create Mutation" should "create and return item with own Id"
-    // TODO(dom): Not working on mongo.
-    // Wrong error code: got P2002 instad of P3010
     #[connector_test(schema(schema_2))]
     async fn create_and_return_item_woi_2(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
@@ -106,8 +104,6 @@ mod byoi_mongo {
     }
 
     // "A Create Mutation" should "error for id that is invalid"
-    // TODO(dom): Not working on mongo.
-    // Wrong error code: got P2009 instad of P3044
     #[connector_test(schema(schema_2))]
     async fn error_for_invalid_id_1_2(runner: Runner) -> TestResult<()> {
         assert_error!(
@@ -123,7 +119,6 @@ mod byoi_mongo {
     }
 
     // "A Create Mutation" should "error for id that is invalid 2"
-    // TODO(dom): Not working on mongo.
     #[connector_test(schema(schema_1))]
     async fn error_for_invalid_id_2_1(runner: Runner) -> TestResult<()> {
         assert_error!(
