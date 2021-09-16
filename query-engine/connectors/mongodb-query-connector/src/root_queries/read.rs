@@ -1,7 +1,5 @@
 use super::*;
-use crate::{
-    filter::convert_filter, output_meta, query_builder::MongoReadQueryBuilder, vacuum_cursor, BsonTransform, IntoBson,
-};
+use crate::{output_meta, query_builder::MongoReadQueryBuilder, vacuum_cursor, IntoBson};
 use connector_interface::{Filter, QueryArguments, RelAggregationSelection};
 use mongodb::{bson::doc, options::FindOptions, ClientSession, Database};
 use prisma_models::*;
