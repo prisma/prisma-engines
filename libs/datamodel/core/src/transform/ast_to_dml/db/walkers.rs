@@ -161,6 +161,41 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
         self.relation_field
     }
 
+    pub(crate) fn model(&self) -> ModelWalker<'ast, 'db> {
+        ModelWalker {
+            model_id: self.model_id,
+            db: self.db,
+            model_attributes: &self.db.types.model_attributes[&self.model_id],
+        }
+    }
+
+    pub(crate) fn related_model(&self) -> ModelWalker<'ast, 'db> {
+        let model_id = self.relation_field.referenced_model;
+
+        ModelWalker {
+            model_id,
+            db: self.db,
+            model_attributes: &self.db.types.model_attributes[&model_id],
+        }
+    }
+
+    pub(crate) fn referencing_fields(&'db self) -> impl Iterator<Item = &'ast ast::Field> + 'db {
+        self.relation_field
+            .fields
+            .iter()
+            .flatten()
+            .map(move |field_id| &self.db.ast[self.model_id][*field_id])
+    }
+
+    #[allow(dead_code)]
+    pub(crate) fn referenced_fields(&'db self) -> impl Iterator<Item = &'ast ast::Field> + 'db {
+        self.relation_field
+            .references
+            .iter()
+            .flatten()
+            .map(move |field_id| &self.db.ast[self.model_id][*field_id])
+    }
+
     /// This will be None for virtual relation fields (when no `fields` argument is passed).
     pub(crate) fn final_foreign_key_name(&self) -> Option<Cow<'ast, str>> {
         self.attributes().fk_name.map(Cow::Borrowed).or_else(|| {

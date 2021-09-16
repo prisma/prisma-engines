@@ -154,13 +154,12 @@ pub(super) fn validate_relations(ctx: &mut Context<'_>) {
         .map(|ds| ds.referential_integrity())
         .unwrap_or_default();
 
-    for ((model_id, field_id), relation_field) in ctx.db.types.relation_fields.iter() {
+    for ((model_id, field_id), _) in ctx.db.types.relation_fields.iter() {
         let model = ctx.db.walk_model(*model_id);
         let field = model.walk_relation_field(*field_id);
-        let related_model = ctx.db.walk_model(relation_field.referenced_model);
 
-        relation::validate_relation_field_arity(model, field, &mut errors);
-        relation::validate_ignored_related_model(model, related_model, field, &mut errors);
+        relation::validate_relation_field_arity(field, &mut errors);
+        relation::validate_ignored_related_model(field, &mut errors);
         relation::validate_on_update_without_foreign_keys(field, referential_integrity, &mut errors);
     }
 

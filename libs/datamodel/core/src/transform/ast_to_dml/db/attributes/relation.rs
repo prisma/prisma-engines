@@ -1,43 +1,25 @@
-use crate::{
-    diagnostics::DatamodelError,
-    transform::ast_to_dml::db::walkers::{ModelWalker, RelationFieldWalker},
-};
+use crate::{diagnostics::DatamodelError, transform::ast_to_dml::db::walkers::RelationFieldWalker};
 use datamodel_connector::ReferentialIntegrity;
 use dml::relation_info::ReferentialAction;
 use itertools::Itertools;
 
 /// Validate that the arity of fields from `fields` is compatible with relation field arity.
-pub(super) fn validate_relation_field_arity(
-    model: ModelWalker<'_, '_>,
-    field: RelationFieldWalker<'_, '_>,
-    errors: &mut Vec<DatamodelError>,
-) {
-    let ast_model = model.ast_model();
-    let ast_relation_field = field.ast_field();
-    let attributes = field.attributes();
-
-    if !ast_relation_field.arity.is_required() {
+pub(super) fn validate_relation_field_arity(field: RelationFieldWalker<'_, '_>, errors: &mut Vec<DatamodelError>) {
+    if !field.ast_field().arity.is_required() {
         return;
     }
 
-    let has_optional_underlying_fields = attributes
-        .fields
-        .iter()
-        .flatten()
-        .map(move |field_id| &ast_model[*field_id])
-        .any(|field| field.arity.is_optional());
-
-    if !has_optional_underlying_fields {
+    if !field.referencing_fields().any(|field| field.arity.is_optional()) {
         return;
     }
 
     errors.push(DatamodelError::new_validation_error(
         &format!(
             "The relation field `{}` uses the scalar fields {}. At least one of those fields is optional. Hence the relation field must be optional as well.",
-            &field.ast_field().name(),
-            &attributes.fields.iter().flatten().map(move |field_id| &ast_model[*field_id].name.name).join(", "),
+            field.ast_field().name(),
+            field.referencing_fields().map(|field| field.name()).join(", "),
         ),
-        ast_relation_field.span
+        field.ast_field().span
     ));
 }
 
@@ -58,29 +40,29 @@ pub(super) fn validate_on_update_without_foreign_keys(
     if field
         .attributes()
         .on_update
-        .map(|act| act != ReferentialAction::NoAction)
-        .unwrap_or(false)
+        .filter(|act| *act != ReferentialAction::NoAction)
+        .is_none()
     {
-        let ast_field = field.ast_field();
-
-        let span = ast_field
-            .span_for_argument("relation", "onUpdate")
-            .unwrap_or(ast_field.span);
-
-        errors.push(DatamodelError::new_validation_error(
-            "Referential actions other than `NoAction` will not work for `onUpdate` without foreign keys. Please follow the issue: https://github.com/prisma/prisma/issues/9014",
-            span
-        ));
+        return;
     }
+
+    let ast_field = field.ast_field();
+
+    let span = ast_field
+        .span_for_argument("relation", "onUpdate")
+        .unwrap_or(ast_field.span);
+
+    errors.push(DatamodelError::new_validation_error(
+        "Referential actions other than `NoAction` will not work for `onUpdate` without foreign keys. Please follow the issue: https://github.com/prisma/prisma/issues/9014",
+        span
+    ));
 }
 
 /// Validates if the related model for the relation is ignored.
-pub(super) fn validate_ignored_related_model(
-    model: ModelWalker<'_, '_>,
-    related_model: ModelWalker<'_, '_>,
-    field: RelationFieldWalker<'_, '_>,
-    errors: &mut Vec<DatamodelError>,
-) {
+pub(super) fn validate_ignored_related_model(field: RelationFieldWalker<'_, '_>, errors: &mut Vec<DatamodelError>) {
+    let related_model = field.related_model();
+    let model = field.model();
+
     if related_model.attributes().is_ignored && !field.attributes().is_ignored && !model.attributes().is_ignored {
         let ast_model = model.ast_model();
         let ast_related_model = related_model.ast_model();
