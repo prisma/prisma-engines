@@ -4,6 +4,7 @@
 //! multiple migration engines.
 
 use datamodel::common::preview_features::PreviewFeature;
+use quaint::prelude::ConnectionInfo;
 pub use test_macros::test_connector;
 pub use test_setup::sqlite_test_url;
 pub use test_setup::{BitFlags, Capabilities, Tags};
@@ -102,6 +103,11 @@ impl TestApi {
         &self.connection_string
     }
 
+    /// The ConnectionInfo based on the connection string
+    pub fn connection_info(&self) -> ConnectionInfo {
+        ConnectionInfo::from_url(self.connection_string()).unwrap()
+    }
+
     /// Create a temporary directory to serve as a test migrations directory.
     pub fn create_migrations_directory(&self) -> TempDir {
         tempfile::tempdir().unwrap()
@@ -181,6 +187,7 @@ impl TestApi {
 
         EngineTestApi {
             connector,
+            connection_info: ConnectionInfo::from_url(connection_string).unwrap(),
             tags: self.args.tags(),
             rt: &self.rt,
         }
@@ -244,6 +251,7 @@ impl TestApi {
 /// writing tests.
 pub struct EngineTestApi<'a> {
     pub(crate) connector: SqlMigrationConnector,
+    connection_info: ConnectionInfo,
     tags: BitFlags<Tags>,
     rt: &'a tokio::runtime::Runtime,
 }
@@ -291,7 +299,7 @@ impl EngineTestApi<'_> {
 
     /// The schema name of the current connected database.
     pub fn schema_name(&self) -> &str {
-        self.connector.schema_name()
+        self.connection_info.schema_name()
     }
 
     /// Execute a raw SQL command and expect it to succeed.

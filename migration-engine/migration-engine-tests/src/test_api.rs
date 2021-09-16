@@ -43,11 +43,11 @@ impl TestApi {
     }
 
     pub fn connection_info(&self) -> ConnectionInfo {
-        self.connector.connection_info()
+        self.root.connection_info()
     }
 
-    pub fn schema_name(&self) -> &str {
-        self.connector.schema_name()
+    pub fn schema_name(&self) -> String {
+        self.connection_info().schema_name().to_owned()
     }
 
     /// Plan a `createMigration` command
@@ -229,7 +229,7 @@ impl TestApi {
         if self.root.is_sqlite() {
             table_name.into()
         } else {
-            (self.connector.schema_name(), table_name).into()
+            (self.connection_info().schema_name().to_owned(), table_name.to_owned()).into()
         }
     }
 

@@ -780,7 +780,7 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
 
         let mut previous_columns = "".to_string();
         let mut next_columns = "".to_string();
-        let mut insert = Insert::single_into((api.schema_name(), "A"));
+        let mut insert = Insert::single_into((api.schema_name(), "A".to_owned()));
         let mut previous_assertions = vec![];
         let mut next_assertions = vec![];
 
@@ -867,7 +867,7 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
     for (from, seed, casts) in RISKY_CASTS.iter() {
         let mut previous_columns = "".to_string();
         let mut next_columns = "".to_string();
-        let mut insert = Insert::single_into((api.schema_name(), "A"));
+        let mut insert = Insert::single_into((api.schema_name(), "A".to_owned()));
         let mut previous_assertions = vec![];
         let mut next_assertions = vec![];
         let mut warnings = vec![];
@@ -967,7 +967,7 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
     for (from, seed, casts) in NOT_CASTABLE.iter() {
         let mut previous_columns = "".to_string();
         let mut next_columns = "".to_string();
-        let mut insert = Insert::single_into((api.schema_name(), "A"));
+        let mut insert = Insert::single_into((api.schema_name(), "A".to_owned()));
         let mut previous_assertions = vec![];
         warnings.clear();
 
@@ -1152,7 +1152,7 @@ fn safe_casts_from_array_with_existing_data_should_work(api: TestApi) {
     for (to, from) in SAFE_CASTS_NON_LIST_TO_STRING.iter() {
         let mut previous_columns = "".to_string();
         let mut next_columns = "".to_string();
-        let mut insert = Insert::single_into((api.schema_name(), "A"));
+        let mut insert = Insert::single_into((api.schema_name(), "A".to_owned()));
         let mut previous_assertions = vec![];
         let mut next_assertions = vec![];
 
