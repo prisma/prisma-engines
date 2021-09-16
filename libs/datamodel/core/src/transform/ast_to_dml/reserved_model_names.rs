@@ -33,21 +33,7 @@ pub(crate) fn validate_enum_name(ast_enum: &ast::Enum, diagnostics: &mut Diagnos
           &ast_enum.name.name
         ),         &ast_enum.name.name,
         ast_enum.span,
-    ));
-}
-
-pub(crate) fn validate_type_definition_name(ast_type: &ast::TypeDefinition, diagnostics: &mut Diagnostics) {
-    if !is_reserved_type_name(&ast_type.name.name) {
-        return;
-    }
-
-    diagnostics.push_error(DatamodelError::new_enum_validation_error(
-        &format!(
-          "The type name `{}` is invalid. It is a reserved name. Please change it. Read more at https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-schema/data-model#naming-enums",
-          &ast_type.name.name
-        ),         &ast_type.name.name,
-        ast_type.span,
-    ));
+));
 }
 
 // The source of the following list is from prisma-client-js. Any edit should be done in both places.
