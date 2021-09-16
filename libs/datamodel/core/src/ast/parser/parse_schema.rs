@@ -2,11 +2,11 @@ use pest::Parser;
 
 use super::{
     helpers::{parsing_catch_all, TokenExtensions},
+    parse_alias::parse_alias,
     parse_enum::parse_enum,
     parse_model::parse_model,
     parse_source_and_generator::{parse_generator, parse_source},
     parse_type_definition::parse_type_definition,
-    parse_types::parse_alias,
     PrismaDatamodelParser, Rule,
 };
 use crate::ast::*;
@@ -122,6 +122,7 @@ fn rule_to_string(rule: Rule) -> &'static str {
         Rule::BLOCK_CLOSE => "End of block (\"}\")",
         Rule::MODEL_KEYWORD => "\"model\" keyword",
         Rule::TYPE_KEYWORD => "\"type\" keyword",
+        Rule::ALIAS_KEYWORD => "\"alias\" keyword",
         Rule::ENUM_KEYWORD => "\"enum\" keyword",
         Rule::GENERATOR_KEYWORD => "\"generator\" keyword",
         Rule::DATASOURCE_KEYWORD => "\"datasource\" keyword",
