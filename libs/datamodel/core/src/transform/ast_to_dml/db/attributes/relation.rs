@@ -1,10 +1,6 @@
 use crate::{
-    ast,
     diagnostics::DatamodelError,
-    transform::ast_to_dml::db::{
-        types::RelationField,
-        walkers::{ModelWalker, RelationFieldWalker},
-    },
+    transform::ast_to_dml::db::walkers::{ModelWalker, RelationFieldWalker},
 };
 use datamodel_connector::ReferentialIntegrity;
 use dml::relation_info::ReferentialAction;
@@ -14,17 +10,17 @@ use itertools::Itertools;
 pub(super) fn validate_relation_field_arity(
     model: ModelWalker<'_, '_>,
     field: RelationFieldWalker<'_, '_>,
-    relation_field: &RelationField<'_>,
     errors: &mut Vec<DatamodelError>,
 ) {
     let ast_model = model.ast_model();
     let ast_relation_field = field.ast_field();
+    let attributes = field.attributes();
 
     if !ast_relation_field.arity.is_required() {
         return;
     }
 
-    let has_optional_underlying_fields = relation_field
+    let has_optional_underlying_fields = attributes
         .fields
         .iter()
         .flatten()
@@ -39,7 +35,7 @@ pub(super) fn validate_relation_field_arity(
         &format!(
             "The relation field `{}` uses the scalar fields {}. At least one of those fields is optional. Hence the relation field must be optional as well.",
             &field.ast_field().name(),
-            &relation_field.fields.iter().flatten().map(move |field_id| &ast_model[*field_id].name.name).join(", "),
+            &attributes.fields.iter().flatten().map(move |field_id| &ast_model[*field_id].name.name).join(", "),
         ),
         ast_relation_field.span
     ));
@@ -52,7 +48,6 @@ pub(super) fn validate_relation_field_arity(
 /// actions on emulations.
 pub(super) fn validate_on_update_without_foreign_keys(
     field: RelationFieldWalker<'_, '_>,
-    relation_field: &RelationField<'_>,
     referential_integrity: ReferentialIntegrity,
     errors: &mut Vec<DatamodelError>,
 ) {
@@ -60,7 +55,8 @@ pub(super) fn validate_on_update_without_foreign_keys(
         return;
     }
 
-    if relation_field
+    if field
+        .attributes()
         .on_update
         .map(|act| act != ReferentialAction::NoAction)
         .unwrap_or(false)
@@ -82,14 +78,13 @@ pub(super) fn validate_on_update_without_foreign_keys(
 pub(super) fn validate_ignored_related_model(
     model: ModelWalker<'_, '_>,
     related_model: ModelWalker<'_, '_>,
-    relation_field: &RelationField<'_>,
-    field_id: ast::FieldId,
+    field: RelationFieldWalker<'_, '_>,
     errors: &mut Vec<DatamodelError>,
 ) {
-    if related_model.attributes().is_ignored && !relation_field.is_ignored && !model.attributes().is_ignored {
+    if related_model.attributes().is_ignored && !field.attributes().is_ignored && !model.attributes().is_ignored {
         let ast_model = model.ast_model();
         let ast_related_model = related_model.ast_model();
-        let ast_field = &ast_model[field_id];
+        let ast_field = field.ast_field();
 
         let message = format!(
             "The relation field `{}` on Model `{}` must specify the `@ignore` attribute, because the model {} it is pointing to is marked ignored.",

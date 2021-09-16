@@ -75,7 +75,7 @@ fn resolve_model_attributes<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::
 
             ctx.db.types.scalar_fields.insert((model_id, field_id), scalar_field);
         } else if let Some(mut rf) = ctx.db.types.take_relation_field(model_id, field_id) {
-            visit_relation_field_attributes(model_id, field_id, ast_field, &mut rf, ctx);
+            visit_relation_field_attributes(model_id, ast_field, &mut rf, ctx);
             ctx.db.types.relation_fields.insert((model_id, field_id), rf);
         } else {
             unreachable!(
@@ -159,9 +159,9 @@ pub(super) fn validate_relation_attributes(ctx: &mut Context<'_>) {
         let field = model.walk_relation_field(*field_id);
         let related_model = ctx.db.walk_model(relation_field.referenced_model);
 
-        relation::validate_relation_field_arity(model, field, relation_field, &mut errors);
-        relation::validate_ignored_related_model(model, related_model, &relation_field, *field_id, &mut errors);
-        relation::validate_on_update_without_foreign_keys(field, &relation_field, referential_integrity, &mut errors);
+        relation::validate_relation_field_arity(model, field, &mut errors);
+        relation::validate_ignored_related_model(model, related_model, field, &mut errors);
+        relation::validate_on_update_without_foreign_keys(field, referential_integrity, &mut errors);
     }
 
     for error in errors.into_iter() {
@@ -288,7 +288,6 @@ fn default_value_constraint_name<'ast>(
 
 fn visit_relation_field_attributes<'ast>(
     model_id: ast::ModelId,
-    field_id: ast::FieldId,
     ast_field: &'ast ast::Field,
     relation_field: &mut RelationField<'ast>,
     ctx: &mut Context<'ast>,
@@ -297,7 +296,7 @@ fn visit_relation_field_attributes<'ast>(
         // @relation
         // Relation attributes are not required _yet_ at this stage. The schema has to be parseable for standardization.
         attributes.visit_optional_single("relation", ctx, |relation_args, ctx| {
-            visit_relation(relation_args, model_id, field_id, relation_field, ctx)
+            visit_relation(relation_args, model_id, relation_field, ctx)
         });
 
         // @id
@@ -677,7 +676,6 @@ fn common_index_validations<'ast>(
 fn visit_relation<'ast>(
     args: &mut Arguments<'ast>,
     model_id: ast::ModelId,
-    field_id: ast::FieldId,
     relation_field: &mut RelationField<'ast>,
     ctx: &mut Context<'ast>,
 ) {
