@@ -1,4 +1,4 @@
-name: PSL
+name: Unit tests
 on:
   push:
     branches:
@@ -6,7 +6,7 @@ on:
   pull_request:
 jobs:
   test:
-    name: "Test Datamodel"
+    name: Workspace unit tests
 
     strategy:
       fail-fast: false
@@ -28,6 +28,14 @@ jobs:
             target
           key: datamodel-cache
 
-      - run: cargo test -p datamodel -p dml -p datamodel-connector -p sql-datamodel-connector
+      - run: |
+            cargo test --workspace \
+                  --exclude=query-engine \
+                  --exclude=query-engine-tests \
+                  --exclude=migration-engine-tests \
+                  --exclude=migration-engine-tests \
+                  --exclude=migration-engine-cli \
+                  --exclude=sql-schema-describer \
+                  --exclude=introspection-engine-tests
         env:
           CLICOLOR_FORCE: 1

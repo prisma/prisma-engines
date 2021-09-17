@@ -233,6 +233,7 @@ pub fn value_from_bson(bson: Bson, meta: &OutputMeta) -> crate::Result<PrismaVal
         // Int
         (TypeIdentifier::Int, Bson::Int64(i)) => PrismaValue::Int(i),
         (TypeIdentifier::Int, Bson::Int32(i)) => PrismaValue::Int(i as i64),
+        (TypeIdentifier::Int, Bson::Double(i)) => PrismaValue::Int(i as i64),
 
         // BigInt
         (TypeIdentifier::BigInt, Bson::Int64(i)) => PrismaValue::BigInt(i),

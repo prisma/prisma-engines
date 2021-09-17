@@ -75,7 +75,7 @@ fn resolve_model_attributes<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::
 
             ctx.db.types.scalar_fields.insert((model_id, field_id), scalar_field);
         } else if let Some(mut rf) = ctx.db.types.take_relation_field(model_id, field_id) {
-            visit_relation_field_attributes(model_id, field_id, ast_field, &mut rf, ctx);
+            visit_relation_field_attributes(model_id, ast_field, &mut rf, ctx);
             ctx.db.types.relation_fields.insert((model_id, field_id), rf);
         } else {
             unreachable!(
@@ -145,6 +145,29 @@ pub(super) fn validate_index_names(ctx: &mut Context<'_>) {
     errors.into_iter().for_each(|err| ctx.push_error(err))
 }
 
+pub(super) fn validate_relations(ctx: &mut Context<'_>) {
+    let mut errors: Vec<DatamodelError> = Vec::new();
+
+    let referential_integrity = ctx
+        .db
+        .datasource()
+        .map(|ds| ds.referential_integrity())
+        .unwrap_or_default();
+
+    for ((model_id, field_id), _) in ctx.db.types.relation_fields.iter() {
+        let model = ctx.db.walk_model(*model_id);
+        let field = model.walk_relation_field(*field_id);
+
+        relation::validate_relation_field_arity(field, &mut errors);
+        relation::validate_ignored_related_model(field, &mut errors);
+        relation::validate_on_update_without_foreign_keys(field, referential_integrity, &mut errors);
+    }
+
+    for error in errors.into_iter() {
+        ctx.push_error(error);
+    }
+}
+
 fn visit_scalar_field_attributes<'ast>(
     model_id: ast::ModelId,
     field_id: ast::FieldId,
@@ -156,8 +179,8 @@ fn visit_scalar_field_attributes<'ast>(
 ) {
     ctx.visit_scalar_field_attributes(model_id, field_id, scalar_field_data.r#type, |attributes, ctx| {
         // @map
-         attributes.visit_optional_single("map", ctx, |map_args, ctx| {
-             map::scalar_field(ast_model, ast_field, model_id, field_id, scalar_field_data, map_args, ctx)
+        attributes.visit_optional_single("map", ctx, |map_args, ctx| {
+            map::scalar_field(ast_model, ast_field, model_id, field_id, scalar_field_data, map_args, ctx)
         });
 
         // @ignore
@@ -179,25 +202,25 @@ fn visit_scalar_field_attributes<'ast>(
             id::field(ast_model, field_id, model_attributes, args, ctx)
         });
 
-         // @updatedAt
-         attributes.visit_optional_single("updatedAt", ctx, |args, ctx| {
-             if !matches!(scalar_field_data.r#type, ScalarFieldType::BuiltInScalar(tpe) if tpe.is_datetime()) {
-                 ctx.push_error(args.new_attribute_validation_error(
+        // @updatedAt
+        attributes.visit_optional_single("updatedAt", ctx, |args, ctx| {
+            if !matches!(scalar_field_data.r#type, ScalarFieldType::BuiltInScalar(tpe) if tpe.is_datetime()) {
+                ctx.push_error(args.new_attribute_validation_error(
                     "Fields that are marked with @updatedAt must be of type DateTime." ));
 
-             }
+            }
 
-             if ast_field.arity.is_list() {
-                 ctx.push_error(args.new_attribute_validation_error("Fields that are marked with @updatedAt cannot be lists."));
-             }
+            if ast_field.arity.is_list() {
+                ctx.push_error(args.new_attribute_validation_error("Fields that are marked with @updatedAt cannot be lists."));
+            }
 
-             scalar_field_data.is_updated_at = true;
-         });
+            scalar_field_data.is_updated_at = true;
+        });
 
-         // @default
-         attributes.visit_optional_single("default", ctx, |args, ctx| {
+        // @default
+        attributes.visit_optional_single("default", ctx, |args, ctx| {
             visit_field_default(args, scalar_field_data, model_id, field_id, ctx);
-         });
+        });
 
         if let ScalarFieldType::BuiltInScalar(scalar_type) = scalar_field_data.r#type {
             // native type attributes
@@ -206,20 +229,20 @@ fn visit_scalar_field_attributes<'ast>(
             });
         }
 
-         // @unique
-         attributes.visit_optional_single("unique", ctx, |args, ctx| {
-             let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
-                 Some(Ok("")) => {
-                     ctx.push_error(args.new_attribute_validation_error("The `map` argument cannot be an empty string."));
-                     None
-                 },
-                 Some(Ok(name)) => Some(name),
-                 Some(Err(err)) => {
-                     ctx.push_error(err); None
-                 },
-                 None => None,
-             };
-             validate_db_name(ast_model, args, db_name, "@unique", ctx);
+        // @unique
+        attributes.visit_optional_single("unique", ctx, |args, ctx| {
+            let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
+                Some(Ok("")) => {
+                    ctx.push_error(args.new_attribute_validation_error("The `map` argument cannot be an empty string."));
+                    None
+                },
+                Some(Ok(name)) => Some(name),
+                Some(Err(err)) => {
+                    ctx.push_error(err); None
+                },
+                None => None,
+            };
+            validate_db_name(ast_model, args, db_name, "@unique", ctx);
 
 
             model_attributes.indexes.push((args.attribute(), IndexAttribute {
@@ -264,7 +287,6 @@ fn default_value_constraint_name<'ast>(
 
 fn visit_relation_field_attributes<'ast>(
     model_id: ast::ModelId,
-    field_id: ast::FieldId,
     ast_field: &'ast ast::Field,
     relation_field: &mut RelationField<'ast>,
     ctx: &mut Context<'ast>,
@@ -273,7 +295,7 @@ fn visit_relation_field_attributes<'ast>(
         // @relation
         // Relation attributes are not required _yet_ at this stage. The schema has to be parseable for standardization.
         attributes.visit_optional_single("relation", ctx, |relation_args, ctx| {
-            visit_relation(relation_args, model_id, field_id, relation_field, ctx)
+            visit_relation(relation_args, model_id, relation_field, ctx)
         });
 
         // @id
@@ -319,10 +341,10 @@ fn visit_relation_field_attributes<'ast>(
             let suggestion = match suggested_fields.len() {
                 0 => String::new(),
                 1 =>
-                format!(
-                    " Did you mean to put it on `{field}`?",
-                    field = suggested_fields[0],
-                ),
+                    format!(
+                        " Did you mean to put it on `{field}`?",
+                        field = suggested_fields[0],
+                    ),
                 _ => {
                     format!(" Did you mean to provide `@@unique([{}])`?", field = suggested_fields.join(", "))
                 }
@@ -653,7 +675,6 @@ fn common_index_validations<'ast>(
 fn visit_relation<'ast>(
     args: &mut Arguments<'ast>,
     model_id: ast::ModelId,
-    field_id: ast::FieldId,
     relation_field: &mut RelationField<'ast>,
     ctx: &mut Context<'ast>,
 ) {
@@ -679,8 +700,6 @@ fn visit_relation<'ast>(
 
         relation_field.fields = Some(fields);
     }
-
-    relation::validate_relation_field_arity(model_id, field_id, relation_field, ctx);
 
     if let Some(references) = args.optional_arg("references") {
         let references = match resolve_field_array(&references, args.span(), relation_field.referenced_model, ctx) {

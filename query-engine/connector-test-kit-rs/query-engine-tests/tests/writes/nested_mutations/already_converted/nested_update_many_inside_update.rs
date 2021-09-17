@@ -51,8 +51,7 @@ mod um_inside_update {
     }
 
     // "a PM to C1! relation" should "work"
-    // TODO:(dom): Not working on mongo. Failing from 18-26
-    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneReq", exclude(MongoDb))]
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneReq")]
     async fn pm_c1_req_should_work(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = setup_data(runner, t).await?;
 
@@ -87,8 +86,7 @@ mod um_inside_update {
     }
 
     // "a PM to C1  relation " should "work"
-    // TODO:(dom): Not working on mongo. Failing from 18-26
-    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneOpt", exclude(MongoDb))]
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneOpt")]
     async fn pm_c1_should_work(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = setup_data(runner, t).await?;
 
@@ -158,8 +156,7 @@ mod um_inside_update {
     }
 
     // "a PM to C1!  relation " should "work with several updateManys"
-    // TODO:(dom): Not working on mongo. Failing from 18-26
-    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneReq", exclude(MongoDb))]
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneReq")]
     async fn pm_c1_req_many_ums(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = setup_data(runner, t).await?;
 
@@ -200,8 +197,7 @@ mod um_inside_update {
     }
 
     // "a PM to C1!  relation " should "work with empty Filter"
-    // TODO:(dom): Not working on mongo. Failing from 18-26
-    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneReq", exclude(MongoDb))]
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneReq")]
     async fn pm_c1_req_empty_filter(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = setup_data(runner, t).await?;
 
@@ -238,8 +234,7 @@ mod um_inside_update {
     }
 
     // "a PM to C1!  relation " should "not change anything when there is no hit"
-    // TODO:(dom): Not working on mongo. Failing from 18-26
-    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneReq", exclude(MongoDb))]
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneReq")]
     async fn pm_c1_req_noop_no_hit(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = setup_data(runner, t).await?;
 
@@ -282,8 +277,7 @@ mod um_inside_update {
     // optional ordering
 
     // "a PM to C1!  relation " should "work when multiple filters hit"
-    // TODO:(dom): Not working on mongo. Failing from 18-26
-    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneReq", exclude(MongoDb))]
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneReq")]
     async fn pm_c1_req_many_filters(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = setup_data(runner, t).await?;
 

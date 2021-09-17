@@ -6,8 +6,7 @@ mod disconnect_inside_upsert {
     use query_test_macros::relation_link_test;
 
     // "a P1 to C1 relation " should "be disconnectable through a nested mutation by id"
-    // TODO:(dom): Not working on mongo. Failing from 18-26
-    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt", exclude(MongoDb))]
+    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt")]
     async fn p1_c1_should_work(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let res = run_query_json!(
             runner,
@@ -59,8 +58,7 @@ mod disconnect_inside_upsert {
     }
 
     // "a P1 to C1 relation with the child and the parent without a relation" should "be disconnectable through a nested mutation by id"
-    // TODO:(dom): Not working on mongo. Failing from 18-26
-    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt", exclude(MongoDb))]
+    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt")]
     async fn p1_c1_child_parnt_wo_rel(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         run_query!(
             runner,
@@ -114,8 +112,7 @@ mod disconnect_inside_upsert {
     }
 
     // "a PM to C1!  relation with the child already in a relation" should "not be disconnectable through a nested mutation by unique"
-    // TODO:(dom): Not working on mongo. Failing from 18-26
-    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneReq", exclude(MongoDb))]
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneReq")]
     async fn pm_c1_req_child_inrel_noop(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = t.parent().parse(
             run_query_json!(
@@ -162,8 +159,7 @@ mod disconnect_inside_upsert {
     }
 
     // "a P1 to C1!  relation with the child and the parent already in a relation" should "should error in a nested mutation by unique"
-    // TODO:(dom): Not working on mongo. Failing from 18-26
-    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneReq", exclude(MongoDb))]
+    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneReq")]
     async fn p1_c1_req_child_parnt_inrel_error(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = t.parent().parse(
             run_query_json!(
@@ -210,8 +206,7 @@ mod disconnect_inside_upsert {
     }
 
     // "a PM to C1  relation with the child already in a relation" should "be disconnectable through a nested mutation by unique"
-    // TODO:(dom): Not working on mongo. Failing from 18-26
-    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneOpt", exclude(MongoDb))]
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneOpt")]
     async fn pm_c1_child_inrel(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = t.parent().parse(
             run_query_json!(
@@ -257,8 +252,7 @@ mod disconnect_inside_upsert {
     }
 
     // "a P1 to CM  relation with the child already in a relation" should "be disconnectable through a nested mutation by unique"
-    // TODO:(dom): Not working on mongo. Failing from 18-26
-    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToMany", exclude(MongoDb))]
+    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToMany")]
     async fn p1_cm_child_inrel(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = t.parent().parse(
             run_query_json!(

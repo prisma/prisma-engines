@@ -45,8 +45,7 @@ mod delete_many_inside_update {
     }
 
     // "a PM to C1!  relation " should "work"
-    // TODO:(dom): Not working on mongo. Failing from 18-26
-    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneReq", exclude(MongoDb))]
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneReq")]
     async fn pm_c1_req(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let (parent_1, _) = setup_data(runner, t).await?;
 
@@ -114,8 +113,7 @@ mod delete_many_inside_update {
     }
 
     // "a PM to C1!  relation " should "work with several deleteManys"
-    // TODO:(dom): Not working on mongo. Failing from 18-26
-    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneReq", exclude(MongoDb))]
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneReq")]
     async fn pm_c1_req_many_delete_manys(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let (parent_1, _) = setup_data(runner, t).await?;
 
@@ -149,8 +147,7 @@ mod delete_many_inside_update {
     }
 
     // "a PM to C1! relation " should "work with empty Filter"
-    // TODO:(dom): Not working on mongo. Failing from 18-26
-    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneReq", exclude(MongoDb))]
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneReq")]
     async fn pm_c1_req_work_empty_filter(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let (parent_1, _) = setup_data(runner, t).await?;
 
@@ -181,8 +178,7 @@ mod delete_many_inside_update {
     }
 
     // "a PM to C1!  relation " should "not change anything when there is no hit"
-    // TODO:(dom): Not working on mongo. Failing from 18-26
-    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneReq", exclude(MongoDb))]
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneReq")]
     async fn pm_c1_req_no_change_if_no_hit(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let (parent_1, _) = setup_data(runner, t).await?;
 

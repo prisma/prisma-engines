@@ -92,7 +92,7 @@ mod update_many {
     }
 
     // "An updateMany mutation" should "update all items if the where clause is empty"
-    #[connector_test(exclude(MongoDb))]
+    #[connector_test]
     async fn update_all_items_if_where_empty(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, optStr: "str1" }"#).await?;
         create_row(&runner, r#"{ id: 2, optStr: "str2", optInt: 2 }"#).await?;
@@ -193,10 +193,7 @@ mod update_many {
     }
 
     // "An updateMany mutation" should "correctly apply all number operations for Float"
-    // TODO(dom): Not working on Mongo (first snapshot)
-    //-{"data":{"findManyTestModel":[{"optFloat":null},{"optFloat":3.1},{"optFloat":4.2}]}}
-    //+{"data":{"findManyTestModel":[{"optFloat":1.1},{"optFloat":3.1},{"optFloat":4.2}]}}
-    #[connector_test(exclude(MongoDb))]
+    #[connector_test]
     async fn apply_number_ops_for_float(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, optStr: "str1" }"#).await?;
         create_row(&runner, r#"{ id: 2, optStr: "str2", optFloat: 2 }"#).await?;

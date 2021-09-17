@@ -374,7 +374,7 @@ impl RelationField {
 
         match self.referential_arity {
             _ if !self.emulates_referential_actions.unwrap_or(false) => Cascade,
-            FieldArity::Required => Restrict,
+            FieldArity::Required => NoAction,
             _ => SetNull,
         }
     }

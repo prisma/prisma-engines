@@ -425,7 +425,7 @@ mod connect_or_create {
     // Regression test for failing internal graph transformations.
     // "Query reordering" should "not break connectOrCreate"
     // TODO(dom): Not working for mongo
-    #[connector_test(schema(schema_4), exclude(MongoDb))]
+    #[connector_test(schema(schema_4), capabilities(CompoundIds))]
     async fn query_reordering_works(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {upsertOneA2B(

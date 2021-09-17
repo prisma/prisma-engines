@@ -8,6 +8,7 @@ use std::collections::HashMap;
 /// Maps field db field names to their meta information.
 pub type OutputMetaMapping = HashMap<String, OutputMeta>;
 
+#[derive(Debug)]
 pub struct OutputMeta {
     pub ident: TypeIdentifier,
     pub default: Option<PrismaValue>,
