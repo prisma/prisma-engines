@@ -16,10 +16,6 @@ pub fn parse_model(token: &Token<'_>, diagnostics: &mut Diagnostics) -> Model {
 
     for current in token.relevant_children() {
         match current.as_rule() {
-            Rule::TYPE_KEYWORD => diagnostics.push_error(DatamodelError::new_legacy_parser_error(
-                "Model declarations have to be indicated with the `model` keyword.",
-                Span::from_pest(current.as_span()),
-            )),
             Rule::non_empty_identifier => name = Some(current.to_id()),
             Rule::block_level_attribute => attributes.push(parse_attribute(&current)),
             Rule::field_declaration => match parse_field(&name.as_ref().unwrap().name, &current) {

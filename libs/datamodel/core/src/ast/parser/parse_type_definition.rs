@@ -14,10 +14,6 @@ pub fn parse_type_definition(token: &Token<'_>, diagnostics: &mut Diagnostics) -
 
     for current in token.relevant_children() {
         match current.as_rule() {
-            Rule::TYPE_KEYWORD => diagnostics.push_error(DatamodelError::new_legacy_parser_error(
-                "Type declarations have to be indicated with the `type` keyword.",
-                Span::from_pest(current.as_span()),
-            )),
             Rule::non_empty_identifier => name = Some(current.to_id()),
             Rule::field_declaration => match parse_field(&name.as_ref().unwrap().name, &current) {
                 Ok(field) => fields.push(field),
@@ -28,7 +24,7 @@ pub fn parse_type_definition(token: &Token<'_>, diagnostics: &mut Diagnostics) -
                 "This line is not a valid field definition.",
                 Span::from_pest(current.as_span()),
             )),
-            _ => parsing_catch_all(&current, "model"),
+            _ => parsing_catch_all(&current, "type definition"),
         }
     }
 

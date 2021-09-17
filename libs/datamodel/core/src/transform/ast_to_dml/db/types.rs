@@ -13,7 +13,7 @@ pub(super) fn resolve_types(ctx: &mut Context<'_>) {
         match (top_id, top) {
             (ast::TopId::Alias(alias_id), ast::Top::Alias(alias)) => visit_alias(alias_id, alias, ctx),
             (ast::TopId::Model(model_id), ast::Top::Model(model)) => visit_model(model_id, model, ctx),
-            (ast::TopId::Type(_type_id), ast::Top::Type(_type_def)) => todo!(),
+            (ast::TopId::Type(_type_id), ast::Top::Type(_type_def)) => (),
             (ast::TopId::Enum(_), ast::Top::Enum(enm)) => visit_enum(enm, ctx),
             (_, ast::Top::Source(_)) | (_, ast::Top::Generator(_)) => (),
             _ => unreachable!(),
