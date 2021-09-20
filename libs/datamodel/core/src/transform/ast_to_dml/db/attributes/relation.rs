@@ -9,7 +9,7 @@ pub(super) fn validate_relation_field_arity(field: RelationFieldWalker<'_, '_>, 
         return;
     }
 
-    if !field.referencing_fields().any(|field| field.arity.is_optional()) {
+    if !field.referencing_fields().any(|field| field.is_optional()) {
         return;
     }
 
