@@ -177,6 +177,12 @@ pub struct DatasourceBlock<'a> {
     params: &'a [(&'a str, &'a str)],
 }
 
+impl<'a> DatasourceBlock<'a> {
+    pub fn url(&self) -> &str {
+        self.url
+    }
+}
+
 impl Display for DatasourceBlock<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str("datasource db {\n    provider = \"")?;
