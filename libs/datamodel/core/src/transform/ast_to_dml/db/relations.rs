@@ -2,49 +2,95 @@ use super::{context::Context, types::RelationField};
 use crate::ast;
 use std::collections::BTreeSet;
 
-#[derive(Debug, Default)]
-pub(super) struct Relations<'ast> {
-    /// (model_a_id, model_b_id, relation)
-    many_to_many: BTreeSet<(ast::ModelId, ast::ModelId, ManyToManyRelation<'ast>)>,
-    ///
-    one_to_one: Vec<OneToOneRelation<'ast>>,
+#[derive(PartialOrd, Ord, PartialEq, Eq, Debug, Clone)]
+enum OneToManyRelationFields {
+    Forward(ast::FieldId),
+    Back(ast::FieldId),
+    Both(ast::FieldId, ast::FieldId),
 }
 
-#[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
-struct ManyToManyRelation<'ast> {
-    /// Relation field on model A.
-    field_a: ast::FieldId,
-    /// Relation field on model B.
-    field_b: ast::FieldId,
+#[derive(PartialOrd, Ord, PartialEq, Eq, Debug, Clone)]
+enum RelationType {
+    ImplicitManyToMany {
+        field_a: ast::FieldId,
+        field_b: ast::FieldId,
+    },
+    OneToOne {
+        field_a: ast::FieldId,
+        field_b: ast::FieldId,
+    },
+    OneToMany(OneToManyRelationFields),
+}
+
+#[derive(PartialOrd, Ord, PartialEq, Eq, Debug, Clone)]
+pub(super) struct Relation<'ast> {
     /// The `name` argument in `@relation`.
     relation_name: Option<&'ast str>,
+    tpe: RelationType,
 }
 
-#[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
-struct OneToOneRelation<'ast> {
-    /// Relation field on the referencing model.
-    referencing_field_id: ast::FieldId,
-    /// Relation field on the referenced model.
-    referenced_field_id: ast::FieldId,
-    relation_name: Option<&'ast str>,
+#[derive(Debug, Default)]
+pub(super) struct Relations<'ast> {
+    // A relation is always between two models. One model is assigned the role
+    // of "model A", and the other is "model B". The meaning of "model A" and
+    // "model B" depends on the type of relation.
+    //
+    // - In implicit many-to-many relations, model A and model B are ordered
+    //   lexicographically, by model name, and failing that by relation field
+    //   name. This order must be stable in order for the columns in the
+    //   implicit many-to-many relation table columns and the data in them to
+    //   keep their meaning.
+    // - In one-to-one and one-to-many relations, model A is the one carrying
+    //   the referencing information and possible constraint. For example, on a
+    //   SQL database, model A would correspond to the table with the foreign
+    //   key constraint, while model B would correspond to the table referenced
+    //   by the foreign key.
+
+    // Storage
+    relations_storage: Vec<Relation<'ast>>,
+
+    // Indexes for efficient querying.
+    //
+    // Why BTreeSets?
+    //
+    // - We can't use a BTreeMap because there can be more than one relation
+    //   between two models
+    // - We use a BTree because we want range queries. Meaning that with a
+    //   BTreeSet, we can efficiently ask:
+    //   - Give me all the relations on other models that point to this model
+    //   - Give me all the relations on this model that point to other models
+    //
+    // Where "on this model" doesn't mean "the relation field is on the model"
+    // but "the foreigr key is on this model" (= this model is model a)
+
+    // (model_a, model_b, relation_idx)
+    forward: BTreeSet<(ast::ModelId, ast::ModelId, usize)>,
+    // (model_b, model_a, relation_idx)
+    back: BTreeSet<(ast::ModelId, ast::ModelId, usize)>,
 }
 
-#[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
-struct ConcreteManyToOneRelation<'ast> {
-    /// Relation field on the referencing model.
-    referencing_field_id: ast::FieldId,
-    /// Relation field on the referenced model.
-    referenced_field_id: Option<ast::FieldId>,
-    relation_name: Option<&'ast str>,
-}
+impl<'ast> Relations<'ast> {
+    /// Iterator over (referenced_model_id, relation)
+    #[allow(dead_code)] // not used _yet_
+    pub(super) fn relations_from_model(
+        &self,
+        model: ast::ModelId,
+    ) -> impl Iterator<Item = (ast::ModelId, &Relation<'ast>)> + '_ {
+        self.forward
+            .range((model, ast::ModelId::ZERO, 0)..(model, ast::ModelId::MAX, usize::MAX))
+            .map(move |(_model_a_id, model_b_id, relation_idx)| (*model_b_id, &self.relations_storage[*relation_idx]))
+    }
 
-#[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
-struct VirtualManyToOneRelation<'ast> {
-    /// Relation field on the referencing model.
-    referencing_field_id: ast::FieldId,
-    /// Relation field on the referenced model.
-    referenced_field_id: Option<ast::FieldId>,
-    relation_name: Option<&'ast str>,
+    /// Iterator over (referencing_model_id, relation)
+    #[allow(dead_code)] // not used _yet_
+    pub(super) fn relations_to_model(
+        &self,
+        model: ast::ModelId,
+    ) -> impl Iterator<Item = (ast::ModelId, &Relation<'ast>)> {
+        self.back
+            .range((model, ast::ModelId::ZERO, 0)..(model, ast::ModelId::MAX, usize::MAX))
+            .map(move |(_model_b_id, model_a_id, relation_idx)| (*model_a_id, &self.relations_storage[*relation_idx]))
+    }
 }
 
 pub(super) fn infer_relations(ctx: &mut Context<'_>) {
@@ -52,8 +98,10 @@ pub(super) fn infer_relations(ctx: &mut Context<'_>) {
 
     for rf in ctx.db.types.relation_fields.iter() {
         let evidence = relation_evidence(rf, ctx);
-        ingest_relation(evidence, &mut relations, ctx);
+        ingest_relation(evidence, &mut relations);
     }
+
+    ctx.db.relations = relations;
 }
 
 // Implementation detail for this module. Should stay private.
@@ -70,7 +118,7 @@ struct RelationEvidence<'ast, 'db> {
 
 fn relation_evidence<'ast, 'db>(
     ((model_id, field_id), relation_field): (&(ast::ModelId, ast::FieldId), &'db RelationField<'ast>),
-    ctx: &'db mut Context<'ast>,
+    ctx: &'db Context<'ast>,
 ) -> RelationEvidence<'ast, 'db> {
     let ast_model = &ctx.db.ast[*model_id];
     let ast_field = &ast_model[*field_id];
@@ -99,12 +147,8 @@ fn relation_evidence<'ast, 'db>(
     }
 }
 
-fn ingest_relation<'ast, 'db>(
-    evidence: RelationEvidence<'ast, 'db>,
-    relations: &mut Relations<'ast>,
-    ctx: &Context<'ast>,
-) {
-    match (evidence.ast_field.arity, evidence.opposite_relation_field) {
+fn ingest_relation<'ast, 'db>(evidence: RelationEvidence<'ast, 'db>, relations: &mut Relations<'ast>) {
+    let relation_type = match (evidence.ast_field.arity, evidence.opposite_relation_field) {
         (ast::FieldArity::List, Some((opp_field_id, opp_field, _))) if opp_field.arity.is_list() => {
             // This is an implicit many-to-many relation.
 
@@ -122,32 +166,54 @@ fn ingest_relation<'ast, 'db>(
                 return;
             }
 
-            let relation = ManyToManyRelation {
+            RelationType::ImplicitManyToMany {
                 field_a: evidence.field_id,
                 field_b: opp_field_id,
-                relation_name: evidence.relation_field.name,
-            };
-
-            relations
-                .many_to_many
-                .insert((evidence.model_id, evidence.relation_field.referenced_model, relation));
+            }
         }
-        (ast::FieldArity::List, Some((opp_field_id, opp_field, opp_relation_field))) => {
+        (ast::FieldArity::List, Some(_)) => {
             // This is a 1:m relation defined on both sides. We skip the virtual side.
+            return;
         }
         (ast::FieldArity::List, None) => {
             // This is a 1:m relation defined on the virtual side only.
-            todo!()
+
+            RelationType::OneToMany(OneToManyRelationFields::Back(evidence.field_id))
         }
-        (ast::FieldArity::Optional | ast::FieldArity::Required, Some((_, opp_field, _)))
+        (ast::FieldArity::Optional | ast::FieldArity::Required, Some((opp_field_id, opp_field, _)))
             if opp_field.arity.is_required() || opp_field.arity.is_optional() =>
         {
             // This is a 1:1 relation.
-            todo!()
+            RelationType::OneToOne {
+                field_a: evidence.field_id,
+                field_b: opp_field_id,
+            }
         }
-        (ast::FieldArity::Optional | ast::FieldArity::Required, opp_field) => {
-            // This is a 1:m relation.
-            todo!()
+        (ast::FieldArity::Optional | ast::FieldArity::Required, None) => {
+            // This is a 1:m relation defined on the concrete side only.
+            RelationType::OneToMany(OneToManyRelationFields::Forward(evidence.field_id))
+        }
+        (ast::FieldArity::Optional | ast::FieldArity::Required, Some((opp_field_id, _, _))) => {
+            // This is a 1:m relation defined on both sides.
+            RelationType::OneToMany(OneToManyRelationFields::Both(evidence.field_id, opp_field_id))
         }
     };
+
+    let relation = Relation {
+        tpe: relation_type,
+        relation_name: evidence.relation_field.name,
+    };
+
+    let relation_idx = relations.relations_storage.len();
+    relations.relations_storage.push(relation);
+    relations.forward.insert((
+        evidence.model_id,
+        evidence.relation_field.referenced_model,
+        relation_idx,
+    ));
+    relations.back.insert((
+        evidence.relation_field.referenced_model,
+        evidence.model_id,
+        relation_idx,
+    ));
 }
