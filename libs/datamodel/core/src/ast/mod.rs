@@ -104,6 +104,13 @@ impl SchemaAst {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub(crate) struct ModelId(u32);
 
+impl ModelId {
+    /// Used for range bounds when iterating over BTrees.
+    pub(crate) const ZERO: ModelId = ModelId(0);
+    /// Used for range bounds when iterating over BTrees.
+    pub(crate) const MAX: ModelId = ModelId(u32::MAX);
+}
+
 impl std::ops::Index<ModelId> for SchemaAst {
     type Output = Model;
 
