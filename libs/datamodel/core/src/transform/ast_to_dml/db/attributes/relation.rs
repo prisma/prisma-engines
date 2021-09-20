@@ -89,7 +89,7 @@ pub(super) fn validate_references_unique_fields(
     connector: &dyn Connector,
     errors: &mut Vec<DatamodelError>,
 ) {
-    if field.referenced_fields_len() == 0 || !errors.is_empty() {
+    if field.referenced_fields().len() == 0 || !errors.is_empty() {
         return;
     }
 
@@ -128,7 +128,7 @@ pub(super) fn validate_referenced_fields_in_correct_order(
     connector: &dyn Connector,
     errors: &mut Vec<DatamodelError>,
 ) {
-    if field.referenced_fields_len() == 0 || !errors.is_empty() {
+    if field.referenced_fields().len() == 0 || !errors.is_empty() {
         return;
     }
 
@@ -139,7 +139,7 @@ pub(super) fn validate_referenced_fields_in_correct_order(
     let reference_order_correct = field.related_model().unique_criterias().any(|criteria| {
         let criteria_fields = criteria.fields().map(|f| f.ast_field().name());
 
-        if criteria_fields.len() != field.referenced_fields_len() {
+        if criteria_fields.len() != field.referenced_fields().len() {
             return false;
         }
 
@@ -166,11 +166,11 @@ pub(super) fn validate_same_length_in_referencing_and_referenced(
     field: RelationFieldWalker<'_, '_>,
     errors: &mut Vec<DatamodelError>,
 ) {
-    if field.referenced_fields_len() == 0 || field.referencing_fields_len() == 0 {
+    if field.referenced_fields().len() == 0 || field.referencing_fields().len() == 0 {
         return;
     }
 
-    if field.referenced_fields_len() == field.referencing_fields_len() {
+    if field.referenced_fields().len() == field.referencing_fields().len() {
         return;
     }
 

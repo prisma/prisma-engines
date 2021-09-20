@@ -246,22 +246,23 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
         }
     }
 
-    pub(crate) fn referencing_fields(&'db self) -> impl Iterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db {
-        self.relation_field
-            .fields
-            .iter()
-            .flatten()
-            .map(move |field_id| ScalarFieldWalker {
-                model_id: self.model_id,
-                field_id: *field_id,
-                db: self.db,
-                scalar_field: &self.db.types.scalar_fields[&(self.model_id, *field_id)],
-            })
+    pub(crate) fn referencing_fields(&'db self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db {
+        let f = move |field_id: &FieldId| ScalarFieldWalker {
+            model_id: self.model_id,
+            field_id: *field_id,
+            db: self.db,
+            scalar_field: &self.db.types.scalar_fields[&(self.model_id, *field_id)],
+        };
+
+        match self.relation_field.fields.as_ref() {
+            Some(references) => references.iter().map(f),
+            None => [].iter().map(f),
+        }
     }
 
     #[allow(dead_code)]
-    pub(crate) fn referenced_fields(&'db self) -> impl Iterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db {
-        self.relation_field.references.iter().flatten().map(move |field_id| {
+    pub(crate) fn referenced_fields(&'db self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db {
+        let f = move |field_id: &FieldId| {
             let model_id = self.attributes().referenced_model;
 
             ScalarFieldWalker {
@@ -270,27 +271,16 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
                 db: self.db,
                 scalar_field: &self.db.types.scalar_fields[&(model_id, *field_id)],
             }
-        })
-    }
+        };
 
-    pub(crate) fn referencing_fields_len(&self) -> usize {
-        self.relation_field
-            .fields
-            .as_ref()
-            .map(|fields| fields.len())
-            .unwrap_or(0)
+        match self.relation_field.references.as_ref() {
+            Some(references) => references.iter().map(f),
+            None => [].iter().map(f),
+        }
     }
 
     pub(crate) fn is_compound_relation(&self) -> bool {
-        self.referenced_fields_len() > 1
-    }
-
-    pub(crate) fn referenced_fields_len(&self) -> usize {
-        self.relation_field
-            .references
-            .as_ref()
-            .map(|references| references.len())
-            .unwrap_or(0)
+        self.referenced_fields().len() > 1
     }
 
     /// This will be None for virtual relation fields (when no `fields` argument is passed).
