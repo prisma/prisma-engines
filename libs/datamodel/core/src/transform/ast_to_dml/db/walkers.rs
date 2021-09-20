@@ -43,6 +43,13 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
         self.model_attributes
     }
 
+    pub(crate) fn fields_are_unique(&self, fields: &[ast::FieldId]) -> bool {
+        self.model_attributes
+            .indexes
+            .iter()
+            .any(|(_, idx)| idx.is_unique && idx.fields == fields)
+    }
+
     #[allow(clippy::unnecessary_lazy_evaluations)] // respectfully disagree
     pub(crate) fn final_database_name(&self) -> &'ast str {
         self.model_attributes

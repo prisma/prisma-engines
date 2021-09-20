@@ -103,7 +103,7 @@ impl<'ast> ParserDatabase<'ast> {
         attributes::fill_in_default_constraint_names(&mut ctx);
         attributes::validate_relation_fields(&mut ctx);
 
-        // Fifth step: relation inferrence
+        // Fifth step: relation inference
         relations::infer_relations(&mut ctx);
 
         ctx.finish()
