@@ -273,7 +273,7 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
         })
     }
 
-    pub(crate) fn _referencing_fields_len(&self) -> usize {
+    pub(crate) fn referencing_fields_len(&self) -> usize {
         self.relation_field
             .fields
             .as_ref()

@@ -81,6 +81,7 @@ pub(super) fn validate_ignored_related_model(field: RelationFieldWalker<'_, '_>,
     }
 }
 
+/// Some connectors expect us to refer only unique fields from the foreign key.
 pub(super) fn validate_references_unique_fields(
     field: RelationFieldWalker<'_, '_>,
     connector: &dyn Connector,
@@ -148,4 +149,24 @@ pub(super) fn validate_referenced_fields_in_correct_order(
             field.ast_field().span
         ));
     }
+}
+
+/// The `fields` and `references` should hold the same number of fields.
+pub(super) fn validate_same_length_in_referencing_and_referenced(
+    field: RelationFieldWalker<'_, '_>,
+    errors: &mut Vec<DatamodelError>,
+) {
+    if field.referenced_fields_len() == 0 || field.referencing_fields_len() == 0 {
+        return;
+    }
+
+    if field.referenced_fields_len() == field.referencing_fields_len() {
+        return;
+    }
+
+    errors.push(DatamodelError::new_attribute_validation_error(
+        "You must specify the same number of fields in `fields` and `references`.",
+        "relation",
+        field.ast_field().span,
+    ));
 }
