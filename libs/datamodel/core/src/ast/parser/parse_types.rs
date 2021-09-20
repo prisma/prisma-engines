@@ -28,7 +28,7 @@ pub fn parse_field_type(token: &Token<'_>) -> Result<(FieldArity, FieldType), Da
     }
 }
 
-fn parse_base_type(token: &Token<'_>) -> FieldType {
+pub fn parse_base_type(token: &Token<'_>) -> FieldType {
     let current = token.first_relevant_child();
     match current.as_rule() {
         Rule::non_empty_identifier => FieldType::Supported(Identifier {

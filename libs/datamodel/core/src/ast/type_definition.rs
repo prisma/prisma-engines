@@ -1,4 +1,3 @@
-use super::model::FieldId;
 use super::*;
 
 /// A type declaration.
@@ -14,19 +13,6 @@ pub struct TypeDefinition {
     pub span: Span,
     /// Should this be commented out.
     pub commented_out: bool,
-}
-
-impl TypeDefinition {
-    pub(crate) fn iter_fields(&self) -> impl Iterator<Item = (FieldId, &Field)> {
-        self.fields
-            .iter()
-            .enumerate()
-            .map(|(idx, field)| (FieldId(idx as u32), field))
-    }
-
-    pub(crate) fn find_field(&self, name: &str) -> Option<&Field> {
-        self.fields.iter().find(|ast_field| ast_field.name.name == name)
-    }
 }
 
 impl WithIdentifier for TypeDefinition {

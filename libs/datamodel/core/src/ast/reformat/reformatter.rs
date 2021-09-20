@@ -341,16 +341,17 @@ impl<'a> Reformatter<'a> {
         );
     }
 
+    // WIP
     fn reformat_type(&self, target: &mut Renderer<'_>, token: &Token<'_>) {
         self.reformat_block_element_internal(
             "type",
             target,
             token,
-            Box::new(|table, renderer, token, model_name| match token.as_rule() {
+            Box::new(|table, _renderer, token, model_name| match token.as_rule() {
                 Rule::field_declaration => self.reformat_field(table, token, model_name),
                 _ => Self::reformat_generic_token(table, token),
             }),
-            Box::new(|table, _, model_name| ()),
+            Box::new(|_table, _, _model_name| ()),
         );
     }
 
