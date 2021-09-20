@@ -337,17 +337,6 @@ impl<'a> Validator<'a> {
                 }
             }
 
-            if !rel_info.fields.is_empty()
-                && !rel_info.references.is_empty()
-                && rel_info.fields.len() != rel_info.references.len()
-            {
-                errors.push_error(DatamodelError::new_attribute_validation_error(
-                    "You must specify the same number of fields in `fields` and `references`.",
-                    RELATION_ATTRIBUTE_NAME,
-                    ast_field.span,
-                ));
-            }
-
             if !errors.has_errors() {
                 // don't output too much errors
                 for err in fields_with_wrong_type {

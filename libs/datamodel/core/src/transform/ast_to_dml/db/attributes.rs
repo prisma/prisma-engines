@@ -158,6 +158,7 @@ pub(super) fn validate_relation_fields(ctx: &mut Context<'_>) {
         let model = ctx.db.walk_model(*model_id);
         let field = model.walk_relation_field(*field_id);
 
+        relation::validate_same_length_in_referencing_and_referenced(field, &mut errors);
         relation::validate_relation_field_arity(field, &mut errors);
         relation::validate_ignored_related_model(field, &mut errors);
         relation::validate_on_update_without_foreign_keys(field, referential_integrity, &mut errors);
