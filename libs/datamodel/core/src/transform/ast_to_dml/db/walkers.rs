@@ -67,6 +67,32 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
         })
     }
 
+    pub(crate) fn unique_criterias(&'db self) -> impl Iterator<Item = UniqueCriteriaWalker<'ast, 'db>> + 'db {
+        let model_id = self.model_id;
+        let db = self.db;
+
+        let from_pk = self
+            .model_attributes
+            .primary_key
+            .iter()
+            .map(move |pk| UniqueCriteriaWalker {
+                model_id,
+                fields: &pk.fields,
+                db,
+            });
+
+        let from_indices = self
+            .walk_indexes()
+            .filter(|walker| walker.attribute().is_unique)
+            .map(move |walker| UniqueCriteriaWalker {
+                model_id,
+                fields: &walker.attribute().fields,
+                db,
+            });
+
+        from_pk.chain(from_indices)
+    }
+
     pub(crate) fn walk_indexes(&self) -> impl Iterator<Item = IndexWalker<'ast, 'db>> + 'db {
         let model_id = self.model_id;
         let db = self.db;
@@ -247,6 +273,26 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
         })
     }
 
+    pub(crate) fn _referencing_fields_len(&self) -> usize {
+        self.relation_field
+            .fields
+            .as_ref()
+            .map(|fields| fields.len())
+            .unwrap_or(0)
+    }
+
+    pub(crate) fn is_compound_relation(&self) -> bool {
+        self.referenced_fields_len() > 1
+    }
+
+    pub(crate) fn referenced_fields_len(&self) -> usize {
+        self.relation_field
+            .references
+            .as_ref()
+            .map(|references| references.len())
+            .unwrap_or(0)
+    }
+
     /// This will be None for virtual relation fields (when no `fields` argument is passed).
     pub(crate) fn final_foreign_key_name(&self) -> Option<Cow<'ast, str>> {
         self.attributes().fk_name.map(Cow::Borrowed).or_else(|| {
@@ -259,6 +305,24 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
                 ConstraintNames::foreign_key_constraint_name(table_name, &column_names, self.db.active_connector())
                     .into(),
             )
+        })
+    }
+}
+
+#[derive(Copy, Clone)]
+pub(crate) struct UniqueCriteriaWalker<'ast, 'db> {
+    model_id: ast::ModelId,
+    fields: &'db [FieldId],
+    db: &'db ParserDatabase<'ast>,
+}
+
+impl<'ast, 'db> UniqueCriteriaWalker<'ast, 'db> {
+    pub(crate) fn fields(&'db self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db {
+        self.fields.iter().map(move |field_id| ScalarFieldWalker {
+            model_id: self.model_id,
+            field_id: *field_id,
+            db: self.db,
+            scalar_field: &self.db.types.scalar_fields[&(self.model_id, *field_id)],
         })
     }
 }
