@@ -29,6 +29,10 @@ pub fn parse_schema(datamodel_string: &str) -> Result<SchemaAst, Diagnostics> {
                     Rule::source_block => top_level_definitions.push(Top::Source(parse_source(&current, &mut errors))),
                     Rule::generator_block => top_level_definitions.push(Top::Generator(parse_generator(&current, &mut errors))),
                     Rule::alias => top_level_definitions.push(Top::Alias(parse_alias(&current))),
+                    Rule::legacy_alias => errors.push_error(DatamodelError::new_validation_error(
+                        TYPE_ALIAS_DEPRECATION,
+                        Span::from_pest(current.as_span()),
+                    )),
                     Rule::comment_block => (),
                     Rule::EOI => {}
                     Rule::CATCH_ALL => errors.push_error(DatamodelError::new_validation_error(
@@ -107,6 +111,7 @@ fn rule_to_string(rule: Rule) -> &'static str {
         Rule::field_type => "field type",
         Rule::field_declaration => "field declaration",
         Rule::alias => "alias",
+        Rule::legacy_alias => "legacy alias",
         Rule::key_value => "configuration property",
         Rule::string_any => "any character",
         Rule::string_escaped_interpolation => "string interpolation",
@@ -154,3 +159,29 @@ fn rule_to_string(rule: Rule) -> &'static str {
         Rule::doc_content => "documentation comment content",
     }
 }
+
+const TYPE_ALIAS_DEPRECATION: &str = r#"
+/ It looks like you are trying to define \
+| a type alias. The keyword for aliases  |
+| changed from `type` to `alias`.        |
+|                                        |
+| Example: `type Name = String           |
+| @default("george")` (old syntax) vs.   |
+| `alias Name = String                   |
+\ @default("george")` (new syntax)       /
+ ----------------------------------------
+\                             .       .
+ \                           / `.   .' "
+  \                  .---.  <    > <    >  .---.
+   \                 |    \  \ - ~ ~ - /  /    |
+         _____          ..-~             ~-..-~
+        |     |   \~~~\.'                    `./~~~/
+       ---------   \__/                        \__/
+      .'  O    \     /               /       \  "
+     (_____,    `._.'               |         }  \/~~~/
+      `----.          /       }     |        /    \__/
+            `-.      |       /      |       /      `. ,~~|
+                ~-.__|      /_ - ~ ^|      /- _      `..-'
+                     |     /        |     /     ~-.     `-. _  _  _
+                     |_____|        |_____|         ~ - . _ _ _ _ _>
+"#;
