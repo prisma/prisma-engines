@@ -24,6 +24,7 @@ members = [
   "prisma-fmt",
   "libs/datamodel/core",
   "libs/json-rpc-stdio",
+  "libs/mongodb-schema-describer",
   "libs/native-types",
   "libs/prisma-inflector",
   "libs/prisma-models",

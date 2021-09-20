@@ -2373,6 +2373,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "mongodb-schema-describer"
+version = "0.1.0"
+dependencies = [
+ "mongodb",
+]
+
+[[package]]
 name = "multimap"
 version = "0.8.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
