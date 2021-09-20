@@ -308,36 +308,6 @@ impl<'a> Validator<'a> {
                     .collect();
 
             if !rel_info.references.is_empty() && !errors.has_errors() {
-                let strict_relation_field_order = self
-                    .source
-                    .map(|s| !s.active_connector.allows_relation_fields_in_arbitrary_order())
-                    .unwrap_or(false);
-
-                // when we have other errors already don't push this error additionally
-                let references_unique_criteria = related_model.loose_unique_criterias().iter().any(|criteria| {
-                    let mut criteria_field_names: Vec<_> = criteria.fields.iter().map(|f| f.name.to_owned()).collect();
-                    criteria_field_names.sort();
-
-                    let mut references_sorted = rel_info.references.clone();
-                    references_sorted.sort();
-
-                    criteria_field_names == references_sorted
-                });
-
-                let reference_order_correct = if strict_relation_field_order && rel_info.references.len() > 1 {
-                    related_model.loose_unique_criterias().iter().any(|criteria| {
-                        let criteria_fields = criteria.fields.iter().map(|f| f.name.as_str());
-                        let references = rel_info.references.iter().map(|f| f.as_str());
-
-                        let same_length = criteria_fields.len() == references.len();
-                        let same_order = criteria_fields.zip(references).all(|(a, b)| a == b);
-
-                        same_length && same_order
-                    })
-                } else {
-                    true
-                };
-
                 let references_singular_id_field = rel_info.references.len() == 1
                     && related_model.field_is_primary(rel_info.references.first().unwrap());
 
@@ -348,27 +318,6 @@ impl<'a> Validator<'a> {
                         None => false,
                     }
                 };
-
-                let must_reference_unique_criteria = match self.source {
-                    Some(source) => !source.active_connector.supports_relations_over_non_unique_criteria(),
-                    None => true,
-                };
-
-                if !references_unique_criteria && must_reference_unique_criteria {
-                    errors.push_error(DatamodelError::new_validation_error(
-                            &format!("The argument `references` must refer to a unique criteria in the related model `{}`. But it is referencing the following fields that are not a unique criteria: {}",
-                                     &related_model.name,
-                                     rel_info.references.join(", ")),
-                            ast_field.span)
-                        );
-                } else if !reference_order_correct {
-                    errors.push_error(DatamodelError::new_validation_error(
-                        &format!("The argument `references` must refer to a unique criteria in the related model `{}` using the same order of fields. Please check the ordering in the following fields: `{}`.",
-                                 &related_model.name,
-                                 rel_info.references.join(", ")),
-                        ast_field.span)
-                    );
-                }
 
                 // TODO: This error is only valid for connectors that don't support native many to manys.
                 // We only render this error if there's a singular id field. Otherwise we render a better error in a different function.
