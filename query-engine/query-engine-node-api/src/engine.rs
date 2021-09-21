@@ -91,7 +91,7 @@ pub struct ConstructorOptions {
     #[serde(default)]
     datasource_overrides: BTreeMap<String, String>,
     #[serde(default)]
-    env: HashMap<String, String>,
+    env: serde_json::Value,
     #[serde(default)]
     telemetry: TelemetryOptions,
     config_dir: PathBuf,
@@ -164,7 +164,7 @@ impl QueryEngine {
             config,
             logger,
             config_dir,
-            env,
+            env: stringify_env_values(env)?,
         };
 
         Ok(Self {
@@ -367,6 +367,29 @@ fn map_known_error(err: query_core::CoreError) -> crate::Result<String> {
     let value = serde_json::to_string(&user_error)?;
 
     Ok(value)
+}
+
+fn stringify_env_values(origin: serde_json::Value) -> crate::Result<HashMap<String, String>> {
+    use serde_json::Value;
+
+    let msg = match origin {
+        Value::Object(map) => {
+            let mut result: HashMap<String, String> = HashMap::new();
+
+            for (key, val) in map.into_iter() {
+                result.insert(key, val.to_string());
+            }
+
+            return Ok(result);
+        }
+        Value::Null => return Ok(Default::default()),
+        Value::Bool(_) => "Expected an object for the env constructor parameter, got a boolean.",
+        Value::Number(_) => "Expected an object for the env constructor parameter, got a number.",
+        Value::String(_) => "Expected an object for the env constructor parameter, got a string.",
+        Value::Array(_) => "Expected an object for the env constructor parameter, got an array.",
+    };
+
+    Err(ApiError::JsonDecode(msg.to_string()))
 }
 
 pub fn set_panic_hook() {
