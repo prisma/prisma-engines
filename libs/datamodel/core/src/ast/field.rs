@@ -32,6 +32,15 @@ impl Field {
             .next()
     }
 
+    /// Finds the position span of the given attribute.
+    pub(crate) fn span_for_attribute(&self, attribute: &str) -> Option<Span> {
+        self.attributes
+            .iter()
+            .filter(|a| a.name() == attribute)
+            .map(|a| a.span)
+            .next()
+    }
+
     /// The name of the field
     pub fn name(&self) -> &str {
         &self.name.name

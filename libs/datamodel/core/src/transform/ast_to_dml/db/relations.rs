@@ -1,5 +1,7 @@
+mod validate;
+
 use super::{context::Context, types::RelationField};
-use crate::ast;
+use crate::{ast, transform::ast_to_dml::db::walkers::ExplicitRelationWalker};
 use std::collections::BTreeSet;
 
 #[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
@@ -119,6 +121,42 @@ pub(super) fn infer_relations(ctx: &mut Context<'_>) {
     }
 
     ctx.db.relations = relations;
+}
+
+pub(super) fn validate_relations(ctx: &mut Context<'_>) {
+    let mut errors = Vec::new();
+
+    for (model_a, model_b, relation) in ctx.db.relations.iter_relations() {
+        match &relation.r#type {
+            RelationType::ImplicitManyToMany { .. } => (),
+            explicit => {
+                let relation = match &explicit {
+                    RelationType::OneToOne(OneToOneRelationFields::Both(field_a, field_b)) => {
+                        ExplicitRelationWalker::new((model_a, *field_a), (model_b, *field_b), relation, &ctx.db)
+                    }
+                    RelationType::OneToMany(OneToManyRelationFields::Both(field_a, field_b)) => {
+                        ExplicitRelationWalker::new((model_a, *field_a), (model_b, *field_b), relation, &ctx.db)
+                    }
+                    _ => {
+                        continue;
+                    }
+                };
+
+                let connector = ctx.db.active_connector();
+
+                validate::field_arity(relation, &mut errors);
+                validate::same_length_in_referencing_and_referenced(relation, &mut errors);
+
+                // These needs to run last to prevent error spam.
+                validate::references_unique_fields(relation, connector, &mut errors);
+                validate::referencing_fields_in_correct_order(relation, connector, &mut errors);
+            }
+        }
+    }
+
+    for error in errors.into_iter() {
+        ctx.push_error(error);
+    }
 }
 
 // Implementation detail for this module. Should stay private.
