@@ -1,7 +1,12 @@
-use datamodel_connector::Connector;
-use itertools::Itertools;
+mod visited_relation;
 
-use crate::{diagnostics::DatamodelError, transform::ast_to_dml::db::walkers::ExplicitRelationWalker};
+use std::{collections::HashSet, rc::Rc};
+
+use datamodel_connector::{Connector, ConnectorCapability};
+use itertools::Itertools;
+use visited_relation::*;
+
+use crate::{ast::Span, diagnostics::DatamodelError, transform::ast_to_dml::db::walkers::ExplicitRelationWalker};
 
 /// The `fields` and `references` should hold the same number of fields.
 pub(super) fn same_length_in_referencing_and_referenced(
@@ -121,4 +126,88 @@ pub(super) fn field_arity(relation: ExplicitRelationWalker<'_, '_>, errors: &mut
         ),
         relation.referencing_field().ast_field().span
     ));
+}
+
+pub(super) fn detect_cycles(
+    relation: ExplicitRelationWalker<'_, '_>,
+    connector: &dyn Connector,
+    errors: &mut Vec<DatamodelError>,
+) {
+    if connector.has_capability(ConnectorCapability::ReferenceCycleDetection)
+        || connector.has_capability(ConnectorCapability::ForeignKeys)
+    {
+        return;
+    }
+
+    // Keeps count on visited relations to iterate them only once.
+    let mut visited = HashSet::new();
+
+    // poor man's tail-recursion ;)
+    let mut next_relations = vec![(relation, Rc::new(VisitedRelation::root(relation)))];
+
+    while let Some((next_relation, visited_relations)) = next_relations.pop() {
+        let related_model = next_relation.referenced_model();
+
+        visited.insert(relation);
+
+        let on_delete = next_relation.on_delete();
+        let on_update = next_relation.on_update();
+
+        // a cycle has a meaning only if every relation in it triggers
+        // modifications in the children
+        if on_update.triggers_modification() || on_delete.triggers_modification() {
+            let model = next_relation.referencing_model().ast_model();
+            let parent_model = relation.referenced_model().ast_model();
+
+            if model.name() == related_model.ast_model().name() {
+                let msg = "A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes.";
+                errors.push(error_with_default_values(relation, msg));
+                return;
+            }
+
+            if related_model.ast_model().name() == parent_model.name() {
+                let msg = format!("Reference causes a cycle. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Cycle path: {}.", visited_relations);
+                errors.push(error_with_default_values(relation, &msg));
+                return;
+            }
+
+            for relation in related_model.explicit_forward_relations() {
+                if !visited.contains(&relation) {
+                    next_relations.push((relation, Rc::new(visited_relations.link_next(relation))));
+                }
+            }
+        }
+    }
+}
+
+fn error_with_default_values(relation: ExplicitRelationWalker<'_, '_>, msg: &str) -> DatamodelError {
+    let on_delete = match relation.referencing_field().attributes().on_delete {
+        None if relation.on_delete().triggers_modification() => Some(relation.on_delete()),
+        _ => None,
+    };
+
+    let on_update = match relation.referenced_field().attributes().on_update {
+        None if relation.on_update().triggers_modification() => Some(relation.on_update()),
+        _ => None,
+    };
+
+    let mut msg = match (on_delete, on_update) {
+        (Some(on_delete), Some(on_update)) => {
+            format!(
+                "{} (Implicit default `onDelete`: `{}`, and `onUpdate`: `{}`)",
+                msg, on_delete, on_update
+            )
+        }
+        (Some(on_delete), None) => {
+            format!("{} (Implicit default `onDelete`: `{}`)", msg, on_delete)
+        }
+        (None, Some(on_update)) => {
+            format!("{} (Implicit default `onUpdate`: `{}`)", msg, on_update)
+        }
+        (None, None) => msg.to_string(),
+    };
+
+    msg.push_str(" Read more at https://pris.ly/d/cyclic-referential-actions");
+
+    DatamodelError::new_validation_error(&msg, relation.referenced_field().ast_field().span)
 }

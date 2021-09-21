@@ -1,10 +1,16 @@
+use datamodel_connector::ConnectorCapability;
+use dml::relation_info::ReferentialAction;
+
 use super::{
     relations::Relation,
     types::{IdAttribute, ModelAttributes, RelationField},
     ParserDatabase, ScalarField,
 };
-use crate::{ast, common::constraint_names::ConstraintNames};
-use std::borrow::Cow;
+use crate::{
+    ast::{self, FieldArity},
+    common::constraint_names::ConstraintNames,
+};
+use std::{borrow::Cow, hash};
 
 impl<'ast> ParserDatabase<'ast> {
     #[track_caller]
@@ -134,6 +140,43 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
             db: self.db,
             relation_field: &self.db.types.relation_fields[&(self.model_id, field_id)],
         }
+    }
+
+    pub(super) fn explicit_forward_relations(
+        &'db self,
+    ) -> impl Iterator<Item = ExplicitRelationWalker<'ast, 'db>> + 'db {
+        let model_id = self.model_id;
+        let db = self.db;
+
+        self.db
+            .relations
+            .relations_from_model(model_id)
+            .filter(|(_, relation)| !relation.is_many_to_many())
+            .filter_map(move |(model_b, relation)| {
+                relation.fields().map(|(field_a, field_b)| {
+                    let field_a = RelationFieldWalker {
+                        model_id,
+                        field_id: field_a,
+                        db,
+                        relation_field: &self.db.types.relation_fields[&(model_id, field_a)],
+                    };
+
+                    let field_b = RelationFieldWalker {
+                        model_id: model_b,
+                        field_id: field_b,
+                        db,
+                        relation_field: &self.db.types.relation_fields[&(model_b, field_b)],
+                    };
+
+                    (field_a, field_b, relation)
+                })
+            })
+            .map(move |(field_a, field_b, relation)| ExplicitRelationWalker {
+                field_a,
+                field_b,
+                relation,
+                db,
+            })
     }
 }
 
@@ -298,6 +341,16 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
             )
         })
     }
+
+    pub(crate) fn referential_arity(&self) -> FieldArity {
+        let some_required = self.referencing_fields().any(|f| f.ast_field().arity.is_required());
+
+        if some_required {
+            FieldArity::Required
+        } else {
+            self.ast_field().arity
+        }
+    }
 }
 
 #[derive(Copy, Clone)]
@@ -365,6 +418,23 @@ pub(super) struct ExplicitRelationWalker<'ast, 'db> {
     db: &'db ParserDatabase<'ast>,
 }
 
+impl<'ast, 'db> PartialEq for ExplicitRelationWalker<'ast, 'db> {
+    fn eq(&self, other: &Self) -> bool {
+        self.relation == other.relation
+    }
+}
+
+impl<'ast, 'db> Eq for ExplicitRelationWalker<'ast, 'db> {}
+
+impl<'ast, 'db> hash::Hash for ExplicitRelationWalker<'ast, 'db> {
+    fn hash<H: hash::Hasher>(&self, state: &mut H) {
+        self.field_a.model_id.hash(state);
+        self.field_a.field_id.hash(state);
+        self.field_b.model_id.hash(state);
+        self.field_b.field_id.hash(state);
+    }
+}
+
 #[allow(dead_code)] // for now
 impl<'ast, 'db> ExplicitRelationWalker<'ast, 'db> {
     pub(super) fn new(
@@ -401,7 +471,7 @@ impl<'ast, 'db> ExplicitRelationWalker<'ast, 'db> {
     }
 
     // maybe public?
-    pub(super) fn referenced_model(&self) -> ModelWalker<'ast, 'db> {
+    pub(super) fn referenced_model(&'db self) -> ModelWalker<'ast, 'db> {
         self.field_b.model()
     }
 
@@ -427,5 +497,40 @@ impl<'ast, 'db> ExplicitRelationWalker<'ast, 'db> {
 
     pub(super) fn is_compound(&self) -> bool {
         self.referencing_fields().len() > 1
+    }
+
+    pub(super) fn is_one_to_many(&self) -> bool {
+        self.relation.is_one_to_many()
+    }
+
+    pub(super) fn on_update(&self) -> ReferentialAction {
+        use ReferentialAction::*;
+
+        self.referencing_field().attributes().on_update.unwrap_or_else(|| {
+            let uses_foreign_keys = self
+                .db
+                .active_connector()
+                .has_capability(ConnectorCapability::ForeignKeys);
+
+            match self.referencing_field().referential_arity() {
+                _ if uses_foreign_keys => Cascade,
+                FieldArity::Required => NoAction,
+                _ => SetNull,
+            }
+        })
+    }
+
+    pub(super) fn on_delete(&self) -> ReferentialAction {
+        use ReferentialAction::*;
+
+        self.referencing_field().attributes().on_delete.unwrap_or_else(|| {
+            let supports_restrict = self.db.active_connector().supports_referential_action(Restrict);
+
+            match self.referencing_field().referential_arity() {
+                FieldArity::Required if supports_restrict => Restrict,
+                FieldArity::Required => NoAction,
+                _ => SetNull,
+            }
+        })
     }
 }

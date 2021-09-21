@@ -34,6 +34,25 @@ pub(super) struct Relation<'ast> {
     r#type: RelationType,
 }
 
+impl<'ast> Relation<'ast> {
+    pub(super) fn is_one_to_many(&self) -> bool {
+        matches!(self.r#type, RelationType::OneToMany(_))
+    }
+
+    pub(super) fn is_many_to_many(&self) -> bool {
+        matches!(self.r#type, RelationType::ImplicitManyToMany { .. })
+    }
+
+    pub(super) fn fields(&self) -> Option<(ast::FieldId, ast::FieldId)> {
+        match &self.r#type {
+            RelationType::ImplicitManyToMany { field_a, field_b } => Some((*field_a, *field_b)),
+            RelationType::OneToOne(OneToOneRelationFields::Both(field_a, field_b)) => Some((*field_a, *field_b)),
+            RelationType::OneToMany(OneToManyRelationFields::Both(field_a, field_b)) => Some((*field_a, *field_b)),
+            _ => None,
+        }
+    }
+}
+
 /// Storage for the relations in a schema.
 ///
 /// A relation is always between two models. One model is assigned the role
