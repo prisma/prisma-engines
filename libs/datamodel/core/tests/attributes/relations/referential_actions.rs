@@ -197,7 +197,7 @@ fn on_update_no_action_should_work_on_prisma_referential_integrity() {
         }
     "#};
 
-    parse(&dml)
+    parse(dml)
         .assert_has_model("B")
         .assert_has_relation_field("a")
         .assert_relation_update_strategy(ReferentialAction::NoAction);
@@ -399,19 +399,17 @@ fn restrict_should_not_work_on_sql_server() {
     "#};
 
     let expected = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@relation": Invalid referential action: `Restrict`. Allowed values: (`Cascade`, `NoAction`, `SetNull`, `SetDefault`)[0m
+        [1;91merror[0m: [1mError validating: Invalid referential action: `Restrict`. Allowed values: (`Cascade`, `NoAction`, `SetNull`, `SetDefault`)[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m    aId Int
-        [1;94m14 | [0m    [1;91ma A @relation(fields: [aId], references: [id], onUpdate: Restrict, onDelete: Restrict)[0m
-        [1;94m15 | [0m}
+        [1;94m14 | [0m    a A @relation(fields: [aId], references: [id], onUpdate: Restrict, [1;91monDelete: Restrict[0m)
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@relation": Invalid referential action: `Restrict`. Allowed values: (`Cascade`, `NoAction`, `SetNull`, `SetDefault`)[0m
+        [1;91merror[0m: [1mError validating: Invalid referential action: `Restrict`. Allowed values: (`Cascade`, `NoAction`, `SetNull`, `SetDefault`)[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m    aId Int
-        [1;94m14 | [0m    [1;91ma A @relation(fields: [aId], references: [id], onUpdate: Restrict, onDelete: Restrict)[0m
-        [1;94m15 | [0m}
+        [1;94m14 | [0m    a A @relation(fields: [aId], references: [id], [1;91monUpdate: Restrict[0m, onDelete: Restrict)
         [1;94m   | [0m
     "#]];
 
@@ -487,12 +485,11 @@ fn set_default_action_should_not_work_on_prisma_level_referential_integrity() {
     );
 
     let expected = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@relation": Invalid referential action: `SetDefault`. Allowed values: (`Cascade`, `Restrict`, `NoAction`, `SetNull`)[0m
+        [1;91merror[0m: [1mError validating: Invalid referential action: `SetDefault`. Allowed values: (`Cascade`, `Restrict`, `NoAction`, `SetNull`)[0m
           [1;94m-->[0m  [4mschema.prisma:20[0m
         [1;94m   | [0m
         [1;94m19 | [0m    aId Int
-        [1;94m20 | [0m    [1;91ma A @relation(fields: [aId], references: [id], onDelete: SetDefault)[0m
-        [1;94m21 | [0m}
+        [1;94m20 | [0m    a A @relation(fields: [aId], references: [id], [1;91monDelete: SetDefault[0m)
         [1;94m   | [0m
     "#]];
 
