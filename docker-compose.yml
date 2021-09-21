@@ -1,7 +1,7 @@
 version: "3"
 services:
   cockroach:
-    image: cockroachdb/cockroach-unstable:v21.1.0-beta.5
+    image: cockroachdb/cockroach-unstable:v21.1.0-rc.3
     restart: always
     command: start-single-node --insecure
     ports:
