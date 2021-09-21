@@ -122,6 +122,7 @@ impl QueryEngine {
             ignore_env_var_errors,
         } = opts;
 
+        let env = stringify_env_values(env)?; // we cannot trust anything JS sends us from process.env
         let overrides: Vec<(_, _)> = datasource_overrides.into_iter().collect();
 
         let config = if ignore_env_var_errors {
@@ -164,7 +165,7 @@ impl QueryEngine {
             config,
             logger,
             config_dir,
-            env: stringify_env_values(env)?,
+            env,
         };
 
         Ok(Self {
@@ -377,7 +378,15 @@ fn stringify_env_values(origin: serde_json::Value) -> crate::Result<HashMap<Stri
             let mut result: HashMap<String, String> = HashMap::new();
 
             for (key, val) in map.into_iter() {
-                result.insert(key, val.to_string());
+                match val {
+                    Value::Null => continue,
+                    Value::String(val) => {
+                        result.insert(key, val);
+                    }
+                    val => {
+                        result.insert(key, val.to_string());
+                    }
+                }
             }
 
             return Ok(result);
