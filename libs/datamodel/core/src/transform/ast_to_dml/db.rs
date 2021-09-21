@@ -5,6 +5,7 @@
 mod attributes;
 mod context;
 mod names;
+mod relations;
 mod types;
 mod walkers;
 
@@ -12,6 +13,7 @@ pub(crate) use types::{ScalarField, ScalarFieldType};
 
 use self::{
     context::Context,
+    relations::Relations,
     types::{RelationField, Types},
 };
 use crate::PreviewFeature;
@@ -52,6 +54,7 @@ pub(crate) struct ParserDatabase<'ast> {
     datasource: Option<&'ast Datasource>,
     names: Names<'ast>,
     types: Types<'ast>,
+    relations: Relations<'ast>,
     _preview_features: BitFlags<PreviewFeature>,
 }
 
@@ -68,6 +71,7 @@ impl<'ast> ParserDatabase<'ast> {
             datasource,
             names: Names::default(),
             types: Types::default(),
+            relations: Relations::default(),
             _preview_features: preview_features,
         };
 
@@ -98,6 +102,9 @@ impl<'ast> ParserDatabase<'ast> {
         attributes::validate_index_names(&mut ctx);
         attributes::fill_in_default_constraint_names(&mut ctx);
         attributes::validate_relation_fields(&mut ctx);
+
+        // Fifth step: relation inference
+        relations::infer_relations(&mut ctx);
 
         ctx.finish()
     }
