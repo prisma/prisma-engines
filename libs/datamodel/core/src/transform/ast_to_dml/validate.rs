@@ -202,32 +202,6 @@ impl<'a> Validator<'a> {
                         ast_model.find_field_bang(field.name()).span,
                     ));
                 }
-
-                if let dml::Field::RelationField(ref rf) = field {
-                    let actions = &[rf.relation_info.on_delete, rf.relation_info.on_update];
-
-                    actions.iter().flatten().for_each(|action| {
-                        if !connector.supports_referential_action(*action) {
-                            let allowed_values: Vec<_> = connector
-                                .referential_actions()
-                                .iter()
-                                .map(|f| format!("`{}`", f))
-                                .collect();
-
-                            let message = format!(
-                                "Invalid referential action: `{}`. Allowed values: ({})",
-                                action,
-                                allowed_values.join(", "),
-                            );
-
-                            diagnostics.push_error(DatamodelError::new_attribute_validation_error(
-                                &message,
-                                "relation",
-                                ast_model.find_field_bang(field.name()).span,
-                            ));
-                        }
-                    });
-                }
             }
         }
 

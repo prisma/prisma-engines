@@ -2,6 +2,7 @@ use crate::{diagnostics::DatamodelError, transform::ast_to_dml::db::walkers::Rel
 use datamodel_connector::{Connector, ReferentialIntegrity};
 use dml::relation_info::ReferentialAction;
 use itertools::Itertools;
+use once_cell::unsync::Lazy;
 
 /// Validate that the arity of fields from `fields` is compatible with relation field arity.
 pub(super) fn validate_relation_field_arity(field: RelationFieldWalker<'_, '_>, errors: &mut Vec<DatamodelError>) {
@@ -179,4 +180,46 @@ pub(super) fn validate_same_length_in_referencing_and_referenced(
         "relation",
         field.ast_field().span,
     ));
+}
+
+/// Does the connector support the given referential actions.
+pub(super) fn validate_referential_actions(
+    field: RelationFieldWalker<'_, '_>,
+    connector: &dyn Connector,
+    errors: &mut Vec<DatamodelError>,
+) {
+    let msg = |action| {
+        let allowed_values = connector
+            .referential_actions()
+            .iter()
+            .map(|f| format!("`{}`", f))
+            .join(", ");
+
+        format!(
+            "Invalid referential action: `{}`. Allowed values: ({})",
+            action, allowed_values,
+        )
+    };
+
+    if let Some(on_delete) = field.attributes().on_delete {
+        if !connector.supports_referential_action(on_delete) {
+            let span = field
+                .ast_field()
+                .span_for_argument("relation", "onDelete")
+                .unwrap_or_else(|| field.ast_field().span);
+
+            errors.push(DatamodelError::new_validation_error(&msg(on_delete), span));
+        }
+    }
+
+    if let Some(on_update) = field.attributes().on_update {
+        if !connector.supports_referential_action(on_update) {
+            let span = field
+                .ast_field()
+                .span_for_argument("relation", "onUpdate")
+                .unwrap_or_else(|| field.ast_field().span);
+
+            errors.push(DatamodelError::new_validation_error(&msg(on_update), span));
+        }
+    }
 }
