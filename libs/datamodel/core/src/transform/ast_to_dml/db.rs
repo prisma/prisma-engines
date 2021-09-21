@@ -105,6 +105,7 @@ impl<'ast> ParserDatabase<'ast> {
 
         // Fifth step: relation inference
         relations::infer_relations(&mut ctx);
+        relations::validate_relations(&mut ctx);
 
         ctx.finish()
     }
