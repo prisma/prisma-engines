@@ -2,7 +2,6 @@ use crate::{diagnostics::DatamodelError, transform::ast_to_dml::db::walkers::Rel
 use datamodel_connector::{Connector, ReferentialIntegrity};
 use dml::relation_info::ReferentialAction;
 use itertools::Itertools;
-use once_cell::unsync::Lazy;
 
 /// Validate that the arity of fields from `fields` is compatible with relation field arity.
 pub(super) fn validate_relation_field_arity(field: RelationFieldWalker<'_, '_>, errors: &mut Vec<DatamodelError>) {

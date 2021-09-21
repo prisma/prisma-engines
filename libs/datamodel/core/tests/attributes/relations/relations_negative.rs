@@ -775,7 +775,7 @@ fn mapping_foreign_keys_on_sqlite_should_error() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 //
