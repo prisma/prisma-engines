@@ -279,10 +279,6 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
         }
     }
 
-    pub(crate) fn is_compound_relation(&self) -> bool {
-        self.referenced_fields().len() > 1
-    }
-
     /// This will be None for virtual relation fields (when no `fields` argument is passed).
     pub(crate) fn final_foreign_key_name(&self) -> Option<Cow<'ast, str>> {
         self.attributes().fk_name.map(Cow::Borrowed).or_else(|| {

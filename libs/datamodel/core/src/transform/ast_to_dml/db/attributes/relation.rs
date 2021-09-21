@@ -132,7 +132,7 @@ pub(super) fn validate_referenced_fields_in_correct_order(
         return;
     }
 
-    if connector.allows_relation_fields_in_arbitrary_order() || !field.is_compound_relation() {
+    if connector.allows_relation_fields_in_arbitrary_order() || field.referenced_fields().len() <= 1 {
         return;
     }
 
