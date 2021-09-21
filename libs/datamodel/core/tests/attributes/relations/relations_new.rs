@@ -468,12 +468,11 @@ fn relation_must_error_when_number_of_fields_and_references_is_not_equal() {
     "#;
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@relation": You must specify the same number of fields in `fields` and `references`.[0m
+        [1;91merror[0m: [1mError validating: You must specify the same number of fields in `fields` and `references`.[0m
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0m        userName String
-        [1;94m12 | [0m        [1;91muser     User    @relation(fields: [userId, userName], references: [id])[0m
-        [1;94m13 | [0m    }
+        [1;94m12 | [0m        user     User    @[1;91mrelation(fields: [userId, userName], references: [id])[0m
         [1;94m   | [0m
     "#]];
 

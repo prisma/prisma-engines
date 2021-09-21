@@ -1,11 +1,9 @@
 use super::{
+    relations::Relation,
     types::{IdAttribute, ModelAttributes, RelationField},
     ParserDatabase, ScalarField,
 };
-use crate::{
-    ast::{self, FieldId, Model},
-    common::constraint_names::ConstraintNames,
-};
+use crate::{ast, common::constraint_names::ConstraintNames};
 use std::borrow::Cow;
 
 impl<'ast> ParserDatabase<'ast> {
@@ -35,7 +33,7 @@ pub(crate) struct ModelWalker<'ast, 'db> {
 }
 
 impl<'ast, 'db> ModelWalker<'ast, 'db> {
-    pub(crate) fn ast_model(&self) -> &'db Model {
+    pub(crate) fn ast_model(&self) -> &'db ast::Model {
         &self.db.ast[self.model_id]
     }
 
@@ -129,7 +127,7 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
             })
     }
 
-    pub(crate) fn walk_relation_field(&self, field_id: FieldId) -> RelationFieldWalker<'ast, 'db> {
+    pub(crate) fn walk_relation_field(&self, field_id: ast::FieldId) -> RelationFieldWalker<'ast, 'db> {
         RelationFieldWalker {
             model_id: self.model_id,
             field_id,
@@ -254,7 +252,7 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
     }
 
     pub(crate) fn referencing_fields(&'db self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db {
-        let f = move |field_id: &FieldId| ScalarFieldWalker {
+        let f = move |field_id: &ast::FieldId| ScalarFieldWalker {
             model_id: self.model_id,
             field_id: *field_id,
             db: self.db,
@@ -269,7 +267,7 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
 
     #[allow(dead_code)]
     pub(crate) fn referenced_fields(&'db self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db {
-        let f = move |field_id: &FieldId| {
+        let f = move |field_id: &ast::FieldId| {
             let model_id = self.attributes().referenced_model;
 
             ScalarFieldWalker {
@@ -305,7 +303,7 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
 #[derive(Copy, Clone)]
 pub(crate) struct UniqueCriteriaWalker<'ast, 'db> {
     model_id: ast::ModelId,
-    fields: &'db [FieldId],
+    fields: &'db [ast::FieldId],
     db: &'db ParserDatabase<'ast>,
 }
 
@@ -355,5 +353,79 @@ impl<'ast, 'db> PrimaryKeyWalker<'ast, 'db> {
 
     pub(crate) fn name(&self) -> Option<&'ast str> {
         self.attribute.name
+    }
+}
+
+#[allow(dead_code)] // for now
+#[derive(Copy, Clone)]
+pub(super) struct ExplicitRelationWalker<'ast, 'db> {
+    field_a: RelationFieldWalker<'ast, 'db>,
+    field_b: RelationFieldWalker<'ast, 'db>,
+    relation: &'db Relation<'ast>,
+    db: &'db ParserDatabase<'ast>,
+}
+
+#[allow(dead_code)] // for now
+impl<'ast, 'db> ExplicitRelationWalker<'ast, 'db> {
+    pub(super) fn new(
+        referencing: (ast::ModelId, ast::FieldId),
+        referenced: (ast::ModelId, ast::FieldId),
+        relation: &'db Relation<'ast>,
+        db: &'db ParserDatabase<'ast>,
+    ) -> Self {
+        let field_a = RelationFieldWalker {
+            model_id: referencing.0,
+            field_id: referencing.1,
+            db,
+            relation_field: &db.types.relation_fields[&(referencing.0, referencing.1)],
+        };
+
+        let field_b = RelationFieldWalker {
+            model_id: referenced.0,
+            field_id: referenced.1,
+            db,
+            relation_field: &db.types.relation_fields[&(referenced.0, referenced.1)],
+        };
+
+        Self {
+            field_a,
+            field_b,
+            relation,
+            db,
+        }
+    }
+
+    // maybe public?
+    pub(super) fn referencing_model(&self) -> ModelWalker<'ast, 'db> {
+        self.field_a.model()
+    }
+
+    // maybe public?
+    pub(super) fn referenced_model(&self) -> ModelWalker<'ast, 'db> {
+        self.field_b.model()
+    }
+
+    // keep private
+    pub(super) fn referencing_field(&self) -> RelationFieldWalker<'ast, 'db> {
+        self.field_a
+    }
+
+    // keep private
+    pub(super) fn referenced_field(&self) -> RelationFieldWalker<'ast, 'db> {
+        self.field_b
+    }
+
+    // maybe public?
+    pub(super) fn referenced_fields(&'db self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db {
+        self.field_a.referenced_fields()
+    }
+
+    // maybe public?
+    pub(super) fn referencing_fields(&'db self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db {
+        self.field_a.referencing_fields()
+    }
+
+    pub(super) fn is_compound(&self) -> bool {
+        self.referencing_fields().len() > 1
     }
 }
