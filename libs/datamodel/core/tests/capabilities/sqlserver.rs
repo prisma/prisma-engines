@@ -20,7 +20,7 @@ fn enum_support() {
         }
     "#};
 
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating: You defined the enum `Status`. But the current connector does not support enums.[0m
@@ -51,7 +51,7 @@ fn scalar_list_support() {
         }
     "#};
 
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mField "val" in model "Todo" can't be a list. The current connector does not support lists of primitive types.[0m
@@ -106,7 +106,7 @@ fn json_support() {
         }
     "#};
 
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating field `data` in model `User`: Field `data` in model `User` can't be of type Json. The current connector does not support the Json type.[0m
@@ -142,7 +142,7 @@ fn non_unique_relation_criteria_support() {
         }
     "#};
 
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating: The argument `references` must refer to a unique criteria in the related model `User`. But it is referencing the following fields that are not a unique criteria: name[0m
@@ -171,7 +171,7 @@ fn auto_increment_on_non_primary_column_support() {
         }
     "#};
 
-    assert!(datamodel::parse_schema(&dml).is_ok());
+    assert!(datamodel::parse_schema(dml).is_ok());
 }
 
 #[test]
@@ -199,7 +199,7 @@ fn key_order_enforcement_support() {
         }
     "#};
 
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating: The argument `references` must refer to a unique criteria in the related model `Todo` using the same order of fields. Please check the ordering in the following fields: `id2, id1`.[0m
