@@ -418,7 +418,7 @@ fn mapping_unique_to_a_field_name_should_work() {
      }
      "#;
 
-    let datamodel = parse(&dml);
+    let datamodel = parse(dml);
     let model = datamodel.assert_has_model("User");
     model.assert_has_index(IndexDefinition {
         name: Some("usedUnique".to_string()),

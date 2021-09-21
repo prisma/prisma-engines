@@ -37,7 +37,7 @@ fn scalar_list_support() {
         }
     "#};
 
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mField "val" in model "Todo" can't be a list. The current connector does not support lists of primitive types.[0m
@@ -133,7 +133,7 @@ fn auto_increment_on_non_primary_column_support() {
         }
     "#};
 
-    assert!(datamodel::parse_schema(&dml).is_ok());
+    assert!(datamodel::parse_schema(dml).is_ok());
 }
 
 #[test]
@@ -161,5 +161,5 @@ fn key_order_enforcement_support() {
         }
     "#};
 
-    assert!(datamodel::parse_schema(&dml).is_ok());
+    assert!(datamodel::parse_schema(dml).is_ok());
 }
