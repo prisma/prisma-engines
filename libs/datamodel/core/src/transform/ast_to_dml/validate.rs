@@ -1,7 +1,6 @@
 #![allow(clippy::suspicious_operation_groupings)] // clippy is wrong there
 
 mod names;
-mod referential_actions;
 
 use crate::{
     ast,
@@ -10,7 +9,6 @@ use crate::{
     diagnostics::{DatamodelError, Diagnostics},
     dml,
 };
-use datamodel_connector::ConnectorCapability;
 use names::NamesValidator;
 
 /// Helper for validating a datamodel.
@@ -564,25 +562,6 @@ impl<'a> Validator<'a> {
                         &field.name,
                         field_span,
                     ));
-                }
-
-                if !field.is_list()
-                    && !field.relation_info.fields.is_empty()
-                    && !field.relation_info.references.is_empty()
-                    && self
-                        .source
-                        .map(|source| &source.active_connector)
-                        .filter(|connector| connector.has_capability(ConnectorCapability::ReferenceCycleDetection))
-                        .map(|connector| connector.has_capability(ConnectorCapability::ForeignKeys))
-                        .unwrap_or_default()
-                {
-                    referential_actions::detect_multiple_cascading_paths(
-                        datamodel,
-                        model,
-                        field,
-                        field_span,
-                        &mut errors,
-                    );
                 }
             } else {
                 let message = format!(

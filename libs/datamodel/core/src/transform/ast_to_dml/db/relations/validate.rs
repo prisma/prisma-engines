@@ -1,15 +1,15 @@
 mod visited_relation;
 
-use std::{collections::HashSet, rc::Rc};
+use std::{
+    collections::{BTreeSet, HashMap, HashSet},
+    rc::Rc,
+};
 
 use datamodel_connector::{Connector, ConnectorCapability};
 use itertools::Itertools;
 use visited_relation::*;
 
-use crate::{
-    diagnostics::DatamodelError,
-    transform::ast_to_dml::db::{context::Context, walkers::ExplicitRelationWalker},
-};
+use crate::{diagnostics::DatamodelError, transform::ast_to_dml::db::walkers::ExplicitRelationWalker};
 
 /// The `fields` and `references` should hold the same number of fields.
 pub(super) fn same_length_in_referencing_and_referenced(
@@ -131,10 +131,10 @@ pub(super) fn field_arity(relation: ExplicitRelationWalker<'_, '_>, errors: &mut
     ));
 }
 
-pub(super) fn detect_cycles(
-    relation: ExplicitRelationWalker<'_, '_>,
+/// Detects cyclical cascading referential actions.
+pub(super) fn detect_cycles<'ast, 'db>(
+    relation: ExplicitRelationWalker<'ast, 'db>,
     connector: &dyn Connector,
-    ctx: &Context<'_>,
     errors: &mut Vec<DatamodelError>,
 ) {
     if !connector.has_capability(ConnectorCapability::ReferenceCycleDetection)
@@ -143,15 +143,12 @@ pub(super) fn detect_cycles(
         return;
     }
 
-    // Keeps count on visited relations to iterate them only once.
-    let mut visited = HashSet::new();
-
     // poor man's tail-recursion ;)
     let mut next_relations = vec![(relation, Rc::new(VisitedRelation::root(relation)))];
+    let parent_model = relation.referencing_model();
 
     while let Some((next_relation, visited_relations)) = next_relations.pop() {
         let related_model = next_relation.referenced_model();
-        visited.insert(relation);
 
         let on_delete = next_relation.on_delete();
         let on_update = next_relation.on_update();
@@ -159,16 +156,15 @@ pub(super) fn detect_cycles(
         // a cycle has a meaning only if every relation in it triggers
         // modifications in the children
         if on_update.triggers_modification() || on_delete.triggers_modification() {
-            let model = next_relation.referencing_model().ast_model();
-            let parent_model = relation.referencing_model().ast_model();
+            let model = next_relation.referencing_model();
 
-            if model.name() == related_model.ast_model().name() {
+            if model.model_id == related_model.model_id {
                 let msg = "A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes.";
                 errors.push(error_with_default_values(relation, msg));
                 return;
             }
 
-            if related_model.ast_model().name() == parent_model.name() {
+            if related_model.model_id == parent_model.model_id {
                 let msg = format!(
                     "Reference causes a cycle. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Cycle path: {}.",
                     visited_relations
@@ -178,12 +174,122 @@ pub(super) fn detect_cycles(
                 return;
             }
 
-            for relation in ctx.db.walk_model_explicit_forward_relations(related_model.model_id) {
-                if !visited.contains(&relation) {
-                    next_relations.push((relation, Rc::new(visited_relations.link_next(relation))));
-                }
+            for relation in related_model.explicit_forward_relations() {
+                next_relations.push((relation, Rc::new(visited_relations.link_next(relation))));
             }
         }
+    }
+}
+
+pub(super) fn detect_multiple_cascading_paths(
+    relation: ExplicitRelationWalker<'_, '_>,
+    connector: &dyn Connector,
+    errors: &mut Vec<DatamodelError>,
+) {
+    if !connector.has_capability(ConnectorCapability::ReferenceCycleDetection)
+        || !connector.has_capability(ConnectorCapability::ForeignKeys)
+    {
+        return;
+    }
+
+    if !relation.on_delete().triggers_modification() && !relation.on_update().triggers_modification() {
+        return;
+    }
+
+    let parent_model = relation.referencing_model();
+
+    // Gather all paths from this model to any other model, skipping
+    // cyclical relations
+    let mut paths = Vec::new();
+
+    // Add all relations from current model to the graph vector. At this point
+    // we only care about multiple paths from this model to any other model. We
+    // handle paths that cross, but are not started from here, when calling the
+    // function from corresponding models.
+    let mut next_relations: Vec<_> = relation
+        .referencing_model()
+        .explicit_forward_relations()
+        .filter(|relation| relation.on_delete().triggers_modification() || relation.on_update().triggers_modification())
+        .map(|relation| (relation, Rc::new(VisitedRelation::root(relation))))
+        .collect();
+
+    while let Some((next_relation, visited_relations)) = next_relations.pop() {
+        let model = next_relation.referencing_model();
+        let related_model = next_relation.referenced_model();
+
+        // Self-relations are detected elsewhere.
+        if model.model_id == related_model.model_id {
+            continue;
+        }
+
+        // Cycles are detected elsewhere.
+        if related_model.model_id == parent_model.model_id {
+            continue;
+        }
+
+        let mut forward_relations = related_model
+            .explicit_forward_relations()
+            .map(|relation| (relation, Rc::new(visited_relations.link_next(relation))))
+            .peekable();
+
+        // If the related model does not have any paths to other models, we
+        // traversed the whole path, storing it to the collection for later
+        // inspection.
+        if forward_relations.peek().is_none() {
+            paths.push(visited_relations.link_next(next_relation));
+            continue;
+        }
+
+        next_relations.extend(forward_relations);
+    }
+
+    // Gather all paths from a relation field to all the models seen from that
+    // field.
+    let mut seen: HashMap<&str, HashSet<&str>> = HashMap::new();
+    for path in paths.iter() {
+        let mut iter = path.iter().peekable();
+
+        let seen_models = match iter.peek() {
+            Some(relation) => seen.entry(relation.referencing_field().ast_field().name()).or_default(),
+            _ => continue,
+        };
+
+        for relation in iter {
+            seen_models.insert(relation.referenced_model().ast_model().name());
+        }
+    }
+
+    // Compact the model nameas that can be reached from the given relation
+    // field, but also from any other relation field in the same model.
+    let mut reachable: BTreeSet<&str> = BTreeSet::new();
+
+    if let Some(from_parent) = seen.remove(relation.referencing_field().ast_field().name()) {
+        for (_, from_other) in seen.into_iter() {
+            reachable.extend(from_parent.intersection(&from_other));
+        }
+    }
+
+    let models = reachable
+        .iter()
+        .map(|model_name| format!("`{}`", model_name))
+        .join(", ");
+
+    if reachable.len() == 1 {
+        let msg = format!(
+            "When any of the records in model {} is updated or deleted, the referential actions on the relations cascade to model `{}` through multiple paths. Please break one of these paths by setting the `onUpdate` and `onDelete` to `NoAction`.",
+            models,
+            relation.referencing_model().ast_model().name()
+        );
+
+        errors.push(error_with_default_values(relation, &msg));
+    } else if reachable.len() > 1 {
+        let msg = format!(
+            "When any of the records in models {} are updated or deleted, the referential actions on the relations cascade to model `{}` through multiple paths. Please break one of these paths by setting the `onUpdate` and `onDelete` to `NoAction`.",
+            models,
+            relation.referencing_model().ast_model().name()
+        );
+
+        errors.push(error_with_default_values(relation, &msg));
     }
 }
 
