@@ -212,17 +212,13 @@ pub(super) fn ingest_relation<'ast, 'db>(
             // This is a 1:1 relation that is required on both sides. Error.
             return; // TODO: error
         }
-        (ast::FieldArity::Optional, Some((opp_field_id, opp_field, opp_relation_field)))
-            if opp_field.arity.is_optional() =>
-        {
+        (ast::FieldArity::Optional, Some((opp_field_id, opp_field, _))) if opp_field.arity.is_optional() => {
             // This is a 1:1 relation that is optional on both sides. We must infer which side is model A.
 
             if evidence.relation_field.fields.is_some() {
                 RelationType::OneToOne(OneToOneRelationFields::Both(evidence.field_id, opp_field_id))
-            } else if opp_relation_field.fields.is_some() {
-                RelationType::OneToOne(OneToOneRelationFields::Both(opp_field_id, evidence.field_id))
             } else {
-                return; // TODO: error on ambiguous relation
+                return;
             }
         }
         // 1:m

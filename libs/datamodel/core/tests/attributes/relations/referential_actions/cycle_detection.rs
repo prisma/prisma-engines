@@ -26,13 +26,6 @@ fn cascading_on_delete_self_relations() {
         [1;94m 9 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: Cascade)[0m
         [1;94m10 | [0m    aId    Int?
         [1;94m   | [0m
-        [1;91merror[0m: [1mError validating: A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. (Implicit default `onUpdate`: `Cascade`) Read more at https://pris.ly/d/cyclic-referential-actions[0m
-          [1;94m-->[0m  [4mschema.prisma:9[0m
-        [1;94m   | [0m
-        [1;94m 8 | [0m    child  A?   @relation(name: "a_self_relation")
-        [1;94m 9 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: Cascade)[0m
-        [1;94m10 | [0m    aId    Int?
-        [1;94m   | [0m
     "#]];
 
     expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
@@ -56,13 +49,6 @@ fn cascading_on_update_self_relations() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError validating: A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. (Implicit default `onDelete`: `SetNull`) Read more at https://pris.ly/d/cyclic-referential-actions[0m
-          [1;94m-->[0m  [4mschema.prisma:9[0m
-        [1;94m   | [0m
-        [1;94m 8 | [0m    child  A?   @relation(name: "a_self_relation")
-        [1;94m 9 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: Cascade)[0m
-        [1;94m10 | [0m    aId    Int?
-        [1;94m   | [0m
         [1;91merror[0m: [1mError validating: A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. (Implicit default `onDelete`: `SetNull`) Read more at https://pris.ly/d/cyclic-referential-actions[0m
           [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
@@ -100,13 +86,6 @@ fn null_setting_on_delete_self_relations() {
         [1;94m 9 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: SetNull)[0m
         [1;94m10 | [0m    aId    Int?
         [1;94m   | [0m
-        [1;91merror[0m: [1mError validating: A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. (Implicit default `onUpdate`: `Cascade`) Read more at https://pris.ly/d/cyclic-referential-actions[0m
-          [1;94m-->[0m  [4mschema.prisma:9[0m
-        [1;94m   | [0m
-        [1;94m 8 | [0m    child  A?   @relation(name: "a_self_relation")
-        [1;94m 9 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: SetNull)[0m
-        [1;94m10 | [0m    aId    Int?
-        [1;94m   | [0m
     "#]];
 
     expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
@@ -130,13 +109,6 @@ fn null_setting_on_update_self_relations() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError validating: A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. (Implicit default `onDelete`: `SetNull`) Read more at https://pris.ly/d/cyclic-referential-actions[0m
-          [1;94m-->[0m  [4mschema.prisma:9[0m
-        [1;94m   | [0m
-        [1;94m 8 | [0m    child  A?   @relation(name: "a_self_relation")
-        [1;94m 9 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: SetNull)[0m
-        [1;94m10 | [0m    aId    Int?
-        [1;94m   | [0m
         [1;91merror[0m: [1mError validating: A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. (Implicit default `onDelete`: `SetNull`) Read more at https://pris.ly/d/cyclic-referential-actions[0m
           [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
@@ -174,13 +146,6 @@ fn default_setting_on_delete_self_relations() {
         [1;94m 9 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: SetDefault)[0m
         [1;94m10 | [0m    aId    Int?
         [1;94m   | [0m
-        [1;91merror[0m: [1mError validating: A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. (Implicit default `onUpdate`: `Cascade`) Read more at https://pris.ly/d/cyclic-referential-actions[0m
-          [1;94m-->[0m  [4mschema.prisma:9[0m
-        [1;94m   | [0m
-        [1;94m 8 | [0m    child  A?   @relation(name: "a_self_relation")
-        [1;94m 9 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: SetDefault)[0m
-        [1;94m10 | [0m    aId    Int?
-        [1;94m   | [0m
     "#]];
 
     expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
@@ -204,13 +169,6 @@ fn default_setting_on_update_self_relations() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError validating: A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. (Implicit default `onDelete`: `SetNull`) Read more at https://pris.ly/d/cyclic-referential-actions[0m
-          [1;94m-->[0m  [4mschema.prisma:9[0m
-        [1;94m   | [0m
-        [1;94m 8 | [0m    child  A?   @relation(name: "a_self_relation")
-        [1;94m 9 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: SetDefault)[0m
-        [1;94m10 | [0m    aId    Int?
-        [1;94m   | [0m
         [1;91merror[0m: [1mError validating: A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. (Implicit default `onDelete`: `SetNull`) Read more at https://pris.ly/d/cyclic-referential-actions[0m
           [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
