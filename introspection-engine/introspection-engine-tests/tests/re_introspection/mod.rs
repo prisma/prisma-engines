@@ -1689,6 +1689,64 @@ async fn re_introspecting_custom_compound_unique_names(api: &TestApi) -> TestRes
     Ok(())
 }
 
+#[test_connector(tags(Postgres, Mssql, Mysql, Sqlite))]
+async fn re_introspecting_custom_compound_unique_upgrade(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
+                t.add_column("first", types::integer());
+                t.add_column("last", types::integer());
+                t.add_index("compound", types::index(&["first", "last"]).unique(true));
+            });
+
+            migration.create_table("Unrelated", |t| {
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("Unrelated_pkey", types::primary_constraint(&["id"]));
+            });
+        })
+        .await?;
+
+    let input_dm = indoc! {r#"
+         model User {
+             id     Int @id @default(autoincrement()) 
+             first  Int
+             last   Int
+
+             @@unique([first, last], name: "compound")
+         }
+     "#};
+
+    let final_dm = indoc! {r#"
+         model User {
+             id     Int @id @default(autoincrement()) 
+             first  Int
+             last   Int
+
+             @@unique([first, last], name: "compound", map: "compound")
+         }
+
+         model Unrelated {
+             id    Int @id @default(autoincrement())
+         }
+     "#};
+
+    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
+
+    let expected = json!([{
+        "code": 17,
+        "message": "These Indices were enriched with custom index names taken from the previous Prisma schema.",
+        "affected" :[
+            {"model": "User", "index_db_name": "compound"},
+        ]
+    }]);
+
+    assert_eq_json!(expected, api.re_introspect_warnings(&input_dm).await?);
+
+    Ok(())
+}
+
 #[test_connector(tags(Postgres, Mssql))]
 async fn re_introspecting_custom_compound_id_names(api: &TestApi) -> TestResult {
     api.barrel()
