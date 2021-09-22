@@ -64,8 +64,8 @@ pub(super) fn references_unique_fields(
     errors.push(DatamodelError::new_validation_error(
         &format!(
             "The argument `references` must refer to a unique criteria in the related model `{}`. But it is referencing the following fields that are not a unique criteria: {}",
-            relation.referenced_model().ast_model().name(),
-            relation.referenced_fields().map(|f| f.ast_field().name()).join(", ")
+            relation.referenced_model().name(),
+            relation.referenced_fields().map(|f| f.name()).join(", ")
         ),
         relation.referencing_field().ast_field().span
     ));
@@ -87,13 +87,13 @@ pub(super) fn referencing_fields_in_correct_order(
     }
 
     let reference_order_correct = relation.referenced_model().unique_criterias().any(|criteria| {
-        let criteria_fields = criteria.fields().map(|f| f.ast_field().name());
+        let criteria_fields = criteria.fields().map(|f| f.name());
 
         if criteria_fields.len() != relation.referenced_fields().len() {
             return false;
         }
 
-        let references = relation.referenced_fields().map(|f| f.ast_field().name());
+        let references = relation.referenced_fields().map(|f| f.name());
         criteria_fields.zip(references).all(|(a, b)| a == b)
     });
 
@@ -104,8 +104,8 @@ pub(super) fn referencing_fields_in_correct_order(
     errors.push(DatamodelError::new_validation_error(
         &format!(
             "The argument `references` must refer to a unique criteria in the related model `{}` using the same order of fields. Please check the ordering in the following fields: `{}`.",
-            relation.referenced_model().ast_model().name(),
-            relation.referenced_fields().map(|f| f.ast_field().name()).join(", ")
+            relation.referenced_model().name(),
+            relation.referenced_fields().map(|f| f.name()).join(", ")
         ),
         relation.referencing_field().ast_field().span
     ));
@@ -124,7 +124,7 @@ pub(super) fn field_arity(relation: ExplicitRelationWalker<'_, '_>, errors: &mut
     errors.push(DatamodelError::new_validation_error(
         &format!(
             "The relation field `{}` uses the scalar fields {}. At least one of those fields is optional. Hence the relation field must be optional as well.",
-            relation.referencing_field().ast_field().name(),
+            relation.referencing_field().name(),
             relation.referencing_fields().map(|field| field.name()).join(", "),
         ),
         relation.referencing_field().ast_field().span
@@ -160,7 +160,7 @@ pub(super) fn detect_cycles<'ast, 'db>(
 
             if model.model_id == related_model.model_id {
                 let msg = "A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes.";
-                errors.push(error_with_default_values(relation, msg));
+                errors.push(cascade_error_with_default_values(relation, msg));
                 return;
             }
 
@@ -170,7 +170,7 @@ pub(super) fn detect_cycles<'ast, 'db>(
                     visited_relations
                 );
 
-                errors.push(error_with_default_values(relation, &msg));
+                errors.push(cascade_error_with_default_values(relation, &msg));
                 return;
             }
 
@@ -250,12 +250,12 @@ pub(super) fn detect_multiple_cascading_paths(
         let mut iter = path.iter().peekable();
 
         let seen_models = match iter.peek() {
-            Some(relation) => seen.entry(relation.referencing_field().ast_field().name()).or_default(),
+            Some(relation) => seen.entry(relation.referencing_field().name()).or_default(),
             _ => continue,
         };
 
         for relation in iter {
-            seen_models.insert(relation.referenced_model().ast_model().name());
+            seen_models.insert(relation.referenced_model().name());
         }
     }
 
@@ -263,7 +263,7 @@ pub(super) fn detect_multiple_cascading_paths(
     // field, but also from any other relation field in the same model.
     let mut reachable: BTreeSet<&str> = BTreeSet::new();
 
-    if let Some(from_parent) = seen.remove(relation.referencing_field().ast_field().name()) {
+    if let Some(from_parent) = seen.remove(relation.referencing_field().name()) {
         for (_, from_other) in seen.into_iter() {
             reachable.extend(from_parent.intersection(&from_other));
         }
@@ -278,22 +278,22 @@ pub(super) fn detect_multiple_cascading_paths(
         let msg = format!(
             "When any of the records in model {} is updated or deleted, the referential actions on the relations cascade to model `{}` through multiple paths. Please break one of these paths by setting the `onUpdate` and `onDelete` to `NoAction`.",
             models,
-            relation.referencing_model().ast_model().name()
+            relation.referencing_model().name()
         );
 
-        errors.push(error_with_default_values(relation, &msg));
+        errors.push(cascade_error_with_default_values(relation, &msg));
     } else if reachable.len() > 1 {
         let msg = format!(
             "When any of the records in models {} are updated or deleted, the referential actions on the relations cascade to model `{}` through multiple paths. Please break one of these paths by setting the `onUpdate` and `onDelete` to `NoAction`.",
             models,
-            relation.referencing_model().ast_model().name()
+            relation.referencing_model().name()
         );
 
-        errors.push(error_with_default_values(relation, &msg));
+        errors.push(cascade_error_with_default_values(relation, &msg));
     }
 }
 
-fn error_with_default_values(relation: ExplicitRelationWalker<'_, '_>, msg: &str) -> DatamodelError {
+fn cascade_error_with_default_values(relation: ExplicitRelationWalker<'_, '_>, msg: &str) -> DatamodelError {
     let on_delete = match relation.referencing_field().attributes().on_delete {
         None if relation.on_delete().triggers_modification() => Some(relation.on_delete()),
         _ => None,
