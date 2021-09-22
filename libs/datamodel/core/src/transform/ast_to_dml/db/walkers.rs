@@ -156,14 +156,14 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
                     let field_a = RelationFieldWalker {
                         model_id: self.model_id,
                         field_id: field_a,
-                        db: &self.db,
+                        db: self.db,
                         relation_field: &self.db.types.relation_fields[&(self.model_id, field_a)],
                     };
 
                     let field_b = RelationFieldWalker {
                         model_id: model_b,
                         field_id: field_b,
-                        db: &self.db,
+                        db: self.db,
                         relation_field: &self.db.types.relation_fields[&(model_b, field_b)],
                     };
 
@@ -171,7 +171,7 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
                         field_a,
                         field_b,
                         relation,
-                        db: &self.db,
+                        db: self.db,
                     }
                 })
             })
