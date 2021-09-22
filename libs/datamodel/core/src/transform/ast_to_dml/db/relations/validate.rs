@@ -6,7 +6,10 @@ use datamodel_connector::{Connector, ConnectorCapability};
 use itertools::Itertools;
 use visited_relation::*;
 
-use crate::{ast::Span, diagnostics::DatamodelError, transform::ast_to_dml::db::walkers::ExplicitRelationWalker};
+use crate::{
+    diagnostics::DatamodelError,
+    transform::ast_to_dml::db::{context::Context, walkers::ExplicitRelationWalker},
+};
 
 /// The `fields` and `references` should hold the same number of fields.
 pub(super) fn same_length_in_referencing_and_referenced(
@@ -131,10 +134,11 @@ pub(super) fn field_arity(relation: ExplicitRelationWalker<'_, '_>, errors: &mut
 pub(super) fn detect_cycles(
     relation: ExplicitRelationWalker<'_, '_>,
     connector: &dyn Connector,
+    ctx: &Context<'_>,
     errors: &mut Vec<DatamodelError>,
 ) {
-    if connector.has_capability(ConnectorCapability::ReferenceCycleDetection)
-        || connector.has_capability(ConnectorCapability::ForeignKeys)
+    if !connector.has_capability(ConnectorCapability::ReferenceCycleDetection)
+        || !connector.has_capability(ConnectorCapability::ForeignKeys)
     {
         return;
     }
@@ -147,7 +151,6 @@ pub(super) fn detect_cycles(
 
     while let Some((next_relation, visited_relations)) = next_relations.pop() {
         let related_model = next_relation.referenced_model();
-
         visited.insert(relation);
 
         let on_delete = next_relation.on_delete();
@@ -157,7 +160,7 @@ pub(super) fn detect_cycles(
         // modifications in the children
         if on_update.triggers_modification() || on_delete.triggers_modification() {
             let model = next_relation.referencing_model().ast_model();
-            let parent_model = relation.referenced_model().ast_model();
+            let parent_model = relation.referencing_model().ast_model();
 
             if model.name() == related_model.ast_model().name() {
                 let msg = "A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes.";
@@ -166,12 +169,16 @@ pub(super) fn detect_cycles(
             }
 
             if related_model.ast_model().name() == parent_model.name() {
-                let msg = format!("Reference causes a cycle. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Cycle path: {}.", visited_relations);
+                let msg = format!(
+                    "Reference causes a cycle. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Cycle path: {}.",
+                    visited_relations
+                );
+
                 errors.push(error_with_default_values(relation, &msg));
                 return;
             }
 
-            for relation in related_model.explicit_forward_relations() {
+            for relation in ctx.db.walk_model_explicit_forward_relations(related_model.model_id) {
                 if !visited.contains(&relation) {
                     next_relations.push((relation, Rc::new(visited_relations.link_next(relation))));
                 }
@@ -186,7 +193,7 @@ fn error_with_default_values(relation: ExplicitRelationWalker<'_, '_>, msg: &str
         _ => None,
     };
 
-    let on_update = match relation.referenced_field().attributes().on_update {
+    let on_update = match relation.referencing_field().attributes().on_update {
         None if relation.on_update().triggers_modification() => Some(relation.on_update()),
         _ => None,
     };
@@ -209,5 +216,5 @@ fn error_with_default_values(relation: ExplicitRelationWalker<'_, '_>, msg: &str
 
     msg.push_str(" Read more at https://pris.ly/d/cyclic-referential-actions");
 
-    DatamodelError::new_validation_error(&msg, relation.referenced_field().ast_field().span)
+    DatamodelError::new_validation_error(&msg, relation.referencing_field().ast_field().span)
 }
