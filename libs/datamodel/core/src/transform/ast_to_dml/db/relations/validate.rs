@@ -274,6 +274,7 @@ pub(super) fn detect_multiple_cascading_paths(
         .map(|model_name| format!("`{}`", model_name))
         .join(", ");
 
+    #[allow(clippy::comparison_chain)] // match looks horrible here...
     if reachable.len() == 1 {
         let msg = format!(
             "When any of the records in model {} is updated or deleted, the referential actions on the relations cascade to model `{}` through multiple paths. Please break one of these paths by setting the `onUpdate` and `onDelete` to `NoAction`.",
