@@ -132,7 +132,7 @@ pub(super) fn field_arity(relation: ExplicitRelationWalker<'_, '_>, errors: &mut
 }
 
 /// Detects cyclical cascading referential actions.
-pub(super) fn detect_cycles<'ast, 'db>(
+pub(super) fn cycles<'ast, 'db>(
     relation: ExplicitRelationWalker<'ast, 'db>,
     connector: &dyn Connector,
     errors: &mut Vec<DatamodelError>,
@@ -181,7 +181,7 @@ pub(super) fn detect_cycles<'ast, 'db>(
     }
 }
 
-pub(super) fn detect_multiple_cascading_paths(
+pub(super) fn multiple_cascading_paths(
     relation: ExplicitRelationWalker<'_, '_>,
     connector: &dyn Connector,
     errors: &mut Vec<DatamodelError>,
@@ -196,6 +196,7 @@ pub(super) fn detect_multiple_cascading_paths(
         return;
     }
 
+    let mut visited = HashSet::new();
     let parent_model = relation.referencing_model();
 
     // Gather all paths from this model to any other model, skipping
@@ -217,6 +218,8 @@ pub(super) fn detect_multiple_cascading_paths(
         let model = next_relation.referencing_model();
         let related_model = next_relation.referenced_model();
 
+        visited.insert((model.model_id, next_relation.referencing_field().field_id));
+
         // Self-relations are detected elsewhere.
         if model.model_id == related_model.model_id {
             continue;
@@ -229,6 +232,12 @@ pub(super) fn detect_multiple_cascading_paths(
 
         let mut forward_relations = related_model
             .explicit_forward_relations()
+            .filter(|relation| {
+                !visited.contains(&(
+                    relation.referencing_model().model_id,
+                    relation.referencing_field().field_id,
+                ))
+            })
             .map(|relation| (relation, Rc::new(visited_relations.link_next(relation))))
             .peekable();
 
@@ -237,6 +246,10 @@ pub(super) fn detect_multiple_cascading_paths(
         // inspection.
         if forward_relations.peek().is_none() {
             paths.push(visited_relations.link_next(next_relation));
+
+            // We want to re-visit the same fields if coming from another path.
+            visited.clear();
+
             continue;
         }
 
