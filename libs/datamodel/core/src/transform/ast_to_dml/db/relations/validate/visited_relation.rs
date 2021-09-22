@@ -34,7 +34,7 @@ impl<'ast, 'db> VisitedRelation<'ast, 'db> {
         let mut this = self;
 
         while let Some(next) = this.previous.as_ref() {
-            traversed.push(self.relation);
+            traversed.push(next.relation);
             this = next;
         }
 

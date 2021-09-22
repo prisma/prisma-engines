@@ -15,6 +15,7 @@ use self::{
     context::Context,
     relations::Relations,
     types::{RelationField, Types},
+    walkers::{ExplicitRelationWalker, RelationFieldWalker},
 };
 use crate::PreviewFeature;
 use crate::{ast, diagnostics::Diagnostics, Datasource};
@@ -165,5 +166,38 @@ impl<'ast> ParserDatabase<'ast> {
             .scalar_fields
             .range((model_id, ast::FieldId::ZERO)..=(model_id, ast::FieldId::MAX))
             .map(|((_, field_id), scalar_type)| (*field_id, scalar_type))
+    }
+
+    pub(super) fn walk_model_explicit_forward_relations(
+        &self,
+        model_id: ast::ModelId,
+    ) -> impl Iterator<Item = ExplicitRelationWalker<'ast, '_>> + '_ {
+        self.relations
+            .relations_from_model(model_id)
+            .filter(|(_, relation)| !relation.is_many_to_many())
+            .filter_map(move |(model_b, relation)| {
+                relation.fields().map(|(field_a, field_b)| {
+                    let field_a = RelationFieldWalker {
+                        model_id,
+                        field_id: field_a,
+                        db: &self,
+                        relation_field: &self.types.relation_fields[&(model_id, field_a)],
+                    };
+
+                    let field_b = RelationFieldWalker {
+                        model_id: model_b,
+                        field_id: field_b,
+                        db: &self,
+                        relation_field: &self.types.relation_fields[&(model_b, field_b)],
+                    };
+
+                    ExplicitRelationWalker {
+                        field_a,
+                        field_b,
+                        relation,
+                        db: &self,
+                    }
+                })
+            })
     }
 }
