@@ -141,43 +141,6 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
             relation_field: &self.db.types.relation_fields[&(self.model_id, field_id)],
         }
     }
-
-    pub(super) fn explicit_forward_relations(
-        &'db self,
-    ) -> impl Iterator<Item = ExplicitRelationWalker<'ast, 'db>> + 'db {
-        let model_id = self.model_id;
-        let db = self.db;
-
-        self.db
-            .relations
-            .relations_from_model(model_id)
-            .filter(|(_, relation)| !relation.is_many_to_many())
-            .filter_map(move |(model_b, relation)| {
-                relation.fields().map(|(field_a, field_b)| {
-                    let field_a = RelationFieldWalker {
-                        model_id,
-                        field_id: field_a,
-                        db,
-                        relation_field: &self.db.types.relation_fields[&(model_id, field_a)],
-                    };
-
-                    let field_b = RelationFieldWalker {
-                        model_id: model_b,
-                        field_id: field_b,
-                        db,
-                        relation_field: &self.db.types.relation_fields[&(model_b, field_b)],
-                    };
-
-                    (field_a, field_b, relation)
-                })
-            })
-            .map(move |(field_a, field_b, relation)| ExplicitRelationWalker {
-                field_a,
-                field_b,
-                relation,
-                db,
-            })
-    }
 }
 
 #[derive(Copy, Clone)]
@@ -257,10 +220,10 @@ impl<'ast, 'db> ScalarFieldWalker<'ast, 'db> {
 
 #[derive(Copy, Clone)]
 pub(crate) struct RelationFieldWalker<'ast, 'db> {
-    model_id: ast::ModelId,
-    field_id: ast::FieldId,
-    db: &'db ParserDatabase<'ast>,
-    relation_field: &'db RelationField<'ast>,
+    pub(crate) model_id: ast::ModelId,
+    pub(crate) field_id: ast::FieldId,
+    pub(crate) db: &'db ParserDatabase<'ast>,
+    pub(crate) relation_field: &'db RelationField<'ast>,
 }
 
 impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
@@ -411,11 +374,11 @@ impl<'ast, 'db> PrimaryKeyWalker<'ast, 'db> {
 
 #[allow(dead_code)] // for now
 #[derive(Copy, Clone)]
-pub(super) struct ExplicitRelationWalker<'ast, 'db> {
-    field_a: RelationFieldWalker<'ast, 'db>,
-    field_b: RelationFieldWalker<'ast, 'db>,
-    relation: &'db Relation<'ast>,
-    db: &'db ParserDatabase<'ast>,
+pub(crate) struct ExplicitRelationWalker<'ast, 'db> {
+    pub(crate) field_a: RelationFieldWalker<'ast, 'db>,
+    pub(crate) field_b: RelationFieldWalker<'ast, 'db>,
+    pub(super) relation: &'db Relation<'ast>,
+    pub(crate) db: &'db ParserDatabase<'ast>,
 }
 
 impl<'ast, 'db> PartialEq for ExplicitRelationWalker<'ast, 'db> {

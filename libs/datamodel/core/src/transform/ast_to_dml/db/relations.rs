@@ -165,6 +165,7 @@ pub(super) fn validate_relations(ctx: &mut Context<'_>) {
 
                 validate::field_arity(relation, &mut errors);
                 validate::same_length_in_referencing_and_referenced(relation, &mut errors);
+                validate::detect_cycles(relation, connector, ctx, &mut errors);
 
                 // These needs to run last to prevent error spam.
                 validate::references_unique_fields(relation, connector, &mut errors);
