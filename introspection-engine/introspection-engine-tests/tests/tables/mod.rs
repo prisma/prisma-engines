@@ -31,7 +31,7 @@ async fn nul_default_bytes(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(exclude(Cockroach))]
 async fn a_simple_table_with_gql_types(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -85,7 +85,40 @@ async fn a_simple_table_with_gql_types(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(tags(Cockroach))]
+async fn a_simple_table_with_gql_types_cockroach(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("Blog", move |t| {
+                t.add_column("bool", types::boolean());
+                t.add_column("float", types::float());
+                t.add_column("date", types::datetime());
+                t.add_column("id", types::integer().increments(true));
+                t.add_column("int", types::integer());
+                t.add_column("string", types::text());
+
+                t.add_constraint("Blog_pkey", types::primary_constraint(vec!["id"]));
+            });
+        })
+        .await?;
+
+    let dm = indoc! {r##"
+        model Blog {
+            bool    Boolean
+            float   Float
+            date    DateTime @db.Timestamp(6)
+            id      BigInt @id @default(autoincrement())
+            int     BigInt
+            string  String
+        }
+    "##};
+
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
+
+    Ok(())
+}
+
+#[test_connector(exclude(Cockroach))]
 async fn should_ignore_prisma_helper_tables(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -137,7 +170,59 @@ async fn should_ignore_prisma_helper_tables(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(tags(Cockroach))]
+async fn should_ignore_prisma_helper_tables_cockroach(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("Blog", move |t| {
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("Blog_pkey", types::primary_constraint(vec!["id"]));
+            });
+
+            migration.create_table("_RelayId", move |t| {
+                t.add_column("id", types::primary());
+                t.add_column("stablemodelidentifier", types::text());
+            });
+
+            migration.create_table("_Migration", move |t| {
+                t.add_column("revision", types::text());
+                t.add_column("name", types::text());
+                t.add_column("datamodel", types::text());
+                t.add_column("status", types::text());
+                t.add_column("applied", types::text());
+                t.add_column("rolled_back", types::text());
+                t.add_column("datamodel_steps", types::text());
+                t.add_column("database_migration", types::text());
+                t.add_column("errors", types::text());
+                t.add_column("started_at", types::text());
+                t.add_column("finished_at", types::text());
+            });
+
+            migration.create_table("_prisma_migrations", move |t| {
+                t.add_column("id", types::primary());
+                t.add_column("checksum", types::text());
+                t.add_column("finished_at", types::text());
+                t.add_column("migration_name", types::text());
+                t.add_column("logs", types::text());
+                t.add_column("rolled_back_at", types::text());
+                t.add_column("started_at", types::text());
+                t.add_column("applied_steps_count", types::text());
+            });
+        })
+        .await?;
+
+    let dm = indoc! {r##"
+        model Blog {
+            id      BigInt @id @default(autoincrement())
+        }
+    "##};
+
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
+
+    Ok(())
+}
+
+#[test_connector(exclude(Cockroach))]
 async fn a_table_with_compound_primary_keys(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -163,7 +248,33 @@ async fn a_table_with_compound_primary_keys(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(tags(Cockroach))]
+async fn a_table_with_compound_primary_keys_cockroach(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("Blog", |t| {
+                t.add_column("id", types::integer());
+                t.add_column("authorId", types::integer());
+
+                t.add_constraint("Blog_pkey", types::primary_constraint(vec!["id", "authorId"]));
+            });
+        })
+        .await?;
+
+    let dm = indoc! {r##"
+        model Blog {
+            id BigInt
+            authorId BigInt
+            @@id([id, authorId])
+        }
+    "##};
+
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
+
+    Ok(())
+}
+
+#[test_connector(exclude(Cockroach))]
 async fn a_table_with_unique_index(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -181,6 +292,32 @@ async fn a_table_with_unique_index(api: &TestApi) -> TestResult {
         model Blog {
             id       Int @id @default(autoincrement())
             authorId Int @unique(map: "test")
+        }
+    "##};
+
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
+
+    Ok(())
+}
+
+#[test_connector(tags(Cockroach))]
+async fn a_table_with_unique_index_cockroach(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("Blog", |t| {
+                t.add_column("id", types::integer().increments(true));
+                t.add_column("authorId", types::integer());
+                t.add_index("test", types::index(vec!["authorId"]).unique(true));
+
+                t.add_constraint("Blog_pkey", types::primary_constraint(["id"]));
+            });
+        })
+        .await?;
+
+    let dm = indoc! {r##"
+        model Blog {
+            id       BigInt @id @default(autoincrement())
+            authorId BigInt @unique(map: "test")
         }
     "##};
 
@@ -217,7 +354,7 @@ async fn a_table_with_multi_column_unique_index(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(exclude(Cockroach))]
 async fn a_table_with_required_and_optional_columns(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -236,6 +373,33 @@ async fn a_table_with_required_and_optional_columns(api: &TestApi) -> TestResult
             id      Int @id @default(autoincrement())
             requiredname Int
             optionalname Int?
+        }
+    "##};
+
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
+
+    Ok(())
+}
+
+#[test_connector(tags(Cockroach))]
+async fn a_table_with_required_and_optional_columns_cockroach(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::integer().increments(true));
+                t.add_column("requiredname", types::integer().nullable(false));
+                t.add_column("optionalname", types::integer().nullable(true));
+
+                t.add_constraint("User_pkey", types::primary_constraint(vec!["id"]))
+            });
+        })
+        .await?;
+
+    let dm = indoc! {r##"
+        model User {
+            id      BigInt @id @default(autoincrement())
+            requiredname BigInt
+            optionalname BigInt?
         }
     "##};
 
@@ -288,7 +452,7 @@ async fn a_table_with_default_values(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(exclude(Cockroach))]
 async fn a_table_with_a_non_unique_index(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -315,7 +479,34 @@ async fn a_table_with_a_non_unique_index(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(tags(Cockroach))]
+async fn a_table_with_a_non_unique_index_cockroach(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("a", types::integer());
+                t.add_column("id", types::integer().increments(true));
+                t.add_index("test", types::index(vec!["a"]));
+
+                t.add_constraint("User_pkey", types::primary_constraint(vec!["id"]))
+            });
+        })
+        .await?;
+
+    let dm = indoc! {r##"
+        model User {
+            a       BigInt
+            id      BigInt @id @default(autoincrement())
+            @@index([a], name: "test")
+        }
+    "##};
+
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
+
+    Ok(())
+}
+
+#[test_connector(exclude(Cockroach))]
 async fn a_table_with_a_multi_column_non_unique_index(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -335,6 +526,35 @@ async fn a_table_with_a_multi_column_non_unique_index(api: &TestApi) -> TestResu
             a  Int
             b  Int
             id Int @id @default(autoincrement())
+            @@index([a,b], name: "test")
+        }
+    "##};
+
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
+
+    Ok(())
+}
+
+#[test_connector(tags(Cockroach))]
+async fn a_table_with_a_multi_column_non_unique_index_cockroach(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("a", types::integer());
+                t.add_column("b", types::integer());
+                t.add_column("id", types::integer().increments(true));
+                t.add_index("test", types::index(vec!["a", "b"]));
+
+                t.add_constraint("User_pkey", types::primary_constraint(vec!["id"]))
+            });
+        })
+        .await?;
+
+    let dm = indoc! { r##"
+        model User {
+            a  BigInt
+            b  BigInt
+            id BigInt @id @default(autoincrement())
             @@index([a,b], name: "test")
         }
     "##};
