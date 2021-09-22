@@ -10,7 +10,7 @@ use crate::{
     ast::{self, FieldArity},
     common::constraint_names::ConstraintNames,
 };
-use std::{borrow::Cow, hash};
+use std::borrow::Cow;
 
 impl<'ast> ParserDatabase<'ast> {
     #[track_caller]
@@ -93,7 +93,7 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
             });
 
         let from_indices = self
-            .walk_indexes()
+            .indexes()
             .filter(|walker| walker.attribute().is_unique)
             .map(move |walker| UniqueCriteriaWalker {
                 model_id,
@@ -104,7 +104,7 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
         from_pk.chain(from_indices)
     }
 
-    pub(crate) fn walk_indexes(&self) -> impl Iterator<Item = IndexWalker<'ast, 'db>> + 'db {
+    pub(crate) fn indexes(&self) -> impl Iterator<Item = IndexWalker<'ast, 'db>> + 'db {
         let model_id = self.model_id;
         let db = self.db;
 
@@ -119,7 +119,7 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
             })
     }
 
-    pub(crate) fn walk_relation_fields(&self) -> impl Iterator<Item = RelationFieldWalker<'ast, 'db>> + 'db {
+    pub(crate) fn relation_fields(&self) -> impl Iterator<Item = RelationFieldWalker<'ast, 'db>> + 'db {
         let model_id = self.model_id;
         let db = self.db;
 
@@ -133,13 +133,44 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
             })
     }
 
-    pub(crate) fn walk_relation_field(&self, field_id: ast::FieldId) -> RelationFieldWalker<'ast, 'db> {
+    pub(crate) fn relation_field(&self, field_id: ast::FieldId) -> RelationFieldWalker<'ast, 'db> {
         RelationFieldWalker {
             model_id: self.model_id,
             field_id,
             db: self.db,
             relation_field: &self.db.types.relation_fields[&(self.model_id, field_id)],
         }
+    }
+
+    pub(super) fn explicit_forward_relations(&self) -> impl Iterator<Item = ExplicitRelationWalker<'ast, 'db>> + '_ {
+        self.db
+            .relations
+            .relations_from_model(self.model_id)
+            .filter(|(_, relation)| !relation.is_many_to_many())
+            .filter_map(move |(model_b, relation)| {
+                relation.fields().map(|(field_a, field_b)| {
+                    let field_a = RelationFieldWalker {
+                        model_id: self.model_id,
+                        field_id: field_a,
+                        db: &self.db,
+                        relation_field: &self.db.types.relation_fields[&(self.model_id, field_a)],
+                    };
+
+                    let field_b = RelationFieldWalker {
+                        model_id: model_b,
+                        field_id: field_b,
+                        db: &self.db,
+                        relation_field: &self.db.types.relation_fields[&(model_b, field_b)],
+                    };
+
+                    ExplicitRelationWalker {
+                        field_a,
+                        field_b,
+                        relation,
+                        db: &self.db,
+                    }
+                })
+            })
     }
 }
 
@@ -381,23 +412,6 @@ pub(crate) struct ExplicitRelationWalker<'ast, 'db> {
     pub(crate) db: &'db ParserDatabase<'ast>,
 }
 
-impl<'ast, 'db> PartialEq for ExplicitRelationWalker<'ast, 'db> {
-    fn eq(&self, other: &Self) -> bool {
-        self.relation == other.relation
-    }
-}
-
-impl<'ast, 'db> Eq for ExplicitRelationWalker<'ast, 'db> {}
-
-impl<'ast, 'db> hash::Hash for ExplicitRelationWalker<'ast, 'db> {
-    fn hash<H: hash::Hasher>(&self, state: &mut H) {
-        self.field_a.model_id.hash(state);
-        self.field_a.field_id.hash(state);
-        self.field_b.model_id.hash(state);
-        self.field_b.field_id.hash(state);
-    }
-}
-
 #[allow(dead_code)] // for now
 impl<'ast, 'db> ExplicitRelationWalker<'ast, 'db> {
     pub(super) fn new(
@@ -434,7 +448,7 @@ impl<'ast, 'db> ExplicitRelationWalker<'ast, 'db> {
     }
 
     // maybe public?
-    pub(super) fn referenced_model(&'db self) -> ModelWalker<'ast, 'db> {
+    pub(super) fn referenced_model(&self) -> ModelWalker<'ast, 'db> {
         self.field_b.model()
     }
 

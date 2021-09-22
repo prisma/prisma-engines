@@ -129,7 +129,7 @@ pub(super) fn validate_index_names(ctx: &mut Context<'_>) {
     let mut index_names = HashSet::new();
     let mut errors = Vec::new();
 
-    for index in ctx.db.walk_models().flat_map(|model| model.walk_indexes()) {
+    for index in ctx.db.walk_models().flat_map(|model| model.indexes()) {
         let index_name = index.final_database_name();
 
         if index_names.insert(index_name.clone()) {
@@ -156,7 +156,7 @@ pub(super) fn validate_relation_fields(ctx: &mut Context<'_>) {
 
     for ((model_id, field_id), _) in ctx.db.types.relation_fields.iter() {
         let model = ctx.db.walk_model(*model_id);
-        let field = model.walk_relation_field(*field_id);
+        let field = model.relation_field(*field_id);
 
         relation_field::validate_ignored_related_model(field, &mut errors);
         relation_field::validate_referential_actions(field, ctx.db.active_connector(), &mut errors);
