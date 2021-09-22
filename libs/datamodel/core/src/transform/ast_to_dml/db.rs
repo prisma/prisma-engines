@@ -15,6 +15,7 @@ use self::{
     context::Context,
     relations::Relations,
     types::{RelationField, Types},
+    walkers::{ExplicitRelationWalker, RelationFieldWalker},
 };
 use crate::PreviewFeature;
 use crate::{ast, diagnostics::Diagnostics, Datasource};
@@ -165,5 +166,36 @@ impl<'ast> ParserDatabase<'ast> {
             .scalar_fields
             .range((model_id, ast::FieldId::ZERO)..=(model_id, ast::FieldId::MAX))
             .map(|((_, field_id), scalar_type)| (*field_id, scalar_type))
+    }
+
+    /// Iterate all complete relations that are not many to many.
+    pub(crate) fn walk_explicit_relations(&self) -> impl Iterator<Item = ExplicitRelationWalker<'ast, '_>> + '_ {
+        self.relations
+            .iter_relations()
+            .filter(|(_, _, relation)| !relation.is_many_to_many())
+            .filter_map(move |(model_a, model_b, relation)| {
+                relation.fields().map(|(field_a, field_b)| {
+                    let field_a = RelationFieldWalker {
+                        model_id: model_a,
+                        field_id: field_a,
+                        db: &self,
+                        relation_field: &self.types.relation_fields[&(model_a, field_a)],
+                    };
+
+                    let field_b = RelationFieldWalker {
+                        model_id: model_b,
+                        field_id: field_b,
+                        db: &self,
+                        relation_field: &self.types.relation_fields[&(model_b, field_b)],
+                    };
+
+                    ExplicitRelationWalker {
+                        field_a,
+                        field_b,
+                        relation,
+                        db: &self,
+                    }
+                })
+            })
     }
 }

@@ -47,7 +47,7 @@ impl<'ast, 'db> fmt::Display for VisitedRelation<'ast, 'db> {
         let mut traversed = self.iter().map(|relation| {
             format!(
                 "{}.{}",
-                relation.referencing_model().ast_model().name(),
+                relation.referencing_model().name(),
                 relation.referencing_field().ast_field().name()
             )
         });

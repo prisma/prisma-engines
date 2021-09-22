@@ -1,7 +1,7 @@
 mod validate;
 
 use super::{context::Context, types::RelationField};
-use crate::{ast, transform::ast_to_dml::db::walkers::ExplicitRelationWalker};
+use crate::ast;
 use std::collections::BTreeSet;
 
 #[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
@@ -35,10 +35,6 @@ pub(super) struct Relation<'ast> {
 }
 
 impl<'ast> Relation<'ast> {
-    pub(super) fn is_one_to_many(&self) -> bool {
-        matches!(self.r#type, RelationType::OneToMany(_))
-    }
-
     pub(super) fn is_many_to_many(&self) -> bool {
         matches!(self.r#type, RelationType::ImplicitManyToMany { .. })
     }
@@ -144,35 +140,17 @@ pub(super) fn infer_relations(ctx: &mut Context<'_>) {
 
 pub(super) fn validate_relations(ctx: &mut Context<'_>) {
     let mut errors = Vec::new();
+    let connector = ctx.db.active_connector();
 
-    for (model_a, model_b, relation) in ctx.db.relations.iter_relations() {
-        match &relation.r#type {
-            RelationType::ImplicitManyToMany { .. } => (),
-            explicit => {
-                let relation = match &explicit {
-                    RelationType::OneToOne(OneToOneRelationFields::Both(field_a, field_b)) => {
-                        ExplicitRelationWalker::new((model_a, *field_a), (model_b, *field_b), relation, &ctx.db)
-                    }
-                    RelationType::OneToMany(OneToManyRelationFields::Both(field_a, field_b)) => {
-                        ExplicitRelationWalker::new((model_a, *field_a), (model_b, *field_b), relation, &ctx.db)
-                    }
-                    _ => {
-                        continue;
-                    }
-                };
+    for relation in ctx.db.walk_explicit_relations() {
+        validate::field_arity(relation, &mut errors);
+        validate::same_length_in_referencing_and_referenced(relation, &mut errors);
+        validate::detect_cycles(relation, connector, &mut errors);
+        validate::detect_multiple_cascading_paths(relation, connector, &mut errors);
 
-                let connector = ctx.db.active_connector();
-
-                validate::field_arity(relation, &mut errors);
-                validate::same_length_in_referencing_and_referenced(relation, &mut errors);
-                validate::detect_cycles(relation, connector, &mut errors);
-                validate::detect_multiple_cascading_paths(relation, connector, &mut errors);
-
-                // These needs to run last to prevent error spam.
-                validate::references_unique_fields(relation, connector, &mut errors);
-                validate::referencing_fields_in_correct_order(relation, connector, &mut errors);
-            }
-        }
+        // These needs to run last to prevent error spam.
+        validate::references_unique_fields(relation, connector, &mut errors);
+        validate::referencing_fields_in_correct_order(relation, connector, &mut errors);
     }
 
     for error in errors.into_iter() {
