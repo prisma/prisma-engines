@@ -178,14 +178,14 @@ impl<'ast> ParserDatabase<'ast> {
                     let field_a = RelationFieldWalker {
                         model_id: model_a,
                         field_id: field_a,
-                        db: &self,
+                        db: self,
                         relation_field: &self.types.relation_fields[&(model_a, field_a)],
                     };
 
                     let field_b = RelationFieldWalker {
                         model_id: model_b,
                         field_id: field_b,
-                        db: &self,
+                        db: self,
                         relation_field: &self.types.relation_fields[&(model_b, field_b)],
                     };
 
@@ -193,7 +193,7 @@ impl<'ast> ParserDatabase<'ast> {
                         field_a,
                         field_b,
                         relation,
-                        db: &self,
+                        db: self,
                     }
                 })
             })
