@@ -54,7 +54,7 @@ impl MigrationPersistence for SqlMigrationConnector {
             .value("finished_at", now)
             .value("migration_name", migration_name);
 
-        conn.execute(insert).await?;
+        conn.query(insert).await?;
 
         Ok(id)
     }
@@ -66,7 +66,7 @@ impl MigrationPersistence for SqlMigrationConnector {
             .so_that(Column::from("id").equals(migration_id))
             .set("rolled_back_at", chrono::Utc::now());
 
-        conn.execute(update).await?;
+        conn.query(update).await?;
 
         Ok(())
     }
@@ -82,7 +82,7 @@ impl MigrationPersistence for SqlMigrationConnector {
             .value("started_at", now)
             .value("migration_name", migration_name);
 
-        conn.execute(insert).await?;
+        conn.query(insert).await?;
 
         Ok(id)
     }
@@ -97,7 +97,7 @@ impl MigrationPersistence for SqlMigrationConnector {
                 Expression::from(Column::from("applied_steps_count")) + Expression::from(1),
             );
 
-        self.conn().execute(update).await?;
+        self.conn().query(update).await?;
 
         Ok(())
     }
@@ -107,7 +107,7 @@ impl MigrationPersistence for SqlMigrationConnector {
             .so_that(Column::from("id").equals(id))
             .set("logs", logs);
 
-        self.conn().execute(update).await?;
+        self.conn().query(update).await?;
 
         Ok(())
     }
@@ -117,7 +117,7 @@ impl MigrationPersistence for SqlMigrationConnector {
             .so_that(Column::from("id").equals(id))
             .set("finished_at", chrono::Utc::now()); // TODO maybe use a database generated timestamp
 
-        self.conn().execute(update).await?;
+        self.conn().query(update).await?;
 
         Ok(())
     }

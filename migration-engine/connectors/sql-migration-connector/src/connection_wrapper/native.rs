@@ -6,8 +6,9 @@ use quaint::{
     prelude::{ConnectionInfo, Query, Queryable, ResultSet},
     single::Quaint,
 };
+use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
 use std::sync::Arc;
-use user_facing_errors::KnownError;
+use user_facing_errors::{introspection_engine::DatabaseSchemaInconsistent, KnownError};
 
 pub(crate) async fn connect(connection_string: &str) -> ConnectorResult<Connection> {
     let connection_info = ConnectionInfo::from_url(connection_string).map_err(|err| {
@@ -77,11 +78,11 @@ impl Connection {
         Connection(ConnectionInner::Generic(quaint))
     }
 
-    pub(crate) fn new_postgres(conn: PostgreSql, url: PostgresUrl) -> Self {
+    fn new_postgres(conn: PostgreSql, url: PostgresUrl) -> Self {
         Connection(ConnectionInner::Postgres(Arc::new((conn, url))))
     }
 
-    pub(crate) fn new_mysql(conn: Mysql, url: MysqlUrl) -> Self {
+    fn new_mysql(conn: Mysql, url: MysqlUrl) -> Self {
         Connection(ConnectionInner::Mysql(Arc::new((conn, url))))
     }
 
@@ -93,18 +94,65 @@ impl Connection {
         }
     }
 
-    pub(crate) async fn execute(&self, query: impl Into<Query<'_>>) -> SqlResult<u64> {
-        self.queryable()
-            .execute(query.into())
-            .await
-            .map_err(|quaint_error| sql_error(quaint_error, &self.connection_info()))
-    }
-
-    pub(crate) fn queryable(&self) -> &dyn Queryable {
+    fn queryable(&self) -> &dyn Queryable {
         match &self.0 {
             ConnectionInner::Postgres(pg) => &pg.0,
             ConnectionInner::Mysql(my) => &my.0,
             ConnectionInner::Generic(q) => q,
+        }
+    }
+
+    pub(crate) async fn describe_schema(&self) -> ConnectorResult<SqlSchema> {
+        let connection_info = self.connection_info();
+        match connection_info {
+            ConnectionInfo::Postgres(_) => {
+                sql_schema_describer::postgres::SqlSchemaDescriber::new(self.queryable(), Default::default())
+                    .describe(connection_info.schema_name())
+                    .await
+                    .map_err(|err| match err.into_kind() {
+                        DescriberErrorKind::QuaintError(err) => quaint_error_to_connector_error(err, &connection_info),
+                        e @ DescriberErrorKind::CrossSchemaReference { .. } => {
+                            let err = KnownError::new(DatabaseSchemaInconsistent {
+                                explanation: format!("{}", e),
+                            });
+
+                            ConnectorError::from(err)
+                        }
+                    })
+            }
+            ConnectionInfo::Mysql(_) => sql_schema_describer::mysql::SqlSchemaDescriber::new(self.queryable())
+                .describe(connection_info.schema_name())
+                .await
+                .map_err(|err| match err.into_kind() {
+                    DescriberErrorKind::QuaintError(err) => quaint_error_to_connector_error(err, &connection_info),
+                    DescriberErrorKind::CrossSchemaReference { .. } => {
+                        unreachable!("No schemas on MySQL")
+                    }
+                }),
+            ConnectionInfo::Mssql(_) => sql_schema_describer::mssql::SqlSchemaDescriber::new(self.queryable())
+                .describe(connection_info.schema_name())
+                .await
+                .map_err(|err| match err.into_kind() {
+                    DescriberErrorKind::QuaintError(err) => quaint_error_to_connector_error(err, &connection_info),
+                    e @ DescriberErrorKind::CrossSchemaReference { .. } => {
+                        let err = KnownError::new(DatabaseSchemaInconsistent {
+                            explanation: e.to_string(),
+                        });
+
+                        ConnectorError::from(err)
+                    }
+                }),
+            ConnectionInfo::Sqlite { .. } | ConnectionInfo::InMemorySqlite { .. } => {
+                sql_schema_describer::sqlite::SqlSchemaDescriber::new(self.queryable())
+                    .describe(connection_info.schema_name())
+                    .await
+                    .map_err(|err| match err.into_kind() {
+                        DescriberErrorKind::QuaintError(err) => quaint_error_to_connector_error(err, &connection_info),
+                        DescriberErrorKind::CrossSchemaReference { .. } => {
+                            unreachable!("No schemas on SQLite")
+                        }
+                    })
+            }
         }
     }
 

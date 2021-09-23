@@ -207,21 +207,19 @@ impl TestApi {
     /// Like quaint::Queryable::query()
     #[track_caller]
     pub fn query(&self, q: quaint::ast::Query<'_>) -> ResultSet {
-        self.root.block_on(self.connector.queryable().query(q)).unwrap()
+        self.root.block_on(self.connector.query(q)).unwrap()
     }
 
     /// Like quaint::Queryable::query_raw()
     #[track_caller]
     pub fn query_raw(&self, q: &str, params: &[Value<'static>]) -> ResultSet {
-        self.root
-            .block_on(self.connector.queryable().query_raw(q, params))
-            .unwrap()
+        self.root.block_on(self.connector.query_raw(q, params)).unwrap()
     }
 
     /// Send a SQL command to the database, and expect it to succeed.
     #[track_caller]
     pub fn raw_cmd(&self, sql: &str) {
-        self.root.block_on(self.connector.queryable().raw_cmd(sql)).unwrap()
+        self.root.block_on(self.connector.raw_cmd(sql)).unwrap()
     }
 
     /// Render a table name with the required prefixing for use with quaint query building.

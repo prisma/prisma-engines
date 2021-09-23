@@ -1,5 +1,5 @@
 use crate::{
-    connection_wrapper::{connect, quaint_error_to_connector_error, Connection},
+    connection_wrapper::{connect, Connection},
     SqlFlavour, SqlMigrationConnector,
 };
 use connection_string::JdbcString;
@@ -8,9 +8,8 @@ use enumflags2::BitFlags;
 use indoc::formatdoc;
 use migration_connector::{migrations_directory::MigrationDirectory, ConnectorError, ConnectorResult};
 use quaint::{connector::MssqlUrl, prelude::Table};
-use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
+use sql_schema_describer::SqlSchema;
 use std::str::FromStr;
-use user_facing_errors::{introspection_engine::DatabaseSchemaInconsistent, KnownError};
 
 pub(crate) struct MssqlFlavour {
     url: MssqlUrl,
@@ -168,24 +167,6 @@ impl SqlFlavour for MssqlFlavour {
         "#, self.schema_name(), self.migrations_table_name()};
 
         Ok(connection.raw_cmd(&sql).await?)
-    }
-
-    async fn describe_schema<'a>(&'a self, connection: &Connection) -> ConnectorResult<SqlSchema> {
-        sql_schema_describer::mssql::SqlSchemaDescriber::new(connection.queryable())
-            .describe(connection.connection_info().schema_name())
-            .await
-            .map_err(|err| match err.into_kind() {
-                DescriberErrorKind::QuaintError(err) => {
-                    quaint_error_to_connector_error(err, &connection.connection_info())
-                }
-                e @ DescriberErrorKind::CrossSchemaReference { .. } => {
-                    let err = KnownError::new(DatabaseSchemaInconsistent {
-                        explanation: format!("{}", e),
-                    });
-
-                    ConnectorError::from(err)
-                }
-            })
     }
 
     async fn drop_database(&self, database_url: &str) -> ConnectorResult<()> {
@@ -422,7 +403,7 @@ impl SqlFlavour for MssqlFlavour {
                         })?;
                 }
 
-                self.describe_schema(&temp_database).await
+                temp_database.describe_schema().await
             })()
             .await
         };

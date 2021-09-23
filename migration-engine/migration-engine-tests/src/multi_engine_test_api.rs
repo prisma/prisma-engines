@@ -305,6 +305,6 @@ impl EngineTestApi<'_> {
     /// Execute a raw SQL command and expect it to succeed.
     #[track_caller]
     pub fn raw_cmd(&self, cmd: &str) {
-        self.rt.block_on(self.connector.queryable().raw_cmd(cmd)).unwrap()
+        self.rt.block_on(self.connector.raw_cmd(cmd)).unwrap()
     }
 }
