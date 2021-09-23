@@ -34,6 +34,7 @@ impl QueryEngine {
 pub struct TestApi {
     migration_api: SqlMigrationConnector,
     config: String,
+    connection_string: String,
 }
 
 impl TestApi {
@@ -52,9 +53,12 @@ impl TestApi {
             unreachable!()
         };
 
+        let datasource = args.datasource_block(&url, &[]);
+
         TestApi {
             migration_api,
-            config: args.datasource_block(&url, &[]).to_string(),
+            config: datasource.to_string(),
+            connection_string: datasource.url().to_string(),
         }
     }
 
@@ -82,8 +86,12 @@ impl TestApi {
         })
     }
 
+    pub fn connection_string(&self) -> &str {
+        &self.connection_string
+    }
+
     pub fn connection_info(&self) -> ConnectionInfo {
-        self.migration_api.connection_info()
+        ConnectionInfo::from_url(self.connection_string()).unwrap()
     }
 
     pub fn to_sql_string<'a>(&'a self, query: impl Into<Query<'a>>) -> quaint::Result<(String, Vec<Value>)> {
@@ -97,7 +105,10 @@ impl TestApi {
 
     pub fn table_name<'a>(&'a self, name: &'a str) -> quaint::ast::Table<'a> {
         match self.connection_info() {
-            ConnectionInfo::Mssql(_url) => (self.migration_api.schema_name(), name).into(),
+            ConnectionInfo::Mssql(_url) => {
+                let schema_name = self.connection_info().schema_name().to_string();
+                Table::from(name).database(schema_name)
+            }
             _ => name.into(),
         }
     }

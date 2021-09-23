@@ -58,7 +58,7 @@ enum FieldType {
     Scalar(ScalarFieldType),
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub(crate) enum ScalarFieldType {
     Enum(ast::EnumId),
     BuiltInScalar(dml::scalars::ScalarType),

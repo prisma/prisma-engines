@@ -1,6 +1,6 @@
 use super::{
     types::{IdAttribute, ModelAttributes, RelationField},
-    ParserDatabase,
+    ParserDatabase, ScalarField,
 };
 use crate::{
     ast::{self, FieldId, Model},
@@ -43,6 +43,13 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
         self.model_attributes
     }
 
+    pub(crate) fn fields_are_unique(&self, fields: &[ast::FieldId]) -> bool {
+        self.model_attributes
+            .indexes
+            .iter()
+            .any(|(_, idx)| idx.is_unique && idx.fields == fields)
+    }
+
     #[allow(clippy::unnecessary_lazy_evaluations)] // respectfully disagree
     pub(crate) fn final_database_name(&self) -> &'ast str {
         self.model_attributes
@@ -65,6 +72,32 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
             attribute: pk,
             db: self.db,
         })
+    }
+
+    pub(crate) fn unique_criterias(&'db self) -> impl Iterator<Item = UniqueCriteriaWalker<'ast, 'db>> + 'db {
+        let model_id = self.model_id;
+        let db = self.db;
+
+        let from_pk = self
+            .model_attributes
+            .primary_key
+            .iter()
+            .map(move |pk| UniqueCriteriaWalker {
+                model_id,
+                fields: &pk.fields,
+                db,
+            });
+
+        let from_indices = self
+            .walk_indexes()
+            .filter(|walker| walker.attribute().is_unique)
+            .map(move |walker| UniqueCriteriaWalker {
+                model_id,
+                fields: &walker.attribute().fields,
+                db,
+            });
+
+        from_pk.chain(from_indices)
     }
 
     pub(crate) fn walk_indexes(&self) -> impl Iterator<Item = IndexWalker<'ast, 'db>> + 'db {
@@ -141,6 +174,47 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
 }
 
 #[derive(Copy, Clone)]
+pub(crate) struct ScalarFieldWalker<'ast, 'db> {
+    model_id: ast::ModelId,
+    field_id: ast::FieldId,
+    db: &'db ParserDatabase<'ast>,
+    scalar_field: &'db ScalarField<'ast>,
+}
+
+impl<'ast, 'db> ScalarFieldWalker<'ast, 'db> {
+    #[allow(dead_code)] // we'll need this
+    pub(crate) fn field_id(&self) -> ast::FieldId {
+        self.field_id
+    }
+
+    pub(crate) fn ast_field(&self) -> &'ast ast::Field {
+        &self.db.ast[self.model_id][self.field_id]
+    }
+
+    pub(crate) fn name(&self) -> &'ast str {
+        self.ast_field().name()
+    }
+
+    pub(crate) fn is_optional(&self) -> bool {
+        self.ast_field().arity.is_optional()
+    }
+
+    #[allow(dead_code)] // we'll need this
+    pub(crate) fn attributes(&self) -> &'db ScalarField<'ast> {
+        self.scalar_field
+    }
+
+    #[allow(dead_code)] // we'll need this
+    pub(crate) fn model(&self) -> ModelWalker<'ast, 'db> {
+        ModelWalker {
+            model_id: self.model_id,
+            db: self.db,
+            model_attributes: &self.db.types.model_attributes[&self.model_id],
+        }
+    }
+}
+
+#[derive(Copy, Clone)]
 pub(crate) struct RelationFieldWalker<'ast, 'db> {
     model_id: ast::ModelId,
     field_id: ast::FieldId,
@@ -179,21 +253,37 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
         }
     }
 
-    pub(crate) fn referencing_fields(&'db self) -> impl Iterator<Item = &'ast ast::Field> + 'db {
-        self.relation_field
-            .fields
-            .iter()
-            .flatten()
-            .map(move |field_id| &self.db.ast[self.model_id][*field_id])
+    pub(crate) fn referencing_fields(&'db self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db {
+        let f = move |field_id: &FieldId| ScalarFieldWalker {
+            model_id: self.model_id,
+            field_id: *field_id,
+            db: self.db,
+            scalar_field: &self.db.types.scalar_fields[&(self.model_id, *field_id)],
+        };
+
+        match self.relation_field.fields.as_ref() {
+            Some(references) => references.iter().map(f),
+            None => [].iter().map(f),
+        }
     }
 
     #[allow(dead_code)]
-    pub(crate) fn referenced_fields(&'db self) -> impl Iterator<Item = &'ast ast::Field> + 'db {
-        self.relation_field
-            .references
-            .iter()
-            .flatten()
-            .map(move |field_id| &self.db.ast[self.model_id][*field_id])
+    pub(crate) fn referenced_fields(&'db self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db {
+        let f = move |field_id: &FieldId| {
+            let model_id = self.attributes().referenced_model;
+
+            ScalarFieldWalker {
+                model_id,
+                field_id: *field_id,
+                db: self.db,
+                scalar_field: &self.db.types.scalar_fields[&(model_id, *field_id)],
+            }
+        };
+
+        match self.relation_field.references.as_ref() {
+            Some(references) => references.iter().map(f),
+            None => [].iter().map(f),
+        }
     }
 
     /// This will be None for virtual relation fields (when no `fields` argument is passed).
@@ -208,6 +298,24 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
                 ConstraintNames::foreign_key_constraint_name(table_name, &column_names, self.db.active_connector())
                     .into(),
             )
+        })
+    }
+}
+
+#[derive(Copy, Clone)]
+pub(crate) struct UniqueCriteriaWalker<'ast, 'db> {
+    model_id: ast::ModelId,
+    fields: &'db [FieldId],
+    db: &'db ParserDatabase<'ast>,
+}
+
+impl<'ast, 'db> UniqueCriteriaWalker<'ast, 'db> {
+    pub(crate) fn fields(&'db self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db {
+        self.fields.iter().map(move |field_id| ScalarFieldWalker {
+            model_id: self.model_id,
+            field_id: *field_id,
+            db: self.db,
+            scalar_field: &self.db.types.scalar_fields[&(self.model_id, *field_id)],
         })
     }
 }
