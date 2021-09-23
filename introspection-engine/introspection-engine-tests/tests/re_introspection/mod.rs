@@ -1684,7 +1684,7 @@ async fn re_introspecting_custom_compound_unique_names(api: &TestApi) -> TestRes
         ]
     }]);
 
-    assert_eq_json!(expected, api.re_introspect_warnings(&input_dm).await?);
+    assert_eq_json!(expected, api.re_introspect_warnings(input_dm).await?);
 
     Ok(())
 }
@@ -1742,7 +1742,7 @@ async fn re_introspecting_custom_compound_unique_upgrade(api: &TestApi) -> TestR
         ]
     }]);
 
-    assert_eq_json!(expected, api.re_introspect_warnings(&input_dm).await?);
+    assert_eq_json!(expected, api.re_introspect_warnings(input_dm).await?);
 
     Ok(())
 }
@@ -1813,7 +1813,7 @@ async fn re_introspecting_custom_compound_id_names(api: &TestApi) -> TestResult 
 
     let re_introspected = api.re_introspect(&input_dm).await?;
 
-    api.assert_eq_datamodels(&final_dm, &re_introspected);
+    api.assert_eq_datamodels(final_dm, &re_introspected);
 
     let expected = json!([{
         "code": 18,

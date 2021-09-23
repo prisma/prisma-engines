@@ -568,7 +568,7 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, ctx: &
     }
 
     if !retained_legacy_index_name_args.is_empty() {
-        let index: Vec<_> = retained_legacy_index_name_args.iter().map(|c| c.clone()).collect();
+        let index: Vec<ModelAndIndex> = retained_legacy_index_name_args.to_vec();
         warnings.push(warning_enriched_with_custom_index_names(&index));
     }
 
