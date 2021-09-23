@@ -64,7 +64,7 @@ fn sql_error(quaint_error: QuaintError, connection_info: &ConnectionInfo) -> Sql
 /// exposes a similar API, with additional error handling to return
 /// `ConnectorResult`s.
 #[derive(Clone, Debug)]
-pub(crate) struct Connection(ConnectionInner);
+pub(crate) struct Connection(ConnectionInner, ConnectionInfo);
 
 #[derive(Clone, Debug)]
 enum ConnectionInner {
@@ -75,23 +75,26 @@ enum ConnectionInner {
 
 impl Connection {
     pub(crate) fn new_generic(quaint: Quaint) -> Self {
-        Connection(ConnectionInner::Generic(quaint))
+        let connection_info = quaint.connection_info().to_owned();
+        Connection(ConnectionInner::Generic(quaint), connection_info)
     }
 
     fn new_postgres(conn: PostgreSql, url: PostgresUrl) -> Self {
-        Connection(ConnectionInner::Postgres(Arc::new((conn, url))))
+        Connection(
+            ConnectionInner::Postgres(Arc::new((conn, url.clone()))),
+            ConnectionInfo::Postgres(url),
+        )
     }
 
     fn new_mysql(conn: Mysql, url: MysqlUrl) -> Self {
-        Connection(ConnectionInner::Mysql(Arc::new((conn, url))))
+        Connection(
+            ConnectionInner::Mysql(Arc::new((conn, url.clone()))),
+            ConnectionInfo::Mysql(url),
+        )
     }
 
-    pub(crate) fn connection_info(&self) -> ConnectionInfo {
-        match &self.0 {
-            ConnectionInner::Postgres(pg) => ConnectionInfo::Postgres(pg.1.clone()),
-            ConnectionInner::Mysql(my) => ConnectionInfo::Mysql(my.1.clone()),
-            ConnectionInner::Generic(q) => q.connection_info().clone(),
-        }
+    pub(crate) fn connection_info(&self) -> &ConnectionInfo {
+        &self.1
     }
 
     fn queryable(&self) -> &dyn Queryable {
@@ -175,14 +178,6 @@ impl Connection {
             .raw_cmd(sql)
             .await
             .map_err(|quaint_error| sql_error(quaint_error, &self.connection_info()))
-    }
-
-    pub(crate) fn schema_name(&self) -> &str {
-        match &self.0 {
-            ConnectionInner::Postgres(pg) => pg.1.schema(),
-            ConnectionInner::Mysql(my) => my.1.dbname(),
-            ConnectionInner::Generic(quaint) => quaint.connection_info().schema_name(),
-        }
     }
 
     pub(crate) async fn version(&self) -> SqlResult<Option<String>> {
