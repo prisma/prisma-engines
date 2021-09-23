@@ -5,6 +5,7 @@ use introspection_connector::{
 };
 use jsonrpc_core::BoxFuture;
 use jsonrpc_derive::rpc;
+use mongodb_introspection_connector::MongoDbIntrospectionConnector;
 use serde_derive::*;
 use sql_introspection_connector::SqlIntrospectionConnector;
 
@@ -76,16 +77,13 @@ impl RpcImpl {
             .load_url(|key| std::env::var(key).ok())
             .map_err(|diagnostics| Error::DatamodelError(diagnostics.to_pretty_string("schema.prisma", schema)))?;
 
-        if connection_string.starts_with("mongo") {
-            let message = r#""mongodb" provider is not supported with this command. For more info see https://www.prisma.io/docs/concepts/database-connectors/mongodb"#;
-            return Err(Error::InvalidDatabaseUrl(message.into()));
-        }
+        let connector: Box<dyn IntrospectionConnector> = if connection_string.starts_with("mongo") {
+            Box::new(MongoDbIntrospectionConnector::new(&connection_string).await?)
+        } else {
+            Box::new(SqlIntrospectionConnector::new(&connection_string, preview_features).await?)
+        };
 
-        Ok((
-            config.subject,
-            connection_string.clone(),
-            Box::new(SqlIntrospectionConnector::new(&connection_string, preview_features).await?),
-        ))
+        Ok((config.subject, connection_string.clone(), connector))
     }
 
     pub async fn catch<O>(fut: impl std::future::Future<Output = ConnectorResult<O>>) -> RpcResult<O> {

@@ -1799,6 +1799,7 @@ dependencies = [
  "json-rpc-stdio",
  "jsonrpc-core",
  "jsonrpc-derive",
+ "mongodb-introspection-connector",
  "serde",
  "serde_derive",
  "serde_json",
@@ -2320,6 +2321,25 @@ dependencies = [
  "native-types",
  "once_cell",
  "serde_json",
+]
+
+[[package]]
+name = "mongodb-introspection-connector"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "bson",
+ "datamodel",
+ "datamodel-connector",
+ "futures",
+ "indoc",
+ "introspection-connector",
+ "mongodb",
+ "mongodb-datamodel-connector",
+ "native-types",
+ "thiserror",
+ "url",
+ "user-facing-errors",
 ]
 
 [[package]]
