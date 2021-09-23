@@ -11,7 +11,7 @@ use visited_relation::*;
 
 use crate::{diagnostics::DatamodelError, transform::ast_to_dml::db::walkers::ExplicitRelationWalker};
 
-/// The `fields` and `references` should hold the same number of fields.
+/// The `fields` and `references` arguments should hold the same number of fields.
 pub(super) fn same_length_in_referencing_and_referenced(
     relation: ExplicitRelationWalker<'_, '_>,
     errors: &mut Vec<DatamodelError>,
@@ -71,8 +71,7 @@ pub(super) fn references_unique_fields(
     ));
 }
 
-/// Some connectors want the fields and references in the same order, and some
-/// other connectors wants foreign keys to point to unique criterias.
+/// Some connectors want the fields and references in the same order.
 pub(super) fn referencing_fields_in_correct_order(
     relation: ExplicitRelationWalker<'_, '_>,
     connector: &dyn Connector,
@@ -111,7 +110,7 @@ pub(super) fn referencing_fields_in_correct_order(
     ));
 }
 
-/// Validate that the arity of fields from `fields` is compatible with relation field arity.
+/// Required relational fields should point to required scalar fields.
 pub(super) fn field_arity(relation: ExplicitRelationWalker<'_, '_>, errors: &mut Vec<DatamodelError>) {
     if !relation.referencing_field().ast_field().arity.is_required() {
         return;
@@ -131,7 +130,18 @@ pub(super) fn field_arity(relation: ExplicitRelationWalker<'_, '_>, errors: &mut
     ));
 }
 
-/// Detects cyclical cascading referential actions.
+/// Detects cyclical cascading referential actions. Counts as a cycle if and
+/// only if all relations have at least one action triggering a cascading
+/// behavior, which is anything other than `NoAction`.
+///
+/// # Examples
+///
+/// A -> A (self relation)
+/// A -> B -> A (cycle)
+///
+/// We count them from forward-relations, e.g. from the side that defines the
+/// foreign key. Many to many relations we skip. The user must set one of the
+/// relation links to NoAction for both referential actions.
 pub(super) fn cycles<'ast, 'db>(
     relation: ExplicitRelationWalker<'ast, 'db>,
     connector: &dyn Connector,
@@ -174,13 +184,25 @@ pub(super) fn cycles<'ast, 'db>(
                 return;
             }
 
-            for relation in related_model.explicit_forward_relations() {
+            for relation in related_model.explicit_complete_relations_fwd() {
                 next_relations.push((relation, Rc::new(visited_relations.link_next(relation))));
             }
         }
     }
 }
 
+/// From the given relation, checks if any other relation fits the criteria:
+///
+/// - Triggers a cascading action (anything else but NoAction)
+/// - Refers to the same model as the given relation at some point in the path
+///
+/// # Example
+///
+/// - A -> B -> C
+/// - A -> D -> C
+///
+/// The user must set one of these relations to use NoAction for onUpdate and
+/// onDelete.
 pub(super) fn multiple_cascading_paths(
     relation: ExplicitRelationWalker<'_, '_>,
     connector: &dyn Connector,
@@ -209,7 +231,7 @@ pub(super) fn multiple_cascading_paths(
     // function from corresponding models.
     let mut next_relations: Vec<_> = relation
         .referencing_model()
-        .explicit_forward_relations()
+        .explicit_complete_relations_fwd()
         .filter(|relation| relation.on_delete().triggers_modification() || relation.on_update().triggers_modification())
         .map(|relation| (relation, Rc::new(VisitedRelation::root(relation))))
         .collect();
@@ -231,7 +253,7 @@ pub(super) fn multiple_cascading_paths(
         }
 
         let mut forward_relations = related_model
-            .explicit_forward_relations()
+            .explicit_complete_relations_fwd()
             .filter(|relation| {
                 !visited.contains(&(
                     relation.referencing_model().model_id,

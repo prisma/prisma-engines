@@ -2,7 +2,7 @@ mod autoincrement;
 mod id;
 mod map;
 mod native_types;
-mod relation_field;
+mod relation;
 
 use super::{
     context::{Arguments, Context},
@@ -158,9 +158,9 @@ pub(super) fn validate_relation_fields(ctx: &mut Context<'_>) {
         let model = ctx.db.walk_model(*model_id);
         let field = model.relation_field(*field_id);
 
-        relation_field::validate_ignored_related_model(field, &mut errors);
-        relation_field::validate_referential_actions(field, ctx.db.active_connector(), &mut errors);
-        relation_field::validate_on_update_without_foreign_keys(field, referential_integrity, &mut errors);
+        relation::validate_ignored_related_model(field, &mut errors);
+        relation::validate_referential_actions(field, ctx.db.active_connector(), &mut errors);
+        relation::validate_on_update_without_foreign_keys(field, referential_integrity, &mut errors);
     }
 
     for error in errors.into_iter() {
