@@ -14,7 +14,7 @@ use quaint::connector::{
     MysqlUrl,
 };
 use regex::{Regex, RegexSet};
-use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
+use sql_schema_describer::SqlSchema;
 use std::sync::atomic::{AtomicU8, Ordering};
 use url::Url;
 use user_facing_errors::{
@@ -289,20 +289,6 @@ impl SqlFlavour for MysqlFlavour {
         Ok(self.run_query_script(sql, connection).await?)
     }
 
-    async fn describe_schema<'a>(&'a self, connection: &Connection) -> ConnectorResult<SqlSchema> {
-        sql_schema_describer::mysql::SqlSchemaDescriber::new(connection.queryable())
-            .describe(connection.connection_info().schema_name())
-            .await
-            .map_err(|err| match err.into_kind() {
-                DescriberErrorKind::QuaintError(err) => {
-                    quaint_error_to_connector_error(err, &connection.connection_info())
-                }
-                DescriberErrorKind::CrossSchemaReference { .. } => {
-                    unreachable!("No schemas in MySQL")
-                }
-            })
-    }
-
     async fn drop_database(&self, database_url: &str) -> ConnectorResult<()> {
         let connection = connect(database_url).await?;
         let connection_info = connection.connection_info();
@@ -466,7 +452,7 @@ impl SqlFlavour for MysqlFlavour {
                     })?;
             }
 
-            self.describe_schema(&temp_database).await
+            temp_database.describe_schema().await
         })()
         .await;
 

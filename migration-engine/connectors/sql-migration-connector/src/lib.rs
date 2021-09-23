@@ -21,7 +21,7 @@ use enumflags2::BitFlags;
 use flavour::SqlFlavour;
 use migration_connector::{migrations_directory::MigrationDirectory, *};
 use pair::Pair;
-use quaint::prelude::{ConnectionInfo, Queryable};
+use quaint::prelude::ConnectionInfo;
 use sql_migration::{DropUserDefinedType, DropView, SqlMigration, SqlMigrationStep};
 use sql_schema_describer::{walkers::SqlSchemaExt, ColumnId, SqlSchema, TableId};
 use std::env;
@@ -85,13 +85,8 @@ impl SqlMigrationConnector {
     }
 
     /// Made public for tests.
-    pub fn queryable(&self) -> &dyn Queryable {
-        self.connection.queryable()
-    }
-
-    /// Made public for tests.
     pub async fn describe_schema(&self) -> ConnectorResult<SqlSchema> {
-        self.flavour.describe_schema(&self.connection).await
+        self.connection.describe_schema().await
     }
 
     /// Try to reset the database to an empty state. This should only be used
@@ -106,7 +101,7 @@ impl SqlMigrationConnector {
     async fn best_effort_reset_impl(&self, connection: &Connection) -> ConnectorResult<()> {
         tracing::info!("Attempting best_effort_reset");
 
-        let source_schema = self.flavour.describe_schema(connection).await?;
+        let source_schema = connection.describe_schema().await?;
         let target_schema = SqlSchema::empty();
         let mut steps = Vec::new();
 
@@ -175,6 +170,25 @@ impl SqlMigrationConnector {
             added_columns_with_virtual_defaults: Vec::new(),
             steps,
         }
+    }
+
+    /// For tests
+    pub async fn query_raw(
+        &self,
+        sql: &str,
+        params: &[quaint::prelude::Value<'_>],
+    ) -> ConnectorResult<quaint::prelude::ResultSet> {
+        Ok(self.connection.query_raw(sql, params).await?)
+    }
+
+    /// For tests
+    pub async fn query(&self, query: impl Into<quaint::ast::Query<'_>>) -> ConnectorResult<quaint::prelude::ResultSet> {
+        Ok(self.connection.query(query).await?)
+    }
+
+    /// For tests
+    pub async fn raw_cmd(&self, sql: &str) -> ConnectorResult<()> {
+        Ok(self.connection.raw_cmd(sql).await?)
     }
 
     /// Generate a name for a temporary (shadow) database, _if_ there is no user-configured shadow database url.

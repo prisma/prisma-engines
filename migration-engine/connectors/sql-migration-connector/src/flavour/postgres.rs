@@ -1,5 +1,5 @@
 use crate::{
-    connection_wrapper::{connect, quaint_error_to_connector_error, Connection},
+    connection_wrapper::{connect, Connection},
     sql_renderer::IteratorJoin,
     SqlFlavour, SqlMigrationConnector,
 };
@@ -8,14 +8,13 @@ use enumflags2::BitFlags;
 use indoc::indoc;
 use migration_connector::{migrations_directory::MigrationDirectory, ConnectorError, ConnectorResult};
 use quaint::connector::{tokio_postgres::error::ErrorPosition, PostgresUrl};
-use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
+use sql_schema_describer::SqlSchema;
 use std::collections::HashMap;
 use url::Url;
 use user_facing_errors::{
     common::{DatabaseAccessDenied, DatabaseDoesNotExist},
-    introspection_engine::DatabaseSchemaInconsistent,
     migration_engine::{self, ApplyMigrationError},
-    KnownError, UserFacingError,
+    UserFacingError,
 };
 
 const ADVISORY_LOCK_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(10);
@@ -261,24 +260,6 @@ impl SqlFlavour for PostgresFlavour {
         Ok(connection.raw_cmd(sql).await?)
     }
 
-    async fn describe_schema<'a>(&'a self, connection: &Connection) -> ConnectorResult<SqlSchema> {
-        sql_schema_describer::postgres::SqlSchemaDescriber::new(connection.queryable(), Default::default())
-            .describe(connection.connection_info().schema_name())
-            .await
-            .map_err(|err| match err.into_kind() {
-                DescriberErrorKind::QuaintError(err) => {
-                    quaint_error_to_connector_error(err, &connection.connection_info())
-                }
-                e @ DescriberErrorKind::CrossSchemaReference { .. } => {
-                    let err = KnownError::new(DatabaseSchemaInconsistent {
-                        explanation: format!("{}", e),
-                    });
-
-                    ConnectorError::from(err)
-                }
-            })
-    }
-
     async fn drop_database(&self, database_str: &str) -> ConnectorResult<()> {
         let mut url = Url::parse(database_str).map_err(ConnectorError::url_parse_error)?;
         let db_name = url.path().trim_start_matches('/').to_owned();
@@ -408,7 +389,7 @@ impl SqlFlavour for PostgresFlavour {
 
                 // The connection to the shadow database is dropped at the end of
                 // the block.
-                self.describe_schema(&shadow_database).await
+                shadow_database.describe_schema().await
             }
         })()
         .await;
