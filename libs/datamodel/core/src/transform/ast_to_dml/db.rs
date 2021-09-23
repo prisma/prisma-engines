@@ -174,7 +174,7 @@ impl<'ast> ParserDatabase<'ast> {
             .iter_relations()
             .filter(|(_, _, relation)| !relation.is_many_to_many())
             .filter_map(move |(model_a, model_b, relation)| {
-                relation.fields().map(|(field_a, field_b)| {
+                relation.as_complete_fields().map(|(field_a, field_b)| {
                     let field_a = RelationFieldWalker {
                         model_id: model_a,
                         field_id: field_a,

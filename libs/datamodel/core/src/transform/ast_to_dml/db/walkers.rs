@@ -39,18 +39,22 @@ pub(crate) struct ModelWalker<'ast, 'db> {
 }
 
 impl<'ast, 'db> ModelWalker<'ast, 'db> {
+    /// The name of the model.
     pub(crate) fn name(&self) -> &'db str {
         self.ast_model().name()
     }
 
+    /// The AST representation.
     pub(crate) fn ast_model(&self) -> &'db ast::Model {
         &self.db.ast[self.model_id]
     }
 
+    /// The parsed attributes.
     pub(crate) fn attributes(&self) -> &'db ModelAttributes<'ast> {
         self.model_attributes
     }
 
+    /// True if given fields are unique in the model.
     pub(crate) fn fields_are_unique(&self, fields: &[ast::FieldId]) -> bool {
         self.model_attributes
             .indexes
@@ -58,6 +62,7 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
             .any(|(_, idx)| idx.is_unique && idx.fields == fields)
     }
 
+    /// The name of the database table the model points to.
     #[allow(clippy::unnecessary_lazy_evaluations)] // respectfully disagree
     pub(crate) fn final_database_name(&self) -> &'ast str {
         self.model_attributes
@@ -74,6 +79,7 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
         })
     }
 
+    /// The primary key of the model, if defined.
     pub(crate) fn primary_key(&self) -> Option<PrimaryKeyWalker<'ast, 'db>> {
         self.model_attributes.primary_key.as_ref().map(|pk| PrimaryKeyWalker {
             model_id: self.model_id,
@@ -82,6 +88,8 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
         })
     }
 
+    /// All unique criterias of the model; consisting of the primary key and
+    /// unique indexes, if set.
     pub(crate) fn unique_criterias(&'db self) -> impl Iterator<Item = UniqueCriteriaWalker<'ast, 'db>> + 'db {
         let model_id = self.model_id;
         let db = self.db;
@@ -108,6 +116,7 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
         from_pk.chain(from_indices)
     }
 
+    /// All indexes defined in the model.
     pub(crate) fn indexes(&self) -> impl Iterator<Item = IndexWalker<'ast, 'db>> + 'db {
         let model_id = self.model_id;
         let db = self.db;
@@ -123,6 +132,7 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
             })
     }
 
+    /// All (virtual) relation fields of the model.
     pub(crate) fn relation_fields(&self) -> impl Iterator<Item = RelationFieldWalker<'ast, 'db>> + 'db {
         let model_id = self.model_id;
         let db = self.db;
@@ -137,6 +147,11 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
             })
     }
 
+    /// Find a relation field with the given id.
+    ///
+    /// ## Panics
+    ///
+    /// If the field does not exist.
     pub(crate) fn relation_field(&self, field_id: ast::FieldId) -> RelationFieldWalker<'ast, 'db> {
         RelationFieldWalker {
             model_id: self.model_id,
@@ -146,13 +161,20 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
         }
     }
 
-    pub(super) fn explicit_forward_relations(&self) -> impl Iterator<Item = ExplicitRelationWalker<'ast, 'db>> + '_ {
+    /// All relations that fit in the following definition:
+    ///
+    /// - Defines the relation fields and actions in the attribute.
+    /// - Is either 1:n or 1:1 relation.
+    /// - Has both sides defined.
+    pub(super) fn explicit_complete_relations_fwd(
+        &self,
+    ) -> impl Iterator<Item = ExplicitRelationWalker<'ast, 'db>> + '_ {
         self.db
             .relations
             .relations_from_model(self.model_id)
             .filter(|(_, relation)| !relation.is_many_to_many())
             .filter_map(move |(model_b, relation)| {
-                relation.fields().map(|(field_a, field_b)| {
+                relation.as_complete_fields().map(|(field_a, field_b)| {
                     let field_a = RelationFieldWalker {
                         model_id: self.model_id,
                         field_id: field_a,
@@ -296,39 +318,6 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
         }
     }
 
-    pub(crate) fn referencing_fields(&'db self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db {
-        let f = move |field_id: &ast::FieldId| ScalarFieldWalker {
-            model_id: self.model_id,
-            field_id: *field_id,
-            db: self.db,
-            scalar_field: &self.db.types.scalar_fields[&(self.model_id, *field_id)],
-        };
-
-        match self.relation_field.fields.as_ref() {
-            Some(references) => references.iter().map(f),
-            None => [].iter().map(f),
-        }
-    }
-
-    #[allow(dead_code)]
-    pub(crate) fn referenced_fields(&'db self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db {
-        let f = move |field_id: &ast::FieldId| {
-            let model_id = self.attributes().referenced_model;
-
-            ScalarFieldWalker {
-                model_id,
-                field_id: *field_id,
-                db: self.db,
-                scalar_field: &self.db.types.scalar_fields[&(model_id, *field_id)],
-            }
-        };
-
-        match self.relation_field.references.as_ref() {
-            Some(references) => references.iter().map(f),
-            None => [].iter().map(f),
-        }
-    }
-
     /// This will be None for virtual relation fields (when no `fields` argument is passed).
     pub(crate) fn final_foreign_key_name(&self) -> Option<Cow<'ast, str>> {
         self.attributes().fk_name.map(Cow::Borrowed).or_else(|| {
@@ -342,16 +331,6 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
                     .into(),
             )
         })
-    }
-
-    pub(crate) fn referential_arity(&self) -> FieldArity {
-        let some_required = self.referencing_fields().any(|f| f.ast_field().arity.is_required());
-
-        if some_required {
-            FieldArity::Required
-        } else {
-            self.ast_field().arity
-        }
     }
 }
 
@@ -421,35 +400,63 @@ pub(crate) struct ExplicitRelationWalker<'ast, 'db> {
 }
 
 impl<'ast, 'db> ExplicitRelationWalker<'ast, 'db> {
-    // maybe public?
     pub(super) fn referencing_model(&self) -> ModelWalker<'ast, 'db> {
         self.field_a.model()
     }
 
-    // maybe public?
     pub(super) fn referenced_model(&self) -> ModelWalker<'ast, 'db> {
         self.field_b.model()
     }
 
-    // keep private
     pub(super) fn referencing_field(&self) -> RelationFieldWalker<'ast, 'db> {
         self.field_a
     }
 
-    // maybe public?
+    /// The scalar fields defining the relation on the referenced model.
     pub(super) fn referenced_fields(&'db self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db {
-        self.field_a.referenced_fields()
+        let f = move |field_id: &ast::FieldId| {
+            let model_id = self.referenced_model().model_id;
+
+            ScalarFieldWalker {
+                model_id,
+                field_id: *field_id,
+                db: self.db,
+                scalar_field: &self.db.types.scalar_fields[&(model_id, *field_id)],
+            }
+        };
+
+        match self.referencing_field().relation_field.references.as_ref() {
+            Some(references) => references.iter().map(f),
+            None => [].iter().map(f),
+        }
     }
 
-    // maybe public?
+    /// The scalar fields on the defining the relation on the referencing model.
     pub(super) fn referencing_fields(&'db self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db {
-        self.field_a.referencing_fields()
+        let f = move |field_id: &ast::FieldId| {
+            let model_id = self.referencing_model().model_id;
+
+            ScalarFieldWalker {
+                model_id,
+                field_id: *field_id,
+                db: self.db,
+                scalar_field: &self.db.types.scalar_fields[&(model_id, *field_id)],
+            }
+        };
+
+        match self.referencing_field().relation_field.fields.as_ref() {
+            Some(references) => references.iter().map(f),
+            None => [].iter().map(f),
+        }
     }
 
+    /// True if the relation uses more than one scalar field as the key.
     pub(super) fn is_compound(&self) -> bool {
         self.referencing_fields().len() > 1
     }
 
+    /// Gives the onUpdate referential action of the relation. If not defined
+    /// explicitly, returns the default value.
     pub(super) fn on_update(&self) -> ReferentialAction {
         use ReferentialAction::*;
 
@@ -459,7 +466,7 @@ impl<'ast, 'db> ExplicitRelationWalker<'ast, 'db> {
                 .active_connector()
                 .has_capability(ConnectorCapability::ForeignKeys);
 
-            match self.referencing_field().referential_arity() {
+            match self.referential_arity() {
                 _ if uses_foreign_keys => Cascade,
                 FieldArity::Required => NoAction,
                 _ => SetNull,
@@ -467,17 +474,33 @@ impl<'ast, 'db> ExplicitRelationWalker<'ast, 'db> {
         })
     }
 
+    /// Gives the onDelete referential action of the relation. If not defined
+    /// explicitly, returns the default value.
     pub(super) fn on_delete(&self) -> ReferentialAction {
         use ReferentialAction::*;
 
         self.referencing_field().attributes().on_delete.unwrap_or_else(|| {
             let supports_restrict = self.db.active_connector().supports_referential_action(Restrict);
 
-            match self.referencing_field().referential_arity() {
+            match self.referential_arity() {
                 FieldArity::Required if supports_restrict => Restrict,
                 FieldArity::Required => NoAction,
                 _ => SetNull,
             }
         })
+    }
+
+    /// Prisma allows setting the relation field as optional, even if one of the
+    /// underlying scalar fields is required. For the purpose of referential
+    /// actions, we count the relation field required if any of the underlying
+    /// fields is required.
+    pub(crate) fn referential_arity(&self) -> FieldArity {
+        let some_required = self.referencing_fields().any(|f| f.ast_field().arity.is_required());
+
+        if some_required {
+            FieldArity::Required
+        } else {
+            self.referencing_field().ast_field().arity
+        }
     }
 }
