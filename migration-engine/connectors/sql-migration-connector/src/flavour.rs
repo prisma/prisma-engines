@@ -74,9 +74,6 @@ pub(crate) trait SqlFlavour:
     /// Initialize the `_prisma_migrations` table.
     async fn create_migrations_table(&self, connection: &Connection) -> ConnectorResult<()>;
 
-    /// Describe the SQL schema.
-    async fn describe_schema<'a>(&'a self, conn: &Connection) -> ConnectorResult<SqlSchema>;
-
     /// Drop the database for the provided URL on the server.
     async fn drop_database(&self, database_url: &str) -> ConnectorResult<()>;
 

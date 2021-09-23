@@ -8,7 +8,7 @@ use enumflags2::BitFlags;
 use indoc::indoc;
 use migration_connector::{migrations_directory::MigrationDirectory, ConnectorError, ConnectorResult};
 use quaint::prelude::ConnectionInfo;
-use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
+use sql_schema_describer::SqlSchema;
 use std::path::Path;
 
 #[derive(Debug)]
@@ -73,20 +73,6 @@ impl SqlFlavour for SqliteFlavour {
         "#};
 
         Ok(connection.raw_cmd(sql).await?)
-    }
-
-    async fn describe_schema<'a>(&'a self, connection: &Connection) -> ConnectorResult<SqlSchema> {
-        sql_schema_describer::sqlite::SqlSchemaDescriber::new(connection.queryable())
-            .describe(connection.connection_info().schema_name())
-            .await
-            .map_err(|err| match err.into_kind() {
-                DescriberErrorKind::QuaintError(err) => {
-                    quaint_error_to_connector_error(err, &connection.connection_info())
-                }
-                DescriberErrorKind::CrossSchemaReference { .. } => {
-                    unreachable!("No schemas in SQLite")
-                }
-            })
     }
 
     async fn drop_database(&self, database_url: &str) -> ConnectorResult<()> {
@@ -168,7 +154,7 @@ impl SqlFlavour for SqliteFlavour {
                 })?;
         }
 
-        let sql_schema = self.describe_schema(&conn).await?;
+        let sql_schema = conn.describe_schema().await?;
 
         Ok(sql_schema)
     }
