@@ -118,7 +118,7 @@ impl<'ast> Relation<'ast> {
         matches!(self.r#type, RelationType::ImplicitManyToMany { .. })
     }
 
-    pub(crate) fn fields(&self) -> Option<(ast::FieldId, ast::FieldId)> {
+    pub(crate) fn as_complete_fields(&self) -> Option<(ast::FieldId, ast::FieldId)> {
         match &self.r#type {
             RelationType::ImplicitManyToMany { field_a, field_b } => Some((*field_a, *field_b)),
             RelationType::OneToOne(OneToOneRelationFields::Both(field_a, field_b)) => Some((*field_a, *field_b)),
