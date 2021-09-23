@@ -404,9 +404,9 @@ fn renaming_a_datasource_works(api: TestApi) {
 }
 
 #[test_connector]
-fn simple_type_aliases_in_migrations_must_work(api: TestApi) {
+fn simple_aliases_in_migrations_must_work(api: TestApi) {
     let dm1 = r#"
-        type CUID = String @id @default(cuid())
+        alias CUID = String @id @default(cuid())
 
         model User {
             id CUID
