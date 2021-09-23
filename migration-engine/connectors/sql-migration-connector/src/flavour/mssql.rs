@@ -210,7 +210,7 @@ impl SqlFlavour for MssqlFlavour {
     }
 
     async fn reset(&self, connection: &Connection) -> ConnectorResult<()> {
-        let schema_name = connection.schema_name();
+        let schema_name = connection.connection_info().schema_name();
 
         let drop_procedures = format!(
             r#"

@@ -126,7 +126,8 @@ impl DestructiveChangeCheckerFlavour for MssqlFlavour {
         table_name: &str,
         conn: &crate::connection_wrapper::Connection,
     ) -> migration_connector::ConnectorResult<i64> {
-        let query = format!("SELECT COUNT(*) FROM [{}].[{}]", conn.schema_name(), table_name);
+        let schema_name = conn.connection_info().schema_name();
+        let query = format!("SELECT COUNT(*) FROM [{}].[{}]", schema_name, table_name);
         let result_set = conn.query_raw(&query, &[]).await?;
         super::extract_table_rows_count(table_name, result_set)
     }
@@ -136,11 +137,10 @@ impl DestructiveChangeCheckerFlavour for MssqlFlavour {
         (table, column): (&str, &str),
         conn: &crate::connection_wrapper::Connection,
     ) -> migration_connector::ConnectorResult<i64> {
+        let schema_name = conn.connection_info().schema_name();
         let query = format!(
             "SELECT COUNT(*) FROM [{}].[{}] WHERE [{}] IS NOT NULL",
-            conn.schema_name(),
-            table,
-            column
+            schema_name, table, column
         );
         let result_set = conn.query_raw(&query, &[]).await?;
         super::extract_column_values_count(result_set)

@@ -316,7 +316,7 @@ impl SqlFlavour for MysqlFlavour {
             .unwrap()
         });
 
-        let db_name = connection.schema_name();
+        let db_name = connection.connection_info().schema_name();
 
         if MYSQL_SYSTEM_DATABASES.is_match(db_name) {
             return Err(SystemDatabase(db_name.to_owned()).into());

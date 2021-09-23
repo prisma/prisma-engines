@@ -281,7 +281,7 @@ impl SqlFlavour for PostgresFlavour {
 
     #[tracing::instrument]
     async fn ensure_connection_validity(&self, connection: &Connection) -> ConnectorResult<()> {
-        let schema_name = connection.schema_name();
+        let schema_name = connection.connection_info().schema_name();
         let schema_exists_result = connection
             .query_raw(
                 "SELECT EXISTS(SELECT 1 FROM pg_namespace WHERE nspname = $1)",
@@ -334,7 +334,7 @@ impl SqlFlavour for PostgresFlavour {
     }
 
     async fn reset(&self, connection: &Connection) -> ConnectorResult<()> {
-        let schema_name = connection.schema_name();
+        let schema_name = connection.connection_info().schema_name();
 
         connection
             .raw_cmd(&format!("DROP SCHEMA \"{}\" CASCADE", schema_name))
