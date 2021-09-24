@@ -1,6 +1,5 @@
 #![allow(clippy::vec_init_then_push, clippy::branches_sharing_code, clippy::needless_borrow)]
 
-mod aggregation;
 mod cursor;
 mod error;
 mod filter;

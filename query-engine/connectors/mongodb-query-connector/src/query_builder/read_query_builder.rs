@@ -1,6 +1,5 @@
 use super::logger::*;
 use crate::{
-    aggregation::RelAggregationBuilder,
     cursor::{CursorBuilder, CursorData},
     filter::convert_filter,
     join::JoinStage,
@@ -98,9 +97,6 @@ pub(crate) struct MongoReadQueryBuilder {
     /// transformed the documents.
     pub(crate) aggregation_filters: Vec<Document>,
 
-    /// Joins used to compute the relation aggregation selections
-    pub(crate) rel_aggregation_selection_joins: Vec<JoinStage>,
-
     /// Order by builder for deferred processing.
     order_builder: Option<OrderByBuilder>,
 
@@ -150,7 +146,6 @@ impl MongoReadQueryBuilder {
             limit: None,
             projection: None,
             is_group_by_query: false,
-            rel_aggregation_selection_joins: vec![],
         }
     }
 
@@ -191,7 +186,6 @@ impl MongoReadQueryBuilder {
             limit: take(args.take, args.ignore_take),
             aggregations: vec![],
             aggregation_filters: vec![],
-            rel_aggregation_selection_joins: vec![],
             order: None,
             order_joins: vec![],
             cursor_data: None,
@@ -263,11 +257,7 @@ impl MongoReadQueryBuilder {
         };
 
         // Joins ($lookup)
-        let joins = self
-            .joins
-            .into_iter()
-            .chain(self.rel_aggregation_selection_joins)
-            .chain(self.order_joins);
+        let joins = self.joins.into_iter().chain(self.order_joins);
 
         stages.extend(joins.flat_map(|nested_stage| {
             let (join, unwind) = nested_stage.build();
@@ -414,18 +404,24 @@ impl MongoReadQueryBuilder {
         mut self,
         aggregation_selections: &[RelAggregationSelection],
     ) -> crate::Result<Self> {
-        let rel_aggr_builder = RelAggregationBuilder::new(aggregation_selections);
-        let joins = rel_aggr_builder.build_joins();
-        let aggr_projections = rel_aggr_builder.build_projections();
+        for aggr in aggregation_selections {
+            let join = match aggr {
+                RelAggregationSelection::Count(rf) => JoinStage {
+                    source: rf.clone(),
+                    alias: Some(aggr.db_alias()),
+                    nested: vec![],
+                },
+            };
+            let projection = doc! {
+              aggr.db_alias(): { "$size": format!("${}", aggr.db_alias()) }
+            };
 
-        self.rel_aggregation_selection_joins.extend(joins.into_iter());
-        self.projection = self.projection.map(|mut p| {
-            for aggr_projection in aggr_projections {
-                p.extend(aggr_projection);
-            }
-
-            p
-        });
+            self.joins.push(join);
+            self.projection = self.projection.map_or(Some(projection.clone()), |mut p| {
+                p.extend(projection);
+                Some(p)
+            });
+        }
 
         Ok(self)
     }
