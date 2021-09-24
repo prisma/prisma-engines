@@ -163,7 +163,7 @@ impl MongoReadQueryBuilder {
         let query = match args.filter {
             Some(filter) => {
                 // If a filter comes with joins, it needs to be run _after_ the initial filter query / $matches.
-                let (filter, filter_joins) = convert_filter(filter, false)?.render();
+                let (filter, filter_joins) = convert_filter(filter, false, false)?.render();
                 if !filter_joins.is_empty() {
                     joins.extend(filter_joins);
                     post_filters.push(filter);
@@ -535,7 +535,7 @@ impl MongoReadQueryBuilder {
     /// Adds aggregation filters based on a having scalar filter.
     pub fn with_having(mut self, having: Option<Filter>) -> crate::Result<Self> {
         if let Some(filter) = having {
-            let (filter_doc, _) = convert_filter(filter, false)?.render();
+            let (filter_doc, _) = convert_filter(filter, false, true)?.render();
             self.aggregation_filters.push(filter_doc);
         }
 

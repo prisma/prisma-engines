@@ -12,6 +12,7 @@ pub async fn aggregate<'conn>(
     group_by: Vec<ScalarFieldRef>,
     having: Option<Filter>,
 ) -> crate::Result<Vec<AggregationRow>> {
+    let is_group_by = !group_by.is_empty();
     let coll = database.collection(&model.db_name());
     let query = MongoReadQueryBuilder::from_args(query_arguments)?
         .with_groupings(group_by, &selections)
@@ -19,7 +20,10 @@ pub async fn aggregate<'conn>(
         .build()?;
 
     let docs = query.execute(coll, session).await?;
-    if docs.is_empty() {
+
+    if is_group_by && docs.is_empty() {
+        Ok(vec![])
+    } else if docs.is_empty() {
         Ok(empty_aggregation(selections))
     } else {
         to_aggregation_rows(docs, selections)
