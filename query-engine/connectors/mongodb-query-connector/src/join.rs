@@ -93,14 +93,10 @@ impl JoinStage {
                 let right_ref = format!("${}", right_field.db_name());
                 let left_var = format!("$$left_{}", idx);
 
-                if relation.is_many_to_many() {
-                    if right_field.is_list {
-                        doc! { "$in": [left_var, right_ref] }
-                    } else {
-                        doc! { "$in": [right_ref, left_var] }
-                    }
-                } else {
-                    doc! { "$eq": [right_ref, left_var] }
+                match relation.is_many_to_many() {
+                    true if right_field.is_list => doc! { "$in": [left_var, right_ref] },
+                    true => doc! { "$in": [right_ref, left_var] },
+                    _ => doc! { "$eq": [right_ref, left_var] },
                 }
             })
             .collect();
