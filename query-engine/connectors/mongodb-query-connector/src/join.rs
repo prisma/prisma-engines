@@ -79,48 +79,64 @@ impl JoinStage {
         let right_model = from_field.related_model();
         let right_coll_name = right_model.db_name();
 
-        let mut left_scalars = from_field.left_scalars();
-        let mut right_scalars = from_field.right_scalars();
-
         // +1 for the required match stage, the rest is from the joins.
         let mut pipeline = Vec::with_capacity(1 + nested_stages.len());
 
-        // todo: multi-field joins
-        // Field on the right hand collection of the join.
-        let right_field = right_scalars.pop().unwrap();
-        let right_name = right_field.db_name().to_string();
+        // First we start with the right side of the equation
+        let right_scalars = from_field.right_scalars();
 
-        // Field on the left hand collection of the join.
-        let left_field = left_scalars.pop().unwrap();
-        let left_name = left_field.db_name();
+        // What $expr operators we will need to express this lookup? (depends on right fields)
+        let ops: Vec<Document> = right_scalars
+            .iter()
+            .enumerate()
+            .map(|(idx, right_field)| {
+                let right_ref = format!("${}", right_field.db_name());
+                let left_var = format!("$$left_{}", idx);
 
-        let right_ref = format!("${}", right_name);
-        let op = if relation.is_many_to_many() {
-            // For m-n join stages: Add an `$addFields` stage that adds an empty array if not present (required to make joins work).
-            pipeline.push(doc! {
-                "$addFields": {
-                    right_name: {
-                        "$cond": {
+                if relation.is_many_to_many() {
+                    if right_field.is_list {
+                        doc! { "$in": [left_var, right_ref] }
+                    } else {
+                        doc! { "$in": [right_ref, left_var] }
+                    }
+                } else {
+                    doc! { "$eq": [right_ref, left_var] }
+                }
+            })
+            .collect();
+
+        // If the relationship is many to many we need to push an $addFields to the pipeline
+        if relation.is_many_to_many() {
+            // addFields is the list of fields and conditions
+            let mut add_fields = Document::new();
+
+            // Go through every right field to place in the $addFields operator
+            for right_field in right_scalars.iter() {
+                let right_name = right_field.db_name();
+                let right_ref = format!("${}", right_name);
+
+                add_fields.insert(
+                    right_name,
+                    doc! {
+                       "$cond": {
                             "if": {
-                                "$ne": [ { "$type": right_ref.clone() }, "array" ]
+                                "$ne": [ { "$type": right_ref.clone() }, "array"]
                             },
                             "then": [],
-                            "else": right_ref.clone(),
+                            "else": right_ref.clone()
                         }
-                    }
-                }
-            });
-
-            if right_field.is_list {
-                doc! { "$in": ["$$left", right_ref] }
-            } else {
-                doc! { "$in": [right_ref, "$$left"] }
+                    },
+                );
             }
-        } else {
-            doc! { "$eq": [right_ref, "$$left"] }
-        };
 
-        pipeline.push(doc! { "$match": { "$expr": op }});
+            // Push addFields to pipeline
+            pipeline.push(doc! {
+                "$addFields": add_fields
+            });
+        }
+
+        // We can now express the match from the operators
+        pipeline.push(doc! { "$match": { "$expr": { "$and": ops } }});
         pipeline.extend(nested_stages);
 
         // Todo: Temporarily disabled.
@@ -134,10 +150,22 @@ impl JoinStage {
         // };
         let unwind_stage = None;
 
+        // Time to deal with the left side of the equation
+        let left_scalars = from_field.left_scalars();
+
+        // With the left side, we need to replace the `left_X` for the right field
+        let mut let_vars = Document::new();
+        for (idx, left_field) in left_scalars.iter().enumerate() {
+            let left_name = format!("left_{}", idx);
+
+            let_vars.insert(left_name, format!("${}", left_field.db_name()));
+        }
+
+        // We can now generate the full $lookup query with all its parts
         let join_stage = doc! {
             "$lookup": {
                 "from": right_coll_name,
-                "let": { "left": format!("${}", left_name) },
+                "let": let_vars,
                 "pipeline": pipeline,
                 "as": as_name,
             }

@@ -8,7 +8,7 @@ mod filter_in {
     fn schema() -> String {
         let schema = indoc! {r#"
             model Foo {
-                id		  String @id
+                #id(id, String, @id)
                 version String
                 name	  String
                 bar		  Bar?
@@ -17,7 +17,7 @@ mod filter_in {
             }
 
             model Bar {
-                id			String	@id
+                #id(id, String, @id)
                 name		String
                 fooId		String
                 version String
