@@ -145,7 +145,7 @@ impl QueryArguments {
         self.take.map(|t| if t < 0 { -t } else { t })
     }
 
-    pub fn cannot_batch(&self) -> bool {
+    pub fn has_unbatchable_ordering(&self) -> bool {
         self.order_by.iter().any(|o| match o {
             OrderBy::Scalar(_) => false,
             OrderBy::Aggregation(_) => true,
