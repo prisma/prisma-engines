@@ -293,7 +293,7 @@ pub struct InteractiveTransactionError {
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
-#[user_facing(code = "P2029", message = "Bind values exceeded error: {message}.")]
-pub struct BindValuesExceeded {
+#[user_facing(code = "P2029", message = "Query parameter limit exceeded error: {message}.")]
+pub struct QueryParameterLimitExceeded {
     pub message: String,
 }

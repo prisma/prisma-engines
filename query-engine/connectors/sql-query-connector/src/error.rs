@@ -143,8 +143,8 @@ pub enum SqlError {
     #[error("{}", _0)]
     TransactionAlreadyClosed(String),
 
-    #[error("Bind values exceeded error: {0}.")]
-    BindValuesExceeded(String),
+    #[error("Query parameter limit exceeded error: {0}.")]
+    QueryParameterLimitExceeded(String),
 }
 
 impl SqlError {
@@ -235,7 +235,9 @@ impl SqlError {
                 )),
                 kind: ErrorKind::TransactionAlreadyClosed { message },
             },
-            SqlError::BindValuesExceeded(e) => ConnectorError::from_kind(ErrorKind::BindValuesExceeded(e)),
+            SqlError::QueryParameterLimitExceeded(e) => {
+                ConnectorError::from_kind(ErrorKind::QueryParameterLimitExceeded(e))
+            }
         }
     }
 }
