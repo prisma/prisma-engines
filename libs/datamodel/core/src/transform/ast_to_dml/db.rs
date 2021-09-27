@@ -15,7 +15,7 @@ use self::{
     context::Context,
     relations::Relations,
     types::{RelationField, Types},
-    walkers::{ExplicitRelationWalker, RelationFieldWalker},
+    walkers::ExplicitRelationWalker,
 };
 use crate::PreviewFeature;
 use crate::{ast, diagnostics::Diagnostics, Datasource};
@@ -174,28 +174,14 @@ impl<'ast> ParserDatabase<'ast> {
             .iter_relations()
             .filter(|(_, _, relation)| !relation.is_many_to_many())
             .filter_map(move |(model_a, model_b, relation)| {
-                relation.as_complete_fields().map(|(field_a, field_b)| {
-                    let field_a = RelationFieldWalker {
-                        model_id: model_a,
-                        field_id: field_a,
+                relation
+                    .as_complete_fields()
+                    .map(|(field_a, field_b)| ExplicitRelationWalker {
+                        side_a: (model_a, field_a),
+                        side_b: (model_b, field_b),
                         db: self,
-                        relation_field: &self.types.relation_fields[&(model_a, field_a)],
-                    };
-
-                    let field_b = RelationFieldWalker {
-                        model_id: model_b,
-                        field_id: field_b,
-                        db: self,
-                        relation_field: &self.types.relation_fields[&(model_b, field_b)],
-                    };
-
-                    ExplicitRelationWalker {
-                        field_a,
-                        field_b,
                         relation,
-                        db: self,
-                    }
-                })
+                    })
             })
     }
 }

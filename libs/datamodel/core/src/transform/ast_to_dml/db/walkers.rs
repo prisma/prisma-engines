@@ -132,7 +132,7 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
             })
     }
 
-    /// All (virtual) relation fields of the model.
+    /// All (concrete) relation fields of the model.
     pub(crate) fn relation_fields(&self) -> impl Iterator<Item = RelationFieldWalker<'ast, 'db>> + 'db {
         let model_id = self.model_id;
         let db = self.db;
@@ -163,7 +163,6 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
 
     /// All relations that fit in the following definition:
     ///
-    /// - Defines the relation fields and actions in the attribute.
     /// - Is either 1:n or 1:1 relation.
     /// - Has both sides defined.
     pub(super) fn explicit_complete_relations_fwd(
@@ -174,28 +173,14 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
             .relations_from_model(self.model_id)
             .filter(|(_, relation)| !relation.is_many_to_many())
             .filter_map(move |(model_b, relation)| {
-                relation.as_complete_fields().map(|(field_a, field_b)| {
-                    let field_a = RelationFieldWalker {
-                        model_id: self.model_id,
-                        field_id: field_a,
+                relation
+                    .as_complete_fields()
+                    .map(|(field_a, field_b)| ExplicitRelationWalker {
+                        side_a: (self.model_id, field_a),
+                        side_b: (model_b, field_b),
                         db: self.db,
-                        relation_field: &self.db.types.relation_fields[&(self.model_id, field_a)],
-                    };
-
-                    let field_b = RelationFieldWalker {
-                        model_id: model_b,
-                        field_id: field_b,
-                        db: self.db,
-                        relation_field: &self.db.types.relation_fields[&(model_b, field_b)],
-                    };
-
-                    ExplicitRelationWalker {
-                        field_a,
-                        field_b,
                         relation,
-                        db: self.db,
-                    }
-                })
+                    })
             })
     }
 }
@@ -277,10 +262,10 @@ impl<'ast, 'db> ScalarFieldWalker<'ast, 'db> {
 
 #[derive(Copy, Clone)]
 pub(crate) struct RelationFieldWalker<'ast, 'db> {
-    pub(crate) model_id: ast::ModelId,
-    pub(crate) field_id: ast::FieldId,
-    pub(crate) db: &'db ParserDatabase<'ast>,
-    pub(crate) relation_field: &'db RelationField<'ast>,
+    pub(super) model_id: ast::ModelId,
+    pub(super) field_id: ast::FieldId,
+    pub(super) db: &'db ParserDatabase<'ast>,
+    pub(super) relation_field: &'db RelationField<'ast>,
 }
 
 impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
@@ -392,8 +377,8 @@ impl<'ast, 'db> PrimaryKeyWalker<'ast, 'db> {
 
 #[derive(Copy, Clone)]
 pub(crate) struct ExplicitRelationWalker<'ast, 'db> {
-    pub(crate) field_a: RelationFieldWalker<'ast, 'db>,
-    pub(crate) field_b: RelationFieldWalker<'ast, 'db>,
+    pub(crate) side_a: (ast::ModelId, ast::FieldId),
+    pub(crate) side_b: (ast::ModelId, ast::FieldId),
     #[allow(dead_code)]
     pub(super) relation: &'db Relation<'ast>,
     pub(crate) db: &'db ParserDatabase<'ast>,
@@ -401,15 +386,28 @@ pub(crate) struct ExplicitRelationWalker<'ast, 'db> {
 
 impl<'ast, 'db> ExplicitRelationWalker<'ast, 'db> {
     pub(super) fn referencing_model(&self) -> ModelWalker<'ast, 'db> {
-        self.field_a.model()
+        ModelWalker {
+            model_id: self.side_a.0,
+            db: self.db,
+            model_attributes: &self.db.types.model_attributes[&self.side_a.0],
+        }
     }
 
     pub(super) fn referenced_model(&self) -> ModelWalker<'ast, 'db> {
-        self.field_b.model()
+        ModelWalker {
+            model_id: self.side_b.0,
+            db: self.db,
+            model_attributes: &self.db.types.model_attributes[&self.side_b.0],
+        }
     }
 
     pub(super) fn referencing_field(&self) -> RelationFieldWalker<'ast, 'db> {
-        self.field_a
+        RelationFieldWalker {
+            model_id: self.side_a.0,
+            field_id: self.side_a.1,
+            db: self.db,
+            relation_field: &self.db.types.relation_fields[&(self.side_a.0, self.side_a.1)],
+        }
     }
 
     /// The scalar fields defining the relation on the referenced model.
