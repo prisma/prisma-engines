@@ -82,7 +82,7 @@ impl MysqlFlavour {
             let shadow_conninfo = conn.connection_info();
             let main_conninfo = main_connection.connection_info();
 
-            super::validate_connection_infos_do_not_match((&shadow_conninfo, &main_conninfo))?;
+            super::validate_connection_infos_do_not_match((shadow_conninfo, main_conninfo))?;
 
             tracing::info!(
                 "Connecting to user-provided shadow database at {}.{:?}",
@@ -144,7 +144,7 @@ impl SqlFlavour for MysqlFlavour {
     async fn run_query_script(&self, sql: &str, connection: &Connection) -> ConnectorResult<()> {
         let convert_error = |error: my::Error| match self.convert_server_error(&error) {
             Some(e) => ConnectorError::from(e),
-            None => quaint_error_to_connector_error(quaint::error::Error::from(error), &connection.connection_info()),
+            None => quaint_error_to_connector_error(quaint::error::Error::from(error), connection.connection_info()),
         };
 
         let (client, _url) = connection.unwrap_mysql();
@@ -316,7 +316,7 @@ impl SqlFlavour for MysqlFlavour {
             .unwrap()
         });
 
-        let db_name = connection.schema_name();
+        let db_name = connection.connection_info().schema_name();
 
         if MYSQL_SYSTEM_DATABASES.is_match(db_name) {
             return Err(SystemDatabase(db_name.to_owned()).into());
