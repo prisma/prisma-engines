@@ -40,12 +40,12 @@ pub(crate) struct ModelWalker<'ast, 'db> {
 
 impl<'ast, 'db> ModelWalker<'ast, 'db> {
     /// The name of the model.
-    pub(crate) fn name(&self) -> &'db str {
+    pub(crate) fn name(&self) -> &'ast str {
         self.ast_model().name()
     }
 
     /// The AST representation.
-    pub(crate) fn ast_model(&self) -> &'db ast::Model {
+    pub(crate) fn ast_model(&self) -> &'ast ast::Model {
         &self.db.ast[self.model_id]
     }
 
