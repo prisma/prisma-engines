@@ -722,7 +722,10 @@ impl<'a> SqlSchemaDescriber<'a> {
                         },
                         ColumnTypeFamily::DateTime => {
                             match default_string.to_lowercase().as_str() {
-                                "now()" | "current_timestamp" => DefaultValue::now(),
+                                "now()"
+                                | "current_timestamp"
+                                | "current_timestamp():::timestamp"
+                                | "current_timestamp():::timestamptz" => DefaultValue::now(),
                                 _ => DefaultValue::db_generated(default_string), //todo parse values
                             }
                         }
