@@ -101,7 +101,7 @@ impl JoinStage {
             })
             .collect();
 
-        // If the relationship is many to many we need to push an $addFields to the pipeline
+        // For m-n join stages: Add an `$addFields` stage that adds an empty array if not present (required to make joins work).
         if relation.is_many_to_many() {
             // addFields is the list of fields and conditions
             let mut add_fields = Document::new();
@@ -149,12 +149,13 @@ impl JoinStage {
         // Time to deal with the left side of the equation
         let left_scalars = from_field.left_scalars();
 
-        // With the left side, we need to replace the `left_X` for the right field
         let mut let_vars = Document::new();
-        for (idx, left_field) in left_scalars.iter().enumerate() {
-            let left_name = format!("left_{}", idx);
 
-            let_vars.insert(left_name, format!("${}", left_field.db_name()));
+        // With the left side, we need to introduce the variable `left_x` pointing to the correct field
+        for (idx, left_field) in left_scalars.iter().enumerate() {
+            let left_var = format!("left_{}", idx);
+
+            let_vars.insert(left_var, format!("${}", left_field.db_name()));
         }
 
         // We can now generate the full $lookup query with all its parts
