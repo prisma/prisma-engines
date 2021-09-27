@@ -1,4 +1,4 @@
-use connector_interface::AggregationSelection;
+use connector_interface::{AggregationSelection, RelAggregationSelection};
 use datamodel::FieldArity;
 use prisma_models::{ModelProjection, PrismaValue, ScalarFieldRef, TypeIdentifier};
 use std::collections::HashMap;
@@ -25,11 +25,18 @@ impl OutputMeta {
     }
 }
 
-pub fn from_selected_fields(selected_fields: &ModelProjection) -> OutputMetaMapping {
+pub fn from_selected_fields(
+    selected_fields: &ModelProjection,
+    aggregation_selections: &[RelAggregationSelection],
+) -> OutputMetaMapping {
     let mut map = OutputMetaMapping::new();
 
     for field in selected_fields.scalar_fields() {
         map.insert(field.db_name().to_owned(), from_field(&field));
+    }
+
+    for selection in aggregation_selections {
+        map.insert(selection.db_alias(), from_rel_aggregation_selection(selection));
     }
 
     map
@@ -68,4 +75,16 @@ pub fn from_aggregation_selection(selection: &AggregationSelection) -> OutputMet
     }
 
     map
+}
+
+/// Mapping for one specific relation aggregation selection.
+/// DB alias -> OutputMeta
+pub fn from_rel_aggregation_selection(aggr_selection: &RelAggregationSelection) -> OutputMeta {
+    let (ident, arity) = aggr_selection.type_identifier_with_arity();
+
+    OutputMeta {
+        ident,
+        default: None,
+        list: matches!(arity, FieldArity::List),
+    }
 }
