@@ -41,7 +41,7 @@ pub async fn get_single_record<'conn>(
 // - [x] OrderBy scalar.
 // - [ ] OrderBy relation.
 // - [x] Skip, take
-// - [ ] Cursor
+// - [x] Cursor
 // - [x] Distinct select (inherently given from core).
 // - [x] Relation aggregation count
 pub async fn get_many_records<'conn>(
