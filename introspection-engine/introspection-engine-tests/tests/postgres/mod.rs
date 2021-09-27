@@ -85,7 +85,7 @@ async fn dbgenerated_type_casts_should_work_cockroach(api: &TestApi) -> TestResu
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(Cockroach))]
 async fn pg_xml_indexes_are_skipped(api: &TestApi) -> TestResult {
     let create_table = format!(
         "CREATE TABLE \"{schema_name}\".xml_test (id SERIAL PRIMARY KEY, data XML)",
