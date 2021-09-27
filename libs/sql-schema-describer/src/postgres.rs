@@ -233,7 +233,14 @@ impl<'a> SqlSchemaDescriber<'a> {
     ) -> DescriberResult<BTreeMap<String, Vec<Column>>> {
         let mut columns: BTreeMap<String, Vec<Column>> = BTreeMap::new();
 
-        let sql = r#"
+        let is_visible_clause = if self.is_cockroach() {
+            " AND info.is_hidden = 'NO'"
+        } else {
+            ""
+        };
+
+        let sql = format!(
+            r#"
             SELECT
                info.table_name,
                 info.column_name,
@@ -250,19 +257,21 @@ impl<'a> SqlSchemaDescriber<'a> {
                 info.data_type,
                 info.character_maximum_length
             FROM information_schema.columns info
-            JOIN pg_attribute  att on att.attname = info.column_name
-            And att.attrelid = (
+            JOIN pg_attribute att on att.attname = info.column_name
+            AND att.attrelid = (
             	SELECT pg_class.oid
             	FROM pg_class
             	JOIN pg_namespace on pg_namespace.oid = pg_class.relnamespace
             	WHERE relname = info.table_name
             	AND pg_namespace.nspname = $1
-            	)
-            WHERE table_schema = $1
+            )
+            WHERE table_schema = $1 {}
             ORDER BY ordinal_position;
-        "#;
+        "#,
+            is_visible_clause,
+        );
 
-        let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
+        let rows = self.conn.query_raw(sql.as_str(), &[schema.into()]).await?;
 
         for col in rows {
             trace!("Got column: {:?}", col);
