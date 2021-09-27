@@ -99,7 +99,10 @@ pub trait Connector: Send + Sync {
             }
         };
 
-        let mut url = url::Url::parse(url).unwrap();
+        let mut url = match url::Url::parse(url) {
+            Ok(url) => url,
+            Err(_) => return Cow::from(url), // bail
+        };
 
         let mut params: BTreeMap<String, String> =
             url.query_pairs().map(|(k, v)| (k.to_string(), v.to_string())).collect();
