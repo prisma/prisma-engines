@@ -1,4 +1,4 @@
-const prismaFmt = require("./js-target/prisma_fmt");
+const prismaFmt = require("./pkg/src/prisma_fmt");
 const fs = require("fs")
 
 const file = String(fs.readFileSync("schema.prisma"));

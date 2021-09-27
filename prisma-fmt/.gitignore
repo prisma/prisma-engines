@@ -1,2 +1,2 @@
-/wasm-target
-/js-target
+node_modules
+/pkg/src
