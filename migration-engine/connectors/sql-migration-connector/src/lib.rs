@@ -41,7 +41,7 @@ impl SqlMigrationConnector {
         shadow_database_connection_string: Option<String>,
     ) -> ConnectorResult<Self> {
         let connection = connect(connection_string).await?;
-        let flavour = flavour::from_connection_info(&connection.connection_info(), preview_features);
+        let flavour = flavour::from_connection_info(connection.connection_info(), preview_features);
 
         flavour.ensure_connection_validity(&connection).await?;
 

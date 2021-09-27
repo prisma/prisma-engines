@@ -113,7 +113,7 @@ impl Connection {
                     .describe(connection_info.schema_name())
                     .await
                     .map_err(|err| match err.into_kind() {
-                        DescriberErrorKind::QuaintError(err) => quaint_error_to_connector_error(err, &connection_info),
+                        DescriberErrorKind::QuaintError(err) => quaint_error_to_connector_error(err, connection_info),
                         e @ DescriberErrorKind::CrossSchemaReference { .. } => {
                             let err = KnownError::new(DatabaseSchemaInconsistent {
                                 explanation: format!("{}", e),
@@ -127,7 +127,7 @@ impl Connection {
                 .describe(connection_info.schema_name())
                 .await
                 .map_err(|err| match err.into_kind() {
-                    DescriberErrorKind::QuaintError(err) => quaint_error_to_connector_error(err, &connection_info),
+                    DescriberErrorKind::QuaintError(err) => quaint_error_to_connector_error(err, connection_info),
                     DescriberErrorKind::CrossSchemaReference { .. } => {
                         unreachable!("No schemas on MySQL")
                     }
@@ -136,7 +136,7 @@ impl Connection {
                 .describe(connection_info.schema_name())
                 .await
                 .map_err(|err| match err.into_kind() {
-                    DescriberErrorKind::QuaintError(err) => quaint_error_to_connector_error(err, &connection_info),
+                    DescriberErrorKind::QuaintError(err) => quaint_error_to_connector_error(err, connection_info),
                     e @ DescriberErrorKind::CrossSchemaReference { .. } => {
                         let err = KnownError::new(DatabaseSchemaInconsistent {
                             explanation: e.to_string(),
@@ -150,7 +150,7 @@ impl Connection {
                     .describe(connection_info.schema_name())
                     .await
                     .map_err(|err| match err.into_kind() {
-                        DescriberErrorKind::QuaintError(err) => quaint_error_to_connector_error(err, &connection_info),
+                        DescriberErrorKind::QuaintError(err) => quaint_error_to_connector_error(err, connection_info),
                         DescriberErrorKind::CrossSchemaReference { .. } => {
                             unreachable!("No schemas on SQLite")
                         }
@@ -163,28 +163,28 @@ impl Connection {
         self.queryable()
             .query(query.into())
             .await
-            .map_err(|quaint_error| sql_error(quaint_error, &self.connection_info()))
+            .map_err(|quaint_error| sql_error(quaint_error, self.connection_info()))
     }
 
     pub(crate) async fn query_raw(&self, sql: &str, params: &[quaint::Value<'_>]) -> SqlResult<ResultSet> {
         self.queryable()
             .query_raw(sql, params)
             .await
-            .map_err(|quaint_error| sql_error(quaint_error, &self.connection_info()))
+            .map_err(|quaint_error| sql_error(quaint_error, self.connection_info()))
     }
 
     pub(crate) async fn raw_cmd(&self, sql: &str) -> SqlResult<()> {
         self.queryable()
             .raw_cmd(sql)
             .await
-            .map_err(|quaint_error| sql_error(quaint_error, &self.connection_info()))
+            .map_err(|quaint_error| sql_error(quaint_error, self.connection_info()))
     }
 
     pub(crate) async fn version(&self) -> SqlResult<Option<String>> {
         self.queryable()
             .version()
             .await
-            .map_err(|quaint_error| sql_error(quaint_error, &self.connection_info()))
+            .map_err(|quaint_error| sql_error(quaint_error, self.connection_info()))
     }
 
     pub(crate) fn unwrap_postgres(&self) -> &(PostgreSql, PostgresUrl) {
