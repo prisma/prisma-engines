@@ -240,3 +240,29 @@ fn named_default_constraints_should_not_validate_name_clashes_on_fk() {
 
     assert!(datamodel::parse_schema(dml).is_ok());
 }
+
+#[test]
+fn string_literals_with_double_quotes_work() {
+    let schema = r#"
+        model Test {
+            id   String @id @default("abcd")
+            name String @default("ab\"c\"d")
+            name2 String @default("\"")
+        }
+    "#;
+
+    let (_, datamodel) = datamodel::parse_schema(schema).unwrap();
+    let test_model = datamodel.assert_has_model("Test");
+    test_model
+        .assert_has_scalar_field("id")
+        .assert_base_type(&ScalarType::String)
+        .assert_default_value(DefaultValue::new_single(PrismaValue::String(String::from("abcd"))));
+    test_model
+        .assert_has_scalar_field("name")
+        .assert_base_type(&ScalarType::String)
+        .assert_default_value(DefaultValue::new_single(PrismaValue::String(String::from("ab\"c\"d"))));
+    test_model
+        .assert_has_scalar_field("name2")
+        .assert_base_type(&ScalarType::String)
+        .assert_default_value(DefaultValue::new_single(PrismaValue::String(String::from("\""))));
+}
