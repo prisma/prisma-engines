@@ -53,7 +53,6 @@ impl<'ast> Relations<'ast> {
     /// Iterator over all the relations in a schema.
     ///
     /// (model_a_id, model_b_id, relation)
-    #[allow(dead_code)] // not used _yet_
     pub(crate) fn iter_relations(&self) -> impl Iterator<Item = (ast::ModelId, ast::ModelId, &Relation<'ast>)> + '_ {
         self.forward.iter().map(move |(model_a_id, model_b_id, relation_idx)| {
             (*model_a_id, *model_b_id, &self.relations_storage[*relation_idx])
@@ -61,7 +60,6 @@ impl<'ast> Relations<'ast> {
     }
 
     /// Iterator over (model_b_id, relation)
-    #[allow(dead_code)] // not used _yet_
     pub(crate) fn relations_from_model(
         &self,
         model_a_id: ast::ModelId,
