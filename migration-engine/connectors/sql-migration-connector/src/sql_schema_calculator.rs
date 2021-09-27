@@ -107,11 +107,6 @@ fn push_inline_relations(model: ModelWalker<'_>, table: &mut sql::Table, flavour
     for relation_field in relation_fields {
         let fk_columns: Vec<String> = relation_field.referencing_columns().map(String::from).collect();
 
-        // Optional unique index for 1:1 relations.
-        if relation_field.is_one_to_one() {
-            push_one_to_one_relation_unique_index(&fk_columns, table);
-        }
-
         // Foreign key
         {
             let fk = sql::ForeignKey {
@@ -126,34 +121,6 @@ fn push_inline_relations(model: ModelWalker<'_>, table: &mut sql::Table, flavour
             table.foreign_keys.push(fk);
         }
     }
-}
-
-fn push_one_to_one_relation_unique_index(column_names: &[String], table: &mut sql::Table) {
-    // Don't add a duplicate index.
-    if table
-        .indices
-        .iter()
-        .any(|index| index.columns == column_names && index.tpe.is_unique())
-    {
-        return;
-    }
-
-    // Don't add if there is a @@id or @id covering
-    if let Some(pk) = &table.primary_key {
-        if pk.columns == column_names {
-            return;
-        }
-    }
-
-    let columns_suffix = column_names.join("_");
-
-    let index = sql::Index {
-        name: format!("{}_{}_unique", table.name, columns_suffix),
-        columns: column_names.to_owned(),
-        tpe: sql::IndexType::Unique,
-    };
-
-    table.indices.push(index);
 }
 
 fn calculate_relation_tables<'a>(
