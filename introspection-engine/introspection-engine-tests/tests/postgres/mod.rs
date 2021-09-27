@@ -41,7 +41,7 @@ async fn sequences_should_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(Cockroach))]
 async fn dbgenerated_type_casts_should_work(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
@@ -54,6 +54,28 @@ async fn dbgenerated_type_casts_should_work(api: &TestApi) -> TestResult {
     let dm = indoc! {r#"
         model A {
           id String @id @default(dbgenerated("(now())::text")) @db.VarChar(30)
+        }
+    "#};
+
+    let result = api.introspect().await?;
+    api.assert_eq_datamodels(dm, &result);
+
+    Ok(())
+}
+
+#[test_connector(tags(Cockroach))]
+async fn dbgenerated_type_casts_should_work_cockroach(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(move |migration| {
+            migration.create_table("A", move |t| {
+                t.inject_custom("id VARCHAR(30) PRIMARY KEY DEFAULT (now())::text");
+            });
+        })
+        .await?;
+
+    let dm = indoc! {r#"
+        model A {
+          id String @id @default(dbgenerated("now():::TIMESTAMPTZ::STRING")) @db.VarChar(30)
         }
     "#};
 
