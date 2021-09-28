@@ -6,7 +6,7 @@ use crate::{
     orderby::OrderByBuilder,
     vacuum_cursor, BsonTransform, IntoBson,
 };
-use connector_interface::{AggregationSelection, Filter, QueryArguments};
+use connector_interface::{AggregationSelection, Filter, QueryArguments, RelAggregationSelection};
 use itertools::Itertools;
 use mongodb::{
     bson::{doc, Bson, Document},
@@ -395,6 +395,33 @@ impl MongoReadQueryBuilder {
     pub fn with_model_projection(mut self, selected_fields: ModelProjection) -> crate::Result<Self> {
         let projection = selected_fields.into_bson()?.into_document()?;
         self.projection = Some(projection);
+
+        Ok(self)
+    }
+
+    /// Adds the necessary joins and the associated selections to the projection
+    pub fn with_aggregation_selections(
+        mut self,
+        aggregation_selections: &[RelAggregationSelection],
+    ) -> crate::Result<Self> {
+        for aggr in aggregation_selections {
+            let join = match aggr {
+                RelAggregationSelection::Count(rf) => JoinStage {
+                    source: rf.clone(),
+                    alias: Some(aggr.db_alias()),
+                    nested: vec![],
+                },
+            };
+            let projection = doc! {
+              aggr.db_alias(): { "$size": format!("${}", aggr.db_alias()) }
+            };
+
+            self.joins.push(join);
+            self.projection = self.projection.map_or(Some(projection.clone()), |mut p| {
+                p.extend(projection);
+                Some(p)
+            });
+        }
 
         Ok(self)
     }

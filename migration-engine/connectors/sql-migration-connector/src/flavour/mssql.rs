@@ -65,7 +65,7 @@ impl MssqlFlavour {
             let shadow_conninfo = conn.connection_info();
             let main_conninfo = main_connection.connection_info();
 
-            super::validate_connection_infos_do_not_match((&shadow_conninfo, &main_conninfo))?;
+            super::validate_connection_infos_do_not_match((shadow_conninfo, main_conninfo))?;
 
             if self.reset(&conn).await.is_err() {
                 connector.best_effort_reset(&conn).await?;
@@ -210,7 +210,7 @@ impl SqlFlavour for MssqlFlavour {
     }
 
     async fn reset(&self, connection: &Connection) -> ConnectorResult<()> {
-        let schema_name = connection.schema_name();
+        let schema_name = connection.connection_info().schema_name();
 
         let drop_procedures = format!(
             r#"

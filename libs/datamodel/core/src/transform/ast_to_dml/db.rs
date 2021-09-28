@@ -15,6 +15,7 @@ use self::{
     context::Context,
     relations::Relations,
     types::{RelationField, Types},
+    walkers::ExplicitRelationWalker,
 };
 use crate::PreviewFeature;
 use crate::{ast, diagnostics::Diagnostics, Datasource};
@@ -105,6 +106,7 @@ impl<'ast> ParserDatabase<'ast> {
 
         // Fifth step: relation inference
         relations::infer_relations(&mut ctx);
+        relations::validate_relations(&mut ctx);
 
         ctx.finish()
     }
@@ -164,5 +166,22 @@ impl<'ast> ParserDatabase<'ast> {
             .scalar_fields
             .range((model_id, ast::FieldId::ZERO)..=(model_id, ast::FieldId::MAX))
             .map(|((_, field_id), scalar_type)| (*field_id, scalar_type))
+    }
+
+    /// Iterate all complete relations that are not many to many.
+    pub(crate) fn walk_explicit_relations(&self) -> impl Iterator<Item = ExplicitRelationWalker<'ast, '_>> + '_ {
+        self.relations
+            .iter_relations()
+            .filter(|(_, _, relation)| !relation.is_many_to_many())
+            .filter_map(move |(model_a, model_b, relation)| {
+                relation
+                    .as_complete_fields()
+                    .map(|(field_a, field_b)| ExplicitRelationWalker {
+                        side_a: (model_a, field_a),
+                        side_b: (model_b, field_b),
+                        db: self,
+                        relation,
+                    })
+            })
     }
 }

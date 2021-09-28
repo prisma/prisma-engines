@@ -434,3 +434,23 @@ fn implicit_unique_constraint_on_compound_one_to_one() {
         defined_on_field: false,
     });
 }
+
+#[test]
+fn one_to_one_optional() {
+    let dml = r#"
+        model A {
+          id Int @id
+          b  B?
+        }
+
+        model B {
+          id   Int @id
+          a_id Int?
+          a    A? @relation(fields: [a_id], references: [id])
+        }
+    "#;
+
+    let schema = parse(&dml);
+    schema.assert_has_model("A").assert_has_relation_field("b");
+    schema.assert_has_model("B").assert_has_relation_field("a");
+}

@@ -80,8 +80,12 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
     }
 }
 
-static PG_RE_NUM: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?(-?\d+)('::.*)?$").expect("compile regex"));
-static PG_RE_FLOAT: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?([^']+)('::.*)?$").expect("compile regex"));
+// Examples (postgres): 1, 1::INT, '1'::INT, -1::INT, '-1'::INT
+// Examples (cockroach): 1:::INT, '1':::INT, (-1):::INT, ('-1'):::INT
+static PG_RE_NUM: Lazy<Regex> = Lazy::new(|| Regex::new(r"^\(?'?(-?\d+)'?\)?(:{2,3}.*)?$").expect("compile regex"));
+// Examples (postgres): 5.3, 5.3::FLOAT, -5.3, '-5.3'::FLOAT
+// Examples (cockroach): 5.3:::FLOAT8, (-5.3):::FLOAT8
+static PG_RE_FLOAT: Lazy<Regex> = Lazy::new(|| Regex::new(r"^\(?'?([^:')]+)'?\)?(:{2,3}.*)?$").expect("compile regex"));
 
 impl Parser for SqlSchemaDescriber<'_> {
     fn re_num() -> &'static Regex {
@@ -722,7 +726,10 @@ impl<'a> SqlSchemaDescriber<'a> {
                         },
                         ColumnTypeFamily::DateTime => {
                             match default_string.to_lowercase().as_str() {
-                                "now()" | "current_timestamp" => DefaultValue::now(),
+                                "now()"
+                                | "current_timestamp"
+                                | "current_timestamp():::timestamp"
+                                | "current_timestamp():::timestamptz" => DefaultValue::now(),
                                 _ => DefaultValue::db_generated(default_string), //todo parse values
                             }
                         }
@@ -840,7 +847,7 @@ fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
 static RE_SEQ: Lazy<Regex> = Lazy::new(|| Regex::new("^(?:.+\\.)?\"?([^.\"]+)\"?").expect("compile regex"));
 
 static AUTOINCREMENT_REGEX: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r#"nextval\((\(?)'((.+)\.)?(("(?P<sequence>.+)")|(?P<sequence2>.+))'(::text\))?::regclass\)"#)
+    Regex::new(r#"nextval\((\(?)'((.+)\.)?(("(?P<sequence>.+)")|(?P<sequence2>.+))'(::text\))?::(regclass|REGCLASS)\)"#)
         .expect("compile autoincrement regex")
 });
 
@@ -876,7 +883,7 @@ fn fetch_dbgenerated(value: &str) -> Option<String> {
 fn unsuffix_default_literal<'a, T: AsRef<str>>(literal: &'a str, expected_suffixes: &[T]) -> Option<Cow<'a, str>> {
     // Tries to match expressions of the form <expr> or <expr>::<type> or <expr>:::<type>.
     static POSTGRES_DATA_TYPE_SUFFIX_RE: Lazy<Regex> =
-        Lazy::new(|| Regex::new(r#"(?ms)^(.*?):{2,3}(\\")?(.*)(\\")?$"#).unwrap());
+        Lazy::new(|| Regex::new(r#"(?ms)^\(?(.*?)\)?:{2,3}(\\")?(.*)(\\")?$"#).unwrap());
 
     let captures = POSTGRES_DATA_TYPE_SUFFIX_RE.captures(literal)?;
     let suffix = captures.get(3).unwrap().as_str();

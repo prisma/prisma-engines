@@ -48,7 +48,7 @@ impl<'a> LiftAstToDml<'a> {
         });
 
         model.indices = model_attributes
-            .walk_indexes()
+            .indexes()
             .map(|idx| dml::IndexDefinition {
                 name: idx.attribute().name.map(String::from),
                 db_name: Some(idx.final_database_name().into_owned()),
@@ -90,7 +90,7 @@ impl<'a> LiftAstToDml<'a> {
             model.add_field(dml::Field::ScalarField(field));
         }
 
-        for relation_field in model_attributes.walk_relation_fields() {
+        for relation_field in model_attributes.relation_fields() {
             let ast_field = relation_field.ast_field();
             let arity = self.lift_field_arity(&ast_field.arity);
             let attributes = relation_field.attributes();
