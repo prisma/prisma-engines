@@ -27,6 +27,7 @@ impl TestResult {
     #[track_caller]
     #[allow(dead_code)] // clippy is wrong
     pub fn assert_warning(&self, warning: &str) {
+        dbg!(&self.warnings);
         assert!(self.warnings.iter().any(|w| w.message == warning))
     }
 }

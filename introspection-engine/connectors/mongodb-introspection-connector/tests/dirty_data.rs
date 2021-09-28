@@ -48,6 +48,8 @@ fn mixing_types() {
     "#]];
 
     expected.assert_eq(res.datamodel());
+
+    res.assert_warning("The following fields had data stored in multiple types. The most common type was chosen. If loading data with a type that does not match the one in the data model, the client will crash.");
 }
 
 #[test]

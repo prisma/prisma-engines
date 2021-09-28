@@ -20,7 +20,7 @@ use super::field_type::FieldType;
 pub(super) struct Statistics {
     fields: BTreeMap<(String, String), FieldSampler>,
     documents: HashMap<String, usize>,
-    indexes: BTreeMap<String, Vec<IndexModel>>,
+    indices: BTreeMap<String, Vec<IndexModel>>,
 }
 
 impl Statistics {
@@ -45,13 +45,15 @@ impl Statistics {
     }
 
     pub(super) fn track_index(&mut self, model_name: &str, index: IndexModel) {
-        let indexes = self.indexes.entry(model_name.to_string()).or_default();
+        let indexes = self.indices.entry(model_name.to_string()).or_default();
         indexes.push(index);
     }
 
     pub(super) fn into_datamodel(self, warnings: &mut Vec<Warning>) -> Datamodel {
         let mut data_model = Datamodel::new();
-        let mut indices = self.indexes;
+        let mut indices = self.indices;
+        let mut unsupported = Vec::new();
+        let mut undecided_types = Vec::new();
 
         let mut models: BTreeMap<String, Model> = self
             .documents
@@ -75,6 +77,14 @@ impl Statistics {
 
             let percentages = sampler.percentages();
             let field_type = percentages.find_most_common().unwrap().to_owned();
+
+            if let FieldType::Unsupported(r#type) = field_type {
+                unsupported.push((model_name.to_string(), field_name.to_string(), r#type));
+            }
+
+            if percentages.data.len() > 1 {
+                undecided_types.push((model_name.to_string(), field_name.to_string(), field_type.to_string()));
+            }
 
             let arity = if field_type.is_array() {
                 datamodel::FieldArity::List
@@ -106,6 +116,14 @@ impl Statistics {
 
         for (_, model) in models.into_iter() {
             data_model.add_model(model);
+        }
+
+        if !unsupported.is_empty() {
+            warnings.push(crate::warnings::unsupported_type(&unsupported));
+        }
+
+        if !undecided_types.is_empty() {
+            warnings.push(crate::warnings::undecided_field_type(&undecided_types));
         }
 
         data_model
