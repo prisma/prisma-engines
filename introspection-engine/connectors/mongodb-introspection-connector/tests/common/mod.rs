@@ -1,5 +1,5 @@
-use datamodel::{common::preview_features::PreviewFeature, Configuration};
-use introspection_connector::{IntrospectionConnector, IntrospectionContext, IntrospectionResult};
+use datamodel::common::preview_features::PreviewFeature;
+use introspection_connector::{IntrospectionConnector, IntrospectionContext};
 use mongodb::{Client, Database};
 use mongodb_introspection_connector::MongoDbIntrospectionConnector;
 use names::Generator;
@@ -14,13 +14,12 @@ static CONN_STR: Lazy<String> = Lazy::new(|| {
 static RT: Lazy<Runtime> = Lazy::new(|| Runtime::new().unwrap());
 
 pub(super) struct TestResult {
-    result: IntrospectionResult,
-    config: Configuration,
+    datamodel: String,
 }
 
 impl TestResult {
-    pub(super) fn datamodel(&self) -> String {
-        datamodel::render_datamodel_to_string(&self.result.data_model, Some(&self.config))
+    pub(super) fn datamodel(&self) -> &str {
+        &self.datamodel
     }
 }
 
@@ -69,9 +68,11 @@ where
         let res = connector.introspect(&datamodel.subject, ctx).await;
         database.drop(None).await.unwrap();
 
+        let res = res.unwrap();
+        let config = datamodel::parse_configuration(&datamodel_string).unwrap().subject;
+
         TestResult {
-            result: res.unwrap(),
-            config: datamodel::parse_configuration(&datamodel_string).unwrap().subject,
+            datamodel: datamodel::render_datamodel_to_string(&res.data_model, Some(&config)),
         }
     })
 }

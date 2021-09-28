@@ -96,7 +96,7 @@ impl From<FieldType> for datamodel::FieldType {
                 Some(NativeTypeInstance::new("Date", Vec::new(), &MongoDbType::Date)),
             ),
             FieldType::Int32 => datamodel::FieldType::Scalar(ScalarType::Int, None, None),
-            FieldType::Timestamp => datamodel::FieldType::Scalar(ScalarType::Int, None, None),
+            FieldType::Timestamp => datamodel::FieldType::Scalar(ScalarType::DateTime, None, None),
             FieldType::Int64 => datamodel::FieldType::Scalar(ScalarType::BigInt, None, None),
             FieldType::Decimal => datamodel::FieldType::Scalar(ScalarType::Decimal, None, None),
             FieldType::Json => datamodel::FieldType::Scalar(ScalarType::Json, None, None),

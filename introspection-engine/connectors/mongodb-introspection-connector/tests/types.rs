@@ -1,29 +1,384 @@
 mod common;
 
-use bson::doc;
+use bson::{doc, oid::ObjectId, Binary, Bson, DateTime, Decimal128, Timestamp};
 use common::*;
 use expect_test::expect;
 
 #[test]
-fn smoke() {
+fn string() {
     let res = introspect(|db| async move {
         db.create_collection("A", None).await?;
         let collection = db.collection("A");
 
-        let document = doc! {"name": "Musti", "age": 9};
+        let docs = vec![
+            doc! {"first": "Musti", "second": "Naukio", "third": "MeowMeow"},
+            doc! {"first": "MeowMeow", "second": null, "third": "Lol"},
+            doc! {"first": "Lol", "second": "Bar"},
+        ];
 
-        collection.insert_one(document, None).await?;
+        collection.insert_many(docs, None).await.unwrap();
 
         Ok(())
     });
 
     let expected = expect![[r#"
         model A {
-          id   String @id @default(dbgenerated()) @map("_id") @db.ObjectId
-          age  Int
-          name String
+          id     String  @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          first  String
+          second String?
+          third  String?
         }
     "#]];
 
-    expected.assert_eq(&res.datamodel());
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
+fn double() {
+    let res = introspect(|db| async move {
+        db.create_collection("A", None).await?;
+        let collection = db.collection("A");
+
+        let docs = vec![
+            doc! {"first": Bson::Double(1.23), "second": Bson::Double(2.23), "third": Bson::Double(3.33)},
+            doc! {"first": Bson::Double(1.23), "second": null, "third": Bson::Double(3.33)},
+            doc! {"first": Bson::Double(1.23), "second": Bson::Double(2.23)},
+        ];
+
+        collection.insert_many(docs, None).await.unwrap();
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          id     String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          first  Float
+          second Float?
+          third  Float?
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
+fn json() {
+    let res = introspect(|db| async move {
+        db.create_collection("A", None).await?;
+        let collection = db.collection("A");
+
+        let docs = vec![
+            doc! {"first": {"foo": 1}, "second": {"foo": 1}, "third": {"foo": 1}},
+            doc! {"first": {"foo": 1}, "second": null, "third": {"foo": 1}},
+            doc! {"first": {"foo": 1}, "second": {"foo": 1}},
+        ];
+
+        collection.insert_many(docs, None).await.unwrap();
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          id     String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          first  Json
+          second Json?
+          third  Json?
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
+fn bool() {
+    let res = introspect(|db| async move {
+        db.create_collection("A", None).await?;
+        let collection = db.collection("A");
+
+        let docs = vec![
+            doc! {"first": true, "second": false, "third": false},
+            doc! {"first": true, "second": null, "third": true},
+            doc! {"first": true, "second": false},
+        ];
+
+        collection.insert_many(docs, None).await.unwrap();
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          id     String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          first  Boolean
+          second Boolean?
+          third  Boolean?
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
+fn int() {
+    let res = introspect(|db| async move {
+        db.create_collection("A", None).await?;
+        let collection = db.collection("A");
+
+        let docs = vec![
+            doc! {"first": Bson::Int32(1), "second": Bson::Int32(1), "third": Bson::Int32(1)},
+            doc! {"first": Bson::Int32(1), "second": null, "third": Bson::Int32(1)},
+            doc! {"first": Bson::Int32(1), "second": Bson::Int32(1)},
+        ];
+
+        collection.insert_many(docs, None).await.unwrap();
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          id     String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          first  Int
+          second Int?
+          third  Int?
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
+fn bigint() {
+    let res = introspect(|db| async move {
+        db.create_collection("A", None).await?;
+        let collection = db.collection("A");
+
+        let docs = vec![
+            doc! {"first": Bson::Int64(1), "second": Bson::Int64(1), "third": Bson::Int64(1)},
+            doc! {"first": Bson::Int64(1), "second": null, "third": Bson::Int64(1)},
+            doc! {"first": Bson::Int64(1), "second": Bson::Int64(1)},
+        ];
+
+        collection.insert_many(docs, None).await.unwrap();
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          id     String  @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          first  BigInt
+          second BigInt?
+          third  BigInt?
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
+fn timestamp() {
+    let res = introspect(|db| async move {
+        db.create_collection("A", None).await?;
+        let collection = db.collection("A");
+
+        let docs = vec![
+            doc! {
+                "first": Bson::Timestamp(Timestamp { time: 1234, increment: 1 }),
+                "second": Bson::Timestamp(Timestamp { time: 1234, increment: 1 }),
+                "third": Bson::Timestamp(Timestamp { time: 1234, increment: 1 })
+            },
+            doc! {
+                "first": Bson::Timestamp(Timestamp { time: 1234, increment: 1}),
+                "second": null,
+                "third": Bson::Timestamp(Timestamp { time: 1234, increment: 1}),
+            },
+            doc! {
+                "first": Bson::Timestamp(Timestamp { time: 1234, increment: 1}),
+                "second": Bson::Timestamp(Timestamp { time: 1234, increment: 1 }),
+            },
+        ];
+
+        collection.insert_many(docs, None).await.unwrap();
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          id     String    @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          first  DateTime
+          second DateTime?
+          third  DateTime?
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
+fn binary() {
+    let res = introspect(|db| async move {
+        db.create_collection("A", None).await?;
+        let collection = db.collection("A");
+
+        let bin = Binary {
+            bytes: b"deadbeef".to_vec(),
+            subtype: bson::spec::BinarySubtype::Generic,
+        };
+
+        let docs = vec![
+            doc! {
+                "first": bin.clone(),
+                "second": bin.clone(),
+                "third": bin.clone(),
+            },
+            doc! {
+                "first": bin.clone(),
+                "second": null,
+                "third": bin.clone(),
+            },
+            doc! {
+                "first": bin.clone(),
+                "second": bin.clone(),
+            },
+        ];
+
+        collection.insert_many(docs, None).await.unwrap();
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          id     String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          first  Bytes
+          second Bytes?
+          third  Bytes?
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
+fn object_id() {
+    let res = introspect(|db| async move {
+        db.create_collection("A", None).await?;
+        let collection = db.collection("A");
+
+        let docs = vec![
+            doc! {
+                "first": ObjectId::new(),
+                "second": ObjectId::new(),
+                "third": ObjectId::new(),
+            },
+            doc! {
+                "first": ObjectId::new(),
+                "second": null,
+                "third": ObjectId::new(),
+            },
+            doc! {
+                "first": ObjectId::new(),
+                "second": ObjectId::new(),
+            },
+        ];
+
+        collection.insert_many(docs, None).await.unwrap();
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          id     String  @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          first  String  @db.ObjectId
+          second String? @db.ObjectId
+          third  String? @db.ObjectId
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
+fn date() {
+    let res = introspect(|db| async move {
+        db.create_collection("A", None).await?;
+        let collection = db.collection("A");
+
+        let docs = vec![
+            doc! {
+                "first": Bson::DateTime(DateTime::now()),
+                "second": Bson::DateTime(DateTime::now()),
+                "third": Bson::DateTime(DateTime::now()),
+            },
+            doc! {
+                "first": Bson::DateTime(DateTime::now()),
+                "second": null,
+                "third": Bson::DateTime(DateTime::now()),
+            },
+            doc! {
+                "first": Bson::DateTime(DateTime::now()),
+                "second": Bson::DateTime(DateTime::now()),
+            },
+        ];
+
+        collection.insert_many(docs, None).await.unwrap();
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          id     String    @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          first  DateTime  @db.Date
+          second DateTime? @db.Date
+          third  DateTime? @db.Date
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
+fn decimal() {
+    let res = introspect(|db| async move {
+        db.create_collection("A", None).await?;
+        let collection = db.collection("A");
+
+        let docs = vec![
+            doc! {
+                "first": Bson::Decimal128(Decimal128::from_bytes([0u8; 16])),
+                "second": Bson::Decimal128(Decimal128::from_bytes([0u8; 16])),
+                "third": Bson::Decimal128(Decimal128::from_bytes([0u8; 16])),
+            },
+            doc! {
+                "first": Bson::Decimal128(Decimal128::from_bytes([0u8; 16])),
+                "second": null,
+                "third": Bson::Decimal128(Decimal128::from_bytes([0u8; 16])),
+            },
+            doc! {
+                "first": Bson::Decimal128(Decimal128::from_bytes([0u8; 16])),
+                "second": Bson::Decimal128(Decimal128::from_bytes([0u8; 16])),
+            },
+        ];
+
+        collection.insert_many(docs, None).await.unwrap();
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          id     String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          first  Decimal
+          second Decimal?
+          third  Decimal?
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
 }
