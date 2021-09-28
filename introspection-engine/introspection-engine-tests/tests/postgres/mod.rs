@@ -16,7 +16,7 @@ async fn sequences_should_work(api: &TestApi) -> TestResult {
                 t.inject_custom("serial  Serial");
                 t.inject_custom("first   BigInt Not Null Default nextval('\"first_Sequence\"'::regclass)");
                 t.inject_custom("second  BigInt Default nextval('\"second_sequence\"')");
-                t.inject_custom("third  BigInt Not Null Default nextval('third_Sequence'::text)");
+                t.inject_custom("third  BigInt Not Null Default nextval('\"third_Sequence\"'::text)");
             });
         })
         .await?;
