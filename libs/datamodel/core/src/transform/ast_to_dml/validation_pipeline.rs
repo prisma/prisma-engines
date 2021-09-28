@@ -65,7 +65,7 @@ impl<'a, 'b> ValidationPipeline<'a> {
         diagnostics.to_result()?;
 
         // Phase 5: Consistency fixes. These don't fail and always run, during parsing AND formatting
-        standardise_parsing::standardise(&mut schema);
+        standardise_parsing::standardise(&mut schema, self.source);
 
         // Transform phase: These only run during formatting.
         if relation_transformation_enabled {
@@ -79,6 +79,7 @@ impl<'a, 'b> ValidationPipeline<'a> {
         // Phase 6: Post Standardisation Validation
         self.validator
             .post_standardisation_validate(ast_schema, &schema, &mut diagnostics);
+        //-> add all duplicate constraint name validations here
 
         diagnostics.to_result()?;
 

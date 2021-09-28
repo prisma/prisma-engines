@@ -1,13 +1,74 @@
 use super::common::*;
-use crate::{common::RelationNames, dml, Field};
+use crate::common::constraint_names::ConstraintNames;
+use crate::{common::RelationNames, dml, Datasource, Field, WithDatabaseName};
 
 /// Helper for standardising a datamodel during parsing.
 ///
 /// This will add relation names, referential actions and M2M references contents
-pub fn standardise(schema: &mut dml::Datamodel) {
+pub fn standardise(schema: &mut dml::Datamodel, source: Option<&Datasource>) {
     name_unnamed_relations(schema);
     set_relation_to_field_to_id_if_missing_for_m2m_relations(schema);
     set_referential_arities(schema);
+    add_implicit_unique_constraints_for_1_to_1_relations(schema, source);
+}
+
+fn add_implicit_unique_constraints_for_1_to_1_relations(schema: &mut dml::Datamodel, source: Option<&Datasource>) {
+    let mut modifications = Vec::new();
+
+    for (model_id, model) in schema.models().enumerate() {
+        for field in model.fields() {
+            match field {
+                Field::RelationField(field) if field.is_singular() && !field.relation_info.fields.is_empty() => {
+                    if let Some(src) = source {
+                        let related_field_is_singular =
+                            matches!(schema.find_related_field(field), Some(rf) if rf.1.is_singular());
+
+                        let covered_by_index = model
+                            .indices
+                            .iter()
+                            .any(|index| index.fields == field.relation_info.fields && index.is_unique());
+
+                        let covered_by_pk =
+                            matches!( &model.primary_key, Some(pk) if pk.fields == field.relation_info.fields);
+
+                        if related_field_is_singular && !covered_by_pk && !covered_by_index {
+                            let column_names: Vec<&str> = field
+                                .relation_info
+                                .fields
+                                .iter()
+                                .map(|field_name| {
+                                    schema.models[model_id]
+                                        .find_field(field_name)
+                                        .unwrap()
+                                        .final_database_name()
+                                })
+                                .collect();
+
+                            let index = dml::IndexDefinition {
+                                name: None,
+                                db_name: Some(ConstraintNames::unique_index_name(
+                                    model.final_database_name(),
+                                    &column_names,
+                                    src.active_connector.as_ref(),
+                                )),
+                                fields: field.relation_info.fields.clone(),
+                                tpe: dml::IndexType::Unique,
+                                defined_on_field: field.relation_info.fields.len() == 1,
+                            };
+
+                            modifications.push((model_id, index));
+                        }
+                    }
+                }
+
+                _ => (),
+            }
+        }
+    }
+
+    for (model_id, index) in modifications {
+        schema.models[model_id].indices.push(index);
+    }
 }
 
 fn set_referential_arities(schema: &mut dml::Datamodel) {

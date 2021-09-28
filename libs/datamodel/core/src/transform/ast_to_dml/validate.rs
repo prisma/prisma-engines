@@ -121,7 +121,7 @@ impl<'a> Validator<'a> {
                 }
             }
 
-            // TODO: Extend this check for other constraints. Now only used
+            //TODO(matthias): Extend this check for other constraints. Now only used
             // for SQL Server default constraint names.
             for field in model.fields().filter(|f| f.is_scalar_field()) {
                 if let Some(name) = field.default_value().and_then(|d| d.db_name()) {
