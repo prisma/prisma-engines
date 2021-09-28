@@ -225,6 +225,17 @@ services:
     networks:
       - databases
 
+  mongo4-single:
+    image: mongo:4
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: "prisma"
+      MONGO_INITDB_ROOT_PASSWORD: "prisma"
+    ports:
+      - "27017:27017"
+    networks:
+      - databases
+
   mongo-express:
     image: mongo-express
     restart: always

@@ -14,7 +14,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: "Start MongoDB"
-        run: make start-mongodb
+        run: make start-mongodb-single
 
       - uses: actions-rs/toolchain@v1
         with:

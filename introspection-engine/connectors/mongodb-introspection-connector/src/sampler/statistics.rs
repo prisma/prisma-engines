@@ -2,13 +2,15 @@ use std::{
     cmp::Ordering,
     collections::{BTreeMap, HashMap},
     fmt,
+    ops::Deref,
 };
 
 use bson::Document;
 use datamodel::{
-    Datamodel, DefaultValue, Field, Model, NativeTypeInstance, PrimaryKeyDefinition, ScalarField, ScalarType,
-    ValueGenerator,
+    Datamodel, DefaultValue, Field, IndexDefinition, IndexType, Model, NativeTypeInstance, PrimaryKeyDefinition,
+    ScalarField, ScalarType, ValueGenerator,
 };
+use mongodb::IndexModel;
 use native_types::MongoDbType;
 
 use super::field_type::FieldType;
@@ -17,10 +19,11 @@ use super::field_type::FieldType;
 pub(super) struct Statistics {
     fields: BTreeMap<(String, String), FieldSampler>,
     documents: HashMap<String, usize>,
+    indexes: BTreeMap<String, Vec<IndexModel>>,
 }
 
 impl Statistics {
-    pub(super) fn track(&mut self, model: &str, document: Document) {
+    pub(super) fn track_document_types(&mut self, model: &str, document: Document) {
         let doc_count = self.documents.entry(model.to_string()).or_default();
         *doc_count += 1;
 
@@ -38,6 +41,11 @@ impl Statistics {
                 }
             }
         }
+    }
+
+    pub(super) fn track_index(&mut self, model: &str, index: IndexModel) {
+        let indexes = self.indexes.entry(model.to_string()).or_default();
+        indexes.push(index);
     }
 }
 
@@ -99,6 +107,7 @@ impl From<Statistics> for Datamodel {
     fn from(stats: Statistics) -> Self {
         let mut data_model = Datamodel::new();
         let mut models: BTreeMap<String, Model> = BTreeMap::new();
+        let mut indices = stats.indexes;
 
         for ((model_name, field_name), sampler) in stats.fields.into_iter() {
             let doc_count = *stats.documents.get(&model_name).unwrap_or(&0);
@@ -131,12 +140,41 @@ impl From<Statistics> for Datamodel {
                     is_ignored: false,
                 });
 
-                Model {
-                    name: model_name,
+                let mut model = Model {
+                    name: model_name.clone(),
                     primary_key: Some(primary_key),
                     fields: vec![primary_key_field],
                     ..Default::default()
+                };
+
+                for index in indices.remove(&model_name).into_iter().flat_map(|i| i.into_iter()) {
+                    let defined_on_field = index.keys.len() == 1;
+
+                    if matches!(index.keys.keys().next().map(Deref::deref), Some("_id")) {
+                        continue;
+                    }
+
+                    let tpe = index
+                        .options
+                        .as_ref()
+                        .and_then(|opts| opts.unique)
+                        .map(|uniq| if uniq { IndexType::Unique } else { IndexType::Normal })
+                        .unwrap_or(IndexType::Normal);
+
+                    let db_name = index.options.and_then(|opts| opts.name);
+
+                    let definition = IndexDefinition {
+                        fields: index.keys.into_iter().map(|(k, _)| k).collect(),
+                        tpe,
+                        defined_on_field,
+                        name: None,
+                        db_name,
+                    };
+
+                    model.add_index(definition);
                 }
+
+                model
             });
 
             if field_name == "_id" {

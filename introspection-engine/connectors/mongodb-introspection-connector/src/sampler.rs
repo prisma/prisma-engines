@@ -17,12 +17,18 @@ pub(super) async fn sample(database: Database) -> crate::Result<IntrospectionRes
     for collection_name in collections {
         let collection = database.collection::<Document>(&collection_name);
 
-        let mut cursor = collection
+        let mut documents = collection
             .aggregate(vec![doc! { "$sample": { "size": 10000 } }], None)
             .await?;
 
-        while let Some(document) = cursor.try_next().await? {
-            statistics.track(&collection_name, document);
+        while let Some(document) = documents.try_next().await? {
+            statistics.track_document_types(&collection_name, document);
+        }
+
+        let mut indices = collection.list_indexes(None).await?;
+
+        while let Some(index) = indices.try_next().await? {
+            statistics.track_index(&collection_name, index);
         }
     }
 
