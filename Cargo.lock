@@ -2372,6 +2372,7 @@ dependencies = [
  "names",
  "native-types",
  "once_cell",
+ "serde_json",
  "thiserror",
  "tokio",
  "url",

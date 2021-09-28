@@ -8,8 +8,9 @@ use std::{
 use bson::Document;
 use datamodel::{
     Datamodel, DefaultValue, Field, IndexDefinition, IndexType, Model, NativeTypeInstance, PrimaryKeyDefinition,
-    ScalarField, ScalarType, ValueGenerator,
+    ScalarField, ScalarType, ValueGenerator, WithDatabaseName,
 };
+use introspection_connector::Warning;
 use mongodb::IndexModel;
 use native_types::MongoDbType;
 
@@ -43,9 +44,71 @@ impl Statistics {
         }
     }
 
-    pub(super) fn track_index(&mut self, model: &str, index: IndexModel) {
-        let indexes = self.indexes.entry(model.to_string()).or_default();
+    pub(super) fn track_index(&mut self, model_name: &str, index: IndexModel) {
+        let indexes = self.indexes.entry(model_name.to_string()).or_default();
         indexes.push(index);
+    }
+
+    pub(super) fn into_datamodel(self, warnings: &mut Vec<Warning>) -> Datamodel {
+        let mut data_model = Datamodel::new();
+        let mut indices = self.indexes;
+
+        let mut models: BTreeMap<String, Model> = self
+            .documents
+            .iter()
+            .map(|(model_name, _)| (model_name.to_string(), new_model(model_name, &mut indices)))
+            .collect();
+
+        for ((model_name, field_name), sampler) in self.fields.into_iter() {
+            let doc_count = *self.documents.get(&model_name).unwrap_or(&0);
+            let field_count = sampler.counter;
+
+            let model = models.get_mut(&model_name).unwrap();
+
+            if field_name == "_id" {
+                continue;
+            }
+
+            if field_name == "id" {
+                warnings.push(crate::warnings::explicit_id_column(&model_name));
+            }
+
+            let percentages = sampler.percentages();
+            let field_type = percentages.find_most_common().unwrap().to_owned();
+
+            let arity = if field_type.is_array() {
+                datamodel::FieldArity::List
+            } else if doc_count > field_count || sampler.nullable {
+                datamodel::FieldArity::Optional
+            } else {
+                datamodel::FieldArity::Required
+            };
+
+            let documentation = if percentages.has_type_variety() {
+                Some(format!("{}", percentages))
+            } else {
+                None
+            };
+
+            model.fields.push(Field::ScalarField(ScalarField {
+                name: field_name,
+                field_type: field_type.into(),
+                arity,
+                database_name: None,
+                default_value: None,
+                documentation,
+                is_generated: false,
+                is_updated_at: false,
+                is_commented_out: false,
+                is_ignored: false,
+            }))
+        }
+
+        for (_, model) in models.into_iter() {
+            data_model.add_model(model);
+        }
+
+        data_model
     }
 }
 
@@ -103,119 +166,64 @@ impl FieldPercentages {
     }
 }
 
-impl From<Statistics> for Datamodel {
-    fn from(stats: Statistics) -> Self {
-        let mut data_model = Datamodel::new();
-        let mut models: BTreeMap<String, Model> = BTreeMap::new();
-        let mut indices = stats.indexes;
+fn new_model(model_name: &str, indices: &mut BTreeMap<String, Vec<IndexModel>>) -> Model {
+    let primary_key = PrimaryKeyDefinition {
+        name: None,
+        db_name: None,
+        fields: vec!["id".to_string()],
+        defined_on_field: true,
+    };
 
-        for ((model_name, field_name), sampler) in stats.fields.into_iter() {
-            let doc_count = *stats.documents.get(&model_name).unwrap_or(&0);
-            let field_count = sampler.counter;
+    let field_type = datamodel::FieldType::Scalar(
+        ScalarType::String,
+        None,
+        Some(NativeTypeInstance::new("ObjectId", Vec::new(), &MongoDbType::ObjectId)),
+    );
 
-            let model = models.entry(model_name.clone()).or_insert_with(|| {
-                let primary_key = PrimaryKeyDefinition {
-                    name: None,
-                    db_name: None,
-                    fields: vec!["id".to_string()],
-                    defined_on_field: true,
-                };
+    let primary_key_field = Field::ScalarField({
+        let mut sf = ScalarField::new("id", datamodel::FieldArity::Required, field_type);
 
-                let primary_key_field = Field::ScalarField(ScalarField {
-                    name: "id".to_string(),
-                    field_type: datamodel::FieldType::Scalar(
-                        ScalarType::String,
-                        None,
-                        Some(NativeTypeInstance::new("ObjectId", Vec::new(), &MongoDbType::ObjectId)),
-                    ),
-                    arity: datamodel::FieldArity::Required,
-                    database_name: Some("_id".to_string()),
-                    default_value: Some(DefaultValue::new_expression(
-                        ValueGenerator::new("dbgenerated".to_owned(), Vec::new()).unwrap(),
-                    )),
-                    documentation: None,
-                    is_generated: false,
-                    is_updated_at: false,
-                    is_commented_out: false,
-                    is_ignored: false,
-                });
+        sf.set_database_name(Some("_id".to_string()));
+        sf.set_default_value(DefaultValue::new_expression(
+            ValueGenerator::new("dbgenerated".to_owned(), Vec::new()).unwrap(),
+        ));
 
-                let mut model = Model {
-                    name: model_name.clone(),
-                    primary_key: Some(primary_key),
-                    fields: vec![primary_key_field],
-                    ..Default::default()
-                };
+        sf
+    });
 
-                for index in indices.remove(&model_name).into_iter().flat_map(|i| i.into_iter()) {
-                    let defined_on_field = index.keys.len() == 1;
+    let mut model = Model {
+        name: model_name.to_string(),
+        primary_key: Some(primary_key),
+        fields: vec![primary_key_field],
+        ..Default::default()
+    };
 
-                    if matches!(index.keys.keys().next().map(Deref::deref), Some("_id")) {
-                        continue;
-                    }
+    for index in indices.remove(model_name).into_iter().flat_map(|i| i.into_iter()) {
+        let defined_on_field = index.keys.len() == 1;
 
-                    let tpe = index
-                        .options
-                        .as_ref()
-                        .and_then(|opts| opts.unique)
-                        .map(|uniq| if uniq { IndexType::Unique } else { IndexType::Normal })
-                        .unwrap_or(IndexType::Normal);
-
-                    let db_name = index.options.and_then(|opts| opts.name);
-
-                    let definition = IndexDefinition {
-                        fields: index.keys.into_iter().map(|(k, _)| k).collect(),
-                        tpe,
-                        defined_on_field,
-                        name: None,
-                        db_name,
-                    };
-
-                    model.add_index(definition);
-                }
-
-                model
-            });
-
-            if field_name == "_id" {
-                continue;
-            }
-
-            let percentages = sampler.percentages();
-            let field_type = percentages.find_most_common().unwrap().to_owned();
-
-            let arity = if field_type.is_array() {
-                datamodel::FieldArity::List
-            } else if doc_count > field_count || sampler.nullable {
-                datamodel::FieldArity::Optional
-            } else {
-                datamodel::FieldArity::Required
-            };
-
-            let documentation = if percentages.has_type_variety() {
-                Some(format!("{}", percentages))
-            } else {
-                None
-            };
-
-            model.fields.push(Field::ScalarField(ScalarField {
-                name: field_name,
-                field_type: field_type.into(),
-                arity,
-                database_name: None,
-                default_value: None,
-                documentation,
-                is_generated: false,
-                is_updated_at: false,
-                is_commented_out: false,
-                is_ignored: false,
-            }))
+        if matches!(index.keys.keys().next().map(Deref::deref), Some("_id")) {
+            continue;
         }
 
-        for (_, model) in models.into_iter() {
-            data_model.add_model(model);
-        }
+        let tpe = index
+            .options
+            .as_ref()
+            .and_then(|opts| opts.unique)
+            .map(|uniq| if uniq { IndexType::Unique } else { IndexType::Normal })
+            .unwrap_or(IndexType::Normal);
 
-        data_model
+        let db_name = index.options.and_then(|opts| opts.name);
+
+        let definition = IndexDefinition {
+            fields: index.keys.into_iter().map(|(k, _)| k).collect(),
+            tpe,
+            defined_on_field,
+            name: None,
+            db_name,
+        };
+
+        model.add_index(definition);
     }
+
+    model
 }

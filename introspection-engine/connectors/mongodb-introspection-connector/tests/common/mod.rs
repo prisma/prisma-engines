@@ -1,5 +1,5 @@
 use datamodel::common::preview_features::PreviewFeature;
-use introspection_connector::{IntrospectionConnector, IntrospectionContext};
+use introspection_connector::{IntrospectionConnector, IntrospectionContext, Warning};
 use mongodb::{Client, Database};
 use mongodb_introspection_connector::MongoDbIntrospectionConnector;
 use names::Generator;
@@ -13,13 +13,21 @@ static CONN_STR: Lazy<String> = Lazy::new(|| {
 
 static RT: Lazy<Runtime> = Lazy::new(|| Runtime::new().unwrap());
 
-pub(super) struct TestResult {
+pub struct TestResult {
     datamodel: String,
+    #[allow(dead_code)] // clippy is wrong
+    warnings: Vec<Warning>,
 }
 
 impl TestResult {
-    pub(super) fn datamodel(&self) -> &str {
+    pub fn datamodel(&self) -> &str {
         &self.datamodel
+    }
+
+    #[track_caller]
+    #[allow(dead_code)] // clippy is wrong
+    pub fn assert_warning(&self, warning: &str) {
+        assert!(self.warnings.iter().any(|w| w.message == warning))
     }
 }
 
@@ -73,6 +81,7 @@ where
 
         TestResult {
             datamodel: datamodel::render_datamodel_to_string(&res.data_model, Some(&config)),
+            warnings: res.warnings,
         }
     })
 }

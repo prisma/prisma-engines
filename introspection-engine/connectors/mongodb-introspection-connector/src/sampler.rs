@@ -1,7 +1,6 @@
 mod field_type;
 mod statistics;
 
-use datamodel::Datamodel;
 use futures::TryStreamExt;
 use introspection_connector::{IntrospectionResult, Version};
 use mongodb::{
@@ -13,6 +12,7 @@ use statistics::*;
 pub(super) async fn sample(database: Database) -> crate::Result<IntrospectionResult> {
     let collections = database.list_collection_names(None).await?;
     let mut statistics = Statistics::default();
+    let mut warnings = Vec::new();
 
     for collection_name in collections {
         let collection = database.collection::<Document>(&collection_name);
@@ -32,9 +32,11 @@ pub(super) async fn sample(database: Database) -> crate::Result<IntrospectionRes
         }
     }
 
+    let data_model = statistics.into_datamodel(&mut warnings);
+
     Ok(IntrospectionResult {
-        data_model: Datamodel::from(statistics),
-        warnings: Vec::new(),
+        data_model,
+        warnings,
         version: Version::NonPrisma,
     })
 }

@@ -5,6 +5,29 @@ use common::*;
 use expect_test::expect;
 
 #[test]
+fn explicit_id_field() {
+    let res = introspect(|db| async move {
+        db.create_collection("A", None).await?;
+        let collection = db.collection("A");
+        let docs = vec![doc! {"id": 1}];
+
+        collection.insert_many(docs, None).await.unwrap();
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          id String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id Int    @id
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+    res.assert_warning("The given model has a field with the name `id`, that clashes with the primary key. Please rename either one of them before using the data model.");
+}
+
+#[test]
 fn mixing_types() {
     let res = introspect(|db| async move {
         db.create_collection("A", None).await?;

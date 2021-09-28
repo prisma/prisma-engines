@@ -19,6 +19,7 @@ url = "2"
 indoc = "1"
 futures = "0.3"
 bson = "2"
+serde_json = "1"
 
 [dev-dependencies]
 tokio = { version = "1", features = ["rt-multi-thread"] }
