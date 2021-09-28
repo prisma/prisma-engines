@@ -5,6 +5,35 @@ on:
       - master
   pull_request:
 jobs:
+  test-mongodb-introspection-connector:
+    name: "Test mongodb on Linux"
+    strategy:
+      fail-fast: false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: "Start MongoDB"
+        run: make start-mongodb
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          default: true
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: me-ie-ubuntu-latest-mongodb-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - run: cargo test -p mongodb-introspection-connector
+        env:
+          CLICOLOR_FORCE: 1
+          TEST_DATABASE_URL: "mongodb://prisma:prisma@localhost:27017/"
+
   test-linux:
     name: "Test ${{ matrix.database.name }} on Linux"
 
