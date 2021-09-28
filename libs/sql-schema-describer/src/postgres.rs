@@ -364,6 +364,8 @@ impl<'a> SqlSchemaDescriber<'a> {
     /// Returns a map from table name to foreign keys.
     async fn get_foreign_keys(&self, schema: &str) -> DescriberResult<BTreeMap<String, Vec<ForeignKey>>> {
         // The `generate_subscripts` in the inner select is needed because the optimizer is free to reorganize the unnested rows if not explicitly ordered.
+        // Note the oid ordering here does not represent FK creation time ordering in CockroachDB
+        // as the oid field in CockroachDB is based on a hash.
         let sql = r#"
             SELECT con.oid         as "con_id",
                 att2.attname    as "child_column",
