@@ -121,8 +121,11 @@ dev-mssql2017: start-mssql_2017
 start-mongodb:
 	docker-compose -f docker-compose.yml up -d --remove-orphans mongo4
 
-start-mongodb-single:
+start-mongodb4-single:
 	docker-compose -f docker-compose.yml up -d --remove-orphans mongo4-single
+
+start-mongodb5-single:
+	docker-compose -f docker-compose.yml up -d --remove-orphans mongo5-single
 
 dev-mongodb: start-mongodb
 	echo 'mongodb' > current_connector

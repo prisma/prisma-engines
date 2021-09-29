@@ -6,15 +6,21 @@ on:
   pull_request:
 jobs:
   test-mongodb-introspection-connector:
-    name: "Test mongodb on Linux"
+    name: "Test ${{ matrix.database.name }} on Linux"
     strategy:
       fail-fast: false
+      matrix:
+        database:
+          - name: "mongodb4"
+            url: "mongodb://prisma:prisma@localhost:27017/"
+          - name: "mongodb5"
+            url: "mongodb://prisma:prisma@localhost:27018/"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
 
-      - name: "Start MongoDB"
-        run: make start-mongodb-single
+      - name: "Start ${{ matrix.database.name }}"
+        run: make start-${{ matrix.database.name }}-single
 
       - uses: actions-rs/toolchain@v1
         with:
@@ -32,7 +38,7 @@ jobs:
       - run: cargo test -p mongodb-introspection-connector
         env:
           CLICOLOR_FORCE: 1
-          TEST_DATABASE_URL: "mongodb://prisma:prisma@localhost:27017/"
+          TEST_DATABASE_URL: ${{ matrix.database.url }}
 
   test-linux:
     name: "Test ${{ matrix.database.name }} on Linux"
