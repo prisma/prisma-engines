@@ -226,7 +226,7 @@ services:
       - databases
 
   mongo5:
-    image: prismagraphql/mongo-single-replica:5.0
+    image: prismagraphql/mongo-single-replica:5.0.3
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: "prisma"
