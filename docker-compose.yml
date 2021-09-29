@@ -225,6 +225,17 @@ services:
     networks:
       - databases
 
+  mongo5:
+    image: prismagraphql/mongo-single-replica:5.0
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: "prisma"
+      MONGO_INITDB_ROOT_PASSWORD: "prisma"
+    ports:
+      - "27018:27017"
+    networks:
+      - databases
+
   jaeger:
     image: jaegertracing/all-in-one:latest
     restart: always

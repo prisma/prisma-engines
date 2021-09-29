@@ -31,7 +31,16 @@ impl ConnectorTagInterface for MongoDbConnectorTag {
                     database
                 )
             }
-
+            Some(MongoDbVersion::V5) if is_ci => format!(
+                "mongodb://prisma:prisma@test-db-mongodb-5:27018/{}?authSource=admin&retryWrites=true",
+                database
+            ),
+            Some(MongoDbVersion::V5) => {
+                format!(
+                    "mongodb://prisma:prisma@127.0.0.1:27018/{}?authSource=admin&retryWrites=true",
+                    database
+                )
+            }
             None => unreachable!("A versioned connector must have a concrete version to run."),
         }
     }
@@ -57,6 +66,7 @@ impl ConnectorTagInterface for MongoDbConnectorTag {
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum MongoDbVersion {
     V4,
+    V5,
 }
 
 impl MongoDbConnectorTag {
@@ -96,6 +106,7 @@ impl TryFrom<&str> for MongoDbVersion {
     fn try_from(s: &str) -> Result<Self, Self::Error> {
         let version = match s {
             "4" => Self::V4,
+            "5" => Self::V5,
             _ => return Err(TestError::parse_error(format!("Unknown MongoDB version `{}`", s))),
         };
 
@@ -107,6 +118,7 @@ impl ToString for MongoDbVersion {
     fn to_string(&self) -> String {
         match self {
             MongoDbVersion::V4 => "4",
+            MongoDbVersion::V5 => "5",
         }
         .to_owned()
     }
