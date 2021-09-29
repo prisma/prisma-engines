@@ -339,13 +339,15 @@ fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: TestApi
 }
 
 #[test_connector(tags(Mysql56))]
-fn json_fields_must_be_rejected(api: TestApi) {
+fn json_fields_must_be_rejected_on_mysql_5_6(api: TestApi) {
     let dm = r#"
         model Test {
             id Int @id
             j Json
         }
         "#;
+
+    api.ensure_connection_validity().unwrap();
 
     let result = api
         .schema_push_w_datasource(dm)

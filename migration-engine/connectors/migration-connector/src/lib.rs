@@ -53,6 +53,11 @@ pub trait MigrationConnector: Send + Sync + 'static {
     /// [DiffTarget](/enum.DiffTarget.html) for possible inputs.
     async fn diff(&self, from: DiffTarget<'_>, to: DiffTarget<'_>) -> ConnectorResult<Migration>;
 
+    /// Make sure the connection to the database is established and valid.
+    /// Connectors can choose to connect lazily, but this method should force
+    /// them to connect.
+    async fn ensure_connection_validity(&self) -> ConnectorResult<()>;
+
     /// The version of the underlying database.
     async fn version(&self) -> ConnectorResult<String>;
 
