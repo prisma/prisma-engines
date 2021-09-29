@@ -26,7 +26,7 @@ impl FieldType {
         match bson {
             Bson::Double(_) => Some(Self::Double),
             Bson::String(_) => Some(Self::String),
-            Bson::Array(docs) if docs.is_empty() => Some(Self::Unsupported("Unknown Array")),
+            Bson::Array(docs) if docs.is_empty() => None,
             Bson::Array(mut docs) => Some(Self::Array(Box::new(
                 docs.pop()
                     .and_then(FieldType::from_bson)

@@ -399,7 +399,7 @@ fn array() {
             },
             doc! {
                 "first": Bson::Array(Array::from(vec![Bson::Int32(1)])),
-                "second": Bson::Array(Array::from(vec![Bson::Int32(1)])),
+                "second": Bson::Array(Array::from(Vec::new())),
             },
         ];
 
@@ -414,6 +414,30 @@ fn array() {
           first  Int[]
           second Int[]
           third  Int[]
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
+fn empty_arrays() {
+    let res = introspect(|db| async move {
+        db.create_collection("A", None).await?;
+        let collection = db.collection("A");
+
+        collection
+            .insert_one(doc! { "data": Bson::Array(Array::from(Vec::new())) }, None)
+            .await
+            .unwrap();
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          id   String                  @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          data Unsupported("Unknown")?
         }
     "#]];
 

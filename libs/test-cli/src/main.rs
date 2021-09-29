@@ -259,8 +259,13 @@ fn minimal_schema_from_url(url: &str) -> anyhow::Result<String> {
     let schema = format!(
         r#"
             datasource db {{
-                provider = "{}"
-                url = "{}"
+              provider = "{}"
+              url = "{}"
+            }}
+
+            generator js {{
+              provider        = "prisma-client-js"
+              previewFeatures = ["mongodb"]
             }}
         "#,
         provider, url

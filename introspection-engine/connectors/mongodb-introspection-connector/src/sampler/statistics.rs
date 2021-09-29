@@ -99,7 +99,11 @@ impl Statistics {
             }
 
             let percentages = sampler.percentages();
-            let field_type = percentages.find_most_common().unwrap().to_owned();
+
+            let field_type = match percentages.find_most_common() {
+                Some(field_type) => field_type.to_owned(),
+                None => FieldType::Unsupported("Unknown"),
+            };
 
             if let FieldType::Unsupported(r#type) = field_type {
                 unsupported.push((model_name.to_string(), field_name.to_string(), r#type));
