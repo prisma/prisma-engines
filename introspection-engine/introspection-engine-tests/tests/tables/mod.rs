@@ -623,7 +623,7 @@ async fn a_table_with_partial_indexes_should_ignore_them(api: &TestApi) -> TestR
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(Cockroach))]
 async fn introspecting_a_table_with_json_type_must_work(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -638,6 +638,31 @@ async fn introspecting_a_table_with_json_type_must_work(api: &TestApi) -> TestRe
         model Blog {
             id      Int @id @default(autoincrement())
             json    Json @db.Json
+        }
+    "#};
+
+    let result = api.introspect().await?;
+
+    api.assert_eq_datamodels(dm, &result);
+
+    Ok(())
+}
+
+#[test_connector(tags(Cockroach))]
+async fn introspecting_a_table_with_json_type_must_work_cockroach(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("Blog", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("json", types::json());
+            });
+        })
+        .await?;
+
+    let dm = indoc! {r#"
+        model Blog {
+            id      Int @id @default(autoincrement())
+            json    Json
         }
     "#};
 
