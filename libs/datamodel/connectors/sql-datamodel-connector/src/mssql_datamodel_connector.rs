@@ -1,6 +1,6 @@
 use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
 use datamodel_connector::helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32};
-use datamodel_connector::{Connector, ConnectorCapability, ReferentialIntegrity};
+use datamodel_connector::{Connector, ConnectorCapability, ConstraintNameSpace, ReferentialIntegrity};
 use dml::{
     field::{Field, FieldType},
     model::Model,
@@ -326,8 +326,8 @@ impl Connector for MsSqlDatamodelConnector {
         Ok(())
     }
 
-    fn get_namespace_violations(&self, schema: &Datamodel) -> Vec<(String, String, String, String)> {
-        //Hashmap(ConstraintName, Vec<Table, Type, Scope, Count>)
+    fn get_namespace_violations(&self, schema: &Datamodel) -> Vec<ConstraintNameSpace> {
+        //Hashmap(ConstraintName, Vec<Table, Type, Scope, Count>) => TODO(matthias) Type this bad boy
         let mut potential_name_space_violations: HashMap<String, Vec<(String, String, String, usize)>> = HashMap::new();
 
         for model in schema.models() {
@@ -395,7 +395,7 @@ impl Connector for MsSqlDatamodelConnector {
             }
         }
 
-        let res: Vec<(String, String, String, String)> = potential_name_space_violations
+        potential_name_space_violations
             .iter()
             .map(|(name, entries)| {
                 let duplicates: Vec<String> = entries
@@ -404,17 +404,19 @@ impl Connector for MsSqlDatamodelConnector {
                     .map(|(_, _, scope, _)| scope.clone())
                     .collect();
 
-                let res: Vec<(String, String, String, String)> = entries
+                entries
                     .iter()
                     .filter(|(_, _, scope, _)| duplicates.contains(scope))
-                    .map(|(table, tpe, scope, _)| (table.clone(), name.clone(), tpe.clone(), scope.clone()))
-                    .collect();
-                res
+                    .map(|(table, tpe, scope, _)| ConstraintNameSpace {
+                        table: table.clone(),
+                        name: name.clone(),
+                        tpe: tpe.clone(),
+                        scope: scope.clone(),
+                    })
+                    .collect::<Vec<ConstraintNameSpace>>()
             })
             .flatten()
-            .collect();
-
-        res
+            .collect()
     }
 
     fn available_native_type_constructors(&self) -> &[NativeTypeConstructor] {

@@ -57,7 +57,7 @@ pub trait Connector: Send + Sync {
 
     fn validate_model(&self, model: &Model) -> Result<(), ConnectorError>;
 
-    fn get_namespace_violations<'dml>(&self, _schema: &'dml Datamodel) -> Vec<(String, String, String, String)> {
+    fn get_namespace_violations<'dml>(&self, _schema: &'dml Datamodel) -> Vec<ConstraintNameSpace> {
         Vec::new()
     }
 
@@ -293,4 +293,11 @@ impl ConnectorCapabilities {
     pub fn contains(&self, capability: ConnectorCapability) -> bool {
         self.capabilities.contains(&capability)
     }
+}
+
+pub struct ConstraintNameSpace {
+    pub table: String,
+    pub name: String,
+    pub tpe: String,
+    pub scope: String,
 }

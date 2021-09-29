@@ -7,6 +7,7 @@ use crate::{
     diagnostics::{DatamodelError, Diagnostics},
     dml,
 };
+use datamodel_connector::ConstraintNameSpace;
 
 /// Helper for validating a datamodel.
 ///
@@ -123,19 +124,22 @@ impl<'a> Validator<'a> {
             .get_namespace_violations(datamodel); // or default
 
         for model in datamodel.models() {
+            let namespace_violation_scope = |name: &str, tpe: &str| {
+                namespace_violations
+                    .iter()
+                    .find(|ns| ns.name == *name && ns.tpe == tpe && model.name == ns.table)
+                    .map(|ns| ns.scope.clone())
+            };
             let ast_model = ast_schema.find_model(&model.name).expect(STATE_ERROR);
 
             if let Some(pk) = &model.primary_key {
                 if let Some(pk_name) = &pk.db_name {
-                    if let Some((_, name, _, _)) = namespace_violations
-                        .iter()
-                        .find(|(table, name, tpe, _)| name == pk_name && tpe == "pk" && model.name == *table)
-                    {
+                    if let Some((_scope)) = namespace_violation_scope(&pk_name, "pk") {
                         let span = ast_model.id_attribute().span;
 
                         let message = format!(
                             "The given constraint name `{}` is already in use in the data model. Please provide a different name using the `map` argument.",
-                            name
+                            pk_name
                         );
 
                         let error = DatamodelError::new_attribute_validation_error(&message, "id", span);
@@ -149,14 +153,11 @@ impl<'a> Validator<'a> {
                 if let Some(df_name) = field.default_value().and_then(|d| d.db_name()) {
                     let ast_field = ast_model.find_field_bang(&field.name);
 
-                    if let Some((_, name, _, _)) = namespace_violations
-                        .iter()
-                        .find(|(table, name, tpe, _)| name == df_name && tpe == "df" && model.name == *table)
-                    {
+                    if let Some((_scope)) = namespace_violation_scope(&df_name, "df") {
                         let message = format!(
-                                "The given constraint name `{}` is already in use in the data model. Please provide a different name using the `map` argument.",
-                                name
-                            );
+                            "The given constraint name `{}` is already in use in the data model. Please provide a different name using the `map` argument.",
+                            df_name
+                        );
 
                         let span = ast_field.span_for_argument("default", "map").unwrap_or(ast_field.span);
                         let error = DatamodelError::new_attribute_validation_error(&message, "default", span);
@@ -175,17 +176,14 @@ impl<'a> Validator<'a> {
                 let field_span = ast_field.map(|f| f.span).unwrap_or_else(ast::Span::empty);
 
                 if let Some(fk_name) = field.relation_info.fk_name.as_ref() {
-                    if let Some((_, name, _, _)) = namespace_violations
-                        .iter()
-                        .find(|(table, name, tpe, _)| name == fk_name && tpe == "fk" && model.name == *table)
-                    {
+                    if let Some((_scope)) = namespace_violation_scope(&fk_name, "fk") {
                         let span = ast_field
                             .and_then(|f| f.span_for_argument("relation", "map"))
                             .unwrap_or(field_span);
 
                         let message = format!(
                             "The given constraint name `{}` is already in use in the data model. Please provide a different name using the `map` argument.",
-                            name
+                            fk_name
                         );
 
                         let error =
@@ -194,6 +192,8 @@ impl<'a> Validator<'a> {
                     }
                 }
             }
+
+            //TODO(matthias) indices
         }
 
         diagnostics
