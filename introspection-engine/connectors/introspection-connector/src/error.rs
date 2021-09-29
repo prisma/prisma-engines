@@ -70,4 +70,7 @@ pub enum ErrorKind {
 
     #[error("Error opening a TLS connection. {}", message)]
     TlsError { message: String },
+
+    #[error("Preview feature not enabled: {}", _0)]
+    UnsupportedFeatureError(&'static str),
 }

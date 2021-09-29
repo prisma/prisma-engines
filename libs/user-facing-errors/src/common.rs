@@ -247,6 +247,12 @@ pub struct TransactionAlreadyClosed {
     pub message: String,
 }
 
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P1019", message = "{message}")]
+pub struct UnsupportedFeatureError {
+    pub message: String,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

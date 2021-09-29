@@ -4,16 +4,19 @@ mod warnings;
 
 pub use error::*;
 
-use datamodel::Datamodel;
+use datamodel::{common::preview_features::PreviewFeature, Datamodel};
 use futures::TryStreamExt;
 use indoc::formatdoc;
 use introspection_connector::{
-    ConnectorError, ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionContext,
+    ConnectorError, ConnectorResult, DatabaseMetadata, ErrorKind, IntrospectionConnector, IntrospectionContext,
     IntrospectionResult,
 };
 use mongodb::{Client, Database};
 use url::Url;
-use user_facing_errors::{common::InvalidConnectionString, KnownError};
+use user_facing_errors::{
+    common::{InvalidConnectionString, UnsupportedFeatureError},
+    KnownError,
+};
 
 #[derive(Debug)]
 pub struct MongoDbIntrospectionConnector {
@@ -96,9 +99,22 @@ impl IntrospectionConnector for MongoDbIntrospectionConnector {
 
     async fn introspect(
         &self,
+        // TODO: Re-introspection.
         _existing_data_model: &Datamodel,
-        _ctx: IntrospectionContext,
+        ctx: IntrospectionContext,
     ) -> ConnectorResult<IntrospectionResult> {
+        if !ctx.preview_features.contains(PreviewFeature::MongoDb) {
+            let mut error = ConnectorError::from_kind(ErrorKind::UnsupportedFeatureError(
+                "MongoDB introspection connector (experimental feature, needs to be enabled)",
+            ));
+
+            error.user_facing_error = Some(KnownError::new(UnsupportedFeatureError {
+                message: error.to_string(),
+            }));
+
+            return Err(error);
+        }
+
         Ok(sampler::sample(self.database()).await?)
     }
 }
