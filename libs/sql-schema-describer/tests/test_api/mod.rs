@@ -108,10 +108,6 @@ impl TestApi {
         self.rt.block_on(self.database.raw_cmd(&full_sql)).unwrap();
     }
 
-    pub(crate) fn is_cockroach(&self) -> bool {
-        self.tags.contains(Tags::Cockroach)
-    }
-
     pub(crate) fn is_mariadb(&self) -> bool {
         self.tags.contains(Tags::Mariadb)
     }
