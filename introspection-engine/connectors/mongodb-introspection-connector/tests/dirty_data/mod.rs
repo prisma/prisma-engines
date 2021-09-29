@@ -1,7 +1,5 @@
-mod common;
-
+use crate::common::*;
 use bson::{doc, Bson, DateTime, Timestamp};
-use common::*;
 use expect_test::expect;
 
 #[test]

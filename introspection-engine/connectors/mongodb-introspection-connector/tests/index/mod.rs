@@ -1,7 +1,5 @@
-mod common;
-
+use crate::common::*;
 use bson::{doc, Bson};
-use common::*;
 use expect_test::expect;
 use mongodb::{options::IndexOptions, IndexModel};
 

@@ -1,7 +1,5 @@
-mod common;
-
-use bson::{doc, oid::ObjectId, Binary, Bson, DateTime, Decimal128, Timestamp};
-use common::*;
+use crate::common::*;
+use bson::{doc, oid::ObjectId, Array, Binary, Bson, DateTime, Decimal128, Timestamp};
 use expect_test::expect;
 
 #[test]
@@ -377,6 +375,46 @@ fn decimal() {
           first  Decimal
           second Decimal?
           third  Decimal?
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
+fn array() {
+    let res = introspect(|db| async move {
+        db.create_collection("A", None).await?;
+        let collection = db.collection("A");
+
+        let docs = vec![
+            doc! {
+                "first": Bson::Array(Array::from(vec![Bson::Int32(1)])),
+                "second": Bson::Array(Array::from(vec![Bson::Int32(1)])),
+                "third": Bson::Array(Array::from(vec![Bson::Int32(1)])),
+            },
+            doc! {
+                "first": Bson::Array(Array::from(vec![Bson::Int32(1)])),
+                "second": null,
+                "third": Bson::Array(Array::from(vec![Bson::Int32(1)])),
+            },
+            doc! {
+                "first": Bson::Array(Array::from(vec![Bson::Int32(1)])),
+                "second": Bson::Array(Array::from(vec![Bson::Int32(1)])),
+            },
+        ];
+
+        collection.insert_many(docs, None).await.unwrap();
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          id     String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          first  Int[]
+          second Int[]
+          third  Int[]
         }
     "#]];
 

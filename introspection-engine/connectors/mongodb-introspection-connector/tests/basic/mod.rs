@@ -1,7 +1,5 @@
-mod common;
-
+use crate::common::*;
 use bson::doc;
-use common::*;
 use expect_test::expect;
 
 #[test]

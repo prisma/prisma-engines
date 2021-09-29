@@ -11,11 +11,10 @@ static CONN_STR: Lazy<String> = Lazy::new(|| {
     std::env::var("TEST_DATABASE_URL").expect("Please set TEST_DATABASE_URL env var pointing to the MongoDB instance.")
 });
 
-static RT: Lazy<Runtime> = Lazy::new(|| Runtime::new().unwrap());
+pub static RT: Lazy<Runtime> = Lazy::new(|| Runtime::new().unwrap());
 
 pub struct TestResult {
     datamodel: String,
-    #[allow(dead_code)] // clippy is wrong
     warnings: Vec<Warning>,
 }
 
@@ -25,7 +24,6 @@ impl TestResult {
     }
 
     #[track_caller]
-    #[allow(dead_code)] // clippy is wrong
     pub fn assert_warning(&self, warning: &str) {
         dbg!(&self.warnings);
         assert!(self.warnings.iter().any(|w| w.message == warning))
