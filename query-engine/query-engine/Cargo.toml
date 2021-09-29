@@ -58,12 +58,7 @@ rustc_version = "0.2.3"
 anyhow = "1"
 chrono = "0.4"
 indoc = "1"
-migration-connector = { path = "../../migration-engine/connectors/migration-connector" }
-migration-core = { path = "../../migration-engine/core" }
 serial_test = "*"
-sql-migration-connector = { path = "../../migration-engine/connectors/sql-migration-connector" }
-test-macros = { path = "../../libs/test-macros" }
-test-setup = { path = "../../libs/test-setup" }
 
 [dev-dependencies.quaint]
 features = [
