@@ -25,5 +25,5 @@ once_cell = "1"
 
 [dev-dependencies]
 tokio = { version = "1", features = ["rt-multi-thread"] }
-names = "0.12"
+names = { version = "0.12", default-features = false }
 expect-test = "1"
