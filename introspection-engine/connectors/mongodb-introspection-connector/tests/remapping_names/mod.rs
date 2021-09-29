@@ -1,4 +1,4 @@
-use crate::common::*;
+use crate::test_api::*;
 
 #[test]
 fn remapping_fields_with_invalid_characters() {

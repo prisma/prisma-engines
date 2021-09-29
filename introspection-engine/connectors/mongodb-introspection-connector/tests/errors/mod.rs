@@ -1,4 +1,4 @@
-use crate::common::*;
+use crate::test_api::*;
 use mongodb_introspection_connector::MongoDbIntrospectionConnector;
 
 #[test]

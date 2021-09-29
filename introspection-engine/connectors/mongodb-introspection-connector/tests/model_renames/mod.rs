@@ -1,4 +1,4 @@
-use crate::common::*;
+use crate::test_api::*;
 
 #[test]
 fn a_model_with_reserved_name() {

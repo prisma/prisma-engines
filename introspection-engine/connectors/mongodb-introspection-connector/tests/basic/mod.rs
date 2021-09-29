@@ -1,4 +1,4 @@
-use crate::common::*;
+use crate::test_api::*;
 
 #[test]
 fn empty_collection() {
