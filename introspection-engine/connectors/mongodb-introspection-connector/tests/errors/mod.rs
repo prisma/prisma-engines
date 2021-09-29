@@ -1,5 +1,4 @@
 use crate::common::*;
-use expect_test::expect;
 use mongodb_introspection_connector::MongoDbIntrospectionConnector;
 
 #[test]

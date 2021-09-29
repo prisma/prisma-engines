@@ -1,9 +1,24 @@
 use crate::common::*;
-use bson::doc;
-use expect_test::expect;
 
 #[test]
-fn multiple_collections() {
+fn empty_collection() {
+    let res = introspect(|db| async move {
+        db.create_collection("A", None).await?;
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          id String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
+fn multiple_collections_with_data() {
     let res = introspect(|db| async move {
         db.create_collection("A", None).await?;
         let collection = db.collection("A");

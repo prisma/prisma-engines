@@ -7,6 +7,9 @@ use once_cell::sync::Lazy;
 use std::future::Future;
 use tokio::runtime::Runtime;
 
+pub use bson::doc;
+pub use expect_test::expect;
+
 static CONN_STR: Lazy<String> = Lazy::new(|| {
     std::env::var("TEST_DATABASE_URL").expect("Please set TEST_DATABASE_URL env var pointing to the MongoDB instance.")
 });

@@ -1,6 +1,5 @@
 use crate::common::*;
-use bson::{doc, oid::ObjectId, Array, Binary, Bson, DateTime, Decimal128, Timestamp};
-use expect_test::expect;
+use bson::{oid::ObjectId, Array, Binary, Bson, DateTime, Decimal128, Timestamp};
 
 #[test]
 fn string() {

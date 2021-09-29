@@ -9,12 +9,21 @@ use mongodb::{
 };
 use statistics::*;
 
+/// From the given database, lists all collections as models, and samples
+/// maximum of 10000 documents for their fields with the following rules:
+///
+/// - If the same field differs in types between documents, takes the most
+/// common type or if even, the latest type and adds a warning.
+/// - Missing fields count as null.
+/// - Indices are taken, but not if they are partial.
 pub(super) async fn sample(database: Database) -> crate::Result<IntrospectionResult> {
     let collections = database.list_collection_names(None).await?;
     let mut statistics = Statistics::default();
     let mut warnings = Vec::new();
 
     for collection_name in collections {
+        statistics.track_model(&collection_name);
+
         let collection = database.collection::<Document>(&collection_name);
 
         let mut documents = collection

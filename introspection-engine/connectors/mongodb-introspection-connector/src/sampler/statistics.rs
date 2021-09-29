@@ -1,4 +1,5 @@
 use std::{
+    borrow::Cow,
     cmp::Ordering,
     collections::{BTreeMap, HashMap},
     fmt,
@@ -13,19 +14,39 @@ use datamodel::{
 use introspection_connector::Warning;
 use mongodb::IndexModel;
 use native_types::MongoDbType;
+use once_cell::sync::Lazy;
+use regex::Regex;
 
 use super::field_type::FieldType;
 
+static RESERVED_NAMES: &[&str] = &["PrismaClient"];
+
+static RE_START: Lazy<Regex> = Lazy::new(|| Regex::new("^[^a-zA-Z]+").unwrap());
+static RE: Lazy<Regex> = Lazy::new(|| Regex::new("[^_a-zA-Z0-9]").unwrap());
+
+/// Statistical data from a MongoDB database for determining a Prisma data
+/// model.
 #[derive(Debug, Default)]
 pub(super) struct Statistics {
+    /// (model_name, field_name) -> type percentages
     fields: BTreeMap<(String, String), FieldSampler>,
-    documents: HashMap<String, usize>,
+    /// model_name -> document count
+    models: HashMap<String, usize>,
+    /// model_name -> indices
     indices: BTreeMap<String, Vec<IndexModel>>,
 }
 
 impl Statistics {
+    /// Track a collection as prisma model.
+    pub(super) fn track_model(&mut self, model: &str) {
+        if !self.models.contains_key(model) {
+            self.models.insert(model.to_string(), 0);
+        }
+    }
+
+    /// Track all fields and field types from the given document.
     pub(super) fn track_document_types(&mut self, model: &str, document: Document) {
-        let doc_count = self.documents.entry(model.to_string()).or_default();
+        let doc_count = self.models.entry(model.to_string()).or_default();
         *doc_count += 1;
 
         for (field, val) in document.into_iter() {
@@ -44,11 +65,13 @@ impl Statistics {
         }
     }
 
+    /// Track an index for the given model.
     pub(super) fn track_index(&mut self, model_name: &str, index: IndexModel) {
         let indexes = self.indices.entry(model_name.to_string()).or_default();
         indexes.push(index);
     }
 
+    /// From the given data, create a Prisma data model with best effort basis.
     pub(super) fn into_datamodel(self, warnings: &mut Vec<Warning>) -> Datamodel {
         let mut data_model = Datamodel::new();
         let mut indices = self.indices;
@@ -56,13 +79,13 @@ impl Statistics {
         let mut undecided_types = Vec::new();
 
         let mut models: BTreeMap<String, Model> = self
-            .documents
+            .models
             .iter()
-            .map(|(model_name, _)| (model_name.to_string(), new_model(model_name, &mut indices)))
+            .map(|(model_name, _)| (model_name.to_string(), new_model(model_name)))
             .collect();
 
         for ((model_name, field_name), sampler) in self.fields.into_iter() {
-            let doc_count = *self.documents.get(&model_name).unwrap_or(&0);
+            let doc_count = *self.models.get(&model_name).unwrap_or(&0);
             let field_count = sampler.counter;
 
             let model = models.get_mut(&model_name).unwrap();
@@ -100,11 +123,16 @@ impl Statistics {
                 None
             };
 
+            let (name, database_name) = match sanitize_string(&field_name) {
+                Some(sanitized) => (sanitized, Some(field_name)),
+                None => (field_name, None),
+            };
+
             model.fields.push(Field::ScalarField(ScalarField {
-                name: field_name,
+                name,
                 field_type: field_type.into(),
                 arity,
-                database_name: None,
+                database_name,
                 default_value: None,
                 documentation,
                 is_generated: false,
@@ -113,6 +141,8 @@ impl Statistics {
                 is_ignored: false,
             }))
         }
+
+        add_indices_to_models(&mut models, &mut indices);
 
         for (_, model) in models.into_iter() {
             data_model.add_model(model);
@@ -172,6 +202,7 @@ impl fmt::Display for FieldPercentages {
 }
 
 impl FieldPercentages {
+    /// The most prominent choice for the field type, based on the tracked data.
     fn find_most_common(&self) -> Option<FieldType> {
         self.data
             .iter()
@@ -179,12 +210,13 @@ impl FieldPercentages {
             .map(|(r#type, _)| r#type.clone())
     }
 
+    /// Dirty data...
     fn has_type_variety(&self) -> bool {
         self.data.len() > 1
     }
 }
 
-fn new_model(model_name: &str, indices: &mut BTreeMap<String, Vec<IndexModel>>) -> Model {
+fn new_model(model_name: &str) -> Model {
     let primary_key = PrimaryKeyDefinition {
         name: None,
         db_name: None,
@@ -209,39 +241,98 @@ fn new_model(model_name: &str, indices: &mut BTreeMap<String, Vec<IndexModel>>) 
         sf
     });
 
-    let mut model = Model {
-        name: model_name.to_string(),
-        primary_key: Some(primary_key),
-        fields: vec![primary_key_field],
-        ..Default::default()
+    let (name, database_name, documentation) = match sanitize_string(model_name) {
+        Some(sanitized) => (Cow::from(sanitized), Some(model_name.to_string()), None),
+        None if RESERVED_NAMES.contains(&model_name) => {
+            let documentation = "This model has been renamed to 'RenamedPrismaClient' during introspection, because the original name 'PrismaClient' is reserved.";
+
+            (
+                Cow::from(format!("Renamed{}", model_name)),
+                Some(model_name.to_string()),
+                Some(documentation.to_string()),
+            )
+        }
+        None => (Cow::from(model_name), None, None),
     };
 
-    for index in indices.remove(model_name).into_iter().flat_map(|i| i.into_iter()) {
-        let defined_on_field = index.keys.len() == 1;
-
-        if matches!(index.keys.keys().next().map(Deref::deref), Some("_id")) {
-            continue;
-        }
-
-        let tpe = index
-            .options
-            .as_ref()
-            .and_then(|opts| opts.unique)
-            .map(|uniq| if uniq { IndexType::Unique } else { IndexType::Normal })
-            .unwrap_or(IndexType::Normal);
-
-        let db_name = index.options.and_then(|opts| opts.name);
-
-        let definition = IndexDefinition {
-            fields: index.keys.into_iter().map(|(k, _)| k).collect(),
-            tpe,
-            defined_on_field,
-            name: None,
-            db_name,
-        };
-
-        model.add_index(definition);
+    Model {
+        name: name.to_string(),
+        primary_key: Some(primary_key),
+        fields: vec![primary_key_field],
+        database_name,
+        documentation,
+        ..Default::default()
     }
+}
 
-    model
+fn add_indices_to_models(models: &mut BTreeMap<String, Model>, indices: &mut BTreeMap<String, Vec<IndexModel>>) {
+    for (model_name, model) in models.iter_mut() {
+        for index in indices.remove(model_name).into_iter().flat_map(|i| i.into_iter()) {
+            let defined_on_field = index.keys.len() == 1;
+
+            // Implicit primary key
+            if matches!(index.keys.keys().next().map(Deref::deref), Some("_id")) {
+                continue;
+            }
+
+            // Partial index
+            if index
+                .options
+                .as_ref()
+                .and_then(|opts| opts.partial_filter_expression.as_ref())
+                .is_some()
+            {
+                continue;
+            }
+
+            // Points to a field that does not exist (yet).
+            if !index.keys.keys().all(|k| {
+                model
+                    .fields
+                    .iter()
+                    .any(|f| f.name() == k || f.database_name() == Some(k))
+            }) {
+                continue;
+            }
+
+            let tpe = index
+                .options
+                .as_ref()
+                .and_then(|opts| opts.unique)
+                .map(|uniq| if uniq { IndexType::Unique } else { IndexType::Normal })
+                .unwrap_or(IndexType::Normal);
+
+            let db_name = index.options.and_then(|opts| opts.name);
+
+            let fields = index
+                .keys
+                .into_iter()
+                .map(|(k, _)| match sanitize_string(&k) {
+                    Some(sanitized) => sanitized,
+                    None => k,
+                })
+                .collect();
+
+            model.add_index(IndexDefinition {
+                fields,
+                tpe,
+                defined_on_field,
+                name: None,
+                db_name,
+            });
+        }
+    }
+}
+
+fn sanitize_string(s: &str) -> Option<String> {
+    let needs_sanitation = RE_START.is_match(s) || RE.is_match(s);
+
+    if needs_sanitation {
+        let start_cleaned: String = RE_START.replace_all(s, "").parse().unwrap();
+        let sanitized: String = RE.replace_all(start_cleaned.as_str(), "_").parse().unwrap();
+
+        Some(sanitized)
+    } else {
+        None
+    }
 }

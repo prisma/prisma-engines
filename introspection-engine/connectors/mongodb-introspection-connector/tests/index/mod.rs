@@ -1,6 +1,5 @@
 use crate::common::*;
-use bson::{doc, Bson};
-use expect_test::expect;
+use bson::Bson;
 use mongodb::{options::IndexOptions, IndexModel};
 
 #[test]
@@ -31,6 +30,40 @@ fn single_column_normal_index() {
           name String
 
           @@index([age], map: "age_1")
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
+fn index_pointing_to_a_renamed_field() {
+    let res = introspect(|db| async move {
+        db.create_collection("A", None).await?;
+        let collection = db.collection("A");
+        let docs = vec![doc! {"name": "Musti", "_age": 9}];
+
+        collection.insert_many(docs, None).await.unwrap();
+
+        let options = IndexOptions::builder().unique(Some(false)).build();
+
+        let model = IndexModel::builder()
+            .keys(doc! { "_age": 1 })
+            .options(Some(options))
+            .build();
+
+        collection.create_index(model, None).await?;
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          id   String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          age  Int    @map("_age")
+          name String
+
+          @@index([age], map: "_age_1")
         }
     "#]];
 
@@ -275,4 +308,70 @@ fn unsupported_types_in_an_index() {
     res.assert_warning(
         "These fields are not supported by the Prisma Client, because Prisma currently does not support their types.",
     );
+}
+
+#[test]
+fn partial_indices_should_be_ignored() {
+    let res = introspect(|db| async move {
+        db.create_collection("A", None).await?;
+        let collection = db.collection("A");
+        let docs = vec![doc! {"name": "Musti", "age": 9}];
+
+        collection.insert_many(docs, None).await.unwrap();
+
+        let options = IndexOptions::builder()
+            .unique(Some(false))
+            .partial_filter_expression(Some(doc! { "age": { "$gt": 10 } }))
+            .build();
+
+        let model = IndexModel::builder()
+            .keys(doc! { "age": 1 })
+            .options(Some(options))
+            .build();
+
+        collection.create_index(model, None).await?;
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          id   String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          age  Int
+          name String
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
+fn skip_index_pointing_to_non_existing_field() {
+    let res = introspect(|db| async move {
+        db.create_collection("A", None).await?;
+        let collection = db.collection("A");
+        let docs = vec![doc! {"name": "Musti"}];
+
+        collection.insert_many(docs, None).await.unwrap();
+
+        let options = IndexOptions::builder().unique(Some(false)).build();
+
+        let model = IndexModel::builder()
+            .keys(doc! { "age": 1 })
+            .options(Some(options))
+            .build();
+
+        collection.create_index(model, None).await?;
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          id   String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          name String
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
 }
