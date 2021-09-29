@@ -94,10 +94,6 @@ impl Statistics {
                 continue;
             }
 
-            if field_name == "id" {
-                warnings.push(crate::warnings::explicit_id_column(&model_name));
-            }
-
             let percentages = sampler.percentages();
 
             let field_type = match percentages.find_most_common() {
@@ -129,6 +125,7 @@ impl Statistics {
 
             let (name, database_name) = match sanitize_string(&field_name) {
                 Some(sanitized) => (sanitized, Some(field_name)),
+                None if field_name == "id" => ("renamedId".to_string(), Some(field_name)),
                 None => (field_name, None),
             };
 

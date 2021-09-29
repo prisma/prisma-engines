@@ -15,13 +15,12 @@ fn explicit_id_field() {
 
     let expected = expect![[r#"
         model A {
-          id String @id @default(dbgenerated()) @map("_id") @db.ObjectId
-          id Int    @id
+          id        String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          renamedId Int    @map("id")
         }
     "#]];
 
     expected.assert_eq(res.datamodel());
-    res.assert_warning("The given model has a field with the name `id`, that clashes with the primary key. Please rename either one of them before using the data model.");
 }
 
 #[test]
