@@ -71,7 +71,7 @@ async fn multiple_foreign_key_constraints_are_taken_always_in_the_some_order_coc
         model A {
           id  Int @id
           foo Int
-          B   B   @relation(fields: [foo], references: [id], onDelete: Cascade, map: "fk_1")
+          B   B   @relation(fields: [foo], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_1")
         }
 
         model B {
@@ -83,7 +83,7 @@ async fn multiple_foreign_key_constraints_are_taken_always_in_the_some_order_coc
         model A {
           id  Int @id
           foo Int
-          B   B   @relation(fields: [foo], references: [id], onUpdate: Restrict, map: "fk_2")
+          B   B   @relation(fields: [foo], references: [id], onDelete: NoAction, onUpdate: Restrict, map: "fk_2")
         }
 
         model B {
