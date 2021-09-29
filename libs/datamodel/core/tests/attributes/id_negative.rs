@@ -451,3 +451,43 @@ fn bytes_should_not_be_allowed_as_id_on_sql_server() {
 
     expected.assert_eq(&error);
 }
+
+#[test]
+fn primary_key_and_foreign_key_names_cannot_clash() {
+    let dml = indoc! { r#"
+        datasource test {
+          provider = "postgresql"
+          url = "postgresql://"
+        }
+
+        model A {
+            id Int @id(map: "foo") 
+            bId Int
+            b   B  @relation(fields: [bId], references: [id], map: "foo")
+        }
+        
+        model B {
+            id Int @id(map: "bar")
+            as A[]
+        }
+    "#};
+
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@id": The given constraint name `foo` is already in use in the data model. Please provide a different name using the `map` argument.[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
+        [1;94m   | [0m
+        [1;94m 6 | [0mmodel A {
+        [1;94m 7 | [0m    id Int @[1;91mid(map: "foo")[0m 
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": The given constraint name `foo` is already in use in the data model. Please provide a different name using the `map` argument.[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
+        [1;94m   | [0m
+        [1;94m 8 | [0m    bId Int
+        [1;94m 9 | [0m    b   B  @relation(fields: [bId], references: [id], [1;91mmap: "foo"[0m)
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}

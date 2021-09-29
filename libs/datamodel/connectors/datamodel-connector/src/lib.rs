@@ -1,19 +1,22 @@
+use std::{borrow::Cow, collections::BTreeMap, str::FromStr};
+
+use enumflags2::BitFlags;
+
+use dml::datamodel::Datamodel;
+use dml::{
+    field::Field, model::Model, native_type_constructor::NativeTypeConstructor,
+    native_type_instance::NativeTypeInstance, relation_info::ReferentialAction, scalars::ScalarType,
+};
+pub use empty_connector::EmptyDatamodelConnector;
+pub use referential_integrity::ReferentialIntegrity;
+
+use crate::connector_error::{ConnectorError, ConnectorErrorFactory, ErrorKind};
+
 pub mod connector_error;
 pub mod helper;
 
 mod empty_connector;
 mod referential_integrity;
-
-pub use empty_connector::EmptyDatamodelConnector;
-pub use referential_integrity::ReferentialIntegrity;
-
-use crate::connector_error::{ConnectorError, ConnectorErrorFactory, ErrorKind};
-use dml::{
-    field::Field, model::Model, native_type_constructor::NativeTypeConstructor,
-    native_type_instance::NativeTypeInstance, relation_info::ReferentialAction, scalars::ScalarType,
-};
-use enumflags2::BitFlags;
-use std::{borrow::Cow, collections::BTreeMap, str::FromStr};
 
 pub trait Connector: Send + Sync {
     fn name(&self) -> &str;
@@ -53,6 +56,10 @@ pub trait Connector: Send + Sync {
     fn validate_field(&self, field: &Field) -> Result<(), ConnectorError>;
 
     fn validate_model(&self, model: &Model) -> Result<(), ConnectorError>;
+
+    fn get_namespace_violations<'dml>(&self, _schema: &'dml Datamodel) -> Vec<(String, String, String, String)> {
+        Vec::new()
+    }
 
     /// Returns all available native type constructors available through this connector.
     /// Powers the auto completion of the vs code plugin.

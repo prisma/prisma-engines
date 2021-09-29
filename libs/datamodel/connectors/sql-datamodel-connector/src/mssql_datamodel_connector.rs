@@ -14,6 +14,8 @@ use native_types::{MsSqlType, MsSqlTypeParameter};
 use once_cell::sync::Lazy;
 use std::borrow::Cow;
 
+use dml::datamodel::Datamodel;
+use std::collections::HashMap;
 use MsSqlType::*;
 use MsSqlTypeParameter::*;
 
@@ -322,6 +324,97 @@ impl Connector for MsSqlDatamodelConnector {
         }
 
         Ok(())
+    }
+
+    fn get_namespace_violations(&self, schema: &Datamodel) -> Vec<(String, String, String, String)> {
+        //Hashmap(ConstraintName, Vec<Table, Type, Scope, Count>)
+        let mut potential_name_space_violations: HashMap<String, Vec<(String, String, String, usize)>> = HashMap::new();
+
+        for model in schema.models() {
+            if let Some(name) = model.primary_key.as_ref().and_then(|pk| pk.db_name.as_ref()) {
+                let entry = potential_name_space_violations
+                    .entry(name.to_string())
+                    .or_insert(vec![]);
+
+                entry.push((model.name.clone(), "pk".to_string(), "global".to_string(), 0));
+
+                entry
+                    .iter_mut()
+                    .filter(|(_, _, scope, _)| scope == "global")
+                    .for_each(|(_, _, _, count)| *count += 1);
+            }
+
+            for name in model
+                .relation_fields()
+                .filter_map(|rf| rf.relation_info.fk_name.as_ref())
+            {
+                let entry = potential_name_space_violations
+                    .entry(name.to_string())
+                    .or_insert(vec![]);
+
+                entry.push((model.name.clone(), "fk".to_string(), "global".to_string(), 0));
+
+                entry
+                    .iter_mut()
+                    .filter(|(_, _, scope, _)| scope == "global")
+                    .for_each(|(_, _, _, count)| *count += 1);
+            }
+
+            for name in model
+                .scalar_fields()
+                .filter_map(|sf| sf.default_value().and_then(|d| d.db_name()))
+            {
+                let entry = potential_name_space_violations
+                    .entry(name.to_string())
+                    .or_insert(vec![]);
+
+                entry.push((model.name.clone(), "df".to_string(), "global".to_string(), 0));
+
+                entry
+                    .iter_mut()
+                    .filter(|(_, _, scope, _)| scope == "global")
+                    .for_each(|(_, _, _, count)| *count += 1);
+            }
+
+            for name in model.indices.iter().filter_map(|i| i.db_name.as_ref()) {
+                let entry = potential_name_space_violations
+                    .entry(name.to_string())
+                    .or_insert(vec![]);
+
+                entry.push((
+                    model.name.clone(),
+                    "idx".to_string(),
+                    format!("model {}", model.name),
+                    0,
+                ));
+
+                entry
+                    .iter_mut()
+                    .filter(|(_, _, scope, _)| *scope == format!("model {}", model.name))
+                    .for_each(|(_, _, _, count)| *count += 1);
+            }
+        }
+
+        let res: Vec<(String, String, String, String)> = potential_name_space_violations
+            .iter()
+            .map(|(name, entries)| {
+                let duplicates: Vec<String> = entries
+                    .iter()
+                    .filter(|(_, _, _, count)| *count > 1)
+                    .map(|(_, _, scope, _)| scope.clone())
+                    .collect();
+
+                let res: Vec<(String, String, String, String)> = entries
+                    .iter()
+                    .filter(|(_, _, scope, _)| duplicates.contains(scope))
+                    .map(|(table, tpe, scope, _)| (table.clone(), name.clone(), tpe.clone(), scope.clone()))
+                    .collect();
+                res
+            })
+            .flatten()
+            .collect();
+
+        res
     }
 
     fn available_native_type_constructors(&self) -> &[NativeTypeConstructor] {

@@ -79,7 +79,6 @@ impl<'a, 'b> ValidationPipeline<'a> {
         // Phase 6: Post Standardisation Validation
         self.validator
             .post_standardisation_validate(ast_schema, &schema, &mut diagnostics);
-        //-> add all duplicate constraint name validations here
 
         diagnostics.to_result()?;
 

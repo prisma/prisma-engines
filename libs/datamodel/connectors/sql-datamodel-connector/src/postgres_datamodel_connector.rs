@@ -3,6 +3,7 @@ use datamodel_connector::{
     helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32},
     Connector, ConnectorCapability, ReferentialIntegrity,
 };
+use dml::datamodel::Datamodel;
 use dml::{
     field::{Field, FieldType},
     model::Model,
@@ -13,6 +14,7 @@ use dml::{
 };
 use enumflags2::BitFlags;
 use native_types::PostgresType::{self, *};
+use std::collections::HashMap;
 
 const SMALL_INT_TYPE_NAME: &str = "SmallInt";
 const INTEGER_TYPE_NAME: &str = "Integer";
@@ -286,6 +288,97 @@ impl Connector for PostgresDatamodelConnector {
         }
 
         Ok(())
+    }
+
+    fn get_namespace_violations(&self, schema: &Datamodel) -> Vec<(String, String, String, String)> {
+        //Hashmap(ConstraintName, Vec<Table, Type, Scope, Count>)
+        let mut potential_name_space_violations: HashMap<String, Vec<(String, String, String, usize)>> = HashMap::new();
+
+        // scopes
+        // relation pk model
+        // pk global
+        // relation table
+        // indexes global
+
+        for model in schema.models() {
+            if let Some(name) = model.primary_key.as_ref().and_then(|pk| pk.db_name.as_ref()) {
+                let entry = potential_name_space_violations
+                    .entry(name.to_string())
+                    .or_insert(vec![]);
+
+                entry.push((
+                    model.name.clone(),
+                    "pk".to_string(),
+                    format!("model relation pk {}", model.name),
+                    0,
+                ));
+
+                entry
+                    .iter_mut()
+                    .filter(|(_, _, scope, _)| *scope == format!("model relation pk {}", model.name))
+                    .for_each(|(_, _, _, count)| *count += 1);
+            }
+
+            for name in model
+                .relation_fields()
+                .filter_map(|rf| rf.relation_info.fk_name.as_ref())
+            {
+                let entry = potential_name_space_violations
+                    .entry(name.to_string())
+                    .or_insert(vec![]);
+
+                entry.push((
+                    model.name.clone(),
+                    "fk".to_string(),
+                    format!("model relation pk {}", model.name),
+                    0,
+                ));
+
+                entry
+                    .iter_mut()
+                    .filter(|(_, _, scope, _)| *scope == format!("model relation pk {}", model.name))
+                    .for_each(|(_, _, _, count)| *count += 1);
+            }
+
+            // for name in model.indices.iter().filter_map(|i| i.db_name.as_ref()) {
+            //     let entry = potential_name_space_violations
+            //         .entry(name.to_string())
+            //         .or_insert(vec![]);
+            //
+            //     entry.push((
+            //         model.name.clone(),
+            //         "idx".to_string(),
+            //         format!("model {}", model.name),
+            //         0,
+            //     ));
+            //
+            //     entry
+            //         .iter_mut()
+            //         .filter(|(_, _, scope, _)| *scope == format!("model {}", model.name))
+            //         .for_each(|(_, _, _, count)| *count += 1);
+            // }
+        }
+
+        let res: Vec<(String, String, String, String)> = potential_name_space_violations
+            .iter()
+            .map(|(name, entries)| {
+                let duplicates: Vec<String> = entries
+                    .iter()
+                    .filter(|(_, _, _, count)| *count > 1)
+                    .map(|(_, _, scope, _)| scope.clone())
+                    .collect();
+
+                let res: Vec<(String, String, String, String)> = entries
+                    .iter()
+                    .filter(|(_, _, scope, _)| duplicates.contains(scope))
+                    .map(|(table, tpe, scope, _)| (table.clone(), name.clone(), tpe.clone(), scope.clone()))
+                    .collect();
+                res
+            })
+            .flatten()
+            .collect();
+
+        res
     }
 
     fn available_native_type_constructors(&self) -> &[NativeTypeConstructor] {

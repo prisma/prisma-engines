@@ -576,11 +576,6 @@ fn named_default_constraints_cannot_clash_with_fk_names() {
           url = "sqlserver://"
         }
 
-        generator js {
-          provider = "prisma-client-js"
-          previewFeatures = ["namedConstraints"]
-        }
-
         model A {
           id  Int @id @default(autoincrement())
           a   String  @default("asdf", map: "reserved")
@@ -598,16 +593,16 @@ fn named_default_constraints_cannot_clash_with_fk_names() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": The given constraint name `reserved` is already in use in the data model. Please provide a different name using the `map` argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
-        [1;94m12 | [0m  id  Int @id @default(autoincrement())
-        [1;94m13 | [0m  a   String  @default("asdf", [1;91mmap: "reserved"[0m)
+        [1;94m 7 | [0m  id  Int @id @default(autoincrement())
+        [1;94m 8 | [0m  a   String  @default("asdf", [1;91mmap: "reserved"[0m)
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": The given constraint name `reserved` is already in use in the data model. Please provide a different name using the `map` argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
-        [1;94m13 | [0m  a   String  @default("asdf", map: "reserved")
-        [1;94m14 | [0m  b   B       @relation(fields: [bId], references: [id], [1;91mmap: "reserved"[0m)
+        [1;94m 8 | [0m  a   String  @default("asdf", map: "reserved")
+        [1;94m 9 | [0m  b   B       @relation(fields: [bId], references: [id], [1;91mmap: "reserved"[0m)
         [1;94m   | [0m
     "#]];
 
