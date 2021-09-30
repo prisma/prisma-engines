@@ -38,12 +38,12 @@ pub struct SqlMigrationConnector {
 
 impl SqlMigrationConnector {
     /// Construct and initialize the SQL migration connector.
-    pub async fn new(
-        connection_string: &str,
+    pub fn new(
+        connection_string: String,
         preview_features: BitFlags<PreviewFeature>,
         shadow_database_connection_string: Option<String>,
     ) -> ConnectorResult<Self> {
-        let connection_info = ConnectionInfo::from_url(connection_string).map_err(|err| {
+        let connection_info = ConnectionInfo::from_url(&connection_string).map_err(|err| {
             let details = user_facing_errors::quaint::invalid_connection_string_description(&err.to_string());
             KnownError::new(user_facing_errors::common::InvalidConnectionString { details })
         })?;
@@ -51,7 +51,7 @@ impl SqlMigrationConnector {
         let flavour = flavour::from_connection_info(&connection_info, preview_features);
 
         Ok(Self {
-            connection_string: connection_string.to_owned(),
+            connection_string,
             connection_info,
             connection: tokio::sync::OnceCell::new(),
             flavour,

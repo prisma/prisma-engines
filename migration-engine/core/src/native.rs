@@ -56,13 +56,13 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Box<dyn api::GenericAp
                 u.query_pairs_mut().append_pair("statement_cache_size", "0");
             }
 
-            let connector = SqlMigrationConnector::new(u.as_str(), preview_features, shadow_database_url).await?;
+            let connector = SqlMigrationConnector::new(u.to_string(), preview_features, shadow_database_url)?;
 
             Ok(Box::new(connector))
         }
         #[cfg(feature = "sql")]
         MYSQL_SOURCE_NAME | SQLITE_SOURCE_NAME | MSSQL_SOURCE_NAME => {
-            let connector = SqlMigrationConnector::new(&url, preview_features, shadow_database_url).await?;
+            let connector = SqlMigrationConnector::new(url, preview_features, shadow_database_url)?;
 
             Ok(Box::new(connector))
         }
