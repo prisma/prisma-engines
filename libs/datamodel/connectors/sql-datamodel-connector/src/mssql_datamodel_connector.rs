@@ -329,10 +329,19 @@ impl Connector for MsSqlDatamodelConnector {
     fn get_namespace_violations(&self, schema: &Datamodel) -> Vec<ConstraintNameSpace> {
         let mut potential_name_space_violations: HashMap<(String, String), Vec<(String, String)>> = HashMap::new();
 
+        //Primary Keys, Foreign Keys and Default Value names have to be globally unique
+        //Indexes have their own table namespace, but cannot have the same name as the Primary key in that table
+
         for model in schema.models() {
             if let Some(name) = model.primary_key.as_ref().and_then(|pk| pk.db_name.as_ref()) {
                 let entry = potential_name_space_violations
-                    .entry((name.to_string(), "global".to_string()))
+                    .entry((name.to_string(), "pk, fk, df global".to_string()))
+                    .or_insert(vec![]);
+
+                entry.push((model.name.clone(), "pk".to_string()));
+
+                let entry = potential_name_space_violations
+                    .entry((name.to_string(), format!("pk, key, idx on {}", model.name)))
                     .or_insert(vec![]);
 
                 entry.push((model.name.clone(), "pk".to_string()));
@@ -343,7 +352,7 @@ impl Connector for MsSqlDatamodelConnector {
                 .filter_map(|rf| rf.relation_info.fk_name.as_ref())
             {
                 let entry = potential_name_space_violations
-                    .entry((name.to_string(), "global".to_string()))
+                    .entry((name.to_string(), "pk, fk, df global".to_string()))
                     .or_insert(vec![]);
 
                 entry.push((model.name.clone(), "fk".to_string()));
@@ -354,7 +363,7 @@ impl Connector for MsSqlDatamodelConnector {
                 .filter_map(|sf| sf.default_value().and_then(|d| d.db_name()))
             {
                 let entry = potential_name_space_violations
-                    .entry((name.to_string(), "global".to_string()))
+                    .entry((name.to_string(), "pk, fk, df global".to_string()))
                     .or_insert(vec![]);
 
                 entry.push((model.name.clone(), "df".to_string()));
@@ -362,7 +371,7 @@ impl Connector for MsSqlDatamodelConnector {
 
             for name in model.indices.iter().filter_map(|i| i.db_name.as_ref()) {
                 let entry = potential_name_space_violations
-                    .entry((name.to_string(), format!("model {}", model.name)))
+                    .entry((name.to_string(), format!("pk, key, idx on {}", model.name)))
                     .or_insert(vec![]);
 
                 entry.push((model.name.clone(), "idx".to_string()));

@@ -293,6 +293,7 @@ fn names_that_are_too_long_are_truncated(api: TestApi) {
 
 //working constraint names
 
+//MSSQL
 #[test_connector(tags(Mssql))]
 fn duplicate_index_names_across_models_work_on_mssql(api: TestApi) {
     let plain_dm = r#"
@@ -319,8 +320,52 @@ fn duplicate_index_names_across_models_work_on_mssql(api: TestApi) {
     });
 }
 
+#[test_connector(tags(Mssql))]
+fn duplicate_constraint_names_across_namespaces_work_on_mssql(api: TestApi) {
+    let plain_dm = r#"
+     model User {
+        id         Int @id
+        neighborId Int @default(1, map: "MyName")
+        posts      Post[]
+
+        @@index([id], name: "MyName")
+     }
+
+     model Post {
+        id Int @id
+        userId Int
+        User   User @relation(fields:[userId], references:[id], map: "MyOtherName") 
+
+        @@index([id], name: "MyOtherName")
+     }
+     "#;
+
+    api.schema_push_w_datasource(plain_dm).send().assert_green();
+}
+
+#[test_connector(tags(Mssql))]
+fn duplicate_primary_and_index_name_in_different_table_works_on_mssql(api: TestApi) {
+    let plain_dm = r#"
+     model User {
+        id         Int @id(map: "Test")
+     }
+
+     model Post {
+        id Int @id 
+        
+        @@index([id], map: "Test")
+     }
+     "#;
+
+    api.schema_push_w_datasource(plain_dm).send().assert_green();
+}
+
+// Test for failures at db level
+
+//Postgres
+
 #[test_connector(tags(Postgres))]
-fn duplicate_constraint_names_across_models_work_on_postgres(api: TestApi) {
+fn duplicate_primary_and_foreign_key_name_across_models_work_on_postgres(api: TestApi) {
     let plain_dm = r#"
             model A {
                 id Int @id(map: "foo")
@@ -328,20 +373,13 @@ fn duplicate_constraint_names_across_models_work_on_postgres(api: TestApi) {
             }
             
             model B {
-                id Int @id(map: "bar")
+                id Int @id
                 aId Int
                 a   A  @relation(fields: [aId], references: [id], map: "foo")
             }
      "#;
 
     api.schema_push_w_datasource(plain_dm).send().assert_green();
-    api.assert_schema().assert_table("A", |table| {
-        table.assert_pk(|pk| pk.assert_constraint_name(Some("foo".to_string())))
-    });
-    api.assert_schema().assert_table("Post2", |table| {
-        table.assert_pk(|pk| pk.assert_constraint_name(Some("bar".to_string())));
-        table.assert_fk_with_name("foo")
-    });
 }
 
 #[test_connector(tags(Postgres))]

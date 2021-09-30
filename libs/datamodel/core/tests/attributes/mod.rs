@@ -1,6 +1,8 @@
 mod arg_parsing;
 mod builtin_attributes;
 mod constraint_names;
+mod constraint_names_negative;
+mod constraint_names_positive;
 mod default_negative;
 mod default_positive;
 mod id_negative;
@@ -17,7 +19,8 @@ mod unique_positive;
 mod updated_at_negative;
 mod updated_at_positive;
 
-fn with_named_constraints(dm: &str) -> String {
+//TODO(matthias) remove the previewFeature and adjust the tests
+fn with_postgres_provider(dm: &str) -> String {
     let header = r#"
     datasource test {
             provider = "postgres"

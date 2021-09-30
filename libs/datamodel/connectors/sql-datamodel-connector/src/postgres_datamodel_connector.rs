@@ -291,95 +291,68 @@ impl Connector for PostgresDatamodelConnector {
     }
 
     fn get_namespace_violations(&self, schema: &Datamodel) -> Vec<ConstraintNameSpace> {
-        // //Hashmap(ConstraintName, Vec<Table, Type, Scope, Count>)
-        // let mut potential_name_space_violations: HashMap<String, Vec<(String, String, String, usize)>> = HashMap::new();
-        //
-        // // scopes
-        // // relation pk model
-        // // pk global
-        // // relation table
-        // // indexes global
-        //
-        // for model in schema.models() {
-        //     if let Some(name) = model.primary_key.as_ref().and_then(|pk| pk.db_name.as_ref()) {
-        //         let entry = potential_name_space_violations
-        //             .entry(name.to_string())
-        //             .or_insert(vec![]);
-        //
-        //         entry.push((
-        //             model.name.clone(),
-        //             "pk".to_string(),
-        //             format!("model relation pk {}", model.name),
-        //             0,
-        //         ));
-        //
-        //         entry
-        //             .iter_mut()
-        //             .filter(|(_, _, scope, _)| *scope == format!("model relation pk {}", model.name))
-        //             .for_each(|(_, _, _, count)| *count += 1);
-        //     }
-        //
-        //     for name in model
-        //         .relation_fields()
-        //         .filter_map(|rf| rf.relation_info.fk_name.as_ref())
-        //     {
-        //         let entry = potential_name_space_violations
-        //             .entry(name.to_string())
-        //             .or_insert(vec![]);
-        //
-        //         entry.push((
-        //             model.name.clone(),
-        //             "fk".to_string(),
-        //             format!("model relation pk {}", model.name),
-        //             0,
-        //         ));
-        //
-        //         entry
-        //             .iter_mut()
-        //             .filter(|(_, _, scope, _)| *scope == format!("model relation pk {}", model.name))
-        //             .for_each(|(_, _, _, count)| *count += 1);
-        //     }
-        //
-        //     // for name in model.indices.iter().filter_map(|i| i.db_name.as_ref()) {
-        //     //     let entry = potential_name_space_violations
-        //     //         .entry(name.to_string())
-        //     //         .or_insert(vec![]);
-        //     //
-        //     //     entry.push((
-        //     //         model.name.clone(),
-        //     //         "idx".to_string(),
-        //     //         format!("model {}", model.name),
-        //     //         0,
-        //     //     ));
-        //     //
-        //     //     entry
-        //     //         .iter_mut()
-        //     //         .filter(|(_, _, scope, _)| *scope == format!("model {}", model.name))
-        //     //         .for_each(|(_, _, _, count)| *count += 1);
-        //     // }
-        // }
-        //
-        // let res: Vec<(String, String, String, String)> = potential_name_space_violations
-        //     .iter()
-        //     .map(|(name, entries)| {
-        //         let duplicates: Vec<String> = entries
-        //             .iter()
-        //             .filter(|(_, _, _, count)| *count > 1)
-        //             .map(|(_, _, scope, _)| scope.clone())
-        //             .collect();
-        //
-        //         let res: Vec<(String, String, String, String)> = entries
-        //             .iter()
-        //             .filter(|(_, _, scope, _)| duplicates.contains(scope))
-        //             .map(|(table, tpe, scope, _)| (table.clone(), name.clone(), tpe.clone(), scope.clone()))
-        //             .collect();
-        //         res
-        //     })
-        //     .flatten()
-        //     .collect();
-        //
-        // res
-        vec![]
+        let mut potential_name_space_violations: HashMap<(String, String), Vec<(String, String)>> = HashMap::new();
+
+        //Primary Key, Unique and Index names have to be globally unique
+        //Additionally, within a table they cannot conflict with Foreign Key names
+
+        for model in schema.models() {
+            if let Some(name) = model.primary_key.as_ref().and_then(|pk| pk.db_name.as_ref()) {
+                let entry = potential_name_space_violations
+                    .entry((name.to_string(), "pk, key, idx global".to_string()))
+                    .or_insert(vec![]);
+
+                entry.push((model.name.clone(), "pk".to_string()));
+
+                let entry = potential_name_space_violations
+                    .entry((name.to_string(), format!("pk, key, idx, fk on {}", model.name)))
+                    .or_insert(vec![]);
+
+                entry.push((model.name.clone(), "pk".to_string()));
+            }
+
+            for name in model
+                .relation_fields()
+                .filter_map(|rf| rf.relation_info.fk_name.as_ref())
+            {
+                let entry = potential_name_space_violations
+                    .entry((name.to_string(), format!("pk, key, idx, fk on {}", model.name)))
+                    .or_insert(vec![]);
+
+                entry.push((model.name.clone(), "fk".to_string()));
+            }
+
+            for name in model.indices.iter().filter_map(|i| i.db_name.as_ref()) {
+                let entry = potential_name_space_violations
+                    .entry((name.to_string(), "pk, key, idx global".to_string()))
+                    .or_insert(vec![]);
+
+                entry.push((model.name.clone(), "idx".to_string()));
+
+                let entry = potential_name_space_violations
+                    .entry((name.to_string(), format!("pk, key, idx, fk on {}", model.name)))
+                    .or_insert(vec![]);
+
+                entry.push((model.name.clone(), "idx".to_string()));
+            }
+        }
+
+        potential_name_space_violations
+            .iter()
+            .filter(|(_, v)| v.len() > 1)
+            .map(|((name, scope), entries)| {
+                entries
+                    .iter()
+                    .map(|(table, tpe)| ConstraintNameSpace {
+                        table: table.clone(),
+                        name: name.clone(),
+                        tpe: tpe.clone(),
+                        scope: scope.clone(),
+                    })
+                    .collect::<Vec<ConstraintNameSpace>>()
+            })
+            .flatten()
+            .collect()
     }
 
     fn available_native_type_constructors(&self) -> &[NativeTypeConstructor] {
