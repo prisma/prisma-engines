@@ -72,5 +72,5 @@ pub enum ErrorKind {
     TlsError { message: String },
 
     #[error("Preview feature not enabled: {}", _0)]
-    UnsupportedFeatureError(&'static str),
+    PreviewFeatureNotEnabled(&'static str),
 }

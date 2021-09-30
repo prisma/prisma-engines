@@ -61,17 +61,17 @@ impl FieldType {
 impl fmt::Display for FieldType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            FieldType::String => write!(f, "String"),
-            FieldType::Double => write!(f, "Double"),
-            FieldType::BinData => write!(f, "BinData"),
-            FieldType::ObjectId => write!(f, "ObjectId"),
-            FieldType::Bool => write!(f, "Boolean"),
-            FieldType::Date => write!(f, "Date"),
-            FieldType::Int32 => write!(f, "Int32"),
-            FieldType::Timestamp => write!(f, "Timestamp"),
-            FieldType::Int64 => write!(f, "Int64"),
-            FieldType::Decimal => write!(f, "Decimal"),
-            FieldType::Json => write!(f, "Document"),
+            FieldType::String => f.write_str("String"),
+            FieldType::Double => f.write_str("Double"),
+            FieldType::BinData => f.write_str("BinData"),
+            FieldType::ObjectId => f.write_str("ObjectId"),
+            FieldType::Bool => f.write_str("Boolean"),
+            FieldType::Date => f.write_str("Date"),
+            FieldType::Int32 => f.write_str("Int32"),
+            FieldType::Timestamp => f.write_str("Timestamp"),
+            FieldType::Int64 => f.write_str("Int64"),
+            FieldType::Decimal => f.write_str("Decimal"),
+            FieldType::Json => f.write_str("Document"),
             FieldType::Array(r#type) => write!(f, "Array({})", r#type),
             FieldType::Unsupported(r#type) => write!(f, "{}", r#type),
         }

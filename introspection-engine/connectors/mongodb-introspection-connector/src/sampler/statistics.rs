@@ -21,9 +21,6 @@ use super::field_type::FieldType;
 
 static RESERVED_NAMES: &[&str] = &["PrismaClient"];
 
-static RE_START: Lazy<Regex> = Lazy::new(|| Regex::new("^[^a-zA-Z]+").unwrap());
-static RE: Lazy<Regex> = Lazy::new(|| Regex::new("[^_a-zA-Z0-9]").unwrap());
-
 /// Statistical data from a MongoDB database for determining a Prisma data
 /// model.
 #[derive(Debug, Default)]
@@ -326,6 +323,9 @@ fn add_indices_to_models(models: &mut BTreeMap<String, Model>, indices: &mut BTr
 }
 
 fn sanitize_string(s: &str) -> Option<String> {
+    static RE_START: Lazy<Regex> = Lazy::new(|| Regex::new("^[^a-zA-Z]+").unwrap());
+    static RE: Lazy<Regex> = Lazy::new(|| Regex::new("[^_a-zA-Z0-9]").unwrap());
+
     let needs_sanitation = RE_START.is_match(s) || RE.is_match(s);
 
     if needs_sanitation {

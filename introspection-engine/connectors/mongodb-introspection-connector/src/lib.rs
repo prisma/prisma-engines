@@ -104,7 +104,7 @@ impl IntrospectionConnector for MongoDbIntrospectionConnector {
         ctx: IntrospectionContext,
     ) -> ConnectorResult<IntrospectionResult> {
         if !ctx.preview_features.contains(PreviewFeature::MongoDb) {
-            let mut error = ConnectorError::from_kind(ErrorKind::UnsupportedFeatureError(
+            let mut error = ConnectorError::from_kind(ErrorKind::PreviewFeatureNotEnabled(
                 "MongoDB introspection connector (experimental feature, needs to be enabled)",
             ));
 
