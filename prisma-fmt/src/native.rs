@@ -1,5 +1,5 @@
 pub(crate) fn run(schema: &str) -> String {
-    let validated_configuration = match datamodel::parse_configuration(&schema) {
+    let validated_configuration = match datamodel::parse_configuration(schema) {
         Ok(validated_configuration) => validated_configuration,
         Err(_) => return "[]".to_owned(),
     };

@@ -1,9 +1,10 @@
+#![cfg(target_arch = "wasm32")]
+
 mod actions;
 mod lint;
 mod native;
 mod preview;
 
-#[cfg(target_arch = "wasm32")]
 mod api {
     use crate::*;
     use datamodel::ast::reformat::Reformatter;

@@ -9,7 +9,7 @@ pub struct MiniError {
 }
 
 pub(crate) fn run(schema: &str) -> String {
-    let datamodel_result = datamodel::parse_datamodel(&schema);
+    let datamodel_result = datamodel::parse_datamodel(schema);
 
     match datamodel_result {
         Err(err) => {
