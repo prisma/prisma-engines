@@ -327,7 +327,6 @@ impl Connector for MsSqlDatamodelConnector {
     }
 
     fn get_namespace_violations(&self, schema: &Datamodel) -> Vec<ConstraintNameSpace> {
-        //Hashmap((ConstraintName, Scope), Vec<Table, Type>) => TODO(matthias) Type this bad boy
         let mut potential_name_space_violations: HashMap<(String, String), Vec<(String, String)>> = HashMap::new();
 
         for model in schema.models() {
@@ -372,7 +371,7 @@ impl Connector for MsSqlDatamodelConnector {
 
         potential_name_space_violations
             .iter()
-            .filter(|(k, v)| v.len() > 1)
+            .filter(|(_, v)| v.len() > 1)
             .map(|((name, scope), entries)| {
                 entries
                     .iter()

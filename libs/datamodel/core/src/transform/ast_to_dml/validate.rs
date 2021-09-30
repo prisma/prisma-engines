@@ -7,7 +7,6 @@ use crate::{
     diagnostics::{DatamodelError, Diagnostics},
     dml,
 };
-use datamodel_connector::ConstraintNameSpace;
 
 /// Helper for validating a datamodel.
 ///
@@ -19,6 +18,8 @@ pub struct Validator<'a> {
 /// State error message. Seeing this error means something went really wrong internally. It's the datamodel equivalent of a bluescreen.
 const STATE_ERROR: &str = "Failed lookup of model, field or optional property during internal processing. This means that the internal representation was mutated incorrectly.";
 const RELATION_ATTRIBUTE_NAME: &str = "relation";
+const INDEX_ATTRIBUTE_NAME: &str = "index";
+const UNIQUE_ATTRIBUTE_NAME: &str = "unique";
 const RELATION_ATTRIBUTE_NAME_WITH_AT: &str = "@relation";
 const PRISMA_FORMAT_HINT: &str = "You can run `prisma format` to fix this automatically.";
 
@@ -134,12 +135,13 @@ impl<'a> Validator<'a> {
 
             if let Some(pk) = &model.primary_key {
                 if let Some(pk_name) = &pk.db_name {
-                    if let Some((_scope)) = namespace_violation_scope(&pk_name, "pk") {
+                    if let Some(scope) = namespace_violation_scope(&pk_name, "pk") {
                         let span = ast_model.id_attribute().span;
 
                         let message = format!(
-                            "The given constraint name `{}` is already in use in the data model. Please provide a different name using the `map` argument.",
-                            pk_name
+                            "The given constraint name `{}` has to be unique in the following namespace: {}. Please provide a different name using the `map` argument.",
+
+                            pk_name,scope
                         );
 
                         let error = DatamodelError::new_attribute_validation_error(&message, "id", span);
@@ -153,10 +155,11 @@ impl<'a> Validator<'a> {
                 if let Some(df_name) = field.default_value().and_then(|d| d.db_name()) {
                     let ast_field = ast_model.find_field_bang(&field.name);
 
-                    if let Some((_scope)) = namespace_violation_scope(&df_name, "df") {
+                    if let Some(scope) = namespace_violation_scope(&df_name, "df") {
                         let message = format!(
-                            "The given constraint name `{}` is already in use in the data model. Please provide a different name using the `map` argument.",
-                            df_name
+                            "The given constraint name `{}` has to be unique in the following namespace: {}. Please provide a different name using the `map` argument.",
+
+                            df_name,scope
                         );
 
                         let span = ast_field.span_for_argument("default", "map").unwrap_or(ast_field.span);
@@ -176,14 +179,15 @@ impl<'a> Validator<'a> {
                 let field_span = ast_field.map(|f| f.span).unwrap_or_else(ast::Span::empty);
 
                 if let Some(fk_name) = field.relation_info.fk_name.as_ref() {
-                    if let Some((_scope)) = namespace_violation_scope(&fk_name, "fk") {
+                    if let Some(scope) = namespace_violation_scope(&fk_name, "fk") {
                         let span = ast_field
                             .and_then(|f| f.span_for_argument("relation", "map"))
                             .unwrap_or(field_span);
 
                         let message = format!(
-                            "The given constraint name `{}` is already in use in the data model. Please provide a different name using the `map` argument.",
-                            fk_name
+                            "The given constraint name `{}` has to be unique in the following namespace: {}. Please provide a different name using the `map` argument.",
+
+                            fk_name, scope
                         );
 
                         let error =
@@ -193,7 +197,28 @@ impl<'a> Validator<'a> {
                 }
             }
 
-            //TODO(matthias) indices
+            for index in &model.indices {
+                if let Some(idx_name) = &index.db_name {
+                    if let Some(scope) = namespace_violation_scope(&idx_name, "idx") {
+                        let span = ast_model.span;
+                        let message = format!(
+                            "The given constraint name `{}` has to be unique in the following namespace: {}. Please provide a different name using the `map` argument.",
+                            idx_name, scope
+                        );
+
+                        let error = DatamodelError::new_attribute_validation_error(
+                            &message,
+                            if index.is_unique() {
+                                UNIQUE_ATTRIBUTE_NAME
+                            } else {
+                                INDEX_ATTRIBUTE_NAME
+                            },
+                            span,
+                        );
+                        diagnostics.push_error(error);
+                    }
+                }
+            }
         }
 
         diagnostics

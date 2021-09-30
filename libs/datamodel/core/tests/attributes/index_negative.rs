@@ -196,6 +196,62 @@ fn unique_indexes_with_same_name_are_not_supported_by_postgres() {
 }
 
 #[test]
+fn unique_indexes_with_same_name_are_not_supported_by_mssql() {
+    let dml = indoc! {r#"
+        datasource sqlserver {
+          provider = "sqlserver"
+          url = "sqlserver://asdlj"
+        }
+
+        model User {
+          id         Int @id
+          neighborId Int
+
+          @@index([id], map: "MyIndexName")
+          @@unique([neighborId], map: "MyIndexName")
+        }
+
+        model Post {
+          id Int @id
+          optionId Int
+
+          @@unique([id], map: "MyIndexName")
+        }
+    "#};
+
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@index": The given constraint name `MyIndexName` has to be unique in the following namespace: model User. Please provide a different name using the `map` argument.[0m
+          [1;94m-->[0m  [4mschema.prisma:6[0m
+        [1;94m   | [0m
+        [1;94m 5 | [0m
+        [1;94m 6 | [0m[1;91mmodel User {[0m
+        [1;94m 7 | [0m  id         Int @id
+        [1;94m 8 | [0m  neighborId Int
+        [1;94m 9 | [0m
+        [1;94m10 | [0m  @@index([id], map: "MyIndexName")
+        [1;94m11 | [0m  @@unique([neighborId], map: "MyIndexName")
+        [1;94m12 | [0m}
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@unique": The given constraint name `MyIndexName` has to be unique in the following namespace: model User. Please provide a different name using the `map` argument.[0m
+          [1;94m-->[0m  [4mschema.prisma:6[0m
+        [1;94m   | [0m
+        [1;94m 5 | [0m
+        [1;94m 6 | [0m[1;91mmodel User {[0m
+        [1;94m 7 | [0m  id         Int @id
+        [1;94m 8 | [0m  neighborId Int
+        [1;94m 9 | [0m
+        [1;94m10 | [0m  @@index([id], map: "MyIndexName")
+        [1;94m11 | [0m  @@unique([neighborId], map: "MyIndexName")
+        [1;94m12 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
 fn must_error_when_unknown_fields_are_used() {
     let dml = indoc! {r#"
         model User {
