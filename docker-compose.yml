@@ -225,6 +225,40 @@ services:
     networks:
       - databases
 
+  mongo4-single:
+    image: mongo:4
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: "prisma"
+      MONGO_INITDB_ROOT_PASSWORD: "prisma"
+    ports:
+      - "27017:27017"
+    networks:
+      - databases
+
+  mongo5-single:
+    image: mongo:5
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: "prisma"
+      MONGO_INITDB_ROOT_PASSWORD: "prisma"
+    ports:
+      - "27018:27017"
+    networks:
+      - databases
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: "prisma"
+      ME_CONFIG_MONGODB_ADMINPASSWORD: "prisma"
+      ME_CONFIG_MONGODB_URL: mongodb://prisma:prisma@mongo4-single:27017/
+    networks:
+      - databases
+
   jaeger:
     image: jaegertracing/all-in-one:latest
     restart: always

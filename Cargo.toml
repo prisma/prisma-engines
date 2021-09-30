@@ -2,6 +2,7 @@
 members = [
   "introspection-engine/connectors/introspection-connector",
   "introspection-engine/connectors/sql-introspection-connector",
+  "introspection-engine/connectors/mongodb-introspection-connector",
   "introspection-engine/core",
   "introspection-engine/introspection-engine-tests",
   "libs/datamodel/connectors/datamodel-connector",

@@ -440,6 +440,10 @@ impl ScalarField {
         field
     }
 
+    pub fn set_default_value(&mut self, val: DefaultValue) {
+        self.default_value = Some(val)
+    }
+
     //todo use withdatabasename::final_database_name instead
     pub fn db_name(&self) -> &str {
         self.database_name.as_ref().unwrap_or(&self.name)

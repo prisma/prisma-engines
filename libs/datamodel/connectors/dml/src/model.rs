@@ -4,7 +4,7 @@ use crate::scalars::ScalarType;
 use crate::traits::{Ignorable, WithDatabaseName, WithName};
 
 /// Represents a model in a prisma schema.
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone, Default)]
 pub struct Model {
     /// Name of the model.
     pub name: String,

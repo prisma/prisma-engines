@@ -14,6 +14,7 @@ use mongodb::{
     ClientSession, Collection,
 };
 use prisma_models::{ModelProjection, ModelRef, ScalarFieldRef};
+use std::convert::TryFrom;
 
 /// Ergonomics wrapper for query execution and logging.
 /// Todo: Add all other queries gradually.
@@ -26,7 +27,7 @@ pub enum MongoReadQuery {
 impl MongoReadQuery {
     pub async fn execute(
         self,
-        on_collection: Collection,
+        on_collection: Collection<Document>,
         with_session: &mut ClientSession,
     ) -> crate::Result<Vec<Document>> {
         log_query(on_collection.name(), &self);
@@ -44,7 +45,7 @@ pub struct PipelineQuery {
 impl PipelineQuery {
     pub async fn execute(
         self,
-        on_collection: Collection,
+        on_collection: Collection<Document>,
         with_session: &mut ClientSession,
     ) -> crate::Result<Vec<Document>> {
         let opts = AggregateOptions::builder().allow_disk_use(true).build();
@@ -64,7 +65,7 @@ pub struct FindQuery {
 impl FindQuery {
     pub async fn execute(
         self,
-        on_collection: Collection,
+        on_collection: Collection<Document>,
         with_session: &mut ClientSession,
     ) -> crate::Result<Vec<Document>> {
         let cursor = on_collection
@@ -294,7 +295,7 @@ impl MongoReadQueryBuilder {
 
         // $skip
         if let Some(skip) = self.skip {
-            stages.push(doc! { "$skip": skip });
+            stages.push(doc! { "$skip": i64::try_from(skip).unwrap() });
         };
 
         // $limit
