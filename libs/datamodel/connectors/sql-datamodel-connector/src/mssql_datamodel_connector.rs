@@ -327,21 +327,16 @@ impl Connector for MsSqlDatamodelConnector {
     }
 
     fn get_namespace_violations(&self, schema: &Datamodel) -> Vec<ConstraintNameSpace> {
-        //Hashmap(ConstraintName, Vec<Table, Type, Scope, Count>) => TODO(matthias) Type this bad boy
-        let mut potential_name_space_violations: HashMap<String, Vec<(String, String, String, usize)>> = HashMap::new();
+        //Hashmap((ConstraintName, Scope), Vec<Table, Type>) => TODO(matthias) Type this bad boy
+        let mut potential_name_space_violations: HashMap<(String, String), Vec<(String, String)>> = HashMap::new();
 
         for model in schema.models() {
             if let Some(name) = model.primary_key.as_ref().and_then(|pk| pk.db_name.as_ref()) {
                 let entry = potential_name_space_violations
-                    .entry(name.to_string())
+                    .entry((name.to_string(), "global".to_string()))
                     .or_insert(vec![]);
 
-                entry.push((model.name.clone(), "pk".to_string(), "global".to_string(), 0));
-
-                entry
-                    .iter_mut()
-                    .filter(|(_, _, scope, _)| scope == "global")
-                    .for_each(|(_, _, _, count)| *count += 1);
+                entry.push((model.name.clone(), "pk".to_string()));
             }
 
             for name in model
@@ -349,15 +344,10 @@ impl Connector for MsSqlDatamodelConnector {
                 .filter_map(|rf| rf.relation_info.fk_name.as_ref())
             {
                 let entry = potential_name_space_violations
-                    .entry(name.to_string())
+                    .entry((name.to_string(), "global".to_string()))
                     .or_insert(vec![]);
 
-                entry.push((model.name.clone(), "fk".to_string(), "global".to_string(), 0));
-
-                entry
-                    .iter_mut()
-                    .filter(|(_, _, scope, _)| scope == "global")
-                    .for_each(|(_, _, _, count)| *count += 1);
+                entry.push((model.name.clone(), "fk".to_string()));
             }
 
             for name in model
@@ -365,49 +355,28 @@ impl Connector for MsSqlDatamodelConnector {
                 .filter_map(|sf| sf.default_value().and_then(|d| d.db_name()))
             {
                 let entry = potential_name_space_violations
-                    .entry(name.to_string())
+                    .entry((name.to_string(), "global".to_string()))
                     .or_insert(vec![]);
 
-                entry.push((model.name.clone(), "df".to_string(), "global".to_string(), 0));
-
-                entry
-                    .iter_mut()
-                    .filter(|(_, _, scope, _)| scope == "global")
-                    .for_each(|(_, _, _, count)| *count += 1);
+                entry.push((model.name.clone(), "df".to_string()));
             }
 
             for name in model.indices.iter().filter_map(|i| i.db_name.as_ref()) {
                 let entry = potential_name_space_violations
-                    .entry(name.to_string())
+                    .entry((name.to_string(), format!("model {}", model.name)))
                     .or_insert(vec![]);
 
-                entry.push((
-                    model.name.clone(),
-                    "idx".to_string(),
-                    format!("model {}", model.name),
-                    0,
-                ));
-
-                entry
-                    .iter_mut()
-                    .filter(|(_, _, scope, _)| *scope == format!("model {}", model.name))
-                    .for_each(|(_, _, _, count)| *count += 1);
+                entry.push((model.name.clone(), "idx".to_string()));
             }
         }
 
         potential_name_space_violations
             .iter()
-            .map(|(name, entries)| {
-                let duplicates: Vec<String> = entries
-                    .iter()
-                    .filter(|(_, _, _, count)| *count > 1)
-                    .map(|(_, _, scope, _)| scope.clone())
-                    .collect();
-
+            .filter(|(k, v)| v.len() > 1)
+            .map(|((name, scope), entries)| {
                 entries
                     .iter()
-                    .filter(|(_, _, scope, _)| duplicates.contains(scope))
-                    .map(|(table, tpe, scope, _)| ConstraintNameSpace {
+                    .map(|(table, tpe)| ConstraintNameSpace {
                         table: table.clone(),
                         name: name.clone(),
                         tpe: tpe.clone(),
