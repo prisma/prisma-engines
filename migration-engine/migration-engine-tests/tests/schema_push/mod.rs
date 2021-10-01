@@ -258,39 +258,6 @@ fn sqlite_reserved_name_space_can_be_used(api: TestApi) {
     });
 }
 
-#[test_connector(tags(Postgres))]
-fn names_that_are_too_long_are_truncated(api: TestApi) {
-    let plain_dm = r#"
-            model Post {
-              id        Int     @id @default(autoincrement())
-              link LinkingTableForUserAndPostWithObnoxiouslyLongNameButNotTooLongBUTLONGER[]
-            }
-
-            model User {
-              id    Int     @id @default(autoincrement())
-              link LinkingTableForUserAndPostWithObnoxiouslyLongNameButNotTooLongBUTLONGER[]
-            }
-
-
-            model LinkingTableForUserAndPostWithObnoxiouslyLongNameButNotTooLongBUTLONGER {
-              id Int     @id @default(autoincrement())
-
-              post   Post @relation(fields: [postId], references: [id])
-              postId Int          @map("post_id")
-
-              user   User @relation(fields: [userId], references: [id])
-              userId Int       @map("user_id")
-            }
-     "#;
-
-    api.schema_push_w_datasource(plain_dm).send().assert_green();
-    api.assert_schema().assert_table("A", |table| {
-        table.assert_has_index_name_and_type("sqlite_unique", true);
-        table.assert_has_index_name_and_type("sqlite_compound_unique", true);
-        table.assert_has_index_name_and_type("sqlite_index", false)
-    });
-}
-
 //working constraint names
 
 //MSSQL

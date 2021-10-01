@@ -316,6 +316,55 @@ fn foreign_keys_and_primary_keys_with_same_name_on_same_table_are_not_supported_
     expectation.assert_eq(&error)
 }
 
+#[test]
+fn truncated_constraint_names_are_checked_for_uniqueness_on_postgres() {
+    let dml = formatdoc! {r#"
+        {datasource}
+
+        model Post {{
+          id        Int     @id @default(autoincrement())
+          link LinkingTableForUserAndPostWithObnoxiouslyLongNameButNotTooLongBUTLONGER[]
+        }}
+
+        model User {{
+          id    Int     @id @default(autoincrement())
+          link LinkingTableForUserAndPostWithObnoxiouslyLongNameButNotTooLongBUTLONGER[]
+        }}
+
+
+        model LinkingTableForUserAndPostWithObnoxiouslyLongNameButNotTooLongBUTLONGER {{
+          id Int     @id @default(autoincrement())
+
+          post   Post @relation(fields: [postId], references: [id])
+          postId Int          @map("post_id")
+
+          user   User @relation(fields: [userId], references: [id])
+          userId Int       @map("user_id")
+        }}
+    "#, datasource = POSTGRES};
+
+    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@relation": The given constraint name `LinkingTableForUserAndPostWithObnoxiouslyLongNameButNotToo_fkey` has to be unique in the following namespace: pk, key, idx, fk on LinkingTableForUserAndPostWithObnoxiouslyLongNameButNotTooLongBUTLONGER. Please provide a different name using the `map` argument.[0m
+          [1;94m-->[0m  [4mschema.prisma:20[0m
+        [1;94m   | [0m
+        [1;94m19 | [0m
+        [1;94m20 | [0m  [1;91mpost   Post @relation(fields: [postId], references: [id])[0m
+        [1;94m21 | [0m  postId Int          @map("post_id")
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": The given constraint name `LinkingTableForUserAndPostWithObnoxiouslyLongNameButNotToo_fkey` has to be unique in the following namespace: pk, key, idx, fk on LinkingTableForUserAndPostWithObnoxiouslyLongNameButNotTooLongBUTLONGER. Please provide a different name using the `map` argument.[0m
+          [1;94m-->[0m  [4mschema.prisma:23[0m
+        [1;94m   | [0m
+        [1;94m22 | [0m
+        [1;94m23 | [0m  [1;91muser   User @relation(fields: [userId], references: [id])[0m
+        [1;94m24 | [0m  userId Int       @map("user_id")
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
 // Namespaces MySql
 #[test]
 fn foreign_keys_and_indexes_with_same_name_on_same_table_are_not_supported_on_mysql() {
