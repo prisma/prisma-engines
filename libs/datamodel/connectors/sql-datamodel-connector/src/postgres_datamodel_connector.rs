@@ -14,7 +14,7 @@ use dml::{
 };
 use enumflags2::BitFlags;
 use native_types::PostgresType::{self, *};
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 const SMALL_INT_TYPE_NAME: &str = "SmallInt";
 const INTEGER_TYPE_NAME: &str = "Integer";
@@ -291,7 +291,7 @@ impl Connector for PostgresDatamodelConnector {
     }
 
     fn get_namespace_violations(&self, schema: &Datamodel) -> Vec<ConstraintNameSpace> {
-        let mut potential_name_space_violations: HashMap<(String, String), Vec<(String, String)>> = HashMap::new();
+        let mut potential_name_space_violations: BTreeMap<(String, String), Vec<(String, String)>> = BTreeMap::new();
 
         //Primary Key, Unique and Index names have to be globally unique
         //Additionally, within a table they cannot conflict with Foreign Key names
@@ -300,13 +300,13 @@ impl Connector for PostgresDatamodelConnector {
             if let Some(name) = model.primary_key.as_ref().and_then(|pk| pk.db_name.as_ref()) {
                 let entry = potential_name_space_violations
                     .entry((name.to_string(), "pk, key, idx global".to_string()))
-                    .or_insert(vec![]);
+                    .or_insert_with(Vec::new);
 
                 entry.push((model.name.clone(), "pk".to_string()));
 
                 let entry = potential_name_space_violations
                     .entry((name.to_string(), format!("pk, key, idx, fk on {}", model.name)))
-                    .or_insert(vec![]);
+                    .or_insert_with(Vec::new);
 
                 entry.push((model.name.clone(), "pk".to_string()));
             }
@@ -317,7 +317,7 @@ impl Connector for PostgresDatamodelConnector {
             {
                 let entry = potential_name_space_violations
                     .entry((name.to_string(), format!("pk, key, idx, fk on {}", model.name)))
-                    .or_insert(vec![]);
+                    .or_insert_with(Vec::new);
 
                 entry.push((model.name.clone(), "fk".to_string()));
             }
@@ -325,13 +325,13 @@ impl Connector for PostgresDatamodelConnector {
             for name in model.indices.iter().filter_map(|i| i.db_name.as_ref()) {
                 let entry = potential_name_space_violations
                     .entry((name.to_string(), "pk, key, idx global".to_string()))
-                    .or_insert(vec![]);
+                    .or_insert_with(Vec::new);
 
                 entry.push((model.name.clone(), "idx".to_string()));
 
                 let entry = potential_name_space_violations
                     .entry((name.to_string(), format!("pk, key, idx, fk on {}", model.name)))
-                    .or_insert(vec![]);
+                    .or_insert_with(Vec::new);
 
                 entry.push((model.name.clone(), "idx".to_string()));
             }

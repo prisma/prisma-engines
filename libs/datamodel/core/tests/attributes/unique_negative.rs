@@ -417,11 +417,25 @@ fn duplicate_implicit_names_should_error() {
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mThe index name `User_used_key` is declared multiple times. With the current connector index names have to be globally unique.[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;91merror[0m: [1mError parsing attribute "@unique": The given constraint name `User_used_key` has to be unique in the following namespace: pk, key, idx global. Please provide a different name using the `map` argument.[0m
+          [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
+        [1;94m10 | [0m    }
+        [1;94m11 | [0m[1;91mmodel User {[0m
+        [1;94m12 | [0m  used           Int @unique
         [1;94m13 | [0m
-        [1;94m14 | [0m  @@[1;91munique([used])[0m
+        [1;94m14 | [0m  @@unique([used])
+        [1;94m15 | [0m}
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@unique": The given constraint name `User_used_key` has to be unique in the following namespace: pk, key, idx global. Please provide a different name using the `map` argument.[0m
+          [1;94m-->[0m  [4mschema.prisma:11[0m
+        [1;94m   | [0m
+        [1;94m10 | [0m    }
+        [1;94m11 | [0m[1;91mmodel User {[0m
+        [1;94m12 | [0m  used           Int @unique
+        [1;94m13 | [0m
+        [1;94m14 | [0m  @@unique([used])
+        [1;94m15 | [0m}
         [1;94m   | [0m
     "#]];
 

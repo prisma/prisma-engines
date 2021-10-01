@@ -360,8 +360,6 @@ fn duplicate_primary_and_index_name_in_different_table_works_on_mssql(api: TestA
     api.schema_push_w_datasource(plain_dm).send().assert_green();
 }
 
-// Test for failures at db level
-
 //Postgres
 
 #[test_connector(tags(Postgres))]
@@ -382,22 +380,21 @@ fn duplicate_primary_and_foreign_key_name_across_models_work_on_postgres(api: Te
     api.schema_push_w_datasource(plain_dm).send().assert_green();
 }
 
-#[test_connector(tags(Postgres))]
-fn validate_disallowed(api: TestApi) {
+//Mysql
+#[test_connector(tags(Mysql))]
+fn duplicate_constraint_names_across_models_work_on_mysql(api: TestApi) {
     let plain_dm = r#"
-            model User {
-          id         Int @id
-          neighborId Int
+     model User {
+        id         Int @id
 
-          @@index([id], map: "MyIndexName")
-        }
+        @@index([id], name: "MyName")
+     }
 
-        model Post {
-          id Int @id
-          optionId Int
+     model Post {
+        id Int @id
 
-          @@unique([id], map: "MyIndexName")
-        }
+        @@index([id], name: "MyName")
+     }
      "#;
 
     api.schema_push_w_datasource(plain_dm).send().assert_green();

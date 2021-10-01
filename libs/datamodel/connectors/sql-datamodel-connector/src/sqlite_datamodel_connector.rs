@@ -1,10 +1,14 @@
-use datamodel_connector::{connector_error::ConnectorError, Connector, ConnectorCapability, ReferentialIntegrity};
+use datamodel_connector::{
+    connector_error::ConnectorError, Connector, ConnectorCapability, ConstraintNameSpace, ReferentialIntegrity,
+};
+use dml::datamodel::Datamodel;
 use dml::{
     field::Field, model::Model, native_type_constructor::NativeTypeConstructor,
     native_type_instance::NativeTypeInstance, relation_info::ReferentialAction, scalars::ScalarType,
 };
 use enumflags2::BitFlags;
 use std::borrow::Cow;
+use std::collections::BTreeMap;
 
 pub struct SqliteDatamodelConnector {
     capabilities: Vec<ConnectorCapability>,
@@ -79,6 +83,38 @@ impl Connector for SqliteDatamodelConnector {
 
     fn validate_model(&self, _model: &Model) -> Result<(), ConnectorError> {
         Ok(())
+    }
+
+    fn get_namespace_violations(&self, schema: &Datamodel) -> Vec<ConstraintNameSpace> {
+        let mut potential_name_space_violations: BTreeMap<(String, String), Vec<(String, String)>> = BTreeMap::new();
+
+        //Indexes have to be globally unique
+        for model in schema.models() {
+            for name in model.indices.iter().filter_map(|i| i.db_name.as_ref()) {
+                let entry = potential_name_space_violations
+                    .entry((name.to_string(), "key, idx global".to_string()))
+                    .or_insert_with(Vec::new);
+
+                entry.push((model.name.clone(), "idx".to_string()));
+            }
+        }
+
+        potential_name_space_violations
+            .iter()
+            .filter(|(_, v)| v.len() > 1)
+            .map(|((name, scope), entries)| {
+                entries
+                    .iter()
+                    .map(|(table, tpe)| ConstraintNameSpace {
+                        table: table.clone(),
+                        name: name.clone(),
+                        tpe: tpe.clone(),
+                        scope: scope.clone(),
+                    })
+                    .collect::<Vec<ConstraintNameSpace>>()
+            })
+            .flatten()
+            .collect()
     }
 
     fn available_native_type_constructors(&self) -> &[NativeTypeConstructor] {

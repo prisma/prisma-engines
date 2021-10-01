@@ -1,4 +1,3 @@
-use crate::attributes::with_postgres_provider;
 use crate::common::*;
 
 #[test]

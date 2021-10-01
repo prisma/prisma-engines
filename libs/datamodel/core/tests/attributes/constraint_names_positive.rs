@@ -101,7 +101,7 @@ fn multiple_constraints_with_same_name_in_different_namespaces_are_supported_by_
 
     model User {
         id         Int @id
-        neighborId Int @default(map: "MyName")
+        neighborId Int @default(5, map: "MyName")
         posts      Post[]
 
         @@index([id], name: "MyName")
@@ -114,12 +114,6 @@ fn multiple_constraints_with_same_name_in_different_namespaces_are_supported_by_
 
         @@index([id], name: "MyOtherName")
      }
-
-     model Blog {
-        id Int @id("MyThirdName")
-
-        @@index([id], name: "MyThirdName")
-     }
     "#;
 
     let schema = parse(dml);
@@ -129,7 +123,7 @@ fn multiple_constraints_with_same_name_in_different_namespaces_are_supported_by_
 
     user_model.assert_has_index(IndexDefinition {
         name: None,
-        db_name: Some("MyIndexName".to_string()),
+        db_name: Some("MyName".to_string()),
         fields: vec!["id".to_string()],
         tpe: IndexType::Normal,
         defined_on_field: false,
@@ -137,7 +131,7 @@ fn multiple_constraints_with_same_name_in_different_namespaces_are_supported_by_
 
     post_model.assert_has_index(IndexDefinition {
         name: None,
-        db_name: Some("MyIndexName".to_string()),
+        db_name: Some("MyOtherName".to_string()),
         fields: vec!["id".to_string()],
         tpe: IndexType::Normal,
         defined_on_field: false,

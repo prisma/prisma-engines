@@ -14,7 +14,7 @@ use dml::{
 };
 use enumflags2::BitFlags;
 use native_types::MySqlType::{self, *};
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 const INT_TYPE_NAME: &str = "Int";
 const UNSIGNED_INT_TYPE_NAME: &str = "UnsignedInt";
@@ -72,7 +72,7 @@ impl MySqlDatamodelConnector {
             ConnectorCapability::RelationsOverNonUniqueCriteria,
             ConnectorCapability::Enums,
             ConnectorCapability::Json,
-            ConnectorCapability::MultipleIndexesWithSameName,
+            ConnectorCapability::MultipleIndexesWithSameName, //TODO(matthias) get rid of this
             ConnectorCapability::AutoIncrementAllowedOnNonId,
             ConnectorCapability::RelationFieldsInArbitraryOrder,
             ConnectorCapability::CreateMany,
@@ -350,11 +350,10 @@ impl Connector for MySqlDatamodelConnector {
     }
 
     fn get_namespace_violations(&self, schema: &Datamodel) -> Vec<ConstraintNameSpace> {
-        let mut potential_name_space_violations: HashMap<(String, String), Vec<(String, String)>> = HashMap::new();
+        let mut potential_name_space_violations: BTreeMap<(String, String), Vec<(String, String)>> = BTreeMap::new();
 
         //Foreign Keys and Indexes each have their own global namespace
         //Additionally, they cannot have the same name within a table
-
         for model in schema.models() {
             for name in model
                 .relation_fields()
@@ -362,27 +361,21 @@ impl Connector for MySqlDatamodelConnector {
             {
                 let entry = potential_name_space_violations
                     .entry((name.to_string(), "fk global".to_string()))
-                    .or_insert(vec![]);
+                    .or_insert_with(Vec::new);
 
                 entry.push((model.name.clone(), "fk".to_string()));
 
                 let entry = potential_name_space_violations
                     .entry((name.to_string(), format!("key, idx, fk on {}", model.name)))
-                    .or_insert(vec![]);
+                    .or_insert_with(Vec::new);
 
                 entry.push((model.name.clone(), "fk".to_string()));
             }
 
             for name in model.indices.iter().filter_map(|i| i.db_name.as_ref()) {
                 let entry = potential_name_space_violations
-                    .entry((name.to_string(), "key, idx global".to_string()))
-                    .or_insert(vec![]);
-
-                entry.push((model.name.clone(), "idx".to_string()));
-
-                let entry = potential_name_space_violations
                     .entry((name.to_string(), format!("key, idx, fk on {}", model.name)))
-                    .or_insert(vec![]);
+                    .or_insert_with(Vec::new);
 
                 entry.push((model.name.clone(), "idx".to_string()));
             }
