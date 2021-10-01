@@ -59,7 +59,8 @@ features!(
     ReferentialActions,
     InteractiveTransactions,
     NamedConstraints,
-    FullTextSearch
+    FullTextSearch,
+    DataProxy,
 );
 
 // Mapping of which active, deprecated and hidden
@@ -74,6 +75,7 @@ pub static GENERATOR: Lazy<FeatureMap> = Lazy::new(|| {
             MongoDb,
             InteractiveTransactions,
             FullTextSearch,
+            DataProxy,
         ])
         .with_deprecated(vec![
             AtomicNumberOperations,
