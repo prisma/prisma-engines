@@ -75,7 +75,7 @@ pub static GENERATOR: Lazy<FeatureMap> = Lazy::new(|| {
             MongoDb,
             InteractiveTransactions,
             FullTextSearch,
-            DataProxy
+            DataProxy,
         ])
         .with_deprecated(vec![
             AtomicNumberOperations,
