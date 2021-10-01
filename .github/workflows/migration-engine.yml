@@ -71,8 +71,8 @@ jobs:
             url: "postgresql://postgres:prisma@localhost:5434"
           - name: postgres13
             url: "postgresql://postgres:prisma@localhost:5435"
-          - name: cockroach
-            url: "postgresql://root@localhost:5436"
+          # - name: cockroach
+          #   url: "postgresql://root@localhost:5436"
             is_cockroach: true
           - name: sqlite
             url: sqlite
