@@ -36,6 +36,8 @@ pub async fn rpc_api(datamodel: &str) -> CoreResult<IoHandler> {
     let mut io_handler = IoHandler::default();
     let executor = Arc::new(crate::migration_api(datamodel).await?);
 
+    executor.ensure_connection_validity().await?;
+
     for cmd in AVAILABLE_COMMANDS {
         let executor = executor.clone();
         io_handler.add_method(cmd, move |params: Params| {

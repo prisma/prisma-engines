@@ -62,6 +62,10 @@ impl MigrationConnector for MongoDbMigrationConnector {
         "mongodb"
     }
 
+    async fn ensure_connection_validity(&self) -> ConnectorResult<()> {
+        Ok(())
+    }
+
     async fn version(&self) -> migration_connector::ConnectorResult<String> {
         Ok("4".to_owned())
     }

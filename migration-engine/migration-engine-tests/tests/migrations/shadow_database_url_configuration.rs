@@ -84,7 +84,7 @@ fn shadow_db_url_can_be_configured_on_postgres(api: TestApi) {
 
     // Check that commands using the shadow database work.
     {
-        let engine = api.new_engine_with_connection_strings(&test_user_connection_string, Some(custom_shadow_db_url));
+        let engine = api.new_engine_with_connection_strings(test_user_connection_string, Some(custom_shadow_db_url));
 
         engine
             .apply_migrations(&migrations_directory)
@@ -121,8 +121,10 @@ fn shadow_db_url_must_not_match_main_url(api: TestApi) {
 
     // URLs match -> error
     {
-        let engine =
-            api.new_engine_with_connection_strings(api.connection_string(), Some(api.connection_string().to_owned()));
+        let engine = api.new_engine_with_connection_strings(
+            api.connection_string().to_owned(),
+            Some(api.connection_string().to_owned()),
+        );
 
         let err = engine
             .create_migration("01init", schema, &migrations_directory)
@@ -140,7 +142,7 @@ fn shadow_db_url_must_not_match_main_url(api: TestApi) {
         let mut url: url::Url = api.connection_string().parse().unwrap();
         url.set_path("/testshadowdb0002");
 
-        let engine = api.new_engine_with_connection_strings(api.connection_string(), Some(url.to_string()));
+        let engine = api.new_engine_with_connection_strings(api.connection_string().to_owned(), Some(url.to_string()));
 
         engine
             .create_migration("01init", schema, &migrations_directory)
@@ -163,7 +165,7 @@ fn shadow_db_not_reachable_error_must_have_the_right_connection_info(api: TestAp
     let mut url: url::Url = api.connection_string().parse().unwrap();
     url.set_port(Some(39824)).unwrap(); // let's assume no database is running on that port
 
-    let engine = api.new_engine_with_connection_strings(api.connection_string(), Some(url.to_string()));
+    let engine = api.new_engine_with_connection_strings(api.connection_string().to_owned(), Some(url.to_string()));
 
     let err = engine
         .create_migration("01init", schema, &migrations_directory)

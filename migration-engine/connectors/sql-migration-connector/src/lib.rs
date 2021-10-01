@@ -25,28 +25,35 @@ use quaint::prelude::ConnectionInfo;
 use sql_migration::{DropUserDefinedType, DropView, SqlMigration, SqlMigrationStep};
 use sql_schema_describer::{walkers::SqlSchemaExt, ColumnId, SqlSchema, TableId};
 use std::env;
+use user_facing_errors::KnownError;
 
 /// The top-level SQL migration connector.
 pub struct SqlMigrationConnector {
-    connection: Connection,
+    connection: tokio::sync::OnceCell<ConnectorResult<Connection>>,
+    connection_string: String,
+    connection_info: ConnectionInfo,
     flavour: Box<dyn SqlFlavour + Send + Sync + 'static>,
     shadow_database_connection_string: Option<String>,
 }
 
 impl SqlMigrationConnector {
     /// Construct and initialize the SQL migration connector.
-    pub async fn new(
-        connection_string: &str,
+    pub fn new(
+        connection_string: String,
         preview_features: BitFlags<PreviewFeature>,
         shadow_database_connection_string: Option<String>,
     ) -> ConnectorResult<Self> {
-        let connection = connect(connection_string).await?;
-        let flavour = flavour::from_connection_info(connection.connection_info(), preview_features);
+        let connection_info = ConnectionInfo::from_url(&connection_string).map_err(|err| {
+            let details = user_facing_errors::quaint::invalid_connection_string_description(&err.to_string());
+            KnownError::new(user_facing_errors::common::InvalidConnectionString { details })
+        })?;
 
-        flavour.ensure_connection_validity(&connection).await?;
+        let flavour = flavour::from_connection_info(&connection_info, preview_features);
 
         Ok(Self {
-            connection,
+            connection_string,
+            connection_info,
+            connection: tokio::sync::OnceCell::new(),
             flavour,
             shadow_database_connection_string,
         })
@@ -76,8 +83,18 @@ impl SqlMigrationConnector {
         flavour.qe_setup(database_str).await
     }
 
-    fn conn(&self) -> &Connection {
-        &self.connection
+    async fn conn(&self) -> ConnectorResult<&Connection> {
+        self.connection
+            .get_or_init(|| {
+                Box::pin(async {
+                    let connection = connect(&self.connection_string).await?;
+                    self.flavour.ensure_connection_validity(&connection).await?;
+                    Ok(connection)
+                })
+            })
+            .await
+            .as_ref()
+            .map_err(|err| err.clone())
     }
 
     fn flavour(&self) -> &(dyn SqlFlavour + Send + Sync) {
@@ -86,7 +103,7 @@ impl SqlMigrationConnector {
 
     /// Made public for tests.
     pub async fn describe_schema(&self) -> ConnectorResult<SqlSchema> {
-        self.connection.describe_schema().await
+        self.conn().await?.describe_schema().await
     }
 
     /// Try to reset the database to an empty state. This should only be used
@@ -178,17 +195,20 @@ impl SqlMigrationConnector {
         sql: &str,
         params: &[quaint::prelude::Value<'_>],
     ) -> ConnectorResult<quaint::prelude::ResultSet> {
-        Ok(self.connection.query_raw(sql, params).await?)
+        let conn = self.conn().await?;
+        Ok(conn.query_raw(sql, params).await?)
     }
 
     /// For tests
     pub async fn query(&self, query: impl Into<quaint::ast::Query<'_>>) -> ConnectorResult<quaint::prelude::ResultSet> {
-        Ok(self.connection.query(query).await?)
+        let conn = self.conn().await?;
+        Ok(conn.query(query).await?)
     }
 
     /// For tests
     pub async fn raw_cmd(&self, sql: &str) -> ConnectorResult<()> {
-        Ok(self.connection.raw_cmd(sql).await?)
+        let conn = self.conn().await?;
+        Ok(conn.raw_cmd(sql).await?)
     }
 
     /// Generate a name for a temporary (shadow) database, _if_ there is no user-configured shadow database url.
@@ -207,8 +227,9 @@ impl SqlMigrationConnector {
                 self.flavour.as_ref(),
             )),
             DiffTarget::Migrations(migrations) => {
+                let conn = self.conn().await?;
                 self.flavour()
-                    .sql_schema_from_migration_history(migrations, &self.connection, self)
+                    .sql_schema_from_migration_history(migrations, conn, self)
                     .await
             }
             DiffTarget::Database => self.describe_schema().await,
@@ -220,16 +241,22 @@ impl SqlMigrationConnector {
 #[async_trait::async_trait]
 impl MigrationConnector for SqlMigrationConnector {
     fn connector_type(&self) -> &'static str {
-        self.connection.connection_info().sql_family().as_str()
+        self.connection_info.sql_family().as_str()
     }
 
     async fn acquire_lock(&self) -> ConnectorResult<()> {
-        self.flavour().acquire_lock(self.conn()).await
+        let conn = self.conn().await?;
+        self.flavour().acquire_lock(conn).await
+    }
+
+    async fn ensure_connection_validity(&self) -> ConnectorResult<()> {
+        let conn = self.conn().await?;
+        self.flavour().ensure_connection_validity(conn).await
     }
 
     async fn version(&self) -> ConnectorResult<String> {
-        Ok(self
-            .connection
+        let conn = self.conn().await?;
+        Ok(conn
             .version()
             .await?
             .unwrap_or_else(|| "Database version information not available.".into()))
@@ -286,8 +313,9 @@ impl MigrationConnector for SqlMigrationConnector {
     }
 
     async fn reset(&self) -> ConnectorResult<()> {
-        if self.flavour.reset(self.conn()).await.is_err() {
-            self.best_effort_reset(self.conn()).await?;
+        let conn = self.conn().await?;
+        if self.flavour.reset(conn).await.is_err() {
+            self.best_effort_reset(conn).await?;
         }
 
         Ok(())
@@ -320,8 +348,9 @@ impl MigrationConnector for SqlMigrationConnector {
 
     #[tracing::instrument(skip(self, migrations))]
     async fn validate_migrations(&self, migrations: &[MigrationDirectory]) -> ConnectorResult<()> {
+        let conn = self.conn().await?;
         self.flavour()
-            .sql_schema_from_migration_history(migrations, self.conn(), self)
+            .sql_schema_from_migration_history(migrations, conn, self)
             .await?;
 
         Ok(())

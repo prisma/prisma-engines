@@ -18,7 +18,7 @@ fn create_migration_with_new_provider_errors(api: TestApi) {
     "#;
 
     let migrations_directory = api.create_migrations_directory();
-    let engine = api.new_engine_with_connection_strings(api.connection_string(), None);
+    let engine = api.new_engine_with_connection_strings(api.connection_string().to_owned(), None);
 
     engine.create_migration("01init", dm, &migrations_directory).send_sync();
 
@@ -33,7 +33,7 @@ fn create_migration_with_new_provider_errors(api: TestApi) {
         }
     "#;
 
-    let sqlite_engine = api.new_engine_with_connection_strings(&sqlite_test_url("migratelocktest"), None);
+    let sqlite_engine = api.new_engine_with_connection_strings(sqlite_test_url("migratelocktest"), None);
 
     let err = sqlite_engine
         .create_migration("02switchprovider", dm2, &migrations_directory)
@@ -83,7 +83,7 @@ fn migration_lock_with_different_comment_shapes_work(api: TestApi) {
 
     let migration_lock_path = migrations_directory.path().join("migration_lock.toml");
 
-    let engine = api.new_engine_with_connection_strings(api.connection_string(), None);
+    let engine = api.new_engine_with_connection_strings(api.connection_string().to_owned(), None);
 
     for contents in contents {
         let span = tracing::info_span!("Contents", contents = contents);

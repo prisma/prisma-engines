@@ -29,6 +29,11 @@ pub trait GenericApi: Send + Sync + 'static {
         input: &DiagnoseMigrationHistoryInput,
     ) -> CoreResult<DiagnoseMigrationHistoryOutput>;
 
+    /// Make sure the connection to the database is established and valid.
+    /// Connectors can choose to connect lazily, but this method should force
+    /// them to connect.
+    async fn ensure_connection_validity(&self) -> CoreResult<()>;
+
     /// Evaluate the consequences of running the next migration we would generate, given the current state of a Prisma schema.
     async fn evaluate_data_loss(&self, input: &EvaluateDataLossInput) -> CoreResult<EvaluateDataLossOutput>;
 
@@ -101,6 +106,10 @@ impl<C: MigrationConnector> GenericApi for C {
         diagnose_migration_history(input, self)
             .instrument(tracing::info_span!("DiagnoseMigrationHistory"))
             .await
+    }
+
+    async fn ensure_connection_validity(&self) -> CoreResult<()> {
+        MigrationConnector::ensure_connection_validity(self).await
     }
 
     async fn evaluate_data_loss(&self, input: &EvaluateDataLossInput) -> CoreResult<EvaluateDataLossOutput> {

@@ -57,7 +57,8 @@ fn parse_base64_string(s: &str) -> Result<String, ConnectorError> {
 
 async fn connect_to_database(database_str: &str) -> Result<String, ConnectorError> {
     let datamodel = datasource_from_database_str(database_str)?;
-    migration_api(&datamodel).await?;
+    let api = migration_api(&datamodel).await?;
+    api.ensure_connection_validity().await?;
     Ok("Connection successful".to_owned())
 }
 
