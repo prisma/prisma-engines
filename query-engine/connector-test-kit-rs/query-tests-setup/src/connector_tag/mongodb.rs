@@ -22,7 +22,7 @@ impl ConnectorTagInterface for MongoDbConnectorTag {
     fn connection_string(&self, database: &str, is_ci: bool) -> String {
         match self.version {
             Some(MongoDbVersion::V4) if is_ci => format!(
-                "mongodb://prisma:prisma@test-db-mongodb-4:27018/{}?authSource=admin&retryWrites=true",
+                "mongodb://prisma:prisma@test-db-mongodb-4:27017/{}?authSource=admin&retryWrites=true",
                 database
             ),
             Some(MongoDbVersion::V4) => {
@@ -37,7 +37,7 @@ impl ConnectorTagInterface for MongoDbConnectorTag {
             ),
             Some(MongoDbVersion::V5) => {
                 format!(
-                    "mongodb://prisma:prisma@127.0.0.1:27018/{}?authSource=admin&retryWrites=true",
+                    "mongodb://prisma:prisma@127.0.0.1:27017/{}?authSource=admin&retryWrites=true",
                     database
                 )
             }

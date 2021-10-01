@@ -232,7 +232,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: "prisma"
       MONGO_INITDB_ROOT_PASSWORD: "prisma"
     ports:
-      - "27018:27017"
+      - "27017:27017"
     networks:
       - databases
 

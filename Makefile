@@ -128,7 +128,7 @@ dev-mongodb: start-mongodb
 start-mongodb5:
 	docker-compose -f docker-compose.yml up -d --remove-orphans mongo5
 
-dev-mongodb5: start-mongodb
+dev-mongodb5: start-mongodb5
 	echo 'mongodb' > current_connector
 	cp $(CONFIG_PATH)/mongodb5 $(CONFIG_FILE)
 
