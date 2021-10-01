@@ -1,13 +1,8 @@
 mod name;
 
-use std::{
-    borrow::Cow,
-    cmp::Ordering,
-    collections::{BTreeMap, HashMap},
-    fmt,
-    ops::Deref,
-};
+pub(crate) use name::Name;
 
+use super::{field_type::FieldType, CompositeTypeDepth};
 use bson::{Bson, Document};
 use convert_case::{Case, Casing};
 use datamodel::{
@@ -16,12 +11,16 @@ use datamodel::{
 };
 use introspection_connector::Warning;
 use mongodb::IndexModel;
-pub(crate) use name::Name;
 use native_types::MongoDbType;
 use once_cell::sync::Lazy;
 use regex::Regex;
-
-use super::{field_type::FieldType, CompositeTypeDepth};
+use std::{
+    borrow::Cow,
+    cmp::Ordering,
+    collections::{BTreeMap, HashMap},
+    fmt,
+    ops::Deref,
+};
 
 pub(super) const SAMPLE_SIZE: i32 = 1000;
 

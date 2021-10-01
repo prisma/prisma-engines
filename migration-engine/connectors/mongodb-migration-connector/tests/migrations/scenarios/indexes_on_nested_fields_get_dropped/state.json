@@ -1,0 +1,29 @@
+{
+    "User": {
+        "documents": [
+            {
+                "_id": 1,
+                "firstName": "George",
+                "address": {
+                    "street": "Downing Street",
+                    "city": "London"
+                }
+            }
+        ],
+        "indexes": [
+            {
+                "name": "UserExistingIndex",
+                "is_unique": false,
+                "keys": {
+                    "firstName": 1,
+                    "address.street": 1,
+                    "address.city": 1
+                }
+            }
+        ]
+    },
+    "Post": {
+        "documents": [{ "_id": 2 }],
+        "indexes": []
+    }
+}

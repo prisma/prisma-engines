@@ -1,0 +1,30 @@
+[+] Collection `users`
+[+] Index `users_fst_name_lst_name_age_idx` on ({"fst_name":1,"lst_name":1,"age":1})
+
+------
+
+{
+  "collections": {
+    "users": {
+      "indexes": [
+        {
+          "name": "_id_",
+          "is_unique": false,
+          "keys": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "users_fst_name_lst_name_age_idx",
+          "is_unique": false,
+          "keys": {
+            "fst_name": 1,
+            "lst_name": 1,
+            "age": 1
+          }
+        }
+      ],
+      "documents": []
+    }
+  }
+}

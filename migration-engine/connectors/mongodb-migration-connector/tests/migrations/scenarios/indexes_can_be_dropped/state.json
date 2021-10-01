@@ -1,0 +1,20 @@
+{
+    "User": {
+        "documents": [],
+        "indexes": [
+            {
+                "name": "UserExistingIndex",
+                "is_unique": false,
+                "keys": {
+                    "firstName": 1,
+                    "lastName": 1,
+                    "age": 1
+                }
+            }
+        ]
+    },
+    "Post": {
+        "documents": [{ "_id": 2}],
+        "indexes": []
+    }
+}

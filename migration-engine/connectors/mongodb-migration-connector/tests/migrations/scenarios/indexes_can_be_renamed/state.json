@@ -1,0 +1,22 @@
+{
+    "User": {
+        "documents": [
+            {
+                "_id": 1,
+                "age": 52,
+                "firstName": "George"
+            }
+        ],
+        "indexes": [
+            {
+                "name": "UserExistingIndex",
+                "is_unique": false,
+                "keys": {
+                    "firstName": 1,
+                    "lastName": 1,
+                    "age": 1
+                }
+            }
+        ]
+    }
+}

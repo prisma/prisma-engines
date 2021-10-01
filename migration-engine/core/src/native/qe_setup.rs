@@ -30,8 +30,9 @@ pub async fn run(prisma_schema: &str) -> CoreResult<()> {
         }
         #[cfg(feature = "mongodb")]
         provider if provider == MONGODB_SOURCE_NAME => {
-            MongoDbMigrationConnector::qe_setup(&url).await?;
-            let connector = MongoDbMigrationConnector::new(&url).await?;
+            let connector = MongoDbMigrationConnector::new(url);
+            // Drop database. Creation is automatically done when collections are created.
+            connector.drop_database().await?;
             Box::new(connector)
         }
         x => unimplemented!("Connector {} is not supported yet", x),

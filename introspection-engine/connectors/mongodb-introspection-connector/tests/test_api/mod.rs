@@ -51,7 +51,7 @@ where
     let mut names = Generator::default();
 
     let database_name = names.next().unwrap().replace('-', "");
-    let connection_string = format!("{}{}?authSource=admin&retryWrites=true", &*CONN_STR, database_name);
+    let connection_string = format!("{}{}", &*CONN_STR, database_name);
 
     let datamodel_string = indoc::formatdoc!(
         r#"

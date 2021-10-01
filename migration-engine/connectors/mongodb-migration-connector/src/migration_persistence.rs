@@ -4,11 +4,11 @@ use migration_connector::MigrationPersistence;
 #[async_trait::async_trait]
 impl MigrationPersistence for MongoDbMigrationConnector {
     async fn baseline_initialize(&self) -> migration_connector::ConnectorResult<()> {
-        todo!()
+        unreachable!()
     }
 
     async fn initialize(&self) -> migration_connector::ConnectorResult<()> {
-        todo!()
+        unreachable!()
     }
 
     async fn mark_migration_applied_impl(
@@ -16,11 +16,11 @@ impl MigrationPersistence for MongoDbMigrationConnector {
         _migration_name: &str,
         _checksum: &str,
     ) -> migration_connector::ConnectorResult<String> {
-        todo!()
+        unreachable!()
     }
 
     async fn mark_migration_rolled_back_by_id(&self, _migration_id: &str) -> migration_connector::ConnectorResult<()> {
-        todo!()
+        unreachable!()
     }
 
     async fn record_migration_started_impl(
@@ -28,19 +28,19 @@ impl MigrationPersistence for MongoDbMigrationConnector {
         _migration_name: &str,
         _checksum: &str,
     ) -> migration_connector::ConnectorResult<String> {
-        todo!()
+        unreachable!()
     }
 
     async fn record_successful_step(&self, _id: &str) -> migration_connector::ConnectorResult<()> {
-        todo!()
+        unreachable!()
     }
 
     async fn record_failed_step(&self, _id: &str, _logs: &str) -> migration_connector::ConnectorResult<()> {
-        todo!()
+        unreachable!()
     }
 
     async fn record_migration_finished(&self, _id: &str) -> migration_connector::ConnectorResult<()> {
-        todo!()
+        unreachable!()
     }
 
     async fn list_migrations(
@@ -48,6 +48,6 @@ impl MigrationPersistence for MongoDbMigrationConnector {
     ) -> migration_connector::ConnectorResult<
         Result<Vec<migration_connector::MigrationRecord>, migration_connector::PersistenceNotInitializedError>,
     > {
-        todo!()
+        unreachable!()
     }
 }
