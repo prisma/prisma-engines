@@ -252,7 +252,7 @@ fn minimal_schema_from_url(url: &str) -> anyhow::Result<String> {
         Some(s) if s.starts_with("postgres") => "postgresql",
         Some("mysql") => "mysql",
         Some("sqlserver") => "sqlserver",
-        Some("mongodb") => "mongodb",
+        Some("mongodb" | "mongodb+srv") => "mongodb",
         _ => anyhow::bail!("Could not extract a provider from the URL"),
     };
 
