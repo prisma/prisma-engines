@@ -3061,6 +3061,7 @@ dependencies = [
  "serde",
  "serde_json",
  "structopt",
+ "wasm-bindgen",
 ]
 
 [[package]]
