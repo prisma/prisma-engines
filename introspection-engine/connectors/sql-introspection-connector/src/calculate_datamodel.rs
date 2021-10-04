@@ -34,7 +34,7 @@ pub fn calculate_datamodel(
 
     let mut warnings = vec![];
     if !previous_data_model.is_empty() {
-        warnings.append(&mut enrich(previous_data_model, &mut data_model, &ctx));
+        enrich(previous_data_model, &mut data_model, &ctx, &mut warnings);
         tracing::debug!("Enriching datamodel is done: {:?}", data_model);
     }
 
