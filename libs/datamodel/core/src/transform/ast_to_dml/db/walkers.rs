@@ -21,14 +21,6 @@ impl<'ast> ParserDatabase<'ast> {
             model_attributes: &self.types.model_attributes[&model_id],
         }
     }
-
-    pub(crate) fn walk_models(&self) -> impl Iterator<Item = ModelWalker<'ast, '_>> + '_ {
-        self.ast.iter_models().map(move |(model_id, _)| ModelWalker {
-            model_id,
-            db: self,
-            model_attributes: &self.types.model_attributes[&model_id],
-        })
-    }
 }
 
 #[derive(Copy, Clone)]
@@ -185,6 +177,7 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
     }
 }
 
+#[allow(dead_code)]
 #[derive(Copy, Clone)]
 pub(crate) struct IndexWalker<'ast, 'db> {
     model_id: ast::ModelId,
@@ -194,10 +187,6 @@ pub(crate) struct IndexWalker<'ast, 'db> {
 }
 
 impl<'ast, 'db> IndexWalker<'ast, 'db> {
-    pub(crate) fn ast_attribute(&self) -> &'ast ast::Attribute {
-        self.index
-    }
-
     pub(crate) fn final_database_name(&self) -> Cow<'ast, str> {
         if let Some(mapped_name) = &self.index_attribute.db_name {
             return Cow::Borrowed(mapped_name);
