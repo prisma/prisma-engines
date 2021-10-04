@@ -5,6 +5,7 @@ use futures::TryStreamExt;
 use introspection_connector::{IntrospectionResult, Version};
 use mongodb::{
     bson::{doc, Document},
+    options::AggregateOptions,
     Database,
 };
 use statistics::*;
@@ -26,8 +27,10 @@ pub(super) async fn sample(database: Database) -> crate::Result<IntrospectionRes
 
         let collection = database.collection::<Document>(&collection_name);
 
+        let options = AggregateOptions::builder().allow_disk_use(Some(true)).build();
+
         let mut documents = collection
-            .aggregate(vec![doc! { "$sample": { "size": 10000 } }], None)
+            .aggregate(vec![doc! { "$sample": { "size": 1000 } }], Some(options))
             .await?;
 
         while let Some(document) = documents.try_next().await? {
