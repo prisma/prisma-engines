@@ -48,13 +48,12 @@ impl TestApi {
             let (_, q, cs) = rt.block_on(args.create_postgres_database());
             (q, cs)
         } else if tags.contains(Tags::Vitess) {
-            let conn = rt
-                .block_on(SqlMigrationConnector::new(
-                    args.database_url(),
-                    preview_features,
-                    args.shadow_database_url().map(String::from),
-                ))
-                .unwrap();
+            let conn = SqlMigrationConnector::new(
+                args.database_url().to_owned(),
+                preview_features,
+                args.shadow_database_url().map(String::from),
+            )
+            .unwrap();
             rt.block_on(conn.reset()).unwrap();
 
             (
@@ -167,27 +166,22 @@ impl TestApi {
     pub fn new_engine(&self) -> EngineTestApi<'_> {
         let shadow_db = self.args.shadow_database_url().as_ref().map(ToString::to_string);
 
-        self.new_engine_with_connection_strings(&self.connection_string, shadow_db)
+        self.new_engine_with_connection_strings(self.connection_string.clone(), shadow_db)
     }
 
     /// Instantiate a new migration with the provided connection string.
     pub fn new_engine_with_connection_strings(
         &self,
-        connection_string: &str,
+        connection_string: String,
         shadow_db_connection_string: Option<String>,
     ) -> EngineTestApi<'_> {
-        let connector = self
-            .rt
-            .block_on(SqlMigrationConnector::new(
-                connection_string,
-                self.preview_features,
-                shadow_db_connection_string,
-            ))
-            .unwrap();
+        let connection_info = ConnectionInfo::from_url(&connection_string).unwrap();
+        let connector =
+            SqlMigrationConnector::new(connection_string, self.preview_features, shadow_db_connection_string).unwrap();
 
         EngineTestApi {
             connector,
-            connection_info: ConnectionInfo::from_url(connection_string).unwrap(),
+            connection_info,
             tags: self.args.tags(),
             rt: &self.rt,
         }

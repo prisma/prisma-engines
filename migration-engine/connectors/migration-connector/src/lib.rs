@@ -49,9 +49,20 @@ pub trait MigrationConnector: Send + Sync + 'static {
     /// the connector name. The SQL connector for example can return "postgresql", "mysql" or "sqlite".
     fn connector_type(&self) -> &'static str;
 
+    /// Create the database referenced by Prisma schema that was used to initialize the connector.
+    async fn create_database(&self) -> ConnectorResult<String>;
+
     /// Create a migration by comparing two database schemas. See
     /// [DiffTarget](/enum.DiffTarget.html) for possible inputs.
     async fn diff(&self, from: DiffTarget<'_>, to: DiffTarget<'_>) -> ConnectorResult<Migration>;
+
+    /// Drop the database referenced by Prisma schema that was used to initialize the connector.
+    async fn drop_database(&self) -> ConnectorResult<()>;
+
+    /// Make sure the connection to the database is established and valid.
+    /// Connectors can choose to connect lazily, but this method should force
+    /// them to connect.
+    async fn ensure_connection_validity(&self) -> ConnectorResult<()>;
 
     /// The version of the underlying database.
     async fn version(&self) -> ConnectorResult<String>;

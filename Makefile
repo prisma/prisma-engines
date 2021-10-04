@@ -72,6 +72,11 @@ dev-postgres13: start-postgres13
 	echo 'postgres13' > current_connector
 	cp $(CONFIG_PATH)/postgres13 $(CONFIG_FILE)
 
+start-cockroach:
+	docker-compose -f docker-compose.yml up -d --remove-orphans cockroach
+	docker exec -d prisma-engines_cockroach_1 cockroach sql --insecure -e "set cluster setting sql.defaults.default_int_size = 4;"
+	docker exec -d prisma-engines_cockroach_1 cockroach sql --insecure -e "set cluster setting sql.defaults.serial_normalization = 'sql_sequence_cached';"
+
 dev-pgbouncer:
 	docker-compose -f docker-compose.yml up -d --remove-orphans pgbouncer postgres11
 	echo 'pgbouncer' > current_connector
@@ -120,6 +125,12 @@ dev-mssql2017: start-mssql_2017
 
 start-mongodb:
 	docker-compose -f docker-compose.yml up -d --remove-orphans mongo4
+
+start-mongodb4-single:
+	docker-compose -f docker-compose.yml up -d --remove-orphans mongo4-single
+
+start-mongodb5-single:
+	docker-compose -f docker-compose.yml up -d --remove-orphans mongo5-single
 
 dev-mongodb: start-mongodb
 	echo 'mongodb' > current_connector

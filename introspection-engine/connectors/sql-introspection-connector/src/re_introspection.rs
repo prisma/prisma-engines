@@ -47,6 +47,36 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, ctx: &
         }
     }
 
+    let mut retained_legacy_index_name_args = vec![];
+    //custom compound index `name` from pre-3.0 datamodels
+    {
+        for model in new_data_model.models() {
+            if let Some(old_model) = &old_data_model.find_model(&model.name) {
+                for index in &model.indices {
+                    if let Some(old_index) = old_model
+                        .indices
+                        .iter()
+                        .find(|old| old.name == index.db_name && old.fields == index.fields)
+                    {
+                        retained_legacy_index_name_args
+                            .push(ModelAndIndex::new(&model.name, old_index.name.as_ref().unwrap()))
+                    }
+                }
+            }
+        }
+
+        //change index name
+        for changed_index_name in &retained_legacy_index_name_args {
+            let index = new_data_model
+                .find_model_mut(&changed_index_name.model)
+                .indices
+                .iter_mut()
+                .find(|i| i.db_name == Some(changed_index_name.index_db_name.to_string()))
+                .unwrap();
+            index.name = Some(changed_index_name.index_db_name.clone());
+        }
+    }
+
     let mut changed_index_names = vec![];
     let mut changed_primary_key_names = vec![];
     //custom index names
@@ -534,6 +564,11 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, ctx: &
 
     if !changed_index_names.is_empty() {
         let index: Vec<_> = changed_index_names.iter().map(|c| c.0.clone()).collect();
+        warnings.push(warning_enriched_with_custom_index_names(&index));
+    }
+
+    if !retained_legacy_index_name_args.is_empty() {
+        let index: Vec<ModelAndIndex> = retained_legacy_index_name_args.to_vec();
         warnings.push(warning_enriched_with_custom_index_names(&index));
     }
 

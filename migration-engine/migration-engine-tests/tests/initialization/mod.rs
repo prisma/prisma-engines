@@ -54,7 +54,8 @@ fn connecting_to_a_postgres_database_with_missing_schema_creates_it(api: TestApi
             url
         );
 
-        api.block_on(migration_api(&datamodel)).unwrap();
+        let me = api.block_on(migration_api(&datamodel)).unwrap();
+        api.block_on(me.ensure_connection_validity()).unwrap();
     }
 
     // Check that the "unexpected" schema now exists.

@@ -233,7 +233,7 @@ async fn multiple_foreign_key_constraints_are_taken_always_in_the_same_order(api
         );
     "#};
 
-    api.database().raw_cmd(&migration).await?;
+    api.database().raw_cmd(migration).await?;
 
     let expected = expect![[r#"
         model A {

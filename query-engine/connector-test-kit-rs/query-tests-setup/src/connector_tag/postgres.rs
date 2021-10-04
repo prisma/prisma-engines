@@ -50,7 +50,7 @@ impl ConnectorTagInterface for PostgresConnectorTag {
             Some(PostgresVersion::V10) => format!("postgresql://postgres:prisma@127.0.0.1:5432/db?schema={}", database),
             Some(PostgresVersion::V11) => format!("postgresql://postgres:prisma@127.0.0.1:5433/db?schema={}", database),
             Some(PostgresVersion::V12) => format!("postgresql://postgres:prisma@127.0.0.1:5434/db?schema={}", database),
-            Some(PostgresVersion::V13) => format!("postgresql://postgres:prisma@127.0.0.1:5434/db?schema={}", database),
+            Some(PostgresVersion::V13) => format!("postgresql://postgres:prisma@127.0.0.1:5435/db?schema={}", database),
             Some(PostgresVersion::PgBouncer) => format!(
                 "postgresql://postgres:prisma@127.0.0.1:6432/db?schema={}&pgbouncer=true",
                 database

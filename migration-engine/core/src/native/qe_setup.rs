@@ -26,7 +26,7 @@ pub async fn run(prisma_schema: &str) -> CoreResult<()> {
         {
             // 1. creates schema & database
             SqlMigrationConnector::qe_setup(&url).await?;
-            Box::new(SqlMigrationConnector::new(&url, preview_features, None).await?)
+            Box::new(SqlMigrationConnector::new(url, preview_features, None)?)
         }
         #[cfg(feature = "mongodb")]
         provider if provider == MONGODB_SOURCE_NAME => {

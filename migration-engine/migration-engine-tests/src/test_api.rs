@@ -5,7 +5,9 @@ pub use test_macros::test_connector;
 pub use test_setup::{BitFlags, Capabilities, Tags};
 
 use crate::{commands::*, multi_engine_test_api::TestApi as RootTestApi};
-use migration_connector::{DatabaseMigrationStepApplier, DiffTarget, MigrationConnector, MigrationPersistence};
+use migration_connector::{
+    ConnectorResult, DatabaseMigrationStepApplier, DiffTarget, MigrationConnector, MigrationPersistence,
+};
 use quaint::{
     prelude::{ConnectionInfo, ResultSet},
     Value,
@@ -44,6 +46,10 @@ impl TestApi {
 
     pub fn connection_info(&self) -> ConnectionInfo {
         self.root.connection_info()
+    }
+
+    pub fn ensure_connection_validity(&self) -> ConnectorResult<()> {
+        self.block_on(self.connector.ensure_connection_validity())
     }
 
     pub fn schema_name(&self) -> String {

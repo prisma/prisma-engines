@@ -1,0 +1,29 @@
+[package]
+name = "mongodb-introspection-connector"
+version = "0.1.0"
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+mongodb = { version = "2", features = ["bson-chrono-0_4", "bson-uuid-0_8"] }
+thiserror = "1.0"
+async-trait = "0.1"
+datamodel = { path = "../../../libs/datamodel/core" }
+mongodb-datamodel-connector = { path = "../../../libs/datamodel/connectors/mongodb-datamodel-connector" }
+datamodel-connector = { path = "../../../libs/datamodel/connectors/datamodel-connector" }
+introspection-connector = { path = "../introspection-connector" }
+user-facing-errors = { path = "../../../libs/user-facing-errors" }
+native-types = { path = "../../../libs/native-types" }
+url = "2"
+indoc = "1"
+futures = "0.3"
+bson = "2"
+serde_json = "1"
+regex = "1"
+once_cell = "1"
+
+[dev-dependencies]
+tokio = { version = "1", features = ["rt-multi-thread"] }
+names = { version = "0.12", default-features = false }
+expect-test = "1"

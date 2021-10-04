@@ -56,59 +56,22 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Box<dyn api::GenericAp
                 u.query_pairs_mut().append_pair("statement_cache_size", "0");
             }
 
-            let connector = SqlMigrationConnector::new(u.as_str(), preview_features, shadow_database_url).await?;
+            let connector = SqlMigrationConnector::new(u.to_string(), preview_features, shadow_database_url)?;
 
             Ok(Box::new(connector))
         }
         #[cfg(feature = "sql")]
         MYSQL_SOURCE_NAME | SQLITE_SOURCE_NAME | MSSQL_SOURCE_NAME => {
-            let connector = SqlMigrationConnector::new(&url, preview_features, shadow_database_url).await?;
+            let connector = SqlMigrationConnector::new(url, preview_features, shadow_database_url)?;
 
             Ok(Box::new(connector))
         }
         #[cfg(feature = "mongodb")]
         MONGODB_SOURCE_NAME => Ok(Box::new(MongoDbMigrationConnector::new(&url).await?)),
-        x => unimplemented!("Connector {} is not supported yet", x),
-    }
-}
-
-/// Create the database referenced by the passed in Prisma schema.
-pub async fn create_database(schema: &str) -> CoreResult<String> {
-    let (source, url, _preview_features, _shadow_database_url) = parse_configuration(schema)?;
-
-    match &source.active_provider {
-        provider
-            if [
-                MYSQL_SOURCE_NAME,
-                POSTGRES_SOURCE_NAME,
-                SQLITE_SOURCE_NAME,
-                MSSQL_SOURCE_NAME,
-            ]
-            .contains(&provider.as_str()) =>
-        {
-            Ok(SqlMigrationConnector::create_database(&url).await?)
-        }
-        x => unimplemented!("Connector {} is not supported yet", x),
-    }
-}
-
-/// Drop the database referenced by the passed in Prisma schema.
-pub async fn drop_database(schema: &str) -> CoreResult<()> {
-    let (source, url, _preview_features, _shadow_database_url) = parse_configuration(schema)?;
-
-    match &source.active_provider {
-        provider
-            if [
-                MYSQL_SOURCE_NAME,
-                POSTGRES_SOURCE_NAME,
-                SQLITE_SOURCE_NAME,
-                MSSQL_SOURCE_NAME,
-            ]
-            .contains(&provider.as_str()) =>
-        {
-            Ok(SqlMigrationConnector::drop_database(&url).await?)
-        }
-        x => unimplemented!("Connector {} is not supported yet", x),
+        provider => Err(CoreError::from_msg(format!(
+            "`{}` is not a supported connector.",
+            provider
+        ))),
     }
 }
 
