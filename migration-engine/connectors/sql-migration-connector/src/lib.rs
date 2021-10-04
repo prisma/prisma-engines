@@ -59,21 +59,6 @@ impl SqlMigrationConnector {
         })
     }
 
-    /// Create the database corresponding to the connection string, without initializing the connector.
-    pub async fn create_database(database_str: &str) -> ConnectorResult<String> {
-        let connection_info = ConnectionInfo::from_url(database_str).map_err(ConnectorError::url_parse_error)?;
-        let flavour = flavour::from_connection_info(&connection_info, BitFlags::empty());
-        flavour.create_database(database_str).await
-    }
-
-    /// Drop the database corresponding to the connection string, without initializing the connector.
-    pub async fn drop_database(database_str: &str) -> ConnectorResult<()> {
-        let connection_info = ConnectionInfo::from_url(database_str).map_err(ConnectorError::url_parse_error)?;
-        let flavour = flavour::from_connection_info(&connection_info, BitFlags::empty());
-
-        flavour.drop_database(database_str).await
-    }
-
     /// Set up the database for connector-test-kit, without initializing the connector.
     pub async fn qe_setup(database_str: &str) -> ConnectorResult<()> {
         let connection_info = ConnectionInfo::from_url(database_str).map_err(ConnectorError::url_parse_error)?;
@@ -262,6 +247,10 @@ impl MigrationConnector for SqlMigrationConnector {
             .unwrap_or_else(|| "Database version information not available.".into()))
     }
 
+    async fn create_database(&self) -> ConnectorResult<String> {
+        self.flavour.create_database(&self.connection_string).await
+    }
+
     async fn diff(&self, from: DiffTarget<'_>, to: DiffTarget<'_>) -> ConnectorResult<Migration> {
         let previous_schema = self.sql_schema_from_diff_target(&from).await?;
         let next_schema = self.sql_schema_from_diff_target(&to).await?;
@@ -302,6 +291,10 @@ impl MigrationConnector for SqlMigrationConnector {
             added_columns_with_virtual_defaults,
             steps,
         }))
+    }
+
+    async fn drop_database(&self) -> ConnectorResult<()> {
+        self.flavour.drop_database(&self.connection_string).await
     }
 
     fn migration_file_extension(&self) -> &'static str {

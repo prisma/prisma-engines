@@ -24,10 +24,21 @@ impl Cli {
     }
 
     pub(crate) async fn run_inner(self) -> Result<String, ConnectorError> {
+        let datamodel = datasource_from_database_str(&self.datasource)?;
+        let api = migration_api(&datamodel).await?;
         match self.command {
-            CliCommand::CreateDatabase => create_database(&self.datasource).await,
-            CliCommand::CanConnectToDatabase => connect_to_database(&self.datasource).await,
-            CliCommand::DropDatabase => drop_database(&self.datasource).await,
+            CliCommand::CreateDatabase => {
+                let db_name = api.create_database().await?;
+                Ok(format!("Database '{}' was successfully created.", db_name))
+            }
+            CliCommand::CanConnectToDatabase => {
+                api.ensure_connection_validity().await?;
+                Ok("Connection successful".to_owned())
+            }
+            CliCommand::DropDatabase => {
+                api.drop_database().await?;
+                Ok("The database was successfully dropped.".to_owned())
+            }
         }
     }
 }
@@ -53,27 +64,6 @@ fn parse_base64_string(s: &str) -> Result<String, ConnectorError> {
         },
         Err(_) => Ok(String::from(s)),
     }
-}
-
-async fn connect_to_database(database_str: &str) -> Result<String, ConnectorError> {
-    let datamodel = datasource_from_database_str(database_str)?;
-    let api = migration_api(&datamodel).await?;
-    api.ensure_connection_validity().await?;
-    Ok("Connection successful".to_owned())
-}
-
-async fn create_database(database_str: &str) -> Result<String, ConnectorError> {
-    let datamodel = datasource_from_database_str(database_str)?;
-    let db_name = migration_core::create_database(&datamodel).await?;
-
-    Ok(format!("Database '{}' was successfully created.", db_name))
-}
-
-async fn drop_database(database_str: &str) -> Result<String, ConnectorError> {
-    let datamodel = datasource_from_database_str(database_str)?;
-    migration_core::drop_database(&datamodel).await?;
-
-    Ok("The database was successfully dropped.".to_string())
 }
 
 fn datasource_from_database_str(database_str: &str) -> Result<String, ConnectorError> {
