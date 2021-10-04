@@ -35,7 +35,19 @@ lazy_static! {
 
 /// Teardown & setup of everything as defined in the passed datamodel.
 pub async fn setup_project(datamodel: &str) -> TestResult<()> {
-    Ok(migration_core::qe_setup::run(datamodel).await?)
+    let api = migration_core::migration_api(datamodel).await?;
+    api.drop_database().await.ok();
+    api.create_database().await?;
+
+    let schema_push_input = migration_core::commands::SchemaPushInput {
+        schema: datamodel.to_string(),
+        assume_empty: true,
+        force: true,
+    };
+
+    api.schema_push(&schema_push_input).await?;
+
+    Ok(())
 }
 
 /// Helper method to allow a sync shell function to run the async test blocks.

@@ -1,7 +1,5 @@
 mod rpc;
 
-pub mod qe_setup;
-
 pub use crate::api::GenericApi;
 pub use rpc::rpc_api;
 
