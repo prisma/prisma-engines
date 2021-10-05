@@ -940,6 +940,8 @@ async fn unique_and_id_on_same_field_works_mssql(api: &TestApi) -> TestResult {
 // is both unique and primary. We only render it as @id then.
 // If a later alter table statement adds another unique constraint then it is persisted as its own
 // entity and can be introspected.
+// In CockroachDB, index OIDs are statically hashed. However, the ordering means that either index
+// can be returned. As such, the test is skipped. See https://github.com/cockroachdb/cockroach/issues/71098.
 async fn unique_and_index_on_same_field_works_postgres(api: &TestApi) -> TestResult {
     api.raw_cmd(
         "
@@ -971,45 +973,6 @@ async fn unique_and_index_on_same_field_works_postgres(api: &TestApi) -> TestRes
 
     let result = api.introspect_dml().await?;
     expectation.assert_eq(&result);
-
-    Ok(())
-}
-
-#[test_connector(tags(Cockroach))]
-// In CockroachDB, index OIDs are statically hashed. However, the ordering means that either index
-// can be returned. Ensure we return one of the expected values.
-async fn unique_and_index_on_same_field_works_cockroach(api: &TestApi) -> TestResult {
-    api.raw_cmd(
-        "
-        CREATE TABLE users (
-            id Integer primary key not null,
-            CONSTRAINT really_must_be_different UNIQUE (id),
-            CONSTRAINT must_be_different UNIQUE (id)
-        );",
-    )
-    .await;
-
-    let expected_a = expect![[r#"
-        model users {
-          id Int @id @unique(map: "really_must_be_different")
-        }
-    "#]];
-    let expected_b = expect![[r#"
-        model users {
-          id Int @id @unique(map: "must_be_different")
-        }
-    "#]];
-
-    let result = api.introspect_dml().await?;
-
-    let expected = if result.eq(expected_a.data) {
-        expected_a
-    } else {
-        expected_b
-    };
-
-    let result = api.introspect_dml().await?;
-    expected.assert_eq(&result);
 
     Ok(())
 }

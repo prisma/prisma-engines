@@ -6,6 +6,8 @@ use quaint::prelude::Queryable;
 use test_macros::test_connector;
 
 #[test_connector(tags(Postgres), exclude(Cockroach))]
+// Cockroach can return either order for multiple foreign keys. This is hard to deterministically
+// test, so disable for now. See: https://github.com/cockroachdb/cockroach/issues/71098.
 async fn multiple_foreign_key_constraints_are_taken_always_in_the_same_order(api: &TestApi) -> TestResult {
     let migration = indoc! {r#"
         CREATE TABLE "A"
@@ -37,68 +39,6 @@ async fn multiple_foreign_key_constraints_are_taken_always_in_the_same_order(api
           A  A[]
         }
     "#]];
-
-    for _ in 0..10 {
-        expected.assert_eq(&api.introspect_dml().await?);
-    }
-
-    Ok(())
-}
-
-#[test_connector(tags(Cockroach))]
-// Cockroach can return either order for multiple foreign keys. Ensure it returns one of the
-// accepted values.
-async fn multiple_foreign_key_constraints_are_taken_always_in_the_some_order_cockroach(api: &TestApi) -> TestResult {
-    let migration = indoc! {r#"
-        CREATE TABLE "A"
-        (
-            id  int primary key,
-            foo int not null
-        );
-
-        CREATE TABLE "B"
-        (
-            id int primary key
-        );
-
-        ALTER TABLE "A" ADD CONSTRAINT "fk_1" FOREIGN KEY (foo) REFERENCES "B"(id) ON DELETE CASCADE;
-        ALTER TABLE "A" ADD CONSTRAINT "fk_2" FOREIGN KEY (foo) REFERENCES "B"(id) ON UPDATE RESTRICT;
-    "#};
-
-    api.database().raw_cmd(migration).await?;
-
-    let expected_a = expect![[r#"
-        model A {
-          id  Int @id
-          foo Int
-          B   B   @relation(fields: [foo], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_1")
-        }
-
-        model B {
-          id Int @id
-          A  A[]
-        }
-    "#]];
-    let expected_b = expect![[r#"
-        model A {
-          id  Int @id
-          foo Int
-          B   B   @relation(fields: [foo], references: [id], onDelete: NoAction, onUpdate: Restrict, map: "fk_2")
-        }
-
-        model B {
-          id Int @id
-          A  A[]
-        }
-    "#]];
-
-    let result = api.introspect_dml().await?;
-
-    let expected = if result.eq(expected_a.data) {
-        expected_a
-    } else {
-        expected_b
-    };
 
     for _ in 0..10 {
         expected.assert_eq(&api.introspect_dml().await?);
