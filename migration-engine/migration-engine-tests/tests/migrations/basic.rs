@@ -160,6 +160,21 @@ fn adding_an_optional_field_must_work(api: TestApi) {
     });
 }
 
+#[test_connector(tags(Mysql))]
+fn adding_an_optional_datetime_field_must_work(api: TestApi) {
+    let dm2 = r#"
+        model Test {
+            id String @id @default(cuid())
+            field DateTime? @db.Timestamp
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm2).send().assert_green();
+    api.assert_schema().assert_table("Test", |table| {
+        table.assert_column("field", |column| column.assert_default(None).assert_is_nullable())
+    });
+}
+
 #[test_connector]
 fn adding_an_id_field_with_a_special_name_must_work(api: TestApi) {
     let dm2 = r#"

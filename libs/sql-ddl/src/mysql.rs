@@ -150,6 +150,8 @@ impl Display for Column<'_> {
 
         if self.not_null {
             f.write_str(" NOT NULL")?;
+        } else {
+            f.write_str(" NULL")?;
         }
 
         if self.auto_increment {
@@ -344,7 +346,7 @@ mod tests {
         let expected = indoc!(
             r#"
             CREATE TABLE `Cat` (
-                `id` INTEGER AUTO_INCREMENT PRIMARY KEY
+                `id` INTEGER NULL AUTO_INCREMENT PRIMARY KEY
             ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
             "#,
         )
