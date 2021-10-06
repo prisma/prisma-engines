@@ -108,6 +108,9 @@ pub(crate) struct MongoReadQueryBuilder {
     /// Kept separate as cursor building needs to consider them seperately.
     pub(crate) order_joins: Vec<JoinStage>,
 
+    /// Finalized ordering aggregation computed from the joins
+    pub(crate) order_aggregate_projections: Option<Document>,
+
     /// Cursor builder for deferred processing.
     cursor_builder: Option<CursorBuilder>,
 
@@ -141,6 +144,7 @@ impl MongoReadQueryBuilder {
             order_builder: None,
             order: None,
             order_joins: vec![],
+            order_aggregate_projections: None,
             cursor_builder: None,
             cursor_data: None,
             skip: None,
@@ -189,6 +193,7 @@ impl MongoReadQueryBuilder {
             aggregation_filters: vec![],
             order: None,
             order_joins: vec![],
+            order_aggregate_projections: None,
             cursor_data: None,
             projection: None,
             is_group_by_query: false,
@@ -270,6 +275,11 @@ impl MongoReadQueryBuilder {
             }
 
             stages.push(join);
+        }
+
+        // Order by aggregate computed from joins ($addFields)
+        if let Some(order_aggregate_projections) = self.order_aggregate_projections {
+            stages.push(doc! { "$addFields": order_aggregate_projections });
         }
 
         // Post-join $matches
@@ -378,6 +388,10 @@ impl MongoReadQueryBuilder {
         // First match the cursor, then add required ordering joins.
         outer_stages.push(doc! { "$match": cursor_data.cursor_filter });
         outer_stages.extend(order_join_stages);
+
+        if let Some(order_aggregate_projections) = self.order_aggregate_projections.clone() {
+            outer_stages.push(doc! { "$addFields": order_aggregate_projections })
+        }
 
         // Self-"join" collection
         let inner_stages = self.into_pipeline_stages();
@@ -546,10 +560,11 @@ impl MongoReadQueryBuilder {
     fn finalize(&mut self) -> crate::Result<()> {
         // Cursor building depends on the ordering, so it must come first.
         if let Some(order_builder) = self.order_builder.take() {
-            let (order, joins) = order_builder.build(self.is_group_by_query);
+            let (order, order_aggregate_projections, joins) = order_builder.build(self.is_group_by_query);
 
             self.order_joins.extend(joins);
             self.order = order;
+            self.order_aggregate_projections = order_aggregate_projections;
         }
 
         if let Some(cursor_builder) = self.cursor_builder.take() {

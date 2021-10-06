@@ -1,6 +1,6 @@
 use crate::join::JoinStage;
 use itertools::Itertools;
-use mongodb::bson::Document;
+use mongodb::bson::{doc, Document};
 use prisma_models::{OrderBy, SortOrder};
 
 #[derive(Debug)]
@@ -109,7 +109,11 @@ impl OrderByData {
     /// document all the way to the scalar to order through all hops.
     pub(crate) fn full_reference_path(&self, use_bindings: bool) -> String {
         if let Some(ref prefix) = self.prefix {
-            format!("{}.{}", prefix.to_string(), self.scalar_field_name())
+            if matches!(self.order_by, OrderBy::Aggregation(_)) {
+                prefix.to_string()
+            } else {
+                format!("{}.{}", prefix.to_string(), self.scalar_field_name())
+            }
         } else if use_bindings {
             self.binding_names().0
         } else {
@@ -166,12 +170,13 @@ impl OrderByBuilder {
     /// Builds and renders a Mongo sort document.
     /// `is_group_by` signals that the ordering is for a grouping,
     /// requiring a prefix to refer to the correct document nesting.
-    pub(crate) fn build(self, is_group_by: bool) -> (Option<Document>, Vec<JoinStage>) {
+    pub(crate) fn build(self, is_group_by: bool) -> (Option<Document>, Option<Document>, Vec<JoinStage>) {
         if self.order_bys.is_empty() {
-            return (None, vec![]);
+            return (None, None, vec![]);
         }
 
         let mut order_doc = Document::new();
+        let mut order_aggregate_proj_doc: Option<Document> = None;
         let mut joins = vec![];
 
         for data in self.order_bys.into_iter() {
@@ -196,6 +201,22 @@ impl OrderByBuilder {
                 data.full_reference_path(false)
             };
 
+            if let OrderBy::Aggregation(order_by_aggregate) = &data.order_by {
+                match order_by_aggregate.sort_aggregation {
+                    prisma_models::SortAggregation::Count => {
+                        if order_aggregate_proj_doc.is_none() {
+                            order_aggregate_proj_doc = Some(Document::new());
+                        }
+
+                        order_aggregate_proj_doc = order_aggregate_proj_doc.map(|mut doc| {
+                            doc.insert(field.clone(), doc! { "$size": format!("${}", field.clone()) });
+                            doc
+                        });
+                    }
+                    _ => unimplemented!("Order by aggregate only supports COUNT"),
+                }
+            }
+
             // Mongo: -1 -> DESC, 1 -> ASC
             match (data.sort_order(), self.reverse) {
                 (SortOrder::Ascending, true) => order_doc.insert(field, -1),
@@ -207,6 +228,6 @@ impl OrderByBuilder {
             joins.extend(data.join);
         }
 
-        (Some(order_doc), joins)
+        (Some(order_doc), order_aggregate_proj_doc, joins)
     }
 }
