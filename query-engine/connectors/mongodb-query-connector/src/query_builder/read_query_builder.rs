@@ -430,6 +430,7 @@ impl MongoReadQueryBuilder {
                     source: rf.clone(),
                     alias: Some(aggr.db_alias()),
                     nested: vec![],
+                    needs_unwind: false,
                 },
             };
             let projection = doc! {

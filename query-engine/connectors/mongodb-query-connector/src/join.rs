@@ -22,6 +22,8 @@ pub(crate) struct JoinStage {
 
     /// Nested joins
     pub(crate) nested: Vec<JoinStage>,
+
+    pub(crate) needs_unwind: bool,
 }
 
 impl JoinStage {
@@ -30,6 +32,7 @@ impl JoinStage {
             source,
             alias: None,
             nested: vec![],
+            needs_unwind: false,
         }
     }
 
@@ -43,6 +46,10 @@ impl JoinStage {
 
     pub(crate) fn extend_nested(&mut self, stages: Vec<JoinStage>) {
         self.nested.extend(stages);
+    }
+
+    pub(crate) fn needs_unwind(&mut self) {
+        self.needs_unwind = true;
     }
 
     /// Returns a join stage for the join between the source collection of `from_field` (the model it's defined on)
@@ -120,8 +127,8 @@ impl JoinStage {
         pipeline.push(doc! { "$match": { "$expr": op }});
         pipeline.extend(nested_stages);
 
-        // If the field is a to-one, add and unwind stage.
-        let unwind_stage = if !from_field.is_list {
+        // If the field is a to-one and is flagged to need an unwind, add an unwind stage.
+        let unwind_stage = if self.needs_unwind && !from_field.is_list {
             Some(doc! {
                 "$unwind": { "path": format!("${}", as_name), "preserveNullAndEmptyArrays": true }
             })

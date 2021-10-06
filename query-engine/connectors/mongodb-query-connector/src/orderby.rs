@@ -31,7 +31,17 @@ impl OrderByData {
             let mut stages = order_by
                 .path()
                 .iter()
-                .map(|rf| JoinStage::new(rf.clone()))
+                .map(|rf| {
+                    let mut join = JoinStage::new(rf.clone());
+
+                    // Order by aggregate needs unwinding in the case of m2one2m to
+                    // unfold the nested joins to enable applying the aggregation
+                    if order_by.is_aggregation() {
+                        join.needs_unwind();
+                    }
+
+                    join
+                })
                 .collect_vec();
 
             // We fold from right to left because the right hand side needs to be always contained
@@ -202,18 +212,20 @@ impl OrderByBuilder {
             };
 
             if let OrderBy::Aggregation(order_by_aggregate) = &data.order_by {
-                match order_by_aggregate.sort_aggregation {
-                    prisma_models::SortAggregation::Count => {
-                        if order_aggregate_proj_doc.is_none() {
-                            order_aggregate_proj_doc = Some(Document::new());
-                        }
+                if !order_by_aggregate.path.is_empty() {
+                    match order_by_aggregate.sort_aggregation {
+                        prisma_models::SortAggregation::Count => {
+                            if order_aggregate_proj_doc.is_none() {
+                                order_aggregate_proj_doc = Some(Document::new());
+                            }
 
-                        order_aggregate_proj_doc = order_aggregate_proj_doc.map(|mut doc| {
-                            doc.insert(field.clone(), doc! { "$size": format!("${}", field.clone()) });
-                            doc
-                        });
+                            order_aggregate_proj_doc = order_aggregate_proj_doc.map(|mut doc| {
+                                doc.insert(field.clone(), doc! { "$size": format!("${}", field.clone()) });
+                                doc
+                            });
+                        }
+                        _ => unimplemented!("Order by aggregate only supports COUNT"),
                     }
-                    _ => unimplemented!("Order by aggregate only supports COUNT"),
                 }
             }
 
