@@ -146,13 +146,6 @@ tests:
 - `make dev-postgres`: PostgreSQL 10
 - `make dev-sqlite`: SQLite
 
-As an optional but recommended step, you can run the tests by setting up an
-IntelliJ project for `./query-engine/connector-test-kit`, which makes test
-results much more accessible. You need to install the Scala plugin for Intellij
-if you want to do so.
-
-Remember to set IntelliJ to use the version 8 of OpenJDK distribution.
-
 **On windows:*
 If not using WSL, `make` is not available and you should just see what your
 command does and do it manually. Basically this means editing the
@@ -169,13 +162,6 @@ the correct values for the following variables:
   `%WORKSPACE_ROOT%\target\release\migration-engine.exe`.
 
 Other variables may or may not be useful.
-
-**Run:**
-If you're using Intellij, you can run all tests by right-clicking
-`src/test/scala` > `Run ScalaTests`.
-
-If you want to use the command line, start `sbt` in
-`./query-engine/connector-test-kit`, then execute `test` in the sbt shell.
 
 ### Set up & run cargo tests:
 
