@@ -33,6 +33,21 @@ impl OrderBy {
             OrderBy::Relevance(_) => None,
         }
     }
+
+    /// Returns `true` if the order by is `Aggregation`.
+    pub fn is_aggregation(&self) -> bool {
+        matches!(self, Self::Aggregation(..))
+    }
+
+    /// Returns `true` if the order by is `Scalar`.
+    pub fn is_scalar(&self) -> bool {
+        matches!(self, Self::Scalar(..))
+    }
+
+    /// Returns `true` if the order by is `Relevance`.
+    pub fn is_relevance(&self) -> bool {
+        matches!(self, Self::Relevance(..))
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
