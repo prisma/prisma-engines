@@ -1,7 +1,6 @@
 use query_engine_tests::*;
 
-// TODO(dom): Not working on mongo
-#[test_suite(schema(schema), exclude(MongoDb))]
+#[test_suite(schema(schema))]
 mod order_by_aggr {
     use indoc::indoc;
     use query_engine_tests::{assert_query_many, run_query};
@@ -529,13 +528,13 @@ mod order_by_aggr {
     fn schema_regression_8036() -> String {
         let schema = indoc! {
             r#"model Post {
-              id          Int      @id @default(autoincrement())
+              #id(id, Int, @id)
               title       String
               #m2m(LikedPeople, Person[], Int)
             }
             
             model Person {
-              id        Int    @id @default(autoincrement())
+              #id(id, Int, @id)
               name      String
               #m2m(likePosts, Post[], Int)
             }
@@ -550,22 +549,28 @@ mod order_by_aggr {
     async fn count_m2m_records_not_connected(runner: Runner) -> TestResult<()> {
         run_query!(
             runner,
-            r#"mutation { createOnePerson(data: { name: "Alice" }) { id } }"#
+            r#"mutation { createOnePerson(data: { id: 1, name: "Alice" }) { id } }"#
         );
         run_query!(
             runner,
-            r#"mutation { createOnePost(data: { title: "First", LikedPeople: { connect: { id: 1 } } }) { id } }"#
+            r#"mutation { createOnePost(data: { id: 1, title: "First", LikedPeople: { connect: { id: 1 } } }) { id } }"#
         );
         run_query!(
             runner,
-            r#"mutation { createOnePost(data: { title: "Second" }) { id } }"#
+            r#"mutation { createOnePost(data: { id: 2, title: "Second" }) { id } }"#
         );
-        run_query!(runner, r#"mutation { createOnePost(data: { title: "Third" }) { id } }"#);
         run_query!(
             runner,
-            r#"mutation { createOnePost(data: { title: "Fourth" }) { id } }"#
+            r#"mutation { createOnePost(data: { id: 3, title: "Third" }) { id } }"#
         );
-        run_query!(runner, r#"mutation { createOnePost(data: { title: "Fifth" }) { id } }"#);
+        run_query!(
+            runner,
+            r#"mutation { createOnePost(data: { id: 4, title: "Fourth" }) { id } }"#
+        );
+        run_query!(
+            runner,
+            r#"mutation { createOnePost(data: { id: 5, title: "Fifth" }) { id } }"#
+        );
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"{
