@@ -100,8 +100,18 @@ impl PostgresConnectorTag {
 
         Ok(Self {
             version,
-            capabilities: postgres_capabilities(),
+            capabilities: if let Some(PostgresVersion::Cockroach) = version {
+                Self::filter_cockroach_capabilities(postgres_capabilities())
+            } else {
+                postgres_capabilities()
+            },
         })
+    }
+
+    fn filter_cockroach_capabilities(caps: Vec<ConnectorCapability>) -> Vec<ConnectorCapability> {
+        caps.into_iter()
+            .filter(|&c| c != ConnectorCapability::FullTextSearchWithoutIndex)
+            .collect()
     }
 
     /// Returns all versions of this connector.
@@ -130,7 +140,7 @@ impl PostgresConnectorTag {
             },
             Self {
                 version: Some(PostgresVersion::Cockroach),
-                capabilities: capabilities.clone(),
+                capabilities: Self::filter_cockroach_capabilities(capabilities.clone()),
             },
             Self {
                 version: Some(PostgresVersion::PgBouncer),
