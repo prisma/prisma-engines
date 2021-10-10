@@ -88,7 +88,8 @@ mod insensitive {
             r#"query { findManyTestModel(where: { str: { gte: "aÆB", mode: insensitive } }) { str }}"#,
             vec![
                 r#"{"data":{"findManyTestModel":[{"str":"æ"},{"str":"Æ"},{"str":"bar"},{"str":"aÆB"},{"str":"aæB"}]}}"#, // Mongo
-                r#"{"data":{"findManyTestModel":[{"str":"æ"},{"str":"Æ"},{"str":"bar"},{"str":"aÆB"},{"str":"AÆB"},{"str":"aæB"},{"str":"aB"}]}}"# // Postgres
+                r#"{"data":{"findManyTestModel":[{"str":"æ"},{"str":"Æ"},{"str":"bar"},{"str":"aÆB"},{"str":"AÆB"},{"str":"aæB"},{"str":"aB"}]}}"#, // Postgres
+                r#"{"data":{"findManyTestModel":[{"str":"æ"},{"str":"Æ"},{"str":"bar"},{"str":"aÆB"},{"str":"AÆB"},{"str":"aæB"}]}}"#, // Cockroach, https://github.com/cockroachdb/cockroach/issues/71313
             ]
         );
 
@@ -97,7 +98,8 @@ mod insensitive {
             r#"query { findManyTestModel(where: { str: { lt: "aÆB", mode: insensitive } }) { str }}"#,
             vec![
                 r#"{"data":{"findManyTestModel":[{"str":"A"},{"str":"AÆB"},{"str":"aB"}]}}"#, // Mongo
-                r#"{"data":{"findManyTestModel":[{"str":"A"}]}}"#                              // Postgres
+                r#"{"data":{"findManyTestModel":[{"str":"A"}]}}"#,                             // Postgres
+                r#"{"data":{"findManyTestModel":[{"str":"A"},{"str":"aB"}]}}"#, // Cockroach, https://github.com/cockroachdb/cockroach/issues/71313
             ]
         );
 
