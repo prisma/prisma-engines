@@ -1,7 +1,5 @@
 #![allow(clippy::suspicious_operation_groupings)] // clippy is wrong there
 
-mod names;
-
 use crate::{
     ast,
     common::constraint_names::ConstraintNames,
@@ -9,7 +7,7 @@ use crate::{
     diagnostics::{DatamodelError, Diagnostics},
     dml,
 };
-use names::NamesValidator;
+use datamodel_connector::ConstraintType;
 
 /// Helper for validating a datamodel.
 ///
@@ -21,6 +19,8 @@ pub struct Validator<'a> {
 /// State error message. Seeing this error means something went really wrong internally. It's the datamodel equivalent of a bluescreen.
 const STATE_ERROR: &str = "Failed lookup of model, field or optional property during internal processing. This means that the internal representation was mutated incorrectly.";
 const RELATION_ATTRIBUTE_NAME: &str = "relation";
+const INDEX_ATTRIBUTE_NAME: &str = "index";
+const UNIQUE_ATTRIBUTE_NAME: &str = "unique";
 const RELATION_ATTRIBUTE_NAME_WITH_AT: &str = "@relation";
 const PRISMA_FORMAT_HINT: &str = "You can run `prisma format` to fix this automatically.";
 
@@ -95,23 +95,55 @@ impl<'a> Validator<'a> {
     pub(crate) fn post_standardisation_validate(
         &self,
         ast_schema: &ast::SchemaAst,
-        schema: &dml::Datamodel,
+        datamodel: &dml::Datamodel,
         diagnostics: &mut Diagnostics,
     ) {
-        let constraint_names = NamesValidator::new(schema, self.source);
+        let mut diagnostics_2 = self.validate_constraint_names_connector_specific(ast_schema, datamodel);
 
-        for model in schema.models() {
+        diagnostics.append(&mut diagnostics_2);
+        for model in datamodel.models() {
+            let mut new_errors = self.validate_relation_arguments_bla(
+                datamodel,
+                ast_schema.find_model(&model.name).expect(STATE_ERROR),
+                model,
+            );
+
+            diagnostics.append(&mut new_errors);
+        }
+    }
+
+    fn validate_constraint_names_connector_specific(
+        &self,
+        ast_schema: &ast::SchemaAst,
+        datamodel: &dml::Datamodel,
+    ) -> Diagnostics {
+        let mut diagnostics = Diagnostics::new();
+
+        let source = if let Some(source) = self.source {
+            source
+        } else {
+            return diagnostics;
+        };
+
+        let namespace_violations = source.active_connector.get_constraint_namespace_violations(datamodel);
+
+        for model in datamodel.models() {
+            let namespace_violation_scope = |name: &str, tpe: ConstraintType| {
+                namespace_violations
+                    .iter()
+                    .find(|ns| ns.name == name && ns.tpe == tpe && model.name == ns.table)
+                    .map(|ns| ns.scope)
+            };
             let ast_model = ast_schema.find_model(&model.name).expect(STATE_ERROR);
 
             if let Some(pk) = &model.primary_key {
-                if let Some(name) = &pk.db_name {
-                    // Only for SQL Server for now...
-                    if constraint_names.is_duplicate(name) {
+                if let Some(pk_name) = &pk.db_name {
+                    if let Some(scope) = namespace_violation_scope(pk_name, ConstraintType::PrimaryKey) {
                         let span = ast_model.id_attribute().span;
 
                         let message = format!(
-                            "The given constraint name `{}` is already in use in the data model. Please provide a different name using the `map` argument.",
-                            name
+                            "The given constraint name `{}` has to be unique in the following namespace: {}. Please provide a different name using the `map` argument.",
+                            pk_name,scope
                         );
 
                         let error = DatamodelError::new_attribute_validation_error(&message, "id", span);
@@ -121,16 +153,14 @@ impl<'a> Validator<'a> {
                 }
             }
 
-            //TODO(matthias): Extend this check for other constraints. Now only used
-            // for SQL Server default constraint names.
-            for field in model.fields().filter(|f| f.is_scalar_field()) {
-                if let Some(name) = field.default_value().and_then(|d| d.db_name()) {
-                    let ast_field = ast_model.find_field_bang(field.name());
+            for field in model.scalar_fields() {
+                if let Some(df_name) = field.default_value().and_then(|d| d.db_name()) {
+                    let ast_field = ast_model.find_field_bang(&field.name);
 
-                    if constraint_names.is_duplicate(name) {
+                    if let Some(scope) = namespace_violation_scope(df_name, ConstraintType::Default) {
                         let message = format!(
-                            "The given constraint name `{}` is already in use in the data model. Please provide a different name using the `map` argument.",
-                            name
+                            "The given constraint name `{}` has to be unique in the following namespace: {}. Please provide a different name using the `map` argument.",
+                            df_name,scope
                         );
 
                         let span = ast_field.span_for_argument("default", "map").unwrap_or(ast_field.span);
@@ -141,15 +171,57 @@ impl<'a> Validator<'a> {
                 }
             }
 
-            let mut new_errors = self.validate_relation_arguments_bla(
-                schema,
-                ast_schema.find_model(&model.name).expect(STATE_ERROR),
-                model,
-                &constraint_names,
-            );
+            for field in model.relation_fields() {
+                let ast_field = ast_model
+                    .fields
+                    .iter()
+                    .find(|ast_field| ast_field.name.name == field.name);
 
-            diagnostics.append(&mut new_errors);
+                let field_span = ast_field.map(|f| f.span).unwrap_or_else(ast::Span::empty);
+
+                if let Some(fk_name) = field.relation_info.fk_name.as_ref() {
+                    if let Some(scope) = namespace_violation_scope(fk_name, ConstraintType::ForeignKey) {
+                        let span = ast_field
+                            .and_then(|f| f.span_for_argument("relation", "map"))
+                            .unwrap_or(field_span);
+
+                        let message = format!(
+                            "The given constraint name `{}` has to be unique in the following namespace: {}. Please provide a different name using the `map` argument.",
+                            fk_name, scope
+                        );
+
+                        let error =
+                            DatamodelError::new_attribute_validation_error(&message, RELATION_ATTRIBUTE_NAME, span);
+                        diagnostics.push_error(error);
+                    }
+                }
+            }
+
+            for index in &model.indices {
+                if let Some(idx_name) = &index.db_name {
+                    if let Some(scope) = namespace_violation_scope(idx_name, ConstraintType::KeyOrIdx) {
+                        let span = ast_model.span;
+                        let message = format!(
+                            "The given constraint name `{}` has to be unique in the following namespace: {}. Please provide a different name using the `map` argument.",
+                            idx_name, scope
+                        );
+
+                        let error = DatamodelError::new_attribute_validation_error(
+                            &message,
+                            if index.is_unique() {
+                                UNIQUE_ATTRIBUTE_NAME
+                            } else {
+                                INDEX_ATTRIBUTE_NAME
+                            },
+                            span,
+                        );
+                        diagnostics.push_error(error);
+                    }
+                }
+            }
         }
+
+        diagnostics
     }
 
     fn validate_model_has_strict_unique_criteria(
@@ -325,7 +397,6 @@ impl<'a> Validator<'a> {
         datamodel: &'dml dml::Datamodel,
         ast_model: &ast::Model,
         model: &dml::Model,
-        constraint_names: &NamesValidator<'dml>,
     ) -> Diagnostics {
         let mut errors = Diagnostics::new();
 
@@ -339,23 +410,6 @@ impl<'a> Validator<'a> {
 
             let rel_info = &field.relation_info;
             let related_model = datamodel.find_model(&rel_info.to).expect(STATE_ERROR);
-
-            if let Some(name) = field.relation_info.fk_name.as_ref() {
-                // Only for SQL Server for now...
-                if constraint_names.is_duplicate(name) {
-                    let span = ast_field
-                        .and_then(|f| f.span_for_argument("relation", "map"))
-                        .unwrap_or(field_span);
-
-                    let message = format!(
-                        "The given constraint name `{}` is already in use in the data model. Please provide a different name using the `map` argument.",
-                        name
-                    );
-
-                    let error = DatamodelError::new_attribute_validation_error(&message, RELATION_ATTRIBUTE_NAME, span);
-                    errors.push_error(error);
-                }
-            }
 
             if let Some((_rel_field_idx, related_field)) = datamodel.find_related_field(field) {
                 let related_field_rel_info = &related_field.relation_info;

@@ -257,35 +257,112 @@ fn sqlite_reserved_name_space_can_be_used(api: TestApi) {
         table.assert_has_index_name_and_type("sqlite_index", false)
     });
 }
-// #[test_connector(tags(Postgres))]
-// fn names_that_are_too_long_are_truncated(api: TestApi) {
-//     let plain_dm = r#"
-//             model Post {
-//               id        Int     @id @default(autoincrement())
-//               link LinkingTableForUserAndPostWithObnoxiouslyLongNameButNotTooLongBUTLONGER[]
-//             }
-//
-//             model User {
-//               id    Int     @id @default(autoincrement())
-//               link LinkingTableForUserAndPostWithObnoxiouslyLongNameButNotTooLongBUTLONGER[]
-//             }
-//
-//
-//             model LinkingTableForUserAndPostWithObnoxiouslyLongNameButNotTooLongBUTLONGER {
-//               id Int     @id @default(autoincrement())
-//
-//               post   Post @relation(fields: [postId], references: [id])
-//               postId Int          @map("post_id")
-//
-//               user   User @relation(fields: [userId], references: [id])
-//               userId Int       @map("user_id")
-//             }
-//      "#;
-//
-//     api.schema_push_w_datasource(plain_dm).send().assert_green();
-//     api.assert_schema().assert_table("A", |table| {
-//         table.assert_has_index_name_and_type("sqlite_unique", true);
-//         table.assert_has_index_name_and_type("sqlite_compound_unique", true);
-//         table.assert_has_index_name_and_type("sqlite_index", false)
-//     });
-// }
+
+//working constraint names
+
+//MSSQL
+#[test_connector(tags(Mssql))]
+fn duplicate_index_names_across_models_work_on_mssql(api: TestApi) {
+    let plain_dm = r#"
+            model Post {
+              id        Int     @id @default(5)
+              test      Int
+              
+              @@index([test], map: "Duplicate")
+            }
+            
+             model Post2 {
+              id        Int     @id @default(5, map: "Duplicate")
+              test      Int
+              
+              @@index([test], map: "Duplicate")
+            }
+     "#;
+
+    api.schema_push_w_datasource(plain_dm).send().assert_green();
+    api.assert_schema()
+        .assert_table("Post", |table| table.assert_has_index_name_and_type("Duplicate", false));
+    api.assert_schema().assert_table("Post2", |table| {
+        table.assert_has_index_name_and_type("Duplicate", false)
+    });
+}
+
+#[test_connector(tags(Mssql))]
+fn duplicate_constraint_names_across_namespaces_work_on_mssql(api: TestApi) {
+    let plain_dm = r#"
+     model User {
+        id         Int @id
+        neighborId Int @default(1, map: "MyName")
+        posts      Post[]
+
+        @@index([id], name: "MyName")
+     }
+
+     model Post {
+        id Int @id
+        userId Int
+        User   User @relation(fields:[userId], references:[id], map: "MyOtherName") 
+
+        @@index([id], name: "MyOtherName")
+     }
+     "#;
+
+    api.schema_push_w_datasource(plain_dm).send().assert_green();
+}
+
+#[test_connector(tags(Mssql))]
+fn duplicate_primary_and_index_name_in_different_table_works_on_mssql(api: TestApi) {
+    let plain_dm = r#"
+     model User {
+        id         Int @id(map: "Test")
+     }
+
+     model Post {
+        id Int @id 
+        
+        @@index([id], map: "Test")
+     }
+     "#;
+
+    api.schema_push_w_datasource(plain_dm).send().assert_green();
+}
+
+//Postgres
+
+#[test_connector(tags(Postgres))]
+fn duplicate_primary_and_foreign_key_name_across_models_work_on_postgres(api: TestApi) {
+    let plain_dm = r#"
+            model A {
+                id Int @id(map: "foo")
+                bs B[]
+            }
+            
+            model B {
+                id Int @id
+                aId Int
+                a   A  @relation(fields: [aId], references: [id], map: "foo")
+            }
+     "#;
+
+    api.schema_push_w_datasource(plain_dm).send().assert_green();
+}
+
+//Mysql
+#[test_connector(tags(Mysql))]
+fn duplicate_constraint_names_across_models_work_on_mysql(api: TestApi) {
+    let plain_dm = r#"
+     model User {
+        id         Int @id
+
+        @@index([id], name: "MyName")
+     }
+
+     model Post {
+        id Int @id
+
+        @@index([id], name: "MyName")
+     }
+     "#;
+
+    api.schema_push_w_datasource(plain_dm).send().assert_green();
+}

@@ -1,4 +1,4 @@
-use crate::attributes::with_named_constraints;
+use crate::attributes::with_postgres_provider;
 use crate::common::*;
 use indoc::indoc;
 
@@ -213,7 +213,7 @@ fn relation_field_as_id_must_error() {
 
 #[test]
 fn invalid_name_for_compound_id_must_error() {
-    let dml = with_named_constraints(indoc! {r#"
+    let dml = with_postgres_provider(indoc! {r#"
         model User {
           name           String
           identification Int
@@ -332,7 +332,7 @@ fn mapped_id_must_error_on_sqlite() {
 
 #[test]
 fn naming_id_to_a_field_name_should_error() {
-    let dml = with_named_constraints(indoc! {r#"
+    let dml = with_postgres_provider(indoc! {r#"
         model User {
           used           Int
           name           String
@@ -364,7 +364,7 @@ fn naming_id_to_a_field_name_should_error() {
 
 #[test]
 fn mapping_id_with_a_name_that_is_too_long_should_error() {
-    let dml = with_named_constraints(indoc! {r#"
+    let dml = with_postgres_provider(indoc! {r#"
         model User {
           name           String
           identification Int
@@ -400,7 +400,7 @@ fn mapping_id_with_a_name_that_is_too_long_should_error() {
 
 #[test]
 fn name_on_field_level_id_should_error() {
-    let dml = with_named_constraints(indoc! {r#"
+    let dml = with_postgres_provider(indoc! {r#"
         model User {
           invalid           Int @id(name: "THIS SHOULD BE MAP INSTEAD")
         }
@@ -450,4 +450,44 @@ fn bytes_should_not_be_allowed_as_id_on_sql_server() {
     "#]];
 
     expected.assert_eq(&error);
+}
+
+#[test]
+fn primary_key_and_foreign_key_names_cannot_clash() {
+    let dml = indoc! { r#"
+        datasource test {
+          provider = "postgresql"
+          url = "postgresql://"
+        }
+
+        model A {
+            id Int @id(map: "foo") 
+            bId Int
+            b   B  @relation(fields: [bId], references: [id], map: "foo")
+        }
+        
+        model B {
+            id Int @id(map: "bar")
+            as A[]
+        }
+    "#};
+
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@id": The given constraint name `foo` has to be unique in the following namespace: on model `A` for primary key, indexes, unique constraints and foreign keys. Please provide a different name using the `map` argument.[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
+        [1;94m   | [0m
+        [1;94m 6 | [0mmodel A {
+        [1;94m 7 | [0m    id Int @[1;91mid(map: "foo")[0m 
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": The given constraint name `foo` has to be unique in the following namespace: on model `A` for primary key, indexes, unique constraints and foreign keys. Please provide a different name using the `map` argument.[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
+        [1;94m   | [0m
+        [1;94m 8 | [0m    bId Int
+        [1;94m 9 | [0m    b   B  @relation(fields: [bId], references: [id], [1;91mmap: "foo"[0m)
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
 }

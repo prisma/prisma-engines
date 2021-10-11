@@ -100,7 +100,6 @@ impl<'ast> ParserDatabase<'ast> {
         attributes::resolve_attributes(&mut ctx);
 
         // Fourth step: global validations
-        attributes::validate_index_names(&mut ctx);
         attributes::fill_in_default_constraint_names(&mut ctx);
         attributes::validate_relation_fields(&mut ctx);
 

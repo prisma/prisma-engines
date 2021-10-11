@@ -1,4 +1,4 @@
-use crate::attributes::with_named_constraints;
+use crate::attributes::with_postgres_provider;
 use crate::common::*;
 use datamodel::{dml, IndexDefinition, IndexType, ScalarType};
 
@@ -225,7 +225,7 @@ fn allow_complicated_self_relations() {
 
 #[test]
 fn allow_explicit_fk_name_definition() {
-    let dml = with_named_constraints(
+    let dml = with_postgres_provider(
         r#"
      model User {
          user_id Int    @id
@@ -255,7 +255,7 @@ fn allow_explicit_fk_name_definition() {
 
 #[test]
 fn allow_implicit_fk_name_definition() {
-    let dml = with_named_constraints(
+    let dml = with_postgres_provider(
         r#"
      model User {
          user_id Int    @id
@@ -285,7 +285,7 @@ fn allow_implicit_fk_name_definition() {
 
 #[test]
 fn implicit_fk_name_definition_with_mapped_models_and_fields() {
-    let dml = with_named_constraints(
+    let dml = with_postgres_provider(
         r#"
      model User {
          user_id Int    @id  @map("user_id_map")
@@ -319,7 +319,7 @@ fn implicit_fk_name_definition_with_mapped_models_and_fields() {
 
 #[test]
 fn implicit_fk_name_definition_with_mapped_models_and_fields_other_order() {
-    let dml = with_named_constraints(
+    let dml = with_postgres_provider(
         r#"
      model User {
          user_id Int    @id  @map("user_id_map")
@@ -353,7 +353,7 @@ fn implicit_fk_name_definition_with_mapped_models_and_fields_other_order() {
 
 #[test]
 fn implicit_unique_constraint_on_one_to_one() {
-    let dml = with_named_constraints(
+    let dml = with_postgres_provider(
         r#"
      model User {
          user_id Int    @id  @map("user_id_map")
@@ -395,7 +395,7 @@ fn implicit_unique_constraint_on_one_to_one() {
 
 #[test]
 fn implicit_unique_constraint_on_compound_one_to_one() {
-    let dml = with_named_constraints(
+    let dml = with_postgres_provider(
         r#"
      model User {
          user_id_1  Int    
@@ -450,7 +450,7 @@ fn one_to_one_optional() {
         }
     "#;
 
-    let schema = parse(&dml);
+    let schema = parse(dml);
     schema.assert_has_model("A").assert_has_relation_field("b");
     schema.assert_has_model("B").assert_has_relation_field("a");
 }

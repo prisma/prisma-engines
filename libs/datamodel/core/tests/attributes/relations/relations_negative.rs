@@ -1,4 +1,4 @@
-use crate::attributes::with_named_constraints;
+use crate::attributes::with_postgres_provider;
 use crate::common::*;
 use indoc::indoc;
 
@@ -721,7 +721,7 @@ fn should_fail_on_missing_embed_ids_on_self_relations() {
 
 #[test]
 fn mapping_foreign_keys_with_a_name_that_is_too_long_should_error() {
-    let dml = with_named_constraints(indoc! {r#"
+    let dml = with_postgres_provider(indoc! {r#"
         model User {
           id Int    @id
           posts   Post[]

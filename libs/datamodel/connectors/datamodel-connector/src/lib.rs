@@ -1,19 +1,23 @@
+use std::{borrow::Cow, collections::BTreeMap, str::FromStr};
+
+use enumflags2::BitFlags;
+
+use dml::datamodel::Datamodel;
+use dml::{
+    field::Field, model::Model, native_type_constructor::NativeTypeConstructor,
+    native_type_instance::NativeTypeInstance, relation_info::ReferentialAction, scalars::ScalarType,
+};
+pub use empty_connector::EmptyDatamodelConnector;
+pub use referential_integrity::ReferentialIntegrity;
+
+use crate::connector_error::{ConnectorError, ConnectorErrorFactory, ErrorKind};
+use std::fmt::{Display, Formatter};
+
 pub mod connector_error;
 pub mod helper;
 
 mod empty_connector;
 mod referential_integrity;
-
-pub use empty_connector::EmptyDatamodelConnector;
-pub use referential_integrity::ReferentialIntegrity;
-
-use crate::connector_error::{ConnectorError, ConnectorErrorFactory, ErrorKind};
-use dml::{
-    field::Field, model::Model, native_type_constructor::NativeTypeConstructor,
-    native_type_instance::NativeTypeInstance, relation_info::ReferentialAction, scalars::ScalarType,
-};
-use enumflags2::BitFlags;
-use std::{borrow::Cow, collections::BTreeMap, str::FromStr};
 
 pub trait Connector: Send + Sync {
     fn name(&self) -> &str;
@@ -53,6 +57,10 @@ pub trait Connector: Send + Sync {
     fn validate_field(&self, field: &Field) -> Result<(), ConnectorError>;
 
     fn validate_model(&self, model: &Model) -> Result<(), ConnectorError>;
+
+    fn get_constraint_namespace_violations<'dml>(&self, _schema: &'dml Datamodel) -> Vec<ConstraintNameSpace<'dml>> {
+        Vec::new()
+    }
 
     /// Returns all available native type constructors available through this connector.
     /// Powers the auto completion of the vs code plugin.
@@ -285,5 +293,96 @@ impl ConnectorCapabilities {
 
     pub fn contains(&self, capability: ConnectorCapability) -> bool {
         self.capabilities.contains(&capability)
+    }
+}
+
+#[derive(Debug)]
+pub struct ConstraintNameSpace<'dml> {
+    pub table: &'dml str,
+    pub name: &'dml str,
+    pub tpe: ConstraintType,
+    pub scope: ConstraintViolationScope<'dml>,
+}
+
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd)]
+pub enum ConstraintType {
+    PrimaryKey,
+    ForeignKey,
+    KeyOrIdx,
+    Default,
+}
+
+#[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Clone, Copy)]
+pub enum ConstraintViolationScope<'dml> {
+    Global,
+    GlobalKeyIndex,
+    GlobalForeignKey,
+    GlobalPrimaryKeyKeyIndex,
+    GlobalKeyIndexForeignKey,
+    GlobalPrimaryKeyForeignKeyDefault,
+    ModelPrimaryKeyKeyIndex(&'dml str),
+    ModelKeyIndexForeignKey(&'dml str),
+    ModelPrimaryKeyForeignKeyDefault(&'dml str),
+    ModelPrimaryKeyKeyIndexForeignKey(&'dml str),
+}
+
+impl<'dml> Display for ConstraintViolationScope<'dml> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ConstraintViolationScope::Global => f.write_str("global"),
+            ConstraintViolationScope::GlobalKeyIndex => f.write_str("global for indexes and unique constraints"),
+            ConstraintViolationScope::GlobalPrimaryKeyKeyIndex => {
+                f.write_str("global for primary key, indexes and unique constraints")
+            }
+            ConstraintViolationScope::GlobalForeignKey => f.write_str("global for foreign keys"),
+            ConstraintViolationScope::GlobalKeyIndexForeignKey => {
+                f.write_str("global for indexes, unique constraints and foreign keys")
+            }
+            ConstraintViolationScope::GlobalPrimaryKeyForeignKeyDefault => {
+                f.write_str("global for primary keys, foreign keys and default constraints")
+            }
+            ConstraintViolationScope::ModelPrimaryKeyKeyIndex(model) => f.write_str(&format!(
+                "on model `{}` for primary key, indexes and unique constraints",
+                model
+            )),
+            ConstraintViolationScope::ModelKeyIndexForeignKey(model) => f.write_str(&format!(
+                "on model `{}` for indexes, unique constraints and foreign keys",
+                model
+            )),
+            ConstraintViolationScope::ModelPrimaryKeyForeignKeyDefault(model) => f.write_str(&format!(
+                "on model `{}` for primary key, foreign keys and default constraints",
+                model
+            )),
+            ConstraintViolationScope::ModelPrimaryKeyKeyIndexForeignKey(model) => f.write_str(&format!(
+                "on model `{}` for primary key, indexes, unique constraints and foreign keys",
+                model
+            )),
+        }
+    }
+}
+
+impl<'dml> ConstraintNameSpace<'dml> {
+    pub fn flatten(
+        potential_name_space_violations: BTreeMap<
+            (&'dml str, ConstraintViolationScope<'dml>),
+            Vec<(&'dml str, ConstraintType)>,
+        >,
+    ) -> Vec<ConstraintNameSpace<'dml>> {
+        potential_name_space_violations
+            .into_iter()
+            .filter(|(_, v)| v.len() > 1)
+            .map(|((name, scope), entries)| {
+                entries
+                    .into_iter()
+                    .map(|(table, tpe)| ConstraintNameSpace {
+                        table,
+                        name,
+                        tpe,
+                        scope,
+                    })
+                    .collect::<Vec<ConstraintNameSpace>>()
+            })
+            .flatten()
+            .collect()
     }
 }

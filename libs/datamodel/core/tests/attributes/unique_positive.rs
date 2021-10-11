@@ -1,4 +1,4 @@
-use crate::attributes::with_named_constraints;
+use crate::attributes::with_postgres_provider;
 use crate::common::*;
 use datamodel::{render_datamodel_to_string, IndexDefinition, IndexType};
 
@@ -243,7 +243,7 @@ fn unique_attributes_must_serialize_to_valid_dml() {
 #[test]
 fn named_multi_field_unique_must_work() {
     //Compatibility case
-    let dml = with_named_constraints(
+    let dml = with_postgres_provider(
         r#"
      model User {
          a String
@@ -266,7 +266,7 @@ fn named_multi_field_unique_must_work() {
 
 #[test]
 fn mapped_multi_field_unique_must_work() {
-    let dml = with_named_constraints(
+    let dml = with_postgres_provider(
         r#"
      model User {
          a String
@@ -289,7 +289,7 @@ fn mapped_multi_field_unique_must_work() {
 
 #[test]
 fn mapped_singular_unique_must_work() {
-    let dml = with_named_constraints(
+    let dml = with_postgres_provider(
         r#"
      model Model {
          a String @unique(map: "test")
@@ -323,7 +323,7 @@ fn mapped_singular_unique_must_work() {
 
 #[test]
 fn named_and_mapped_multi_field_unique_must_work() {
-    let dml = with_named_constraints(
+    let dml = with_postgres_provider(
         r#"
      model Model {
          a String
@@ -346,7 +346,7 @@ fn named_and_mapped_multi_field_unique_must_work() {
 
 #[test]
 fn implicit_names_must_work() {
-    let dml = with_named_constraints(
+    let dml = with_postgres_provider(
         r#"
      model Model {
          a String @unique
@@ -377,7 +377,7 @@ fn implicit_names_must_work() {
 
 #[test]
 fn defined_on_field_must_work() {
-    let dml = with_named_constraints(
+    let dml = with_postgres_provider(
         r#"
      model Model {
          a String @unique

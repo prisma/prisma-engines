@@ -16,7 +16,6 @@ use crate::{
     transform::helpers::ValueValidator,
 };
 use prisma_value::PrismaValue;
-use std::collections::HashSet;
 
 pub(super) fn resolve_attributes(ctx: &mut Context<'_>) {
     for top in ctx.db.ast.iter_tops() {
@@ -119,30 +118,6 @@ fn resolve_model_attributes<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::
     autoincrement::validate_auto_increment(model_id, &model_attributes, ctx);
 
     ctx.db.types.model_attributes.insert(model_id, model_attributes);
-}
-
-pub(super) fn validate_index_names(ctx: &mut Context<'_>) {
-    if ctx.db.active_connector().supports_multiple_indexes_with_same_name() {
-        return;
-    }
-
-    let mut index_names = HashSet::new();
-    let mut errors = Vec::new();
-
-    for index in ctx.db.walk_models().flat_map(|model| model.indexes()) {
-        let index_name = index.final_database_name();
-
-        if index_names.insert(index_name.clone()) {
-            continue; // true means this name hasn't been seen before
-        }
-
-        errors.push(DatamodelError::new_multiple_indexes_with_same_name_are_not_supported(
-            &index_name,
-            index.ast_attribute().span,
-        ))
-    }
-
-    errors.into_iter().for_each(|err| ctx.push_error(err))
 }
 
 pub(super) fn validate_relation_fields(ctx: &mut Context<'_>) {

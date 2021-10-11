@@ -47,9 +47,11 @@ impl Pluralize for CategoryRule {
 
         for suffix in self.words {
             if normalized.ends_with(suffix) {
-                if !normalized.ends_with(&self.singular) {
-                    panic!("Invariant violation: Invalid inflection rule match: {}.", self.singular);
-                }
+                assert!(
+                    normalized.ends_with(&self.singular),
+                    "Invariant violation: Invalid inflection rule match: {}.",
+                    self.singular
+                );
 
                 let chars = s.graphemes(true).collect::<Vec<&str>>();
                 let end_index = chars.len() - self.singular.len();
