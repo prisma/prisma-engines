@@ -450,7 +450,7 @@ fn one_to_one_optional() {
         }
     "#;
 
-    let schema = parse(&dml);
+    let schema = parse(dml);
     schema.assert_has_model("A").assert_has_relation_field("b");
     schema.assert_has_model("B").assert_has_relation_field("a");
 }

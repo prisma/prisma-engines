@@ -119,99 +119,103 @@ impl<'a> Validator<'a> {
     ) -> Diagnostics {
         let mut diagnostics = Diagnostics::new();
 
-        if let Some(source) = self.source {
-            let namespace_violations = source.active_connector.get_constraint_namespace_violations(datamodel);
+        let source = if let Some(source) = self.source {
+            source
+        } else {
+            return diagnostics;
+        };
 
-            for model in datamodel.models() {
-                let namespace_violation_scope = |name: &str, tpe: ConstraintType| {
-                    namespace_violations
-                        .iter()
-                        .find(|ns| ns.name == name && ns.tpe == tpe && model.name == ns.table)
-                        .map(|ns| ns.scope.clone())
-                };
-                let ast_model = ast_schema.find_model(&model.name).expect(STATE_ERROR);
+        let namespace_violations = source.active_connector.get_constraint_namespace_violations(datamodel);
 
-                if let Some(pk) = &model.primary_key {
-                    if let Some(pk_name) = &pk.db_name {
-                        if let Some(scope) = namespace_violation_scope(pk_name, ConstraintType::PrimaryKey) {
-                            let span = ast_model.id_attribute().span;
+        for model in datamodel.models() {
+            let namespace_violation_scope = |name: &str, tpe: ConstraintType| {
+                namespace_violations
+                    .iter()
+                    .find(|ns| ns.name == name && ns.tpe == tpe && model.name == ns.table)
+                    .map(|ns| ns.scope)
+            };
+            let ast_model = ast_schema.find_model(&model.name).expect(STATE_ERROR);
 
-                            let message = format!(
+            if let Some(pk) = &model.primary_key {
+                if let Some(pk_name) = &pk.db_name {
+                    if let Some(scope) = namespace_violation_scope(pk_name, ConstraintType::PrimaryKey) {
+                        let span = ast_model.id_attribute().span;
+
+                        let message = format!(
                             "The given constraint name `{}` has to be unique in the following namespace: {}. Please provide a different name using the `map` argument.",
                             pk_name,scope
                         );
 
-                            let error = DatamodelError::new_attribute_validation_error(&message, "id", span);
+                        let error = DatamodelError::new_attribute_validation_error(&message, "id", span);
 
-                            diagnostics.push_error(error);
-                        }
+                        diagnostics.push_error(error);
                     }
                 }
+            }
 
-                for field in model.scalar_fields() {
-                    if let Some(df_name) = field.default_value().and_then(|d| d.db_name()) {
-                        let ast_field = ast_model.find_field_bang(&field.name);
+            for field in model.scalar_fields() {
+                if let Some(df_name) = field.default_value().and_then(|d| d.db_name()) {
+                    let ast_field = ast_model.find_field_bang(&field.name);
 
-                        if let Some(scope) = namespace_violation_scope(df_name, ConstraintType::Default) {
-                            let message = format!(
+                    if let Some(scope) = namespace_violation_scope(df_name, ConstraintType::Default) {
+                        let message = format!(
                             "The given constraint name `{}` has to be unique in the following namespace: {}. Please provide a different name using the `map` argument.",
                             df_name,scope
                         );
 
-                            let span = ast_field.span_for_argument("default", "map").unwrap_or(ast_field.span);
-                            let error = DatamodelError::new_attribute_validation_error(&message, "default", span);
+                        let span = ast_field.span_for_argument("default", "map").unwrap_or(ast_field.span);
+                        let error = DatamodelError::new_attribute_validation_error(&message, "default", span);
 
-                            diagnostics.push_error(error);
-                        }
+                        diagnostics.push_error(error);
                     }
                 }
+            }
 
-                for field in model.relation_fields() {
-                    let ast_field = ast_model
-                        .fields
-                        .iter()
-                        .find(|ast_field| ast_field.name.name == field.name);
+            for field in model.relation_fields() {
+                let ast_field = ast_model
+                    .fields
+                    .iter()
+                    .find(|ast_field| ast_field.name.name == field.name);
 
-                    let field_span = ast_field.map(|f| f.span).unwrap_or_else(ast::Span::empty);
+                let field_span = ast_field.map(|f| f.span).unwrap_or_else(ast::Span::empty);
 
-                    if let Some(fk_name) = field.relation_info.fk_name.as_ref() {
-                        if let Some(scope) = namespace_violation_scope(fk_name, ConstraintType::ForeignKey) {
-                            let span = ast_field
-                                .and_then(|f| f.span_for_argument("relation", "map"))
-                                .unwrap_or(field_span);
+                if let Some(fk_name) = field.relation_info.fk_name.as_ref() {
+                    if let Some(scope) = namespace_violation_scope(fk_name, ConstraintType::ForeignKey) {
+                        let span = ast_field
+                            .and_then(|f| f.span_for_argument("relation", "map"))
+                            .unwrap_or(field_span);
 
-                            let message = format!(
+                        let message = format!(
                             "The given constraint name `{}` has to be unique in the following namespace: {}. Please provide a different name using the `map` argument.",
                             fk_name, scope
                         );
 
-                            let error =
-                                DatamodelError::new_attribute_validation_error(&message, RELATION_ATTRIBUTE_NAME, span);
-                            diagnostics.push_error(error);
-                        }
+                        let error =
+                            DatamodelError::new_attribute_validation_error(&message, RELATION_ATTRIBUTE_NAME, span);
+                        diagnostics.push_error(error);
                     }
                 }
+            }
 
-                for index in &model.indices {
-                    if let Some(idx_name) = &index.db_name {
-                        if let Some(scope) = namespace_violation_scope(idx_name, ConstraintType::KeyOrIdx) {
-                            let span = ast_model.span;
-                            let message = format!(
+            for index in &model.indices {
+                if let Some(idx_name) = &index.db_name {
+                    if let Some(scope) = namespace_violation_scope(idx_name, ConstraintType::KeyOrIdx) {
+                        let span = ast_model.span;
+                        let message = format!(
                             "The given constraint name `{}` has to be unique in the following namespace: {}. Please provide a different name using the `map` argument.",
                             idx_name, scope
                         );
 
-                            let error = DatamodelError::new_attribute_validation_error(
-                                &message,
-                                if index.is_unique() {
-                                    UNIQUE_ATTRIBUTE_NAME
-                                } else {
-                                    INDEX_ATTRIBUTE_NAME
-                                },
-                                span,
-                            );
-                            diagnostics.push_error(error);
-                        }
+                        let error = DatamodelError::new_attribute_validation_error(
+                            &message,
+                            if index.is_unique() {
+                                UNIQUE_ATTRIBUTE_NAME
+                            } else {
+                                INDEX_ATTRIBUTE_NAME
+                            },
+                            span,
+                        );
+                        diagnostics.push_error(error);
                     }
                 }
             }

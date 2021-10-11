@@ -1,20 +1,20 @@
 use crate::attributes::with_postgres_provider;
 use crate::common::*;
 
-const SQL_SERVER: &'static str = r#"datasource sqlserver {
+const SQL_SERVER: &str = r#"datasource sqlserver {
                                          provider = "sqlserver"
                                          url = "sqlserver://asdlj"
                                      }"#;
 
-const POSTGRES: &'static str = r#"datasource postgres {
+const POSTGRES: &str = r#"datasource postgres {
                                   provider = "postgres"
                                   url = "postgres://asdlj"
                                 }"#;
-const MYSQL: &'static str = r#"datasource mysql {
+const MYSQL: &str = r#"datasource mysql {
                                   provider = "mysql"
                                   url = "mysql://asdlj"
                                 }"#;
-const SQLITE: &'static str = r#"datasource sqlite {
+const SQLITE: &str = r#"datasource sqlite {
                                   provider = "sqlite"
                                   url = "sqlite://asdlj"
                                 }"#;

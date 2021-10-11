@@ -375,8 +375,8 @@ impl<'dml> ConstraintNameSpace<'dml> {
                 entries
                     .into_iter()
                     .map(|(table, tpe)| ConstraintNameSpace {
-                        table: &table,
-                        name: &name,
+                        table,
+                        name,
                         tpe,
                         scope,
                     })
