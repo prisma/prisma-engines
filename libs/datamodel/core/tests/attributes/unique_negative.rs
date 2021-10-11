@@ -417,7 +417,7 @@ fn duplicate_implicit_names_should_error() {
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@unique": The given constraint name `User_used_key` has to be unique in the following namespace: pk, key, idx global. Please provide a different name using the `map` argument.[0m
+        [1;91merror[0m: [1mError parsing attribute "@unique": The given constraint name `User_used_key` has to be unique in the following namespace: global for primary key, indexes and unique constraints. Please provide a different name using the `map` argument.[0m
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m    }
@@ -427,7 +427,7 @@ fn duplicate_implicit_names_should_error() {
         [1;94m14 | [0m  @@unique([used])
         [1;94m15 | [0m}
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@unique": The given constraint name `User_used_key` has to be unique in the following namespace: pk, key, idx global. Please provide a different name using the `map` argument.[0m
+        [1;91merror[0m: [1mError parsing attribute "@unique": The given constraint name `User_used_key` has to be unique in the following namespace: global for primary key, indexes and unique constraints. Please provide a different name using the `map` argument.[0m
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m    }

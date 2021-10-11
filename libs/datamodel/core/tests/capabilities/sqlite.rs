@@ -92,7 +92,7 @@ fn unique_index_names_support() {
     let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@index": The given constraint name `metaId` has to be unique in the following namespace: key, idx global. Please provide a different name using the `map` argument.[0m
+        [1;91merror[0m: [1mError parsing attribute "@index": The given constraint name `metaId` has to be unique in the following namespace: global for indexes and unique constraints. Please provide a different name using the `map` argument.[0m
           [1;94m-->[0m  [4mschema.prisma:6[0m
         [1;94m   | [0m
         [1;94m 5 | [0m
@@ -103,7 +103,7 @@ fn unique_index_names_support() {
         [1;94m10 | [0m  @@index([id], name: "metaId")
         [1;94m11 | [0m}
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@index": The given constraint name `metaId` has to be unique in the following namespace: key, idx global. Please provide a different name using the `map` argument.[0m
+        [1;91merror[0m: [1mError parsing attribute "@index": The given constraint name `metaId` has to be unique in the following namespace: global for indexes and unique constraints. Please provide a different name using the `map` argument.[0m
           [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
         [1;94m12 | [0m

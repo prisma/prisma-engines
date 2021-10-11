@@ -1,6 +1,8 @@
 use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
 use datamodel_connector::helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32};
-use datamodel_connector::{Connector, ConnectorCapability, ConstraintNameSpace, ReferentialIntegrity};
+use datamodel_connector::{
+    Connector, ConnectorCapability, ConstraintNameSpace, ConstraintType, ConstraintViolationScope, ReferentialIntegrity,
+};
 use dml::{
     field::{Field, FieldType},
     model::Model,
@@ -326,8 +328,11 @@ impl Connector for MsSqlDatamodelConnector {
         Ok(())
     }
 
-    fn get_namespace_violations(&self, schema: &Datamodel) -> Vec<ConstraintNameSpace> {
-        let mut potential_name_space_violations: BTreeMap<(String, String), Vec<(String, String)>> = BTreeMap::new();
+    fn get_constraint_namespace_violations<'dml>(&self, schema: &'dml Datamodel) -> Vec<ConstraintNameSpace<'dml>> {
+        let mut potential_name_space_violations: BTreeMap<
+            (&str, ConstraintViolationScope),
+            Vec<(&str, ConstraintType)>,
+        > = BTreeMap::new();
 
         //Primary Keys, Foreign Keys and Default Value names have to be globally unique
         //Indexes have their own table namespace, but cannot have the same name as the Primary key in that table
@@ -335,16 +340,16 @@ impl Connector for MsSqlDatamodelConnector {
         for model in schema.models() {
             if let Some(name) = model.primary_key.as_ref().and_then(|pk| pk.db_name.as_ref()) {
                 let entry = potential_name_space_violations
-                    .entry((name.to_string(), "pk, fk, df global".to_string()))
+                    .entry((name, ConstraintViolationScope::GlobalPrimaryKeyForeignKeyDefault))
                     .or_insert_with(Vec::new);
 
-                entry.push((model.name.clone(), "pk".to_string()));
+                entry.push((&model.name, ConstraintType::PrimaryKey));
 
                 let entry = potential_name_space_violations
-                    .entry((name.to_string(), format!("pk, key, idx on {}", model.name)))
+                    .entry((name, ConstraintViolationScope::ModelPrimaryKeyKeyIndex(&model.name)))
                     .or_insert_with(Vec::new);
 
-                entry.push((model.name.clone(), "pk".to_string()));
+                entry.push((&model.name, ConstraintType::PrimaryKey));
             }
 
             for name in model
@@ -352,10 +357,10 @@ impl Connector for MsSqlDatamodelConnector {
                 .filter_map(|rf| rf.relation_info.fk_name.as_ref())
             {
                 let entry = potential_name_space_violations
-                    .entry((name.to_string(), "pk, fk, df global".to_string()))
+                    .entry((name, ConstraintViolationScope::GlobalPrimaryKeyForeignKeyDefault))
                     .or_insert_with(Vec::new);
 
-                entry.push((model.name.clone(), "fk".to_string()));
+                entry.push((&model.name, ConstraintType::ForeignKey));
             }
 
             for name in model
@@ -363,37 +368,22 @@ impl Connector for MsSqlDatamodelConnector {
                 .filter_map(|sf| sf.default_value().and_then(|d| d.db_name()))
             {
                 let entry = potential_name_space_violations
-                    .entry((name.to_string(), "pk, fk, df global".to_string()))
+                    .entry((name, ConstraintViolationScope::GlobalPrimaryKeyForeignKeyDefault))
                     .or_insert_with(Vec::new);
 
-                entry.push((model.name.clone(), "df".to_string()));
+                entry.push((&model.name, ConstraintType::Default));
             }
 
             for name in model.indices.iter().filter_map(|i| i.db_name.as_ref()) {
                 let entry = potential_name_space_violations
-                    .entry((name.to_string(), format!("pk, key, idx on {}", model.name)))
+                    .entry((name, ConstraintViolationScope::ModelPrimaryKeyKeyIndex(&model.name)))
                     .or_insert_with(Vec::new);
 
-                entry.push((model.name.clone(), "idx".to_string()));
+                entry.push((&model.name, ConstraintType::KeyOrIdx));
             }
         }
 
-        potential_name_space_violations
-            .iter()
-            .filter(|(_, v)| v.len() > 1)
-            .map(|((name, scope), entries)| {
-                entries
-                    .iter()
-                    .map(|(table, tpe)| ConstraintNameSpace {
-                        table: table.clone(),
-                        name: name.clone(),
-                        tpe: tpe.clone(),
-                        scope: scope.clone(),
-                    })
-                    .collect::<Vec<ConstraintNameSpace>>()
-            })
-            .flatten()
-            .collect()
+        ConstraintNameSpace::flatten(potential_name_space_violations)
     }
 
     fn available_native_type_constructors(&self) -> &[NativeTypeConstructor] {

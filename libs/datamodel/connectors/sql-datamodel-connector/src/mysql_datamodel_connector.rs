@@ -1,7 +1,8 @@
 use datamodel_connector::{
     connector_error::ConnectorError,
     helper::{args_vec_from_opt, parse_one_opt_u32, parse_one_u32, parse_two_opt_u32},
-    Connector, ConnectorCapability, ConstraintNameSpace, ReferentialIntegrity,
+    Connector, ConnectorCapability, ConstraintNameSpace, ConstraintType, ConstraintViolationScope,
+    ReferentialIntegrity,
 };
 use dml::datamodel::Datamodel;
 use dml::{
@@ -349,8 +350,11 @@ impl Connector for MySqlDatamodelConnector {
         Ok(())
     }
 
-    fn get_namespace_violations(&self, schema: &Datamodel) -> Vec<ConstraintNameSpace> {
-        let mut potential_name_space_violations: BTreeMap<(String, String), Vec<(String, String)>> = BTreeMap::new();
+    fn get_constraint_namespace_violations<'dml>(&self, schema: &'dml Datamodel) -> Vec<ConstraintNameSpace<'dml>> {
+        let mut potential_name_space_violations: BTreeMap<
+            (&str, ConstraintViolationScope),
+            Vec<(&str, ConstraintType)>,
+        > = BTreeMap::new();
 
         //Foreign Keys and Indexes each have their own global namespace
         //Additionally, they cannot have the same name within a table
@@ -360,43 +364,28 @@ impl Connector for MySqlDatamodelConnector {
                 .filter_map(|rf| rf.relation_info.fk_name.as_ref())
             {
                 let entry = potential_name_space_violations
-                    .entry((name.to_string(), "fk global".to_string()))
+                    .entry((name, ConstraintViolationScope::GlobalForeignKey))
                     .or_insert_with(Vec::new);
 
-                entry.push((model.name.clone(), "fk".to_string()));
+                entry.push((&model.name, ConstraintType::ForeignKey));
 
                 let entry = potential_name_space_violations
-                    .entry((name.to_string(), format!("key, idx, fk on {}", model.name)))
+                    .entry((name, ConstraintViolationScope::ModelKeyIndexForeignKey(&model.name)))
                     .or_insert_with(Vec::new);
 
-                entry.push((model.name.clone(), "fk".to_string()));
+                entry.push((&model.name, ConstraintType::ForeignKey));
             }
 
             for name in model.indices.iter().filter_map(|i| i.db_name.as_ref()) {
                 let entry = potential_name_space_violations
-                    .entry((name.to_string(), format!("key, idx, fk on {}", model.name)))
+                    .entry((name, ConstraintViolationScope::ModelKeyIndexForeignKey(&model.name)))
                     .or_insert_with(Vec::new);
 
-                entry.push((model.name.clone(), "idx".to_string()));
+                entry.push((&model.name, ConstraintType::KeyOrIdx));
             }
         }
 
-        potential_name_space_violations
-            .iter()
-            .filter(|(_, v)| v.len() > 1)
-            .map(|((name, scope), entries)| {
-                entries
-                    .iter()
-                    .map(|(table, tpe)| ConstraintNameSpace {
-                        table: table.clone(),
-                        name: name.clone(),
-                        tpe: tpe.clone(),
-                        scope: scope.clone(),
-                    })
-                    .collect::<Vec<ConstraintNameSpace>>()
-            })
-            .flatten()
-            .collect()
+        ConstraintNameSpace::flatten(potential_name_space_violations)
     }
 
     fn available_native_type_constructors(&self) -> &[NativeTypeConstructor] {

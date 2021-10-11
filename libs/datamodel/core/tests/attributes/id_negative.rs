@@ -475,13 +475,13 @@ fn primary_key_and_foreign_key_names_cannot_clash() {
     let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@id": The given constraint name `foo` has to be unique in the following namespace: pk, key, idx, fk on A. Please provide a different name using the `map` argument.[0m
+        [1;91merror[0m: [1mError parsing attribute "@id": The given constraint name `foo` has to be unique in the following namespace: on model `A` for primary key, indexes, unique constraints and foreign keys. Please provide a different name using the `map` argument.[0m
           [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
         [1;94m 6 | [0mmodel A {
         [1;94m 7 | [0m    id Int @[1;91mid(map: "foo")[0m 
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@relation": The given constraint name `foo` has to be unique in the following namespace: pk, key, idx, fk on A. Please provide a different name using the `map` argument.[0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": The given constraint name `foo` has to be unique in the following namespace: on model `A` for primary key, indexes, unique constraints and foreign keys. Please provide a different name using the `map` argument.[0m
           [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
         [1;94m 8 | [0m    bId Int

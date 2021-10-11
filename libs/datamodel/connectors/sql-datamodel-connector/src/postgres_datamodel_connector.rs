@@ -1,7 +1,8 @@
 use datamodel_connector::{
     connector_error::ConnectorError,
     helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32},
-    Connector, ConnectorCapability, ConstraintNameSpace, ReferentialIntegrity,
+    Connector, ConnectorCapability, ConstraintNameSpace, ConstraintType, ConstraintViolationScope,
+    ReferentialIntegrity,
 };
 use dml::datamodel::Datamodel;
 use dml::{
@@ -290,8 +291,11 @@ impl Connector for PostgresDatamodelConnector {
         Ok(())
     }
 
-    fn get_namespace_violations(&self, schema: &Datamodel) -> Vec<ConstraintNameSpace> {
-        let mut potential_name_space_violations: BTreeMap<(String, String), Vec<(String, String)>> = BTreeMap::new();
+    fn get_constraint_namespace_violations<'dml>(&self, schema: &'dml Datamodel) -> Vec<ConstraintNameSpace<'dml>> {
+        let mut potential_name_space_violations: BTreeMap<
+            (&str, ConstraintViolationScope),
+            Vec<(&str, ConstraintType)>,
+        > = BTreeMap::new();
 
         //Primary Key, Unique and Index names have to be globally unique
         //Additionally, within a table they cannot conflict with Foreign Key names
@@ -299,16 +303,19 @@ impl Connector for PostgresDatamodelConnector {
         for model in schema.models() {
             if let Some(name) = model.primary_key.as_ref().and_then(|pk| pk.db_name.as_ref()) {
                 let entry = potential_name_space_violations
-                    .entry((name.to_string(), "pk, key, idx global".to_string()))
+                    .entry((name, ConstraintViolationScope::GlobalPrimaryKeyKeyIndex))
                     .or_insert_with(Vec::new);
 
-                entry.push((model.name.clone(), "pk".to_string()));
+                entry.push((&model.name, ConstraintType::PrimaryKey));
 
                 let entry = potential_name_space_violations
-                    .entry((name.to_string(), format!("pk, key, idx, fk on {}", model.name)))
+                    .entry((
+                        name,
+                        ConstraintViolationScope::ModelPrimaryKeyKeyIndexForeignKey(&model.name),
+                    ))
                     .or_insert_with(Vec::new);
 
-                entry.push((model.name.clone(), "pk".to_string()));
+                entry.push((&model.name, ConstraintType::PrimaryKey));
             }
 
             for name in model
@@ -316,43 +323,34 @@ impl Connector for PostgresDatamodelConnector {
                 .filter_map(|rf| rf.relation_info.fk_name.as_ref())
             {
                 let entry = potential_name_space_violations
-                    .entry((name.to_string(), format!("pk, key, idx, fk on {}", model.name)))
+                    .entry((
+                        name,
+                        ConstraintViolationScope::ModelPrimaryKeyKeyIndexForeignKey(&model.name),
+                    ))
                     .or_insert_with(Vec::new);
 
-                entry.push((model.name.clone(), "fk".to_string()));
+                entry.push((&model.name, ConstraintType::ForeignKey));
             }
 
             for name in model.indices.iter().filter_map(|i| i.db_name.as_ref()) {
                 let entry = potential_name_space_violations
-                    .entry((name.to_string(), "pk, key, idx global".to_string()))
+                    .entry((name, ConstraintViolationScope::GlobalPrimaryKeyKeyIndex))
                     .or_insert_with(Vec::new);
 
-                entry.push((model.name.clone(), "idx".to_string()));
+                entry.push((&model.name, ConstraintType::KeyOrIdx));
 
                 let entry = potential_name_space_violations
-                    .entry((name.to_string(), format!("pk, key, idx, fk on {}", model.name)))
+                    .entry((
+                        name,
+                        ConstraintViolationScope::ModelPrimaryKeyKeyIndexForeignKey(&model.name),
+                    ))
                     .or_insert_with(Vec::new);
 
-                entry.push((model.name.clone(), "idx".to_string()));
+                entry.push((&model.name, ConstraintType::KeyOrIdx));
             }
         }
 
-        potential_name_space_violations
-            .iter()
-            .filter(|(_, v)| v.len() > 1)
-            .map(|((name, scope), entries)| {
-                entries
-                    .iter()
-                    .map(|(table, tpe)| ConstraintNameSpace {
-                        table: table.clone(),
-                        name: name.clone(),
-                        tpe: tpe.clone(),
-                        scope: scope.clone(),
-                    })
-                    .collect::<Vec<ConstraintNameSpace>>()
-            })
-            .flatten()
-            .collect()
+        ConstraintNameSpace::flatten(potential_name_space_violations)
     }
 
     fn available_native_type_constructors(&self) -> &[NativeTypeConstructor] {
