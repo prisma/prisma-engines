@@ -6,10 +6,10 @@ mod query_raw {
     // MariaDB is the only one supporting anon blocks
     #[connector_test(only(MySQL("mariadb")))]
     async fn mysql_call(runner: Runner) -> TestResult<()> {
-        // Create a simple table for the test
 
+        // Create a simple table for the test
         runner
-            .query(fmt_execute_raw("CREATE TABLE test (id INT PRIMARY KEY);", vec![]))
+            .query(fmt_execute_raw("CREATE TABLE test (id INT);", vec![]))
             .await?
             .assert_success();
 

@@ -48,6 +48,7 @@ pub trait QueryExt: Queryable + Send + Sync {
         let params: Vec<_> = params.into_iter().map(convert_lossy).collect();
         let result_set = AssertUnwindSafe(self.query_raw(&q, &params)).catch_unwind().await??;
 
+        // Somehow in "certain" cases, query_raw does not return the column names in the result
         let columns: Vec<String> = result_set.columns().iter().map(ToString::to_string).collect();
         let mut result = Vec::new();
 
@@ -55,7 +56,8 @@ pub trait QueryExt: Queryable + Send + Sync {
             let mut object = Map::new();
 
             for (idx, p_value) in row.into_iter().enumerate() {
-                let column_name: String = columns[idx].clone();
+                let column_name = columns.get(idx).unwrap_or(&format!("f{}", idx)).clone();
+
                 object.insert(column_name, Value::from(p_value));
             }
 
