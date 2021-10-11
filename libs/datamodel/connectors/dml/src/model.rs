@@ -2,6 +2,7 @@ use crate::default_value::DefaultKind;
 use crate::field::{Field, FieldType, RelationField, ScalarField};
 use crate::scalars::ScalarType;
 use crate::traits::{Ignorable, WithDatabaseName, WithName};
+use indoc::formatdoc;
 
 /// Represents a model in a prisma schema.
 #[derive(Debug, PartialEq, Clone, Default)]
@@ -219,7 +220,29 @@ impl Model {
         // first candidate: primary key
         {
             if let Some(pk) = &self.primary_key {
-                let id_fields: Vec<_> = pk.fields.iter().map(|f| self.find_scalar_field(f).unwrap()).collect();
+                let id_fields: Vec<_> = pk
+                    .fields
+                    .iter()
+                    .map(|f| match self.find_scalar_field(f) {
+                        Some(field) => field,
+                        None => {
+                            let error = formatdoc!(
+                                r#"
+                                Hi there! We've been seeing this error in our error reporting backend,
+                                but cannot reproduce it in our own tests. The problem is that we have a
+                                primary key in the model `{}` that uses the column `{}` which we for
+                                some reason don't have in our internal representation. If you see this,
+                                could you please file an issue to https://github.com/prisma/prisma so we
+                                can discuss about fixing this. -- Your friendly prisma developers.
+                            "#,
+                                self.name,
+                                f
+                            );
+
+                            panic!("{}", error.replace('\n', " "));
+                        }
+                    })
+                    .collect();
 
                 if !id_fields.is_empty()
                     && !id_fields
