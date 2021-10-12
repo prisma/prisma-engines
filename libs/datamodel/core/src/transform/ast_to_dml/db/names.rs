@@ -35,7 +35,7 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
     let mut names = Names::default();
 
     for (top_id, top) in ctx.db.ast.iter_tops() {
-        assert_is_not_a_reserved_scalar_type(top, ctx);
+        assert_is_not_a_reserved_scalar_type(top.identifier(), ctx);
 
         let namespace = match (top_id, top) {
             (_, ast::Top::Enum(ast_enum)) => {
@@ -121,8 +121,7 @@ fn duplicate_top_error(existing: &ast::Top, duplicate: &ast::Top) -> DatamodelEr
     )
 }
 
-fn assert_is_not_a_reserved_scalar_type(top: &dyn WithIdentifier, ctx: &mut Context<'_>) {
-    let ident = top.identifier();
+fn assert_is_not_a_reserved_scalar_type(ident: &ast::Identifier, ctx: &mut Context<'_>) {
     if ScalarType::from_str(&ident.name).is_ok() {
         ctx.push_error(DatamodelError::new_reserved_scalar_type_error(&ident.name, ident.span));
     }
