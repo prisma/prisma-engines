@@ -200,3 +200,28 @@ fn index_accepts_three_different_notations() {
         defined_on_field: false,
     });
 }
+
+#[test]
+fn index_accepts_sort_order() {
+    let dml = with_postgres_provider(
+        r#"
+    model User {
+        id        Int    @id
+        firstName String
+        
+        @@index([firstName(sort: Desc)])
+    }
+    "#,
+    );
+
+    let schema = parse(&dml);
+    let user_model = schema.assert_has_model("User");
+
+    user_model.assert_has_index(IndexDefinition {
+        name: None,
+        db_name: Some("User_firstName_idx".to_string()),
+        fields: vec!["firstName".to_string()],
+        tpe: IndexType::Normal,
+        defined_on_field: false,
+    });
+}
