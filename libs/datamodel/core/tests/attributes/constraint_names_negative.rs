@@ -367,51 +367,6 @@ fn truncated_constraint_names_are_checked_for_uniqueness_on_postgres() {
 
 // Namespaces MySql
 #[test]
-fn foreign_keys_and_indexes_with_same_name_on_same_table_are_not_supported_on_mysql() {
-    let dml = formatdoc! {r#"
-        {datasource}
-
-        model A {{
-          id  Int @id
-          bId Int
-          b   B   @relation(fields: [bId], references: [id], map: "foo")
-          
-          @@index([bId], map: "foo")
-        }}
-        
-        model B {{
-          id Int @id
-          as A[]
-        }}
-    "#, datasource = MYSQL};
-
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@relation": The given constraint name `foo` has to be unique in the following namespace: on model `A` for indexes, unique constraints and foreign keys. Please provide a different name using the `map` argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:9[0m
-        [1;94m   | [0m
-        [1;94m 8 | [0m  bId Int
-        [1;94m 9 | [0m  b   B   @relation(fields: [bId], references: [id], [1;91mmap: "foo"[0m)
-        [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@index": The given constraint name `foo` has to be unique in the following namespace: on model `A` for indexes, unique constraints and foreign keys. Please provide a different name using the `map` argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:6[0m
-        [1;94m   | [0m
-        [1;94m 5 | [0m
-        [1;94m 6 | [0m[1;91mmodel A {[0m
-        [1;94m 7 | [0m  id  Int @id
-        [1;94m 8 | [0m  bId Int
-        [1;94m 9 | [0m  b   B   @relation(fields: [bId], references: [id], map: "foo")
-        [1;94m10 | [0m  
-        [1;94m11 | [0m  @@index([bId], map: "foo")
-        [1;94m12 | [0m}
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&error)
-}
-
-#[test]
 fn foreign_keys_and_indexes_have_to_be_globally_unique_within_their_namespaces_on_mysql() {
     let dml = formatdoc! {r#"
         {datasource}
