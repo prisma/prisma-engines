@@ -5,7 +5,8 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ArgumentListLookup, ParsedField, ParsedInputMap,
 };
-use connector::{Filter, IdFilter};
+use connector::{Filter, IdFilter, RecordFilter};
+use datamodel_connector::ConnectorCapability;
 use prisma_models::ModelRef;
 use std::{convert::TryInto, sync::Arc};
 
@@ -83,7 +84,7 @@ pub fn update_many_records(
 
 /// Creates an update record query node and adds it to the query graph.
 #[tracing::instrument(skip(graph, filter, model, data_map))]
-pub fn update_record_node<T>(
+pub fn update_record_node<T: Clone>(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,
     filter: T,
@@ -100,20 +101,58 @@ where
 
     args.update_datetimes(Arc::clone(&model));
 
-    let filter = filter.into();
-    let record_filter = filter.into();
-    let ur = UpdateRecord {
-        model,
-        record_filter,
-        args,
+    let filter: Filter = filter.clone().into();
+    let (update_node, read_node) = if connector_ctx.capabilities.contains(&ConnectorCapability::ForeignKeys) {
+        let update_parent = Query::Write(WriteQuery::UpdateRecord(UpdateRecord {
+            model: model.clone(),
+            record_filter: filter.into(),
+            args,
+        }));
+        let update_node = graph.create_node(update_parent);
+
+        (update_node, None)
+    } else {
+        // When the connector needs referential actions emulation, we need an extra parent read so that we can read the children.
+        // Therefore, we temporarily set the record_filter to empty and later set it to the ids fetched by the prior parent read
+        // to avoid fetching the parent twice
+        let update_parent = Query::Write(WriteQuery::UpdateRecord(UpdateRecord {
+            model: model.clone(),
+            record_filter: RecordFilter::empty(),
+            args,
+        }));
+        let update_node = graph.create_node(update_parent);
+
+        let read_node = graph.create_node(utils::read_ids_infallible(
+            model.clone(),
+            model.primary_identifier(),
+            filter,
+        ));
+
+        graph.create_edge(
+            &read_node,
+            &update_node,
+            QueryGraphDependency::ParentProjection(
+                model.primary_identifier(),
+                Box::new(move |mut update_node, parent_ids| {
+                    if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut ur))) = update_node {
+                        ur.record_filter = parent_ids.into();
+                    }
+
+                    Ok(update_node)
+                }),
+            ),
+        )?;
+
+        utils::insert_emulated_on_update(graph, connector_ctx, &model, &read_node, &update_node)?;
+
+        (update_node, Some(read_node))
     };
 
-    let node = graph.create_node(Query::Write(WriteQuery::UpdateRecord(ur)));
     for (relation_field, data_map) in update_args.nested {
-        nested::connect_nested_query(graph, connector_ctx, node, relation_field, data_map)?;
+        nested::connect_nested_query(graph, connector_ctx, update_node, relation_field, data_map)?;
     }
 
-    Ok(node)
+    Ok(read_node.unwrap_or(update_node))
 }
 
 /// Creates an update many record query node and adds it to the query graph.

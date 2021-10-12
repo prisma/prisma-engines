@@ -50,7 +50,7 @@ mod one2one_req {
     }
 }
 
-#[test_suite(suite = "setnull_onU_1to1_opt", schema(optional), exclude(MongoDb))]
+#[test_suite(suite = "setnull_onU_1to1_opt", schema(optional))]
 mod one2one_opt {
     fn optional() -> String {
         let schema = indoc! {
@@ -139,7 +139,7 @@ mod one2many_req {
     }
 }
 
-#[test_suite(suite = "setnull_onU_1toM_opt", schema(optional), exclude(MongoDb))]
+#[test_suite(suite = "setnull_onU_1toM_opt", schema(optional))]
 mod one2many_opt {
     fn optional() -> String {
         let schema = indoc! {

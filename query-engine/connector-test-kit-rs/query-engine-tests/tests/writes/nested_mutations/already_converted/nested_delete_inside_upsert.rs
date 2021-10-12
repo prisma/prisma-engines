@@ -6,8 +6,8 @@ mod delete_inside_upsert {
     use query_test_macros::relation_link_test;
 
     // "a P1 to C1  relation " should "work through a nested mutation by id"
-    // TODO:(dom): Not working on mongo. Failing from 9-17
-    // Reason: Misses foreign key cascade emulation for update
+    // TODO(mongo): Tests 9-17 are failing on MongoDB because the SET_NULL emulation on the upsert
+    // TODO(mongo): first sets the foreign key of `p` to null thus making the deletion of `childOpt` impossible
     #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt", exclude(MongoDb))]
     async fn p1_c1_should_work(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = t.parent().parse(

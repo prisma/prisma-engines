@@ -122,7 +122,7 @@ pub(super) fn ambiguity(field: RelationFieldWalker<'_, '_>, names: &Names<'_>) -
 pub(super) fn on_update_without_foreign_keys(
     field: RelationFieldWalker<'_, '_>,
     referential_integrity: ReferentialIntegrity,
-    diagnostics: &mut Diagnostics,
+    _diagnostics: &mut Diagnostics,
 ) {
     if referential_integrity.uses_foreign_keys() {
         return;
@@ -137,16 +137,7 @@ pub(super) fn on_update_without_foreign_keys(
         return;
     }
 
-    let ast_field = field.ast_field();
-
-    let span = ast_field
-        .span_for_argument("relation", "onUpdate")
-        .unwrap_or(ast_field.span);
-
-    diagnostics.push_error(DatamodelError::new_validation_error(
-        "Referential actions other than `NoAction` will not work for `onUpdate` without foreign keys. Please follow the issue: https://github.com/prisma/prisma/issues/9014",
-        span
-    ));
+    // TODO: Check if other validations are needed
 }
 
 /// Validates if the related model for the relation is ignored.

@@ -130,6 +130,15 @@ impl Relation {
             .or_else(|| self.field_b().on_delete().cloned())
             .unwrap_or(self.field_a().on_delete_default)
     }
+
+    /// Retrieves the onUpdate policy for this relation.
+    pub fn on_update(&self) -> ReferentialAction {
+        self.field_a()
+            .on_update()
+            .cloned()
+            .or_else(|| self.field_b().on_update().cloned())
+            .unwrap_or(self.field_a().on_update_default)
+    }
 }
 
 impl Debug for Relation {

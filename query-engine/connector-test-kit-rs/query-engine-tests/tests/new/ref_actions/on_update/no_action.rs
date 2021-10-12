@@ -69,7 +69,7 @@ mod one2one_req {
     }
 }
 
-#[test_suite(suite = "noaction_onU_1to1_opt", schema(optional), exclude(MongoDb))]
+#[test_suite(suite = "noaction_onU_1to1_opt", schema(optional))]
 mod one2one_opt {
     fn optional() -> String {
         let schema = indoc! {
@@ -90,7 +90,7 @@ mod one2one_opt {
     }
 
     /// Updating the parent must fail if a child is connected.
-    #[connector_test]
+    #[connector_test(exclude(MongoDb))]
     async fn update_parent_failure(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", child: { create: { id: 1 }}}) { id }}"#),
@@ -163,7 +163,7 @@ mod one2one_opt {
     }
 }
 
-#[test_suite(suite = "noaction_onU_1toM_req", schema(required), exclude(MongoDb))]
+#[test_suite(suite = "noaction_onU_1toM_req", schema(required))]
 mod one2many_req {
     fn required() -> String {
         let schema = indoc! {
@@ -184,7 +184,7 @@ mod one2many_req {
     }
 
     /// Updating the parent must fail if a child is connected.
-    #[connector_test]
+    #[connector_test(exclude(MongoDb))]
     async fn update_parent_failure(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
@@ -256,7 +256,7 @@ mod one2many_req {
     }
 }
 
-#[test_suite(suite = "noaction_onU_1toM_opt", schema(optional), exclude(MongoDb))]
+#[test_suite(suite = "noaction_onU_1toM_opt", schema(optional))]
 mod one2many_opt {
     fn optional() -> String {
         let schema = indoc! {
@@ -277,7 +277,7 @@ mod one2many_opt {
     }
 
     /// Updating the parent must fail if a child is connected.
-    #[connector_test]
+    #[connector_test(exclude(MongoDb))]
     async fn update_parent_failure(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
