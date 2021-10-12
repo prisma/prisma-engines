@@ -53,8 +53,8 @@ pub enum DatamodelError {
   #[error("No such argument.")]
   UnusedArgumentError { arg_name: String, span: Span },
 
-  #[error("Field \"{}\" is already defined on model \"{}\".", field_name, model_name)]
-  DuplicateFieldError { model_name: String, field_name: String, span: Span },
+  #[error("Field \"{}\" is already defined on {} \"{}\".", field_name, container_type, model_name)]
+  DuplicateFieldError { model_name: String, field_name: String, span: Span, container_type: &'static str },
 
   #[error("Field \"{}\" in model \"{}\" can't be a list. The current connector does not support lists of primitive types.", field_name, model_name)]
   ScalarListFieldsAreNotSupported { model_name: String, field_name: String, span: Span },
@@ -268,8 +268,18 @@ impl DatamodelError {
         }
     }
 
+    pub fn new_composite_type_duplicate_field_error(type_name: &str, field_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::DuplicateFieldError {
+            container_type: "composite type",
+            model_name: String::from(type_name),
+            field_name: String::from(field_name),
+            span,
+        }
+    }
+
     pub fn new_duplicate_field_error(model_name: &str, field_name: &str, span: Span) -> DatamodelError {
         DatamodelError::DuplicateFieldError {
+            container_type: "model",
             model_name: String::from(model_name),
             field_name: String::from(field_name),
             span,

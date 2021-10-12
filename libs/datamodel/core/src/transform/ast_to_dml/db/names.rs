@@ -13,7 +13,7 @@ use std::{
 /// Resolved names for use in the validation process.
 #[derive(Default)]
 pub(super) struct Names<'ast> {
-    /// Models, enums and type aliases
+    /// Models, enums, composite types and type aliases
     pub(super) tops: HashMap<&'ast str, TopId>,
     /// Generators have their own namespace.
     pub(super) generators: HashMap<&'ast str, TopId>,
@@ -75,6 +75,24 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
                     {
                         ctx.push_error(DatamodelError::new_duplicate_field_error(
                             &model.name.name,
+                            &field.name.name,
+                            field.identifier().span,
+                        ))
+                    }
+                }
+
+                &mut names.tops
+            }
+            (ast::TopId::CompositeType(_), ast::Top::CompositeType(ct)) => {
+                ct.name.validate("Composite type", &mut ctx.diagnostics);
+
+                // Check that there is no duplicate field on the composite type
+                tmp_names.clear();
+
+                for field in ct.fields.iter() {
+                    if !tmp_names.insert(&field.name.name) {
+                        ctx.push_error(DatamodelError::new_composite_type_duplicate_field_error(
+                            &ct.name.name,
                             &field.name.name,
                             field.identifier().span,
                         ))
