@@ -7,7 +7,7 @@ mod context;
 mod names;
 mod relations;
 mod types;
-mod walkers;
+pub(crate) mod walkers;
 
 pub(crate) use types::{ScalarField, ScalarFieldType};
 
@@ -54,7 +54,7 @@ pub(crate) struct ParserDatabase<'ast> {
     ast: &'ast ast::SchemaAst,
     datasource: Option<&'ast Datasource>,
     names: Names<'ast>,
-    types: Types<'ast>,
+    pub(crate) types: Types<'ast>,
     relations: Relations<'ast>,
     _preview_features: BitFlags<PreviewFeature>,
 }
@@ -167,7 +167,8 @@ impl<'ast> ParserDatabase<'ast> {
             .map(|((_, field_id), scalar_type)| (*field_id, scalar_type))
     }
 
-    /// Iterate all complete relations that are not many to many.
+    /// Iterate all complete relations that are not many to many and are
+    /// correctly defined from both sides.
     pub(crate) fn walk_explicit_relations(&self) -> impl Iterator<Item = ExplicitRelationWalker<'ast, '_>> + '_ {
         self.relations
             .iter_relations()

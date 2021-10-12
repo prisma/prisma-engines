@@ -23,12 +23,12 @@ pub(super) fn resolve_types(ctx: &mut Context<'_>) {
 }
 
 #[derive(Debug, Default)]
-pub(super) struct Types<'ast> {
+pub(crate) struct Types<'ast> {
     pub(super) type_aliases: HashMap<ast::AliasId, ScalarFieldType>,
     pub(super) scalar_fields: BTreeMap<(ast::ModelId, ast::FieldId), ScalarField<'ast>>,
     /// This contains only the relation fields actually present in the schema
     /// source text.
-    pub(super) relation_fields: BTreeMap<(ast::ModelId, ast::FieldId), RelationField<'ast>>,
+    pub(crate) relation_fields: BTreeMap<(ast::ModelId, ast::FieldId), RelationField<'ast>>,
     pub(super) enum_attributes: HashMap<ast::EnumId, EnumAttributes<'ast>>,
     pub(super) model_attributes: HashMap<ast::ModelId, ModelAttributes<'ast>>,
 }

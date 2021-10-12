@@ -168,13 +168,13 @@ pub(super) fn cycles<'ast, 'db>(
         if on_update.triggers_modification() || on_delete.triggers_modification() {
             let model = next_relation.referencing_model();
 
-            if model.model_id == related_model.model_id {
+            if model == related_model {
                 let msg = "A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes.";
                 errors.push(cascade_error_with_default_values(relation, msg));
                 return;
             }
 
-            if related_model.model_id == parent_model.model_id {
+            if related_model == parent_model {
                 let msg = format!(
                     "Reference causes a cycle. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Cycle path: {}.",
                     visited_relations
@@ -240,26 +240,21 @@ pub(super) fn multiple_cascading_paths(
         let model = next_relation.referencing_model();
         let related_model = next_relation.referenced_model();
 
-        visited.insert((model.model_id, next_relation.referencing_field().field_id));
+        visited.insert(next_relation.referencing_field());
 
         // Self-relations are detected elsewhere.
-        if model.model_id == related_model.model_id {
+        if model == related_model {
             continue;
         }
 
         // Cycles are detected elsewhere.
-        if related_model.model_id == parent_model.model_id {
+        if related_model == parent_model {
             continue;
         }
 
         let mut forward_relations = related_model
             .explicit_complete_relations_fwd()
-            .filter(|relation| {
-                !visited.contains(&(
-                    relation.referencing_model().model_id,
-                    relation.referencing_field().field_id,
-                ))
-            })
+            .filter(|relation| !visited.contains(&relation.referencing_field()))
             .map(|relation| (relation, Rc::new(visited_relations.link_next(relation))))
             .peekable();
 

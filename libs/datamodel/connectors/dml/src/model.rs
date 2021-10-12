@@ -170,6 +170,7 @@ impl Model {
     }
 
     /// Finds a relation field by name and returns a mutable reference.
+    #[track_caller]
     pub fn find_relation_field_mut(&mut self, name: &str) -> &mut RelationField {
         let model_name = &self.name.clone();
         self.relation_fields_mut().find(|rf| rf.name == *name).expect(&*format!(
