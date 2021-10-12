@@ -77,6 +77,10 @@ start-cockroach:
 	docker exec -d prisma-engines_cockroach_1 cockroach sql --insecure -e "set cluster setting sql.defaults.default_int_size = 4;"
 	docker exec -d prisma-engines_cockroach_1 cockroach sql --insecure -e "set cluster setting sql.defaults.serial_normalization = 'sql_sequence_cached';"
 
+dev-cockroach: start-cockroach
+	echo 'cockroach' > current_connector
+	cp $(CONFIG_PATH)/cockroach $(CONFIG_FILE)
+
 dev-pgbouncer:
 	docker-compose -f docker-compose.yml up -d --remove-orphans pgbouncer postgres11
 	echo 'pgbouncer' > current_connector
