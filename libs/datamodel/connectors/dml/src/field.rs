@@ -1,3 +1,5 @@
+//! A field in a model.
+
 use crate::native_type_instance::NativeTypeInstance;
 use crate::relation_info::RelationInfo;
 use crate::scalars::ScalarType;
@@ -41,6 +43,8 @@ pub enum FieldType {
     Unsupported(String),
     /// The first option is Some(x) if the scalar type is based upon a type alias.
     Scalar(ScalarType, Option<String>, Option<NativeTypeInstance>),
+    /// This is a composite type fields, with a composite type of the given type.
+    CompositeType(String),
 }
 
 impl FieldType {

@@ -22,8 +22,15 @@ pub(super) fn resolve_attributes(ctx: &mut Context<'_>) {
         match top {
             (ast::TopId::Model(model_id), ast::Top::Model(model)) => resolve_model_attributes(model_id, model, ctx),
             (ast::TopId::Enum(enum_id), ast::Top::Enum(ast_enum)) => resolve_enum_attributes(enum_id, ast_enum, ctx),
+            (ast::TopId::CompositeType(_), ast::Top::CompositeType(ct)) => resolve_composite_type_attributes(ct, ctx),
             _ => (),
         }
+    }
+}
+
+fn resolve_composite_type_attributes<'ast>(ct: &'ast ast::CompositeType, ctx: &mut Context<'ast>) {
+    for (_field_id, field) in ct.iter_fields() {
+        ctx.visit_attributes(&field.attributes, |_attributes, _ctx| ());
     }
 }
 
@@ -370,6 +377,15 @@ fn visit_field_default<'ast>(
 
     loop {
         match r#type {
+            ScalarFieldType::CompositeType(ctid) => {
+                let ct_name = ctx.db.walk_composite_type(ctid).name();
+                ctx.push_error(DatamodelError::new_composite_type_field_validation_error(
+                    "Defaults inside composite types are not supported",
+                    ct_name,
+                    &ast_field.name.name,
+                    args.span(),
+                ));
+            }
             ScalarFieldType::Enum(enum_id) => {
                 match value.as_constant_literal() {
                     Ok(value) => {

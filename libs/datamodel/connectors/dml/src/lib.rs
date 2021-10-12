@@ -1,6 +1,7 @@
 //! This module contains the models representing the Datamodel part of a Prisma schema.
 //! It contains the main data structures that the engines can build upon.
 
+pub mod composite_type;
 pub mod datamodel;
 pub mod default_value;
 pub mod r#enum;

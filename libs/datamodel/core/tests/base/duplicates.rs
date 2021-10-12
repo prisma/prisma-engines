@@ -84,6 +84,16 @@ fn fail_on_duplicate_models_with_relations() {
 #[test]
 fn fail_on_duplicate_composite_types() {
     let dml = indoc! {r#"
+        datasource db {
+            provider = "mongodb"
+            url = "mongodb://"
+        }
+
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["mongoDb"]
+        }
+
         type Address {
             street String
         }
@@ -95,10 +105,10 @@ fn fail_on_duplicate_composite_types() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mThe composite type "Address" cannot be defined because a composite type with that name already exists.[0m
-          [1;94m-->[0m  [4mschema.prisma:5[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
-        [1;94m 4 | [0m
-        [1;94m 5 | [0mtype [1;91mAddress[0m {
+        [1;94m14 | [0m
+        [1;94m15 | [0mtype [1;91mAddress[0m {
         [1;94m   | [0m
     "#]];
 
@@ -108,6 +118,16 @@ fn fail_on_duplicate_composite_types() {
 #[test]
 fn fail_on_composite_type_model_conflict() {
     let dml = indoc! {r#"
+        datasource db {
+            provider = "mongodb"
+            url = "mongodb://"
+        }
+
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["mongoDb"]
+        }
+
         type Address {
             street String
         }
@@ -119,10 +139,10 @@ fn fail_on_composite_type_model_conflict() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mThe model "Address" cannot be defined because a composite type with that name already exists.[0m
-          [1;94m-->[0m  [4mschema.prisma:5[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
-        [1;94m 4 | [0m
-        [1;94m 5 | [0mmodel [1;91mAddress[0m {
+        [1;94m14 | [0m
+        [1;94m15 | [0mmodel [1;91mAddress[0m {
         [1;94m   | [0m
     "#]];
 
@@ -221,6 +241,16 @@ fn fail_on_duplicate_model_field() {
 #[test]
 fn fail_on_duplicate_composite_type_field() {
     let dml = indoc! {r#"
+        datasource db {
+            provider = "mongodb"
+            url = "mongodb://"
+        }
+
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["mongoDb"]
+        }
+
         type Address {
           name String
           street String
@@ -231,10 +261,10 @@ fn fail_on_duplicate_composite_type_field() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mField "street" is already defined on composite type "Address".[0m
-          [1;94m-->[0m  [4mschema.prisma:4[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m 3 | [0m  street String
-        [1;94m 4 | [0m  [1;91mstreet[0m String
+        [1;94m13 | [0m  street String
+        [1;94m14 | [0m  [1;91mstreet[0m String
         [1;94m   | [0m
     "#]];
 

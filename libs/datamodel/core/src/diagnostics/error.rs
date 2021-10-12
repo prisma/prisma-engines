@@ -113,8 +113,11 @@ pub enum DatamodelError {
   #[error("Error validating model \"{}\": {}", model_name, message)]
   ModelValidationError { message: String, model_name: String, span: Span  },
 
-  #[error("Error validating field `{}` in model `{}`: {}", field, model, message)]
-  FieldValidationError { message: String, model: String, field: String, span: Span },
+  #[error("Error validating composite type \"{}\": {}", composite_type_name, message)]
+  CompositeTypeValidationError { message: String, composite_type_name: String, span: Span  },
+
+  #[error("Error validating field `{}` in {} `{}`: {}", field, container_type, container_name, message)]
+  FieldValidationError { message: String, container_name: String, field: String, span: Span, container_type: &'static str },
 
   #[error("Error validating datasource `{datasource}`: {message}")]
   SourceValidationError { message: String, datasource: String, span: Span },
@@ -309,6 +312,18 @@ impl DatamodelError {
         }
     }
 
+    pub fn new_composite_type_validation_error(
+        message: String,
+        composite_type_name: String,
+        span: Span,
+    ) -> DatamodelError {
+        DatamodelError::CompositeTypeValidationError {
+            message,
+            composite_type_name,
+            span,
+        }
+    }
+
     pub fn new_enum_validation_error(message: &str, enum_name: &str, span: Span) -> DatamodelError {
         DatamodelError::EnumValidationError {
             message: String::from(message),
@@ -317,10 +332,26 @@ impl DatamodelError {
         }
     }
 
+    pub fn new_composite_type_field_validation_error(
+        message: &str,
+        composite_type_name: &str,
+        field: &str,
+        span: Span,
+    ) -> DatamodelError {
+        DatamodelError::FieldValidationError {
+            message: message.to_owned(),
+            container_name: composite_type_name.to_owned(),
+            container_type: "composite type",
+            field: field.to_owned(),
+            span,
+        }
+    }
+
     pub fn new_field_validation_error(message: &str, model: &str, field: &str, span: Span) -> DatamodelError {
         DatamodelError::FieldValidationError {
             message: message.to_owned(),
-            model: model.to_owned(),
+            container_name: model.to_owned(),
+            container_type: "model",
             field: field.to_owned(),
             span,
         }
@@ -483,6 +514,7 @@ impl DatamodelError {
             DatamodelError::ConnectorError { span, .. } => *span,
             DatamodelError::PreviewFeatureNotKnownError { span, .. } => *span,
             DatamodelError::ShadowDatabaseUrlIsSameAsMainUrl { span, .. } => *span,
+            DatamodelError::CompositeTypeValidationError { span, .. } => *span,
         }
     }
     pub fn description(&self) -> String {

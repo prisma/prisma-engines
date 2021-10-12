@@ -1,4 +1,4 @@
-use datamodel::parse_schema_ast;
+use datamodel::{parse_schema, parse_schema_ast};
 use expect_test::expect;
 
 #[test]
@@ -261,4 +261,26 @@ fn composite_types_cannot_have_block_attributes() {
         .to_pretty_string("schema.prisma", datamodel);
 
     expected.assert_eq(&found);
+}
+
+#[test]
+fn composite_types_can_nest() {
+    let schema = r#"
+        datasource db {
+            provider = "mongodb"
+            url = "mongodb://"
+        }
+
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["mongoDb"]
+        }
+
+        type Address {
+            name String?
+            secondaryAddress Address?
+        }
+    "#;
+
+    assert!(parse_schema(schema).is_ok());
 }

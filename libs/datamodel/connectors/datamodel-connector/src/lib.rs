@@ -34,6 +34,10 @@ pub trait Connector: Send + Sync {
 
     fn referential_actions(&self) -> BitFlags<ReferentialAction>;
 
+    fn supports_composite_types(&self) -> bool {
+        self.has_capability(ConnectorCapability::CompositeTypes)
+    }
+
     fn supports_named_primary_keys(&self) -> bool {
         self.has_capability(ConnectorCapability::NamedPrimaryKeys)
     }
@@ -250,6 +254,7 @@ capabilities!(
     AutoIncrement,
     RelationFieldsInArbitraryOrder,
     ForeignKeys,
+    CompositeTypes,
     //Start of ME/IE only capabilities
     AutoIncrementAllowedOnNonId,
     AutoIncrementMultipleAllowed,

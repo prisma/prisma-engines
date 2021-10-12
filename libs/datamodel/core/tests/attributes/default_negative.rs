@@ -608,3 +608,77 @@ fn named_default_constraints_cannot_clash_with_fk_names() {
 
     expectation.assert_eq(&error)
 }
+
+#[test]
+fn default_on_composite_type_field_errors() {
+    let schema = indoc! { r#"
+        datasource db {
+            provider = "mongodb"
+            url = "mongodb://"
+        }
+
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["mongoDb"]
+        }
+
+        type Address {
+            street String
+        }
+
+        model User {
+            id Int @id
+            address Address? @default("{ \"street\": \"broadway\"}")
+        }
+    "#};
+
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError validating field `address` in composite type `Address`: Defaults inside composite types are not supported[0m
+          [1;94m-->[0m  [4mschema.prisma:17[0m
+        [1;94m   | [0m
+        [1;94m16 | [0m    id Int @id
+        [1;94m17 | [0m    address Address? @[1;91mdefault("{ \"street\": \"broadway\"}")[0m
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&error)
+}
+
+#[test]
+fn default_inside_composite_type_field_errors() {
+    let schema = indoc! { r#"
+        datasource db {
+            provider = "mongodb"
+            url = "mongodb://"
+        }
+
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["mongoDb"]
+        }
+
+        type Address {
+            street String @default("Champs Elysees")
+        }
+
+        model User {
+            id Int @id
+            address Address?
+        }
+    "#};
+
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mAttribute not known: "@default".[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;94m   | [0m
+        [1;94m11 | [0mtype Address {
+        [1;94m12 | [0m    street String @[1;91mdefault[0m("Champs Elysees")
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&error)
+}
