@@ -2,9 +2,7 @@ mod string_builder;
 mod table;
 
 use crate::ast;
-
-use crate::ast::helper::get_sort_index_of_attribute;
-use crate::ast::Attribute;
+use crate::ast::{helper::get_sort_index_of_attribute, Attribute, WithDocumentation};
 pub use string_builder::StringBuilder;
 pub use table::TableFormat;
 
@@ -66,6 +64,7 @@ impl<'a> Renderer<'a> {
                     }
 
                     match other {
+                        ast::Top::CompositeType(ct) => self.render_composite_type(ct),
                         ast::Top::Model(model) => self.render_model(model),
                         ast::Top::Enum(enm) => self.render_enum(enm),
                         ast::Top::Source(source) => self.render_source_block(source),
@@ -79,12 +78,16 @@ impl<'a> Renderer<'a> {
         self.stream.write_char('\n').expect("Writer error.");
     }
 
-    fn render_documentation(target: &mut dyn LineWriteable, obj: &dyn ast::WithDocumentation) {
-        if let Some(doc) = &obj.documentation() {
+    fn render_documentation(
+        target: &mut dyn LineWriteable,
+        documentation: Option<&ast::Comment>,
+        is_commented_out: bool,
+    ) {
+        if let Some(doc) = documentation {
             for line in doc.text.split('\n') {
                 // We comment out objects in introspection. Those are put into `//` comments.
                 // We use the documentation on the object to render an explanation for why that happened. It's nice if this explanation is also in a `//` instead of a `///` comment.
-                if obj.is_commented_out() {
+                if is_commented_out {
                     target.write("// ");
                 } else {
                     target.write("/// ");
@@ -96,7 +99,7 @@ impl<'a> Renderer<'a> {
     }
 
     fn render_source_block(&mut self, source: &ast::SourceConfig) {
-        Self::render_documentation(self, source);
+        Self::render_documentation(self, source.documentation.as_ref(), source.is_commented_out());
 
         self.write("datasource ");
         self.write(&source.name.name);
@@ -121,7 +124,7 @@ impl<'a> Renderer<'a> {
     }
 
     fn render_generator_block(&mut self, generator: &ast::GeneratorConfig) {
-        Self::render_documentation(self, generator);
+        Self::render_documentation(self, generator.documentation.as_ref(), generator.is_commented_out());
 
         self.write("generator ");
         self.write(&generator.name.name);
@@ -146,7 +149,11 @@ impl<'a> Renderer<'a> {
     }
 
     fn render_custom_type(target: &mut TableFormat, field: &ast::Field) {
-        Self::render_documentation(&mut target.interleave_writer(), field);
+        Self::render_documentation(
+            &mut target.interleave_writer(),
+            field.documentation.as_ref(),
+            field.is_commented_out(),
+        );
 
         target.write("type ");
         target.write(&field.name.name);
@@ -175,7 +182,7 @@ impl<'a> Renderer<'a> {
             "".to_string()
         };
 
-        Self::render_documentation(self, model);
+        Self::render_documentation(self, model.documentation.as_ref(), model.is_commented_out());
 
         self.write(format!("{}model ", comment_out).as_ref());
         self.write(&model.name.name);
@@ -205,6 +212,28 @@ impl<'a> Renderer<'a> {
         self.end_line();
     }
 
+    fn render_composite_type(&mut self, type_def: &ast::CompositeType) {
+        Self::render_documentation(self, type_def.documentation.as_ref(), type_def.is_commented_out());
+
+        self.write("type ");
+        self.write(&type_def.name.name);
+        self.write(" {");
+        self.end_line();
+        self.indent_up();
+
+        let mut field_formatter = TableFormat::new();
+
+        for field in &type_def.fields {
+            Self::render_field(&mut field_formatter, field, false);
+        }
+
+        field_formatter.render(self);
+
+        self.indent_down();
+        self.write("}");
+        self.end_line();
+    }
+
     fn sort_attributes(mut attributes: Vec<Attribute>, is_field_attribute: bool) -> Vec<Attribute> {
         // sort attributes
         attributes.sort_by(|a, b| {
@@ -216,7 +245,7 @@ impl<'a> Renderer<'a> {
     }
 
     fn render_enum(&mut self, enm: &ast::Enum) {
-        Self::render_documentation(self, enm);
+        Self::render_documentation(self, enm.documentation.as_ref(), enm.is_commented_out());
 
         self.write("enum ");
         self.write(&enm.name.name);
@@ -265,7 +294,11 @@ impl<'a> Renderer<'a> {
     }
 
     pub fn render_field(target: &mut TableFormat, field: &ast::Field, is_commented_out: bool) {
-        Self::render_documentation(&mut target.interleave_writer(), field);
+        Self::render_documentation(
+            &mut target.interleave_writer(),
+            field.documentation.as_ref(),
+            field.is_commented_out,
+        );
 
         let commented_out = if field.is_commented_out || is_commented_out {
             "// ".to_string()
