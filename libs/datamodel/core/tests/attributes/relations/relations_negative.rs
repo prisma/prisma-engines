@@ -812,6 +812,84 @@ fn mapping_foreign_keys_on_sqlite_should_error() {
     expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
+#[test]
+fn relation_field_in_composite_type_errors() {
+    let schema = r#"
+        datasource db {
+            provider = "mongodb"
+            url = "mongodb://"
+        }
+
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["mongoDb"]
+        }
+
+
+        type Address {
+            street String
+            test Test
+        }
+
+        model Test {
+            id Int @id
+        }
+    "#;
+
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError validating composite type "Address": Test refers to a model, making this a relation field. Relation fields inside composite types are not supported.[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m            street String
+        [1;94m15 | [0m            test [1;91mTest[0m
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(schema).map(drop).unwrap_err());
+}
+
+#[test]
+fn relation_attribute_on_a_composite_field_errors() {
+    let schema = r#"
+        datasource db {
+            provider = "mongodb"
+            url = "mongodb://"
+        }
+
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["mongoDb"]
+        }
+
+
+        type Address {
+            street String
+        }
+
+        model Test {
+            id Int @id
+            addres Address? @relation("TestAddress")
+        }
+    "#;
+
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@relation": Invalid field type, not a relation.[0m
+          [1;94m-->[0m  [4mschema.prisma:19[0m
+        [1;94m   | [0m
+        [1;94m18 | [0m            id Int @id
+        [1;94m19 | [0m            addres Address? @[1;91mrelation("TestAddress")[0m
+        [1;94m   | [0m
+        [1;91merror[0m: [1mNo such argument.[0m
+          [1;94m-->[0m  [4mschema.prisma:19[0m
+        [1;94m   | [0m
+        [1;94m18 | [0m            id Int @id
+        [1;94m19 | [0m            addres Address? @relation([1;91m"TestAddress"[0m)
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(schema).map(drop).unwrap_err());
+}
+
 //
 // #[test]
 // fn having_the_map_argument_on_the_wrong_side_should_error() {

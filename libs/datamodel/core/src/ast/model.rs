@@ -3,7 +3,7 @@ use super::*;
 /// An opaque identifier for a field in an AST model. Use the
 /// `model[field_id]` syntax to resolve the id to an `ast::Field`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub(crate) struct FieldId(u32);
+pub(crate) struct FieldId(pub(super) u32);
 
 impl FieldId {
     /// Used for range bounds when iterating over BTreeMaps.

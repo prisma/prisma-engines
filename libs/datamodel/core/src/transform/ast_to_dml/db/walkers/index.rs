@@ -1,10 +1,9 @@
-use std::borrow::Cow;
-
 use crate::{
     ast,
     common::constraint_names::ConstraintNames,
     transform::ast_to_dml::db::{types::IndexAttribute, ParserDatabase},
 };
+use std::borrow::Cow;
 
 #[allow(dead_code)]
 #[derive(Copy, Clone)]

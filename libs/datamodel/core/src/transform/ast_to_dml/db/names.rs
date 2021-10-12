@@ -84,6 +84,17 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
                 &mut names.tops
             }
             (ast::TopId::CompositeType(_), ast::Top::CompositeType(ct)) => {
+                if !ctx.db.active_connector().supports_composite_types() {
+                    ctx.push_error(DatamodelError::new_validation_error(
+                        &format!(
+                            "Composite types are not supported on {}.",
+                            ctx.db.active_connector().name()
+                        ),
+                        ct.span,
+                    ));
+                    continue;
+                }
+
                 ct.name.validate("Composite type", &mut ctx.diagnostics);
 
                 // Check that there is no duplicate field on the composite type
