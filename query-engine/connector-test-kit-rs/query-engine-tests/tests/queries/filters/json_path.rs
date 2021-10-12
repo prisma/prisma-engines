@@ -507,14 +507,16 @@ mod json_path {
         Ok(())
     }
 
-    #[connector_test(schema(pg_json), only(Postgres))]
+    // CockroachDB does not support JSON comparisons (https://github.com/cockroachdb/cockroach/issues/49144).
+    #[connector_test(schema(pg_json), only(Postgres), exclude(Cockroach))]
     async fn gt_gte_pg_json(runner: Runner) -> TestResult<()> {
         gt_gte_runner(runner).await?;
 
         Ok(())
     }
 
-    #[connector_test]
+    // CockroachDB does not support JSON comparisons (https://github.com/cockroachdb/cockroach/issues/49144).
+    #[connector_test(exclude(Cockroach))]
     async fn gt_gte(runner: Runner) -> TestResult<()> {
         gt_gte_runner(runner).await?;
 
@@ -565,14 +567,16 @@ mod json_path {
         Ok(())
     }
 
-    #[connector_test(schema(pg_json), only(Postgres))]
+    // CockroachDB does not support JSON comparisons (https://github.com/cockroachdb/cockroach/issues/49144).
+    #[connector_test(schema(pg_json), only(Postgres), exclude(Cockroach))]
     async fn lt_lte_pg_json(runner: Runner) -> TestResult<()> {
         lt_lte_runner(runner).await?;
 
         Ok(())
     }
 
-    #[connector_test]
+    // CockroachDB does not support JSON comparisons (https://github.com/cockroachdb/cockroach/issues/49144).
+    #[connector_test(exclude(Cockroach))]
     async fn lt_lte(runner: Runner) -> TestResult<()> {
         lt_lte_runner(runner).await?;
 
@@ -622,14 +626,16 @@ mod json_path {
         Ok(())
     }
 
-    #[connector_test(schema(pg_json), only(Postgres))]
+    // CockroachDB does not support JSON comparisons (https://github.com/cockroachdb/cockroach/issues/49144).
+    #[connector_test(schema(pg_json), only(Postgres), exclude(Cockroach))]
     async fn multi_filtering_pg_json(runner: Runner) -> TestResult<()> {
         multi_filtering_runner(runner).await?;
 
         Ok(())
     }
 
-    #[connector_test]
+    // CockroachDB does not support JSON comparisons (https://github.com/cockroachdb/cockroach/issues/49144).
+    #[connector_test(exclude(Cockroach))]
     async fn multi_filtering(runner: Runner) -> TestResult<()> {
         multi_filtering_runner(runner).await?;
 
