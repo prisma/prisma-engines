@@ -1,12 +1,11 @@
 use super::common::*;
 use crate::common::constraint_names::ConstraintNames;
-use crate::{common::RelationNames, dml, Datasource, Field, WithDatabaseName};
+use crate::{dml, Datasource, Field, WithDatabaseName};
 
 /// Helper for standardising a datamodel during parsing.
 ///
 /// This will add relation names, referential actions and M2M references contents
 pub fn standardise(schema: &mut dml::Datamodel, source: Option<&Datasource>) {
-    name_unnamed_relations(schema);
     set_relation_to_field_to_id_if_missing_for_m2m_relations(schema);
     set_referential_arities(schema);
     add_implicit_unique_constraints_for_1_to_1_relations(schema, source);
@@ -135,29 +134,4 @@ fn set_relation_to_field_to_id_if_missing_for_m2m_relations(schema: &mut dml::Da
             }
         }
     }
-}
-
-fn name_unnamed_relations(datamodel: &mut dml::Datamodel) {
-    let unnamed_relations = find_unnamed_relations(datamodel);
-
-    for (model_name, field_name, rel_info) in unnamed_relations {
-        // Embedding side.
-        let field = datamodel.find_relation_field_mut(&model_name, &field_name);
-        field.relation_info.name = RelationNames::name_for_unambiguous_relation(&model_name, &rel_info.to);
-    }
-}
-
-// Returns list of model name, field name and relation info.
-fn find_unnamed_relations(datamodel: &dml::Datamodel) -> Vec<(String, String, dml::RelationInfo)> {
-    let mut rels = Vec::new();
-
-    for model in datamodel.models() {
-        for field in model.relation_fields() {
-            if field.relation_info.name.is_empty() {
-                rels.push((model.name.clone(), field.name.clone(), field.relation_info.clone()))
-            }
-        }
-    }
-
-    rels
 }

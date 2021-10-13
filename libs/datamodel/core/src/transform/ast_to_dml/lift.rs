@@ -105,7 +105,7 @@ impl<'a> LiftAstToDml<'a> {
             field.emulates_referential_actions(active_connector.emulates_referential_actions());
 
             field.documentation = ast_field.documentation.clone().map(|comment| comment.text);
-            field.relation_info.name = attributes.name.map(String::from).unwrap_or_default();
+            field.relation_info.name = relation_field.relation_name().to_string();
             field.relation_info.on_delete = attributes.on_delete;
             field.relation_info.on_update = attributes.on_update;
             field.is_ignored = attributes.is_ignored;

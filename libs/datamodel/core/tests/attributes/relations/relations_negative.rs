@@ -31,6 +31,40 @@ fn fail_if_ambiguous_relation_fields_do_not_specify_a_name() {
 }
 
 #[test]
+fn fail_if_naming_relation_fields_the_same_as_the_explicit_names() {
+    let dml = indoc! {r#"
+        model Club {
+          id                 Int      @id @default(autoincrement())
+          adminId            Int      @map("admin_id")
+          admin              User     @relation(fields: [adminId], references: [id])
+          members            User[]   @relation("ClubToUser")
+          
+          @@map("clubs")
+        }
+
+        model User {
+          id                 Int       @id @default(autoincrement())
+          clubs_clubsTousers Club[]    @relation("ClubToUser")
+          ownedClubs         Club[]
+          
+          @@map("users")
+        }
+    "#};
+
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError validating model "Club": Ambiguous relation detected. The fields `admin` and `members` in model `Club` both refer to `User`. Please provide different relation names for them by adding `@relation(<name>).[0m
+          [1;94m-->[0m  [4mschema.prisma:4[0m
+        [1;94m   | [0m
+        [1;94m 3 | [0m  adminId            Int      @map("admin_id")
+        [1;94m 4 | [0m  [1;91madmin              User     @relation(fields: [adminId], references: [id])[0m
+        [1;94m 5 | [0m  members            User[]   @relation("ClubToUser")
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+}
+
+#[test]
 fn must_error_when_non_existing_fields_are_used() {
     let dml = indoc! {r#"
         model User {

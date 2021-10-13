@@ -84,6 +84,7 @@ impl Datamodel {
     }
 
     /// Finds a mutable relation field reference by a model and field name.
+    #[track_caller]
     pub fn find_relation_field_mut(&mut self, model: &str, field: &str) -> &mut RelationField {
         self.find_model_mut(model).find_relation_field_mut(field)
     }
