@@ -44,8 +44,8 @@ fn fail_if_naming_relation_fields_the_same_as_the_explicit_names() {
 
         model User {
           id                 Int       @id @default(autoincrement())
-          ownedClubs         Club[]
           clubs_clubsTousers Club[]    @relation("ClubToUser")
+          ownedClubs         Club[]
           
           @@map("users")
         }
