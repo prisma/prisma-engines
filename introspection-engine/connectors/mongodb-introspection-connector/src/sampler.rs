@@ -30,7 +30,8 @@ pub(super) async fn sample(database: Database) -> crate::Result<IntrospectionRes
         let options = AggregateOptions::builder().allow_disk_use(Some(true)).build();
 
         let mut documents = collection
-            // 
+            // Any update to this number size must be done there as well: 
+            // https://github.com/prisma/prisma-engines/blob/master/introspection-engine/connectors/mongodb-introspection-connector/src/sampler/statistics.rs#L118
             .aggregate(vec![doc! { "$sample": { "size": 1000 } }], Some(options))
             .await?;
 
