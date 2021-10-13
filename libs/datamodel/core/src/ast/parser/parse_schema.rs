@@ -24,7 +24,7 @@ pub fn parse_schema(datamodel_string: &str) -> Result<SchemaAst, Diagnostics> {
             for current in datamodel.relevant_children() {
                 match current.as_rule() {
                     Rule::model_declaration => {
-                        let keyword = current.clone().into_inner().find(|pair| matches!(dbg!(pair.as_rule()), Rule::TYPE_KEYWORD | Rule::MODEL_KEYWORD) ).expect("Expected model or type keyword");
+                        let keyword = current.clone().into_inner().find(|pair| matches!(pair.as_rule(), Rule::TYPE_KEYWORD | Rule::MODEL_KEYWORD) ).expect("Expected model or type keyword");
 
                         match keyword.as_rule() {
                             Rule::TYPE_KEYWORD => {
