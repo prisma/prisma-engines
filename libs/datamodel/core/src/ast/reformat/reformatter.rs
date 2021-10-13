@@ -742,7 +742,10 @@ impl<'a> Reformatter<'a> {
     //duplicated from renderer -.-
     fn render_value(target: &mut StringBuilder, val: &ast::Expression) {
         match val {
-            ast::Expression::Array(vals, _) => Self::render_array(target, vals),
+            ast::Expression::ExpressionArray(vals, _) => Self::render_expression_array(target, vals),
+            ast::Expression::ConstantValueWithArgs(ident, vals, _) => {
+                Self::render_constant_value_w_args(target, ident, vals)
+            }
             ast::Expression::BooleanValue(val, _) => target.write(val),
             ast::Expression::ConstantValue(val, _) => target.write(val),
             ast::Expression::NumericValue(val, _) => target.write(val),
@@ -750,7 +753,8 @@ impl<'a> Reformatter<'a> {
             ast::Expression::Function(name, args, _) => Self::render_func(target, name, args),
         };
     }
-    fn render_array(target: &mut StringBuilder, vals: &[ast::Expression]) {
+
+    fn render_expression_array(target: &mut StringBuilder, vals: &[ast::Expression]) {
         target.write("[");
         for (idx, arg) in vals.iter().enumerate() {
             if idx > 0 {
@@ -760,6 +764,20 @@ impl<'a> Reformatter<'a> {
         }
         target.write("]");
     }
+
+    fn render_constant_value_w_args(target: &mut StringBuilder, ident: &String, vals: &[ast::Argument]) {
+        target.write(&ident);
+        target.write("(");
+        for (idx, arg) in vals.iter().enumerate() {
+            if idx > 0 {
+                target.write(", ");
+            }
+            //TODO(matthias) get rid of the dupliation?
+            // Self::render_argument(target, arg);
+        }
+        target.write(")");
+    }
+
     fn render_func(target: &mut StringBuilder, name: &str, vals: &[ast::Expression]) {
         target.write(name);
         target.write("(");

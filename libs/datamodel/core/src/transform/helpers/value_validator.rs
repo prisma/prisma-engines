@@ -158,7 +158,7 @@ impl<'a> ValueValidator<'a> {
 
     /// Unwraps the value as an array of constants.
     pub fn as_constant_array(&self) -> Result<Vec<&'a str>, DatamodelError> {
-        if let ast::Expression::Array(values, _) = &self.value {
+        if let ast::Expression::ExpressionArray(values, _) = &self.value {
             values
                 .iter()
                 .map(|val| ValueValidator::new(val).as_constant_literal())
@@ -201,7 +201,7 @@ impl<'a> ValueValidator<'a> {
     /// Unwraps the wrapped value as a constant literal..
     pub fn as_array(&self) -> Vec<ValueValidator<'a>> {
         match &self.value {
-            ast::Expression::Array(values, _) => {
+            ast::Expression::ExpressionArray(values, _) => {
                 let mut validators: Vec<ValueValidator<'_>> = Vec::new();
 
                 for value in values {

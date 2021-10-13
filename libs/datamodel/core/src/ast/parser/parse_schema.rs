@@ -92,6 +92,7 @@ fn rule_to_string(rule: Rule) -> &'static str {
         Rule::expression => "expression",
         Rule::argument_name => "argument name",
         Rule::function => "function expression",
+        Rule::constant_literal_w_args => "constant literal with arguments",
         Rule::argument_value => "argument value",
         Rule::argument => "argument",
         Rule::attribute_arguments => "attribute arguments",

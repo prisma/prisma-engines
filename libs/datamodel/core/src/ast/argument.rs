@@ -1,4 +1,5 @@
 use super::*;
+use std::fmt::{Display, Formatter};
 
 /// An argument, either for attributes, or for keys in source blocks.
 #[derive(Debug, Clone, PartialEq)]
@@ -14,6 +15,12 @@ pub struct Argument {
 impl WithIdentifier for Argument {
     fn identifier(&self) -> &Identifier {
         &self.name
+    }
+}
+
+impl Display for Argument {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self)
     }
 }
 
@@ -37,7 +44,7 @@ impl Argument {
     pub fn new_array(name: &str, value: Vec<Expression>) -> Argument {
         Argument {
             name: Identifier::new(name),
-            value: Expression::Array(value, Span::empty()),
+            value: Expression::ExpressionArray(value, Span::empty()),
             span: Span::empty(),
         }
     }

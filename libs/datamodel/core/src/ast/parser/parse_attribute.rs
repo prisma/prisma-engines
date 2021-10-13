@@ -29,6 +29,7 @@ pub fn parse_attribute(token: &Token<'_>) -> Attribute {
 }
 
 fn parse_attribute_args(token: &Token<'_>, arguments: &mut Vec<Argument>) {
+    dbg!(token.as_str());
     for current in token.relevant_children() {
         match current.as_rule() {
             // This is a named arg.
@@ -44,19 +45,19 @@ fn parse_attribute_args(token: &Token<'_>, arguments: &mut Vec<Argument>) {
     }
 }
 
-fn parse_attribute_arg(token: &Token<'_>) -> Argument {
+pub(crate) fn parse_attribute_arg(token: &Token<'_>) -> Argument {
     let mut name: Option<Identifier> = None;
-    let mut argument: Option<Expression> = None;
+    let mut value: Option<Expression> = None;
 
     for current in token.relevant_children() {
         match current.as_rule() {
             Rule::argument_name => name = Some(current.to_id()),
-            Rule::argument_value => argument = Some(parse_arg_value(&current)),
+            Rule::argument_value => value = Some(parse_arg_value(&current)),
             _ => parsing_catch_all(&current, "attribute argument"),
         }
     }
 
-    match (name, argument) {
+    match (name, value) {
         (Some(name), Some(value)) => Argument {
             name,
             value,
