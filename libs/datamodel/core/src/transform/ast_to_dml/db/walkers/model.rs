@@ -131,16 +131,20 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
             })
     }
 
-    /// All (concrete) relation fields of the model.
+    /// Iterate all the relation fields in the model in the order they were
+    /// defined. Note that these are only the fields that were actually written
+    /// in the schema.
     pub(crate) fn relation_fields(&self) -> impl Iterator<Item = RelationFieldWalker<'ast, 'db>> + 'db {
         let model_id = self.model_id;
         let db = self.db;
 
         self.db
-            .iter_model_relation_fields(self.model_id)
-            .map(move |(field_id, relation_field)| RelationFieldWalker {
+            .types
+            .relation_fields
+            .range((model_id, ast::FieldId::ZERO)..=(model_id, ast::FieldId::MAX))
+            .map(move |((_, field_id), relation_field)| RelationFieldWalker {
                 model_id,
-                field_id,
+                field_id: *field_id,
                 db,
                 relation_field,
             })

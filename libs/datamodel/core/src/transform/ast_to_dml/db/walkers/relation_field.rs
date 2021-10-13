@@ -52,12 +52,21 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
         self.relation_field
     }
 
+    /// The relation name explicitly written in the schema source.
+    pub(crate) fn explicit_relation_name(&self) -> Option<&'ast str> {
+        self.relation_field.name
+    }
+
     pub(crate) fn model(&self) -> ModelWalker<'ast, 'db> {
         ModelWalker {
             model_id: self.model_id,
             db: self.db,
             model_attributes: &self.db.types.model_attributes[&self.model_id],
         }
+    }
+
+    pub(crate) fn references_model(&self, other: ast::ModelId) -> bool {
+        self.relation_field.referenced_model == other
     }
 
     pub(crate) fn related_model(&self) -> ModelWalker<'ast, 'db> {
@@ -88,8 +97,7 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
     /// The name of the relation. Either uses the `name` (or default) argument,
     /// or generates an implicit name.
     pub(crate) fn relation_name(&self) -> RelationName<'ast> {
-        self.relation_field
-            .name
+        self.explicit_relation_name()
             .map(RelationName::Explicit)
             .unwrap_or_else(|| RelationName::generated(self.model().name(), self.related_model().name()))
     }
