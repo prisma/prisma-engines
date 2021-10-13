@@ -25,7 +25,7 @@ pub(super) fn resolve_types(ctx: &mut Context<'_>) {
 
 #[derive(Debug, Default)]
 pub(super) struct Types<'ast> {
-    pub(super) composite_type_fields: BTreeMap<(ast::CompositeTypeId, ast::FieldId), CompositeTypeField>,
+    pub(super) composite_type_fields: BTreeMap<(ast::CompositeTypeId, ast::FieldId), CompositeTypeField<'ast>>,
     pub(super) type_aliases: HashMap<ast::AliasId, ScalarFieldType>,
     pub(super) scalar_fields: BTreeMap<(ast::ModelId, ast::FieldId), ScalarField<'ast>>,
     /// This contains only the relation fields actually present in the schema
@@ -53,9 +53,10 @@ impl<'ast> Types<'ast> {
     }
 }
 
-#[derive(Debug)]
-pub(super) struct CompositeTypeField {
+#[derive(Debug, Clone)]
+pub(super) struct CompositeTypeField<'ast> {
     pub(super) r#type: ScalarFieldType,
+    pub(super) mapped_name: Option<&'ast str>,
 }
 
 #[derive(Debug)]
@@ -292,7 +293,10 @@ fn visit_composite_type<'ast>(ct_id: ast::CompositeTypeId, ct: &'ast ast::Compos
     for (field_id, ast_field) in ct.iter_fields() {
         match field_type(ast_field, ctx) {
             Ok(FieldType::Scalar(scalar_type)) => {
-                let field = CompositeTypeField { r#type: scalar_type };
+                let field = CompositeTypeField {
+                    r#type: scalar_type,
+                    mapped_name: None,
+                };
                 ctx.db.types.composite_type_fields.insert((ct_id, field_id), field);
             }
             Ok(FieldType::Model(referenced_model_id)) => {
