@@ -1,9 +1,11 @@
+mod composite_type;
 mod index;
 mod model;
 mod relation;
 mod relation_field;
 mod scalar_field;
 
+pub(crate) use composite_type::*;
 pub(crate) use index::*;
 pub(crate) use model::*;
 pub(crate) use relation::*;
@@ -14,7 +16,6 @@ use super::ParserDatabase;
 use crate::ast;
 
 impl<'ast> ParserDatabase<'ast> {
-    #[track_caller]
     pub(crate) fn walk_model(&self, model_id: ast::ModelId) -> ModelWalker<'ast, '_> {
         ModelWalker {
             model_id,
@@ -26,8 +27,12 @@ impl<'ast> ParserDatabase<'ast> {
     pub(crate) fn walk_models(&self) -> impl Iterator<Item = ModelWalker<'ast, '_>> + '_ {
         self.ast()
             .iter_tops()
-            .flat_map(|(top_id, _)| top_id.as_model_id())
+            .filter_map(|(top_id, _)| top_id.as_model_id())
             .map(move |model_id| self.walk_model(model_id))
+    }
+
+    pub(crate) fn walk_composite_type(&self, ctid: ast::CompositeTypeId) -> CompositeTypeWalker<'ast, '_> {
+        CompositeTypeWalker { ctid, db: self }
     }
 
     /// Iterate all complete relations that are not many to many and are
