@@ -25,7 +25,7 @@ impl PrimaryKeyTemplate {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PrimaryKey {
     pub alias: Option<String>,
     fields: Vec<ScalarFieldWeak>,

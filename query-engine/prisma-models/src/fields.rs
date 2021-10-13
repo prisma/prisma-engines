@@ -7,12 +7,13 @@ use std::{
     sync::{Arc, Weak},
 };
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Fields {
     pub all: Vec<Field>,
     primary_key: Option<PrimaryKey>,
     scalar: OnceCell<Vec<ScalarFieldWeak>>,
     relation: OnceCell<Vec<RelationFieldWeak>>,
+    composite: OnceCell<Vec<RelationFieldWeak>>,
     model: ModelWeakRef,
     created_at: OnceCell<Option<ScalarFieldRef>>,
     updated_at: OnceCell<Option<ScalarFieldRef>>,
@@ -25,6 +26,7 @@ impl Fields {
             primary_key,
             scalar: OnceCell::new(),
             relation: OnceCell::new(),
+            composite: OnceCell::new(),
             created_at: OnceCell::new(),
             updated_at: OnceCell::new(),
             model,

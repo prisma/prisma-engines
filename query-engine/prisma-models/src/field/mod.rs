@@ -1,6 +1,8 @@
+mod composite;
 mod relation;
 mod scalar;
 
+pub use composite::*;
 pub use relation::*;
 pub use scalar::*;
 
@@ -12,18 +14,21 @@ use std::{hash::Hash, sync::Arc};
 pub enum FieldTemplate {
     Relation(RelationFieldTemplate),
     Scalar(ScalarFieldTemplate),
+    Composite(CompositeFieldTemplate),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Field {
     Relation(RelationFieldRef),
     Scalar(ScalarFieldRef),
+    Composite(CompositeFieldRef),
 }
 
 #[derive(Debug, Clone)]
 pub enum FieldWeak {
     Relation(RelationFieldWeak),
     Scalar(ScalarFieldWeak),
+    Composite(CompositeFieldWeak),
 }
 
 impl FieldWeak {
@@ -31,6 +36,7 @@ impl FieldWeak {
         match self {
             Self::Relation(rf) => rf.upgrade().unwrap().into(),
             Self::Scalar(sf) => sf.upgrade().unwrap().into(),
+            Self::Composite(cf) => cf.upgrade().unwrap().into(),
         }
     }
 }
@@ -40,6 +46,7 @@ impl From<&Field> for FieldWeak {
         match f {
             Field::Scalar(sf) => sf.into(),
             Field::Relation(rf) => rf.into(),
+            Field::Composite(cf) => cf.into(),
         }
     }
 }
@@ -53,6 +60,12 @@ impl From<&ScalarFieldRef> for FieldWeak {
 impl From<&RelationFieldRef> for FieldWeak {
     fn from(f: &RelationFieldRef) -> Self {
         FieldWeak::Relation(Arc::downgrade(f))
+    }
+}
+
+impl From<&CompositeFieldRef> for FieldWeak {
+    fn from(f: &CompositeFieldRef) -> Self {
+        FieldWeak::Composite(Arc::downgrade(f))
     }
 }
 
@@ -95,6 +108,7 @@ impl Field {
         match self {
             Field::Scalar(ref sf) => &sf.name,
             Field::Relation(ref rf) => &rf.name,
+            Field::Composite(ref cf) => &cf.name,
         }
     }
 
@@ -102,6 +116,7 @@ impl Field {
         match self {
             Field::Scalar(_) => true,
             Field::Relation(_) => false,
+            Field::Composite(_) => false,
         }
     }
 
@@ -109,6 +124,7 @@ impl Field {
         match self {
             Field::Scalar(sf) => sf.is_id,
             Field::Relation(_) => false,
+            Field::Composite(_) => false,
         }
     }
 
@@ -116,6 +132,7 @@ impl Field {
         match self {
             Field::Scalar(ref sf) => sf.is_list,
             Field::Relation(ref rf) => rf.is_list,
+            Field::Composite(ref cf) => cf.is_list(),
         }
     }
 
@@ -130,6 +147,7 @@ impl Field {
         match self {
             Field::Scalar(ref sf) => sf.is_required,
             Field::Relation(ref rf) => rf.is_required,
+            Field::Composite(ref cf) => cf.is_required(),
         }
     }
 
@@ -137,6 +155,7 @@ impl Field {
         match self {
             Field::Scalar(ref sf) => sf.unique(),
             Field::Relation(_) => false,
+            Field::Composite(_) => false,
         }
     }
 
@@ -144,6 +163,7 @@ impl Field {
         match self {
             Self::Scalar(sf) => sf.model(),
             Self::Relation(rf) => rf.model(),
+            Self::Composite(cf) => cf.model(),
         }
     }
 
@@ -151,6 +171,7 @@ impl Field {
         match self {
             Self::Scalar(sf) => vec![sf.clone()],
             Self::Relation(rf) => rf.scalar_fields(),
+            Self::Composite(cf) => cf.scalar_fields(),
         }
     }
 
@@ -158,6 +179,7 @@ impl Field {
         match self {
             Field::Relation(field) => FieldWeak::Relation(Arc::downgrade(field)),
             Field::Scalar(field) => FieldWeak::Scalar(Arc::downgrade(field)),
+            Field::Composite(field) => FieldWeak::Composite(Arc::downgrade(field)),
         }
     }
 }
@@ -167,6 +189,7 @@ impl FieldTemplate {
         match self {
             FieldTemplate::Scalar(st) => Field::Scalar(st.build(model)),
             FieldTemplate::Relation(rt) => Field::Relation(rt.build(model)),
+            FieldTemplate::Composite(ct) => Field::Composite(ct.build(model)),
         }
     }
 }
@@ -180,6 +203,12 @@ impl From<ScalarFieldRef> for Field {
 impl From<RelationFieldRef> for Field {
     fn from(rf: RelationFieldRef) -> Self {
         Field::Relation(rf)
+    }
+}
+
+impl From<CompositeFieldRef> for Field {
+    fn from(cf: CompositeFieldRef) -> Self {
+        Field::Composite(cf)
     }
 }
 
