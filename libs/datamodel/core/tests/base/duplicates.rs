@@ -148,6 +148,42 @@ fn fail_on_composite_type_model_conflict() {
 
     expectation.assert_eq(&parse_and_render_error(dml));
 }
+
+#[test]
+fn fail_on_composite_type_enum_conflict() {
+    let dml = indoc! {r#"
+        datasource db {
+            provider = "mongodb"
+            url = "mongodb://"
+        }
+
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["mongoDb"]
+        }
+
+        type Address {
+            street String
+        }
+
+        enum Address {
+            HERE
+            THERE
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mThe enum "Address" cannot be defined because a composite type with that name already exists.[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m
+        [1;94m15 | [0menum [1;91mAddress[0m {
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&parse_and_render_error(dml));
+}
+
 #[test]
 fn fail_on_model_enum_conflict() {
     let dml = indoc! {r#"

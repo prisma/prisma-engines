@@ -37,7 +37,7 @@ impl<'ast, 'db> CompositeTypeWalker<'ast, 'db> {
         &self.db.ast[self.ctid].name.name
     }
 
-    pub(crate) fn fields(&self) -> impl Iterator<Item = CompositeTypeFieldWalker<'ast, 'db>> {
+    pub(crate) fn fields(&self) -> impl Iterator<Item = CompositeTypeFieldWalker<'ast, 'db>> + 'db {
         let db = self.db;
         db.types
             .composite_type_fields
