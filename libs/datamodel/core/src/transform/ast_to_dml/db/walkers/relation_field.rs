@@ -5,12 +5,12 @@ use std::{
 };
 
 use crate::{
-    ast,
+    ast::{self, FieldArity},
     common::constraint_names::ConstraintNames,
     transform::ast_to_dml::db::{types::RelationField, ParserDatabase},
 };
 
-use super::ModelWalker;
+use super::{ModelWalker, ScalarFieldWalker};
 
 #[derive(Copy, Clone)]
 pub(crate) struct RelationFieldWalker<'ast, 'db> {
@@ -92,6 +92,34 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
             .name
             .map(RelationName::Explicit)
             .unwrap_or_else(|| RelationName::generated(self.model().name(), self.related_model().name()))
+    }
+
+    pub(crate) fn referential_arity(&self) -> FieldArity {
+        let some_required = self.fields().any(|f| f.ast_field().arity.is_required());
+
+        if some_required {
+            FieldArity::Required
+        } else {
+            self.ast_field().arity
+        }
+    }
+
+    fn fields(&self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, '_>> + '_ {
+        let f = move |field_id: &ast::FieldId| {
+            let model_id = self.model_id;
+
+            ScalarFieldWalker {
+                model_id,
+                field_id: *field_id,
+                db: self.db,
+                scalar_field: &self.db.types.scalar_fields[&(model_id, *field_id)],
+            }
+        };
+
+        match self.attributes().fields.as_ref() {
+            Some(references) => references.iter().map(f),
+            None => [].iter().map(f),
+        }
     }
 }
 
