@@ -11,7 +11,7 @@ use mongodb::{
 use statistics::*;
 
 /// From the given database, lists all collections as models, and samples
-/// maximum of 10000 documents for their fields with the following rules:
+/// maximum of 1000 documents for their fields with the following rules:
 ///
 /// - If the same field differs in types between documents, takes the most
 /// common type or if even, the latest type and adds a warning.
@@ -30,6 +30,7 @@ pub(super) async fn sample(database: Database) -> crate::Result<IntrospectionRes
         let options = AggregateOptions::builder().allow_disk_use(Some(true)).build();
 
         let mut documents = collection
+            // 
             .aggregate(vec![doc! { "$sample": { "size": 1000 } }], Some(options))
             .await?;
 
