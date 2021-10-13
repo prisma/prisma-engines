@@ -586,5 +586,5 @@ fn separate_non_crossing_cascade_paths_should_work() {
         }
     "#;
 
-    assert!(dbg!(datamodel::parse_schema(dm)).is_ok());
+    assert!(datamodel::parse_schema(dm).is_ok());
 }

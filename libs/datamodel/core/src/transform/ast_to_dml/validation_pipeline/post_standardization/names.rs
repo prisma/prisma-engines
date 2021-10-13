@@ -21,15 +21,14 @@ impl<'ast> Names<'ast> {
     pub(super) fn new(db: &ParserDatabase<'ast>) -> Self {
         let mut relation_names: HashMap<RelationIdentifier<'ast>, Vec<FieldId>> = HashMap::new();
 
-        for ((model_id, field_id), _) in db.types.relation_fields.iter() {
-            let model = db.walk_model(*model_id);
-            let field = model.relation_field(*field_id);
+        for field in db.walk_models().flat_map(|m| m.relation_fields()) {
+            let model_id = field.model().model_id();
             let related_model_id = field.related_model().model_id();
 
-            let identifier = (*model_id, related_model_id, field.relation_name());
+            let identifier = (model_id, related_model_id, field.relation_name());
             let field_ids = relation_names.entry(identifier).or_default();
 
-            field_ids.push(*field_id);
+            field_ids.push(field.field_id());
         }
 
         Self { relation_names }
