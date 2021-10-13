@@ -13,6 +13,9 @@ pub struct CompositeTypeField {
     pub name: String,
     pub r#type: CompositeTypeFieldType,
     pub arity: FieldArity,
+
+    /// The database internal name.
+    pub database_name: Option<String>,
 }
 
 #[derive(Debug, PartialEq, Clone)]

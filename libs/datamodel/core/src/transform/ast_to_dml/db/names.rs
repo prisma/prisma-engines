@@ -1,6 +1,6 @@
 use super::Context;
 use crate::{
-    ast::{self, Argument, FieldId, TopId, WithAttributes, WithIdentifier},
+    ast::{self, Argument, TopId, WithAttributes, WithIdentifier},
     diagnostics::DatamodelError,
     reserved_model_names::{validate_enum_name, validate_model_name},
 };
@@ -19,7 +19,8 @@ pub(super) struct Names<'ast> {
     pub(super) generators: HashMap<&'ast str, TopId>,
     /// Datasources have their own namespace.
     pub(super) datasources: HashMap<&'ast str, TopId>,
-    pub(super) model_fields: BTreeMap<(ast::ModelId, &'ast str), FieldId>,
+    pub(super) model_fields: BTreeMap<(ast::ModelId, &'ast str), ast::FieldId>,
+    pub(super) composite_type_fields: HashMap<(ast::CompositeTypeId, &'ast str), ast::FieldId>,
 }
 
 /// `resolve_names()` is responsible for populating `ParserDatabase.names` and
@@ -83,7 +84,7 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
 
                 &mut names.tops
             }
-            (ast::TopId::CompositeType(_), ast::Top::CompositeType(ct)) => {
+            (ast::TopId::CompositeType(ctid), ast::Top::CompositeType(ct)) => {
                 if !ctx.db.active_connector().supports_composite_types() {
                     ctx.push_error(DatamodelError::new_validation_error(
                         &format!(
@@ -97,11 +98,13 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
 
                 ct.name.validate("Composite type", &mut ctx.diagnostics);
 
-                // Check that there is no duplicate field on the composite type
-                tmp_names.clear();
-
-                for field in ct.fields.iter() {
-                    if !tmp_names.insert(&field.name.name) {
+                for (field_id, field) in ct.iter_fields() {
+                    // Check that there is no duplicate field on the composite type
+                    if names
+                        .composite_type_fields
+                        .insert((ctid, &field.name.name), field_id)
+                        .is_some()
+                    {
                         ctx.push_error(DatamodelError::new_composite_type_duplicate_field_error(
                             &ct.name.name,
                             &field.name.name,

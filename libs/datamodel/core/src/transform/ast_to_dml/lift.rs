@@ -44,6 +44,7 @@ impl<'a> LiftAstToDml<'a> {
                 name: field.name().to_owned(),
                 r#type: self.lift_composite_type_field_type(field.r#type()),
                 arity: self.lift_field_arity(&field.arity()),
+                database_name: field.mapped_name().map(String::from),
             };
 
             fields.push(field);
