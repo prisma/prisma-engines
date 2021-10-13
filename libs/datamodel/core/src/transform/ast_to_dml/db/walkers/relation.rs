@@ -131,12 +131,6 @@ impl<'ast, 'db> ExplicitRelationWalker<'ast, 'db> {
     /// actions, we count the relation field required if any of the underlying
     /// fields is required.
     pub(crate) fn referential_arity(&self) -> FieldArity {
-        let some_required = self.referencing_fields().any(|f| f.ast_field().arity.is_required());
-
-        if some_required {
-            FieldArity::Required
-        } else {
-            self.referencing_field().ast_field().arity
-        }
+        self.referencing_field().referential_arity()
     }
 }

@@ -120,8 +120,9 @@ impl<'a> LiftAstToDml<'a> {
             let attributes = relation_field.attributes();
             let target_model = &self.db.ast()[attributes.referenced_model];
             let relation_info = dml::RelationInfo::new(target_model.name());
+            let referential_arity = self.lift_field_arity(&relation_field.referential_arity());
 
-            let mut field = dml::RelationField::new(&ast_field.name.name, arity, arity, relation_info);
+            let mut field = dml::RelationField::new(&ast_field.name.name, arity, referential_arity, relation_info);
 
             field.supports_restrict_action(
                 active_connector.supports_referential_action(dml::ReferentialAction::Restrict),

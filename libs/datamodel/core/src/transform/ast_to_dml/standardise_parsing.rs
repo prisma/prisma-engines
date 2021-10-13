@@ -7,7 +7,6 @@ use crate::{dml, Datasource, Field, WithDatabaseName};
 /// This will add relation names, referential actions and M2M references contents
 pub fn standardise(schema: &mut dml::Datamodel, source: Option<&Datasource>) {
     set_relation_to_field_to_id_if_missing_for_m2m_relations(schema);
-    set_referential_arities(schema);
     add_implicit_unique_constraints_for_1_to_1_relations(schema, source);
 }
 
@@ -67,42 +66,6 @@ fn add_implicit_unique_constraints_for_1_to_1_relations(schema: &mut dml::Datamo
 
     for (model_id, index) in modifications {
         schema.models[model_id].indices.push(index);
-    }
-}
-
-fn set_referential_arities(schema: &mut dml::Datamodel) {
-    let mut modifications = Vec::new();
-
-    for (model_id, model) in schema.models().enumerate() {
-        for (field_id, field) in model.fields().enumerate() {
-            match field {
-                Field::RelationField(field) if field.is_singular() => {
-                    let some_required = field
-                        .relation_info
-                        .fields
-                        .iter()
-                        .flat_map(|name| model.find_field(name))
-                        .any(|field| field.arity().is_required());
-
-                    let arity = if some_required {
-                        dml::FieldArity::Required
-                    } else {
-                        field.arity
-                    };
-
-                    modifications.push((model_id, field_id, arity));
-                }
-                _ => (),
-            }
-        }
-    }
-
-    for (model_id, field_id, arity) in modifications {
-        let mut field = schema.models[model_id].fields[field_id]
-            .as_relation_field_mut()
-            .unwrap();
-
-        field.referential_arity = arity;
     }
 }
 
