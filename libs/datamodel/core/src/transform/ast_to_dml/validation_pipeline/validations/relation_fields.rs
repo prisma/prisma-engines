@@ -1,4 +1,7 @@
-use crate::{diagnostics::DatamodelError, transform::ast_to_dml::db::walkers::RelationFieldWalker};
+use crate::{
+    diagnostics::{DatamodelError, Diagnostics},
+    transform::ast_to_dml::db::walkers::RelationFieldWalker,
+};
 use datamodel_connector::{Connector, ReferentialIntegrity};
 use dml::relation_info::ReferentialAction;
 use itertools::Itertools;
@@ -8,10 +11,10 @@ use itertools::Itertools;
 ///
 /// This is temporary to the point until Query Engine supports `onUpdate`
 /// actions on emulations.
-pub(super) fn validate_on_update_without_foreign_keys(
+pub(super) fn on_update_without_foreign_keys(
     field: RelationFieldWalker<'_, '_>,
     referential_integrity: ReferentialIntegrity,
-    errors: &mut Vec<DatamodelError>,
+    diagnostics: &mut Diagnostics,
 ) {
     if referential_integrity.uses_foreign_keys() {
         return;
@@ -32,14 +35,14 @@ pub(super) fn validate_on_update_without_foreign_keys(
         .span_for_argument("relation", "onUpdate")
         .unwrap_or(ast_field.span);
 
-    errors.push(DatamodelError::new_validation_error(
+    diagnostics.push_error(DatamodelError::new_validation_error(
         "Referential actions other than `NoAction` will not work for `onUpdate` without foreign keys. Please follow the issue: https://github.com/prisma/prisma/issues/9014",
         span
     ));
 }
 
 /// Validates if the related model for the relation is ignored.
-pub(super) fn validate_ignored_related_model(field: RelationFieldWalker<'_, '_>, errors: &mut Vec<DatamodelError>) {
+pub(super) fn ignored_related_model(field: RelationFieldWalker<'_, '_>, diagnostics: &mut Diagnostics) {
     let related_model = field.related_model();
     let model = field.model();
 
@@ -56,7 +59,7 @@ pub(super) fn validate_ignored_related_model(field: RelationFieldWalker<'_, '_>,
         ast_field.name(), ast_model.name(), ast_related_model.name()
     );
 
-    errors.push(DatamodelError::new_attribute_validation_error(
+    diagnostics.push_error(DatamodelError::new_attribute_validation_error(
         &message,
         "ignore",
         ast_field.span,
@@ -64,10 +67,10 @@ pub(super) fn validate_ignored_related_model(field: RelationFieldWalker<'_, '_>,
 }
 
 /// Does the connector support the given referential actions.
-pub(super) fn validate_referential_actions(
+pub(super) fn referential_actions(
     field: RelationFieldWalker<'_, '_>,
     connector: &dyn Connector,
-    errors: &mut Vec<DatamodelError>,
+    diagnostics: &mut Diagnostics,
 ) {
     let msg = |action| {
         let allowed_values = connector
@@ -89,7 +92,7 @@ pub(super) fn validate_referential_actions(
                 .span_for_argument("relation", "onDelete")
                 .unwrap_or_else(|| field.ast_field().span);
 
-            errors.push(DatamodelError::new_validation_error(&msg(on_delete), span));
+            diagnostics.push_error(DatamodelError::new_validation_error(&msg(on_delete), span));
         }
     }
 
@@ -100,7 +103,7 @@ pub(super) fn validate_referential_actions(
                 .span_for_argument("relation", "onUpdate")
                 .unwrap_or_else(|| field.ast_field().span);
 
-            errors.push(DatamodelError::new_validation_error(&msg(on_update), span));
+            diagnostics.push_error(DatamodelError::new_validation_error(&msg(on_update), span));
         }
     }
 }

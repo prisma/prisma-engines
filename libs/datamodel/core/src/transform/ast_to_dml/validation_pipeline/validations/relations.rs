@@ -9,12 +9,35 @@ use datamodel_connector::{Connector, ConnectorCapability};
 use itertools::Itertools;
 use visited_relation::*;
 
-use crate::{diagnostics::DatamodelError, transform::ast_to_dml::db::walkers::ExplicitRelationWalker};
+use crate::{
+    diagnostics::{DatamodelError, Diagnostics},
+    transform::ast_to_dml::db::walkers::ExplicitRelationWalker,
+};
+
+/// Required relational fields should point to required scalar fields.
+pub(super) fn field_arity(relation: ExplicitRelationWalker<'_, '_>, diagnostics: &mut Diagnostics) {
+    if !relation.referencing_field().ast_field().arity.is_required() {
+        return;
+    }
+
+    if !relation.referencing_fields().any(|field| field.is_optional()) {
+        return;
+    }
+
+    diagnostics.push_error(DatamodelError::new_validation_error(
+        &format!(
+            "The relation field `{}` uses the scalar fields {}. At least one of those fields is optional. Hence the relation field must be optional as well.",
+            relation.referencing_field().name(),
+            relation.referencing_fields().map(|field| field.name()).join(", "),
+        ),
+        relation.referencing_field().ast_field().span
+    ));
+}
 
 /// The `fields` and `references` arguments should hold the same number of fields.
 pub(super) fn same_length_in_referencing_and_referenced(
     relation: ExplicitRelationWalker<'_, '_>,
-    errors: &mut Vec<DatamodelError>,
+    diagnostics: &mut Diagnostics,
 ) {
     if relation.referenced_fields().len() == 0 || relation.referencing_fields().len() == 0 {
         return;
@@ -27,7 +50,7 @@ pub(super) fn same_length_in_referencing_and_referenced(
     let ast_field = relation.referencing_field().ast_field();
     let span = ast_field.span_for_attribute("relation").unwrap_or(ast_field.span);
 
-    errors.push(DatamodelError::new_validation_error(
+    diagnostics.push_error(DatamodelError::new_validation_error(
         "You must specify the same number of fields in `fields` and `references`.",
         span,
     ));
@@ -37,9 +60,9 @@ pub(super) fn same_length_in_referencing_and_referenced(
 pub(super) fn references_unique_fields(
     relation: ExplicitRelationWalker<'_, '_>,
     connector: &dyn Connector,
-    errors: &mut Vec<DatamodelError>,
+    diagnostics: &mut Diagnostics,
 ) {
-    if relation.referenced_fields().len() == 0 || !errors.is_empty() {
+    if relation.referenced_fields().len() == 0 || !diagnostics.errors().is_empty() {
         return;
     }
 
@@ -61,7 +84,7 @@ pub(super) fn references_unique_fields(
         return;
     }
 
-    errors.push(DatamodelError::new_validation_error(
+    diagnostics.push_error(DatamodelError::new_validation_error(
         &format!(
             "The argument `references` must refer to a unique criteria in the related model `{}`. But it is referencing the following fields that are not a unique criteria: {}",
             relation.referenced_model().name(),
@@ -75,9 +98,9 @@ pub(super) fn references_unique_fields(
 pub(super) fn referencing_fields_in_correct_order(
     relation: ExplicitRelationWalker<'_, '_>,
     connector: &dyn Connector,
-    errors: &mut Vec<DatamodelError>,
+    diagnostics: &mut Diagnostics,
 ) {
-    if relation.referenced_fields().len() == 0 || !errors.is_empty() {
+    if relation.referenced_fields().len() == 0 || !diagnostics.errors().is_empty() {
         return;
     }
 
@@ -100,31 +123,11 @@ pub(super) fn referencing_fields_in_correct_order(
         return;
     }
 
-    errors.push(DatamodelError::new_validation_error(
+    diagnostics.push_error(DatamodelError::new_validation_error(
         &format!(
             "The argument `references` must refer to a unique criteria in the related model `{}` using the same order of fields. Please check the ordering in the following fields: `{}`.",
             relation.referenced_model().name(),
             relation.referenced_fields().map(|f| f.name()).join(", ")
-        ),
-        relation.referencing_field().ast_field().span
-    ));
-}
-
-/// Required relational fields should point to required scalar fields.
-pub(super) fn field_arity(relation: ExplicitRelationWalker<'_, '_>, errors: &mut Vec<DatamodelError>) {
-    if !relation.referencing_field().ast_field().arity.is_required() {
-        return;
-    }
-
-    if !relation.referencing_fields().any(|field| field.is_optional()) {
-        return;
-    }
-
-    errors.push(DatamodelError::new_validation_error(
-        &format!(
-            "The relation field `{}` uses the scalar fields {}. At least one of those fields is optional. Hence the relation field must be optional as well.",
-            relation.referencing_field().name(),
-            relation.referencing_fields().map(|field| field.name()).join(", "),
         ),
         relation.referencing_field().ast_field().span
     ));
@@ -145,7 +148,7 @@ pub(super) fn field_arity(relation: ExplicitRelationWalker<'_, '_>, errors: &mut
 pub(super) fn cycles<'ast, 'db>(
     relation: ExplicitRelationWalker<'ast, 'db>,
     connector: &dyn Connector,
-    errors: &mut Vec<DatamodelError>,
+    diagnostics: &mut Diagnostics,
 ) {
     if !connector.has_capability(ConnectorCapability::ReferenceCycleDetection)
         || !connector.has_capability(ConnectorCapability::ForeignKeys)
@@ -170,7 +173,7 @@ pub(super) fn cycles<'ast, 'db>(
 
             if model == related_model {
                 let msg = "A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes.";
-                errors.push(cascade_error_with_default_values(relation, msg));
+                diagnostics.push_error(cascade_error_with_default_values(relation, msg));
                 return;
             }
 
@@ -180,7 +183,7 @@ pub(super) fn cycles<'ast, 'db>(
                     visited_relations
                 );
 
-                errors.push(cascade_error_with_default_values(relation, &msg));
+                diagnostics.push_error(cascade_error_with_default_values(relation, &msg));
                 return;
             }
 
@@ -206,7 +209,7 @@ pub(super) fn cycles<'ast, 'db>(
 pub(super) fn multiple_cascading_paths(
     relation: ExplicitRelationWalker<'_, '_>,
     connector: &dyn Connector,
-    errors: &mut Vec<DatamodelError>,
+    diagnostics: &mut Diagnostics,
 ) {
     if !connector.has_capability(ConnectorCapability::ReferenceCycleDetection)
         || !connector.has_capability(ConnectorCapability::ForeignKeys)
@@ -312,7 +315,7 @@ pub(super) fn multiple_cascading_paths(
             relation.referencing_model().name()
         );
 
-        errors.push(cascade_error_with_default_values(relation, &msg));
+        diagnostics.push_error(cascade_error_with_default_values(relation, &msg));
     } else if reachable.len() > 1 {
         let msg = format!(
             "When any of the records in models {} are updated or deleted, the referential actions on the relations cascade to model `{}` through multiple paths. Please break one of these paths by setting the `onUpdate` and `onDelete` to `NoAction`.",
@@ -320,7 +323,7 @@ pub(super) fn multiple_cascading_paths(
             relation.referencing_model().name()
         );
 
-        errors.push(cascade_error_with_default_values(relation, &msg));
+        diagnostics.push_error(cascade_error_with_default_values(relation, &msg));
     }
 }
 

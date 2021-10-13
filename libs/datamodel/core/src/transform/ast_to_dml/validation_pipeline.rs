@@ -1,4 +1,4 @@
-mod post_standardization;
+mod validations;
 
 use super::{
     db::ParserDatabase, lift::LiftAstToDml, standardise_formatting::StandardiserForFormatting, standardise_parsing,
@@ -78,11 +78,11 @@ impl<'a, 'b> ValidationPipeline<'a> {
             }
         }
 
-        // Global validations after we have consistent data model.
-        post_standardization::validate(&db, &mut diagnostics);
+        // Phase 6: Global validations after we have consistent data model.
+        validations::validate(&db, &mut diagnostics);
         diagnostics.to_result()?;
 
-        // Phase 6: Post Standardisation Validation
+        // Phase 7: Post Standardisation Validation (deprecated, move stuff out from here if you can)
         self.validator
             .post_standardisation_validate(ast_schema, &schema, &mut diagnostics);
 
