@@ -445,6 +445,7 @@ trait DatamodelFieldExtensions {
 impl DatamodelFieldExtensions for dml::ScalarField {
     fn type_identifier(&self) -> TypeIdentifier {
         match &self.field_type {
+            dml::FieldType::CompositeType(_) => todo!("composite type support in datamodel_converter"),
             dml::FieldType::Enum(x) => TypeIdentifier::Enum(x.clone()),
             dml::FieldType::Relation(_) => TypeIdentifier::String, // Todo: Unused
             dml::FieldType::Scalar(scalar, _, _) => (*scalar).into(),

@@ -3,7 +3,7 @@ use crate::{
     diagnostics::DatamodelError,
     transform::ast_to_dml::db::{
         context::{Arguments, Context},
-        types::ModelAttributes,
+        types::{CompositeTypeField, ModelAttributes},
         ScalarField,
     },
 };
@@ -75,6 +75,43 @@ pub(super) fn scalar_field<'ast>(
         }
         ctx.push_error(DatamodelError::new_duplicate_field_error(
             &ast_model.name.name,
+            &ast_field.name.name,
+            ast_field.span,
+        ));
+    }
+}
+
+pub(super) fn composite_type_field<'ast>(
+    ct: &'ast ast::CompositeType,
+    ast_field: &'ast ast::Field,
+    ctid: ast::CompositeTypeId,
+    field_id: ast::FieldId,
+    field: &mut CompositeTypeField<'ast>,
+    map_args: &mut Arguments<'ast>,
+    ctx: &mut Context<'ast>,
+) {
+    let mapped_name = match visit_map_attribute(map_args, ctx) {
+        Some(name) => name,
+        None => return,
+    };
+
+    field.mapped_name = Some(mapped_name);
+
+    if ctx
+        .mapped_composite_type_names
+        .insert((ctid, mapped_name), field_id)
+        .is_some()
+    {
+        ctx.push_error(DatamodelError::new_duplicate_field_error(
+            &ct.name.name,
+            &ast_field.name.name,
+            ast_field.span,
+        ));
+    }
+
+    if ctx.db.names.composite_type_fields.contains_key(&(ctid, mapped_name)) {
+        ctx.push_error(DatamodelError::new_duplicate_field_error(
+            &ct.name.name,
             &ast_field.name.name,
             ast_field.span,
         ));

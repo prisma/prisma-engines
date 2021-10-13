@@ -1,4 +1,5 @@
 use crate::{ast, dml, transform::ast_to_dml::db};
+use ::dml::composite_type::{CompositeType, CompositeTypeField, CompositeTypeFieldType};
 use std::collections::HashMap;
 
 /// Helper for lifting a datamodel.
@@ -21,6 +22,9 @@ impl<'a> LiftAstToDml<'a> {
             match (top_id, ast_obj) {
                 (ast::TopId::Enum(id), ast::Top::Enum(en)) => schema.add_enum(self.lift_enum(id, en)),
                 (ast::TopId::Model(model_id), ast::Top::Model(ty)) => schema.add_model(self.lift_model(model_id, ty)),
+                (ast::TopId::CompositeType(ct_id), ast::Top::CompositeType(_)) => {
+                    schema.composite_types.push(self.lift_composite_type(ct_id))
+                }
                 (_, ast::Top::Source(_)) => { /* Source blocks are explicitly ignored by the validator */ }
                 (_, ast::Top::Generator(_)) => { /* Generator blocks are explicitly ignored by the validator */ }
                 (_, ast::Top::Type(_)) => { /* Type blocks are inlined */ }
@@ -29,6 +33,27 @@ impl<'a> LiftAstToDml<'a> {
         }
 
         schema
+    }
+
+    fn lift_composite_type(&self, ct_id: ast::CompositeTypeId) -> CompositeType {
+        let mut fields = Vec::new();
+        let walker = self.db.walk_composite_type(ct_id);
+
+        for field in walker.fields() {
+            let field = CompositeTypeField {
+                name: field.name().to_owned(),
+                r#type: self.lift_composite_type_field_type(field.r#type()),
+                arity: self.lift_field_arity(&field.arity()),
+                database_name: field.mapped_name().map(String::from),
+            };
+
+            fields.push(field);
+        }
+
+        CompositeType {
+            name: walker.name().to_owned(),
+            fields,
+        }
     }
 
     /// Internal: Validates a model AST node and lifts it to a DML model.
@@ -96,8 +121,9 @@ impl<'a> LiftAstToDml<'a> {
             let attributes = relation_field.attributes();
             let target_model = &self.db.ast()[attributes.referenced_model];
             let relation_info = dml::RelationInfo::new(target_model.name());
+            let referential_arity = self.lift_field_arity(&relation_field.referential_arity());
 
-            let mut field = dml::RelationField::new(&ast_field.name.name, arity, arity, relation_info);
+            let mut field = dml::RelationField::new(&ast_field.name.name, arity, referential_arity, relation_info);
 
             field.supports_restrict_action(
                 active_connector.supports_referential_action(dml::ReferentialAction::Restrict),
@@ -105,7 +131,7 @@ impl<'a> LiftAstToDml<'a> {
             field.emulates_referential_actions(active_connector.emulates_referential_actions());
 
             field.documentation = ast_field.documentation.clone().map(|comment| comment.text);
-            field.relation_info.name = attributes.name.map(String::from).unwrap_or_default();
+            field.relation_info.name = relation_field.relation_name().to_string();
             field.relation_info.on_delete = attributes.on_delete;
             field.relation_info.on_update = attributes.on_update;
             field.is_ignored = attributes.is_ignored;
@@ -163,8 +189,8 @@ impl<'a> LiftAstToDml<'a> {
     }
 
     /// Internal: Lift a field's arity.
-    fn lift_field_arity(&self, ast_field: &ast::FieldArity) -> dml::FieldArity {
-        match ast_field {
+    fn lift_field_arity(&self, field_arity: &ast::FieldArity) -> dml::FieldArity {
+        match field_arity {
             ast::FieldArity::Required => dml::FieldArity::Required,
             ast::FieldArity::Optional => dml::FieldArity::Optional,
             ast::FieldArity::List => dml::FieldArity::List,
@@ -178,6 +204,9 @@ impl<'a> LiftAstToDml<'a> {
         scalar_field_data: &db::ScalarField<'_>,
     ) -> dml::FieldType {
         match scalar_field_type {
+            db::ScalarFieldType::CompositeType(ctid) => {
+                dml::FieldType::CompositeType(self.db.ast()[*ctid].name.name.to_owned())
+            }
             db::ScalarFieldType::Enum(enum_id) => {
                 let enum_name = &self.db.ast()[*enum_id].name.name;
                 dml::FieldType::Enum(enum_name.to_owned())
@@ -198,6 +227,20 @@ impl<'a> LiftAstToDml<'a> {
                         .unwrap()
                 });
                 dml::FieldType::Scalar(scalar_type.to_owned(), None, native_type)
+            }
+        }
+    }
+
+    fn lift_composite_type_field_type(&self, scalar_field_type: &db::ScalarFieldType) -> CompositeTypeFieldType {
+        match scalar_field_type {
+            db::ScalarFieldType::CompositeType(ctid) => {
+                CompositeTypeFieldType::CompositeType(self.db.ast()[*ctid].name.name.to_owned())
+            }
+            db::ScalarFieldType::BuiltInScalar(scalar_type) => {
+                CompositeTypeFieldType::Scalar(scalar_type.to_owned(), None, None)
+            }
+            db::ScalarFieldType::Alias(_) | db::ScalarFieldType::Enum(_) | db::ScalarFieldType::Unsupported => {
+                unreachable!()
             }
         }
     }

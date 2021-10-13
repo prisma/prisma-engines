@@ -14,7 +14,7 @@ pub(crate) enum Top {
 impl Top {
     pub fn get_type(&self) -> &str {
         match self {
-            Top::CompositeType(_) => "composite_type",
+            Top::CompositeType(_) => "composite type",
             Top::Enum(_) => "enum",
             Top::Model(_) => "model",
             Top::Source(_) => "source",

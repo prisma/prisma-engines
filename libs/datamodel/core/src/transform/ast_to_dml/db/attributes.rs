@@ -2,7 +2,6 @@ mod autoincrement;
 mod id;
 mod map;
 mod native_types;
-mod relation;
 
 use super::{
     context::{Arguments, Context},
@@ -22,8 +21,30 @@ pub(super) fn resolve_attributes(ctx: &mut Context<'_>) {
         match top {
             (ast::TopId::Model(model_id), ast::Top::Model(model)) => resolve_model_attributes(model_id, model, ctx),
             (ast::TopId::Enum(enum_id), ast::Top::Enum(ast_enum)) => resolve_enum_attributes(enum_id, ast_enum, ctx),
+            (ast::TopId::CompositeType(ctid), ast::Top::CompositeType(ct)) => {
+                resolve_composite_type_attributes(ctid, ct, ctx)
+            }
             _ => (),
         }
+    }
+}
+
+fn resolve_composite_type_attributes<'ast>(
+    ctid: ast::CompositeTypeId,
+    ct: &'ast ast::CompositeType,
+    ctx: &mut Context<'ast>,
+) {
+    for (field_id, field) in ct.iter_fields() {
+        let mut ctfield = ctx.db.types.composite_type_fields[&(ctid, field_id)].clone();
+
+        ctx.visit_attributes(&field.attributes, |attributes, ctx| {
+            // @map
+            attributes.visit_optional_single("map", ctx, |map_args, ctx| {
+                map::composite_type_field(ct, field, ctid, field_id, &mut ctfield, map_args, ctx);
+            });
+        });
+
+        ctx.db.types.composite_type_fields.insert((ctid, field_id), ctfield);
     }
 }
 
@@ -118,29 +139,6 @@ fn resolve_model_attributes<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::
     autoincrement::validate_auto_increment(model_id, &model_attributes, ctx);
 
     ctx.db.types.model_attributes.insert(model_id, model_attributes);
-}
-
-pub(super) fn validate_relation_fields(ctx: &mut Context<'_>) {
-    let mut errors: Vec<DatamodelError> = Vec::new();
-
-    let referential_integrity = ctx
-        .db
-        .datasource()
-        .map(|ds| ds.referential_integrity())
-        .unwrap_or_default();
-
-    for ((model_id, field_id), _) in ctx.db.types.relation_fields.iter() {
-        let model = ctx.db.walk_model(*model_id);
-        let field = model.relation_field(*field_id);
-
-        relation::validate_ignored_related_model(field, &mut errors);
-        relation::validate_referential_actions(field, ctx.db.active_connector(), &mut errors);
-        relation::validate_on_update_without_foreign_keys(field, referential_integrity, &mut errors);
-    }
-
-    for error in errors.into_iter() {
-        ctx.push_error(error);
-    }
 }
 
 fn visit_scalar_field_attributes<'ast>(
@@ -370,6 +368,15 @@ fn visit_field_default<'ast>(
 
     loop {
         match r#type {
+            ScalarFieldType::CompositeType(ctid) => {
+                let ct_name = ctx.db.walk_composite_type(ctid).name();
+                ctx.push_error(DatamodelError::new_composite_type_field_validation_error(
+                    "Defaults inside composite types are not supported",
+                    ct_name,
+                    &ast_field.name.name,
+                    args.span(),
+                ));
+            }
             ScalarFieldType::Enum(enum_id) => {
                 match value.as_constant_literal() {
                     Ok(value) => {

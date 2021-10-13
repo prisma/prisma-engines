@@ -32,6 +32,7 @@ impl MongoDbDatamodelConnector {
             ConnectorCapability::CreateMany,
             ConnectorCapability::ScalarLists,
             ConnectorCapability::InsensitiveFilters,
+            ConnectorCapability::CompositeTypes,
         ];
 
         let native_types = mongodb_types::available_types();
