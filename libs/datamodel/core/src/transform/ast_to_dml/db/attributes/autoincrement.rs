@@ -11,7 +11,8 @@ pub(super) fn validate_auto_increment(
 ) {
     let autoincrement_fields = || {
         ctx.db
-            .iter_model_scalar_fields(model_id)
+            .types
+            .range_model_scalar_fields(model_id)
             .filter(|(_, f)| f.is_autoincrement())
     };
 

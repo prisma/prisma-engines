@@ -452,7 +452,8 @@ fn visit_field_default<'ast>(
 fn visit_model_ignore(model_id: ast::ModelId, model_data: &mut ModelAttributes<'_>, ctx: &mut Context<'_>) {
     let ignored_field_errors: Vec<_> = ctx
         .db
-        .iter_model_scalar_fields(model_id)
+        .types
+        .range_model_scalar_fields(model_id)
         .filter(|(_, sf)| sf.is_ignored)
         .map(|(field_id, _)| {
             DatamodelError::new_attribute_validation_error(

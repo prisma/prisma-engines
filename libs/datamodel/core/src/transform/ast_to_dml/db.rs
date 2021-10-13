@@ -136,15 +136,4 @@ impl<'ast> ParserDatabase<'ast> {
             .map(|datasource| datasource.active_connector.as_ref())
             .unwrap_or(&EmptyDatamodelConnector)
     }
-
-    /// Iterate all the scalar fields in a given model in the order they were defined.
-    pub(crate) fn iter_model_scalar_fields(
-        &self,
-        model_id: ast::ModelId,
-    ) -> impl Iterator<Item = (ast::FieldId, &ScalarField<'ast>)> {
-        self.types
-            .scalar_fields
-            .range((model_id, ast::FieldId::ZERO)..=(model_id, ast::FieldId::MAX))
-            .map(|((_, field_id), scalar_type)| (*field_id, scalar_type))
-    }
 }

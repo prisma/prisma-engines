@@ -4,7 +4,7 @@ mod unique_criteria;
 pub(crate) use primary_key::*;
 pub(crate) use unique_criteria::*;
 
-use super::{ExplicitRelationWalker, IndexWalker, RelationFieldWalker};
+use super::{ExplicitRelationWalker, IndexWalker, RelationFieldWalker, ScalarFieldWalker};
 use crate::{
     ast,
     transform::ast_to_dml::db::{types::ModelAttributes, ParserDatabase},
@@ -85,6 +85,20 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
             attribute: pk,
             db: self.db,
         })
+    }
+
+    /// Iterate all the scalar fields in a given model in the order they were defined.
+    pub(crate) fn scalar_fields(&self) -> impl Iterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db {
+        let db = self.db;
+        db.types
+            .scalar_fields
+            .range((self.model_id, ast::FieldId::ZERO)..=(self.model_id, ast::FieldId::MAX))
+            .map(move |((model_id, field_id), scalar_field)| ScalarFieldWalker {
+                model_id: *model_id,
+                field_id: *field_id,
+                db,
+                scalar_field,
+            })
     }
 
     /// All unique criterias of the model; consisting of the primary key and
