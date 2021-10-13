@@ -7,11 +7,6 @@ use std::{
     sync::{Arc, Weak},
 };
 
-static ID_FIELD: &str = "id";
-static EMBEDDED_ID_FIELD: &str = "_id";
-static UPDATED_AT_FIELD: &str = "updatedAt";
-static CREATED_AT_FIELD: &str = "createdAt";
-
 pub type ScalarFieldRef = Arc<ScalarField>;
 pub type ScalarFieldWeak = Weak<ScalarField>;
 
@@ -161,30 +156,16 @@ impl ScalarField {
         self.model().internal_data_model()
     }
 
-    /// A field is an ID field if the name is `id` or `_id` in legacy internal_data_models,
-    /// or if the field has Id behaviour defined.
     pub fn is_id(&self) -> bool {
-        if self.model().is_legacy() {
-            self.name == ID_FIELD || self.name == EMBEDDED_ID_FIELD
-        } else {
-            self.is_id
-        }
+        self.is_id
     }
 
     pub fn is_created_at(&self) -> bool {
-        if self.model().is_legacy() {
-            self.name == CREATED_AT_FIELD
-        } else {
-            matches!(self.behaviour, Some(FieldBehaviour::CreatedAt))
-        }
+        matches!(self.behaviour, Some(FieldBehaviour::CreatedAt))
     }
 
     pub fn is_updated_at(&self) -> bool {
-        if self.model().is_legacy() {
-            self.name == UPDATED_AT_FIELD
-        } else {
-            matches!(self.behaviour, Some(FieldBehaviour::UpdatedAt))
-        }
+        matches!(self.behaviour, Some(FieldBehaviour::UpdatedAt))
     }
 
     pub fn unique(&self) -> bool {

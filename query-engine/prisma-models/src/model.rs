@@ -13,7 +13,6 @@ pub type ModelWeakRef = Weak<Model>;
 #[derive(Debug)]
 pub struct ModelTemplate {
     pub name: String,
-    pub is_embedded: bool,
     pub fields: Vec<FieldTemplate>,
     pub manifestation: Option<String>,
     pub primary_key: Option<PrimaryKeyTemplate>,
@@ -24,7 +23,6 @@ pub struct ModelTemplate {
 
 pub struct Model {
     pub name: String,
-    pub is_embedded: bool,
     manifestation: Option<String>,
     fields: OnceCell<Fields>,
     indexes: OnceCell<Vec<Index>>,
@@ -39,7 +37,6 @@ impl Debug for Model {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Model")
             .field("name", &self.name)
-            .field("is_embedded", &self.is_embedded)
             .field("manifestation", &self.manifestation)
             .field("fields", &self.fields)
             .field("indexes", &self.indexes)
@@ -54,7 +51,6 @@ impl ModelTemplate {
     pub fn build(self, internal_data_model: InternalDataModelWeakRef) -> ModelRef {
         let model = Arc::new(Model {
             name: self.name,
-            is_embedded: self.is_embedded,
             manifestation: self.manifestation,
             fields: OnceCell::new(),
             indexes: OnceCell::new(),
@@ -140,10 +136,6 @@ impl Model {
             .iter()
             .filter(|index| index.typ == IndexType::Unique)
             .collect()
-    }
-
-    pub fn is_legacy(&self) -> bool {
-        self.internal_data_model().is_legacy()
     }
 
     pub fn db_name(&self) -> &str {

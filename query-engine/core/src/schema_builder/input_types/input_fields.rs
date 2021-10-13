@@ -140,10 +140,10 @@ pub(crate) fn nested_update_many_field(
 
 /// Builds "set" field for nested updates (on relation fields).
 pub(crate) fn nested_set_input_field(ctx: &mut BuilderContext, parent_field: &RelationFieldRef) -> Option<InputField> {
-    match (parent_field.related_model().is_embedded, parent_field.is_list) {
-        (true, _) => None,
-        (false, true) => Some(where_input_field(ctx, operations::SET, parent_field)),
-        (false, false) => None,
+    if parent_field.is_list {
+        Some(where_input_field(ctx, operations::SET, parent_field))
+    } else {
+        None
     }
 }
 
@@ -152,15 +152,10 @@ pub(crate) fn nested_disconnect_input_field(
     ctx: &mut BuilderContext,
     parent_field: &RelationFieldRef,
 ) -> Option<InputField> {
-    match (
-        parent_field.related_model().is_embedded,
-        parent_field.is_list,
-        parent_field.is_required,
-    ) {
-        (true, _, _) => None,
-        (false, true, _) => Some(where_input_field(ctx, operations::DISCONNECT, parent_field)),
-        (false, false, false) => Some(input_field(operations::DISCONNECT, InputType::boolean(), None).optional()),
-        (false, false, true) => None,
+    match (parent_field.is_list, parent_field.is_required) {
+        (true, _) => Some(where_input_field(ctx, operations::DISCONNECT, parent_field)),
+        (false, false) => Some(input_field(operations::DISCONNECT, InputType::boolean(), None).optional()),
+        (false, true) => None,
     }
 }
 
@@ -177,15 +172,8 @@ pub(crate) fn nested_delete_input_field(
 }
 
 /// Builds the "connect" input field for a relation.
-pub(crate) fn nested_connect_input_field(
-    ctx: &mut BuilderContext,
-    parent_field: &RelationFieldRef,
-) -> Option<InputField> {
-    if parent_field.related_model().is_embedded {
-        None
-    } else {
-        Some(where_input_field(ctx, operations::CONNECT, parent_field))
-    }
+pub(crate) fn nested_connect_input_field(ctx: &mut BuilderContext, parent_field: &RelationFieldRef) -> InputField {
+    where_input_field(ctx, operations::CONNECT, parent_field)
 }
 
 pub(crate) fn nested_update_input_field(ctx: &mut BuilderContext, parent_field: &RelationFieldRef) -> InputField {

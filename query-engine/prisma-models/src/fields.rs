@@ -13,7 +13,7 @@ pub struct Fields {
     primary_key: Option<PrimaryKey>,
     scalar: OnceCell<Vec<ScalarFieldWeak>>,
     relation: OnceCell<Vec<RelationFieldWeak>>,
-    composite: OnceCell<Vec<RelationFieldWeak>>,
+    composite: OnceCell<Vec<CompositeFieldWeak>>,
     model: ModelWeakRef,
     created_at: OnceCell<Option<ScalarFieldRef>>,
     updated_at: OnceCell<Option<ScalarFieldRef>>,

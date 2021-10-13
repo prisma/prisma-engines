@@ -1,4 +1,4 @@
-use crate::prelude::*;
+use crate::{prelude::*, CompositeTypeRef, CompositeTypeTemplate};
 use once_cell::sync::OnceCell;
 use std::sync::{Arc, Weak};
 
@@ -11,13 +11,15 @@ pub struct InternalDataModelTemplate {
     pub models: Vec<ModelTemplate>,
     pub relations: Vec<RelationTemplate>,
     pub enums: Vec<InternalEnum>,
-    pub version: Option<String>,
+    pub composite_types: Vec<CompositeTypeTemplate>,
 }
 
 #[derive(Debug)]
 pub struct InternalDataModel {
-    pub enums: Vec<InternalEnumRef>,
-    version: Option<String>,
+    models: OnceCell<Vec<ModelRef>>,
+    composite_types: OnceCell<Vec<CompositeTypeRef>>,
+    relations: OnceCell<Vec<RelationRef>>,
+    relation_fields: OnceCell<Vec<RelationFieldRef>>,
 
     /// Todo clarify / rename.
     /// The db name influences how data is queried from the database.
@@ -25,10 +27,7 @@ pub struct InternalDataModel {
     /// Other connectors do not use `schema`, like postgres does, and this variable would
     /// influence the `database` part instead.
     pub db_name: String,
-
-    models: OnceCell<Vec<ModelRef>>,
-    relations: OnceCell<Vec<RelationRef>>,
-    relation_fields: OnceCell<Vec<RelationFieldRef>>,
+    pub enums: Vec<InternalEnumRef>,
 }
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
@@ -79,11 +78,11 @@ impl InternalDataModelTemplate {
     pub fn build(self, db_name: String) -> InternalDataModelRef {
         let internal_data_model = Arc::new(InternalDataModel {
             models: OnceCell::new(),
+            composite_types: OnceCell::new(),
             relations: OnceCell::new(),
-            enums: self.enums.into_iter().map(Arc::new).collect(),
-            version: self.version,
-            db_name,
             relation_fields: OnceCell::new(),
+            db_name,
+            enums: self.enums.into_iter().map(Arc::new).collect(),
         });
 
         let models = self
@@ -143,10 +142,6 @@ impl InternalDataModel {
             .ok_or_else(|| DomainError::RelationNotFound { name: name.to_string() })
     }
 
-    pub fn is_legacy(&self) -> bool {
-        self.version.is_none()
-    }
-
     /// Finds all non-list relation fields pointing to the given model.
     /// `required` may narrow down the returned fields to required fields only. Returns all on `false`.
     pub fn fields_pointing_to_model(&self, model: &ModelRef, required: bool) -> Vec<RelationFieldRef> {
@@ -180,13 +175,5 @@ impl InternalDataModel {
                     .collect()
             })
             .as_slice()
-    }
-
-    pub fn non_embedded_models(&self) -> Vec<ModelRef> {
-        self.models()
-            .iter()
-            .filter(|m| !m.is_embedded)
-            .map(|m| Arc::clone(m))
-            .collect()
     }
 }

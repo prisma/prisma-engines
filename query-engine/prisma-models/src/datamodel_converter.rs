@@ -30,7 +30,7 @@ impl<'a> DatamodelConverter<'a> {
             models: self.convert_models(),
             relations: self.convert_relations(),
             enums: self.convert_enums(),
-            version: Some("v2".to_string()),
+            composite_types: self.convert_composite_types(),
         }
     }
 
@@ -60,7 +60,6 @@ impl<'a> DatamodelConverter<'a> {
             .filter(|model| model.is_supported())
             .map(|model| ModelTemplate {
                 name: model.name.clone(),
-                is_embedded: model.is_embedded,
                 fields: self.convert_fields(model),
                 manifestation: model.database_name().map(|s| s.to_owned()),
                 primary_key: self.convert_pk(model),
@@ -127,6 +126,10 @@ impl<'a> DatamodelConverter<'a> {
                 }
             })
             .collect()
+    }
+
+    fn convert_composite_types(&self) -> Vec<CompositeTypeTemplate> {
+        todo!()
     }
 
     fn convert_relations(&self) -> Vec<RelationTemplate> {

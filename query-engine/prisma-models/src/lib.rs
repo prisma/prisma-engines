@@ -1,6 +1,7 @@
 #![deny(warnings)]
 #![allow(clippy::from_over_into)]
 
+mod composite_type;
 mod datamodel_converter;
 mod error;
 mod field;
@@ -17,6 +18,7 @@ mod relation;
 pub mod pk;
 pub mod prelude;
 
+pub use composite_type::*;
 pub use datamodel::dml;
 pub use datamodel_converter::*;
 pub use error::*;
