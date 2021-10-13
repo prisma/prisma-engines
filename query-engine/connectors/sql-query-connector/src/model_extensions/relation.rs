@@ -1,7 +1,10 @@
-use crate::sql_ext::column::AsColumns;
-use crate::RelationLinkManifestation::*;
-use crate::{AsTable, ColumnIterator, Relation, RelationField, RelationLinkManifestation, RelationSide};
+use prisma_models::{Relation, RelationField, RelationLinkManifestation, RelationSide};
 use quaint::{ast::Table, prelude::Column};
+use RelationLinkManifestation::*;
+
+use crate::model_extensions::AsColumns;
+
+use super::{AsTable, ColumnIterator};
 
 pub trait RelationFieldExt {
     fn m2m_columns(&self) -> Vec<Column<'static>>;

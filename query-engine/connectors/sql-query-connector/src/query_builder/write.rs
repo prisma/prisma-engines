@@ -1,3 +1,4 @@
+use crate::model_extensions::*;
 use connector_interface::{DatasourceFieldName, WriteArgs, WriteExpression};
 use itertools::Itertools;
 use prisma_models::*;

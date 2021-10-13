@@ -1,3 +1,4 @@
+use crate::model_extensions::*;
 use prisma_models::*;
 use quaint::prelude::*;
 

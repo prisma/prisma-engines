@@ -1,4 +1,4 @@
-use crate::{join_utils::*, query_arguments_ext::QueryArgumentsExt};
+use crate::{join_utils::*, model_extensions::*, query_arguments_ext::QueryArgumentsExt};
 use connector_interface::QueryArguments;
 use prisma_models::*;
 use quaint::ast::*;

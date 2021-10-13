@@ -1,4 +1,4 @@
-use crate::{ordering::OrderingJoins, query_arguments_ext::QueryArgumentsExt};
+use crate::{model_extensions::*, ordering::OrderingJoins, query_arguments_ext::QueryArgumentsExt};
 use connector_interface::QueryArguments;
 use prisma_models::*;
 use quaint::ast::*;

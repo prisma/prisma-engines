@@ -1,4 +1,6 @@
-use crate::{cursor_condition, filter_conversion::AliasedCondition, nested_aggregations, ordering};
+use crate::{
+    cursor_condition, filter_conversion::AliasedCondition, model_extensions::*, nested_aggregations, ordering,
+};
 use connector_interface::{filter::Filter, AggregationSelection, QueryArguments, RelAggregationSelection};
 use itertools::Itertools;
 use prisma_models::*;

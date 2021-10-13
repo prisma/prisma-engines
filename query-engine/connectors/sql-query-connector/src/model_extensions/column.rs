@@ -1,9 +1,9 @@
-use crate::{
-    Field, ModelProjection, RelationField, RelationLinkManifestation, ScalarField, ScalarFieldExt, TypeIdentifier,
-};
 use itertools::Itertools;
+use prisma_models::{Field, ModelProjection, RelationField, RelationLinkManifestation, ScalarField, TypeIdentifier};
 use quaint::ast::{Column, Row, TypeDataLength, TypeFamily};
 use std::convert::AsRef;
+
+use crate::model_extensions::ScalarFieldExt;
 
 pub struct ColumnIterator {
     count: usize,
@@ -54,13 +54,6 @@ pub trait AsColumns {
     fn as_columns(&self) -> ColumnIterator;
 }
 
-impl AsColumns for &[Field] {
-    fn as_columns(&self) -> ColumnIterator {
-        let cols: Vec<Column<'static>> = self.iter().flat_map(AsColumns::as_columns).collect();
-        ColumnIterator::from(cols)
-    }
-}
-
 impl AsColumns for ModelProjection {
     fn as_columns(&self) -> ColumnIterator {
         let cols: Vec<Column<'static>> = self
@@ -88,6 +81,7 @@ impl AsColumns for Field {
         match self {
             Field::Scalar(ref sf) => ColumnIterator::from(vec![sf.as_column()]),
             Field::Relation(ref rf) => rf.as_columns(),
+            Field::Composite(_) => unimplemented!(),
         }
     }
 }

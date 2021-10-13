@@ -66,6 +66,7 @@ impl ModelProjection {
             .flat_map(|field| match field {
                 Field::Scalar(sf) => vec![sf.clone()],
                 Field::Relation(rf) => rf.scalar_fields(),
+                Field::Composite(_) => todo!(),
             })
             .into_iter()
             .unique_by(|field| field.name.clone())

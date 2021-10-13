@@ -1,8 +1,7 @@
 use chrono::Utc;
+use prisma_models::{ScalarField, TypeIdentifier};
 use prisma_value::PrismaValue;
 use quaint::ast::Value;
-
-use crate::{ScalarField, TypeIdentifier};
 
 pub trait ScalarFieldExt {
     fn value<'a>(&self, pv: PrismaValue) -> Value<'a>;
