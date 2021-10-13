@@ -331,6 +331,70 @@ fn fail_on_duplicate_field_with_map() {
 }
 
 #[test]
+fn fail_on_duplicate_composite_type_field_with_map() {
+    let dml = indoc! {r#"
+        datasource db {
+            provider = "mongodb"
+            url = "mongodb://"
+        }
+
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["mongoDb"]
+        }
+
+        type User {
+            firstName String
+            otherName String @map("firstName")
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mField "otherName" is already defined on model "User".[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
+        [1;94m   | [0m
+        [1;94m12 | [0m    firstName String
+        [1;94m13 | [0m    [1;91motherName String @map("firstName")[0m
+        [1;94m14 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&parse_and_render_error(dml));
+}
+
+#[test]
+fn fail_on_duplicate_mapped_composite_type_field() {
+    let dml = indoc! {r#"
+        datasource db {
+            provider = "mongodb"
+            url = "mongodb://"
+        }
+
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["mongoDb"]
+        }
+
+        type User {
+            primaryName String @map("firstName")
+            otherName String @map("firstName")
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mField "otherName" is already defined on model "User".[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
+        [1;94m   | [0m
+        [1;94m12 | [0m    primaryName String @map("firstName")
+        [1;94m13 | [0m    [1;91motherName String @map("firstName")[0m
+        [1;94m14 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&parse_and_render_error(dml));
+}
+
+#[test]
 fn fail_on_duplicate_mapped_field_name() {
     let dml = indoc! {r#"
         model User {

@@ -31,13 +31,17 @@ impl<'ast, 'db> CompositeTypeWalker<'ast, 'db> {
 pub(crate) struct CompositeTypeFieldWalker<'ast, 'db> {
     ctid: ast::CompositeTypeId,
     field_id: ast::FieldId,
-    field: &'db types::CompositeTypeField,
+    field: &'db types::CompositeTypeField<'ast>,
     db: &'db ParserDatabase<'ast>,
 }
 
 impl<'ast, 'db> CompositeTypeFieldWalker<'ast, 'db> {
     pub(crate) fn ast_field(&self) -> &'ast ast::Field {
         &self.db.ast[self.ctid][self.field_id]
+    }
+
+    pub(crate) fn mapped_name(&self) -> Option<&'ast str> {
+        self.field.mapped_name
     }
 
     pub(crate) fn name(&self) -> &'ast str {
