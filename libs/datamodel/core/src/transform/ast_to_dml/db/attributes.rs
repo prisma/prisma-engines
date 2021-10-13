@@ -2,7 +2,6 @@ mod autoincrement;
 mod id;
 mod map;
 mod native_types;
-mod relation;
 
 use super::{
     context::{Arguments, Context},
@@ -140,29 +139,6 @@ fn resolve_model_attributes<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::
     autoincrement::validate_auto_increment(model_id, &model_attributes, ctx);
 
     ctx.db.types.model_attributes.insert(model_id, model_attributes);
-}
-
-pub(super) fn validate_relation_fields(ctx: &mut Context<'_>) {
-    let mut errors: Vec<DatamodelError> = Vec::new();
-
-    let referential_integrity = ctx
-        .db
-        .datasource()
-        .map(|ds| ds.referential_integrity())
-        .unwrap_or_default();
-
-    for ((model_id, field_id), _) in ctx.db.types.relation_fields.iter() {
-        let model = ctx.db.walk_model(*model_id);
-        let field = model.relation_field(*field_id);
-
-        relation::validate_ignored_related_model(field, &mut errors);
-        relation::validate_referential_actions(field, ctx.db.active_connector(), &mut errors);
-        relation::validate_on_update_without_foreign_keys(field, referential_integrity, &mut errors);
-    }
-
-    for error in errors.into_iter() {
-        ctx.push_error(error);
-    }
 }
 
 fn visit_scalar_field_attributes<'ast>(
