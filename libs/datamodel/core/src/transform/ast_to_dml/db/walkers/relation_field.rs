@@ -95,7 +95,7 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
     }
 }
 
-#[derive(Debug, Clone, Eq)]
+#[derive(Debug, Clone)]
 pub(crate) enum RelationName<'ast> {
     Explicit(&'ast str),
     Generated(String),
@@ -108,6 +108,30 @@ impl<'ast> PartialEq for RelationName<'ast> {
             (Self::Generated(l0), Self::Generated(r0)) => l0 == r0,
             (Self::Explicit(l0), Self::Generated(r0)) => l0 == r0,
             (Self::Generated(l0), Self::Explicit(r0)) => l0 == r0,
+        }
+    }
+}
+
+impl<'ast> Eq for RelationName<'ast> {}
+
+impl<'ast> PartialOrd for RelationName<'ast> {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        match (self, other) {
+            (Self::Explicit(l0), Self::Explicit(r0)) => l0.partial_cmp(r0),
+            (Self::Generated(l0), Self::Generated(r0)) => l0.partial_cmp(r0),
+            (Self::Explicit(l0), Self::Generated(r0)) => l0.partial_cmp(&r0.as_str()),
+            (Self::Generated(l0), Self::Explicit(r0)) => l0.as_str().partial_cmp(*r0),
+        }
+    }
+}
+
+impl<'ast> Ord for RelationName<'ast> {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        match (self, other) {
+            (Self::Explicit(l0), Self::Explicit(r0)) => l0.cmp(r0),
+            (Self::Generated(l0), Self::Generated(r0)) => l0.cmp(r0),
+            (Self::Explicit(l0), Self::Generated(r0)) => l0.cmp(&r0.as_str()),
+            (Self::Generated(l0), Self::Explicit(r0)) => l0.as_str().cmp(*r0),
         }
     }
 }

@@ -24,14 +24,10 @@ impl<'ast> ParserDatabase<'ast> {
     }
 
     pub(crate) fn walk_models(&self) -> impl Iterator<Item = ModelWalker<'ast, '_>> + '_ {
-        self.types
-            .model_attributes
-            .iter()
-            .map(move |(model_id, model_attributes)| ModelWalker {
-                model_id: *model_id,
-                db: self,
-                model_attributes,
-            })
+        self.ast()
+            .iter_tops()
+            .flat_map(|(top_id, _)| top_id.as_model_id())
+            .map(move |model_id| self.walk_model(model_id))
     }
 
     /// Iterate all complete relations that are not many to many and are
