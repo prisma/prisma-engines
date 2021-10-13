@@ -14,9 +14,6 @@ mod projections;
 mod record;
 mod relation;
 
-#[cfg(feature = "sql-ext")]
-pub mod sql_ext;
-
 pub mod pk;
 pub mod prelude;
 
@@ -36,8 +33,5 @@ pub use relation::*;
 
 // reexport
 pub use prisma_value::*;
-
-#[cfg(feature = "sql-ext")]
-pub use sql_ext::*;
 
 pub type Result<T> = std::result::Result<T, DomainError>;

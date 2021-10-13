@@ -11,6 +11,3 @@ pub use crate::record::*;
 pub use crate::relation::*;
 pub use datamodel::dml;
 pub use prisma_value::*;
-
-#[cfg(feature = "sql-ext")]
-pub use crate::sql_ext::*;
