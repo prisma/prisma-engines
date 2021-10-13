@@ -36,6 +36,15 @@ pub(super) struct Types<'ast> {
 }
 
 impl<'ast> Types<'ast> {
+    pub(super) fn range_model_scalar_fields(
+        &self,
+        model_id: ast::ModelId,
+    ) -> impl Iterator<Item = (ast::FieldId, &ScalarField<'ast>)> {
+        self.scalar_fields
+            .range((model_id, ast::FieldId::ZERO)..=(model_id, ast::FieldId::MAX))
+            .map(|((_, field_id), scalar_field)| (*field_id, scalar_field))
+    }
+
     pub(super) fn take_scalar_field(
         &mut self,
         model_id: ast::ModelId,

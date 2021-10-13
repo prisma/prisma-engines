@@ -159,13 +159,14 @@ pub(super) fn relation_evidence<'ast, 'db>(
     let is_self_relation = *model_id == relation_field.referenced_model;
     let opposite_relation_field: Option<(ast::FieldId, &ast::Field, &RelationField<'_>)> = ctx
         .db
-        .iter_model_relation_fields(relation_field.referenced_model)
+        .walk_model(relation_field.referenced_model)
+        .relation_fields()
         // Only considers relations between the same models
-        .filter(|(_, opposite_relation_field)| opposite_relation_field.referenced_model == *model_id)
+        .filter(|opposite_relation_field| opposite_relation_field.references_model(*model_id))
         // Filter out the field itself, in case of self-relations
-        .filter(|(opposite_field_id, _)| !is_self_relation || opposite_field_id != field_id)
-        .find(|(_, opp)| opp.name == relation_field.name)
-        .map(|(opp_field_id, opp)| (opp_field_id, &opposite_model[opp_field_id], opp));
+        .filter(|opposite_relation_field| !is_self_relation || opposite_relation_field.field_id != *field_id)
+        .find(|opposite_relation_field| opposite_relation_field.explicit_relation_name() == relation_field.name)
+        .map(|opp_rf| (opp_rf.field_id(), opp_rf.ast_field(), opp_rf.relation_field));
 
     RelationEvidence {
         ast_model,

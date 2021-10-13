@@ -7,15 +7,12 @@ mod context;
 mod names;
 mod relations;
 mod types;
+
 pub(crate) mod walkers;
 
 pub(crate) use types::{ScalarField, ScalarFieldType};
 
-use self::{
-    context::Context,
-    relations::Relations,
-    types::{RelationField, Types},
-};
+use self::{context::Context, relations::Relations, types::Types};
 use crate::PreviewFeature;
 use crate::{ast, diagnostics::Diagnostics, Datasource};
 use datamodel_connector::{Connector, EmptyDatamodelConnector};
@@ -138,29 +135,5 @@ impl<'ast> ParserDatabase<'ast> {
         self.datasource
             .map(|datasource| datasource.active_connector.as_ref())
             .unwrap_or(&EmptyDatamodelConnector)
-    }
-
-    /// Iterate all the relation fields in a given model in the order they were
-    /// defined. Note that these are only the fields that were actually written
-    /// in the schema.
-    fn iter_model_relation_fields(
-        &self,
-        model_id: ast::ModelId,
-    ) -> impl Iterator<Item = (ast::FieldId, &RelationField<'ast>)> + '_ {
-        self.types
-            .relation_fields
-            .range((model_id, ast::FieldId::ZERO)..=(model_id, ast::FieldId::MAX))
-            .map(|((_, field_id), rf)| (*field_id, rf))
-    }
-
-    /// Iterate all the scalar fields in a given model in the order they were defined.
-    pub(crate) fn iter_model_scalar_fields(
-        &self,
-        model_id: ast::ModelId,
-    ) -> impl Iterator<Item = (ast::FieldId, &ScalarField<'ast>)> {
-        self.types
-            .scalar_fields
-            .range((model_id, ast::FieldId::ZERO)..=(model_id, ast::FieldId::MAX))
-            .map(|((_, field_id), scalar_type)| (*field_id, scalar_type))
     }
 }

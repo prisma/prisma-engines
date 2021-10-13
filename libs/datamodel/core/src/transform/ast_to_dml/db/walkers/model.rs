@@ -4,7 +4,7 @@ mod unique_criteria;
 pub(crate) use primary_key::*;
 pub(crate) use unique_criteria::*;
 
-use super::{ExplicitRelationWalker, IndexWalker, RelationFieldWalker};
+use super::{ExplicitRelationWalker, IndexWalker, RelationFieldWalker, ScalarFieldWalker};
 use crate::{
     ast,
     transform::ast_to_dml::db::{types::ModelAttributes, ParserDatabase},
@@ -87,6 +87,20 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
         })
     }
 
+    /// Iterate all the scalar fields in a given model in the order they were defined.
+    pub(crate) fn scalar_fields(&self) -> impl Iterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db {
+        let db = self.db;
+        db.types
+            .scalar_fields
+            .range((self.model_id, ast::FieldId::ZERO)..=(self.model_id, ast::FieldId::MAX))
+            .map(move |((model_id, field_id), scalar_field)| ScalarFieldWalker {
+                model_id: *model_id,
+                field_id: *field_id,
+                db,
+                scalar_field,
+            })
+    }
+
     /// All unique criterias of the model; consisting of the primary key and
     /// unique indexes, if set.
     pub(crate) fn unique_criterias(&'db self) -> impl Iterator<Item = UniqueCriteriaWalker<'ast, 'db>> + 'db {
@@ -131,16 +145,20 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
             })
     }
 
-    /// All (concrete) relation fields of the model.
+    /// Iterate all the relation fields in the model in the order they were
+    /// defined. Note that these are only the fields that were actually written
+    /// in the schema.
     pub(crate) fn relation_fields(&self) -> impl Iterator<Item = RelationFieldWalker<'ast, 'db>> + 'db {
         let model_id = self.model_id;
         let db = self.db;
 
         self.db
-            .iter_model_relation_fields(self.model_id)
-            .map(move |(field_id, relation_field)| RelationFieldWalker {
+            .types
+            .relation_fields
+            .range((model_id, ast::FieldId::ZERO)..=(model_id, ast::FieldId::MAX))
+            .map(move |((_, field_id), relation_field)| RelationFieldWalker {
                 model_id,
-                field_id,
+                field_id: *field_id,
                 db,
                 relation_field,
             })
