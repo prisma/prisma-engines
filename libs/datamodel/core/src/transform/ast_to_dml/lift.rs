@@ -59,20 +59,20 @@ impl<'a> LiftAstToDml<'a> {
     /// Internal: Validates a model AST node and lifts it to a DML model.
     fn lift_model(&self, model_id: ast::ModelId, ast_model: &ast::Model) -> dml::Model {
         let mut model = dml::Model::new(ast_model.name.name.clone(), None);
-        let model_attributes = self.db.walk_model(model_id);
+        let walker = self.db.walk_model(model_id);
 
         model.documentation = ast_model.documentation.clone().map(|comment| comment.text);
-        model.database_name = model_attributes.attributes().mapped_name.map(String::from);
-        model.is_ignored = model_attributes.attributes().is_ignored;
+        model.database_name = walker.attributes().mapped_name.map(String::from);
+        model.is_ignored = walker.attributes().is_ignored;
 
-        model.primary_key = model_attributes.primary_key().map(|pk| dml::PrimaryKeyDefinition {
+        model.primary_key = walker.primary_key().map(|pk| dml::PrimaryKeyDefinition {
             name: pk.name().map(String::from),
             db_name: pk.final_database_name().map(|c| c.into_owned()),
             fields: pk.iter_ast_fields().map(|field| field.name.name.to_owned()).collect(),
             defined_on_field: pk.is_defined_on_field(),
         });
 
-        model.indices = model_attributes
+        model.indices = walker
             .indexes()
             .map(|idx| dml::IndexDefinition {
                 name: idx.attribute().name.map(String::from),
@@ -98,24 +98,26 @@ impl<'a> LiftAstToDml<'a> {
         // the AST, so we need this bit of extra bookkeeping.
         let mut field_ids_for_sorting: HashMap<&str, ast::FieldId> = HashMap::with_capacity(ast_model.fields.len());
 
-        for (field_id, scalar_field_data) in self.db.iter_model_scalar_fields(model_id) {
+        for scalar_field in walker.scalar_fields() {
+            let field_id = scalar_field.field_id();
+            let attributes = scalar_field.attributes();
             let ast_field = &ast_model[field_id];
             let arity = self.lift_field_arity(&ast_field.arity);
-            let field_type = self.lift_scalar_field_type(ast_field, &scalar_field_data.r#type, scalar_field_data);
+            let field_type = self.lift_scalar_field_type(ast_field, &attributes.r#type, attributes);
 
             let mut field = dml::ScalarField::new(&ast_field.name.name, arity, field_type);
 
             field.documentation = ast_field.documentation.clone().map(|comment| comment.text);
-            field.is_ignored = scalar_field_data.is_ignored;
-            field.is_updated_at = scalar_field_data.is_updated_at;
-            field.database_name = scalar_field_data.mapped_name.map(String::from);
-            field.default_value = scalar_field_data.default.clone();
+            field.is_ignored = attributes.is_ignored;
+            field.is_updated_at = attributes.is_updated_at;
+            field.database_name = attributes.mapped_name.map(String::from);
+            field.default_value = attributes.default.clone();
 
             field_ids_for_sorting.insert(&ast_field.name.name, field_id);
             model.add_field(dml::Field::ScalarField(field));
         }
 
-        for relation_field in model_attributes.relation_fields() {
+        for relation_field in walker.relation_fields() {
             let ast_field = relation_field.ast_field();
             let arity = self.lift_field_arity(&ast_field.arity);
             let attributes = relation_field.attributes();
