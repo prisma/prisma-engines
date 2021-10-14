@@ -19,7 +19,7 @@ use regex::Regex;
 
 use super::field_type::FieldType;
 
-pub(super) const SAMPLE_SIZE: u16 = 1000;
+pub(super) const SAMPLE_SIZE: u32 = 1000;
 
 static RESERVED_NAMES: &[&str] = &["PrismaClient"];
 
