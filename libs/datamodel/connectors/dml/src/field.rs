@@ -169,6 +169,7 @@ impl Field {
         match &self {
             Field::ScalarField(sf) => &sf.arity,
             Field::RelationField(rf) => &rf.arity,
+            Field::CompositeField(rf) => &rf.arity,
         }
     }
 
@@ -206,12 +207,14 @@ impl WithName for Field {
         match self {
             Field::ScalarField(sf) => sf.name(),
             Field::RelationField(rf) => rf.name(),
+            Field::CompositeField(cf) => cf.name(),
         }
     }
     fn set_name(&mut self, name: &str) {
         match self {
             Field::ScalarField(sf) => sf.set_name(name),
             Field::RelationField(rf) => rf.set_name(name),
+            Field::CompositeField(cf) => cf.set_name(name),
         }
     }
 }
@@ -228,6 +231,7 @@ impl WithDatabaseName for Field {
     fn set_database_name(&mut self, database_name: Option<String>) {
         match self {
             Field::ScalarField(sf) => sf.set_database_name(database_name),
+            Field::CompositeField(cf) => cf.set_database_name(database_name),
             Field::RelationField(_) => (),
         }
     }
