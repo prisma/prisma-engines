@@ -84,8 +84,8 @@ mod one2one_req {
     }
 
     /// Deleting the parent with no default for SetDefault fails.
-    /// Only postgres allows setting no default for a SetDefault FK.
-    #[connector_test(schema(required_without_default), only(Postgres))]
+    /// Only postgres (except CockroachDB) allows setting no default for a SetDefault FK.
+    #[connector_test(schema(required_without_default), only(Postgres), exclude(Cockroach))]
     async fn delete_parent_fail(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, child: { create: { id: 1 }}}) { id }}"#),
@@ -288,8 +288,8 @@ mod one2many_req {
     }
 
     /// Deleting the parent with no default for SetDefault fails.
-    /// Only postgres allows setting no default for a SetDefault FK.
-    #[connector_test(schema(required_without_default), only(Postgres))]
+    /// Only postgres (except CockroachDB) allows setting no default for a SetDefault FK.
+    #[connector_test(schema(required_without_default), only(Postgres), exclude(Cockroach))]
     async fn delete_parent_fail(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, children: { create: { id: 1 }}}) { id }}"#),
