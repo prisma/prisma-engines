@@ -56,7 +56,7 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
     /// True if given fields are unique in the model.
     pub(crate) fn fields_are_unique(&self, fields: &[ast::FieldId]) -> bool {
         self.model_attributes
-            .indexes
+            .ast_indexes
             .iter()
             .any(|(_, idx)| idx.is_unique && idx.fields == fields)
     }
@@ -129,25 +129,42 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
         from_pk.chain(from_indices)
     }
 
-    /// All indexes defined in the model.
-    pub(crate) fn indexes(&self) -> impl Iterator<Item = IndexWalker<'ast, 'db>> + 'db {
+    /// Iterate all the relation fields in the model in the order they were
+    /// defined. Note that these are only the fields that were actually written
+    /// in the schema.
+    pub(crate) fn explicit_indexes(&self) -> impl Iterator<Item = IndexWalker<'ast, 'db>> + 'db {
         let model_id = self.model_id;
         let db = self.db;
 
         self.model_attributes
-            .indexes
+            .ast_indexes
             .iter()
             .map(move |(index, index_attribute)| IndexWalker {
                 model_id,
-                index,
+                index: Some(index),
                 db,
                 index_attribute,
             })
     }
 
     /// Iterate all the relation fields in the model in the order they were
-    /// defined. Note that these are only the fields that were actually written
-    /// in the schema.
+    /// defined, followed by the implicit indexes.
+    pub(crate) fn indexes(&self) -> impl Iterator<Item = IndexWalker<'ast, 'db>> + '_ {
+        let implicit_indexes = self
+            .model_attributes
+            .implicit_indexes
+            .iter()
+            .map(move |index_attribute| IndexWalker {
+                model_id: self.model_id(),
+                index: None,
+                db: self.db,
+                index_attribute,
+            });
+
+        self.explicit_indexes().chain(implicit_indexes)
+    }
+
+    /// All (concrete) relation fields of the model.
     pub(crate) fn relation_fields(&self) -> impl Iterator<Item = RelationFieldWalker<'ast, 'db>> + 'db {
         let model_id = self.model_id;
         let db = self.db;

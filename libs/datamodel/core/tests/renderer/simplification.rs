@@ -50,7 +50,7 @@ fn test_exclude_default_relation_names_from_rendering() {
     let expected = expect![[r#"
         model Todo {
           id     Int  @id
-          userId Int
+          userId Int  @unique
           user   User @relation(fields: [userId], references: [id])
         }
 

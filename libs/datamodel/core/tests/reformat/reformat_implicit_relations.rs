@@ -1075,8 +1075,8 @@ fn should_not_get_confused_with_complicated_self_relations() {
     let expected = expect![[r#"
         model Human {
           id        Int  @id
-          husbandId Int?
-          fatherId  Int?
+          husbandId Int? @unique
+          fatherId  Int? @unique
           parentId  Int?
 
           wife    Human? @relation("Marrige")

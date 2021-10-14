@@ -4,6 +4,7 @@
 
 mod attributes;
 mod context;
+mod indexes;
 mod names;
 mod relations;
 mod types;
@@ -100,6 +101,9 @@ impl<'ast> ParserDatabase<'ast> {
 
         // Fifth step: relation inference
         relations::infer_relations(&mut ctx);
+
+        // Sixth step: infering implicit indices
+        indexes::infer_implicit_indexes(&mut ctx);
 
         ctx.finish()
     }
