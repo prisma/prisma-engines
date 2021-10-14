@@ -4,6 +4,7 @@ use itertools::Itertools;
 use once_cell::sync::Lazy;
 use regex::Regex;
 use std::{
+    borrow::Cow,
     collections::{BTreeMap, HashMap},
     str::FromStr,
 };
@@ -141,6 +142,8 @@ pub(crate) struct ModelAttributes<'ast> {
     pub(crate) is_ignored: bool,
     /// @@index and @(@)unique.
     pub(super) indexes: Vec<(&'ast ast::Attribute, IndexAttribute<'ast>)>,
+    /// @(@)unique added explicitely to the datamodel by us.
+    pub(super) implicit_indexes: Vec<IndexAttribute<'static>>,
     /// @@map
     pub(crate) mapped_name: Option<&'ast str>,
 }
@@ -168,7 +171,7 @@ pub(crate) struct IndexAttribute<'ast> {
     pub(crate) fields: Vec<ast::FieldId>,
     pub(crate) source_field: Option<ast::FieldId>,
     pub(crate) name: Option<&'ast str>,
-    pub(crate) db_name: Option<&'ast str>,
+    pub(crate) db_name: Option<Cow<'ast, str>>,
 }
 
 #[derive(Debug, Default)]

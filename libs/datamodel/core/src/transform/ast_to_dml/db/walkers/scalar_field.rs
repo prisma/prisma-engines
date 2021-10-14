@@ -13,6 +13,14 @@ pub(crate) struct ScalarFieldWalker<'ast, 'db> {
     pub(crate) scalar_field: &'db ScalarField<'ast>,
 }
 
+impl<'ast, 'db> PartialEq for ScalarFieldWalker<'ast, 'db> {
+    fn eq(&self, other: &Self) -> bool {
+        self.model_id == other.model_id && self.field_id == other.field_id
+    }
+}
+
+impl<'ast, 'db> Eq for ScalarFieldWalker<'ast, 'db> {}
+
 impl<'ast, 'db> ScalarFieldWalker<'ast, 'db> {
     #[allow(dead_code)] // we'll need this
     pub(crate) fn field_id(&self) -> ast::FieldId {
@@ -25,6 +33,10 @@ impl<'ast, 'db> ScalarFieldWalker<'ast, 'db> {
 
     pub(crate) fn name(&self) -> &'ast str {
         self.ast_field().name()
+    }
+
+    pub(crate) fn final_database_name(&self) -> &'ast str {
+        self.attributes().mapped_name.unwrap_or_else(|| self.name())
     }
 
     pub(crate) fn is_optional(&self) -> bool {

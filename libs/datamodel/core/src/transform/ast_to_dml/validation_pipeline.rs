@@ -67,7 +67,7 @@ impl<'a, 'b> ValidationPipeline<'a> {
         diagnostics.to_result()?;
 
         // Phase 5: Consistency fixes. These don't fail and always run, during parsing AND formatting
-        standardise_parsing::standardise(&mut schema, self.source);
+        standardise_parsing::standardise(&mut schema);
 
         // Transform phase: These only run during formatting.
         if relation_transformation_enabled {

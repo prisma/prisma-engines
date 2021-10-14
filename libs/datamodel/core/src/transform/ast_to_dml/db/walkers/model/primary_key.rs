@@ -3,7 +3,7 @@ use std::borrow::Cow;
 use crate::{
     ast,
     common::constraint_names::ConstraintNames,
-    transform::ast_to_dml::db::{types::IdAttribute, ParserDatabase},
+    transform::ast_to_dml::db::{types::IdAttribute, walkers::ScalarFieldWalker, ParserDatabase},
 };
 
 #[derive(Copy, Clone)]
@@ -41,5 +41,21 @@ impl<'ast, 'db> PrimaryKeyWalker<'ast, 'db> {
 
     pub(crate) fn name(&self) -> Option<&'ast str> {
         self.attribute.name
+    }
+
+    pub(crate) fn fields(&self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + '_ {
+        self.attribute.fields.iter().map(move |field_id| ScalarFieldWalker {
+            model_id: self.model_id,
+            field_id: *field_id,
+            db: self.db,
+            scalar_field: &self.db.types.scalar_fields[&(self.model_id, *field_id)],
+        })
+    }
+
+    pub(crate) fn contains_exactly_fields(
+        &self,
+        fields: impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>>,
+    ) -> bool {
+        self.attribute.fields.len() == fields.len() && self.fields().zip(fields).all(|(a, b)| a == b)
     }
 }

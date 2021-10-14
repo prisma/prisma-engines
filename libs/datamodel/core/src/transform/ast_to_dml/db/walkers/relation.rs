@@ -3,7 +3,10 @@ use dml::relation_info::ReferentialAction;
 
 use crate::{
     ast::{self, FieldArity},
-    transform::ast_to_dml::db::{relations::Relation, ParserDatabase},
+    transform::ast_to_dml::db::{
+        relations::{Relation, RelationType},
+        ParserDatabase,
+    },
 };
 
 use super::{ModelWalker, RelationFieldWalker, ScalarFieldWalker};
@@ -15,7 +18,6 @@ use super::{ModelWalker, RelationFieldWalker, ScalarFieldWalker};
 pub(crate) struct ExplicitRelationWalker<'ast, 'db> {
     pub(crate) side_a: (ast::ModelId, ast::FieldId),
     pub(crate) side_b: (ast::ModelId, ast::FieldId),
-    #[allow(dead_code)]
     pub(crate) relation: &'db Relation<'ast>,
     pub(crate) db: &'db ParserDatabase<'ast>,
 }
@@ -132,5 +134,10 @@ impl<'ast, 'db> ExplicitRelationWalker<'ast, 'db> {
     /// fields is required.
     pub(crate) fn referential_arity(&self) -> FieldArity {
         self.referencing_field().referential_arity()
+    }
+
+    /// 1:1, 1:n or m:n
+    pub(crate) fn relation_type(&self) -> RelationType {
+        self.relation.r#type()
     }
 }
