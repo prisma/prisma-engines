@@ -220,7 +220,7 @@ fn visit_scalar_field_attributes<'ast>(
             validate_db_name(ast_model, args, db_name, "@unique", ctx);
 
 
-            model_attributes.indexes.push((args.attribute(), IndexAttribute {
+            model_attributes.ast_indexes.push((args.attribute(), IndexAttribute {
                 is_unique: true,
                 fields: vec![field_id],
                 source_field: Some(field_id),
@@ -529,7 +529,7 @@ fn model_index<'ast>(
         (None, None) => None,
     };
 
-    data.indexes.push((args.attribute(), index_attribute));
+    data.ast_indexes.push((args.attribute(), index_attribute));
 }
 
 /// Validate @@unique on models.
@@ -584,7 +584,7 @@ fn model_unique<'ast>(
     index_attribute.name = name;
     index_attribute.db_name = db_name.map(Cow::from);
 
-    data.indexes.push((args.attribute(), index_attribute));
+    data.ast_indexes.push((args.attribute(), index_attribute));
 }
 
 fn common_index_validations<'ast>(

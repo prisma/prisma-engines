@@ -56,7 +56,7 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
     /// True if given fields are unique in the model.
     pub(crate) fn fields_are_unique(&self, fields: &[ast::FieldId]) -> bool {
         self.model_attributes
-            .indexes
+            .ast_indexes
             .iter()
             .any(|(_, idx)| idx.is_unique && idx.fields == fields)
     }
@@ -137,7 +137,7 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
         let db = self.db;
 
         self.model_attributes
-            .indexes
+            .ast_indexes
             .iter()
             .map(move |(index, index_attribute)| IndexWalker {
                 model_id,
