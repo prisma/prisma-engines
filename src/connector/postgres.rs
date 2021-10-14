@@ -251,6 +251,11 @@ impl PostgresUrl {
         self.query_params.max_idle_connection_lifetime
     }
 
+    /// The custom application name
+    pub fn application_name(&self) -> Option<&str> {
+        self.query_params.application_name.as_deref()
+    }
+
     pub(crate) fn cache(&self) -> LruCache<String, Statement> {
         if self.query_params.pg_bouncer {
             LruCache::new(0)
@@ -268,6 +273,7 @@ impl PostgresUrl {
         let mut ssl_accept_mode = SslAcceptMode::AcceptInvalidCerts;
         let mut ssl_mode = SslMode::Prefer;
         let mut host = None;
+        let mut application_name = None;
         let mut socket_timeout = None;
         let mut connect_timeout = Some(Duration::from_secs(5));
         let mut pool_timeout = Some(Duration::from_secs(10));
@@ -387,6 +393,9 @@ impl PostgresUrl {
                         max_idle_connection_lifetime = Some(Duration::from_secs(as_int));
                     }
                 }
+                "application_name" => {
+                    application_name = Some(v.to_string());
+                }
                 _ => {
                     tracing::trace!(message = "Discarding connection string param", param = &*k);
                 }
@@ -411,6 +420,7 @@ impl PostgresUrl {
             statement_cache_size,
             max_connection_lifetime,
             max_idle_connection_lifetime,
+            application_name,
         })
     }
 
@@ -432,6 +442,10 @@ impl PostgresUrl {
         config.port(self.port());
         config.dbname(self.dbname());
         config.pgbouncer_mode(self.query_params.pg_bouncer);
+
+        if let Some(application_name) = self.application_name() {
+            config.application_name(application_name);
+        }
 
         if let Some(connect_timeout) = self.query_params.connect_timeout {
             config.connect_timeout(connect_timeout);
@@ -457,6 +471,7 @@ pub(crate) struct PostgresUrlQueryParams {
     statement_cache_size: usize,
     max_connection_lifetime: Option<Duration>,
     max_idle_connection_lifetime: Option<Duration>,
+    application_name: Option<String>,
 }
 
 impl PostgreSql {
@@ -717,6 +732,13 @@ mod tests {
     fn should_have_default_cache_size() {
         let url = PostgresUrl::new(Url::parse("postgresql:///localhost:5432/foo").unwrap()).unwrap();
         assert_eq!(500, url.cache().capacity());
+    }
+
+    #[test]
+    fn should_have_application_name() {
+        let url =
+            PostgresUrl::new(Url::parse("postgresql:///localhost:5432/foo?application_name=test").unwrap()).unwrap();
+        assert_eq!(Some("test"), url.application_name());
     }
 
     #[test]
