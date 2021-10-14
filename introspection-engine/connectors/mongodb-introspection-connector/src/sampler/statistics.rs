@@ -19,6 +19,8 @@ use regex::Regex;
 
 use super::field_type::FieldType;
 
+pub(super) const SAMPLE_SIZE: u8 = 1000;
+
 static RESERVED_NAMES: &[&str] = &["PrismaClient"];
 
 /// Statistical data from a MongoDB database for determining a Prisma data
@@ -116,8 +118,8 @@ impl Statistics {
 
             let documentation = if percentages.has_type_variety() {
                 Some(format!(
-                    "Multiple data types found {} out of 1000 sampled entries",
-                    percentages
+                    "Multiple data types found {} out of {} sampled entries",
+                    percentages, SAMPLE_SIZE
                 ))
             } else {
                 None
