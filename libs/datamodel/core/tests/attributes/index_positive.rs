@@ -209,8 +209,9 @@ fn index_accepts_sort_order() {
     model User {
         id        Int    @id
         firstName String
+        lastName  String
         
-        @@index([firstName(sort: Desc)])
+        @@index([firstName(sort: Desc), lastName(sort: Desc, length: 5)])
     }
     "#,
     );

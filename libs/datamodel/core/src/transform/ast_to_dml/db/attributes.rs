@@ -590,6 +590,8 @@ fn common_index_validations<'ast>(
         }
     };
 
+    println!("{:?}", fields);
+
     match resolve_field_array(&fields, args.span(), model_id, ctx) {
         Ok(fields) => {
             index_data.fields = fields;
@@ -782,6 +784,9 @@ enum FieldResolutionError<'ast> {
 /// Takes an attribute argument, validates it as an array of constants, then
 /// resolves  the constant as field names on the model. The error variant
 /// contains the fields that are not in the model.
+///
+/// TODO(matthias) This is used for pks, key, idx and fk currently
+/// all but fk can contain extra arguments
 fn resolve_field_array<'ast>(
     values: &ValueValidator<'ast>,
     attribute_span: ast::Span,

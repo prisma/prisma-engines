@@ -421,14 +421,11 @@ impl<'a> Renderer<'a> {
 
     fn render_constant_value_with_args(target: &mut dyn LineWriteable, ident: &String, vals: &[ast::Argument]) {
         target.write(ident);
-        target.write("(");
-        for (idx, arg) in vals.iter().enumerate() {
-            if idx > 0 {
-                target.write(", ");
-            }
-            Self::render_argument(target, arg);
+        if !vals.is_empty() {
+            target.write("(");
+            Self::render_arguments(target, vals);
+            target.write(")");
         }
-        target.write(")");
     }
 
     fn render_str(target: &mut dyn LineWriteable, param: &str) {

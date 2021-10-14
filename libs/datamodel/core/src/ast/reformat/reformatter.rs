@@ -772,10 +772,19 @@ impl<'a> Reformatter<'a> {
             if idx > 0 {
                 target.write(", ");
             }
-            //TODO(matthias) get rid of the dupliation?
-            // Self::render_argument(target, arg);
+            //TODO(matthias) get rid of the duplication?
+            Self::render_argument(target, arg);
         }
         target.write(")");
+    }
+
+    fn render_argument(target: &mut StringBuilder, arg: &ast::Argument) {
+        if !arg.name.name.is_empty() {
+            target.write(&arg.name.name);
+            target.write(": ");
+        }
+
+        Self::render_value(target, &arg.value);
     }
 
     fn render_func(target: &mut StringBuilder, name: &str, vals: &[ast::Expression]) {
