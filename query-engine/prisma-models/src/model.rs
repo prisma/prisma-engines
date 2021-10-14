@@ -1,5 +1,5 @@
-use crate::pk::PrimaryKeyTemplate;
 use crate::prelude::*;
+use crate::{pk::PrimaryKeyTemplate, CompositeTypeRef};
 use once_cell::sync::OnceCell;
 use std::{
     fmt::Debug,
@@ -48,7 +48,11 @@ impl Debug for Model {
 }
 
 impl ModelTemplate {
-    pub fn build(self, internal_data_model: InternalDataModelWeakRef) -> ModelRef {
+    pub fn build(
+        self,
+        internal_data_model: InternalDataModelWeakRef,
+        composite_types: &[CompositeTypeRef],
+    ) -> ModelRef {
         let model = Arc::new(Model {
             name: self.name,
             manifestation: self.manifestation,
@@ -63,7 +67,7 @@ impl ModelTemplate {
         let all_fields: Vec<_> = self
             .fields
             .into_iter()
-            .map(|ft| ft.build(Arc::downgrade(&model)))
+            .map(|ft| ft.build(Arc::downgrade(&model, composite_types)))
             .collect();
 
         let pk = self.primary_key.map(|pk| pk.build(&all_fields));

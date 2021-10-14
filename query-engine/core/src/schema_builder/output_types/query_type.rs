@@ -5,7 +5,7 @@ use super::*;
 pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRef) {
     let fields = ctx
         .internal_data_model
-        .models()
+        .models_cloned()
         .into_iter()
         .map(|model| {
             let mut vec = vec![

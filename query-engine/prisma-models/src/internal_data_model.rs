@@ -11,7 +11,7 @@ pub struct InternalDataModelTemplate {
     pub models: Vec<ModelTemplate>,
     pub relations: Vec<RelationTemplate>,
     pub enums: Vec<InternalEnum>,
-    pub composite_types: Vec<CompositeTypeTemplate>,
+    pub composite_types: Vec<CompositeTypeRef>,
 }
 
 #[derive(Debug)]
@@ -85,6 +85,8 @@ impl InternalDataModelTemplate {
             enums: self.enums.into_iter().map(Arc::new).collect(),
         });
 
+        let composite_types = self.composite_types.into_iter().map(|template| template.build());
+
         let models = self
             .models
             .into_iter()
@@ -112,6 +114,10 @@ impl InternalDataModel {
 
     pub fn models(&self) -> &[ModelRef] {
         self.models.get().unwrap()
+    }
+
+    pub fn models_cloned(&self) -> Vec<ModelRef> {
+        self.models.get().unwrap().into_iter().map(Arc::clone).collect()
     }
 
     pub fn relations(&self) -> &[RelationRef] {

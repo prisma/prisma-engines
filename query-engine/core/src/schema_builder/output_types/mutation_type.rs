@@ -10,7 +10,7 @@ use prisma_models::{dml, PrismaValue};
 pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRef) {
     let mut fields: Vec<OutputField> = ctx
         .internal_data_model
-        .models()
+        .models_cloned()
         .into_iter()
         .map(|model| {
             let mut vec = vec![];

@@ -1,7 +1,10 @@
+use std::sync::Arc;
+
 use crate::pk::PrimaryKeyTemplate;
 use crate::*;
 use datamodel::{dml, Ignorable, NativeTypeInstance, WithDatabaseName};
 use itertools::Itertools;
+use once_cell::sync::OnceCell;
 
 pub struct DatamodelConverter<'a> {
     datamodel: &'a dml::Datamodel,
@@ -128,7 +131,20 @@ impl<'a> DatamodelConverter<'a> {
             .collect()
     }
 
-    fn convert_composite_types(&self) -> Vec<CompositeTypeTemplate> {
+    fn convert_composite_types(&self) -> Vec<CompositeTypeRef> {
+        // First pass, create a placeholder for all composites.
+        let composites: Vec<_> = self
+            .datamodel
+            .composite_types
+            .iter()
+            .map(|ct| {
+                Arc::new(CompositeType {
+                    name: ct.name,
+                    fields: OnceCell::new(),
+                })
+            })
+            .collect();
+
         todo!()
     }
 

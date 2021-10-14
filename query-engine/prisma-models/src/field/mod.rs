@@ -6,7 +6,7 @@ pub use composite::*;
 pub use relation::*;
 pub use scalar::*;
 
-use crate::prelude::*;
+use crate::{prelude::*, CompositeTypeRef};
 use datamodel::ScalarType;
 use std::{hash::Hash, sync::Arc};
 
@@ -185,11 +185,11 @@ impl Field {
 }
 
 impl FieldTemplate {
-    pub fn build(self, model: ModelWeakRef) -> Field {
+    pub fn build(self, model: ModelWeakRef, composite_types: &[CompositeTypeRef]) -> Field {
         match self {
             FieldTemplate::Scalar(st) => Field::Scalar(st.build(model)),
             FieldTemplate::Relation(rt) => Field::Relation(rt.build(model)),
-            FieldTemplate::Composite(ct) => Field::Composite(ct.build(model)),
+            FieldTemplate::Composite(ct) => Field::Composite(ct.build(model, composite_types)),
         }
     }
 }

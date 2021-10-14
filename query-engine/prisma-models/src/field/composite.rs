@@ -1,6 +1,5 @@
-use crate::{Fields, ModelRef, ModelWeakRef, ScalarFieldRef};
+use crate::{CompositeTypeRef, ModelRef, ModelWeakRef, ScalarFieldRef};
 use datamodel::FieldArity;
-use once_cell::sync::OnceCell;
 use std::{
     fmt::Debug,
     hash::{Hash, Hasher},
@@ -13,45 +12,37 @@ pub type CompositeFieldWeak = Weak<CompositeField>;
 #[derive(Debug)]
 pub struct CompositeFieldTemplate {
     pub name: String,
+    pub db_name: Option<String>,
     pub is_required: bool,
     pub arity: FieldArity,
-    // typ:
+    pub type_name: String,
 }
 
 impl CompositeFieldTemplate {
-    pub fn build(self, _model: ModelWeakRef) -> CompositeFieldRef {
-        // let scalar = ScalarField {
-        //     name: self.name,
-        //     type_identifier: self.type_identifier,
-        //     is_id: self.is_id,
-        //     is_required: self.is_required,
-        //     is_list: self.is_list,
-        //     is_autoincrement: self.is_autoincrement,
-        //     is_auto_generated_int_id: self.is_auto_generated_int_id,
-        //     read_only: OnceCell::new(),
-        //     is_unique: self.is_unique,
-        //     internal_enum: self.internal_enum,
-        //     behaviour: self.behaviour,
-        //     arity: self.arity,
-        //     db_name: self.db_name,
-        //     default_value: self.default_value,
-        //     native_type: self.native_type,
-        //     model,
-        // };
+    pub fn build(self, model: ModelWeakRef, composite_types: &[CompositeTypeRef]) -> CompositeFieldRef {
+        let composite = CompositeField {
+            name: self.name,
+            db_name: self.db_name,
+            typ: composite_types
+                .into_iter()
+                .find(|typ| &typ.name == &self.type_name)
+                .expect(&format!("Invalid composite type reference: {}", self.type_name))
+                .clone(),
+            arity: self.arity,
+            model: model,
+        };
 
-        // Arc::new(scalar)
-
-        todo!()
+        Arc::new(composite)
     }
 }
 
 #[derive(Clone)]
 pub struct CompositeField {
     pub name: String,
-    pub arity: FieldArity,
-    pub model: ModelWeakRef,
-
-    fields: OnceCell<Fields>,
+    pub db_name: Option<String>,
+    pub typ: CompositeTypeRef,
+    arity: FieldArity,
+    model: ModelWeakRef,
 }
 
 impl CompositeField {
@@ -99,7 +90,7 @@ impl Debug for CompositeField {
             .field("name", &self.name)
             .field("arity", &self.arity)
             .field("model", &"#ModelWeakRef#")
-            .field("fields", &self.fields)
+            .field("composite type", &self.typ.name)
             .finish()
     }
 }
