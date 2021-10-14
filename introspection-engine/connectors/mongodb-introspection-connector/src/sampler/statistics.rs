@@ -118,7 +118,7 @@ impl Statistics {
 
             let documentation = if percentages.has_type_variety() {
                 Some(format!(
-                    "Multiple data types found {} out of {} sampled entries",
+                    "Multiple data types found: {} out of {} sampled entries",
                     percentages, SAMPLE_SIZE
                 ))
             } else {
