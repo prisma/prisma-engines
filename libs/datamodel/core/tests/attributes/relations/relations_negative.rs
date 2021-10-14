@@ -890,6 +890,42 @@ fn relation_attribute_on_a_composite_field_errors() {
     expect.assert_eq(&datamodel::parse_schema(schema).map(drop).unwrap_err());
 }
 
+#[test]
+fn a_typoed_relation_should_fail_gracefully() {
+    let dml = indoc! {r#"
+        datasource db {
+          provider = "sqlserver"
+          url      = env("DATABASE_URL")
+        }
+
+        model Test {
+          id         Int        @id
+          fk         Int
+          testparent TestParent @relation(fields: [fk], references: [id])
+        }
+
+        model TestParent {
+          id    Int    @id
+          tests Test[]
+          
+          fk   Int
+          self TestParent @relation(fields: [fk], references: [id])
+        }
+    "#};
+
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError validating field `self` in model `TestParent`: The relation field `self` on Model `TestParent` is missing an opposite relation field on the model `TestParent`. Either run `prisma format` or add it manually.[0m
+          [1;94m-->[0m  [4mschema.prisma:17[0m
+        [1;94m   | [0m
+        [1;94m16 | [0m  fk   Int
+        [1;94m17 | [0m  [1;91mself TestParent @relation(fields: [fk], references: [id])[0m
+        [1;94m18 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
+}
+
 //
 // #[test]
 // fn having_the_map_argument_on_the_wrong_side_should_error() {
