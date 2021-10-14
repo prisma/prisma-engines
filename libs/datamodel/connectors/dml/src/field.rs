@@ -101,6 +101,7 @@ impl FieldType {
 pub enum Field {
     ScalarField(ScalarField),
     RelationField(RelationField),
+    CompositeField(CompositeField),
 }
 
 impl Field {
@@ -144,6 +145,7 @@ impl Field {
         match self {
             Field::ScalarField(sf) => sf.documentation.as_deref(),
             Field::RelationField(rf) => rf.documentation.as_deref(),
+            Field::CompositeField(cf) => cf.documentation.as_deref(),
         }
     }
 
@@ -151,6 +153,7 @@ impl Field {
         match self {
             Field::ScalarField(sf) => sf.documentation = documentation,
             Field::RelationField(rf) => rf.documentation = documentation,
+            Field::CompositeField(cf) => cf.documentation = documentation,
         }
     }
 
@@ -158,6 +161,7 @@ impl Field {
         match self {
             Field::ScalarField(sf) => sf.is_commented_out,
             Field::RelationField(rf) => rf.is_commented_out,
+            Field::CompositeField(cf) => cf.is_commented_out,
         }
     }
 
@@ -216,6 +220,7 @@ impl WithDatabaseName for Field {
     fn database_name(&self) -> Option<&str> {
         match self {
             Field::ScalarField(sf) => sf.database_name.as_deref(),
+            Field::CompositeField(cf) => cf.database_name.as_deref(),
             Field::RelationField(_) => None,
         }
     }
@@ -224,6 +229,24 @@ impl WithDatabaseName for Field {
         match self {
             Field::ScalarField(sf) => sf.set_database_name(database_name),
             Field::RelationField(_) => (),
+        }
+    }
+}
+
+impl Ignorable for Field {
+    fn is_ignored(&self) -> bool {
+        match self {
+            Field::RelationField(rf) => rf.is_ignored,
+            Field::ScalarField(sf) => sf.is_ignored,
+            Field::CompositeField(cf) => cf.is_ignored,
+        }
+    }
+
+    fn ignore(&mut self) {
+        match self {
+            Field::RelationField(rf) => rf.is_ignored = true,
+            Field::ScalarField(sf) => sf.is_ignored = true,
+            Field::CompositeField(sf) => cf.is_ignored = true,
         }
     }
 }
@@ -506,18 +529,27 @@ impl WithDatabaseName for ScalarField {
     }
 }
 
-impl Ignorable for Field {
-    fn is_ignored(&self) -> bool {
-        match self {
-            Field::RelationField(rf) => rf.is_ignored,
-            Field::ScalarField(sf) => sf.is_ignored,
-        }
-    }
+/// Represents a composite field.
+#[derive(Debug, PartialEq, Clone)]
+pub struct CompositeField {
+    /// Name of the field.
+    pub name: String,
 
-    fn ignore(&mut self) {
-        match self {
-            Field::RelationField(rf) => rf.is_ignored = true,
-            Field::ScalarField(sf) => sf.is_ignored = true,
-        }
-    }
+    /// The database internal name.
+    pub database_name: Option<String>,
+
+    /// The name of the composite type that backs this field.
+    pub composite_type: String,
+
+    /// The field's arity.
+    pub arity: FieldArity,
+
+    /// Comments associated with this field.
+    pub documentation: Option<String>,
+
+    /// Indicates if this field has to be commented out.
+    pub is_commented_out: bool,
+
+    /// Indicates if this field has to be ignored by the Client.
+    pub is_ignored: bool,
 }
