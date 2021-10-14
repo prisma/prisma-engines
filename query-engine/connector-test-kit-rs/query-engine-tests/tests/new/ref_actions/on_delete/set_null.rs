@@ -110,7 +110,7 @@ mod one2many_req {
     }
 
     /// Deleting the parent must fail if a child is connected (because of null key violation).
-    #[connector_test(exclude(Cockroach))]
+    #[connector_test]
     async fn delete_parent_failure(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, children: { create: { id: 1 }}}) { id }}"#),
