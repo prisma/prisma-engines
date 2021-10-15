@@ -373,7 +373,7 @@ impl<'a> Renderer<'a> {
     fn render_value(target: &mut dyn LineWriteable, val: &ast::Expression) {
         match val {
             ast::Expression::ExpressionArray(vals, _) => Self::render_expression_array(target, vals),
-            ast::Expression::ConstantValueWithArgs(ident, vals, _) => {
+            ast::Expression::FieldWithArgs(ident, vals, _) => {
                 Self::render_constant_value_with_args(target, ident, vals)
             }
             ast::Expression::BooleanValue(val, _) => target.write(val),

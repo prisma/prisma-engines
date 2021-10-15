@@ -21,7 +21,7 @@ pub enum Expression {
     /// An array of other values.
     ExpressionArray(Vec<Expression>, Span),
     /// A contained list of arguments.
-    ConstantValueWithArgs(String, Vec<Argument>, Span),
+    FieldWithArgs(String, Vec<Argument>, Span),
 }
 
 impl fmt::Display for Expression {
@@ -37,7 +37,7 @@ impl fmt::Display for Expression {
             Expression::ExpressionArray(vals, _) => {
                 write!(f, "[{}]", vals.iter().map(|arg| format!("{}", arg)).join(","))
             }
-            Expression::ConstantValueWithArgs(ident, vals, _) => {
+            Expression::FieldWithArgs(ident, vals, _) => {
                 write!(f, "{}({})", ident, vals.iter().map(|arg| format!("{}", arg)).join(","))
             }
         }
@@ -86,7 +86,7 @@ impl Expression {
             Self::ConstantValue(_, span) => *span,
             Self::Function(_, _, span) => *span,
             Self::ExpressionArray(_, span) => *span,
-            Self::ConstantValueWithArgs(_, _, span) => *span,
+            Self::FieldWithArgs(_, _, span) => *span,
         }
     }
 
@@ -105,8 +105,8 @@ impl Expression {
             Expression::StringValue(_, _) => "string",
             Expression::ConstantValue(_, _) => "literal",
             Expression::Function(_, _, _) => "functional",
-            Expression::ExpressionArray(_, _) => "expression array",
-            Expression::ConstantValueWithArgs(_, _, _) => "constant with args",
+            Expression::ExpressionArray(_, _) => "array",
+            Expression::FieldWithArgs(_, _, _) => "field with args",
         }
     }
 }

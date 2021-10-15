@@ -169,6 +169,27 @@ impl<'a> ValueValidator<'a> {
         }
     }
 
+    /// Unwraps the value as an array of constants.
+    pub fn as_field_array_with_args(&self) -> Result<Vec<(&'a str, Option<&str>, Option<u32>)>, DatamodelError> {
+        if let ast::Expression::ExpressionArray(values, _) = &self.value {
+            values
+                .iter()
+                .map(|val| ValueValidator::new(val).naming_is_hard())
+                .collect()
+        } else {
+            // Single values are accepted as array literals, for example in `@relation(fields: userId)`.
+            Ok(vec![self.naming_is_hard()?])
+        }
+    }
+
+    pub fn naming_is_hard(&self) -> Result<(&'a str, Option<&'a str>, Option<u32>), DatamodelError> {
+        match &self.value {
+            Expression::ConstantValue(field_name, _) => Ok((field_name, None, None)),
+            Expression::FieldWithArgs(field_name, args, _) => Ok((field_name, None, None)),
+            _ => Err(self.construct_type_mismatch_error("constant literal")),
+        }
+    }
+
     /// Unwraps the wrapped value as a constant literal.
     pub fn as_constant_literal(&self) -> Result<&'a str, DatamodelError> {
         match &self.value {

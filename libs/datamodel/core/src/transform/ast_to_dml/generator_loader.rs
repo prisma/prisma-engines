@@ -122,7 +122,7 @@ impl GeneratorLoader {
                 ast::Expression::ConstantValue(val, _) => val.clone(),
                 ast::Expression::Function(_, _, _) => String::from("(function)"),
                 ast::Expression::ExpressionArray(_, _) => String::from("(array)"),
-                ast::Expression::ConstantValueWithArgs(_, _, _) => String::from("(array)"),
+                ast::Expression::FieldWithArgs(_, _, _) => String::from("(array)"),
             };
 
             properties.insert(prop.name.name.clone(), value);

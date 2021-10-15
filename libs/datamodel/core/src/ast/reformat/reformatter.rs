@@ -743,9 +743,7 @@ impl<'a> Reformatter<'a> {
     fn render_value(target: &mut StringBuilder, val: &ast::Expression) {
         match val {
             ast::Expression::ExpressionArray(vals, _) => Self::render_expression_array(target, vals),
-            ast::Expression::ConstantValueWithArgs(ident, vals, _) => {
-                Self::render_constant_value_w_args(target, ident, vals)
-            }
+            ast::Expression::FieldWithArgs(ident, vals, _) => Self::render_constant_value_w_args(target, ident, vals),
             ast::Expression::BooleanValue(val, _) => target.write(val),
             ast::Expression::ConstantValue(val, _) => target.write(val),
             ast::Expression::NumericValue(val, _) => target.write(val),

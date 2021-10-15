@@ -203,27 +203,34 @@ fn index_accepts_three_different_notations() {
 
 #[test]
 fn index_accepts_sort_order() {
-    println!("test");
     let dml = with_postgres_provider(
         r#"
     model User {
-        id        Int    @id
-        firstName String
-        lastName  String
+        id         Int    @id
+        firstName  String @unique(sort:Desc, length: 5)
+        middleName String @unique(sort:Desc)
+        lastName   String @unique(length: 5)
+        generation Int    @unique
         
-        @@index([firstName(sort: Desc), lastName(sort: Desc, length: 5)])
+        @@index([firstName(sort: Desc), middleName(length: 5), lastName(sort: Desc, length: 5), generation])
+        @@unique([firstName(sort: Desc), middleName(length: 5), lastName(sort: Desc, length: 5), generation])
     }
     "#,
     );
 
     let schema = parse(&dml);
-    // let user_model = schema.assert_has_model("User");
-    //
-    // user_model.assert_has_index(IndexDefinition {
-    //     name: None,
-    //     db_name: Some("User_firstName_idx".to_string()),
-    //     fields: vec!["firstName".to_string()],
-    //     tpe: IndexType::Normal,
-    //     defined_on_field: false,
-    // });
+    let user_model = schema.assert_has_model("User");
+
+    user_model.assert_has_index(IndexDefinition {
+        name: None,
+        db_name: Some("User_firstName_middleName_lastName_generation_idx".to_string()),
+        fields: vec![
+            "firstName".to_string(),
+            "middleName".to_string(),
+            "lastName".to_string(),
+            "generation".to_string(),
+        ],
+        tpe: IndexType::Normal,
+        defined_on_field: false,
+    });
 }

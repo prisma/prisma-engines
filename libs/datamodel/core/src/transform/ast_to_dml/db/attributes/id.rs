@@ -1,4 +1,6 @@
-use super::{resolve_field_array, FieldResolutionError};
+use super::FieldResolutionError;
+use crate::transform::ast_to_dml::db::attributes::resolve_field_array_with_args;
+use crate::transform::ast_to_dml::db::types::IndexFieldOptions;
 use crate::{
     ast,
     common::constraint_names::ConstraintNames,
@@ -29,7 +31,7 @@ pub(super) fn model<'ast>(
         ));
     }
 
-    let resolved_fields = match resolve_field_array(&fields, args.span(), model_id, ctx) {
+    let resolved_fields = match resolve_field_array_with_args(&fields, args.span(), model_id, ctx) {
         Ok(fields) => fields,
         Err(FieldResolutionError::AlreadyDealtWith) => return,
         Err(FieldResolutionError::ProblematicFields {
@@ -59,6 +61,7 @@ pub(super) fn model<'ast>(
 
     // ID attribute fields must reference only required fields.
     let fields_that_are_not_required: Vec<&str> = resolved_fields
+        .0
         .iter()
         .map(|field_id| &ctx.db.ast[model_id][*field_id])
         .filter(|field| !field.arity.is_required())
@@ -97,7 +100,8 @@ pub(super) fn model<'ast>(
     model_data.primary_key = Some(IdAttribute {
         name,
         db_name,
-        fields: resolved_fields,
+        fields: resolved_fields.0,
+        field_options: resolved_fields.1,
         source_field: None,
     });
 }
@@ -120,7 +124,8 @@ pub(super) fn field<'ast>(
             model_attributes.primary_key = Some(IdAttribute {
                 name: None,
                 db_name,
-                fields: vec![field_id],
+                fields: vec![(field_id)],
+                field_options: vec![(field_id, IndexFieldOptions::default())],
                 source_field: Some(field_id),
             })
         }

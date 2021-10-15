@@ -274,3 +274,36 @@ fn named_and_mapped_multi_field_ids_must_work() {
     user_model.assert_has_id_fields(&["a", "b"]);
     user_model.assert_has_named_pk("dbname");
 }
+
+#[test]
+fn id_accepts_length_arg_on_mysql() {
+    let dml = with_postgres_provider(
+        r#"
+    model User {
+        firstName  String
+        middleName String
+        lastName   String
+        
+        @@id([firstName, middleName(length: 1), lastName])
+    }
+    
+    model Blog {
+        title  String @id(length:5)
+    }
+    "#,
+    );
+
+    let schema = parse(&dml);
+    let user_model = schema.assert_has_model("User");
+
+    user_model.assert_has_pk(PrimaryKeyDefinition {
+        name: None,
+        db_name: Some("User_pkey".to_string()),
+        fields: vec![
+            "firstName".to_string(),
+            "middleName".to_string(),
+            "lastName".to_string(),
+        ],
+        defined_on_field: false,
+    });
+}

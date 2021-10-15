@@ -37,7 +37,7 @@ fn parse_constant_literal_with_args(token: &Token<'_>) -> Expression {
     }
 
     match name {
-        Some(name) => Expression::ConstantValueWithArgs(name, arguments, Span::from_pest(token.as_span())),
+        Some(name) => Expression::FieldWithArgs(name, arguments, Span::from_pest(token.as_span())),
         _ => unreachable!(
             "Encountered impossible constant literal during parsing: {:?}",
             token.as_str()
