@@ -38,7 +38,7 @@ fn fail_if_naming_relation_fields_the_same_as_the_explicit_names() {
           adminId            Int      @map("admin_id")
           admin              User     @relation(fields: [adminId], references: [id])
           members            User[]   @relation("ClubToUser")
-          
+
           @@map("clubs")
         }
 
@@ -46,7 +46,7 @@ fn fail_if_naming_relation_fields_the_same_as_the_explicit_names() {
           id                 Int       @id @default(autoincrement())
           clubs_clubsTousers Club[]    @relation("ClubToUser")
           ownedClubs         Club[]
-          
+
           @@map("users")
         }
     "#};
@@ -907,7 +907,7 @@ fn a_typoed_relation_should_fail_gracefully() {
         model TestParent {
           id    Int    @id
           tests Test[]
-          
+
           fk   Int
           self TestParent @relation(fields: [fk], references: [id])
         }
@@ -923,7 +923,7 @@ fn a_typoed_relation_should_fail_gracefully() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 //

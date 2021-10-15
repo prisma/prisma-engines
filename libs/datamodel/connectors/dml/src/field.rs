@@ -577,6 +577,12 @@ impl CompositeField {
     }
 }
 
+impl Default for CompositeField {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl WithName for CompositeField {
     fn name(&self) -> &String {
         &self.name
