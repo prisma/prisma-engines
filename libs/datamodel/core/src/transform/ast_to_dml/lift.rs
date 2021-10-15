@@ -103,7 +103,19 @@ impl<'a> LiftAstToDml<'a> {
             let attributes = scalar_field.attributes();
             let ast_field = &ast_model[field_id];
             let arity = self.lift_field_arity(&ast_field.arity);
-            let field_type = self.lift_scalar_field_type(ast_field, &attributes.r#type, attributes);
+            let field_type = match &attributes.r#type {
+                db::ScalarFieldType::CompositeType(ctid) => {
+                    let mut field = dml::CompositeField::new();
+                    field.composite_type = self.db.ast()[*ctid].name.name.to_owned();
+                    field.documentation = ast_field.documentation.clone().map(|comment| comment.text);
+                    field.is_ignored = attributes.is_ignored;
+                    field.database_name = attributes.mapped_name.map(String::from);
+
+                    model.add_field(dml::Field::CompositeField(field));
+                    continue;
+                }
+                _ => self.lift_scalar_field_type(ast_field, &attributes.r#type, attributes),
+            };
 
             let mut field = dml::ScalarField::new(&ast_field.name.name, arity, field_type);
 
@@ -206,8 +218,8 @@ impl<'a> LiftAstToDml<'a> {
         scalar_field_data: &db::ScalarField<'_>,
     ) -> dml::FieldType {
         match scalar_field_type {
-            db::ScalarFieldType::CompositeType(ctid) => {
-                dml::FieldType::CompositeType(self.db.ast()[*ctid].name.name.to_owned())
+            db::ScalarFieldType::CompositeType(_) => {
+                unreachable!();
             }
             db::ScalarFieldType::Enum(enum_id) => {
                 let enum_name = &self.db.ast()[*enum_id].name.name;

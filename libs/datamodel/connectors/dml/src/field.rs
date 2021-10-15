@@ -563,6 +563,20 @@ pub struct CompositeField {
     pub is_ignored: bool,
 }
 
+impl CompositeField {
+    pub fn new() -> Self {
+        CompositeField {
+            name: String::new(),
+            database_name: None,
+            composite_type: String::new(),
+            arity: FieldArity::Optional,
+            documentation: None,
+            is_commented_out: false,
+            is_ignored: false,
+        }
+    }
+}
+
 impl WithName for CompositeField {
     fn name(&self) -> &String {
         &self.name
