@@ -11,7 +11,7 @@ pub(crate) struct UniqueCriteriaWalker<'ast, 'db> {
 }
 
 impl<'ast, 'db> UniqueCriteriaWalker<'ast, 'db> {
-    pub(crate) fn fields(&'db self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db {
+    pub(crate) fn fields(self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db {
         self.fields.iter().map(move |field_id| ScalarFieldWalker {
             model_id: self.model_id,
             field_id: *field_id,
@@ -20,15 +20,15 @@ impl<'ast, 'db> UniqueCriteriaWalker<'ast, 'db> {
         })
     }
 
-    pub(crate) fn is_strict_criteria(&self) -> bool {
+    pub(crate) fn is_strict_criteria(self) -> bool {
         !self.has_optional_fields() && !self.has_unsupported_fields()
     }
 
-    pub(crate) fn has_optional_fields(&self) -> bool {
+    pub(crate) fn has_optional_fields(self) -> bool {
         self.fields().any(|field| field.is_optional())
     }
 
-    pub(crate) fn has_unsupported_fields(&self) -> bool {
+    pub(crate) fn has_unsupported_fields(self) -> bool {
         self.fields().any(|field| field.is_unsupported())
     }
 }

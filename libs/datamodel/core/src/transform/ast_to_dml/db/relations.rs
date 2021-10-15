@@ -73,8 +73,9 @@ impl<'ast> Relations<'ast> {
         })
     }
 
+    #[track_caller]
     pub(crate) fn relation_for_relation_field(&self, model_id: ast::ModelId, field_id: ast::FieldId) -> usize {
-        self.relation_for_relation_field[&(model_id, field_id)]
+        self.relation_for_relation_field[(&(model_id, field_id))]
     }
 
     /// Iterator over (model_b_id, relation)
@@ -158,6 +159,10 @@ impl RelationType {
     pub(crate) fn is_one_to_one(self) -> bool {
         matches!(self, Self::OneToOne)
     }
+
+    pub(crate) fn is_many_to_many(self) -> bool {
+        matches!(self, Self::ImplicitManyToMany)
+    }
 }
 
 #[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
@@ -170,10 +175,6 @@ pub(crate) struct Relation<'ast> {
 }
 
 impl<'ast> Relation<'ast> {
-    pub(crate) fn is_many_to_many(&self) -> bool {
-        matches!(self.attributes, RelationAttributes::ImplicitManyToMany { .. })
-    }
-
     pub(crate) fn as_complete_fields(&self) -> Option<(ast::FieldId, ast::FieldId)> {
         match &self.attributes {
             RelationAttributes::ImplicitManyToMany { field_a, field_b } => Some((*field_a, *field_b)),

@@ -41,7 +41,7 @@ impl<'ast> ParserDatabase<'ast> {
     pub(crate) fn walk_explicit_relations(&self) -> impl Iterator<Item = ExplicitRelationWalker<'ast, '_>> + '_ {
         self.relations
             .iter_relations()
-            .filter(|(_, _, relation)| !relation.is_many_to_many())
+            .filter(|(_, _, relation)| !relation.r#type().is_many_to_many())
             .filter_map(move |(model_a, model_b, relation)| {
                 relation
                     .as_complete_fields()

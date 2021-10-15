@@ -138,22 +138,15 @@ impl<'a> LiftAstToDml<'a> {
             field.relation_info.on_update = attributes.on_update;
             field.is_ignored = attributes.is_ignored;
 
-            field.relation_info.references = attributes
-                .references
-                .as_ref()
-                .map(|references| references.iter().map(|s| target_model[*s].name().to_owned()).collect())
-                .unwrap_or_default();
+            field.relation_info.references = relation_field
+                .references()
+                .map(|f| target_model[f.field_id()].name().to_string())
+                .collect();
 
-            field.relation_info.fields = attributes
-                .fields
-                .as_ref()
-                .map(|fields| {
-                    fields
-                        .iter()
-                        .map(|id| self.db.ast()[model_id][*id].name.name.clone())
-                        .collect()
-                })
-                .unwrap_or_default();
+            field.relation_info.fields = relation_field
+                .fields()
+                .map(|f| self.db.ast()[model_id][f.field_id()].name.name.to_string())
+                .collect();
 
             field.relation_info.fk_name = relation_field.final_foreign_key_name().map(|cow| cow.into_owned());
 

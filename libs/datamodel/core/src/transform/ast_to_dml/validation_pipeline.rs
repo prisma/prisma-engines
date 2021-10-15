@@ -1,8 +1,7 @@
 mod validations;
 
 use super::{
-    db::ParserDatabase, lift::LiftAstToDml, standardise_formatting::StandardiserForFormatting, standardise_parsing,
-    validate::Validator,
+    db::ParserDatabase, lift::LiftAstToDml, standardise_formatting::StandardiserForFormatting, validate::Validator,
 };
 use crate::{
     ast, common::preview_features::PreviewFeature, configuration, diagnostics::Diagnostics, ValidatedDatamodel,
@@ -73,11 +72,6 @@ impl<'a, 'b> ValidationPipeline<'a> {
         // Early return so that the standardiser does not have to deal with invalid schemas
         diagnostics.to_result()?;
 
-        // Phase 6: Consistency fixes. These don't fail and always run, during
-        // parsing AND formatting. (deprecated, move stuff out from here if you
-        // can)
-        standardise_parsing::standardise(&mut schema);
-
         // Transform phase: These only run during formatting. (double
         // deprecated, please do not add anything here)
         if relation_transformation_enabled {
@@ -88,7 +82,7 @@ impl<'a, 'b> ValidationPipeline<'a> {
             }
         }
 
-        // Phase 7: Post Standardisation Validation (deprecated, move stuff out from here if you can)
+        // Phase 6: Post Standardisation Validation (deprecated, move stuff out from here if you can)
         self.validator
             .post_standardisation_validate(ast_schema, &schema, &mut diagnostics);
 

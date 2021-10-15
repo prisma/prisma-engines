@@ -31,7 +31,7 @@ impl<'ast, 'db> RelationWalker<'ast, 'db> {
     }
 
     pub(crate) fn is_many_to_many(&self) -> bool {
-        self.get().is_many_to_many()
+        self.get().r#type().is_many_to_many()
     }
 }
 
