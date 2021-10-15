@@ -76,6 +76,7 @@ impl<'a> DatamodelConverter<'a> {
             .fields()
             .filter(|field| !field.is_ignored())
             .filter_map(|field| match field {
+                dml::Field::CompositeField(_cf) => todo!(),
                 dml::Field::RelationField(rf) => {
                     let relation = self
                         .relations
@@ -387,6 +388,7 @@ impl ModelConverterUtilities for dml::Model {
             let is_supported = match field {
                 dml::Field::ScalarField(sf) => sf.type_identifier() != TypeIdentifier::Unsupported,
                 dml::Field::RelationField(_) => true,
+                dml::Field::CompositeField(_) => false,
             };
 
             is_supported && !field.is_ignored()
@@ -423,6 +425,7 @@ impl ModelConverterUtilities for dml::Model {
             let is_supported = match field {
                 dml::Field::ScalarField(sf) => sf.type_identifier() != TypeIdentifier::Unsupported,
                 dml::Field::RelationField(_) => true,
+                dml::Field::CompositeField(_) => false,
             };
 
             is_supported && !field.is_ignored()
