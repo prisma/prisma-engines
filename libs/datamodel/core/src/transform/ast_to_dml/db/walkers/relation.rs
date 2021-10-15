@@ -1,6 +1,4 @@
-use datamodel_connector::ConnectorCapability;
-use dml::relation_info::ReferentialAction;
-
+use super::{ModelWalker, RelationFieldWalker, ScalarFieldWalker};
 use crate::{
     ast::{self, FieldArity},
     transform::ast_to_dml::db::{
@@ -8,12 +6,40 @@ use crate::{
         ParserDatabase,
     },
 };
+use datamodel_connector::ConnectorCapability;
+use dml::relation_info::ReferentialAction;
 
-use super::{ModelWalker, RelationFieldWalker, ScalarFieldWalker};
+/// Meant as the public API.
+#[allow(dead_code)]
+pub(crate) struct RelationWalker<'ast, 'db> {
+    pub(super) db: &'db ParserDatabase<'ast>,
+    pub(super) relation_id: usize,
+}
+
+#[allow(dead_code)]
+impl<'ast, 'db> RelationWalker<'ast, 'db> {
+    fn get(&self) -> &'db Relation<'ast> {
+        &self.db.relations.relations_storage[self.relation_id]
+    }
+
+    pub(crate) fn field_a(&self) -> Option<(ast::ModelId, ast::FieldId)> {
+        let relation = self.get();
+        relation
+            .attributes
+            .field_a()
+            .map(|field_id| (relation.model_a, field_id))
+    }
+
+    pub(crate) fn is_many_to_many(&self) -> bool {
+        self.get().is_many_to_many()
+    }
+}
 
 /// Represents a relation that has fields and references defined in one of the
 /// relation fields. Includes 1:1 and 1:n relations that are defined correctly
 /// from both sides.
+///
+/// Meant for validations only.
 #[derive(Copy, Clone)]
 pub(crate) struct ExplicitRelationWalker<'ast, 'db> {
     pub(crate) side_a: (ast::ModelId, ast::FieldId),

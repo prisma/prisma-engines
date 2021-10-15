@@ -2,7 +2,7 @@ use crate::{
     ast,
     transform::ast_to_dml::db::{context::Context, types::RelationField},
 };
-use std::collections::BTreeSet;
+use std::collections::{BTreeSet, HashMap};
 
 /// Detect relation types and construct relation objects to the database.
 pub(super) fn infer_relations(ctx: &mut Context<'_>) {
@@ -35,7 +35,7 @@ pub(super) fn infer_relations(ctx: &mut Context<'_>) {
 #[derive(Debug, Default)]
 pub(crate) struct Relations<'ast> {
     /// Storage. Private. Do not use directly.
-    relations_storage: Vec<Relation<'ast>>,
+    pub(super) relations_storage: Vec<Relation<'ast>>,
 
     // Indexes for efficient querying.
     //
@@ -58,6 +58,9 @@ pub(crate) struct Relations<'ast> {
     ///
     /// This can be interpreted as the relations _to_ a model.
     back: BTreeSet<(ast::ModelId, ast::ModelId, usize)>,
+
+    /// Mapping of relation fields to relations.
+    relation_for_relation_field: HashMap<(ast::ModelId, ast::FieldId), usize>,
 }
 
 impl<'ast> Relations<'ast> {
@@ -68,6 +71,10 @@ impl<'ast> Relations<'ast> {
         self.forward.iter().map(move |(model_a_id, model_b_id, relation_idx)| {
             (*model_a_id, *model_b_id, &self.relations_storage[*relation_idx])
         })
+    }
+
+    pub(crate) fn relation_for_relation_field(&self, model_id: ast::ModelId, field_id: ast::FieldId) -> usize {
+        self.relation_for_relation_field[&(model_id, field_id)]
     }
 
     /// Iterator over (model_b_id, relation)
@@ -115,6 +122,31 @@ pub(super) enum RelationAttributes {
     OneToMany(OneToManyRelationFields),
 }
 
+impl RelationAttributes {
+    pub(super) fn field_a(&self) -> Option<ast::FieldId> {
+        use RelationAttributes::*;
+        match self {
+            ImplicitManyToMany { field_a, field_b: _ }
+            | OneToOne(OneToOneRelationFields::Both(field_a, _))
+            | OneToOne(OneToOneRelationFields::Forward(field_a))
+            | OneToMany(OneToManyRelationFields::Forward(field_a))
+            | OneToMany(OneToManyRelationFields::Both(field_a, _)) => Some(*field_a),
+            _ => None,
+        }
+    }
+
+    fn field_b(&self) -> Option<ast::FieldId> {
+        use RelationAttributes::*;
+        match self {
+            ImplicitManyToMany { field_a: _, field_b }
+            | OneToOne(OneToOneRelationFields::Both(_, field_b))
+            | OneToMany(OneToManyRelationFields::Back(field_b))
+            | OneToMany(OneToManyRelationFields::Both(_, field_b)) => Some(*field_b),
+            _ => None,
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum RelationType {
     ImplicitManyToMany,
@@ -132,7 +164,9 @@ impl RelationType {
 pub(crate) struct Relation<'ast> {
     /// The `name` argument in `@relation`.
     relation_name: Option<&'ast str>,
-    attributes: RelationAttributes,
+    pub(super) attributes: RelationAttributes,
+    pub(super) model_a: ast::ModelId,
+    pub(super) model_b: ast::ModelId,
 }
 
 impl<'ast> Relation<'ast> {
@@ -282,12 +316,28 @@ pub(super) fn ingest_relation<'ast, 'db>(
         }
     };
 
+    let relation_idx = relations.relations_storage.len();
+
+    let mut add = |model_id, field_id| {
+        relations
+            .relation_for_relation_field
+            .insert((model_id, field_id), relation_idx);
+    };
+
+    if let Some(field_a) = relation_type.field_a() {
+        add(evidence.model_id, field_a);
+    }
+
+    if let Some(field_b) = relation_type.field_b() {
+        add(evidence.relation_field.referenced_model, field_b);
+    }
+
     let relation = Relation {
         attributes: relation_type,
         relation_name: evidence.relation_field.name,
+        model_a: evidence.model_id,
+        model_b: evidence.relation_field.referenced_model,
     };
-
-    let relation_idx = relations.relations_storage.len();
 
     relations.relations_storage.push(relation);
 

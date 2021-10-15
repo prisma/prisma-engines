@@ -1,16 +1,14 @@
-use std::{
-    borrow::Cow,
-    fmt,
-    hash::{Hash, Hasher},
-};
-
+use super::{ModelWalker, RelationWalker, ScalarFieldWalker};
 use crate::{
     ast::{self, FieldArity},
     common::constraint_names::ConstraintNames,
     transform::ast_to_dml::db::{types::RelationField, ParserDatabase},
 };
-
-use super::{ModelWalker, ScalarFieldWalker};
+use std::{
+    borrow::Cow,
+    fmt,
+    hash::{Hash, Hasher},
+};
 
 #[derive(Copy, Clone)]
 pub(crate) struct RelationFieldWalker<'ast, 'db> {
@@ -110,6 +108,34 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
         } else {
             self.ast_field().arity
         }
+    }
+
+    #[allow(dead_code)]
+    pub(crate) fn relation(&self) -> super::RelationWalker<'ast, 'db> {
+        let relation_id = self
+            .db
+            .relations
+            .relation_for_relation_field(self.model_id, self.field_id);
+
+        RelationWalker {
+            db: self.db,
+            relation_id,
+        }
+    }
+
+    #[allow(dead_code)]
+    pub(crate) fn is_part_of_many_to_many(&self) -> bool {
+        self.relation().is_many_to_many()
+    }
+
+    #[allow(dead_code)]
+    pub(crate) fn is_forward(&self) -> bool {
+        self.relation().field_a() == Some((self.model_id, self.field_id))
+    }
+
+    #[allow(dead_code)]
+    pub(crate) fn is_backward(&self) -> bool {
+        !self.is_forward()
     }
 
     fn fields(&self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, '_>> + '_ {
