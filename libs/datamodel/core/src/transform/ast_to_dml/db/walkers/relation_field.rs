@@ -138,7 +138,7 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
         !self.is_forward()
     }
 
-    fn fields(&self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, '_>> + '_ {
+    pub(crate) fn fields(&self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, '_>> + '_ {
         let f = move |field_id: &ast::FieldId| {
             let model_id = self.model_id;
 
@@ -151,8 +151,38 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
         };
 
         match self.attributes().fields.as_ref() {
-            Some(references) => references.iter().map(f),
+            Some(fields) => fields.iter().map(f),
             None => [].iter().map(f),
+        }
+    }
+
+    pub(crate) fn references(&'db self) -> Box<dyn ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db> {
+        let f = move |field_id: &ast::FieldId| {
+            let model_id = self.model_id;
+
+            ScalarFieldWalker {
+                model_id,
+                field_id: *field_id,
+                db: self.db,
+                scalar_field: &self.db.types.scalar_fields[&(model_id, *field_id)],
+            }
+        };
+
+        match self.attributes().references.as_ref() {
+            Some(references) => Box::new(references.iter().map(f)),
+            None if self.relation().is_many_to_many() => {
+                match self
+                    .related_model()
+                    .unique_criterias()
+                    .filter(|c| c.is_strict_criteria())
+                    .next()
+                    .as_ref()
+                {
+                    Some(criteria) => Box::new(criteria.fields()),
+                    None => Box::new([].iter().map(f)),
+                }
+            }
+            None => Box::new([].iter().map(f)),
         }
     }
 }

@@ -19,4 +19,16 @@ impl<'ast, 'db> UniqueCriteriaWalker<'ast, 'db> {
             scalar_field: &self.db.types.scalar_fields[&(self.model_id, *field_id)],
         })
     }
+
+    pub(crate) fn is_strict_criteria(&self) -> bool {
+        !self.has_optional_fields() && !self.has_unsupported_fields()
+    }
+
+    pub(crate) fn has_optional_fields(&self) -> bool {
+        self.fields().any(|field| field.is_optional())
+    }
+
+    pub(crate) fn has_unsupported_fields(&self) -> bool {
+        self.fields().any(|field| field.is_unsupported())
+    }
 }

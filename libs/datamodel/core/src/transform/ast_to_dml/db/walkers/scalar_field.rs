@@ -1,5 +1,5 @@
 use crate::{
-    ast,
+    ast::{self, FieldType},
     transform::ast_to_dml::db::{ParserDatabase, ScalarField},
 };
 
@@ -41,6 +41,10 @@ impl<'ast, 'db> ScalarFieldWalker<'ast, 'db> {
 
     pub(crate) fn is_optional(&self) -> bool {
         self.ast_field().arity.is_optional()
+    }
+
+    pub(crate) fn is_unsupported(&self) -> bool {
+        matches!(self.ast_field().field_type, FieldType::Unsupported(_, _))
     }
 
     #[allow(dead_code)] // we'll need this
