@@ -34,27 +34,27 @@ impl<'ast, 'db> Hash for ModelWalker<'ast, 'db> {
 
 impl<'ast, 'db> ModelWalker<'ast, 'db> {
     /// The name of the model.
-    pub(crate) fn name(&self) -> &'ast str {
+    pub(crate) fn name(self) -> &'ast str {
         self.ast_model().name()
     }
 
     /// The ID of the model in the db
-    pub(crate) fn model_id(&self) -> ast::ModelId {
+    pub(crate) fn model_id(self) -> ast::ModelId {
         self.model_id
     }
 
     /// The AST representation.
-    pub(crate) fn ast_model(&self) -> &'ast ast::Model {
+    pub(crate) fn ast_model(self) -> &'ast ast::Model {
         &self.db.ast[self.model_id]
     }
 
     /// The parsed attributes.
-    pub(crate) fn attributes(&self) -> &'db ModelAttributes<'ast> {
+    pub(crate) fn attributes(self) -> &'db ModelAttributes<'ast> {
         self.model_attributes
     }
 
     /// True if given fields are unique in the model.
-    pub(crate) fn fields_are_unique(&self, fields: &[ast::FieldId]) -> bool {
+    pub(crate) fn fields_are_unique(self, fields: &[ast::FieldId]) -> bool {
         self.model_attributes
             .ast_indexes
             .iter()
@@ -63,7 +63,7 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
 
     /// The name of the database table the model points to.
     #[allow(clippy::unnecessary_lazy_evaluations)] // respectfully disagree
-    pub(crate) fn final_database_name(&self) -> &'ast str {
+    pub(crate) fn final_database_name(self) -> &'ast str {
         self.model_attributes
             .mapped_name
             .unwrap_or_else(|| &self.db.ast[self.model_id].name.name)
@@ -79,7 +79,7 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
     }
 
     /// The primary key of the model, if defined.
-    pub(crate) fn primary_key(&self) -> Option<PrimaryKeyWalker<'ast, 'db>> {
+    pub(crate) fn primary_key(self) -> Option<PrimaryKeyWalker<'ast, 'db>> {
         self.model_attributes.primary_key.as_ref().map(|pk| PrimaryKeyWalker {
             model_id: self.model_id,
             attribute: pk,
@@ -88,7 +88,7 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
     }
 
     /// Iterate all the scalar fields in a given model in the order they were defined.
-    pub(crate) fn scalar_fields(&self) -> impl Iterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db {
+    pub(crate) fn scalar_fields(self) -> impl Iterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db {
         let db = self.db;
         db.types
             .scalar_fields
@@ -103,7 +103,7 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
 
     /// All unique criterias of the model; consisting of the primary key and
     /// unique indexes, if set.
-    pub(crate) fn unique_criterias(&'db self) -> impl Iterator<Item = UniqueCriteriaWalker<'ast, 'db>> + 'db {
+    pub(crate) fn unique_criterias(self) -> impl Iterator<Item = UniqueCriteriaWalker<'ast, 'db>> + 'db {
         let model_id = self.model_id;
         let db = self.db;
 
@@ -132,7 +132,7 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
     /// Iterate all the relation fields in the model in the order they were
     /// defined. Note that these are only the fields that were actually written
     /// in the schema.
-    pub(crate) fn explicit_indexes(&self) -> impl Iterator<Item = IndexWalker<'ast, 'db>> + 'db {
+    pub(crate) fn explicit_indexes(self) -> impl Iterator<Item = IndexWalker<'ast, 'db>> + 'db {
         let model_id = self.model_id;
         let db = self.db;
 
@@ -149,7 +149,7 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
 
     /// Iterate all the relation fields in the model in the order they were
     /// defined, followed by the implicit indexes.
-    pub(crate) fn indexes(&self) -> impl Iterator<Item = IndexWalker<'ast, 'db>> + '_ {
+    pub(crate) fn indexes(self) -> impl Iterator<Item = IndexWalker<'ast, 'db>> + 'db {
         let implicit_indexes = self
             .model_attributes
             .implicit_indexes
@@ -165,7 +165,7 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
     }
 
     /// All (concrete) relation fields of the model.
-    pub(crate) fn relation_fields(&self) -> impl Iterator<Item = RelationFieldWalker<'ast, 'db>> + 'db {
+    pub(crate) fn relation_fields(self) -> impl Iterator<Item = RelationFieldWalker<'ast, 'db>> + 'db {
         let model_id = self.model_id;
         let db = self.db;
 
@@ -186,7 +186,7 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
     /// ## Panics
     ///
     /// If the field does not exist.
-    pub(crate) fn relation_field(&self, field_id: ast::FieldId) -> RelationFieldWalker<'ast, 'db> {
+    pub(crate) fn relation_field(self, field_id: ast::FieldId) -> RelationFieldWalker<'ast, 'db> {
         RelationFieldWalker {
             model_id: self.model_id,
             field_id,
@@ -200,8 +200,8 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
     /// - Is either 1:n or 1:1 relation.
     /// - Has both sides defined.
     pub(crate) fn explicit_complete_relations_fwd(
-        &self,
-    ) -> impl Iterator<Item = ExplicitRelationWalker<'ast, 'db>> + '_ {
+        self,
+    ) -> impl Iterator<Item = ExplicitRelationWalker<'ast, 'db>> + 'db {
         self.db
             .relations
             .relations_from_model(self.model_id)

@@ -17,7 +17,7 @@ pub(crate) struct IndexWalker<'ast, 'db> {
 }
 
 impl<'ast, 'db> IndexWalker<'ast, 'db> {
-    pub(crate) fn final_database_name(&self) -> Cow<'ast, str> {
+    pub(crate) fn final_database_name(self) -> Cow<'ast, str> {
         if let Some(mapped_name) = self.index_attribute.db_name.as_ref() {
             return mapped_name.clone(); // :( :( :(
         }
@@ -33,11 +33,11 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
         }
     }
 
-    pub(crate) fn attribute(&self) -> &'db IndexAttribute<'ast> {
+    pub(crate) fn attribute(self) -> &'db IndexAttribute<'ast> {
         self.index_attribute
     }
 
-    pub(crate) fn fields(&self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + '_ {
+    pub(crate) fn fields(self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db {
         self.index_attribute
             .fields
             .iter()
@@ -50,13 +50,13 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
     }
 
     pub(crate) fn contains_exactly_fields(
-        &self,
+        self,
         fields: impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>>,
     ) -> bool {
         self.index_attribute.fields.len() == fields.len() && self.fields().zip(fields).all(|(a, b)| a == b)
     }
 
-    pub(crate) fn is_unique(&self) -> bool {
+    pub(crate) fn is_unique(self) -> bool {
         self.index_attribute.is_unique
     }
 }

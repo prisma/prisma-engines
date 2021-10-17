@@ -11,7 +11,7 @@ pub(crate) struct UniqueCriteriaWalker<'ast, 'db> {
 }
 
 impl<'ast, 'db> UniqueCriteriaWalker<'ast, 'db> {
-    pub(crate) fn fields(&'db self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db {
+    pub(crate) fn fields(self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db {
         self.fields.iter().map(move |field_id| ScalarFieldWalker {
             model_id: self.model_id,
             field_id: *field_id,

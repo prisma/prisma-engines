@@ -24,7 +24,7 @@ pub(crate) struct ExplicitRelationWalker<'ast, 'db> {
 
 impl<'ast, 'db> ExplicitRelationWalker<'ast, 'db> {
     /// The model that defines the relation fields and actions.
-    pub(crate) fn referencing_model(&self) -> ModelWalker<'ast, 'db> {
+    pub(crate) fn referencing_model(self) -> ModelWalker<'ast, 'db> {
         ModelWalker {
             model_id: self.side_a.0,
             db: self.db,
@@ -33,7 +33,7 @@ impl<'ast, 'db> ExplicitRelationWalker<'ast, 'db> {
     }
 
     /// The implicit relation side.
-    pub(crate) fn referenced_model(&self) -> ModelWalker<'ast, 'db> {
+    pub(crate) fn referenced_model(self) -> ModelWalker<'ast, 'db> {
         ModelWalker {
             model_id: self.side_b.0,
             db: self.db,
@@ -41,7 +41,7 @@ impl<'ast, 'db> ExplicitRelationWalker<'ast, 'db> {
         }
     }
 
-    pub(crate) fn referencing_field(&self) -> RelationFieldWalker<'ast, 'db> {
+    pub(crate) fn referencing_field(self) -> RelationFieldWalker<'ast, 'db> {
         RelationFieldWalker {
             model_id: self.side_a.0,
             field_id: self.side_a.1,
@@ -51,7 +51,7 @@ impl<'ast, 'db> ExplicitRelationWalker<'ast, 'db> {
     }
 
     /// The scalar fields defining the relation on the referenced model.
-    pub(crate) fn referenced_fields(&'db self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db {
+    pub(crate) fn referenced_fields(self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db {
         let f = move |field_id: &ast::FieldId| {
             let model_id = self.referenced_model().model_id;
 
@@ -70,7 +70,7 @@ impl<'ast, 'db> ExplicitRelationWalker<'ast, 'db> {
     }
 
     /// The scalar fields on the defining the relation on the referencing model.
-    pub(crate) fn referencing_fields(&'db self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db {
+    pub(crate) fn referencing_fields(self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db {
         let f = move |field_id: &ast::FieldId| {
             let model_id = self.referencing_model().model_id;
 
@@ -89,13 +89,13 @@ impl<'ast, 'db> ExplicitRelationWalker<'ast, 'db> {
     }
 
     /// True if the relation uses more than one scalar field as the key.
-    pub(crate) fn is_compound(&self) -> bool {
+    pub(crate) fn is_compound(self) -> bool {
         self.referencing_fields().len() > 1
     }
 
     /// Gives the onUpdate referential action of the relation. If not defined
     /// explicitly, returns the default value.
-    pub(crate) fn on_update(&self) -> ReferentialAction {
+    pub(crate) fn on_update(self) -> ReferentialAction {
         use ReferentialAction::*;
 
         self.referencing_field().attributes().on_update.unwrap_or_else(|| {
@@ -114,7 +114,7 @@ impl<'ast, 'db> ExplicitRelationWalker<'ast, 'db> {
 
     /// Gives the onDelete referential action of the relation. If not defined
     /// explicitly, returns the default value.
-    pub(crate) fn on_delete(&self) -> ReferentialAction {
+    pub(crate) fn on_delete(self) -> ReferentialAction {
         use ReferentialAction::*;
 
         self.referencing_field().attributes().on_delete.unwrap_or_else(|| {
@@ -132,12 +132,12 @@ impl<'ast, 'db> ExplicitRelationWalker<'ast, 'db> {
     /// underlying scalar fields is required. For the purpose of referential
     /// actions, we count the relation field required if any of the underlying
     /// fields is required.
-    pub(crate) fn referential_arity(&self) -> FieldArity {
+    pub(crate) fn referential_arity(self) -> FieldArity {
         self.referencing_field().referential_arity()
     }
 
     /// 1:1, 1:n or m:n
-    pub(crate) fn relation_type(&self) -> RelationType {
+    pub(crate) fn relation_type(self) -> RelationType {
         self.relation.r#type()
     }
 }
