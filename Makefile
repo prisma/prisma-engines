@@ -133,6 +133,9 @@ start-mongodb4-single:
 start-mongodb5-single:
 	docker-compose -f docker-compose.yml up -d --remove-orphans mongo5-single
 
+start-mongodb4:
+	docker-compose -f docker-compose.yml up -d --remove-orphans mongo4
+
 dev-mongodb4: start-mongodb4
 	echo 'mongodb' > current_connector
 	cp $(CONFIG_PATH)/mongodb4 $(CONFIG_FILE)
