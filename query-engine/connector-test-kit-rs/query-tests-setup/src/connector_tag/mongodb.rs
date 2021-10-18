@@ -84,10 +84,16 @@ impl MongoDbConnectorTag {
 
     /// Returns all versions of this connector.
     pub fn all() -> Vec<Self> {
-        vec![Self {
-            version: Some(MongoDbVersion::V4),
-            capabilities: mongo_capabilities(),
-        }]
+        vec![
+            Self {
+                version: Some(MongoDbVersion::V4),
+                capabilities: mongo_capabilities(),
+            },
+            Self {
+                version: Some(MongoDbVersion::V5),
+                capabilities: mongo_capabilities(),
+            },
+        ]
     }
 }
 
