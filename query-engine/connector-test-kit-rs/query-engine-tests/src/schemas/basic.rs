@@ -176,7 +176,3 @@ pub fn autoinc_id() -> String {
 
     schema.to_owned()
 }
-
-pub fn empty() -> String {
-    "".to_owned()
-}
