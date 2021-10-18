@@ -9,7 +9,8 @@ use super::{
     context::{Arguments, Context},
     types::{EnumAttributes, IndexAttribute, ModelAttributes, RelationField, ScalarField, ScalarFieldType},
 };
-use crate::transform::ast_to_dml::db::types::IndexSort;
+use crate::ast::{FieldId, Model};
+use crate::transform::ast_to_dml::db::types::SortOrder;
 use crate::{
     ast::{self, WithName},
     common::constraint_names::ConstraintNames,
@@ -207,33 +208,71 @@ fn visit_scalar_field_attributes<'ast>(
 
         // @unique
         attributes.visit_optional_single("unique", ctx, |args, ctx| {
-            let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
-                Some(Ok("")) => {
-                    ctx.push_error(args.new_attribute_validation_error("The `map` argument cannot be an empty string."));
-                    None
-                },
-                Some(Ok(name)) => Some(name),
-                Some(Err(err)) => {
-                    ctx.push_error(err); None
-                },
-                None => None,
-            };
-
-            validate_db_name(ast_model, args, db_name, "@unique", ctx);
-
-            // parse sort and length
-
-
-            model_attributes.ast_indexes.push((args.attribute(), IndexAttribute {
-                is_unique: true,
-                fields: vec![(field_id)],
-                fields_options: vec![(field_id, None, None)],
-                source_field: Some(field_id),
-                name: None,
-                db_name: db_name.map(Cow::from),
-            }))
+            visit_field_unique(field_id, ast_model, model_attributes, args, ctx)
         });
     });
+}
+
+fn visit_field_unique<'ast>(
+    field_id: FieldId,
+    ast_model: &'ast Model,
+    model_attributes: &mut ModelAttributes<'ast>,
+    args: &mut Arguments<'ast>,
+    ctx: &mut Context<'ast>,
+) {
+    let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
+        Some(Ok("")) => {
+            ctx.push_error(args.new_attribute_validation_error("The `map` argument cannot be an empty string."));
+            None
+        }
+        Some(Ok(name)) => Some(name),
+        Some(Err(err)) => {
+            ctx.push_error(err);
+            None
+        }
+        None => None,
+    };
+
+    validate_db_name(ast_model, args, db_name, "@unique", ctx);
+
+    //TODO(matthias) check that length is only provided on mysql and only on certain columns???
+    let length = match args.optional_arg("length").map(|length| length.as_int()) {
+        Some(Ok(length)) => Some(length as u32),
+        Some(Err(err)) => {
+            ctx.push_error(err);
+            None
+        }
+        None => None,
+    };
+
+    let sort = match args.optional_arg("sort").map(|sort| sort.as_constant_literal()) {
+        Some(Ok("Desc")) => Some(SortOrder::Desc),
+        Some(Ok("Asc")) => Some(SortOrder::Desc),
+        Some(Ok(other)) => {
+            ctx.push_error(args.new_attribute_validation_error(&format!(
+                "The `sort` argument can only be `Asc` or `Desc` you provided: {}.",
+                other
+            )));
+            None
+        }
+        Some(Err(err)) => {
+            ctx.push_error(err);
+            None
+        }
+        None => None,
+    };
+
+    model_attributes.ast_indexes.push((
+        args.attribute(),
+        IndexAttribute {
+            is_unique: true,
+            fields: vec![(field_id)],
+            field_options: vec![(field_id, sort, length)],
+            source_field: Some(field_id),
+            name: None,
+            db_name: db_name.map(Cow::from),
+        },
+    ))
 }
 
 fn default_value_constraint_name<'ast>(
@@ -875,7 +914,7 @@ fn resolve_field_array_with_args<'ast>(
     attribute_span: ast::Span,
     model_id: ast::ModelId,
     ctx: &mut Context<'ast>,
-) -> Result<(Vec<ast::FieldId>, Vec<(ast::FieldId, Option<IndexSort>, Option<u32>)>), FieldResolutionError<'ast>> {
+) -> Result<(Vec<ast::FieldId>, Vec<(ast::FieldId, Option<SortOrder>, Option<u32>)>), FieldResolutionError<'ast>> {
     let constant_array = match values.as_field_array_with_args() {
         Ok(values) => values,
         Err(err) => {
@@ -931,7 +970,7 @@ fn resolve_field_array_with_args<'ast>(
         let field_ids = constant_array
             .into_iter()
             .zip(field_ids)
-            .map(|((_, sort, length), field_Id)| (field_Id, Some(IndexSort::Asc), length))
+            .map(|((_, sort, length), field_id)| (field_id, Some(SortOrder::Asc), length))
             .collect();
 
         Ok((other_field_ids, field_ids))
