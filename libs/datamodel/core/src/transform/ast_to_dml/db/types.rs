@@ -148,25 +148,10 @@ impl ModelAttributes<'_> {
 pub(crate) struct IndexAttribute<'ast> {
     pub(crate) is_unique: bool,
     pub(crate) fields: Vec<ast::FieldId>,
-    pub(crate) fields_options: Vec<(ast::FieldId, IndexFieldOptions)>,
+    pub(crate) fields_options: Vec<(ast::FieldId, Option<IndexSort>, Option<u32>)>,
     pub(crate) source_field: Option<ast::FieldId>,
     pub(crate) name: Option<&'ast str>,
     pub(crate) db_name: Option<&'ast str>,
-}
-
-#[derive(Debug)]
-pub(crate) struct IndexFieldOptions {
-    pub(crate) sort: IndexSort,
-    pub(crate) length: Option<u32>,
-}
-
-impl Default for IndexFieldOptions {
-    fn default() -> Self {
-        IndexFieldOptions {
-            sort: IndexSort::Asc,
-            length: None,
-        }
-    }
 }
 
 #[derive(Debug)]
@@ -178,7 +163,7 @@ pub(crate) enum IndexSort {
 #[derive(Debug, Default)]
 pub(super) struct IdAttribute<'ast> {
     pub(super) fields: Vec<ast::FieldId>,
-    pub(super) field_options: Vec<(ast::FieldId, IndexFieldOptions)>,
+    pub(super) field_lengths: Vec<(ast::FieldId, Option<u32>)>,
     pub(super) source_field: Option<ast::FieldId>,
     pub(super) name: Option<&'ast str>,
     pub(super) db_name: Option<&'ast str>,

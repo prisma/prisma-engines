@@ -1,6 +1,5 @@
 use super::FieldResolutionError;
 use crate::transform::ast_to_dml::db::attributes::resolve_field_array_with_args;
-use crate::transform::ast_to_dml::db::types::IndexFieldOptions;
 use crate::{
     ast,
     common::constraint_names::ConstraintNames,
@@ -100,11 +99,13 @@ pub(super) fn model<'ast>(
     model_data.primary_key = Some(IdAttribute {
         name,
         db_name,
-        fields: resolved_fields.0,
-        field_options: resolved_fields.1,
+        fields: resolved_fields.0.clone(),
+        field_lengths: resolved_fields.0.iter().map(|x| (*x, None)).collect(),
         source_field: None,
     });
 }
+
+///@id on fields
 pub(super) fn field<'ast>(
     ast_model: &'ast ast::Model,
     field_id: ast::FieldId,
@@ -121,11 +122,20 @@ pub(super) fn field<'ast>(
         None => {
             let db_name = primary_key_constraint_name(ast_model, args, "@id", ctx);
 
+            let length = match args.optional_arg("length").map(|length| length.as_int()) {
+                Some(Ok(length)) => Some(length as u32),
+                Some(Err(err)) => {
+                    ctx.push_error(err);
+                    None
+                }
+                None => None,
+            };
+
             model_attributes.primary_key = Some(IdAttribute {
                 name: None,
                 db_name,
                 fields: vec![(field_id)],
-                field_options: vec![(field_id, IndexFieldOptions::default())],
+                field_lengths: vec![(field_id, length)],
                 source_field: Some(field_id),
             })
         }
