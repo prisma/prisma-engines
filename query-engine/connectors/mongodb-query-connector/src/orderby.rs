@@ -159,10 +159,22 @@ impl OrderByBuilder {
 
         for data in self.order_bys.into_iter() {
             let field = if is_group_by {
-                // Explanation: All group by fields go into the _id key of the result document.
-                // As it is the only point where the flat scalars are contained for the group,
-                // we beed to refer to the object
-                format!("_id.{}", data.scalar_field_name())
+                if let Some(sort_aggr) = data.order_by.sort_aggregation {
+                    let prefix = match sort_aggr {
+                        prisma_models::SortAggregation::Count => "count",
+                        prisma_models::SortAggregation::Avg => "avg",
+                        prisma_models::SortAggregation::Sum => "sum",
+                        prisma_models::SortAggregation::Min => "min",
+                        prisma_models::SortAggregation::Max => "max",
+                    };
+
+                    format!("{}_{}", prefix, data.scalar_field_name())
+                } else {
+                    // Explanation: All group by fields go into the _id key of the result document.
+                    // As it is the only point where the flat scalars are contained for the group,
+                    // we need to refer to the object
+                    format!("_id.{}", data.scalar_field_name())
+                }
             } else {
                 data.full_reference_path(false)
             };
