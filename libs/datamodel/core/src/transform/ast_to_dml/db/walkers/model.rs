@@ -92,6 +92,16 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
         })
     }
 
+    /// Walk a scalar field by id.
+    pub(crate) fn scalar_field(&self, field_id: ast::FieldId) -> ScalarFieldWalker<'ast, 'db> {
+        ScalarFieldWalker {
+            model_id: self.model_id,
+            field_id,
+            db: self.db,
+            scalar_field: &self.db.types.scalar_fields[&(self.model_id, field_id)],
+        }
+    }
+
     /// Iterate all the scalar fields in a given model in the order they were defined.
     pub(crate) fn scalar_fields(self) -> impl Iterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db {
         let db = self.db;

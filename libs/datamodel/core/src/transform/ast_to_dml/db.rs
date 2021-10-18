@@ -11,7 +11,8 @@ mod types;
 
 pub(crate) mod walkers;
 
-pub(crate) use types::{ScalarField, ScalarFieldType};
+// We should strive to make these private and expose that data through walkers.
+pub(crate) use types::{RelationField, ScalarField, ScalarFieldType};
 
 use self::{context::Context, relations::Relations, types::Types};
 use crate::PreviewFeature;

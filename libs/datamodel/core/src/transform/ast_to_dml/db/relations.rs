@@ -35,14 +35,14 @@ pub(super) fn infer_relations(ctx: &mut Context<'_>) {
 #[derive(Debug, Default)]
 pub(crate) struct Relations<'ast> {
     /// Storage. Private. Do not use directly.
-    relations_storage: Vec<Relation<'ast>>,
+    pub(super) relations_storage: Vec<Relation<'ast>>,
 
     // Indexes for efficient querying.
     //
     // Why BTreeSets?
     //
     // - We can't use a BTreeMap because there can be more than one relation
-    //   between two models
+    //   between two models.
     // - We use a BTree because we want range queries. Meaning that with a
     //   BTreeSet, we can efficiently ask:
     //   - Give me all the relations on other models that point to this model
@@ -132,7 +132,9 @@ impl RelationType {
 pub(crate) struct Relation<'ast> {
     /// The `name` argument in `@relation`.
     relation_name: Option<&'ast str>,
-    attributes: RelationAttributes,
+    pub(super) attributes: RelationAttributes,
+    pub(super) model_a: ast::ModelId,
+    pub(super) model_b: ast::ModelId,
 }
 
 impl<'ast> Relation<'ast> {
@@ -282,9 +284,21 @@ pub(super) fn ingest_relation<'ast, 'db>(
         }
     };
 
-    let relation = Relation {
-        attributes: relation_type,
-        relation_name: evidence.relation_field.name,
+    let relation = match relation_type {
+        // Back-only relation fields are special, because we always take the forward side when defining the relation type,
+        // except in this case, because there is no forward side.
+        RelationAttributes::OneToMany(OneToManyRelationFields::Back(_)) => Relation {
+            attributes: relation_type,
+            relation_name: evidence.relation_field.name,
+            model_a: evidence.relation_field.referenced_model,
+            model_b: evidence.model_id,
+        },
+        _ => Relation {
+            attributes: relation_type,
+            relation_name: evidence.relation_field.name,
+            model_a: evidence.model_id,
+            model_b: evidence.relation_field.referenced_model,
+        },
     };
 
     let relation_idx = relations.relations_storage.len();
