@@ -218,28 +218,6 @@ fn nice_error_broken_field_type_legacy_required() {
 }
 
 #[test]
-fn nice_error_legacy_model_decl() {
-    let dml = indoc! {r#"
-        type User {
-          id Int @id
-        }
-    "#};
-
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mModel declarations have to be indicated with the `model` keyword.[0m
-          [1;94m-->[0m  [4mschema.prisma:1[0m
-        [1;94m   | [0m
-        [1;94m   | [0m
-        [1;94m 1 | [0m[1;91mtype[0m User {
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&error)
-}
-
-#[test]
 fn nice_error_in_case_of_literal_type_in_env_var() {
     let source = indoc! {r#"
         datasource ds {

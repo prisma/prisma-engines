@@ -598,11 +598,7 @@ fn postgres_cross_schema_references_are_not_allowed(api: TestApi) {
     api.raw_cmd(&sql);
 
     let err = api.describe_error();
-    let fk_name = if api.is_cockroach() {
-        "fk_city_ref_City"
-    } else {
-        "User_city_fkey"
-    };
+    let fk_name = "User_city_fkey";
 
     assert_eq!(
         format!("Illegal cross schema reference from `prisma-tests.User` to `prisma-tests_2.City` in constraint `{}`. Foreign keys between database schemas are not supported in Prisma. Please follow the GitHub ticket: https://github.com/prisma/prisma/issues/1175", fk_name),

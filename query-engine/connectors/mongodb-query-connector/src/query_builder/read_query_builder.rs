@@ -14,6 +14,7 @@ use mongodb::{
     ClientSession, Collection,
 };
 use prisma_models::{ModelProjection, ModelRef, ScalarFieldRef};
+use std::convert::TryFrom;
 
 /// Ergonomics wrapper for query execution and logging.
 /// Todo: Add all other queries gradually.
@@ -26,7 +27,7 @@ pub enum MongoReadQuery {
 impl MongoReadQuery {
     pub async fn execute(
         self,
-        on_collection: Collection,
+        on_collection: Collection<Document>,
         with_session: &mut ClientSession,
     ) -> crate::Result<Vec<Document>> {
         log_query(on_collection.name(), &self);
@@ -44,7 +45,7 @@ pub struct PipelineQuery {
 impl PipelineQuery {
     pub async fn execute(
         self,
-        on_collection: Collection,
+        on_collection: Collection<Document>,
         with_session: &mut ClientSession,
     ) -> crate::Result<Vec<Document>> {
         let opts = AggregateOptions::builder().allow_disk_use(true).build();
@@ -64,7 +65,7 @@ pub struct FindQuery {
 impl FindQuery {
     pub async fn execute(
         self,
-        on_collection: Collection,
+        on_collection: Collection<Document>,
         with_session: &mut ClientSession,
     ) -> crate::Result<Vec<Document>> {
         let cursor = on_collection
@@ -259,14 +260,17 @@ impl MongoReadQueryBuilder {
         // Joins ($lookup)
         let joins = self.joins.into_iter().chain(self.order_joins);
 
-        stages.extend(joins.flat_map(|nested_stage| {
+        let mut unwinds: Vec<Document> = vec![];
+
+        for nested_stage in joins {
             let (join, unwind) = nested_stage.build();
 
-            match unwind {
-                Some(unwind) => vec![join, unwind],
-                None => vec![join],
+            if let Some(u) = unwind {
+                unwinds.push(u);
             }
-        }));
+
+            stages.push(join);
+        }
 
         // Post-join $matches
         stages.extend(self.join_filters.into_iter().map(|filter| doc! { "$match": filter }));
@@ -287,6 +291,11 @@ impl MongoReadQueryBuilder {
             );
         }
 
+        // Join's $unwind placed before sorting
+        // because Mongo does not support sorting multiple arrays
+        // https://jira.mongodb.org/browse/SERVER-32859
+        stages.extend(unwinds);
+
         // $sort
         if let Some(order) = self.order {
             stages.push(doc! { "$sort": order })
@@ -294,7 +303,7 @@ impl MongoReadQueryBuilder {
 
         // $skip
         if let Some(skip) = self.skip {
-            stages.push(doc! { "$skip": skip });
+            stages.push(doc! { "$skip": i64::try_from(skip).unwrap() });
         };
 
         // $limit
@@ -356,13 +365,10 @@ impl MongoReadQueryBuilder {
             .order_joins
             .clone()
             .into_iter()
-            .flat_map(|nested_stage| {
-                let (join, unwind) = nested_stage.build();
+            .map(|nested_stage| {
+                let (join, _) = nested_stage.build();
 
-                match unwind {
-                    Some(unwind) => vec![join, unwind],
-                    None => vec![join],
-                }
+                join
             })
             .collect_vec();
 

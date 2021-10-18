@@ -26,4 +26,4 @@ connection-string = "0.1"
 test-setup = { path = "../../libs/test-setup" }
 serial_test = "*"
 datamodel-connector = { path = "../../libs/datamodel/connectors/datamodel-connector" }
-prisma-models = { path = "../../libs/prisma-models" }
+prisma-models = { path = "../prisma-models" }

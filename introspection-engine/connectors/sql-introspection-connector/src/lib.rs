@@ -18,7 +18,7 @@ use datamodel::Datamodel;
 use enumflags2::BitFlags;
 pub use error::*;
 use introspection_connector::{
-    ConnectorError, ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionContext,
+    ConnectorError, ConnectorResult, DatabaseMetadata, ErrorKind, IntrospectionConnector, IntrospectionContext,
     IntrospectionResult,
 };
 use quaint::prelude::SqlFamily;
@@ -26,6 +26,8 @@ use quaint::{prelude::ConnectionInfo, single::Quaint};
 use schema_describer_loading::load_describer;
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
 use std::future::Future;
+use user_facing_errors::common::InvalidConnectionString;
+use user_facing_errors::KnownError;
 
 pub type SqlIntrospectionResult<T> = core::result::Result<T, SqlError>;
 
@@ -43,7 +45,15 @@ impl SqlIntrospectionConnector {
         let connection = Quaint::new(connection_string).await.map_err(|error| {
             ConnectionInfo::from_url(connection_string)
                 .map(|connection_info| SqlError::from(error).into_connector_error(&connection_info))
-                .unwrap_or_else(ConnectorError::url_parse_error)
+                .unwrap_or_else(|err| {
+                    let details = user_facing_errors::quaint::invalid_connection_string_description(&err.to_string());
+                    let known = KnownError::new(InvalidConnectionString { details });
+
+                    ConnectorError {
+                        user_facing_error: Some(known),
+                        kind: ErrorKind::InvalidDatabaseUrl(format!("{} in database URL", err)),
+                    }
+                })
         })?;
 
         tracing::debug!("SqlIntrospectionConnector initialized.");

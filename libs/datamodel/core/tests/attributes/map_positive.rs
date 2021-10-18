@@ -29,3 +29,27 @@ fn map_attribute() {
         .assert_has_scalar_field("text")
         .assert_with_db_name("post_text");
 }
+
+#[test]
+fn map_on_composite_type_field() {
+    let dml = r#"
+        datasource db {
+            provider = "mongodb"
+            url = "mongodb://"
+        }
+
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["mongoDb"]
+        }
+
+
+        type Address {
+            fullName String @map("full_name")
+        }
+   "#;
+
+    let schema = parse(dml);
+    let address_type = &schema.composite_types[0];
+    assert_eq!(address_type.fields[0].database_name.as_deref(), Some("full_name"));
+}

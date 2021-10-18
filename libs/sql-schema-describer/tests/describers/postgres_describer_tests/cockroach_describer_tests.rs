@@ -91,8 +91,8 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                 .assert_is_list()
         })
         .assert_column("array_int_col", |c| {
-            c.assert_full_data_type("_int8")
-                .assert_column_type_family(ColumnTypeFamily::BigInt)
+            c.assert_full_data_type("_int4")
+                .assert_column_type_family(ColumnTypeFamily::Int)
                 .assert_is_list()
         })
         .assert_column("array_text_col", |c| {
@@ -130,8 +130,8 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                 .assert_column_type_family(ColumnTypeFamily::Float)
         })
         .assert_column("int_col", |c| {
-            c.assert_full_data_type("int8")
-                .assert_column_type_family(ColumnTypeFamily::BigInt)
+            c.assert_full_data_type("int4")
+                .assert_column_type_family(ColumnTypeFamily::Int)
         })
         .assert_column("string1_col", |c| {
             c.assert_full_data_type("text")
@@ -186,12 +186,12 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                 .assert_column_type_family(ColumnTypeFamily::Int)
         })
         .assert_column("smallserial_col", |c| {
-            c.assert_full_data_type("int8")
-                .assert_column_type_family(ColumnTypeFamily::BigInt)
+            c.assert_full_data_type("int2")
+                .assert_column_type_family(ColumnTypeFamily::Int)
         })
         .assert_column("serial_col", |c| {
-            c.assert_full_data_type("int8")
-                .assert_column_type_family(ColumnTypeFamily::BigInt)
+            c.assert_full_data_type("int4")
+                .assert_column_type_family(ColumnTypeFamily::Int)
         })
         .assert_column("json_col", |c| {
             c.assert_full_data_type("jsonb")

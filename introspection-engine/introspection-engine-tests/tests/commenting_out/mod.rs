@@ -47,7 +47,7 @@ async fn a_table_without_uniques_should_ignore(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(Cockroach))]
 async fn relations_between_ignored_models_should_not_have_field_level_ignores(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -149,7 +149,7 @@ async fn a_table_without_fully_required_compound_unique(api: &TestApi) -> TestRe
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(Cockroach))]
 async fn unsupported_type_keeps_its_usages(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -187,6 +187,54 @@ async fn unsupported_type_keeps_its_usages(api: &TestApi) -> TestResult {
           @@id([broken, dummy])
           @@unique([broken, dummy], map: "unique")
           @@index([broken, dummy], map: "non_unique")
+        }
+    "#]];
+
+    let result = api.introspect_dml().await?;
+
+    dm.assert_eq(&result);
+
+    Ok(())
+}
+
+#[test_connector(tags(Cockroach))]
+async fn unsupported_type_keeps_its_usages_cockroach(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("Test", |t| {
+                t.add_column("id", types::primary());
+                // Geometry/Geography is the only type that is not supported by Prisma, but is also not
+                // indexable (only inverted-indexable).
+                t.add_column("broken", types::custom("geometry"));
+                t.add_column("broken2", types::custom("geography"));
+            });
+        })
+        .await?;
+
+    let expected = json!([{
+        "code": 3,
+        "message": "These fields are not supported by the Prisma Client, because Prisma currently does not support their types.",
+        "affected": [
+            {
+                "model": "Test",
+                "field": "broken",
+                "tpe": "geometry"
+            },
+            {
+                "model": "Test",
+                "field": "broken2",
+                "tpe": "geography"
+            },
+        ]
+    }]);
+
+    assert_eq_json!(expected, api.introspection_warnings().await?);
+
+    let dm = expect![[r#"
+        model Test {
+          id      Int                      @id @default(autoincrement())
+          broken  Unsupported("geometry")
+          broken2 Unsupported("geography")
         }
     "#]];
 
@@ -247,7 +295,7 @@ async fn a_table_with_only_an_unsupported_id(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(Cockroach))]
 async fn a_table_with_unsupported_types_in_a_relation(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -257,7 +305,7 @@ async fn a_table_with_unsupported_types_in_a_relation(api: &TestApi) -> TestResu
             });
             migration.create_table("Post", |t| {
                 t.add_column("id", types::primary());
-                t.inject_custom("user_ip cidr not null ");
+                t.inject_custom("user_ip cidr not null");
                 t.add_foreign_key(&["user_ip"], "User", &["ip"]);
             });
         })

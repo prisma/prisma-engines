@@ -1,10 +1,15 @@
-use datamodel_connector::{connector_error::ConnectorError, Connector, ConnectorCapability, ReferentialIntegrity};
+use datamodel_connector::{
+    connector_error::ConnectorError, Connector, ConnectorCapability, ConstraintNameSpace, ConstraintType,
+    ConstraintViolationScope, ReferentialIntegrity,
+};
+use dml::datamodel::Datamodel;
 use dml::{
     field::Field, model::Model, native_type_constructor::NativeTypeConstructor,
     native_type_instance::NativeTypeInstance, relation_info::ReferentialAction, scalars::ScalarType,
 };
 use enumflags2::BitFlags;
 use std::borrow::Cow;
+use std::collections::BTreeMap;
 
 pub struct SqliteDatamodelConnector {
     capabilities: Vec<ConnectorCapability>,
@@ -79,6 +84,25 @@ impl Connector for SqliteDatamodelConnector {
 
     fn validate_model(&self, _model: &Model) -> Result<(), ConnectorError> {
         Ok(())
+    }
+
+    fn get_constraint_namespace_violations<'dml>(&self, schema: &'dml Datamodel) -> Vec<ConstraintNameSpace<'dml>> {
+        let mut potential_name_space_violations: BTreeMap<
+            (&str, ConstraintViolationScope),
+            Vec<(&str, ConstraintType)>,
+        > = BTreeMap::new();
+
+        //Indexes have to be globally unique
+        for model in schema.models() {
+            for name in model.indices.iter().filter_map(|i| i.db_name.as_ref()) {
+                let entry = potential_name_space_violations
+                    .entry((name, ConstraintViolationScope::GlobalKeyIndex))
+                    .or_insert_with(Vec::new);
+
+                entry.push((&model.name, ConstraintType::KeyOrIdx));
+            }
+        }
+        ConstraintNameSpace::flatten(potential_name_space_violations)
     }
 
     fn available_native_type_constructors(&self) -> &[NativeTypeConstructor] {

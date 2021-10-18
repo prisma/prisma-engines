@@ -1,35 +1,19 @@
-use super::{context::Context, types::RelationField};
-use crate::ast;
+use crate::{
+    ast,
+    transform::ast_to_dml::db::{context::Context, types::RelationField},
+};
 use std::collections::BTreeSet;
 
-#[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
-enum OneToManyRelationFields {
-    Forward(ast::FieldId),
-    Back(ast::FieldId),
-    Both(ast::FieldId, ast::FieldId),
-}
+/// Detect relation types and construct relation objects to the database.
+pub(super) fn infer_relations(ctx: &mut Context<'_>) {
+    let mut relations = Relations::default();
 
-#[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
-enum OneToOneRelationFields {
-    Forward(ast::FieldId),
-    Both(ast::FieldId, ast::FieldId),
-}
+    for rf in ctx.db.types.relation_fields.iter() {
+        let evidence = relation_evidence(rf, ctx);
+        ingest_relation(evidence, &mut relations, ctx);
+    }
 
-#[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
-enum RelationType {
-    ImplicitManyToMany {
-        field_a: ast::FieldId,
-        field_b: ast::FieldId,
-    },
-    OneToOne(OneToOneRelationFields),
-    OneToMany(OneToManyRelationFields),
-}
-
-#[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
-pub(super) struct Relation<'ast> {
-    /// The `name` argument in `@relation`.
-    relation_name: Option<&'ast str>,
-    r#type: RelationType,
+    ctx.db.relations = relations;
 }
 
 /// Storage for the relations in a schema.
@@ -49,7 +33,7 @@ pub(super) struct Relation<'ast> {
 ///   key constraint, while model B would correspond to the table referenced
 ///   by the foreign key.
 #[derive(Debug, Default)]
-pub(super) struct Relations<'ast> {
+pub(crate) struct Relations<'ast> {
     /// Storage. Private. Do not use directly.
     relations_storage: Vec<Relation<'ast>>,
 
@@ -80,16 +64,14 @@ impl<'ast> Relations<'ast> {
     /// Iterator over all the relations in a schema.
     ///
     /// (model_a_id, model_b_id, relation)
-    #[allow(dead_code)] // not used _yet_
-    pub(super) fn iter_relations(&self) -> impl Iterator<Item = (ast::ModelId, ast::ModelId, &Relation<'ast>)> + '_ {
+    pub(crate) fn iter_relations(&self) -> impl Iterator<Item = (ast::ModelId, ast::ModelId, &Relation<'ast>)> + '_ {
         self.forward.iter().map(move |(model_a_id, model_b_id, relation_idx)| {
             (*model_a_id, *model_b_id, &self.relations_storage[*relation_idx])
         })
     }
 
     /// Iterator over (model_b_id, relation)
-    #[allow(dead_code)] // not used _yet_
-    pub(super) fn relations_from_model(
+    pub(crate) fn relations_from_model(
         &self,
         model_a_id: ast::ModelId,
     ) -> impl Iterator<Item = (ast::ModelId, &Relation<'ast>)> + '_ {
@@ -100,7 +82,7 @@ impl<'ast> Relations<'ast> {
 
     /// Iterator over (model_a_id, relation)
     #[allow(dead_code)] // not used _yet_
-    pub(super) fn relations_to_model(
+    pub(crate) fn relations_to_model(
         &self,
         model_b_id: ast::ModelId,
     ) -> impl Iterator<Item = (ast::ModelId, &Relation<'ast>)> {
@@ -110,30 +92,87 @@ impl<'ast> Relations<'ast> {
     }
 }
 
-pub(super) fn infer_relations(ctx: &mut Context<'_>) {
-    let mut relations = Relations::default();
+#[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
+pub(super) enum OneToManyRelationFields {
+    Forward(ast::FieldId),
+    Back(ast::FieldId),
+    Both(ast::FieldId, ast::FieldId),
+}
 
-    for rf in ctx.db.types.relation_fields.iter() {
-        let evidence = relation_evidence(rf, ctx);
-        ingest_relation(evidence, &mut relations, ctx);
+#[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
+pub(super) enum OneToOneRelationFields {
+    Forward(ast::FieldId),
+    Both(ast::FieldId, ast::FieldId),
+}
+
+#[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
+pub(super) enum RelationAttributes {
+    ImplicitManyToMany {
+        field_a: ast::FieldId,
+        field_b: ast::FieldId,
+    },
+    OneToOne(OneToOneRelationFields),
+    OneToMany(OneToManyRelationFields),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum RelationType {
+    ImplicitManyToMany,
+    OneToOne,
+    OneToMany,
+}
+
+impl RelationType {
+    pub(crate) fn is_one_to_one(self) -> bool {
+        matches!(self, Self::OneToOne)
+    }
+}
+
+#[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
+pub(crate) struct Relation<'ast> {
+    /// The `name` argument in `@relation`.
+    relation_name: Option<&'ast str>,
+    attributes: RelationAttributes,
+}
+
+impl<'ast> Relation<'ast> {
+    pub(crate) fn is_many_to_many(&self) -> bool {
+        matches!(self.attributes, RelationAttributes::ImplicitManyToMany { .. })
     }
 
-    ctx.db.relations = relations;
+    pub(crate) fn as_complete_fields(&self) -> Option<(ast::FieldId, ast::FieldId)> {
+        match &self.attributes {
+            RelationAttributes::ImplicitManyToMany { field_a, field_b } => Some((*field_a, *field_b)),
+            RelationAttributes::OneToOne(OneToOneRelationFields::Both(field_a, field_b)) => Some((*field_a, *field_b)),
+            RelationAttributes::OneToMany(OneToManyRelationFields::Both(field_a, field_b)) => {
+                Some((*field_a, *field_b))
+            }
+            _ => None,
+        }
+    }
+
+    pub(super) fn r#type(&self) -> RelationType {
+        match self.attributes {
+            RelationAttributes::ImplicitManyToMany { .. } => RelationType::ImplicitManyToMany,
+            RelationAttributes::OneToOne(_) => RelationType::OneToOne,
+            RelationAttributes::OneToMany(_) => RelationType::OneToMany,
+        }
+    }
 }
 
 // Implementation detail for this module. Should stay private.
-struct RelationEvidence<'ast, 'db> {
-    ast_model: &'ast ast::Model,
-    model_id: ast::ModelId,
-    ast_field: &'ast ast::Field,
-    field_id: ast::FieldId,
-    is_self_relation: bool,
-    relation_field: &'db RelationField<'ast>,
-    opposite_model: &'ast ast::Model,
-    opposite_relation_field: Option<(ast::FieldId, &'ast ast::Field, &'db RelationField<'ast>)>,
+pub(super) struct RelationEvidence<'ast, 'db> {
+    pub(super) ast_model: &'ast ast::Model,
+    pub(super) model_id: ast::ModelId,
+    pub(super) ast_field: &'ast ast::Field,
+    pub(super) field_id: ast::FieldId,
+    pub(super) is_self_relation: bool,
+    pub(super) relation_field: &'db RelationField<'ast>,
+    pub(super) opposite_model: &'ast ast::Model,
+    pub(super) opposite_relation_field: Option<(ast::FieldId, &'ast ast::Field, &'db RelationField<'ast>)>,
 }
 
-fn relation_evidence<'ast, 'db>(
+pub(super) fn relation_evidence<'ast, 'db>(
     ((model_id, field_id), relation_field): (&(ast::ModelId, ast::FieldId), &'db RelationField<'ast>),
     ctx: &'db Context<'ast>,
 ) -> RelationEvidence<'ast, 'db> {
@@ -143,13 +182,14 @@ fn relation_evidence<'ast, 'db>(
     let is_self_relation = *model_id == relation_field.referenced_model;
     let opposite_relation_field: Option<(ast::FieldId, &ast::Field, &RelationField<'_>)> = ctx
         .db
-        .iter_model_relation_fields(relation_field.referenced_model)
+        .walk_model(relation_field.referenced_model)
+        .relation_fields()
         // Only considers relations between the same models
-        .filter(|(_, opposite_relation_field)| opposite_relation_field.referenced_model == *model_id)
+        .filter(|opposite_relation_field| opposite_relation_field.references_model(*model_id))
         // Filter out the field itself, in case of self-relations
-        .filter(|(opposite_field_id, _)| !is_self_relation || opposite_field_id != field_id)
-        .find(|(_, opp)| opp.name == relation_field.name)
-        .map(|(opp_field_id, opp)| (opp_field_id, &opposite_model[opp_field_id], opp));
+        .filter(|opposite_relation_field| !is_self_relation || opposite_relation_field.field_id != *field_id)
+        .find(|opposite_relation_field| opposite_relation_field.explicit_relation_name() == relation_field.name)
+        .map(|opp_rf| (opp_rf.field_id(), opp_rf.ast_field(), opp_rf.relation_field));
 
     RelationEvidence {
         ast_model,
@@ -163,7 +203,7 @@ fn relation_evidence<'ast, 'db>(
     }
 }
 
-fn ingest_relation<'ast, 'db>(
+pub(super) fn ingest_relation<'ast, 'db>(
     evidence: RelationEvidence<'ast, 'db>,
     relations: &mut Relations<'ast>,
     ctx: &'db Context<'ast>,
@@ -186,7 +226,7 @@ fn ingest_relation<'ast, 'db>(
                 return;
             }
 
-            RelationType::ImplicitManyToMany {
+            RelationAttributes::ImplicitManyToMany {
                 field_a: evidence.field_id,
                 field_b: opp_field_id,
             }
@@ -195,7 +235,7 @@ fn ingest_relation<'ast, 'db>(
         // 1:1
         (ast::FieldArity::Required, Some((opp_field_id, opp_field, _))) if opp_field.arity.is_optional() => {
             // This is a required 1:1 relation, and we are on the required side.
-            RelationType::OneToOne(OneToOneRelationFields::Both(evidence.field_id, opp_field_id))
+            RelationAttributes::OneToOne(OneToOneRelationFields::Both(evidence.field_id, opp_field_id))
         }
         (ast::FieldArity::Optional, Some((_, opp_field, _))) if opp_field.arity.is_required() => {
             // This is a required 1:1 relation, and we are on the virtual side. Skip.
@@ -205,17 +245,13 @@ fn ingest_relation<'ast, 'db>(
             // This is a 1:1 relation that is required on both sides. Error.
             return; // TODO: error
         }
-        (ast::FieldArity::Optional, Some((opp_field_id, opp_field, opp_relation_field)))
-            if opp_field.arity.is_optional() =>
-        {
+        (ast::FieldArity::Optional, Some((opp_field_id, opp_field, _))) if opp_field.arity.is_optional() => {
             // This is a 1:1 relation that is optional on both sides. We must infer which side is model A.
 
             if evidence.relation_field.fields.is_some() {
-                RelationType::OneToOne(OneToOneRelationFields::Both(evidence.field_id, opp_field_id))
-            } else if opp_relation_field.fields.is_some() {
-                RelationType::OneToOne(OneToOneRelationFields::Both(opp_field_id, evidence.field_id))
+                RelationAttributes::OneToOne(OneToOneRelationFields::Both(evidence.field_id, opp_field_id))
             } else {
-                return; // TODO: error on ambiguous relation
+                return;
             }
         }
         // 1:m
@@ -225,11 +261,11 @@ fn ingest_relation<'ast, 'db>(
         }
         (ast::FieldArity::List, None) => {
             // This is a 1:m relation defined on the virtual side only.
-            RelationType::OneToMany(OneToManyRelationFields::Back(evidence.field_id))
+            RelationAttributes::OneToMany(OneToManyRelationFields::Back(evidence.field_id))
         }
         (ast::FieldArity::Required | ast::FieldArity::Optional, Some((opp_field_id, _, _))) => {
             // This is a 1:m relation defined on both sides.
-            RelationType::OneToMany(OneToManyRelationFields::Both(evidence.field_id, opp_field_id))
+            RelationAttributes::OneToMany(OneToManyRelationFields::Both(evidence.field_id, opp_field_id))
         }
 
         // 1:m or 1:1
@@ -239,15 +275,15 @@ fn ingest_relation<'ast, 'db>(
             // 1:1 or a 1:m relation.
             match &evidence.relation_field.fields {
                 Some(fields) if ctx.db.walk_model(evidence.model_id).fields_are_unique(fields) => {
-                    RelationType::OneToOne(OneToOneRelationFields::Forward(evidence.field_id))
+                    RelationAttributes::OneToOne(OneToOneRelationFields::Forward(evidence.field_id))
                 }
-                _ => RelationType::OneToMany(OneToManyRelationFields::Forward(evidence.field_id)),
+                _ => RelationAttributes::OneToMany(OneToManyRelationFields::Forward(evidence.field_id)),
             }
         }
     };
 
     let relation = Relation {
-        r#type: relation_type,
+        attributes: relation_type,
         relation_name: evidence.relation_field.name,
     };
 

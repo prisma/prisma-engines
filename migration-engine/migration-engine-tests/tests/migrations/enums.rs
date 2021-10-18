@@ -525,7 +525,7 @@ fn enum_array_modification_should_work(api: TestApi) {
         }
     "#;
 
-    api.create_migration("01init", &dm, &migrations_directory).send_sync();
+    api.create_migration("01init", dm, &migrations_directory).send_sync();
 
     api.apply_migrations(&migrations_directory)
         .send_sync()
@@ -548,13 +548,13 @@ fn enum_array_modification_should_work(api: TestApi) {
         }
     "#;
 
-    api.create_migration("02remove", &dm, &migrations_directory).send_sync();
+    api.create_migration("02remove", dm, &migrations_directory).send_sync();
 
     api.apply_migrations(&migrations_directory)
         .send_sync()
         .assert_applied_migrations(&["02remove"]);
 
-    api.create_migration("03empty", &dm, &migrations_directory).send_sync();
+    api.create_migration("03empty", dm, &migrations_directory).send_sync();
 
     api.apply_migrations(&migrations_directory)
         .send_sync()

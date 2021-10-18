@@ -1,15 +1,15 @@
-use crate::{LintOpts, MiniError};
 use datamodel::diagnostics::{DatamodelError, DatamodelWarning};
-use std::io::{self, Read};
 
-pub fn run(_opts: LintOpts) {
-    let mut datamodel_string = String::new();
+#[derive(serde::Serialize)]
+pub struct MiniError {
+    start: usize,
+    end: usize,
+    text: String,
+    is_warning: bool,
+}
 
-    io::stdin()
-        .read_to_string(&mut datamodel_string)
-        .expect("Unable to read from stdin.");
-
-    let datamodel_result = datamodel::parse_datamodel(&datamodel_string);
+pub(crate) fn run(schema: &str) -> String {
+    let datamodel_result = datamodel::parse_datamodel(schema);
 
     match datamodel_result {
         Err(err) => {
@@ -37,7 +37,7 @@ pub fn run(_opts: LintOpts) {
 
             mini_errors.append(&mut mini_warnings);
 
-            print_diagnostics(mini_errors);
+            print_diagnostics(mini_errors)
         }
         Ok(validated_datamodel) => {
             let mini_warnings: Vec<MiniError> = validated_datamodel
@@ -51,13 +51,11 @@ pub fn run(_opts: LintOpts) {
                 })
                 .collect();
 
-            print_diagnostics(mini_warnings);
+            print_diagnostics(mini_warnings)
         }
     }
 }
 
-fn print_diagnostics(diagnostics: Vec<MiniError>) {
-    let json = serde_json::to_string(&diagnostics).expect("Failed to render JSON");
-
-    print!("{}", json)
+fn print_diagnostics(diagnostics: Vec<MiniError>) -> String {
+    serde_json::to_string(&diagnostics).expect("Failed to render JSON")
 }
