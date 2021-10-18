@@ -5,5 +5,6 @@ mod order_by_aggregation;
 mod order_by_dependent;
 mod order_by_dependent_pagination;
 mod order_by_mutation;
+mod order_by_relevance;
 mod pagination;
 mod relation_filter_ordering;

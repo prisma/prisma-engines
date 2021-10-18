@@ -77,12 +77,17 @@ impl ManyRecords {
             .collect();
 
         self.records.sort_by(|a, b| {
-            let mut orderings = order_bys.iter().map(|o| {
-                let index = field_indices[o.field.db_name()];
-                match o.sort_order {
-                    SortOrder::Ascending => a.values[index].cmp(&b.values[index]),
-                    SortOrder::Descending => b.values[index].cmp(&a.values[index]),
+            let mut orderings = order_bys.iter().map(|o| match o {
+                OrderBy::Scalar(by_scalar) => {
+                    let index = field_indices[by_scalar.field.db_name()];
+
+                    match by_scalar.sort_order {
+                        SortOrder::Ascending => a.values[index].cmp(&b.values[index]),
+                        SortOrder::Descending => b.values[index].cmp(&a.values[index]),
+                    }
                 }
+                OrderBy::Aggregation(_) => todo!(),
+                OrderBy::Relevance(_) => todo!(),
             });
 
             orderings
