@@ -1,6 +1,6 @@
 use super::Context;
 use crate::{
-    ast::{self, Argument, FieldId, TopId, WithAttributes, WithIdentifier},
+    ast::{self, Argument, TopId, WithAttributes, WithIdentifier},
     diagnostics::DatamodelError,
     reserved_model_names::{validate_enum_name, validate_model_name},
 };
@@ -13,13 +13,14 @@ use std::{
 /// Resolved names for use in the validation process.
 #[derive(Default)]
 pub(super) struct Names<'ast> {
-    /// Models, enums and type aliases
+    /// Models, enums, composite types and type aliases
     pub(super) tops: HashMap<&'ast str, TopId>,
     /// Generators have their own namespace.
     pub(super) generators: HashMap<&'ast str, TopId>,
     /// Datasources have their own namespace.
     pub(super) datasources: HashMap<&'ast str, TopId>,
-    pub(super) model_fields: BTreeMap<(ast::ModelId, &'ast str), FieldId>,
+    pub(super) model_fields: BTreeMap<(ast::ModelId, &'ast str), ast::FieldId>,
+    pub(super) composite_type_fields: HashMap<(ast::CompositeTypeId, &'ast str), ast::FieldId>,
 }
 
 /// `resolve_names()` is responsible for populating `ParserDatabase.names` and
@@ -35,7 +36,7 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
     let mut names = Names::default();
 
     for (top_id, top) in ctx.db.ast.iter_tops() {
-        assert_is_not_a_reserved_scalar_type(top, ctx);
+        assert_is_not_a_reserved_scalar_type(top.identifier(), ctx);
 
         let namespace = match (top_id, top) {
             (_, ast::Top::Enum(ast_enum)) => {
@@ -83,6 +84,37 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
 
                 &mut names.tops
             }
+            (ast::TopId::CompositeType(ctid), ast::Top::CompositeType(ct)) => {
+                if !ctx.db.active_connector().supports_composite_types() {
+                    ctx.push_error(DatamodelError::new_validation_error(
+                        &format!(
+                            "Composite types are not supported on {}.",
+                            ctx.db.active_connector().name()
+                        ),
+                        ct.span,
+                    ));
+                    continue;
+                }
+
+                ct.name.validate("Composite type", &mut ctx.diagnostics);
+
+                for (field_id, field) in ct.iter_fields() {
+                    // Check that there is no duplicate field on the composite type
+                    if names
+                        .composite_type_fields
+                        .insert((ctid, &field.name.name), field_id)
+                        .is_some()
+                    {
+                        ctx.push_error(DatamodelError::new_composite_type_duplicate_field_error(
+                            &ct.name.name,
+                            &field.name.name,
+                            field.identifier().span,
+                        ))
+                    }
+                }
+
+                &mut names.tops
+            }
             (_, ast::Top::Source(datasource)) => {
                 check_for_duplicate_properties(top, &datasource.properties, &mut tmp_names, ctx);
                 &mut names.datasources
@@ -121,8 +153,7 @@ fn duplicate_top_error(existing: &ast::Top, duplicate: &ast::Top) -> DatamodelEr
     )
 }
 
-fn assert_is_not_a_reserved_scalar_type(top: &dyn WithIdentifier, ctx: &mut Context<'_>) {
-    let ident = top.identifier();
+fn assert_is_not_a_reserved_scalar_type(ident: &ast::Identifier, ctx: &mut Context<'_>) {
     if ScalarType::from_str(&ident.name).is_ok() {
         ctx.push_error(DatamodelError::new_reserved_scalar_type_error(&ident.name, ident.span));
     }

@@ -34,6 +34,10 @@ pub trait Connector: Send + Sync {
 
     fn referential_actions(&self) -> BitFlags<ReferentialAction>;
 
+    fn supports_composite_types(&self) -> bool {
+        self.has_capability(ConnectorCapability::CompositeTypes)
+    }
+
     fn supports_named_primary_keys(&self) -> bool {
         self.has_capability(ConnectorCapability::NamedPrimaryKeys)
     }
@@ -250,6 +254,7 @@ capabilities!(
     AutoIncrement,
     RelationFieldsInArbitraryOrder,
     ForeignKeys,
+    CompositeTypes,
     //Start of ME/IE only capabilities
     AutoIncrementAllowedOnNonId,
     AutoIncrementMultipleAllowed,
@@ -320,8 +325,8 @@ pub enum ConstraintViolationScope<'dml> {
     GlobalPrimaryKeyKeyIndex,
     GlobalKeyIndexForeignKey,
     GlobalPrimaryKeyForeignKeyDefault,
+    ModelKeyIndex(&'dml str),
     ModelPrimaryKeyKeyIndex(&'dml str),
-    ModelKeyIndexForeignKey(&'dml str),
     ModelPrimaryKeyForeignKeyDefault(&'dml str),
     ModelPrimaryKeyKeyIndexForeignKey(&'dml str),
 }
@@ -345,10 +350,9 @@ impl<'dml> Display for ConstraintViolationScope<'dml> {
                 "on model `{}` for primary key, indexes and unique constraints",
                 model
             )),
-            ConstraintViolationScope::ModelKeyIndexForeignKey(model) => f.write_str(&format!(
-                "on model `{}` for indexes, unique constraints and foreign keys",
-                model
-            )),
+            ConstraintViolationScope::ModelKeyIndex(model) => {
+                f.write_str(&format!("on model `{}` for indexes and unique constraints", model))
+            }
             ConstraintViolationScope::ModelPrimaryKeyForeignKeyDefault(model) => f.write_str(&format!(
                 "on model `{}` for primary key, foreign keys and default constraints",
                 model

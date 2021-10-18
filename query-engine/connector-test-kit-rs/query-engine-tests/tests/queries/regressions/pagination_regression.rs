@@ -130,21 +130,21 @@ mod pagination_regr {
     }
 
     async fn create_test_data_3505_1(runner: &Runner) -> TestResult<()> {
-        create_row(&runner, r#"{ id: 1 }"#).await?;
-        create_row(&runner, r#"{ id: 2 }"#).await?;
-        create_row(&runner, r#"{ id: 3, field: "Test"}"#).await?;
-        create_row(&runner, r#"{ id: 4 }"#).await?;
-        create_row(&runner, r#"{ id: 5, field: "Test2"}"#).await?;
+        create_row(runner, r#"{ id: 1 }"#).await?;
+        create_row(runner, r#"{ id: 2 }"#).await?;
+        create_row(runner, r#"{ id: 3, field: "Test"}"#).await?;
+        create_row(runner, r#"{ id: 4 }"#).await?;
+        create_row(runner, r#"{ id: 5, field: "Test2"}"#).await?;
 
         Ok(())
     }
 
     async fn create_test_data_3505_2(runner: &Runner) -> TestResult<()> {
-        create_row(&runner, r#"{ id: 1 }"#).await?;
-        create_row(&runner, r#"{ id: 2, field: "Test"}"#).await?;
-        create_row(&runner, r#"{ id: 3 }"#).await?;
-        create_row(&runner, r#"{ id: 4 }"#).await?;
-        create_row(&runner, r#"{ id: 5, field: "Test2"}"#).await?;
+        create_row(runner, r#"{ id: 1 }"#).await?;
+        create_row(runner, r#"{ id: 2, field: "Test"}"#).await?;
+        create_row(runner, r#"{ id: 3 }"#).await?;
+        create_row(runner, r#"{ id: 4 }"#).await?;
+        create_row(runner, r#"{ id: 5, field: "Test2"}"#).await?;
 
         Ok(())
     }

@@ -2,6 +2,7 @@ use pest::Parser;
 
 use super::{
     helpers::{parsing_catch_all, TokenExtensions},
+    parse_composite_type::parse_composite_type,
     parse_enum::parse_enum,
     parse_model::parse_model,
     parse_source_and_generator::{parse_generator, parse_source},
@@ -22,7 +23,20 @@ pub fn parse_schema(datamodel_string: &str) -> Result<SchemaAst, Diagnostics> {
             let mut top_level_definitions: Vec<Top> = vec![];
             for current in datamodel.relevant_children() {
                 match current.as_rule() {
-                    Rule::model_declaration => top_level_definitions.push(Top::Model(parse_model(&current, &mut errors))),
+                    Rule::model_declaration => {
+                        let keyword = current.clone().into_inner().find(|pair| matches!(pair.as_rule(), Rule::TYPE_KEYWORD | Rule::MODEL_KEYWORD) ).expect("Expected model or type keyword");
+
+                        match keyword.as_rule() {
+                            Rule::TYPE_KEYWORD => {
+                                top_level_definitions.push(Top::CompositeType(parse_composite_type(&current, &mut errors)))
+                            }
+                            Rule::MODEL_KEYWORD => {
+                                top_level_definitions.push(Top::Model(parse_model(&current, &mut errors)))
+                            }
+                            _ => unreachable!(),
+                        }
+
+                    },
                     Rule::enum_declaration => top_level_definitions.push(Top::Enum(parse_enum(&current, &mut errors))),
                     Rule::source_block => top_level_definitions.push(Top::Source(parse_source(&current, &mut errors))),
                     Rule::generator_block => top_level_definitions.push(Top::Generator(parse_generator(&current, &mut errors))),

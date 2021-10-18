@@ -356,8 +356,8 @@ impl Connector for MySqlDatamodelConnector {
             Vec<(&str, ConstraintType)>,
         > = BTreeMap::new();
 
-        //Foreign Keys and Indexes each have their own global namespace
-        //Additionally, they cannot have the same name within a table
+        //Foreign Keys have a global namespace
+        //Keys and Indexes have a model namespace
         for model in schema.models() {
             for name in model
                 .relation_fields()
@@ -368,17 +368,11 @@ impl Connector for MySqlDatamodelConnector {
                     .or_insert_with(Vec::new);
 
                 entry.push((&model.name, ConstraintType::ForeignKey));
-
-                let entry = potential_name_space_violations
-                    .entry((name, ConstraintViolationScope::ModelKeyIndexForeignKey(&model.name)))
-                    .or_insert_with(Vec::new);
-
-                entry.push((&model.name, ConstraintType::ForeignKey));
             }
 
             for name in model.indices.iter().filter_map(|i| i.db_name.as_ref()) {
                 let entry = potential_name_space_violations
-                    .entry((name, ConstraintViolationScope::ModelKeyIndexForeignKey(&model.name)))
+                    .entry((name, ConstraintViolationScope::ModelKeyIndex(&model.name)))
                     .or_insert_with(Vec::new);
 
                 entry.push((&model.name, ConstraintType::KeyOrIdx));

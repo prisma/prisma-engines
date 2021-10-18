@@ -240,3 +240,34 @@ fn key_order_enforcement_support() {
 
     assert!(datamodel::parse_schema(dml).is_ok());
 }
+
+#[test]
+fn sqlite_does_not_support_composite_types() {
+    let schema = indoc!(
+        r#"
+        datasource db {
+            provider = "sqlite"
+            url = "file:dev.db"
+        }
+
+        type Address {
+            street String
+        }
+        "#
+    );
+
+    let err = datamodel::parse_schema(schema).unwrap_err();
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError validating: Composite types are not supported on sqlite.[0m
+          [1;94m-->[0m  [4mschema.prisma:6[0m
+        [1;94m   | [0m
+        [1;94m 5 | [0m
+        [1;94m 6 | [0m[1;91mtype Address {[0m
+        [1;94m 7 | [0m    street String
+        [1;94m 8 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&err);
+}

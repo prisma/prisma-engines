@@ -25,6 +25,7 @@ impl<'a> LowerDmlToAst<'a> {
             dml::FieldType::Scalar(tpe, custom_type_name, _) => ast::FieldType::Supported(ast::Identifier::new(
                 custom_type_name.as_ref().unwrap_or(&tpe.to_string()),
             )),
+            dml::FieldType::CompositeType(name) => ast::FieldType::Supported(ast::Identifier::new(name)),
             dml::FieldType::Enum(tpe) => ast::FieldType::Supported(ast::Identifier::new(tpe)),
             dml::FieldType::Unsupported(tpe) => ast::FieldType::Unsupported(tpe.clone(), Span::empty()),
             dml::FieldType::Relation(rel) => ast::FieldType::Supported(ast::Identifier::new(&rel.to)),

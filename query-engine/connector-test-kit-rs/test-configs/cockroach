@@ -1,0 +1,5 @@
+{
+    "connector": "postgres",
+    "version": "cockroach",
+    "runner": "direct"
+}

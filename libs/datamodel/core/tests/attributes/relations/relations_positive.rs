@@ -1,6 +1,6 @@
 use crate::attributes::with_postgres_provider;
 use crate::common::*;
-use datamodel::{dml, IndexDefinition, IndexType, ScalarType};
+use datamodel::{dml, render_datamodel_to_string, IndexDefinition, IndexType, ScalarType};
 
 #[test]
 fn must_add_referenced_fields_on_both_sides_for_many_to_many_relations() {
@@ -353,24 +353,22 @@ fn implicit_fk_name_definition_with_mapped_models_and_fields_other_order() {
 
 #[test]
 fn implicit_unique_constraint_on_one_to_one() {
-    let dml = with_postgres_provider(
-        r#"
-     model User {
-         user_id Int    @id  @map("user_id_map")
-         post    Post?
-         
-         @@map("UserMap")
-     }
-
-     model Post {
-         post_id Int    @id @map("post_id_map")
-         user_id Int    @map("user_id_map_on_post")    
-         user    User   @relation(fields: user_id, references: user_id)
-         
-         @@map("PostMap")
-     }
-     "#,
-    );
+    let dml = with_postgres_provider(indoc! {r#"
+        model User {
+          user_id Int    @id  @map("user_id_map")
+          post    Post?
+          
+          @@map("UserMap")
+        }
+        
+        model Post {
+          post_id Int    @id @map("post_id_map")
+          user_id Int    @map("user_id_map_on_post")    
+          user    User   @relation(fields: user_id, references: user_id)
+          
+          @@map("PostMap")
+        }
+    "#});
 
     let schema = parse(&dml);
 
@@ -378,6 +376,7 @@ fn implicit_unique_constraint_on_one_to_one() {
         .assert_has_model("User")
         .assert_has_relation_field("post")
         .assert_relation_fk_name(None);
+
     schema
         .assert_has_model("Post")
         .assert_has_relation_field("user")
@@ -433,6 +432,35 @@ fn implicit_unique_constraint_on_compound_one_to_one() {
         tpe: IndexType::Unique,
         defined_on_field: false,
     });
+}
+
+#[test]
+fn no_unique_constraint_if_referring_the_pk() {
+    let dml = with_postgres_provider(indoc! {r#"
+        model Cat {
+          id      Int @id
+          collar  Collar?
+        }
+
+        model Collar {
+          id      Int @id
+          cat     Cat @relation(fields:[id], references: [id])
+        }
+    "#});
+
+    let expected = expect![[r#"
+        model Cat {
+          id     Int     @id
+          collar Collar?
+        }
+
+        model Collar {
+          id  Int @id
+          cat Cat @relation(fields: [id], references: [id])
+        }
+    "#]];
+
+    expected.assert_eq(&render_datamodel_to_string(&parse(&dml), None));
 }
 
 #[test]

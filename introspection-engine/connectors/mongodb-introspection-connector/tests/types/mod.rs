@@ -1,5 +1,5 @@
 use crate::test_api::*;
-use bson::{oid::ObjectId, Array, Binary, Bson, DateTime, Decimal128, Timestamp};
+use bson::{oid::ObjectId, Binary, Bson, DateTime, Decimal128, Timestamp};
 
 #[test]
 fn string() {
@@ -388,18 +388,18 @@ fn array() {
 
         let docs = vec![
             doc! {
-                "first": Bson::Array(Array::from(vec![Bson::Int32(1)])),
-                "second": Bson::Array(Array::from(vec![Bson::Int32(1)])),
-                "third": Bson::Array(Array::from(vec![Bson::Int32(1)])),
+                "first": Bson::Array(vec![Bson::Int32(1)]),
+                "second": Bson::Array(vec![Bson::Int32(1)]),
+                "third": Bson::Array(vec![Bson::Int32(1)]),
             },
             doc! {
-                "first": Bson::Array(Array::from(vec![Bson::Int32(1)])),
+                "first": Bson::Array(vec![Bson::Int32(1)]),
                 "second": null,
-                "third": Bson::Array(Array::from(vec![Bson::Int32(1)])),
+                "third": Bson::Array(vec![Bson::Int32(1)]),
             },
             doc! {
-                "first": Bson::Array(Array::from(vec![Bson::Int32(1)])),
-                "second": Bson::Array(Array::from(Vec::new())),
+                "first": Bson::Array(vec![Bson::Int32(1)]),
+                "second": Bson::Array(Vec::new()),
             },
         ];
 
@@ -427,7 +427,7 @@ fn empty_arrays() {
         let collection = db.collection("A");
 
         collection
-            .insert_one(doc! { "data": Bson::Array(Array::from(Vec::new())) }, None)
+            .insert_one(doc! { "data": Bson::Array(Vec::new()) }, None)
             .await
             .unwrap();
 

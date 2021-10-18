@@ -6,87 +6,159 @@ use pretty_assertions::assert_eq;
 #[test]
 fn test_parser_renderer_via_dml() {
     // TODO: test `onDelete` back once `prisma migrate` is a thing
-    let input = r#"model User {
-  id        Int      @id
-  createdAt DateTime
-  email     String   @unique
-  name      String?
-  posts     Post[]   @relation("author")
-  profile   Profile?
+    let input = indoc! {r#"
+        model User {
+          id        Int      @id
+          createdAt DateTime
+          email     String   @unique
+          name      String?
+          posts     Post[]   @relation("author")
+          profile   Profile?
 
-  @@unique([email, name])
-  @@unique([name, email])
-  @@map("user")
-}
+          @@unique([email, name])
+          @@unique([name, email])
+          @@map("user")
+        }
 
-model Profile {
-  id     Int    @id
-  bio    String
-  userId Int
-  user   User   @relation(fields: [userId], references: [id])
+        model Profile {
+          id     Int    @id
+          bio    String
+          userId Int
+          user   User   @relation(fields: [userId], references: [id])
 
-  @@map("profile")
-}
+          @@map("profile")
+        }
 
-model Post {
-  id         Int
-  createdAt  DateTime
-  updatedAt  DateTime
-  title      String           @default("Default-Title")
-  wasLiked   Boolean          @default(false)
-  authorId   Int
-  author     User             @relation("author", fields: [authorId], references: [id])
-  published  Boolean          @default(false)
-  categories PostToCategory[]
+        model Post {
+          id         Int
+          createdAt  DateTime
+          updatedAt  DateTime
+          title      String           @default("Default-Title")
+          wasLiked   Boolean          @default(false)
+          authorId   Int
+          author     User             @relation("author", fields: [authorId], references: [id])
+          published  Boolean          @default(false)
+          categories PostToCategory[]
 
-  @@id([title, createdAt])
-  @@map("post")
-}
+          @@id([title, createdAt])
+          @@map("post")
+        }
 
-model Category {
-  id    Int              @id
-  name  String
-  posts PostToCategory[]
-  cat   CategoryEnum
+        model Category {
+          id    Int              @id
+          name  String
+          posts PostToCategory[]
+          cat   CategoryEnum
 
-  @@map("category")
-}
+          @@map("category")
+        }
 
-model PostToCategory {
-  id            Int      @id
-  postTitle     String
-  postCreatedAt DateTime
-  categoryId    Int
-  post          Post     @relation(fields: [postTitle, postCreatedAt], references: [title, createdAt])
-  category      Category @relation(fields: [categoryId], references: [id])
+        model PostToCategory {
+          id            Int      @id
+          postTitle     String
+          postCreatedAt DateTime
+          categoryId    Int
+          post          Post     @relation(fields: [postTitle, postCreatedAt], references: [title, createdAt])
+          category      Category @relation(fields: [categoryId], references: [id])
 
-  @@map("post_to_category")
-}
+          @@map("post_to_category")
+        }
 
-model A {
-  id  Int @id
-  bId Int
-  b   B   @relation(fields: [bId], references: [id])
-}
+        model A {
+          id  Int @id
+          bId Int
+          b   B   @relation(fields: [bId], references: [id])
+        }
 
-model B {
-  id Int @id
-  a  A?
-}
+        model B {
+          id Int @id
+          a  A?
+        }
 
-enum CategoryEnum {
-  A
-  B
-  C
-}
-"#;
+        enum CategoryEnum {
+          A
+          B
+          C
+        }
+    "#};
 
-    let dml = parse(input);
-    let rendered = datamodel::render_datamodel_to_string(&dml, None);
+    let expected = expect![[r#"
+        model User {
+          id        Int      @id
+          createdAt DateTime
+          email     String   @unique
+          name      String?
+          posts     Post[]   @relation("author")
+          profile   Profile?
 
-    print!("{}", rendered);
+          @@unique([email, name])
+          @@unique([name, email])
+          @@map("user")
+        }
 
-    assert_eq!(input, rendered);
+        model Profile {
+          id     Int    @id
+          bio    String
+          userId Int    @unique
+          user   User   @relation(fields: [userId], references: [id])
+
+          @@map("profile")
+        }
+
+        model Post {
+          id         Int
+          createdAt  DateTime
+          updatedAt  DateTime
+          title      String           @default("Default-Title")
+          wasLiked   Boolean          @default(false)
+          authorId   Int
+          author     User             @relation("author", fields: [authorId], references: [id])
+          published  Boolean          @default(false)
+          categories PostToCategory[]
+
+          @@id([title, createdAt])
+          @@map("post")
+        }
+
+        model Category {
+          id    Int              @id
+          name  String
+          posts PostToCategory[]
+          cat   CategoryEnum
+
+          @@map("category")
+        }
+
+        model PostToCategory {
+          id            Int      @id
+          postTitle     String
+          postCreatedAt DateTime
+          categoryId    Int
+          post          Post     @relation(fields: [postTitle, postCreatedAt], references: [title, createdAt])
+          category      Category @relation(fields: [categoryId], references: [id])
+
+          @@map("post_to_category")
+        }
+
+        model A {
+          id  Int @id
+          bId Int @unique
+          b   B   @relation(fields: [bId], references: [id])
+        }
+
+        model B {
+          id Int @id
+          a  A?
+        }
+
+        enum CategoryEnum {
+          A
+          B
+          C
+        }
+    "#]];
+
+    expected.assert_eq(&datamodel::render_datamodel_to_string(&parse(input), None));
 }
 
 #[test]

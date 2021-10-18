@@ -81,7 +81,7 @@ where
         let database = client.database(&database_name);
         let connector = MongoDbIntrospectionConnector::new(&connection_string).await.unwrap();
 
-        if let Err(_) = init_database(database.clone()).await {
+        if init_database(database.clone()).await.is_err() {
             database.drop(None).await.unwrap();
         }
 

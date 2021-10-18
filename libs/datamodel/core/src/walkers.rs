@@ -174,6 +174,7 @@ impl<'a> ScalarFieldWalker<'a> {
                 datamodel: self.datamodel,
                 r#enum: self.datamodel.find_enum(name).unwrap(),
             }),
+            FieldType::CompositeType(_) => TypeWalker::Base(ScalarType::Json), // only used by the ME, will be gone soon
             FieldType::Scalar(scalar_type, _, None) => TypeWalker::Base(*scalar_type),
             FieldType::Scalar(scalar_type, _, Some(nt)) => TypeWalker::NativeType(*scalar_type, nt),
             FieldType::Unsupported(description) => TypeWalker::Unsupported(description.clone()),
