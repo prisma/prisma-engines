@@ -116,47 +116,43 @@ The prisma version hash is the latest git commit at the time the binary was buil
 
 ## Testing
 
-There are two test suites for the engines: Unit tests ("Cargo tests") and
-integration tests ("Connector TestKit").
+There are two test suites for the engines: Unit tests and
+integration tests.
 
-The Unit tests are implemented in the Rust code. They test internal
+- **Unit tests**: They test internal
 functionality of individual crates and components.
 
-The Connector TestKit is a separate Scala project found at
-`./query-engine/connector-test-kit` that runs GraphQL queries against isolated
-instances of the query engine and asserts that the responses are correct.
+  You can find them across the whole codebase, usually in `./tests` folders at the root of modules. 
 
-### Set up & run integration tests:
+- **Integration tests**: They run GraphQL queries against isolated
+instances of the Query Engine and asserts that the responses are correct.
+
+  You can find them at `./query-engine/connector-test-kit-rs`.
+
+### Set up & run tests:
 
 **Prerequisites:**
 - Installed Rust toolchain.
 - Installed Docker and Docker-Compose.
-- Installed Java, Scala, SBT (Scala Build Tool).
 - Installed `direnv`, then `direnv allow` on the repository root.
     - Alternatively: Load the defined environment in `./.envrc` manually in your shell.
 
 **Setup:**
 There are helper `make` commands to set up a test environment for a specific
 database connector you want to test. The commands set up a container (if needed)
-and write the `current_connector` file, which is picked up by the integration
+and write the `.test_config` file, which is picked up by the integration
 tests:
 
 - `make dev-mysql`: MySQL 5.7
 - `make dev-mysql8`: MySQL 8
 - `make dev-postgres`: PostgreSQL 10
 - `make dev-sqlite`: SQLite
-
-As an optional but recommended step, you can run the tests by setting up an
-IntelliJ project for `./query-engine/connector-test-kit`, which makes test
-results much more accessible. You need to install the Scala plugin for Intellij
-if you want to do so.
-
-Remember to set IntelliJ to use the version 8 of OpenJDK distribution.
+- `make dev-mongodb5`: MongoDB 5
 
 **On windows:*
 If not using WSL, `make` is not available and you should just see what your
 command does and do it manually. Basically this means editing the
-`current_connector` file and starting the needed Docker containers.
+`.test_config` file and starting the needed Docker containers.
 
 To actually get the tests working, read the contents of `.envrc`. Then `Edit
 environment variables for your account` from Windows settings, and add at least
@@ -171,20 +167,7 @@ the correct values for the following variables:
 Other variables may or may not be useful.
 
 **Run:**
-If you're using Intellij, you can run all tests by right-clicking
-`src/test/scala` > `Run ScalaTests`.
 
-If you want to use the command line, start `sbt` in
-`./query-engine/connector-test-kit`, then execute `test` in the sbt shell.
-
-### Set up & run cargo tests:
-
-**Prerequisites:**
-- Installed Rust toolchain.
-- Installed Docker and Docker-Compose.
-- Start all test databases with `make all-dbs`.
-
-**Run:**
 Run `cargo test` in the repository root.
 
 ## Security
