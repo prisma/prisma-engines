@@ -203,21 +203,4 @@ impl ConstraintNames {
         }
         None
     }
-
-    pub(crate) fn client_name_already_in_use(
-        idx_name: &str,
-        field_name: &str,
-        model_name: &str,
-        span: Span,
-        attribute: &str,
-    ) -> Option<DatamodelError> {
-        if field_name == idx_name {
-            return Some(DatamodelError::new_model_validation_error(
-                &format!("The custom name `{}` specified for the `{}` attribute is already used as a name for a field. Please choose a different name.", idx_name, attribute),
-                model_name,
-                span,
-            ));
-        }
-        None
-    }
 }
