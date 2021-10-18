@@ -357,8 +357,7 @@ impl AliasedCondition for OneRelationIsNullFilter {
 
             let id_columns: Vec<Column<'static>> = self
                 .field
-                .model()
-                .primary_identifier()
+                .linking_fields()
                 .as_columns()
                 .map(|c| c.opt_table(alias.clone()))
                 .collect();
