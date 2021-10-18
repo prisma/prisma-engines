@@ -2,7 +2,7 @@ use indoc::indoc;
 use query_engine_tests::*;
 
 // Validates fix for
-// https://github.com/prisma/prisma-engines/issues/8389
+// https://github.com/prisma/prisma/issues/8389
 
 #[test_suite(schema(schema), only(MongoDb))]
 mod prisma_8389 {
@@ -17,9 +17,9 @@ mod prisma_8389 {
         schema.to_owned()
     }
 
-    // Ensures that the internal MongoDB Rust driver pagination does not fail
-    // fetching more pages. 101 documents is the default batchSize.
-    // We intentionally create 101+ documents (104, arbitrarily) to ensure
+    // Ensures that the MongoDB Rust driver's internal pagination does not fail
+    // fetching more than one page. 101 documents is the default batch size.
+    // We intentionally create 101+ documents (103, arbitrarily) to assert
     // no errors are raised when querying them
     #[connector_test]
     async fn find_many_more_than_101_should_work(runner: Runner) -> TestResult<()> {
