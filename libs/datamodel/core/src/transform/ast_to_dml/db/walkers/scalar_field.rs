@@ -23,33 +23,33 @@ impl<'ast, 'db> Eq for ScalarFieldWalker<'ast, 'db> {}
 
 impl<'ast, 'db> ScalarFieldWalker<'ast, 'db> {
     #[allow(dead_code)] // we'll need this
-    pub(crate) fn field_id(&self) -> ast::FieldId {
+    pub(crate) fn field_id(self) -> ast::FieldId {
         self.field_id
     }
 
-    pub(crate) fn ast_field(&self) -> &'ast ast::Field {
+    pub(crate) fn ast_field(self) -> &'ast ast::Field {
         &self.db.ast[self.model_id][self.field_id]
     }
 
-    pub(crate) fn name(&self) -> &'ast str {
+    pub(crate) fn name(self) -> &'ast str {
         self.ast_field().name()
     }
 
-    pub(crate) fn final_database_name(&self) -> &'ast str {
+    pub(crate) fn final_database_name(self) -> &'ast str {
         self.attributes().mapped_name.unwrap_or_else(|| self.name())
     }
 
-    pub(crate) fn is_optional(&self) -> bool {
+    pub(crate) fn is_optional(self) -> bool {
         self.ast_field().arity.is_optional()
     }
 
     #[allow(dead_code)] // we'll need this
-    pub(crate) fn attributes(&self) -> &'db ScalarField<'ast> {
+    pub(crate) fn attributes(self) -> &'db ScalarField<'ast> {
         self.scalar_field
     }
 
     #[allow(dead_code)] // we'll need this
-    pub(crate) fn model(&self) -> ModelWalker<'ast, 'db> {
+    pub(crate) fn model(self) -> ModelWalker<'ast, 'db> {
         ModelWalker {
             model_id: self.model_id,
             db: self.db,

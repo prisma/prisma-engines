@@ -50,19 +50,15 @@ pub(super) fn ignored_related_model(field: RelationFieldWalker<'_, '_>, diagnost
         return;
     }
 
-    let ast_model = model.ast_model();
-    let ast_related_model = related_model.ast_model();
-    let ast_field = field.ast_field();
-
     let message = format!(
         "The relation field `{}` on Model `{}` must specify the `@ignore` attribute, because the model {} it is pointing to is marked ignored.",
-        ast_field.name(), ast_model.name(), ast_related_model.name()
+        field.name(), model.name(), related_model.name()
     );
 
     diagnostics.push_error(DatamodelError::new_attribute_validation_error(
         &message,
         "ignore",
-        ast_field.span,
+        field.ast_field().span,
     ));
 }
 
