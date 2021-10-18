@@ -76,6 +76,11 @@ fn check_for_reset_conditions(output: &DiagnoseMigrationHistoryOutput) -> Option
 
     if let Some(DriftDiagnostic::DriftDetected { summary }) = &output.drift {
         let mut reason = DRIFT_DETECTED_MESSAGE.trim_start().to_owned();
+
+        if !output.has_migrations_table {
+            reason.push_str(FIRST_TIME_MIGRATION_MESSAGE);
+        }
+
         reason.push_str(summary);
         reset_reasons.push(reason);
     }
@@ -117,6 +122,11 @@ Drift detected: Your database schema is not in sync with your migration history.
 The following is a summary of the differences between the expected database schema given your migrations files, and the actual schema of the database.
 
 It should be understood as the set of changes to get from the expected schema to the actual schema.
+"#;
+
+const FIRST_TIME_MIGRATION_MESSAGE: &str = r#"
+If you are running this the first time on an existing database, please make sure to read this documentation page:
+https://www.prisma.io/docs/guides/database/developing-with-prisma-migrate/troubleshooting-development
 "#;
 
 /// A suggested action for the CLI `migrate dev` command.
