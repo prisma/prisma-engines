@@ -236,6 +236,18 @@ services:
     networks:
       - databases
 
+  mongo5:
+    image: prismagraphql/mongo-single-replica:5.0.3
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: "prisma"
+      MONGO_INITDB_ROOT_PASSWORD: "prisma"
+      MONGO_PORT: 27018
+    ports:
+      - "27018:27018"
+    networks:
+      - databases
+
   mongo5-single:
     image: mongo:5
     restart: always

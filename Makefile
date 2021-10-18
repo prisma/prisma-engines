@@ -127,18 +127,25 @@ dev-mssql2017: start-mssql_2017
 	echo 'mssql2017' > current_connector
 	cp $(CONFIG_PATH)/sqlserver2017 $(CONFIG_FILE)
 
-start-mongodb:
-	docker-compose -f docker-compose.yml up -d --remove-orphans mongo4
-
 start-mongodb4-single:
 	docker-compose -f docker-compose.yml up -d --remove-orphans mongo4-single
 
 start-mongodb5-single:
 	docker-compose -f docker-compose.yml up -d --remove-orphans mongo5-single
 
-dev-mongodb: start-mongodb
+start-mongodb4:
+	docker-compose -f docker-compose.yml up -d --remove-orphans mongo4
+
+dev-mongodb4: start-mongodb4
 	echo 'mongodb' > current_connector
 	cp $(CONFIG_PATH)/mongodb4 $(CONFIG_FILE)
+
+start-mongodb5:
+	docker-compose -f docker-compose.yml up -d --remove-orphans mongo5
+
+dev-mongodb5: start-mongodb5
+	echo 'mongodb' > current_connector
+	cp $(CONFIG_PATH)/mongodb5 $(CONFIG_FILE)
 
 start-vitess_5_7:
 	docker-compose -f docker-compose.yml up -d --remove-orphans vitess-test-5_7 vitess-shadow-5_7
