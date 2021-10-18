@@ -132,16 +132,13 @@ impl JoinStage {
         pipeline.push(doc! { "$match": { "$expr": { "$and": ops } }});
         pipeline.extend(nested_stages);
 
-        // Todo: Temporarily disabled.
-        // If the field is a to-one, add and unwind stage.
-        // let unwind_stage = if !from_field.is_list {
-        //     Some(doc! {
-        //         "$unwind": { "path": format!("${}", as_name), "preserveNullAndEmptyArrays": true }
-        //     })
-        // } else {
-        //     None
-        // };
-        let unwind_stage = None;
+        let unwind_stage = if !from_field.is_list {
+            Some(doc! {
+                "$unwind": { "path": format!("${}", as_name), "preserveNullAndEmptyArrays": true }
+            })
+        } else {
+            None
+        };
 
         // Time to deal with the left side of the equation
         let left_scalars = from_field.left_scalars();
