@@ -51,20 +51,17 @@ impl JoinStage {
     /// there's no `alias` defined. Else the alias is the name.
     /// Example: If you have a document `{ _id: 1, field: "a" }` and join relation "aToB", the resulting document
     /// will have the shape: `{ _id: 1, field: "a", aToB: [{...}, {...}, ...] }` without alias and
-    /// `{ _id: 1, field: "a", alisHere: [{...}, {...}, ...] }` with alias `"aliasHere"`.
+    /// `{ _id: 1, field: "a", aliasHere: [{...}, {...}, ...] }` with alias `"aliasHere"`.
     ///
     /// Returns: `(Join document, Unwind document)`
     pub(crate) fn build(self) -> (Document, Option<Document>) {
         let nested_stages: Vec<Document> = self
             .nested
             .into_iter()
-            .flat_map(|nested_stage| {
-                let (join, unwind) = nested_stage.build();
+            .map(|nested_stage| {
+                let (join, _) = nested_stage.build();
 
-                match unwind {
-                    Some(unwind) => vec![join, unwind],
-                    None => vec![join],
-                }
+                join
             })
             .collect();
 
@@ -123,16 +120,14 @@ impl JoinStage {
         pipeline.push(doc! { "$match": { "$expr": op }});
         pipeline.extend(nested_stages);
 
-        // Todo: Temporarily disabled.
         // If the field is a to-one, add and unwind stage.
-        // let unwind_stage = if !from_field.is_list {
-        //     Some(doc! {
-        //         "$unwind": { "path": format!("${}", as_name), "preserveNullAndEmptyArrays": true }
-        //     })
-        // } else {
-        //     None
-        // };
-        let unwind_stage = None;
+        let unwind_stage = if !from_field.is_list {
+            Some(doc! {
+                "$unwind": { "path": format!("${}", as_name), "preserveNullAndEmptyArrays": true }
+            })
+        } else {
+            None
+        };
 
         let join_stage = doc! {
             "$lookup": {

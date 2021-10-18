@@ -260,14 +260,17 @@ impl MongoReadQueryBuilder {
         // Joins ($lookup)
         let joins = self.joins.into_iter().chain(self.order_joins);
 
-        stages.extend(joins.flat_map(|nested_stage| {
+        let mut unwinds: Vec<Document> = vec![];
+
+        for nested_stage in joins {
             let (join, unwind) = nested_stage.build();
 
-            match unwind {
-                Some(unwind) => vec![join, unwind],
-                None => vec![join],
+            if let Some(u) = unwind {
+                unwinds.push(u);
             }
-        }));
+
+            stages.push(join);
+        }
 
         // Post-join $matches
         stages.extend(self.join_filters.into_iter().map(|filter| doc! { "$match": filter }));
@@ -287,6 +290,11 @@ impl MongoReadQueryBuilder {
                     .map(|filter| doc! { "$match": filter }),
             );
         }
+
+        // Join's $unwind placed before sorting
+        // because Mongo does not support sorting multiple arrays
+        // https://jira.mongodb.org/browse/SERVER-32859
+        stages.extend(unwinds);
 
         // $sort
         if let Some(order) = self.order {
@@ -357,13 +365,10 @@ impl MongoReadQueryBuilder {
             .order_joins
             .clone()
             .into_iter()
-            .flat_map(|nested_stage| {
-                let (join, unwind) = nested_stage.build();
+            .map(|nested_stage| {
+                let (join, _) = nested_stage.build();
 
-                match unwind {
-                    Some(unwind) => vec![join, unwind],
-                    None => vec![join],
-                }
+                join
             })
             .collect_vec();
 
