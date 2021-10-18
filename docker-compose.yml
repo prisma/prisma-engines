@@ -231,8 +231,9 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: "prisma"
       MONGO_INITDB_ROOT_PASSWORD: "prisma"
+      MONGO_PORT: 27018
     ports:
-      - "27017:27017"
+      - "27018:27018"
     networks:
       - databases
 
