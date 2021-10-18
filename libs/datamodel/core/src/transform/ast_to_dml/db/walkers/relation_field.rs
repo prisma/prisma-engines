@@ -79,6 +79,14 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
         }
     }
 
+    pub(crate) fn referenced_fields(self) -> Option<impl Iterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db> {
+        self.attributes().references.as_ref().map(|references| {
+            references
+                .iter()
+                .map(move |field_id| self.related_model().scalar_field(*field_id))
+        })
+    }
+
     /// This will be None for virtual relation fields (when no `fields` argument is passed).
     pub(crate) fn final_foreign_key_name(self) -> Option<Cow<'ast, str>> {
         self.attributes().fk_name.map(Cow::Borrowed).or_else(|| {

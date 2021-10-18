@@ -30,7 +30,6 @@ impl<'ast, 'db> RelationWalker<'ast, 'db> {
     }
 }
 
-#[derive(Copy, Clone)]
 pub(crate) enum RefinedRelationWalker<'ast, 'db> {
     Inline(InlineRelationWalker<'ast, 'db>),
     ImplicitManyToMany(ImplicitManyToManyRelationWalker<'ast, 'db>),
@@ -55,6 +54,25 @@ impl<'ast, 'db> InlineRelationWalker<'ast, 'db> {
         self.db.walk_model(self.get().model_b)
     }
 
+    #[allow(dead_code)]
+    pub(crate) fn referenced_fields(self) -> Box<dyn Iterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db> {
+        self.forward_relation_field()
+            .and_then(
+                |field: RelationFieldWalker<'ast, 'db>| -> Option<Box<dyn Iterator<Item = ScalarFieldWalker<'ast, 'db>>>> {
+                    field.referenced_fields().map(|fields| Box::new(fields) as Box<dyn Iterator<Item = ScalarFieldWalker<'ast, 'db>>>)
+                },
+            )
+            .unwrap_or_else(move || {
+                Box::new(
+                    self.referenced_model()
+                        .unique_criterias()
+                        .find(|c| c.is_strict_criteria())
+                        .into_iter()
+                        .flat_map(|c| c.fields()),
+                )
+            })
+    }
+
     pub(crate) fn forward_relation_field(self) -> Option<RelationFieldWalker<'ast, 'db>> {
         let model = self.referencing_model();
         match self.get().attributes {
@@ -69,8 +87,7 @@ impl<'ast, 'db> InlineRelationWalker<'ast, 'db> {
 
     pub(crate) fn back_relation_field(self) -> Option<RelationFieldWalker<'ast, 'db>> {
         let model = self.referenced_model();
-        dbg!(model.model_id());
-        match dbg!(self.get()).attributes {
+        match self.get().attributes {
             RelationAttributes::OneToOne(OneToOneRelationFields::Both(_, b))
             | RelationAttributes::OneToMany(OneToManyRelationFields::Both(_, b))
             | RelationAttributes::OneToMany(OneToManyRelationFields::Back(b)) => Some(model.relation_field(b)),

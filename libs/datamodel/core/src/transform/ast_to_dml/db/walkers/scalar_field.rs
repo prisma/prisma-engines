@@ -60,4 +60,8 @@ impl<'ast, 'db> ScalarFieldWalker<'ast, 'db> {
             model_attributes: &self.db.types.model_attributes[&self.model_id],
         }
     }
+
+    pub(crate) fn is_unsupported(self) -> bool {
+        matches!(self.ast_field().field_type, ast::FieldType::Unsupported(_, _))
+    }
 }
