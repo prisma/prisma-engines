@@ -1,6 +1,8 @@
 use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
 use datamodel_connector::helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32};
-use datamodel_connector::{Connector, ConnectorCapability, ReferentialIntegrity};
+use datamodel_connector::{
+    Connector, ConnectorCapability, ConstraintNameSpace, ConstraintType, ConstraintViolationScope, ReferentialIntegrity,
+};
 use dml::{
     field::{Field, FieldType},
     model::Model,
@@ -14,6 +16,8 @@ use native_types::{MsSqlType, MsSqlTypeParameter};
 use once_cell::sync::Lazy;
 use std::borrow::Cow;
 
+use dml::datamodel::Datamodel;
+use std::collections::BTreeMap;
 use MsSqlType::*;
 use MsSqlTypeParameter::*;
 
@@ -322,6 +326,64 @@ impl Connector for MsSqlDatamodelConnector {
         }
 
         Ok(())
+    }
+
+    fn get_constraint_namespace_violations<'dml>(&self, schema: &'dml Datamodel) -> Vec<ConstraintNameSpace<'dml>> {
+        let mut potential_name_space_violations: BTreeMap<
+            (&str, ConstraintViolationScope),
+            Vec<(&str, ConstraintType)>,
+        > = BTreeMap::new();
+
+        //Primary Keys, Foreign Keys and Default Value names have to be globally unique
+        //Indexes have their own table namespace, but cannot have the same name as the Primary key in that table
+
+        for model in schema.models() {
+            if let Some(name) = model.primary_key.as_ref().and_then(|pk| pk.db_name.as_ref()) {
+                let entry = potential_name_space_violations
+                    .entry((name, ConstraintViolationScope::GlobalPrimaryKeyForeignKeyDefault))
+                    .or_insert_with(Vec::new);
+
+                entry.push((&model.name, ConstraintType::PrimaryKey));
+
+                let entry = potential_name_space_violations
+                    .entry((name, ConstraintViolationScope::ModelPrimaryKeyKeyIndex(&model.name)))
+                    .or_insert_with(Vec::new);
+
+                entry.push((&model.name, ConstraintType::PrimaryKey));
+            }
+
+            for name in model
+                .relation_fields()
+                .filter_map(|rf| rf.relation_info.fk_name.as_ref())
+            {
+                let entry = potential_name_space_violations
+                    .entry((name, ConstraintViolationScope::GlobalPrimaryKeyForeignKeyDefault))
+                    .or_insert_with(Vec::new);
+
+                entry.push((&model.name, ConstraintType::ForeignKey));
+            }
+
+            for name in model
+                .scalar_fields()
+                .filter_map(|sf| sf.default_value().and_then(|d| d.db_name()))
+            {
+                let entry = potential_name_space_violations
+                    .entry((name, ConstraintViolationScope::GlobalPrimaryKeyForeignKeyDefault))
+                    .or_insert_with(Vec::new);
+
+                entry.push((&model.name, ConstraintType::Default));
+            }
+
+            for name in model.indices.iter().filter_map(|i| i.db_name.as_ref()) {
+                let entry = potential_name_space_violations
+                    .entry((name, ConstraintViolationScope::ModelPrimaryKeyKeyIndex(&model.name)))
+                    .or_insert_with(Vec::new);
+
+                entry.push((&model.name, ConstraintType::KeyOrIdx));
+            }
+        }
+
+        ConstraintNameSpace::flatten(potential_name_space_violations)
     }
 
     fn available_native_type_constructors(&self) -> &[NativeTypeConstructor] {

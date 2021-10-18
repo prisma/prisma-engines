@@ -1,20 +1,6 @@
 use super::*;
 use query_tests_setup::ConnectorTag;
 
-pub fn validate_only_exclude(
-    only: &OnlyConnectorTags,
-    exclude: &ExcludeConnectorTags,
-    on_module: bool,
-) -> Result<(), darling::Error> {
-    if !only.is_empty() && !exclude.is_empty() && !on_module {
-        return Err(darling::Error::custom(
-            "Only one of `only` and `exclude` can be specified for a connector test.",
-        ));
-    }
-
-    Ok(())
-}
-
 pub fn validate_suite(suite: &Option<String>, on_module: bool) -> Result<(), darling::Error> {
     if suite.is_none() && !on_module {
         return Err(darling::Error::custom(
@@ -27,6 +13,14 @@ pub fn validate_suite(suite: &Option<String>, on_module: bool) -> Result<(), dar
 
 pub fn connectors_to_test(only: &OnlyConnectorTags, exclude: &ExcludeConnectorTags) -> Vec<ConnectorTag> {
     if !only.is_empty() {
+        if !exclude.is_empty() {
+            return only
+                .tags()
+                .to_vec()
+                .into_iter()
+                .filter(|tag| !exclude.tags().contains(tag))
+                .collect();
+        }
         only.tags().to_vec()
     } else if !exclude.is_empty() {
         let all = ConnectorTag::all();

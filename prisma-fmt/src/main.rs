@@ -4,15 +4,11 @@ mod lint;
 mod native;
 mod preview;
 
-use std::path::PathBuf;
+use std::{
+    io::{self, Read},
+    path::PathBuf,
+};
 use structopt::StructOpt;
-
-#[derive(Debug, StructOpt, Clone)]
-pub struct LintOpts {
-    /// If set, silences all `environment variable not found` errors
-    #[structopt(long)]
-    no_env_errors: bool,
-}
 
 #[derive(Debug, StructOpt, Clone)]
 pub struct FormatOpts {
@@ -30,18 +26,11 @@ pub struct FormatOpts {
 }
 
 #[derive(Debug, StructOpt, Clone)]
-pub struct PreviewFeaturesOpts {
-    /// If set, only returns datasource instead of generator preview features
-    #[structopt(long)]
-    datasource_only: bool,
-}
-
-#[derive(Debug, StructOpt, Clone)]
 #[structopt(version = env!("GIT_HASH"))]
 /// Prisma Datamodel v2 formatter
 pub enum FmtOpts {
     /// Specifies linter mode
-    Lint(LintOpts),
+    Lint,
     /// Specifies format mode
     Format(FormatOpts),
     /// Specifies Native Types mode
@@ -49,23 +38,25 @@ pub enum FmtOpts {
     /// List of available referential actions
     ReferentialActions,
     /// Specifies preview features mode
-    PreviewFeatures(PreviewFeaturesOpts),
-}
-
-#[derive(serde::Serialize)]
-pub struct MiniError {
-    pub start: usize,
-    pub end: usize,
-    pub text: String,
-    pub is_warning: bool,
+    PreviewFeatures,
 }
 
 fn main() {
     match FmtOpts::from_args() {
-        FmtOpts::Lint(opts) => lint::run(opts),
+        FmtOpts::Lint => plug(lint::run),
         FmtOpts::Format(opts) => format::run(opts),
-        FmtOpts::NativeTypes => native::run(),
-        FmtOpts::ReferentialActions => actions::run(),
-        FmtOpts::PreviewFeatures(opts) => preview::run(opts),
+        FmtOpts::NativeTypes => plug(native::run),
+        FmtOpts::ReferentialActions => plug(actions::run),
+        FmtOpts::PreviewFeatures => plug(|_s| preview::run()),
     }
+}
+
+fn plug<F: Fn(&str) -> String>(f: F) {
+    let mut datamodel_string = String::new();
+
+    io::stdin()
+        .read_to_string(&mut datamodel_string)
+        .expect("Unable to read from stdin.");
+
+    print!("{}", f(&datamodel_string))
 }

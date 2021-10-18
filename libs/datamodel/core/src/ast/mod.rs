@@ -6,6 +6,7 @@
 mod argument;
 mod attribute;
 mod comment;
+mod composite_type;
 mod r#enum;
 mod expression;
 mod field;
@@ -27,6 +28,7 @@ pub use span::Span;
 pub(crate) use argument::Argument;
 pub(crate) use attribute::Attribute;
 pub(crate) use comment::Comment;
+pub(crate) use composite_type::{CompositeType, CompositeTypeId};
 pub(crate) use expression::Expression;
 pub(crate) use field::{Field, FieldArity, FieldType};
 pub(crate) use generator_config::GeneratorConfig;
@@ -55,6 +57,7 @@ pub struct SchemaAst {
 }
 
 impl SchemaAst {
+    /// Construct an empty Schema AST.
     pub fn empty() -> Self {
         SchemaAst { tops: Vec::new() }
     }
@@ -84,6 +87,7 @@ impl SchemaAst {
                 Top::Source(_) => TopId::Source(SourceId(top_idx as u32)),
                 Top::Generator(_) => TopId::Generator(GeneratorId(top_idx as u32)),
                 Top::Type(_) => TopId::Alias(AliasId(top_idx as u32)),
+                Top::CompositeType(_) => TopId::CompositeType(CompositeTypeId(top_idx as u32)),
             };
 
             (top_id, top)
@@ -156,6 +160,7 @@ pub(crate) struct SourceId(u32);
 /// syntax to resolve the id to an `ast::Top`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub(crate) enum TopId {
+    CompositeType(CompositeTypeId),
     Model(ModelId),
     Enum(EnumId),
     Alias(AliasId),
@@ -177,9 +182,10 @@ impl std::ops::Index<TopId> for SchemaAst {
 
     fn index(&self, index: TopId) -> &Self::Output {
         let idx = match index {
-            TopId::Model(ModelId(idx)) => idx,
-            TopId::Enum(EnumId(idx)) => idx,
+            TopId::CompositeType(CompositeTypeId(idx)) => idx,
             TopId::Alias(AliasId(idx)) => idx,
+            TopId::Enum(EnumId(idx)) => idx,
+            TopId::Model(ModelId(idx)) => idx,
             TopId::Generator(GeneratorId(idx)) => idx,
             TopId::Source(SourceId(idx)) => idx,
         };

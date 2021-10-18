@@ -2,7 +2,8 @@ mod autoincrement;
 mod id;
 mod map;
 mod native_types;
-mod relation;
+
+use std::borrow::Cow;
 
 use super::{
     context::{Arguments, Context},
@@ -16,15 +17,36 @@ use crate::{
     transform::helpers::ValueValidator,
 };
 use prisma_value::PrismaValue;
-use std::collections::HashSet;
 
 pub(super) fn resolve_attributes(ctx: &mut Context<'_>) {
     for top in ctx.db.ast.iter_tops() {
         match top {
             (ast::TopId::Model(model_id), ast::Top::Model(model)) => resolve_model_attributes(model_id, model, ctx),
             (ast::TopId::Enum(enum_id), ast::Top::Enum(ast_enum)) => resolve_enum_attributes(enum_id, ast_enum, ctx),
+            (ast::TopId::CompositeType(ctid), ast::Top::CompositeType(ct)) => {
+                resolve_composite_type_attributes(ctid, ct, ctx)
+            }
             _ => (),
         }
+    }
+}
+
+fn resolve_composite_type_attributes<'ast>(
+    ctid: ast::CompositeTypeId,
+    ct: &'ast ast::CompositeType,
+    ctx: &mut Context<'ast>,
+) {
+    for (field_id, field) in ct.iter_fields() {
+        let mut ctfield = ctx.db.types.composite_type_fields[&(ctid, field_id)].clone();
+
+        ctx.visit_attributes(&field.attributes, |attributes, ctx| {
+            // @map
+            attributes.visit_optional_single("map", ctx, |map_args, ctx| {
+                map::composite_type_field(ct, field, ctid, field_id, &mut ctfield, map_args, ctx);
+            });
+        });
+
+        ctx.db.types.composite_type_fields.insert((ctid, field_id), ctfield);
     }
 }
 
@@ -121,53 +143,6 @@ fn resolve_model_attributes<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::
     ctx.db.types.model_attributes.insert(model_id, model_attributes);
 }
 
-pub(super) fn validate_index_names(ctx: &mut Context<'_>) {
-    if ctx.db.active_connector().supports_multiple_indexes_with_same_name() {
-        return;
-    }
-
-    let mut index_names = HashSet::new();
-    let mut errors = Vec::new();
-
-    for index in ctx.db.walk_models().flat_map(|model| model.indexes()) {
-        let index_name = index.final_database_name();
-
-        if index_names.insert(index_name.clone()) {
-            continue; // true means this name hasn't been seen before
-        }
-
-        errors.push(DatamodelError::new_multiple_indexes_with_same_name_are_not_supported(
-            &index_name,
-            index.ast_attribute().span,
-        ))
-    }
-
-    errors.into_iter().for_each(|err| ctx.push_error(err))
-}
-
-pub(super) fn validate_relation_fields(ctx: &mut Context<'_>) {
-    let mut errors: Vec<DatamodelError> = Vec::new();
-
-    let referential_integrity = ctx
-        .db
-        .datasource()
-        .map(|ds| ds.referential_integrity())
-        .unwrap_or_default();
-
-    for ((model_id, field_id), _) in ctx.db.types.relation_fields.iter() {
-        let model = ctx.db.walk_model(*model_id);
-        let field = model.relation_field(*field_id);
-
-        relation::validate_ignored_related_model(field, &mut errors);
-        relation::validate_referential_actions(field, ctx.db.active_connector(), &mut errors);
-        relation::validate_on_update_without_foreign_keys(field, referential_integrity, &mut errors);
-    }
-
-    for error in errors.into_iter() {
-        ctx.push_error(error);
-    }
-}
-
 fn visit_scalar_field_attributes<'ast>(
     model_id: ast::ModelId,
     field_id: ast::FieldId,
@@ -245,12 +220,12 @@ fn visit_scalar_field_attributes<'ast>(
             validate_db_name(ast_model, args, db_name, "@unique", ctx);
 
 
-            model_attributes.indexes.push((args.attribute(), IndexAttribute {
+            model_attributes.ast_indexes.push((args.attribute(), IndexAttribute {
                 is_unique: true,
                 fields: vec![field_id],
                 source_field: Some(field_id),
                 name: None,
-                db_name,
+                db_name: db_name.map(Cow::from),
             }))
         });
     });
@@ -395,6 +370,15 @@ fn visit_field_default<'ast>(
 
     loop {
         match r#type {
+            ScalarFieldType::CompositeType(ctid) => {
+                let ct_name = ctx.db.walk_composite_type(ctid).name();
+                ctx.push_error(DatamodelError::new_composite_type_field_validation_error(
+                    "Defaults inside composite types are not supported",
+                    ct_name,
+                    &ast_field.name.name,
+                    args.span(),
+                ));
+            }
             ScalarFieldType::Enum(enum_id) => {
                 match value.as_constant_literal() {
                     Ok(value) => {
@@ -470,7 +454,8 @@ fn visit_field_default<'ast>(
 fn visit_model_ignore(model_id: ast::ModelId, model_data: &mut ModelAttributes<'_>, ctx: &mut Context<'_>) {
     let ignored_field_errors: Vec<_> = ctx
         .db
-        .iter_model_scalar_fields(model_id)
+        .types
+        .range_model_scalar_fields(model_id)
         .filter(|(_, sf)| sf.is_ignored)
         .map(|(field_id, _)| {
             DatamodelError::new_attribute_validation_error(
@@ -539,12 +524,12 @@ fn model_index<'ast>(
             None
         }
         // backwards compatibility, accept name arg on normal indexes and use it as map arg.
-        (Some(name), None) => Some(name),
-        (None, Some(map)) => Some(map),
+        (Some(name), None) => Some(Cow::from(name)),
+        (None, Some(map)) => Some(Cow::from(map)),
         (None, None) => None,
     };
 
-    data.indexes.push((args.attribute(), index_attribute));
+    data.ast_indexes.push((args.attribute(), index_attribute));
 }
 
 /// Validate @@unique on models.
@@ -597,9 +582,9 @@ fn model_unique<'ast>(
     };
 
     index_attribute.name = name;
-    index_attribute.db_name = db_name;
+    index_attribute.db_name = db_name.map(Cow::from);
 
-    data.indexes.push((args.attribute(), index_attribute));
+    data.ast_indexes.push((args.attribute(), index_attribute));
 }
 
 fn common_index_validations<'ast>(
@@ -625,15 +610,20 @@ fn common_index_validations<'ast>(
             relation_fields,
         }) => {
             if !unresolvable_fields.is_empty() {
-                ctx.push_error(DatamodelError::new_model_validation_error(
-                    &format!(
+                ctx.push_error({
+                    let message: &str = &format!(
                         "The {}index definition refers to the unknown fields {}.",
                         if index_data.is_unique { "unique " } else { "" },
                         unresolvable_fields.join(", "),
-                    ),
-                    ctx.db.ast()[model_id].name(),
-                    args.span(),
-                ));
+                    );
+                    let model_name = ctx.db.ast()[model_id].name();
+                    let span = args.span();
+                    DatamodelError::ModelValidationError {
+                        message: String::from(message),
+                        model_name: String::from(model_name),
+                        span,
+                    }
+                });
             }
 
             if !relation_fields.is_empty() {

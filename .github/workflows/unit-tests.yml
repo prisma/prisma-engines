@@ -36,6 +36,7 @@ jobs:
                   --exclude=migration-engine-tests \
                   --exclude=migration-engine-cli \
                   --exclude=sql-schema-describer \
-                  --exclude=introspection-engine-tests
+                  --exclude=introspection-engine-tests \
+                  --exclude=mongodb-introspection-connector
         env:
           CLICOLOR_FORCE: 1

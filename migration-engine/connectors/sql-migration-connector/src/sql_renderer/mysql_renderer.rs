@@ -318,7 +318,7 @@ fn render_mysql_modify(
         nullability = if next_column.arity().is_required() {
             " NOT NULL"
         } else {
-            ""
+            " NULL"
         },
         default = default,
         sequence = if next_column.is_autoincrement() {

@@ -6,6 +6,7 @@ use datamodel::{
 use pretty_assertions::assert_eq;
 
 pub(crate) use expect_test::expect;
+pub(crate) use indoc::formatdoc;
 pub(crate) use indoc::indoc;
 
 pub(crate) trait DatasourceAsserts {

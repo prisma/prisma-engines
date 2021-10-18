@@ -2,9 +2,10 @@ use crate::default_value::DefaultKind;
 use crate::field::{Field, FieldType, RelationField, ScalarField};
 use crate::scalars::ScalarType;
 use crate::traits::{Ignorable, WithDatabaseName, WithName};
+use indoc::formatdoc;
 
 /// Represents a model in a prisma schema.
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone, Default)]
 pub struct Model {
     /// Name of the model.
     pub name: String,
@@ -117,6 +118,7 @@ impl Model {
     pub fn scalar_fields_mut(&mut self) -> impl Iterator<Item = &mut ScalarField> {
         self.fields_mut().filter_map(|fw| match fw {
             Field::RelationField(_) => None,
+            Field::CompositeField(_) => None,
             Field::ScalarField(sf) => Some(sf),
         })
     }
@@ -125,6 +127,7 @@ impl Model {
     pub fn relation_fields_mut(&mut self) -> impl Iterator<Item = &mut RelationField> {
         self.fields_mut().filter_map(|fw| match fw {
             Field::RelationField(rf) => Some(rf),
+            Field::CompositeField(_) => None,
             Field::ScalarField(_) => None,
         })
     }
@@ -169,6 +172,7 @@ impl Model {
     }
 
     /// Finds a relation field by name and returns a mutable reference.
+    #[track_caller]
     pub fn find_relation_field_mut(&mut self, name: &str) -> &mut RelationField {
         let model_name = &self.name.clone();
         self.relation_fields_mut().find(|rf| rf.name == *name).expect(&*format!(
@@ -219,7 +223,29 @@ impl Model {
         // first candidate: primary key
         {
             if let Some(pk) = &self.primary_key {
-                let id_fields: Vec<_> = pk.fields.iter().map(|f| self.find_scalar_field(f).unwrap()).collect();
+                let id_fields: Vec<_> = pk
+                    .fields
+                    .iter()
+                    .map(|f| match self.find_scalar_field(f) {
+                        Some(field) => field,
+                        None => {
+                            let error = formatdoc!(
+                                r#"
+                                Hi there! We've been seeing this error in our error reporting backend,
+                                but cannot reproduce it in our own tests. The problem is that we have a
+                                primary key in the model `{}` that uses the column `{}` which we for
+                                some reason don't have in our internal representation. If you see this,
+                                could you please file an issue to https://github.com/prisma/prisma so we
+                                can discuss about fixing this. -- Your friendly prisma developers.
+                            "#,
+                                self.name,
+                                f
+                            );
+
+                            panic!("{}", error.replace('\n', " "));
+                        }
+                    })
+                    .collect();
 
                 if !id_fields.is_empty()
                     && !id_fields

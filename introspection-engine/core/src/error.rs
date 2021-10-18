@@ -12,6 +12,8 @@ pub enum Error {
     InvalidDatabaseUrl(String),
     /// When there are no models or enums detected.
     IntrospectionResultEmpty(String),
+    /// Preview feature was not enabled
+    PreviewFeatureNotEnabled(String),
 }
 
 impl Display for Error {
@@ -25,6 +27,7 @@ impl Display for Error {
                 f.write_str(details)
             }
             Error::Generic(err) => f.write_str(err),
+            Error::PreviewFeatureNotEnabled(err) => f.write_str(err),
         }
     }
 }
@@ -37,6 +40,7 @@ impl std::error::Error for Error {
             Error::InvalidDatabaseUrl(_) => None,
             Error::IntrospectionResultEmpty(_) => None,
             Error::Generic(_) => None,
+            Error::PreviewFeatureNotEnabled(_) => None,
         }
     }
 }
@@ -45,6 +49,7 @@ impl From<ConnectorError> for Error {
     fn from(e: ConnectorError) -> Self {
         match e.kind {
             ErrorKind::InvalidDatabaseUrl(reason) => Self::InvalidDatabaseUrl(reason),
+            e @ ErrorKind::PreviewFeatureNotEnabled(_) => Self::PreviewFeatureNotEnabled(e.to_string()),
             _ => Error::ConnectorError(e),
         }
     }

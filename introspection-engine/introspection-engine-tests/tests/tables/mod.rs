@@ -345,7 +345,7 @@ async fn a_table_with_a_multi_column_non_unique_index(api: &TestApi) -> TestResu
 }
 
 // SQLite does not have a serial type that's not a primary key.
-#[test_connector(exclude(Sqlite, Mysql))]
+#[test_connector(exclude(Sqlite, Mysql, Cockroach))]
 async fn a_table_with_non_id_autoincrement(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -355,6 +355,34 @@ async fn a_table_with_non_id_autoincrement(api: &TestApi) -> TestResult {
 
                 t.add_constraint("Test_pkey", types::primary_constraint(vec!["id"]));
                 t.add_constraint("Test_authorId_key", types::unique_constraint(vec!["authorId"]));
+            });
+        })
+        .await?;
+
+    let dm = indoc! {r#"
+        model Test {
+            id       Int @id
+            authorId Int @default(autoincrement()) @unique
+        }
+    "#};
+
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
+
+    Ok(())
+}
+
+// Cockroach can return non-deterministic results if the UNIQUE constraint is defined twice
+// (it does not collapse similar unique constraints). This variation does not include the
+// doubly defined unique constraint.
+#[test_connector(tags(Cockroach))]
+async fn a_table_with_non_id_autoincrement_cockroach(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("Test", |t| {
+                t.add_column("id", types::integer());
+                t.add_column("authorId", types::serial().unique(true));
+
+                t.add_constraint("Test_pkey", types::primary_constraint(vec!["id"]));
             });
         })
         .await?;
@@ -595,7 +623,7 @@ async fn a_table_with_partial_indexes_should_ignore_them(api: &TestApi) -> TestR
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(Cockroach))]
 async fn introspecting_a_table_with_json_type_must_work(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -610,6 +638,31 @@ async fn introspecting_a_table_with_json_type_must_work(api: &TestApi) -> TestRe
         model Blog {
             id      Int @id @default(autoincrement())
             json    Json @db.Json
+        }
+    "#};
+
+    let result = api.introspect().await?;
+
+    api.assert_eq_datamodels(dm, &result);
+
+    Ok(())
+}
+
+#[test_connector(tags(Cockroach))]
+async fn introspecting_a_table_with_json_type_must_work_cockroach(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("Blog", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("json", types::json());
+            });
+        })
+        .await?;
+
+    let dm = indoc! {r#"
+        model Blog {
+            id      Int @id @default(autoincrement())
+            json    Json
         }
     "#};
 
@@ -881,12 +934,14 @@ async fn unique_and_id_on_same_field_works_mssql(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(Cockroach))]
 // If multiple constraints are created in the create table statement Postgres seems to collapse them
 // into the first named one. So on the db level there will be one named really_must_be_different that
 // is both unique and primary. We only render it as @id then.
 // If a later alter table statement adds another unique constraint then it is persisted as its own
 // entity and can be introspected.
+// In CockroachDB, index OIDs are statically hashed. However, the ordering means that either index
+// can be returned. As such, the test is skipped. See https://github.com/cockroachdb/cockroach/issues/71098.
 async fn unique_and_index_on_same_field_works_postgres(api: &TestApi) -> TestResult {
     api.raw_cmd(
         "

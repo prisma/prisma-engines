@@ -310,9 +310,7 @@ fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: TestApi
 
     let expected_msg = if api.is_vitess() {
         "Unique constraint failed on the (not available)"
-    } else if api.is_mysql() {
-        "Unique constraint failed on the constraint: `Fruit_name_key`"
-    } else if api.is_mssql() {
+    } else if api.is_mysql() || api.is_mssql() {
         "Unique constraint failed on the constraint: `Fruit_name_key`"
     } else {
         "Unique constraint failed on the fields: (`name`)"
@@ -339,13 +337,15 @@ fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: TestApi
 }
 
 #[test_connector(tags(Mysql56))]
-fn json_fields_must_be_rejected(api: TestApi) {
+fn json_fields_must_be_rejected_on_mysql_5_6(api: TestApi) {
     let dm = r#"
         model Test {
             id Int @id
             j Json
         }
         "#;
+
+    api.ensure_connection_validity().unwrap();
 
     let result = api
         .schema_push_w_datasource(dm)

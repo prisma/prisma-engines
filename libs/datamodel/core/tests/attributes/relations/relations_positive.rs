@@ -1,6 +1,6 @@
-use crate::attributes::with_named_constraints;
+use crate::attributes::with_postgres_provider;
 use crate::common::*;
-use datamodel::{dml, ScalarType};
+use datamodel::{dml, render_datamodel_to_string, IndexDefinition, IndexType, ScalarType};
 
 #[test]
 fn must_add_referenced_fields_on_both_sides_for_many_to_many_relations() {
@@ -225,7 +225,7 @@ fn allow_complicated_self_relations() {
 
 #[test]
 fn allow_explicit_fk_name_definition() {
-    let dml = with_named_constraints(
+    let dml = with_postgres_provider(
         r#"
      model User {
          user_id Int    @id
@@ -255,7 +255,7 @@ fn allow_explicit_fk_name_definition() {
 
 #[test]
 fn allow_implicit_fk_name_definition() {
-    let dml = with_named_constraints(
+    let dml = with_postgres_provider(
         r#"
      model User {
          user_id Int    @id
@@ -285,7 +285,7 @@ fn allow_implicit_fk_name_definition() {
 
 #[test]
 fn implicit_fk_name_definition_with_mapped_models_and_fields() {
-    let dml = with_named_constraints(
+    let dml = with_postgres_provider(
         r#"
      model User {
          user_id Int    @id  @map("user_id_map")
@@ -319,7 +319,7 @@ fn implicit_fk_name_definition_with_mapped_models_and_fields() {
 
 #[test]
 fn implicit_fk_name_definition_with_mapped_models_and_fields_other_order() {
-    let dml = with_named_constraints(
+    let dml = with_postgres_provider(
         r#"
      model User {
          user_id Int    @id  @map("user_id_map")
@@ -352,6 +352,118 @@ fn implicit_fk_name_definition_with_mapped_models_and_fields_other_order() {
 }
 
 #[test]
+fn implicit_unique_constraint_on_one_to_one() {
+    let dml = with_postgres_provider(indoc! {r#"
+        model User {
+          user_id Int    @id  @map("user_id_map")
+          post    Post?
+          
+          @@map("UserMap")
+        }
+        
+        model Post {
+          post_id Int    @id @map("post_id_map")
+          user_id Int    @map("user_id_map_on_post")    
+          user    User   @relation(fields: user_id, references: user_id)
+          
+          @@map("PostMap")
+        }
+    "#});
+
+    let schema = parse(&dml);
+
+    schema
+        .assert_has_model("User")
+        .assert_has_relation_field("post")
+        .assert_relation_fk_name(None);
+
+    schema
+        .assert_has_model("Post")
+        .assert_has_relation_field("user")
+        .assert_relation_referenced_fields(&["user_id"])
+        .assert_relation_fk_name(Some("PostMap_user_id_map_on_post_fkey".to_string()));
+
+    schema.assert_has_model("Post").assert_has_index(IndexDefinition {
+        name: None,
+        db_name: Some("PostMap_user_id_map_on_post_key".to_string()),
+        fields: vec!["user_id".to_string()],
+        tpe: IndexType::Unique,
+        defined_on_field: true,
+    });
+}
+
+#[test]
+fn implicit_unique_constraint_on_compound_one_to_one() {
+    let dml = with_postgres_provider(
+        r#"
+     model User {
+         user_id_1  Int    
+         user_id_2  Int    
+         post       Post?
+         
+         @@id([user_id_1, user_id_2])
+     }
+
+     model Post {
+         post_id    Int    @id
+         user_id_1  Int      
+         user_id_2  Int      
+         user       User   @relation(fields: [user_id_1, user_id_2], references: [user_id_1, user_id_2])
+     }
+     "#,
+    );
+
+    let schema = parse(&dml);
+
+    schema
+        .assert_has_model("User")
+        .assert_has_relation_field("post")
+        .assert_relation_fk_name(None);
+    schema
+        .assert_has_model("Post")
+        .assert_has_relation_field("user")
+        .assert_relation_referenced_fields(&["user_id_1", "user_id_2"])
+        .assert_relation_fk_name(Some("Post_user_id_1_user_id_2_fkey".to_string()));
+
+    schema.assert_has_model("Post").assert_has_index(IndexDefinition {
+        name: None,
+        db_name: Some("Post_user_id_1_user_id_2_key".to_string()),
+        fields: vec!["user_id_1".to_string(), "user_id_2".to_string()],
+        tpe: IndexType::Unique,
+        defined_on_field: false,
+    });
+}
+
+#[test]
+fn no_unique_constraint_if_referring_the_pk() {
+    let dml = with_postgres_provider(indoc! {r#"
+        model Cat {
+          id      Int @id
+          collar  Collar?
+        }
+
+        model Collar {
+          id      Int @id
+          cat     Cat @relation(fields:[id], references: [id])
+        }
+    "#});
+
+    let expected = expect![[r#"
+        model Cat {
+          id     Int     @id
+          collar Collar?
+        }
+
+        model Collar {
+          id  Int @id
+          cat Cat @relation(fields: [id], references: [id])
+        }
+    "#]];
+
+    expected.assert_eq(&render_datamodel_to_string(&parse(&dml), None));
+}
+
+#[test]
 fn one_to_one_optional() {
     let dml = r#"
         model A {
@@ -366,7 +478,7 @@ fn one_to_one_optional() {
         }
     "#;
 
-    let schema = parse(&dml);
+    let schema = parse(dml);
     schema.assert_has_model("A").assert_has_relation_field("b");
     schema.assert_has_model("B").assert_has_relation_field("a");
 }

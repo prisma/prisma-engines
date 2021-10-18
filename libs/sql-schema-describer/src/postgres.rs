@@ -8,7 +8,7 @@ use native_types::{NativeType, PostgresType};
 use quaint::{connector::ResultRow, prelude::Queryable};
 use regex::Regex;
 use serde_json::from_str;
-use std::{any::type_name, borrow::Cow, collections::BTreeMap, convert::TryInto};
+use std::{any::type_name, borrow::Cow, collections::BTreeMap, collections::HashSet, convert::TryInto};
 use tracing::trace;
 
 #[enumflags2::bitflags]
@@ -57,6 +57,33 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
         let table_names = self.get_table_names(schema).await?;
         let mut tables = Vec::with_capacity(table_names.len());
 
+        if self.is_cockroach() {
+            // Currently, we ignore all hidden columns from CockroachDB.
+            // However, these still show up from get_indices, where CockroachDB can place implicit
+            // columns in front of indexes and primary keys.
+            // For now, remove all hidden columns from the indexes and PK, removing them as an index
+            // or PK if every column is implicit.
+            for (table_name, table_indexes) in indexes.iter_mut() {
+                let mut table_columns = HashSet::new();
+                if let Some(val) = columns.get(table_name) {
+                    for c in val {
+                        table_columns.insert(c.name.to_string());
+                    }
+                }
+                let (indexes, table_pk_wrapped) = table_indexes;
+
+                let table_pk = table_pk_wrapped.as_mut().unwrap();
+                table_pk.columns.retain(|c| table_columns.contains(c));
+                if table_pk.columns.is_empty() {
+                    table_indexes.1 = None;
+                }
+                for index in indexes.iter_mut() {
+                    index.columns.retain(|c| table_columns.contains(c))
+                }
+                indexes.retain(|i| !i.columns.is_empty());
+            }
+        }
+
         for table_name in &table_names {
             tables.push(self.get_table(table_name, &mut columns, &mut foreign_keys, &mut indexes));
         }
@@ -80,8 +107,12 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
     }
 }
 
-static PG_RE_NUM: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?(-?\d+)('::.*)?$").expect("compile regex"));
-static PG_RE_FLOAT: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?([^']+)('::.*)?$").expect("compile regex"));
+// Examples (postgres): 1, 1::INT, '1'::INT, -1::INT, '-1'::INT
+// Examples (cockroach): 1:::INT, '1':::INT, (-1):::INT, ('-1'):::INT
+static PG_RE_NUM: Lazy<Regex> = Lazy::new(|| Regex::new(r"^\(?'?(-?\d+)'?\)?(:{2,3}.*)?$").expect("compile regex"));
+// Examples (postgres): 5.3, 5.3::FLOAT, -5.3, '-5.3'::FLOAT
+// Examples (cockroach): 5.3:::FLOAT8, (-5.3):::FLOAT8
+static PG_RE_FLOAT: Lazy<Regex> = Lazy::new(|| Regex::new(r"^\(?'?([^:')]+)'?\)?(:{2,3}.*)?$").expect("compile regex"));
 
 impl Parser for SqlSchemaDescriber<'_> {
     fn re_num() -> &'static Regex {
@@ -233,7 +264,14 @@ impl<'a> SqlSchemaDescriber<'a> {
     ) -> DescriberResult<BTreeMap<String, Vec<Column>>> {
         let mut columns: BTreeMap<String, Vec<Column>> = BTreeMap::new();
 
-        let sql = r#"
+        let is_visible_clause = if self.is_cockroach() {
+            " AND info.is_hidden = 'NO'"
+        } else {
+            ""
+        };
+
+        let sql = format!(
+            r#"
             SELECT
                info.table_name,
                 info.column_name,
@@ -250,19 +288,21 @@ impl<'a> SqlSchemaDescriber<'a> {
                 info.data_type,
                 info.character_maximum_length
             FROM information_schema.columns info
-            JOIN pg_attribute  att on att.attname = info.column_name
-            And att.attrelid = (
+            JOIN pg_attribute att on att.attname = info.column_name
+            AND att.attrelid = (
             	SELECT pg_class.oid
             	FROM pg_class
             	JOIN pg_namespace on pg_namespace.oid = pg_class.relnamespace
             	WHERE relname = info.table_name
             	AND pg_namespace.nspname = $1
-            	)
-            WHERE table_schema = $1
+            )
+            WHERE table_schema = $1 {}
             ORDER BY ordinal_position;
-        "#;
+        "#,
+            is_visible_clause,
+        );
 
-        let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
+        let rows = self.conn.query_raw(sql.as_str(), &[schema.into()]).await?;
 
         for col in rows {
             trace!("Got column: {:?}", col);
@@ -522,7 +562,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                     generate_subscripts(pg_index.indkey, 1) AS indkeyidx
                 FROM pg_index
                 -- ignores partial indexes
-                Where indpred is Null
+                WHERE indpred IS NULL
                 GROUP BY indrelid, indexrelid, indisunique, indisprimary, indkeyidx, indkey
                 ORDER BY indrelid, indexrelid, indkeyidx
             ) rawIndex,
@@ -843,7 +883,7 @@ fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
 static RE_SEQ: Lazy<Regex> = Lazy::new(|| Regex::new("^(?:.+\\.)?\"?([^.\"]+)\"?").expect("compile regex"));
 
 static AUTOINCREMENT_REGEX: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r#"nextval\((\(?)'((.+)\.)?(("(?P<sequence>.+)")|(?P<sequence2>.+))'(::text\))?::regclass\)"#)
+    Regex::new(r#"nextval\((\(?)'((.+)\.)?(("(?P<sequence>.+)")|(?P<sequence2>.+))'(::text\))?::(regclass|REGCLASS)\)"#)
         .expect("compile autoincrement regex")
 });
 
@@ -879,7 +919,7 @@ fn fetch_dbgenerated(value: &str) -> Option<String> {
 fn unsuffix_default_literal<'a, T: AsRef<str>>(literal: &'a str, expected_suffixes: &[T]) -> Option<Cow<'a, str>> {
     // Tries to match expressions of the form <expr> or <expr>::<type> or <expr>:::<type>.
     static POSTGRES_DATA_TYPE_SUFFIX_RE: Lazy<Regex> =
-        Lazy::new(|| Regex::new(r#"(?ms)^(.*?):{2,3}(\\")?(.*)(\\")?$"#).unwrap());
+        Lazy::new(|| Regex::new(r#"(?ms)^\(?(.*?)\)?:{2,3}(\\")?(.*)(\\")?$"#).unwrap());
 
     let captures = POSTGRES_DATA_TYPE_SUFFIX_RE.captures(literal)?;
     let suffix = captures.get(3).unwrap().as_str();

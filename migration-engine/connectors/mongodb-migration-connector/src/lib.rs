@@ -62,6 +62,14 @@ impl MigrationConnector for MongoDbMigrationConnector {
         "mongodb"
     }
 
+    async fn create_database(&self) -> ConnectorResult<String> {
+        todo!();
+    }
+
+    async fn ensure_connection_validity(&self) -> ConnectorResult<()> {
+        Ok(())
+    }
+
     async fn version(&self) -> migration_connector::ConnectorResult<String> {
         Ok("4".to_owned())
     }
@@ -81,6 +89,10 @@ impl MigrationConnector for MongoDbMigrationConnector {
             }
             _ => todo!(),
         }
+    }
+
+    async fn drop_database(&self) -> ConnectorResult<()> {
+        todo!();
     }
 
     fn migration_file_extension(&self) -> &'static str {

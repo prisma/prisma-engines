@@ -372,6 +372,7 @@ impl<'a> Reformatter<'a> {
 
         for current in token.clone().into_inner() {
             match current.as_rule() {
+                Rule::MODEL_KEYWORD | Rule::TYPE_KEYWORD => (),
                 Rule::BLOCK_OPEN => {
                     block_has_opened = true;
                 }
@@ -881,7 +882,6 @@ impl<'a> Reformatter<'a> {
     }
 
     fn reformat_generic_token(target: &mut dyn LineWriteable, token: &Token<'_>) {
-        //        println!("generic token: |{:?}|", token.as_str());
         match token.as_rule() {
             Rule::NEWLINE => target.end_line(),
             Rule::comment_block => {

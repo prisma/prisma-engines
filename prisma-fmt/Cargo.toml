@@ -4,11 +4,18 @@ version = "0.1.0"
 authors = ["Emanuel Joebstl <emanuel.joebstl@gmail.com>"]
 edition = "2018"
 
+# crate-type for wasm builds.
+# Commented out because it fails binary builds on linux-musl (Alpine).
+# [lib]
+# crate-type = ["cdylib"]
+
 [dependencies]
 datamodel = { path = "../libs/datamodel/core" }
-structopt = "0.3"
-serde = { version = "1.0.90", features = ["derive"] }
 serde_json = { version = "1.0", features = ["float_roundtrip"] }
+serde = { version = "1.0.90", features = ["derive"] }
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+structopt = "0.3"
 
 [features]
 # sigh please don't ask :(

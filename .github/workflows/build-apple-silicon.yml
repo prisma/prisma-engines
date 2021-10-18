@@ -53,7 +53,7 @@ jobs:
       - run: |
           SDKROOT=$(xcrun -sdk macosx11.1 --show-sdk-path)
           MACOSX_DEPLOYMENT_TARGET=$(xcrun -sdk macosx11.1 --show-sdk-platform-version)
-          cargo build --target=aarch64-apple-darwin --release
+          cargo build --target=aarch64-apple-darwin --release -p query-engine -p query-engine-node-api -p migration-engine-cli -p introspection-core -p prisma-fmt --features vendored-openssl
 
       - uses: actions/upload-artifact@v2
         with:

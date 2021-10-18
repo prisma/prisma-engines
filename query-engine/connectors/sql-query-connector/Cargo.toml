@@ -42,7 +42,7 @@ path = "../query-connector"
 
 [dependencies.prisma-models]
 features = ["sql-ext"]
-path = "../../../libs/prisma-models"
+path = "../../prisma-models"
 
 [dependencies.prisma-value]
 features = ["sql-ext"]

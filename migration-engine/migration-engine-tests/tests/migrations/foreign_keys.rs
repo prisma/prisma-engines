@@ -18,9 +18,8 @@ fn foreign_keys_of_inline_one_to_one_relations_have_a_unique_constraint(api: Tes
 
     api.schema_push_w_datasource(dm).send().assert_green();
     api.assert_schema().assert_table("Box", |t| {
-        t.assert_indexes_count(1).assert_index_on_columns(&["cat_id"], |idx| {
-            idx.assert_is_unique().assert_name("Box_cat_id_unique")
-        })
+        t.assert_indexes_count(1)
+            .assert_index_on_columns(&["cat_id"], |idx| idx.assert_is_unique().assert_name("Box_cat_id_key"))
     });
 }
 

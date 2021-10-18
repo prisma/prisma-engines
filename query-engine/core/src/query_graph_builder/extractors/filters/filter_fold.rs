@@ -83,7 +83,7 @@ fn fold_not(filters: Vec<Filter>) -> Filter {
 }
 
 #[test]
-fn ensure_and_folded() -> () {
+fn ensure_and_folded() {
     let input = fold_filter(Filter::And(vec![Filter::Empty, Filter::And(vec![Filter::Empty])]));
     let expected_output = Filter::And(vec![Filter::Empty, Filter::Empty]);
 
@@ -91,7 +91,7 @@ fn ensure_and_folded() -> () {
 }
 
 #[test]
-fn ensure_or_folded() -> () {
+fn ensure_or_folded() {
     let input = fold_filter(Filter::Or(vec![Filter::Empty, Filter::Or(vec![Filter::Empty])]));
     let expected_output = Filter::Or(vec![Filter::Empty, Filter::Empty]);
 
@@ -99,7 +99,7 @@ fn ensure_or_folded() -> () {
 }
 
 #[test]
-fn ensure_not_is_not_folded() -> () {
+fn ensure_not_is_not_folded() {
     let input = fold_filter(Filter::Not(vec![Filter::Empty, Filter::Not(vec![Filter::Empty])]));
     let expected_output = Filter::Not(vec![Filter::Empty, Filter::Not(vec![Filter::Empty])]);
     assert_eq!(input, expected_output);
@@ -114,7 +114,7 @@ fn ensure_not_is_not_folded() -> () {
 }
 
 #[test]
-fn ensure_nested_conditions_are_folded() -> () {
+fn ensure_nested_conditions_are_folded() {
     let input = fold_filter(Filter::Not(vec![
         Filter::Empty,
         Filter::Not(vec![Filter::Not(vec![Filter::Empty])]),
@@ -138,7 +138,7 @@ fn ensure_nested_conditions_are_folded() -> () {
 }
 
 #[test]
-fn ensure_filter_fold_does_not_alter_boolean_logic() -> () {
+fn ensure_filter_fold_does_not_alter_boolean_logic() {
     let filters = generate_filters();
 
     for filter in filters {
