@@ -132,6 +132,7 @@ impl JoinStage {
         pipeline.push(doc! { "$match": { "$expr": { "$and": ops } }});
         pipeline.extend(nested_stages);
 
+        // If the field is a to-one, add an unwind stage.
         let unwind_stage = if !from_field.is_list {
             Some(doc! {
                 "$unwind": { "path": format!("${}", as_name), "preserveNullAndEmptyArrays": true }
