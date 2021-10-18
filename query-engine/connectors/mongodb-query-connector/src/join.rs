@@ -58,13 +58,10 @@ impl JoinStage {
         let nested_stages: Vec<Document> = self
             .nested
             .into_iter()
-            .flat_map(|nested_stage| {
-                let (join, unwind) = nested_stage.build();
+            .map(|nested_stage| {
+                let (join, _) = nested_stage.build();
 
-                match unwind {
-                    Some(unwind) => vec![join, unwind],
-                    None => vec![join],
-                }
+                join
             })
             .collect();
 
