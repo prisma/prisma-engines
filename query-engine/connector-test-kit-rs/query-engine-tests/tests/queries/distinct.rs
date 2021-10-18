@@ -168,7 +168,7 @@ mod distinct {
     /// 5 => ["2", "3", "2"]
     async fn nested_dataset(runner: &Runner) -> TestResult<()> {
         test_user(
-            &runner,
+            runner,
             r#"{ id: 1, first_name: "Joe", last_name: "Doe", email: "1", posts: {
             create: [
                 { id: 1, title: "3" }
@@ -182,7 +182,7 @@ mod distinct {
         .await?;
 
         test_user(
-            &runner,
+            runner,
             r#"{ id: 2, first_name: "Joe", last_name: "Doe", email: "2", posts: {
             create: [
                 { id: 6, title: "1" }
@@ -193,13 +193,13 @@ mod distinct {
         .await?;
 
         test_user(
-            &runner,
+            runner,
             r#"{ id: 3, first_name: "Rocky", last_name: "Balboa", email: "3" }"#,
         )
         .await?;
 
         test_user(
-            &runner,
+            runner,
             r#"{ id: 4, first_name: "Papa", last_name: "Elon", email: "4", posts: {
             create: [
                 { id: 8, title: "1" }
@@ -210,7 +210,7 @@ mod distinct {
         .await?;
 
         test_user(
-            &runner,
+            runner,
             r#"{ id: 5, first_name: "Troll", last_name: "Face", email: "5", posts: {
             create: [
                 { id: 10, title: "2" }

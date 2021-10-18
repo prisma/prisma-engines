@@ -36,28 +36,28 @@ impl<'ast, 'db> Hash for RelationFieldWalker<'ast, 'db> {
 }
 
 impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
-    pub(crate) fn field_id(&self) -> ast::FieldId {
+    pub(crate) fn field_id(self) -> ast::FieldId {
         self.field_id
     }
 
-    pub(crate) fn name(&self) -> &'ast str {
+    pub(crate) fn name(self) -> &'ast str {
         self.ast_field().name()
     }
 
-    pub(crate) fn ast_field(&self) -> &'ast ast::Field {
+    pub(crate) fn ast_field(self) -> &'ast ast::Field {
         &self.db.ast[self.model_id][self.field_id]
     }
 
-    pub(crate) fn attributes(&self) -> &'db RelationField<'ast> {
+    pub(crate) fn attributes(self) -> &'db RelationField<'ast> {
         self.relation_field
     }
 
     /// The relation name explicitly written in the schema source.
-    pub(crate) fn explicit_relation_name(&self) -> Option<&'ast str> {
+    pub(crate) fn explicit_relation_name(self) -> Option<&'ast str> {
         self.relation_field.name
     }
 
-    pub(crate) fn model(&self) -> ModelWalker<'ast, 'db> {
+    pub(crate) fn model(self) -> ModelWalker<'ast, 'db> {
         ModelWalker {
             model_id: self.model_id,
             db: self.db,
@@ -65,11 +65,11 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
         }
     }
 
-    pub(crate) fn references_model(&self, other: ast::ModelId) -> bool {
+    pub(crate) fn references_model(self, other: ast::ModelId) -> bool {
         self.relation_field.referenced_model == other
     }
 
-    pub(crate) fn related_model(&self) -> ModelWalker<'ast, 'db> {
+    pub(crate) fn related_model(self) -> ModelWalker<'ast, 'db> {
         let model_id = self.relation_field.referenced_model;
 
         ModelWalker {
@@ -80,7 +80,7 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
     }
 
     /// This will be None for virtual relation fields (when no `fields` argument is passed).
-    pub(crate) fn final_foreign_key_name(&self) -> Option<Cow<'ast, str>> {
+    pub(crate) fn final_foreign_key_name(self) -> Option<Cow<'ast, str>> {
         self.attributes().fk_name.map(Cow::Borrowed).or_else(|| {
             let fields = self.relation_field.fields.as_ref()?;
             let model = self.db.walk_model(self.model_id);
@@ -96,13 +96,13 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
 
     /// The name of the relation. Either uses the `name` (or default) argument,
     /// or generates an implicit name.
-    pub(crate) fn relation_name(&self) -> RelationName<'ast> {
+    pub(crate) fn relation_name(self) -> RelationName<'ast> {
         self.explicit_relation_name()
             .map(RelationName::Explicit)
             .unwrap_or_else(|| RelationName::generated(self.model().name(), self.related_model().name()))
     }
 
-    pub(crate) fn referential_arity(&self) -> FieldArity {
+    pub(crate) fn referential_arity(self) -> FieldArity {
         let some_required = self.fields().any(|f| f.ast_field().arity.is_required());
 
         if some_required {
@@ -112,7 +112,7 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
         }
     }
 
-    fn fields(&self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, '_>> + '_ {
+    fn fields(self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db {
         let f = move |field_id: &ast::FieldId| {
             let model_id = self.model_id;
 

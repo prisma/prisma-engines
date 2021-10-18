@@ -118,6 +118,7 @@ fn sanitize_models(datamodel: &mut Datamodel, ctx: &IntrospectionContext) -> Has
                         };
                     }
                 }
+                Field::CompositeField(_) => todo!(),
             }
         }
 

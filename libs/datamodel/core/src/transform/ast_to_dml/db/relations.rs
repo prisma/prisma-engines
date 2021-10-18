@@ -106,7 +106,7 @@ pub(super) enum OneToOneRelationFields {
 }
 
 #[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
-pub(super) enum RelationType {
+pub(super) enum RelationAttributes {
     ImplicitManyToMany {
         field_a: ast::FieldId,
         field_b: ast::FieldId,
@@ -115,24 +115,47 @@ pub(super) enum RelationType {
     OneToMany(OneToManyRelationFields),
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum RelationType {
+    ImplicitManyToMany,
+    OneToOne,
+    OneToMany,
+}
+
+impl RelationType {
+    pub(crate) fn is_one_to_one(self) -> bool {
+        matches!(self, Self::OneToOne)
+    }
+}
+
 #[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
 pub(crate) struct Relation<'ast> {
     /// The `name` argument in `@relation`.
     relation_name: Option<&'ast str>,
-    r#type: RelationType,
+    attributes: RelationAttributes,
 }
 
 impl<'ast> Relation<'ast> {
     pub(crate) fn is_many_to_many(&self) -> bool {
-        matches!(self.r#type, RelationType::ImplicitManyToMany { .. })
+        matches!(self.attributes, RelationAttributes::ImplicitManyToMany { .. })
     }
 
     pub(crate) fn as_complete_fields(&self) -> Option<(ast::FieldId, ast::FieldId)> {
-        match &self.r#type {
-            RelationType::ImplicitManyToMany { field_a, field_b } => Some((*field_a, *field_b)),
-            RelationType::OneToOne(OneToOneRelationFields::Both(field_a, field_b)) => Some((*field_a, *field_b)),
-            RelationType::OneToMany(OneToManyRelationFields::Both(field_a, field_b)) => Some((*field_a, *field_b)),
+        match &self.attributes {
+            RelationAttributes::ImplicitManyToMany { field_a, field_b } => Some((*field_a, *field_b)),
+            RelationAttributes::OneToOne(OneToOneRelationFields::Both(field_a, field_b)) => Some((*field_a, *field_b)),
+            RelationAttributes::OneToMany(OneToManyRelationFields::Both(field_a, field_b)) => {
+                Some((*field_a, *field_b))
+            }
             _ => None,
+        }
+    }
+
+    pub(super) fn r#type(&self) -> RelationType {
+        match self.attributes {
+            RelationAttributes::ImplicitManyToMany { .. } => RelationType::ImplicitManyToMany,
+            RelationAttributes::OneToOne(_) => RelationType::OneToOne,
+            RelationAttributes::OneToMany(_) => RelationType::OneToMany,
         }
     }
 }
@@ -203,7 +226,7 @@ pub(super) fn ingest_relation<'ast, 'db>(
                 return;
             }
 
-            RelationType::ImplicitManyToMany {
+            RelationAttributes::ImplicitManyToMany {
                 field_a: evidence.field_id,
                 field_b: opp_field_id,
             }
@@ -212,7 +235,7 @@ pub(super) fn ingest_relation<'ast, 'db>(
         // 1:1
         (ast::FieldArity::Required, Some((opp_field_id, opp_field, _))) if opp_field.arity.is_optional() => {
             // This is a required 1:1 relation, and we are on the required side.
-            RelationType::OneToOne(OneToOneRelationFields::Both(evidence.field_id, opp_field_id))
+            RelationAttributes::OneToOne(OneToOneRelationFields::Both(evidence.field_id, opp_field_id))
         }
         (ast::FieldArity::Optional, Some((_, opp_field, _))) if opp_field.arity.is_required() => {
             // This is a required 1:1 relation, and we are on the virtual side. Skip.
@@ -226,7 +249,7 @@ pub(super) fn ingest_relation<'ast, 'db>(
             // This is a 1:1 relation that is optional on both sides. We must infer which side is model A.
 
             if evidence.relation_field.fields.is_some() {
-                RelationType::OneToOne(OneToOneRelationFields::Both(evidence.field_id, opp_field_id))
+                RelationAttributes::OneToOne(OneToOneRelationFields::Both(evidence.field_id, opp_field_id))
             } else {
                 return;
             }
@@ -238,11 +261,11 @@ pub(super) fn ingest_relation<'ast, 'db>(
         }
         (ast::FieldArity::List, None) => {
             // This is a 1:m relation defined on the virtual side only.
-            RelationType::OneToMany(OneToManyRelationFields::Back(evidence.field_id))
+            RelationAttributes::OneToMany(OneToManyRelationFields::Back(evidence.field_id))
         }
         (ast::FieldArity::Required | ast::FieldArity::Optional, Some((opp_field_id, _, _))) => {
             // This is a 1:m relation defined on both sides.
-            RelationType::OneToMany(OneToManyRelationFields::Both(evidence.field_id, opp_field_id))
+            RelationAttributes::OneToMany(OneToManyRelationFields::Both(evidence.field_id, opp_field_id))
         }
 
         // 1:m or 1:1
@@ -252,15 +275,15 @@ pub(super) fn ingest_relation<'ast, 'db>(
             // 1:1 or a 1:m relation.
             match &evidence.relation_field.fields {
                 Some(fields) if ctx.db.walk_model(evidence.model_id).fields_are_unique(fields) => {
-                    RelationType::OneToOne(OneToOneRelationFields::Forward(evidence.field_id))
+                    RelationAttributes::OneToOne(OneToOneRelationFields::Forward(evidence.field_id))
                 }
-                _ => RelationType::OneToMany(OneToManyRelationFields::Forward(evidence.field_id)),
+                _ => RelationAttributes::OneToMany(OneToManyRelationFields::Forward(evidence.field_id)),
             }
         }
     };
 
     let relation = Relation {
-        r#type: relation_type,
+        attributes: relation_type,
         relation_name: evidence.relation_field.name,
     };
 

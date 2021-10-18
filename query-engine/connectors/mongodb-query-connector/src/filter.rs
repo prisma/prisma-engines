@@ -35,19 +35,19 @@ pub(crate) struct MongoRelationFilter {
 }
 
 /// Builds a MongoDB query filter from a Prisma filter.
-pub(crate) fn convert_filter(filter: Filter, invert: bool) -> crate::Result<MongoFilter> {
+pub(crate) fn convert_filter(filter: Filter, invert: bool, is_having_filter: bool) -> crate::Result<MongoFilter> {
     let filter = fold_compounds(filter);
     let filter_pair = match filter {
-        Filter::And(filters) if invert => coerce_empty(false, "$or", filters, invert)?,
-        Filter::And(filters) => coerce_empty(true, "$and", filters, invert)?,
+        Filter::And(filters) if invert => coerce_empty(false, "$or", filters, invert, is_having_filter)?,
+        Filter::And(filters) => coerce_empty(true, "$and", filters, invert, is_having_filter)?,
 
-        Filter::Or(filters) if invert => coerce_empty(true, "$and", filters, invert)?,
-        Filter::Or(filters) => coerce_empty(false, "$or", filters, invert)?,
+        Filter::Or(filters) if invert => coerce_empty(true, "$and", filters, invert, is_having_filter)?,
+        Filter::Or(filters) => coerce_empty(false, "$or", filters, invert, is_having_filter)?,
 
-        Filter::Not(filters) if invert => coerce_empty(false, "$or", filters, !invert)?,
-        Filter::Not(filters) => coerce_empty(true, "$and", filters, !invert)?,
+        Filter::Not(filters) if invert => coerce_empty(false, "$or", filters, !invert, is_having_filter)?,
+        Filter::Not(filters) => coerce_empty(true, "$and", filters, !invert, is_having_filter)?,
 
-        Filter::Scalar(sf) => scalar_filter(sf, invert, true)?,
+        Filter::Scalar(sf) => scalar_filter(sf, invert, true, is_having_filter)?,
         Filter::Empty => MongoFilter::Scalar(doc! {}),
         Filter::ScalarList(slf) => scalar_list_filter(slf, invert)?,
         Filter::OneRelationIsNull(filter) => one_is_null(filter, invert),
@@ -87,7 +87,13 @@ fn fold_compounds(filter: Filter) -> Filter {
     }
 }
 
-fn coerce_empty(truthy: bool, operation: &str, filters: Vec<Filter>, invert: bool) -> crate::Result<MongoFilter> {
+fn coerce_empty(
+    truthy: bool,
+    operation: &str,
+    filters: Vec<Filter>,
+    invert: bool,
+    is_having_filter: bool,
+) -> crate::Result<MongoFilter> {
     if filters.is_empty() {
         // We need to create a truthy or falsey expression for empty AND / OR queries.
         // _id always exists. So matching on exist/not exists creates our truthy/falsey expressions.
@@ -100,14 +106,19 @@ fn coerce_empty(truthy: bool, operation: &str, filters: Vec<Filter>, invert: boo
 
         Ok(MongoFilter::Scalar(doc))
     } else {
-        fold_filters(operation, filters, invert)
+        fold_filters(operation, filters, invert, is_having_filter)
     }
 }
 
-fn fold_filters(operation: &str, filters: Vec<Filter>, invert: bool) -> crate::Result<MongoFilter> {
+fn fold_filters(
+    operation: &str,
+    filters: Vec<Filter>,
+    invert: bool,
+    is_having_filter: bool,
+) -> crate::Result<MongoFilter> {
     let filters = filters
         .into_iter()
-        .map(|f| Ok(convert_filter(f, invert)?.render()))
+        .map(|f| Ok(convert_filter(f, invert, is_having_filter)?.render()))
         .collect::<crate::Result<Vec<_>>>()?;
 
     let (filters, joins) = fold_nested(filters);
@@ -125,7 +136,12 @@ fn fold_nested(nested: Vec<(Document, Vec<JoinStage>)>) -> (Vec<Document>, Vec<J
     })
 }
 
-fn scalar_filter(filter: ScalarFilter, invert: bool, include_field_wrapper: bool) -> crate::Result<MongoFilter> {
+fn scalar_filter(
+    filter: ScalarFilter,
+    invert: bool,
+    include_field_wrapper: bool,
+    is_having_filter: bool,
+) -> crate::Result<MongoFilter> {
     let field = match filter.projection {
         connector_interface::ScalarProjection::Single(sf) => sf,
         connector_interface::ScalarProjection::Compound(mut c) if c.len() == 1 => c.pop().unwrap(),
@@ -141,8 +157,17 @@ fn scalar_filter(filter: ScalarFilter, invert: bool, include_field_wrapper: bool
         QueryMode::Insensitive => insensitive_scalar_filter(&field, filter.condition.invert(invert))?,
     };
 
+    // Explanation: Having filters can only appear in group by queries.
+    // All group by fields go into the _id key of the result document.
+    // As it is the only point where the flat scalars are contained for the group,
+    // we need to refer to the object.
+    let field_name = match is_having_filter {
+        true => format!("_id.{}", field.db_name()),
+        false => field.db_name().to_string(),
+    };
+
     if include_field_wrapper {
-        Ok(MongoFilter::Scalar(doc! { field.db_name(): filter }))
+        Ok(MongoFilter::Scalar(doc! { field_name: filter }))
     } else {
         Ok(MongoFilter::Scalar(filter))
     }
@@ -339,7 +364,8 @@ fn relation_filter(filter: RelationFilter, invert: bool) -> crate::Result<MongoF
 
     // Tmp condition check while mongo is getting fully tested.
     let is_empty = matches!(nested_filter, Filter::Empty);
-    let (nested_filter, nested_joins) = convert_filter(nested_filter, requires_invert(&filter.condition))?.render();
+    let (nested_filter, nested_joins) =
+        convert_filter(nested_filter, requires_invert(&filter.condition), false)?.render();
 
     let mut join_stage = JoinStage::new(from_field);
     join_stage.extend_nested(nested_joins);
@@ -408,7 +434,7 @@ fn aggregate_conditions(op: &str, filter: Filter, invert: bool) -> crate::Result
         ScalarProjection::Single(field) => field.clone(),
     };
 
-    let (filter, _) = scalar_filter(sf, invert, false)?.render();
+    let (filter, _) = scalar_filter(sf, invert, false, false)?.render();
 
     Ok(MongoFilter::Scalar(
         doc! { format!("{}_{}", op, field.db_name()): filter },

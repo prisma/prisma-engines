@@ -135,7 +135,7 @@ pub async fn update_records<'conn>(
             .map(|p| (&id_field, p.values().next().unwrap()).into_bson())
             .collect::<crate::Result<Vec<_>>>()?
     } else {
-        let filter = convert_filter(record_filter.filter, false)?;
+        let filter = convert_filter(record_filter.filter, false, false)?;
         find_ids(coll.clone(), session, model, filter).await?
     };
 
@@ -243,7 +243,7 @@ pub async fn delete_records<'conn>(
 
         doc! { id_field.db_name(): { "$in": ids } }
     } else {
-        let filter = convert_filter(record_filter.filter, false)?;
+        let filter = convert_filter(record_filter.filter, false, false)?;
         let ids = find_ids(coll.clone(), session, model, filter).await?;
 
         doc! { id_field.db_name(): { "$in": ids } }

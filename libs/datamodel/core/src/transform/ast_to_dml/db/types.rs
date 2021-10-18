@@ -4,6 +4,7 @@ use itertools::Itertools;
 use once_cell::sync::Lazy;
 use regex::Regex;
 use std::{
+    borrow::Cow,
     collections::{BTreeMap, HashMap},
     str::FromStr,
 };
@@ -139,8 +140,10 @@ pub(crate) struct ModelAttributes<'ast> {
     pub(super) primary_key: Option<IdAttribute<'ast>>,
     /// @@ignore
     pub(crate) is_ignored: bool,
-    /// @@index and @(@)unique.
-    pub(super) indexes: Vec<(&'ast ast::Attribute, IndexAttribute<'ast>)>,
+    /// @@index and @(@)unique explicitely written to the schema AST.
+    pub(super) ast_indexes: Vec<(&'ast ast::Attribute, IndexAttribute<'ast>)>,
+    /// @(@)unique added implicitely to the datamodel by us.
+    pub(super) implicit_indexes: Vec<IndexAttribute<'static>>,
     /// @@map
     pub(crate) mapped_name: Option<&'ast str>,
 }
@@ -153,7 +156,9 @@ impl ModelAttributes<'_> {
 
     /// Whether MySQL would consider the field indexed for autoincrement purposes.
     pub(super) fn field_is_indexed_for_autoincrement(&self, field_id: ast::FieldId) -> bool {
-        self.indexes.iter().any(|(_, idx)| idx.fields.get(0) == Some(&field_id))
+        self.ast_indexes
+            .iter()
+            .any(|(_, idx)| idx.fields.get(0) == Some(&field_id))
             || self
                 .primary_key
                 .as_ref()
@@ -168,7 +173,7 @@ pub(crate) struct IndexAttribute<'ast> {
     pub(crate) fields: Vec<ast::FieldId>,
     pub(crate) source_field: Option<ast::FieldId>,
     pub(crate) name: Option<&'ast str>,
-    pub(crate) db_name: Option<&'ast str>,
+    pub(crate) db_name: Option<Cow<'ast, str>>,
 }
 
 #[derive(Debug, Default)]

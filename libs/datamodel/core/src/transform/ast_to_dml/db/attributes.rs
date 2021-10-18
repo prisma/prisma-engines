@@ -3,6 +3,8 @@ mod id;
 mod map;
 mod native_types;
 
+use std::borrow::Cow;
+
 use super::{
     context::{Arguments, Context},
     types::{EnumAttributes, IndexAttribute, ModelAttributes, RelationField, ScalarField, ScalarFieldType},
@@ -218,12 +220,12 @@ fn visit_scalar_field_attributes<'ast>(
             validate_db_name(ast_model, args, db_name, "@unique", ctx);
 
 
-            model_attributes.indexes.push((args.attribute(), IndexAttribute {
+            model_attributes.ast_indexes.push((args.attribute(), IndexAttribute {
                 is_unique: true,
                 fields: vec![field_id],
                 source_field: Some(field_id),
                 name: None,
-                db_name,
+                db_name: db_name.map(Cow::from),
             }))
         });
     });
@@ -522,12 +524,12 @@ fn model_index<'ast>(
             None
         }
         // backwards compatibility, accept name arg on normal indexes and use it as map arg.
-        (Some(name), None) => Some(name),
-        (None, Some(map)) => Some(map),
+        (Some(name), None) => Some(Cow::from(name)),
+        (None, Some(map)) => Some(Cow::from(map)),
         (None, None) => None,
     };
 
-    data.indexes.push((args.attribute(), index_attribute));
+    data.ast_indexes.push((args.attribute(), index_attribute));
 }
 
 /// Validate @@unique on models.
@@ -580,9 +582,9 @@ fn model_unique<'ast>(
     };
 
     index_attribute.name = name;
-    index_attribute.db_name = db_name;
+    index_attribute.db_name = db_name.map(Cow::from);
 
-    data.indexes.push((args.attribute(), index_attribute));
+    data.ast_indexes.push((args.attribute(), index_attribute));
 }
 
 fn common_index_validations<'ast>(
@@ -608,15 +610,20 @@ fn common_index_validations<'ast>(
             relation_fields,
         }) => {
             if !unresolvable_fields.is_empty() {
-                ctx.push_error(DatamodelError::new_model_validation_error(
-                    &format!(
+                ctx.push_error({
+                    let message: &str = &format!(
                         "The {}index definition refers to the unknown fields {}.",
                         if index_data.is_unique { "unique " } else { "" },
                         unresolvable_fields.join(", "),
-                    ),
-                    ctx.db.ast()[model_id].name(),
-                    args.span(),
-                ));
+                    );
+                    let model_name = ctx.db.ast()[model_id].name();
+                    let span = args.span();
+                    DatamodelError::ModelValidationError {
+                        message: String::from(message),
+                        model_name: String::from(model_name),
+                        span,
+                    }
+                });
             }
 
             if !relation_fields.is_empty() {

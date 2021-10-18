@@ -28,7 +28,6 @@ pub struct ConnectorTestArgs {
 
 impl ConnectorTestArgs {
     pub fn validate(&self, on_module: bool) -> Result<(), darling::Error> {
-        validate_only_exclude(&self.only, &self.exclude, on_module)?;
         validate_suite(&self.suite, on_module)?;
 
         if self.schema.is_none() && !on_module {

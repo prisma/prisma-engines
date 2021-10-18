@@ -316,7 +316,7 @@ mod order_by_dependent_pag {
         schema.to_string()
     }
 
-    #[connector_test(schema(multiple_rel_same_model), exclude(MongoDb))] // Mongo is excluded due to CI issues (version drift?).
+    #[connector_test(schema(multiple_rel_same_model))]
     async fn multiple_rel_same_model_order_by(runner: Runner) -> TestResult<()> {
         // test data
         run_query!(

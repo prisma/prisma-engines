@@ -57,19 +57,29 @@ impl<'a, 'b> ValidationPipeline<'a> {
         // Early return so that the validator does not have to deal with invalid schemas
         diagnostics.to_result()?;
 
-        // Phase 3: Lift AST to DML. This can't fail.
+        // Phase 3: Global validations after we have consistent data model.
+        validations::validate(&db, &mut diagnostics);
+        diagnostics.to_result()?;
+
+        // Phase 4: Lift AST to DML. This can't fail.
         let mut schema = LiftAstToDml::new(&db).lift();
 
-        // Phase 4: Validation
+        // From now on we do not operate on the internal ast anymore, but DML.
+        // Please try to avoid all new validations after this, if you can.
+
+        // Phase 5: Validation (deprecated, move stuff out from here if you can)
         self.validator.validate(db.ast(), &schema, &mut diagnostics);
 
         // Early return so that the standardiser does not have to deal with invalid schemas
         diagnostics.to_result()?;
 
-        // Phase 5: Consistency fixes. These don't fail and always run, during parsing AND formatting
-        standardise_parsing::standardise(&mut schema, self.source);
+        // Phase 6: Consistency fixes. These don't fail and always run, during
+        // parsing AND formatting. (deprecated, move stuff out from here if you
+        // can)
+        standardise_parsing::standardise(&mut schema);
 
-        // Transform phase: These only run during formatting.
+        // Transform phase: These only run during formatting. (double
+        // deprecated, please do not add anything here)
         if relation_transformation_enabled {
             if let Err(mut err) = self.standardiser_for_formatting.standardise(ast_schema, &mut schema) {
                 diagnostics.append(&mut err);
@@ -77,10 +87,6 @@ impl<'a, 'b> ValidationPipeline<'a> {
                 return Err(diagnostics);
             }
         }
-
-        // Phase 6: Global validations after we have consistent data model.
-        validations::validate(&db, &mut diagnostics);
-        diagnostics.to_result()?;
 
         // Phase 7: Post Standardisation Validation (deprecated, move stuff out from here if you can)
         self.validator
