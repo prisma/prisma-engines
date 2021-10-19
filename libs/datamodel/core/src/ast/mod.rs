@@ -67,11 +67,6 @@ impl SchemaAst {
         self.iter_models().find(|(_, m)| m.name.name == model).map(|(_, m)| m)
     }
 
-    // Deprecated. Use ParserDatabase instead where possible.
-    pub(crate) fn find_field(&self, model: &str, field: &str) -> Option<&Field> {
-        self.find_model(model)?.fields.iter().find(|f| f.name.name == field)
-    }
-
     pub(crate) fn iter_models(&self) -> impl Iterator<Item = (ModelId, &Model)> {
         self.iter_tops().filter_map(|(top_id, top)| match (top_id, top) {
             (TopId::Model(model_id), Top::Model(model)) => Some((model_id, model)),

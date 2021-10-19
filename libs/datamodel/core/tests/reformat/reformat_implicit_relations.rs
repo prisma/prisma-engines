@@ -484,16 +484,16 @@ fn forward_relation_fields_must_be_added() {
     "#};
 
     let expected = expect![[r#"
-         model PostableEntity {
-           id     String  @id
-           Post   Post?   @relation(fields: [postId], references: [id])
-           postId String?
-         }
+        model PostableEntity {
+          id     String  @id
+          Post   Post?   @relation(fields: [postId], references: [id])
+          postId String?
+        }
 
-         model Post {
-           id               String           @id
-           postableEntities PostableEntity[]
-         }
+        model Post {
+          id               String           @id
+          postableEntities PostableEntity[]
+        }
     "#]];
 
     let result = Reformatter::new(input).reformat_to_string();

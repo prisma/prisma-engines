@@ -111,7 +111,10 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
     }
 
     pub(crate) fn referential_arity(self) -> FieldArity {
-        let some_required = self.fields().any(|f| f.ast_field().arity.is_required());
+        let some_required = self
+            .fields()
+            .map(|mut f| f.any(|f| f.ast_field().arity.is_required()))
+            .unwrap_or(false);
 
         if some_required {
             FieldArity::Required
@@ -120,22 +123,17 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
         }
     }
 
-    pub(crate) fn fields(self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> {
-        let f = move |field_id: &ast::FieldId| {
-            let model_id = self.model_id;
-
-            ScalarFieldWalker {
+    pub(crate) fn fields(self) -> Option<impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>>> {
+        let model_id = self.model_id;
+        let attributes = self.attributes();
+        attributes.fields.as_ref().map(move |fields| {
+            fields.iter().map(move |field_id| ScalarFieldWalker {
                 model_id,
                 field_id: *field_id,
                 db: self.db,
                 scalar_field: &self.db.types.scalar_fields[&(model_id, *field_id)],
-            }
-        };
-
-        match self.attributes().fields.as_ref() {
-            Some(references) => references.iter().map(f),
-            None => [].iter().map(f),
-        }
+            })
+        })
     }
 }
 
@@ -190,7 +188,7 @@ impl<'ast> std::hash::Hash for RelationName<'ast> {
 }
 
 impl<'ast> RelationName<'ast> {
-    fn generated(model_a: &str, model_b: &str) -> Self {
+    pub(crate) fn generated(model_a: &str, model_b: &str) -> Self {
         if model_a < model_b {
             Self::Generated(format!("{}To{}", model_a, model_b))
         } else {

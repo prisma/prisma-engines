@@ -1,18 +1,26 @@
+pub(super) mod many_to_many;
+pub(super) mod one_to_many;
+pub(super) mod one_to_one;
+
 mod visited_relation;
 
+use crate::{
+    ast,
+    diagnostics::{DatamodelError, Diagnostics},
+    transform::ast_to_dml::db::walkers::ExplicitRelationWalker,
+};
+use datamodel_connector::{Connector, ConnectorCapability};
+use itertools::Itertools;
 use std::{
     collections::{BTreeSet, HashMap, HashSet},
     rc::Rc,
 };
-
-use datamodel_connector::{Connector, ConnectorCapability};
-use itertools::Itertools;
 use visited_relation::*;
 
-use crate::{
-    diagnostics::{DatamodelError, Diagnostics},
-    transform::ast_to_dml::db::walkers::ExplicitRelationWalker,
-};
+const PRISMA_FORMAT_HINT: &str = "You can run `prisma format` to fix this automatically.";
+const RELATION_ATTRIBUTE_NAME: &str = "relation";
+const RELATION_ATTRIBUTE_NAME_WITH_AT: &str = "@relation";
+const STATE_ERROR: &str = "Failed lookup of model, field or optional property during internal processing. This means that the internal representation was mutated incorrectly.";
 
 /// Required relational fields should point to required scalar fields.
 pub(super) fn field_arity(relation: ExplicitRelationWalker<'_, '_>, diagnostics: &mut Diagnostics) {
@@ -357,4 +365,11 @@ fn cascade_error_with_default_values(relation: ExplicitRelationWalker<'_, '_>, m
     msg.push_str(" Read more at https://pris.ly/d/cyclic-referential-actions");
 
     DatamodelError::new_validation_error(&msg, relation.referencing_field().ast_field().span)
+}
+
+fn is_empty_fields(fields: Option<&[ast::FieldId]>) -> bool {
+    match fields {
+        None | Some([]) => true,
+        Some(_) => false,
+    }
 }

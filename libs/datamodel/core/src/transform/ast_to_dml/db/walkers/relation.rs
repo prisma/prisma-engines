@@ -1,7 +1,7 @@
-use super::{ModelWalker, RelationFieldWalker, ScalarFieldWalker};
+use super::{ModelWalker, RelationFieldWalker, RelationName, ScalarFieldWalker};
 use crate::{
     ast,
-    transform::ast_to_dml::db::{relations::*, ParserDatabase},
+    transform::ast_to_dml::db::{relations::*, ParserDatabase, ScalarFieldType},
 };
 use datamodel_connector::ConnectorCapability;
 use dml::relation_info::ReferentialAction;
@@ -35,6 +35,20 @@ pub(crate) enum RefinedRelationWalker<'ast, 'db> {
     ImplicitManyToMany(ImplicitManyToManyRelationWalker<'ast, 'db>),
 }
 
+/// A scalar inferred by loose/magic reformatting
+pub(crate) struct InferredField<'ast, 'db> {
+    pub(crate) name: String,
+    pub(crate) arity: ast::FieldArity,
+    pub(crate) tpe: ScalarFieldType,
+    pub(crate) blueprint: ScalarFieldWalker<'ast, 'db>,
+}
+
+pub(crate) enum ReferencingFields<'ast, 'db> {
+    Concrete(Box<dyn Iterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db>),
+    Inferred(Vec<InferredField<'ast, 'db>>),
+    NA,
+}
+
 #[derive(Copy, Clone)]
 pub(crate) struct InlineRelationWalker<'ast, 'db> {
     relation_id: usize,
@@ -46,6 +60,10 @@ impl<'ast, 'db> InlineRelationWalker<'ast, 'db> {
         &self.db.relations.relations_storage[self.relation_id]
     }
 
+    pub(crate) fn is_one_to_one(&self) -> bool {
+        matches!(self.get().attributes, RelationAttributes::OneToOne(_))
+    }
+
     pub(crate) fn referencing_model(self) -> ModelWalker<'ast, 'db> {
         self.db.walk_model(self.get().model_a)
     }
@@ -54,7 +72,49 @@ impl<'ast, 'db> InlineRelationWalker<'ast, 'db> {
         self.db.walk_model(self.get().model_b)
     }
 
-    #[allow(dead_code)]
+    // Should only be used for lifting
+    pub(crate) fn referencing_fields(self) -> ReferencingFields<'ast, 'db> {
+        use crate::common::NameNormalizer;
+
+        self.forward_relation_field()
+            .and_then(|rf| rf.fields())
+            .map(|fields| ReferencingFields::Concrete(Box::new(fields)))
+            .unwrap_or_else(|| match self.referenced_model().unique_criterias().next() {
+                Some(first_unique_criteria) => ReferencingFields::Inferred(
+                    first_unique_criteria
+                        .fields()
+                        .map(|field| {
+                            let name = format!(
+                                "{}{}",
+                                self.referenced_model().name().camel_case(),
+                                field.name().pascal_case()
+                            );
+
+                            if let Some(existing_field) =
+                                self.referencing_model().scalar_fields().find(|sf| sf.name() == name)
+                            {
+                                InferredField {
+                                    name,
+                                    arity: existing_field.ast_field().arity,
+                                    tpe: existing_field.attributes().r#type,
+                                    blueprint: field,
+                                }
+                            } else {
+                                InferredField {
+                                    name,
+                                    arity: ast::FieldArity::Optional,
+                                    tpe: field.attributes().r#type,
+                                    blueprint: field,
+                                }
+                            }
+                        })
+                        .collect(),
+                ),
+                None => ReferencingFields::NA,
+            })
+    }
+
+    // Should only be used for lifting
     pub(crate) fn referenced_fields(self) -> Box<dyn Iterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db> {
         self.forward_relation_field()
             .and_then(
@@ -85,6 +145,23 @@ impl<'ast, 'db> InlineRelationWalker<'ast, 'db> {
         }
     }
 
+    pub(crate) fn forward_relation_field_arity(self) -> ast::FieldArity {
+        self.forward_relation_field()
+            .map(|rf| rf.ast_field().arity)
+            .unwrap_or_else(|| {
+                let is_required = match self.referencing_fields() {
+                    ReferencingFields::Concrete(mut fields) => fields.all(|f| f.ast_field().arity.is_required()),
+                    ReferencingFields::Inferred(fields) => fields.iter().all(|f| f.arity.is_required()),
+                    ReferencingFields::NA => todo!(),
+                };
+                if is_required {
+                    ast::FieldArity::Required
+                } else {
+                    ast::FieldArity::Optional
+                }
+            })
+    }
+
     pub(crate) fn back_relation_field(self) -> Option<RelationFieldWalker<'ast, 'db>> {
         let model = self.referenced_model();
         match self.get().attributes {
@@ -95,6 +172,15 @@ impl<'ast, 'db> InlineRelationWalker<'ast, 'db> {
             | RelationAttributes::OneToOne(OneToOneRelationFields::Forward(_)) => None,
             RelationAttributes::ImplicitManyToMany { field_a: _, field_b: _ } => unreachable!(),
         }
+    }
+
+    /// The name of the relation. Either uses the `name` (or default) argument,
+    /// or generates an implicit name.
+    pub(crate) fn relation_name(self) -> RelationName<'ast> {
+        self.get()
+            .relation_name
+            .map(RelationName::Explicit)
+            .unwrap_or_else(|| RelationName::generated(self.referencing_model().name(), self.referenced_model().name()))
     }
 }
 

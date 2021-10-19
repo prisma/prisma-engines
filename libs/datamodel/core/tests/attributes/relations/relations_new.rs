@@ -616,19 +616,19 @@ fn must_error_when_fields_argument_is_missing_for_one_to_one() {
     "#;
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `post` on Model `User` and `user` on Model `Post` do not provide the `fields` argument in the @relation attribute. You have to provide it on one of the two fields.[0m
-          [1;94m-->[0m  [4mschema.prisma:5[0m
-        [1;94m   | [0m
-        [1;94m 4 | [0m        firstName String
-        [1;94m 5 | [0m        [1;91mpost      Post?[0m
-        [1;94m 6 | [0m    }
-        [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `user` on Model `Post` and `post` on Model `User` do not provide the `fields` argument in the @relation attribute. You have to provide it on one of the two fields.[0m
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m        userId Int
         [1;94m11 | [0m        [1;91muser   User    @relation(references: [id])[0m
         [1;94m12 | [0m    }
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `post` on Model `User` and `user` on Model `Post` do not provide the `fields` argument in the @relation attribute. You have to provide it on one of the two fields.[0m
+          [1;94m-->[0m  [4mschema.prisma:5[0m
+        [1;94m   | [0m
+        [1;94m 4 | [0m        firstName String
+        [1;94m 5 | [0m        [1;91mpost      Post?[0m
+        [1;94m 6 | [0m    }
         [1;94m   | [0m
     "#]];
 
@@ -652,19 +652,19 @@ fn must_error_when_references_argument_is_missing_for_one_to_one() {
     "#;
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `post` on Model `User` and `user` on Model `Post` do not provide the `references` argument in the @relation attribute. You have to provide it on one of the two fields.[0m
-          [1;94m-->[0m  [4mschema.prisma:5[0m
-        [1;94m   | [0m
-        [1;94m 4 | [0m        firstName String
-        [1;94m 5 | [0m        [1;91mpost      Post[0m
-        [1;94m 6 | [0m    }
-        [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `user` on Model `Post` and `post` on Model `User` do not provide the `references` argument in the @relation attribute. You have to provide it on one of the two fields.[0m
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m        userId Int
         [1;94m11 | [0m        [1;91muser   User    @relation(fields: [userId])[0m
         [1;94m12 | [0m    }
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `post` on Model `User` and `user` on Model `Post` do not provide the `references` argument in the @relation attribute. You have to provide it on one of the two fields.[0m
+          [1;94m-->[0m  [4mschema.prisma:5[0m
+        [1;94m   | [0m
+        [1;94m 4 | [0m        firstName String
+        [1;94m 5 | [0m        [1;91mpost      Post[0m
+        [1;94m 6 | [0m    }
         [1;94m   | [0m
     "#]];
 
@@ -689,19 +689,19 @@ fn must_error_when_fields_and_references_argument_are_placed_on_different_sides_
     "#;
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@relation": The relation field `post` on Model `User` provides the `references` argument in the @relation attribute. And the related field `user` on Model `Post` provides the `fields` argument. You must provide both arguments on the same side.[0m
-          [1;94m-->[0m  [4mschema.prisma:6[0m
-        [1;94m   | [0m
-        [1;94m 5 | [0m        postId    Int
-        [1;94m 6 | [0m        [1;91mpost      Post @relation(references: [id])[0m
-        [1;94m 7 | [0m    }
-        [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": The relation field `user` on Model `Post` provides the `fields` argument in the @relation attribute. And the related field `post` on Model `User` provides the `references` argument. You must provide both arguments on the same side.[0m
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0m        userId Int
         [1;94m12 | [0m        [1;91muser   User    @relation(fields: [userId])[0m
         [1;94m13 | [0m    }
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": The relation field `user` on Model `Post` provides the `fields` argument in the @relation attribute. And the related field `post` on Model `User` provides the `references` argument. You must provide both arguments on the same side.[0m
+          [1;94m-->[0m  [4mschema.prisma:6[0m
+        [1;94m   | [0m
+        [1;94m 5 | [0m        postId    Int
+        [1;94m 6 | [0m        [1;91mpost      Post @relation(references: [id])[0m
+        [1;94m 7 | [0m    }
         [1;94m   | [0m
     "#]];
 
@@ -726,20 +726,6 @@ fn must_error_when_fields_or_references_argument_is_placed_on_both_sides_for_one
     "#;
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `post` on Model `User` and `user` on Model `Post` both provide the `references` argument in the @relation attribute. You have to provide it only on one of the two fields.[0m
-          [1;94m-->[0m  [4mschema.prisma:6[0m
-        [1;94m   | [0m
-        [1;94m 5 | [0m        postId    Int
-        [1;94m 6 | [0m        [1;91mpost      Post @relation(fields: [postId], references: [id])[0m
-        [1;94m 7 | [0m    }
-        [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `post` on Model `User` and `user` on Model `Post` both provide the `fields` argument in the @relation attribute. You have to provide it only on one of the two fields.[0m
-          [1;94m-->[0m  [4mschema.prisma:6[0m
-        [1;94m   | [0m
-        [1;94m 5 | [0m        postId    Int
-        [1;94m 6 | [0m        [1;91mpost      Post @relation(fields: [postId], references: [id])[0m
-        [1;94m 7 | [0m    }
-        [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `user` on Model `Post` and `post` on Model `User` both provide the `references` argument in the @relation attribute. You have to provide it only on one of the two fields.[0m
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
@@ -747,12 +733,26 @@ fn must_error_when_fields_or_references_argument_is_placed_on_both_sides_for_one
         [1;94m12 | [0m        [1;91muser   User    @relation(fields: [userId], references: [id])[0m
         [1;94m13 | [0m    }
         [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `user` on Model `Post` and `post` on Model `User` both provide the `references` argument in the @relation attribute. You have to provide it only on one of the two fields.[0m
+          [1;94m-->[0m  [4mschema.prisma:6[0m
+        [1;94m   | [0m
+        [1;94m 5 | [0m        postId    Int
+        [1;94m 6 | [0m        [1;91mpost      Post @relation(fields: [postId], references: [id])[0m
+        [1;94m 7 | [0m    }
+        [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `user` on Model `Post` and `post` on Model `User` both provide the `fields` argument in the @relation attribute. You have to provide it only on one of the two fields.[0m
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0m        userId Int
         [1;94m12 | [0m        [1;91muser   User    @relation(fields: [userId], references: [id])[0m
         [1;94m13 | [0m    }
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `user` on Model `Post` and `post` on Model `User` both provide the `fields` argument in the @relation attribute. You have to provide it only on one of the two fields.[0m
+          [1;94m-->[0m  [4mschema.prisma:6[0m
+        [1;94m   | [0m
+        [1;94m 5 | [0m        postId    Int
+        [1;94m 6 | [0m        [1;91mpost      Post @relation(fields: [postId], references: [id])[0m
+        [1;94m 7 | [0m    }
         [1;94m   | [0m
     "#]];
 

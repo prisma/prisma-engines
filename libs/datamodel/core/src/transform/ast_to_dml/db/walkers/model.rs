@@ -83,6 +83,11 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
         })
     }
 
+    /// Used in validation. True only if the model has a single field id.
+    pub(crate) fn has_single_id_field(self) -> bool {
+        matches!(&self.attributes().primary_key, Some(pk) if pk.fields.len() == 1)
+    }
+
     /// The primary key of the model, if defined.
     pub(crate) fn primary_key(self) -> Option<PrimaryKeyWalker<'ast, 'db>> {
         self.model_attributes.primary_key.as_ref().map(|pk| PrimaryKeyWalker {

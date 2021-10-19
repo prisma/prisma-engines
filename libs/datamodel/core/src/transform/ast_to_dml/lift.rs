@@ -50,7 +50,7 @@ impl<'a> LiftAstToDml<'a> {
             let model_name = model.name.as_str();
             model
                 .fields
-                .sort_by_key(|field| field_ids_for_sorting[&(model_name, field.name())]);
+                .sort_by_key(|field| field_ids_for_sorting.get(&(model_name, field.name())).cloned());
         }
 
         schema
@@ -82,92 +82,117 @@ impl<'a> LiftAstToDml<'a> {
             match relation.refine() {
                 RefinedRelationWalker::Inline(relation) => {
                     // Forward field
-                    if let Some(relation_field) = relation.forward_relation_field() {
-                        let attributes = relation_field.attributes();
-                        let arity = self.lift_field_arity(&relation_field.ast_field().arity);
-                        let relation_info = dml::RelationInfo::new(relation_field.related_model().name());
-                        let referential_arity = self.lift_field_arity(&relation_field.referential_arity());
-                        let mut field =
-                            dml::RelationField::new(relation_field.name(), arity, referential_arity, relation_info);
+                    {
+                        let relation_info = dml::RelationInfo::new(relation.referenced_model().name());
+                        let model = schema.find_model_mut(relation.referencing_model().name());
+                        let mut inferred_scalar_fields = Vec::new(); // reformatted/virtual/inferred extra scalar fields for reformatted relations.
 
-                        common_dml_fields(&mut field, attributes, relation_field);
+                        let mut relation_field = if let Some(relation_field) = relation.forward_relation_field() {
+                            // Construct a relation field in the DML for an existing relation field in the source.
+                            let attributes = relation_field.attributes();
+                            let arity = self.lift_field_arity(&relation_field.ast_field().arity);
+                            let referential_arity = self.lift_field_arity(&relation_field.referential_arity());
+                            let mut field =
+                                dml::RelationField::new(relation_field.name(), arity, referential_arity, relation_info);
 
-                        field.relation_info.references = attributes
-                            .references
-                            .as_ref()
-                            .map(|references| {
-                                references
-                                    .iter()
-                                    .map(|s| relation_field.related_model().scalar_field(*s).name().to_owned())
-                                    .collect()
-                            })
-                            .unwrap_or_default();
+                            common_dml_fields(&mut field, attributes, relation_field);
+                            field_ids_for_sorting.insert(
+                                (relation_field.model().name(), relation_field.name()),
+                                relation_field.field_id(),
+                            );
 
-                        field.relation_info.fields = attributes
-                            .fields
-                            .as_ref()
-                            .map(|fields| {
-                                fields
-                                    .iter()
-                                    .map(|id| relation_field.model().scalar_field(*id).name().to_owned())
-                                    .collect()
-                            })
-                            .unwrap_or_default();
+                            field
+                        } else {
+                            // Construct a relation field in the DML without corresponding relation field in the source.
+                            //
+                            // This is part of magic reformatting.
+                            let arity = self.lift_field_arity(&relation.forward_relation_field_arity());
+                            let referential_arity = arity;
+                            dml::RelationField::new(
+                                relation.referenced_model().name(),
+                                arity,
+                                referential_arity,
+                                relation_info,
+                            )
+                        };
 
-                        let model = schema.find_model_mut(relation_field.model().name());
-                        model.add_field(dml::Field::RelationField(field));
-                        field_ids_for_sorting.insert(
-                            (relation_field.model().name(), relation_field.name()),
-                            relation_field.field_id(),
-                        );
-                    }
+                        relation_field.relation_info.name = relation.relation_name().to_string();
+
+                        relation_field.relation_info.references = relation
+                            .referenced_fields()
+                            .map(|field| field.name().to_owned())
+                            .collect();
+
+                        relation_field.relation_info.fields = match relation.referencing_fields() {
+                            ReferencingFields::Concrete(fields) => fields.map(|f| f.name().to_owned()).collect(),
+                            ReferencingFields::Inferred(fields) => {
+                                let mut field_names = Vec::with_capacity(fields.len());
+
+                                for field in fields {
+                                    let field_type = self.lift_scalar_field_type(
+                                        field.blueprint.ast_field(),
+                                        &field.tpe,
+                                        field.blueprint.attributes(),
+                                    );
+                                    let mut scalar_field = dml::ScalarField::new_generated(&field.name, field_type);
+                                    scalar_field.arity = if relation_field.arity.is_required() {
+                                        dml::FieldArity::Required
+                                    } else {
+                                        self.lift_field_arity(&field.arity)
+                                    };
+                                    inferred_scalar_fields.push(dml::Field::ScalarField(scalar_field));
+
+                                    field_names.push(field.name);
+                                }
+
+                                field_names
+                            }
+                            ReferencingFields::NA => Vec::new(),
+                        };
+                        model.add_field(dml::Field::RelationField(relation_field));
+
+                        for field in inferred_scalar_fields {
+                            model.add_field(field)
+                        }
+                    };
 
                     // Back field
-                    if let Some(relation_field) = relation.back_relation_field() {
-                        let ast_field = relation_field.ast_field();
-                        let attributes = relation_field.attributes();
-                        let arity = self.lift_field_arity(&ast_field.arity);
-                        let relation_info = dml::RelationInfo::new(relation_field.related_model().name());
-                        let referential_arity = self.lift_field_arity(&relation_field.referential_arity());
-                        let mut field =
-                            dml::RelationField::new(relation_field.name(), arity, referential_arity, relation_info);
+                    {
+                        let relation_info = dml::RelationInfo::new(relation.referencing_model().name());
+                        let model = schema.find_model_mut(relation.referenced_model().name());
 
-                        common_dml_fields(&mut field, attributes, relation_field);
+                        let mut field = if let Some(relation_field) = relation.back_relation_field() {
+                            let ast_field = relation_field.ast_field();
+                            let attributes = relation_field.attributes();
+                            let arity = self.lift_field_arity(&ast_field.arity);
+                            let referential_arity = self.lift_field_arity(&relation_field.referential_arity());
+                            let mut field =
+                                dml::RelationField::new(relation_field.name(), arity, referential_arity, relation_info);
 
-                        // TODO: delete this block.
-                        // This block is required because of validations that happen after lifting, but these will be moved to ParserDatabase.
-                        // If you can delete this and the tests pass, it safe to delete it.
-                        {
-                            field.relation_info.references = attributes
-                                .references
-                                .as_ref()
-                                .map(|references| {
-                                    references
-                                        .iter()
-                                        .map(|s| relation_field.related_model().scalar_field(*s).name().to_owned())
-                                        .collect()
-                                })
-                                .unwrap_or_default();
+                            common_dml_fields(&mut field, attributes, relation_field);
 
-                            field.relation_info.fields = attributes
-                                .fields
-                                .as_ref()
-                                .map(|fields| {
-                                    fields
-                                        .iter()
-                                        .map(|id| relation_field.model().scalar_field(*id).name().to_owned())
-                                        .collect()
-                                })
-                                .unwrap_or_default();
-                        }
+                            field_ids_for_sorting.insert(
+                                (relation_field.model().name(), relation_field.name()),
+                                relation_field.field_id(),
+                            );
 
-                        let model = schema.find_model_mut(relation_field.model().name());
+                            field
+                        } else {
+                            let arity = dml::FieldArity::List;
+                            let referential_arity = dml::FieldArity::List;
+                            let mut field = dml::RelationField::new(
+                                relation.referencing_model().name(),
+                                arity,
+                                referential_arity,
+                                relation_info,
+                            );
+                            field.is_ignored = relation.referencing_model().is_ignored();
+                            field
+                        };
+
+                        field.relation_info.name = relation.relation_name().to_string();
                         model.add_field(dml::Field::RelationField(field));
-                        field_ids_for_sorting.insert(
-                            (relation_field.model().name(), relation_field.name()),
-                            relation_field.field_id(),
-                        );
-                    }
+                    };
                 }
                 RefinedRelationWalker::ImplicitManyToMany(relation) => {
                     for relation_field in [relation.field_a(), relation.field_b()] {
@@ -215,55 +240,6 @@ impl<'a> LiftAstToDml<'a> {
                     }
                 }
             }
-        }
-
-        // TEMPORARY until this is validated in ParserDatabase. If you delete this and the test suite passes, it can be deleted.
-        for relation_field in self.db.walk_models().flat_map(|m| m.relation_fields()) {
-            // This is the load-bearing `if`. We re-add all relation fields to the datamodel that weren't inferred as part
-            //  of a relation, so further validations can happen.
-            //
-            //  The whole loop can be deleted once these validations happen before lifting.
-            if field_ids_for_sorting.contains_key(&(relation_field.model().name(), relation_field.name())) {
-                continue;
-            }
-
-            let ast_field = relation_field.ast_field();
-            let attributes = relation_field.attributes();
-            let arity = self.lift_field_arity(&ast_field.arity);
-            let relation_info = dml::RelationInfo::new(relation_field.related_model().name());
-            let referential_arity = self.lift_field_arity(&relation_field.referential_arity());
-            let mut field = dml::RelationField::new(relation_field.name(), arity, referential_arity, relation_info);
-
-            common_dml_fields(&mut field, attributes, relation_field);
-
-            field.relation_info.references = attributes
-                .references
-                .as_ref()
-                .map(|references| {
-                    references
-                        .iter()
-                        .map(|s| relation_field.related_model().scalar_field(*s).name().to_owned())
-                        .collect()
-                })
-                .unwrap_or_default();
-
-            field.relation_info.fields = attributes
-                .fields
-                .as_ref()
-                .map(|fields| {
-                    fields
-                        .iter()
-                        .map(|id| relation_field.model().scalar_field(*id).name().to_owned())
-                        .collect()
-                })
-                .unwrap_or_default();
-
-            let model = schema.find_model_mut(relation_field.model().name());
-            model.add_field(dml::Field::RelationField(field));
-            field_ids_for_sorting.insert(
-                (relation_field.model().name(), relation_field.name()),
-                relation_field.field_id(),
-            );
         }
     }
 

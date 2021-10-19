@@ -7,7 +7,6 @@ mod datasource_provider;
 mod db;
 mod generator_loader;
 mod lift;
-mod standardise_formatting;
 mod validate;
 mod validation_pipeline;
 

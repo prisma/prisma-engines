@@ -1,8 +1,6 @@
 mod validations;
 
-use super::{
-    db::ParserDatabase, lift::LiftAstToDml, standardise_formatting::StandardiserForFormatting, validate::Validator,
-};
+use super::{db::ParserDatabase, lift::LiftAstToDml, validate::Validator};
 use crate::{
     ast, common::preview_features::PreviewFeature, configuration, diagnostics::Diagnostics, ValidatedDatamodel,
 };
@@ -13,7 +11,6 @@ use enumflags2::BitFlags;
 pub(crate) struct ValidationPipeline<'a> {
     source: Option<&'a configuration::Datasource>,
     validator: Validator<'a>,
-    standardiser_for_formatting: StandardiserForFormatting,
     preview_features: BitFlags<PreviewFeature>,
 }
 
@@ -27,7 +24,6 @@ impl<'a, 'b> ValidationPipeline<'a> {
         ValidationPipeline {
             source,
             validator: Validator::new(source),
-            standardiser_for_formatting: StandardiserForFormatting::new(),
             preview_features,
         }
     }
@@ -61,7 +57,7 @@ impl<'a, 'b> ValidationPipeline<'a> {
         diagnostics.to_result()?;
 
         // Phase 4: Lift AST to DML. This can't fail.
-        let mut schema = LiftAstToDml::new(&db).lift();
+        let schema = LiftAstToDml::new(&db).lift();
 
         // From now on we do not operate on the internal ast anymore, but DML.
         // Please try to avoid all new validations after this, if you can.
@@ -69,17 +65,11 @@ impl<'a, 'b> ValidationPipeline<'a> {
         // Phase 5: Validation (deprecated, move stuff out from here if you can)
         self.validator.validate(db.ast(), &schema, &mut diagnostics);
 
-        // Early return so that the standardiser does not have to deal with invalid schemas
-        diagnostics.to_result()?;
-
-        // Transform phase: These only run during formatting. (double
-        // deprecated, please do not add anything here)
         if relation_transformation_enabled {
-            if let Err(mut err) = self.standardiser_for_formatting.standardise(ast_schema, &mut schema) {
-                diagnostics.append(&mut err);
-                // Early return so that the post validation does not have to deal with invalid schemas
-                return Err(diagnostics);
-            }
+            // do nothing
+        } else {
+            // Assume this is the schema we want. Run the rest of the validations.
+            validations::validate_strict(&db, &mut diagnostics)
         }
 
         // Phase 6: Post Standardisation Validation (deprecated, move stuff out from here if you can)

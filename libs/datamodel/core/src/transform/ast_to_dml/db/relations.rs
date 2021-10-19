@@ -131,7 +131,7 @@ impl RelationType {
 #[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
 pub(crate) struct Relation<'ast> {
     /// The `name` argument in `@relation`.
-    relation_name: Option<&'ast str>,
+    pub(super) relation_name: Option<&'ast str>,
     pub(super) attributes: RelationAttributes,
     pub(super) model_a: ast::ModelId,
     pub(super) model_b: ast::ModelId,
@@ -210,6 +210,9 @@ pub(super) fn ingest_relation<'ast, 'db>(
     relations: &mut Relations<'ast>,
     ctx: &'db Context<'ast>,
 ) {
+    // In this function, we want to ingest the relation only once,
+    // so if we know that we will create a relation for the opposite
+    // field, we skip the field by returning early.
     let relation_type = match (evidence.ast_field.arity, evidence.opposite_relation_field) {
         // m:n
         (ast::FieldArity::List, Some((opp_field_id, opp_field, _))) if opp_field.arity.is_list() => {
@@ -239,23 +242,45 @@ pub(super) fn ingest_relation<'ast, 'db>(
             // This is a required 1:1 relation, and we are on the required side.
             RelationAttributes::OneToOne(OneToOneRelationFields::Both(evidence.field_id, opp_field_id))
         }
+        (ast::FieldArity::Required, Some((opp_field_id, opp_field, _))) if opp_field.arity.is_required() => {
+            // This is a 1:1 relation that is required on both sides. We are going to reject this later,
+            // so which model is model A doesn't matter.
+
+            if [evidence.ast_model.name.name.as_str(), evidence.ast_field.name()]
+                > [evidence.opposite_model.name.name.as_str(), opp_field.name()]
+            {
+                return;
+            }
+
+            RelationAttributes::OneToOne(OneToOneRelationFields::Both(evidence.field_id, opp_field_id))
+        }
         (ast::FieldArity::Optional, Some((_, opp_field, _))) if opp_field.arity.is_required() => {
             // This is a required 1:1 relation, and we are on the virtual side. Skip.
             return;
         }
-        (ast::FieldArity::Required, Some((_, opp_field, _))) if opp_field.arity.is_required() => {
-            // This is a 1:1 relation that is required on both sides. Error.
-            return; // TODO: error
-        }
-        (ast::FieldArity::Optional, Some((opp_field_id, opp_field, _))) if opp_field.arity.is_optional() => {
+        (ast::FieldArity::Optional, Some((opp_field_id, opp_field, opp_field_attributes)))
+            if opp_field.arity.is_optional() =>
+        {
             // This is a 1:1 relation that is optional on both sides. We must infer which side is model A.
 
             if evidence.relation_field.fields.is_some() {
                 RelationAttributes::OneToOne(OneToOneRelationFields::Both(evidence.field_id, opp_field_id))
+            } else if opp_field_attributes.fields.is_none() {
+                // No fields defined, we have to break the tie: take the first model name / field name (self relations)
+                // in lexicographic order.
+                if [evidence.ast_model.name.name.as_str(), evidence.ast_field.name()]
+                    > [evidence.opposite_model.name.name.as_str(), opp_field.name()]
+                {
+                    return;
+                }
+
+                RelationAttributes::OneToOne(OneToOneRelationFields::Both(evidence.field_id, opp_field_id))
             } else {
+                // Opposite field has fields, it's the forward side. Return.
                 return;
             }
         }
+
         // 1:m
         (ast::FieldArity::List, Some(_)) => {
             // This is a 1:m relation defined on both sides. We skip the virtual side.

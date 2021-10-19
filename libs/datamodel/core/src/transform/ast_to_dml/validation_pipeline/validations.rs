@@ -5,7 +5,10 @@ mod relation_fields;
 mod relations;
 
 use self::names::Names;
-use crate::{diagnostics::Diagnostics, transform::ast_to_dml::db::ParserDatabase};
+use crate::{
+    diagnostics::Diagnostics,
+    transform::ast_to_dml::db::{walkers::RefinedRelationWalker, ParserDatabase},
+};
 
 pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics) {
     let names = Names::new(db);
@@ -21,7 +24,7 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics) {
         models::has_a_strict_unique_criteria(model, diagnostics);
 
         for field in model.relation_fields() {
-            // We don't want to spam, so with ambigous relations we should exit
+            // We don't want to spam, so with ambiguous relations we should exit
             // immediately if any errors.
 
             if let Err(error) = relation_fields::ambiguity(field, &names) {
@@ -45,6 +48,22 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics) {
             // These needs to run last to prevent error spam.
             relations::references_unique_fields(relation, connector, diagnostics);
             relations::referencing_fields_in_correct_order(relation, connector, diagnostics);
+        }
+    }
+}
+
+pub(super) fn validate_strict(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics) {
+    for relation in db.walk_relations() {
+        match relation.refine() {
+            RefinedRelationWalker::Inline(relation) if relation.is_one_to_one() => {
+                relations::one_to_one::validate_strict(relation, diagnostics);
+            }
+            RefinedRelationWalker::Inline(relation) => {
+                relations::one_to_many::validate_strict(relation, diagnostics);
+            }
+            RefinedRelationWalker::ImplicitManyToMany(relation) => {
+                relations::many_to_many::validate_strict(relation, diagnostics);
+            }
         }
     }
 }
