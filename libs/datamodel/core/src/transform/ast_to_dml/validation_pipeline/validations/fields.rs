@@ -4,7 +4,7 @@ use crate::{
     transform::ast_to_dml::db::walkers::FieldWalker,
 };
 
-pub(super) fn validate_name(field: FieldWalker<'_, '_>, names: &Names<'_>, diagnostics: &mut Diagnostics) {
+pub(super) fn validate_client_name(field: FieldWalker<'_, '_>, names: &Names<'_>, diagnostics: &mut Diagnostics) {
     let model = field.model();
 
     for taken in names.name_taken(model.model_id(), field.name()).into_iter() {

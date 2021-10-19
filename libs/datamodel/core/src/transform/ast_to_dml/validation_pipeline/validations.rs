@@ -14,7 +14,7 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics) {
 
     for model in db.walk_models() {
         for field in model.scalar_fields() {
-            fields::validate_name(field.into(), &names, diagnostics);
+            fields::validate_client_name(field.into(), &names, diagnostics);
         }
 
         for field in model.relation_fields() {
@@ -25,7 +25,7 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics) {
                 return;
             }
 
-            fields::validate_name(field.into(), &names, diagnostics);
+            fields::validate_client_name(field.into(), &names, diagnostics);
 
             relation_fields::ignored_related_model(field, diagnostics);
             relation_fields::referential_actions(field, connector, diagnostics);
