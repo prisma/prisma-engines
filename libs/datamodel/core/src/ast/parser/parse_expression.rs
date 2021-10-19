@@ -4,8 +4,6 @@ use crate::ast::parser::parse_attribute::parse_attribute_arg;
 use crate::ast::*;
 
 pub fn parse_expression(token: &Token<'_>) -> Expression {
-    println!("Parse Expression: {}", token.as_str());
-
     let first_child = token.first_relevant_child();
     let span = Span::from_pest(first_child.as_span());
     match first_child.as_rule() {

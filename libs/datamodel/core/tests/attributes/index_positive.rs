@@ -1,4 +1,4 @@
-use datamodel::{render_datamodel_to_string, IndexDefinition, IndexType};
+use datamodel::{render_datamodel_to_string, IndexDefinition, IndexType, SortOrder};
 
 use crate::attributes::with_postgres_provider;
 use crate::common::*;
@@ -21,6 +21,10 @@ fn basic_index_must_work() {
         name: None,
         db_name: Some("User_firstName_lastName_idx".to_string()),
         fields: vec!["firstName".to_string(), "lastName".to_string()],
+        field_options: vec![
+            ("firstName".to_string(), SortOrder::Asc, None),
+            ("lastName".to_string(), SortOrder::Asc, None),
+        ],
         tpe: IndexType::Normal,
         defined_on_field: false,
     });
@@ -48,6 +52,7 @@ fn indexes_on_enum_fields_must_work() {
         name: None,
         db_name: Some("User_role_idx".to_string()),
         fields: vec!["role".to_string()],
+        field_options: vec![("role".to_string(), SortOrder::Asc, None)],
         tpe: IndexType::Normal,
         defined_on_field: false,
     });
@@ -72,6 +77,10 @@ fn the_name_argument_must_work() {
         name: None,
         db_name: Some("MyIndexName".to_string()),
         fields: vec!["firstName".to_string(), "lastName".to_string()],
+        field_options: vec![
+            ("firstName".to_string(), SortOrder::Asc, None),
+            ("lastName".to_string(), SortOrder::Asc, None),
+        ],
         tpe: IndexType::Normal,
         defined_on_field: false,
     });
@@ -100,6 +109,10 @@ fn the_map_argument_must_work() {
         name: None,
         db_name: Some("MyIndexName".to_string()),
         fields: vec!["firstName".to_string(), "lastName".to_string()],
+        field_options: vec![
+            ("firstName".to_string(), SortOrder::Asc, None),
+            ("lastName".to_string(), SortOrder::Asc, None),
+        ],
         tpe: IndexType::Normal,
         defined_on_field: false,
     });
@@ -125,6 +138,10 @@ fn multiple_index_must_work() {
         name: None,
         db_name: Some("User_firstName_lastName_idx".to_string()),
         fields: vec!["firstName".to_string(), "lastName".to_string()],
+        field_options: vec![
+            ("firstName".to_string(), SortOrder::Asc, None),
+            ("lastName".to_string(), SortOrder::Asc, None),
+        ],
         tpe: IndexType::Normal,
         defined_on_field: false,
     });
@@ -133,6 +150,10 @@ fn multiple_index_must_work() {
         name: None,
         db_name: Some("MyIndexName".to_string()),
         fields: vec!["firstName".to_string(), "lastName".to_string()],
+        field_options: vec![
+            ("firstName".to_string(), SortOrder::Asc, None),
+            ("lastName".to_string(), SortOrder::Asc, None),
+        ],
         tpe: IndexType::Normal,
         defined_on_field: false,
     });
@@ -180,6 +201,10 @@ fn index_accepts_three_different_notations() {
         name: None,
         db_name: Some("OtherIndexName".to_string()),
         fields: vec!["firstName".to_string(), "lastName".to_string()],
+        field_options: vec![
+            ("firstName".to_string(), SortOrder::Asc, None),
+            ("lastName".to_string(), SortOrder::Asc, None),
+        ],
         tpe: IndexType::Normal,
         defined_on_field: false,
     });
@@ -188,6 +213,10 @@ fn index_accepts_three_different_notations() {
         name: None,
         db_name: Some("MyIndexName".to_string()),
         fields: vec!["firstName".to_string(), "lastName".to_string()],
+        field_options: vec![
+            ("firstName".to_string(), SortOrder::Asc, None),
+            ("lastName".to_string(), SortOrder::Asc, None),
+        ],
         tpe: IndexType::Normal,
         defined_on_field: false,
     });
@@ -196,6 +225,10 @@ fn index_accepts_three_different_notations() {
         name: None,
         db_name: Some("User_firstName_lastName_idx".to_string()),
         fields: vec!["firstName".to_string(), "lastName".to_string()],
+        field_options: vec![
+            ("firstName".to_string(), SortOrder::Asc, None),
+            ("lastName".to_string(), SortOrder::Asc, None),
+        ],
         tpe: IndexType::Normal,
         defined_on_field: false,
     });
@@ -230,6 +263,13 @@ fn index_accepts_sort_order() {
             "lastName".to_string(),
             "generation".to_string(),
         ],
+        field_options: vec![
+            ("firstName".to_string(), SortOrder::Asc, None),
+            ("middleName".to_string(), SortOrder::Asc, None),
+            ("lastName".to_string(), SortOrder::Asc, None),
+            ("generation".to_string(), SortOrder::Asc, None),
+        ],
+
         tpe: IndexType::Normal,
         defined_on_field: false,
     });

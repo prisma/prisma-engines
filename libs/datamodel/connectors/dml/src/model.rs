@@ -35,6 +35,7 @@ pub struct IndexDefinition {
     pub name: Option<String>,
     pub db_name: Option<String>,
     pub fields: Vec<String>,
+    pub field_options: Vec<(String, SortOrder, Option<u32>)>,
     pub tpe: IndexType,
     pub defined_on_field: bool,
 }
@@ -51,6 +52,7 @@ pub struct PrimaryKeyDefinition {
     pub name: Option<String>,
     pub db_name: Option<String>,
     pub fields: Vec<String>,
+    pub field_options: Vec<(String, Option<u32>)>,
     pub defined_on_field: bool,
 }
 

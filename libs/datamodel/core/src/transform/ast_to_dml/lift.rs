@@ -69,6 +69,10 @@ impl<'a> LiftAstToDml<'a> {
             name: pk.name().map(String::from),
             db_name: pk.final_database_name().map(|c| c.into_owned()),
             fields: pk.iter_ast_fields().map(|field| field.name.name.to_owned()).collect(),
+            field_options: pk
+                .iter_ast_field_options()
+                .map(|(field, length)| (field.name.name.to_owned(), length))
+                .collect(),
             defined_on_field: pk.is_defined_on_field(),
         });
 
@@ -82,6 +86,10 @@ impl<'a> LiftAstToDml<'a> {
                     .fields
                     .iter()
                     .map(|id| self.db.ast()[model_id][*id].name.name.clone())
+                    .collect(),
+                field_options: idx
+                    .field_options()
+                    .map(|(field, sort, length)| (field.name.name.to_owned(), sort, length))
                     .collect(),
                 tpe: match idx.attribute().is_unique {
                     true => dml::IndexType::Unique,

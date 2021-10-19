@@ -10,7 +10,7 @@ use super::{
     types::{EnumAttributes, IndexAttribute, ModelAttributes, RelationField, ScalarField, ScalarFieldType},
 };
 use crate::ast::{FieldId, Model};
-use crate::transform::ast_to_dml::db::types::SortOrder;
+use crate::transform::ast_to_dml::db::types::AstSortOrder;
 use crate::{
     ast::{self, WithName},
     common::constraint_names::ConstraintNames,
@@ -246,8 +246,8 @@ fn visit_field_unique<'ast>(
     };
 
     let sort = match args.optional_arg("sort").map(|sort| sort.as_constant_literal()) {
-        Some(Ok("Desc")) => Some(SortOrder::Desc),
-        Some(Ok("Asc")) => Some(SortOrder::Desc),
+        Some(Ok("Desc")) => Some(AstSortOrder::Desc),
+        Some(Ok("Asc")) => Some(AstSortOrder::Desc),
         Some(Ok(other)) => {
             ctx.push_error(args.new_attribute_validation_error(&format!(
                 "The `sort` argument can only be `Asc` or `Desc` you provided: {}.",
@@ -647,6 +647,7 @@ fn common_index_validations<'ast>(
     match resolve_field_array_with_args(&fields, args.span(), model_id, ctx) {
         Ok(fields) => {
             index_data.fields = fields.0;
+            index_data.field_options = fields.1;
         }
         Err(FieldResolutionError::AlreadyDealtWith) => (),
         Err(FieldResolutionError::ProblematicFields {
@@ -914,7 +915,13 @@ fn resolve_field_array_with_args<'ast>(
     attribute_span: ast::Span,
     model_id: ast::ModelId,
     ctx: &mut Context<'ast>,
-) -> Result<(Vec<ast::FieldId>, Vec<(ast::FieldId, Option<SortOrder>, Option<u32>)>), FieldResolutionError<'ast>> {
+) -> Result<
+    (
+        Vec<ast::FieldId>,
+        Vec<(ast::FieldId, Option<AstSortOrder>, Option<u32>)>,
+    ),
+    FieldResolutionError<'ast>,
+> {
     let constant_array = match values.as_field_array_with_args() {
         Ok(values) => values,
         Err(err) => {
@@ -970,7 +977,7 @@ fn resolve_field_array_with_args<'ast>(
         let field_ids = constant_array
             .into_iter()
             .zip(field_ids)
-            .map(|((_, sort, length), field_id)| (field_id, Some(SortOrder::Asc), length))
+            .map(|((_, sort, length), field_id)| (field_id, Some(AstSortOrder::Asc), length))
             .collect();
 
         Ok((other_field_ids, field_ids))

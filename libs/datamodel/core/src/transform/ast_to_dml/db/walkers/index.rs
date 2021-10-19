@@ -6,6 +6,8 @@ use crate::{
 use std::borrow::Cow;
 
 use super::ScalarFieldWalker;
+use crate::transform::ast_to_dml::db::types::AstSortOrder;
+use dml::model::SortOrder;
 
 #[allow(dead_code)]
 #[derive(Copy, Clone)]
@@ -46,6 +48,25 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
                 field_id: *field_id,
                 db: self.db,
                 scalar_field: &self.db.types.scalar_fields[&(self.model_id, *field_id)],
+            })
+    }
+
+    pub(crate) fn field_options(
+        &self,
+    ) -> impl ExactSizeIterator<Item = (&ast::Field, dml::model::SortOrder, std::option::Option<u32>)> + '_ {
+        self.index_attribute
+            .field_options
+            .iter()
+            .map(move |(field_id, sort, length)| {
+                (
+                    &self.db.ast[self.model_id][*field_id],
+                    match sort {
+                        Some(AstSortOrder::Asc) => SortOrder::Asc,
+                        Some(AstSortOrder::Desc) => SortOrder::Desc,
+                        None => SortOrder::Asc,
+                    },
+                    *length,
+                )
             })
     }
 

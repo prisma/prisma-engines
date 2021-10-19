@@ -1,6 +1,6 @@
 use crate::attributes::with_postgres_provider;
 use crate::common::*;
-use datamodel::{render_datamodel_to_string, IndexDefinition, IndexType};
+use datamodel::{render_datamodel_to_string, IndexDefinition, IndexType, SortOrder};
 
 #[test]
 fn basic_unique_index_must_work() {
@@ -20,6 +20,10 @@ fn basic_unique_index_must_work() {
         name: None,
         db_name: Some("User_firstName_lastName_key".to_string()),
         fields: vec!["firstName".to_string(), "lastName".to_string()],
+        field_options: vec![
+            ("firstName".to_string(), SortOrder::Asc, None),
+            ("lastName".to_string(), SortOrder::Asc, None),
+        ],
         tpe: IndexType::Unique,
         defined_on_field: false,
     });
@@ -94,10 +98,15 @@ fn the_name_argument_must_work() {
 
     let schema = parse(dml);
     let user_model = schema.assert_has_model("User");
+
     user_model.assert_has_index(IndexDefinition {
         name: Some("MyIndexName".to_string()),
         db_name: Some("User_firstName_lastName_key".to_string()),
         fields: vec!["firstName".to_string(), "lastName".to_string()],
+        field_options: vec![
+            ("firstName".to_string(), SortOrder::Asc, None),
+            ("lastName".to_string(), SortOrder::Asc, None),
+        ],
         tpe: IndexType::Unique,
         defined_on_field: false,
     });
@@ -130,6 +139,18 @@ fn multiple_unique_must_work() {
                     "firstName",
                     "lastName",
                 ],
+                field_options: [
+                    (
+                        "firstName",
+                        Asc,
+                        None,
+                    ),
+                    (
+                        "lastName",
+                        Asc,
+                        None,
+                    ),
+                ],
                 tpe: Unique,
                 defined_on_field: false,
             },
@@ -143,6 +164,18 @@ fn multiple_unique_must_work() {
                 fields: [
                     "firstName",
                     "lastName",
+                ],
+                field_options: [
+                    (
+                        "firstName",
+                        Asc,
+                        None,
+                    ),
+                    (
+                        "lastName",
+                        Asc,
+                        None,
+                    ),
                 ],
                 tpe: Unique,
                 defined_on_field: false,
@@ -194,6 +227,7 @@ fn multi_field_unique_indexes_on_enum_fields_must_work() {
         name: None,
         db_name: Some("User_role_key".to_string()),
         fields: vec!["role".to_string()],
+        field_options: vec![("role".to_string(), SortOrder::Asc, None)],
         tpe: IndexType::Unique,
         defined_on_field: false,
     });
@@ -219,6 +253,7 @@ fn single_field_unique_indexes_on_enum_fields_must_work() {
         name: None,
         db_name: Some("User_role_key".to_string()),
         fields: vec!["role".to_string()],
+        field_options: vec![("role".to_string(), SortOrder::Asc, None)],
         tpe: IndexType::Unique,
         defined_on_field: true,
     });
@@ -259,6 +294,10 @@ fn named_multi_field_unique_must_work() {
         name: Some("ClientName".to_string()),
         db_name: Some("User_a_b_key".to_string()),
         fields: vec!["a".to_string(), "b".to_string()],
+        field_options: vec![
+            ("a".to_string(), SortOrder::Asc, None),
+            ("b".to_string(), SortOrder::Asc, None),
+        ],
         tpe: IndexType::Unique,
         defined_on_field: false,
     });
@@ -282,6 +321,10 @@ fn mapped_multi_field_unique_must_work() {
         name: None,
         db_name: Some("dbname".to_string()),
         fields: vec!["a".to_string(), "b".to_string()],
+        field_options: vec![
+            ("a".to_string(), SortOrder::Asc, None),
+            ("b".to_string(), SortOrder::Asc, None),
+        ],
         tpe: IndexType::Unique,
         defined_on_field: false,
     });
@@ -307,6 +350,7 @@ fn mapped_singular_unique_must_work() {
         name: None,
         db_name: Some("test".to_string()),
         fields: vec!["a".to_string()],
+        field_options: vec![("a".to_string(), SortOrder::Asc, None)],
         tpe: IndexType::Unique,
         defined_on_field: true,
     });
@@ -316,6 +360,7 @@ fn mapped_singular_unique_must_work() {
         name: None,
         db_name: Some("test2".to_string()),
         fields: vec!["a".to_string()],
+        field_options: vec![("a".to_string(), SortOrder::Asc, None)],
         tpe: IndexType::Unique,
         defined_on_field: true,
     });
@@ -339,6 +384,10 @@ fn named_and_mapped_multi_field_unique_must_work() {
         name: Some("compoundId".to_string()),
         db_name: Some("dbname".to_string()),
         fields: vec!["a".to_string(), "b".to_string()],
+        field_options: vec![
+            ("a".to_string(), SortOrder::Asc, None),
+            ("b".to_string(), SortOrder::Asc, None),
+        ],
         tpe: IndexType::Unique,
         defined_on_field: false,
     });
@@ -362,6 +411,10 @@ fn implicit_names_must_work() {
         name: None,
         db_name: Some("Model_a_b_key".to_string()),
         fields: vec!["a".to_string(), "b".to_string()],
+        field_options: vec![
+            ("a".to_string(), SortOrder::Asc, None),
+            ("b".to_string(), SortOrder::Asc, None),
+        ],
         tpe: IndexType::Unique,
         defined_on_field: false,
     });
@@ -370,6 +423,7 @@ fn implicit_names_must_work() {
         name: None,
         db_name: Some("Model_a_key".to_string()),
         fields: vec!["a".to_string()],
+        field_options: vec![("a".to_string(), SortOrder::Asc, None)],
         tpe: IndexType::Unique,
         defined_on_field: true,
     });
@@ -393,6 +447,7 @@ fn defined_on_field_must_work() {
         name: None,
         db_name: Some("Model_a_key".to_string()),
         fields: vec!["a".to_string()],
+        field_options: vec![("a".to_string(), SortOrder::Asc, None)],
         tpe: IndexType::Unique,
         defined_on_field: true,
     });
@@ -401,6 +456,7 @@ fn defined_on_field_must_work() {
         name: None,
         db_name: Some("Model_b_key".to_string()),
         fields: vec!["b".to_string()],
+        field_options: vec![("b".to_string(), SortOrder::Asc, None)],
         tpe: IndexType::Unique,
         defined_on_field: false,
     });
@@ -424,6 +480,10 @@ fn mapping_unique_to_a_field_name_should_work() {
         name: Some("usedUnique".to_string()),
         db_name: Some("used".to_string()),
         fields: vec!["name".to_string(), "identification".to_string()],
+        field_options: vec![
+            ("name".to_string(), SortOrder::Asc, None),
+            ("identification".to_string(), SortOrder::Asc, None),
+        ],
         tpe: IndexType::Unique,
         defined_on_field: false,
     });

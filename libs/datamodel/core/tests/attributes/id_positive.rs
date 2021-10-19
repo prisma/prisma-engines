@@ -145,6 +145,7 @@ fn multi_field_ids_must_work() {
         name: None,
         db_name: None,
         fields: vec!["a".into(), "b".into()],
+        field_options: vec![("a".into(), None), ("b".into(), None)],
         defined_on_field: false,
     });
 }
@@ -163,6 +164,7 @@ fn should_allow_unique_and_id_on_same_field() {
         name: None,
         db_name: None,
         fields: vec!["id".into()],
+        field_options: vec![("id".into(), None)],
         defined_on_field: true,
     });
 
@@ -170,6 +172,7 @@ fn should_allow_unique_and_id_on_same_field() {
         name: None,
         db_name: Some("Model_id_key".to_string()),
         fields: vec!["id".into()],
+        field_options: vec![("id".into(), SortOrder::Asc, None)],
         tpe: IndexType::Unique,
         defined_on_field: true,
     });
@@ -303,6 +306,11 @@ fn id_accepts_length_arg_on_mysql() {
             "firstName".to_string(),
             "middleName".to_string(),
             "lastName".to_string(),
+        ],
+        field_options: vec![
+            ("firstName".to_string(), None),
+            ("middleName".to_string(), None),
+            ("lastName".to_string(), None),
         ],
         defined_on_field: false,
     });

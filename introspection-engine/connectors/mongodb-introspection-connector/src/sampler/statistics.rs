@@ -224,6 +224,7 @@ fn new_model(model_name: &str) -> Model {
         name: None,
         db_name: None,
         fields: vec!["id".to_string()],
+        field_options: vec![("id".to_string(), None)], //TODO(matthias)
         defined_on_field: true,
     };
 
@@ -318,6 +319,7 @@ fn add_indices_to_models(models: &mut BTreeMap<String, Model>, indices: &mut BTr
 
             model.add_index(IndexDefinition {
                 fields,
+                field_options: vec![], //TODO(matthias)
                 tpe,
                 defined_on_field,
                 name: None,

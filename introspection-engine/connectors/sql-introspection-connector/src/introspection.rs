@@ -66,6 +66,7 @@ pub fn introspect(
                 name: None,
                 db_name: pk.constraint_name.clone(),
                 fields: pk.columns.clone(),
+                field_options: vec![], //TODO(matthias)
                 defined_on_field: pk.columns.len() == 1,
             });
         }

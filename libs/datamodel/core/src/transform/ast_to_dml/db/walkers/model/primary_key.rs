@@ -39,6 +39,13 @@ impl<'ast, 'db> PrimaryKeyWalker<'ast, 'db> {
             .map(move |id| &self.db.ast[self.model_id][*id])
     }
 
+    pub(crate) fn iter_ast_field_options(&self) -> impl Iterator<Item = (&'ast ast::Field, Option<u32>)> + '_ {
+        self.attribute
+            .field_lengths
+            .iter()
+            .map(move |(id, length)| (&self.db.ast[self.model_id][*id], *length))
+    }
+
     pub(crate) fn name(&self) -> Option<&'ast str> {
         self.attribute.name
     }

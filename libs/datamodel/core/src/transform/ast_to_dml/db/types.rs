@@ -171,14 +171,14 @@ impl ModelAttributes<'_> {
 pub(crate) struct IndexAttribute<'ast> {
     pub(crate) is_unique: bool,
     pub(crate) fields: Vec<ast::FieldId>,
-    pub(crate) field_options: Vec<(ast::FieldId, Option<SortOrder>, Option<u32>)>,
+    pub(crate) field_options: Vec<(ast::FieldId, Option<AstSortOrder>, Option<u32>)>,
     pub(crate) source_field: Option<ast::FieldId>,
     pub(crate) name: Option<&'ast str>,
     pub(crate) db_name: Option<Cow<'ast, str>>,
 }
 
 #[derive(Debug)]
-pub(crate) enum SortOrder {
+pub(crate) enum AstSortOrder {
     Asc,
     Desc,
 }
