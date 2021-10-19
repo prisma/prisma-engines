@@ -53,6 +53,11 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
         self.model_attributes
     }
 
+    /// Model has the @@ignore attribute.
+    pub(crate) fn is_ignored(self) -> bool {
+        self.attributes().is_ignored
+    }
+
     /// True if given fields are unique in the model.
     pub(crate) fn fields_are_unique(self, fields: &[ast::FieldId]) -> bool {
         self.model_attributes
