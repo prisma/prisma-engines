@@ -1,3 +1,4 @@
+mod fields;
 mod names;
 mod relation_fields;
 mod relations;
@@ -11,17 +12,25 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics) {
 
     let referential_integrity = db.datasource().map(|ds| ds.referential_integrity()).unwrap_or_default();
 
-    for field in db.walk_models().flat_map(|m| m.relation_fields()) {
-        // We don't want to spam, so with ambigous relations we should exit
-        // immediately if any errors.
-        if let Err(error) = names.validate_ambiguous_relation(field) {
-            diagnostics.push_error(error);
-            return;
+    for model in db.walk_models() {
+        for field in model.scalar_fields() {
+            fields::validate_client_name(field.into(), &names, diagnostics);
         }
 
-        relation_fields::ignored_related_model(field, diagnostics);
-        relation_fields::referential_actions(field, connector, diagnostics);
-        relation_fields::on_update_without_foreign_keys(field, referential_integrity, diagnostics);
+        for field in model.relation_fields() {
+            // We don't want to spam, so with ambigous relations we should exit
+            // immediately if any errors.
+            if let Err(error) = relation_fields::ambiguity(field, &names) {
+                diagnostics.push_error(error);
+                return;
+            }
+
+            fields::validate_client_name(field.into(), &names, diagnostics);
+
+            relation_fields::ignored_related_model(field, diagnostics);
+            relation_fields::referential_actions(field, connector, diagnostics);
+            relation_fields::on_update_without_foreign_keys(field, referential_integrity, diagnostics);
+        }
     }
 
     for relation in db.walk_explicit_relations() {
