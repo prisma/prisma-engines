@@ -20,7 +20,7 @@ impl OrderByData {
     }
 
     pub(crate) fn compute(order_by: OrderBy, index: usize) -> Self {
-        if order_by.path().is_empty() {
+        if order_by.path.is_empty() {
             Self {
                 join: None,
                 prefix: None,
@@ -28,11 +28,7 @@ impl OrderByData {
             }
         } else {
             let prefix = Self::compute_prefix(index, &order_by);
-            let mut stages = order_by
-                .path()
-                .iter()
-                .map(|rf| JoinStage::new(rf.clone()))
-                .collect_vec();
+            let mut stages = order_by.path.iter().map(|rf| JoinStage::new(rf.clone())).collect_vec();
 
             // We fold from right to left because the right hand side needs to be always contained
             // in the left hand side here (JoinStage<A, JoinStage<B, JoinStage<C>>>).
@@ -57,11 +53,7 @@ impl OrderByData {
     }
 
     fn compute_prefix(index: usize, order_by: &OrderBy) -> OrderByPrefix {
-        let mut parts = order_by
-            .path()
-            .iter()
-            .map(|rf| rf.relation().name.clone())
-            .collect_vec();
+        let mut parts = order_by.path.iter().map(|rf| rf.relation().name.clone()).collect_vec();
         let alias = format!("orderby_{}_{}", parts[0], index);
 
         parts[0] = alias;
@@ -79,13 +71,7 @@ impl OrderByData {
 
             (first.clone(), first)
         } else {
-            // TODO: Order by relevance won't work here
-            let right = self
-                .order_by
-                .field()
-                .expect("a field on which to order by is expected")
-                .db_name()
-                .to_owned();
+            let right = self.order_by.field.db_name().to_owned();
 
             let left = if right.starts_with('_') {
                 right.strip_prefix('_').unwrap().to_owned()
@@ -98,11 +84,8 @@ impl OrderByData {
     }
 
     /// The name of the scalar the ordering (ultimately) refers to.
-    pub(crate) fn scalar_field_name(&self) -> String {
-        // TODO: Order by relevance won't work here
-        let field = self.order_by.field().expect("a field on which to order by is expected");
-
-        field.db_name().to_string()
+    pub(crate) fn scalar_field_name(&self) -> &str {
+        self.order_by.field.db_name()
     }
 
     /// Computes the full query path that would be required to traverse from the top-most
@@ -113,12 +96,12 @@ impl OrderByData {
         } else if use_bindings {
             self.binding_names().0
         } else {
-            self.scalar_field_name()
+            self.scalar_field_name().to_string()
         }
     }
 
     pub(crate) fn sort_order(&self) -> SortOrder {
-        self.order_by.sort_order()
+        self.order_by.sort_order
     }
 }
 
