@@ -62,14 +62,16 @@ impl<'ast> Names<'ast> {
         }
     }
 
-    pub(super) fn name_taken(&self, model_id: ModelId, name: &str) -> Option<NameTaken> {
+    pub(super) fn name_taken(&self, model_id: ModelId, name: &str) -> Vec<NameTaken> {
+        let mut result = Vec::new();
+
         if self
             .index_names
             .get(&model_id)
             .map(|names| names.contains(name))
             .unwrap_or(false)
         {
-            return Some(NameTaken::Index);
+            result.push(NameTaken::Index);
         }
 
         if self
@@ -78,7 +80,7 @@ impl<'ast> Names<'ast> {
             .map(|names| names.contains(name))
             .unwrap_or(false)
         {
-            return Some(NameTaken::Unique);
+            result.push(NameTaken::Unique);
         }
 
         if self
@@ -87,9 +89,9 @@ impl<'ast> Names<'ast> {
             .map(|pk| *pk == name)
             .unwrap_or(false)
         {
-            return Some(NameTaken::PrimaryKey);
+            result.push(NameTaken::PrimaryKey);
         }
 
-        None
+        result
     }
 }
