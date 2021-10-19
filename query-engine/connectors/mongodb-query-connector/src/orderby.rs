@@ -176,8 +176,8 @@ impl OrderByBuilder {
 
         for data in self.order_bys.into_iter() {
             let field = if is_group_by {
-                if let Some(sort_aggr) = data.order_by.sort_aggregation {
-                    let prefix = match sort_aggr {
+                if let OrderBy::Aggregation(order_by_aggr) = &data.order_by {
+                    let prefix = match order_by_aggr.sort_aggregation {
                         prisma_models::SortAggregation::Count => "count",
                         prisma_models::SortAggregation::Avg => "avg",
                         prisma_models::SortAggregation::Sum => "sum",
