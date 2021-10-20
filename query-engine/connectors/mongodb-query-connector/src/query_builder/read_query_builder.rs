@@ -109,7 +109,7 @@ pub(crate) struct MongoReadQueryBuilder {
     pub(crate) order_joins: Vec<JoinStage>,
 
     /// Finalized ordering aggregation computed from the joins
-    pub(crate) order_aggregate_projections: Option<Document>,
+    pub(crate) order_aggregate_projections: Vec<Document>,
 
     /// Cursor builder for deferred processing.
     cursor_builder: Option<CursorBuilder>,
@@ -144,7 +144,7 @@ impl MongoReadQueryBuilder {
             order_builder: None,
             order: None,
             order_joins: vec![],
-            order_aggregate_projections: None,
+            order_aggregate_projections: vec![],
             cursor_builder: None,
             cursor_data: None,
             skip: None,
@@ -193,7 +193,7 @@ impl MongoReadQueryBuilder {
             aggregation_filters: vec![],
             order: None,
             order_joins: vec![],
-            order_aggregate_projections: None,
+            order_aggregate_projections: vec![],
             cursor_data: None,
             projection: None,
             is_group_by_query: false,
@@ -278,9 +278,7 @@ impl MongoReadQueryBuilder {
         }
 
         // Order by aggregate computed from joins ($addFields)
-        if let Some(order_aggregate_projections) = self.order_aggregate_projections {
-            stages.push(doc! { "$addFields": order_aggregate_projections });
-        }
+        stages.extend(self.order_aggregate_projections);
 
         // Post-join $matches
         stages.extend(self.join_filters.into_iter().map(|filter| doc! { "$match": filter }));
@@ -389,9 +387,7 @@ impl MongoReadQueryBuilder {
         outer_stages.push(doc! { "$match": cursor_data.cursor_filter });
         outer_stages.extend(order_join_stages);
 
-        if let Some(order_aggregate_projections) = self.order_aggregate_projections.clone() {
-            outer_stages.push(doc! { "$addFields": order_aggregate_projections })
-        }
+        outer_stages.extend(self.order_aggregate_projections.clone());
 
         // Self-"join" collection
         let inner_stages = self.into_pipeline_stages();
@@ -430,7 +426,6 @@ impl MongoReadQueryBuilder {
                     source: rf.clone(),
                     alias: Some(aggr.db_alias()),
                     nested: vec![],
-                    needs_unwind: false,
                 },
             };
             let projection = doc! {

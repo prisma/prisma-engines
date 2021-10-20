@@ -277,6 +277,164 @@ mod order_by_aggr {
         Ok(())
     }
 
+    fn m2one2one2m() -> String {
+        let schema = indoc! {
+            r#"model A {
+              #id(id, Int, @id)
+              b_id Int?
+              b    B?   @relation(fields: [b_id], references: [id])
+            }
+            
+            model B {
+              #id(id, Int, @id)
+              as   A[]
+              c_id Int?
+              c    C?   @relation(fields: [c_id], references: [id])
+            }
+            
+            model C {
+              #id(id, Int, @id)
+              bs B[]
+              ds D[]
+            }
+            
+            model D {
+              #id(id, Int, @id)
+              c_id Int?
+              c    C?   @relation(fields: [c_id], references: [id])
+            }
+            "#
+        };
+
+        schema.to_owned()
+    }
+
+    // "[3+ Hops] Ordering by m2one2one2one2m count desc" should "work"
+    #[connector_test(schema(m2one2one2m))]
+    async fn m2one2one2m_count_asc(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation {
+                    createOneA(data: {
+                      id: 1,
+                      b: {
+                        create: {
+                          id: 1,
+                          c: {
+                            create: {
+                              id: 1,
+                              ds: {
+                                create: [{ id: 1 }]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }) {
+                      id
+                    }
+              }"#
+        );
+        run_query!(
+            &runner,
+            r#"mutation {
+                    createOneA(data: {
+                      id: 2,
+                      b: {
+                        create: {
+                          id: 2,
+                          c: {
+                            create: {
+                              id: 2,
+                              ds: {
+                                create: [{ id: 2 }, { id: 3 }]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }) {
+                      id
+                    }
+                }"#
+        );
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{
+                findManyA(orderBy: { b: { c: { ds: { _count: asc } } } }) {
+                  id
+                }
+              }
+              "#),
+          @r###"{"data":{"findManyA":[{"id":1},{"id":2}]}}"###
+        );
+
+        Ok(())
+    }
+
+    // "[3+ Hops] Ordering by m2one2one2one2m count desc" should "work"
+    #[connector_test(schema(m2one2one2m))]
+    async fn m2one2one2m_count_desc(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation {
+                createOneA(data: {
+                  id: 1,
+                  b: {
+                    create: {
+                      id: 1,
+                      c: {
+                        create: {
+                          id: 1,
+                          ds: {
+                            create: [{ id: 1 }]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }) {
+                  id
+                }
+          }"#
+        );
+        run_query!(
+            &runner,
+            r#"mutation {
+                createOneA(data: {
+                  id: 2,
+                  b: {
+                    create: {
+                      id: 2,
+                      c: {
+                        create: {
+                          id: 2,
+                          ds: {
+                            create: [{ id: 2 }, { id: 3 }]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }) {
+                  id
+                }
+            }"#
+        );
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{
+            findManyA(orderBy: { b: { c: { ds: { _count: desc } } } }) {
+              id
+            }
+          }
+          "#),
+          @r###"{"data":{"findManyA":[{"id":2},{"id":1}]}}"###
+        );
+
+        Ok(())
+    }
+
     // With pagination tests
 
     // "[Cursor] Ordering by one2m count asc" should "work"
@@ -519,6 +677,73 @@ mod order_by_aggr {
             }
           }"#),
           @r###"{"data":{"findManyPost":[{"id":2,"user":{"name":"Bob","categories":[{"name":"Computer Science"},{"name":"Music"}]}},{"id":3,"user":{"name":"Bob","categories":[{"name":"Computer Science"},{"name":"Music"}]}}]}}"###
+        );
+
+        Ok(())
+    }
+
+    // "[Cursor][3+ Hops] Ordering by m2one2one2one2m count desc" should "work"
+    #[connector_test(schema(m2one2one2m))]
+    async fn cursor_m2one2one2m_count_desc(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation {
+                    createOneA(data: {
+                      id: 1,
+                      b: {
+                        create: {
+                          id: 1,
+                          c: {
+                            create: {
+                              id: 1,
+                              ds: {
+                                create: [{ id: 1 }]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }) {
+                      id
+                    }
+              }"#
+        );
+        run_query!(
+            &runner,
+            r#"mutation {
+                    createOneA(data: {
+                      id: 2,
+                      b: {
+                        create: {
+                          id: 2,
+                          c: {
+                            create: {
+                              id: 2,
+                              ds: {
+                                create: [{ id: 2 }, { id: 3 }]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }) {
+                      id
+                    }
+                }"#
+        );
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{
+                findManyA(
+                  orderBy: { b: { c: { ds: { _count: desc } } } },
+                  cursor: { id: 1 },
+                  take: 1
+                ) {
+                  id
+                }
+              }
+              "#),
+          @r###"{"data":{"findManyA":[{"id":1}]}}"###
         );
 
         Ok(())
