@@ -34,21 +34,6 @@ impl OrderBy {
         }
     }
 
-    /// Returns `true` if the order by is `Aggregation`.
-    pub fn is_aggregation(&self) -> bool {
-        matches!(self, Self::Aggregation(..))
-    }
-
-    /// Returns `true` if the order by is `Scalar`.
-    pub fn is_scalar(&self) -> bool {
-        matches!(self, Self::Scalar(..))
-    }
-
-    /// Returns `true` if the order by is `Relevance`.
-    pub fn is_relevance(&self) -> bool {
-        matches!(self, Self::Relevance(..))
-    }
-
     pub fn has_middle_to_one_path(&self) -> bool {
         let path = self.path();
         let len = path.len();

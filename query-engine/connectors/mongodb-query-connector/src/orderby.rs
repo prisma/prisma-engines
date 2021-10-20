@@ -251,7 +251,7 @@ impl OrderByBuilder {
 /// 1. { $unwind: { path: "$orderby_AToB" } } -> { orderby_AToB: { BToC: [{ CToD: [1, 2, 3] }] } }
 /// 2. { $addFields: { orderby_AToB: "$orderby_AToB.BToC" } } -> [{ CToD: [1, 2, 3] }]
 /// 3. { $unwind: { path: "$orderby_AToB" } } ->  { CToD: [1, 2, 3] }
-/// 3. { $addFields: { orderby_AToB: "$orderby_AToB.CToD" } } -> [1, 2, 3]
+/// 4. { $addFields: { orderby_AToB: "$orderby_AToB.CToD" } } -> [1, 2, 3]
 fn unwind_aggregate_joins(
     join_name: &str,
     order_by_aggregate: &prisma_models::OrderByAggregation,
