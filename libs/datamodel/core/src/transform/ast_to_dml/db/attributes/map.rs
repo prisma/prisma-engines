@@ -73,11 +73,21 @@ pub(super) fn scalar_field<'ast>(
         if !ctx.db.types.scalar_fields.contains_key(&(model_id, *field_id)) {
             return;
         }
-        ctx.push_error(DatamodelError::new_duplicate_field_error(
-            &ast_model.name.name,
-            &ast_field.name.name,
-            ast_field.span,
-        ));
+
+        match ctx
+            .db
+            .types
+            .scalar_fields
+            .get(&(model_id, *field_id))
+            .and_then(|sf| sf.mapped_name)
+        {
+            Some(name) if name != mapped_name => return,
+            _ => ctx.push_error(DatamodelError::new_duplicate_field_error(
+                &ast_model.name.name,
+                &ast_field.name.name,
+                ast_field.span,
+            )),
+        }
     }
 }
 
