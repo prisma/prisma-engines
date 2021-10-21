@@ -300,7 +300,7 @@ impl Connector for MsSqlDatamodelConnector {
         }
 
         if let Some(pk) = &model.primary_key {
-            for id_field in pk.fields.iter() {
+            for (id_field, _) in pk.fields.iter() {
                 let field = model.find_field(id_field).unwrap();
 
                 if let FieldType::Scalar(scalar_type, _, native_type) = field.field_type() {

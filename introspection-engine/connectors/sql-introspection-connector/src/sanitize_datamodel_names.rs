@@ -52,7 +52,7 @@ fn sanitize_models(datamodel: &mut Datamodel, ctx: &IntrospectionContext) -> Has
         let model_db_name = model.database_name().map(|s| s.to_owned());
 
         if let Some(pk) = &mut model.primary_key {
-            pk.fields = sanitize_strings(pk.fields.as_slice());
+            pk.fields = sanitize_pk_strings(pk.fields.as_slice());
         }
 
         for field in model.fields_mut() {
@@ -155,6 +155,10 @@ fn sanitize_enums(datamodel: &mut Datamodel, enum_renames: &HashMap<String, (Str
 
 fn sanitize_strings(strings: &[String]) -> Vec<String> {
     strings.iter().map(|f| sanitize_string(f)).collect()
+}
+
+fn sanitize_pk_strings(strings: &[(String, Option<u32>)]) -> Vec<(String, Option<u32>)> {
+    strings.iter().map(|(f, l)| (sanitize_string(f), *l)).collect()
 }
 
 // Todo: This is now widely used, we can make this smarter at some point.

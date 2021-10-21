@@ -41,6 +41,14 @@ impl Argument {
         }
     }
 
+    pub fn new_numeric(name: &str, value: u32) -> Argument {
+        Argument {
+            name: Identifier::new(name),
+            value: Expression::NumericValue(value.to_string(), Span::empty()),
+            span: Span::empty(),
+        }
+    }
+
     pub fn new_array(name: &str, value: Vec<Expression>) -> Argument {
         Argument {
             name: Identifier::new(name),

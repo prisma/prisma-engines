@@ -335,7 +335,7 @@ impl Connector for MySqlDatamodelConnector {
         }
 
         if let Some(pk) = &model.primary_key {
-            for id_field in pk.fields.iter() {
+            for (id_field, _) in pk.fields.iter() {
                 let field = model.find_field(id_field).unwrap();
                 if let FieldType::Scalar(_, _, Some(native_type)) = field.field_type() {
                     let native_type_name = native_type.name.as_str();

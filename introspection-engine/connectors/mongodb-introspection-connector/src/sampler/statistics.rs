@@ -223,8 +223,7 @@ fn new_model(model_name: &str) -> Model {
     let primary_key = PrimaryKeyDefinition {
         name: None,
         db_name: None,
-        fields: vec!["id".to_string()],
-        field_options: vec![("id".to_string(), None)], //TODO(matthias)
+        fields: vec![("id".to_string(), None)],
         defined_on_field: true,
     };
 

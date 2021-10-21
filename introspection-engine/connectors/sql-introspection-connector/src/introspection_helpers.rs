@@ -445,3 +445,14 @@ pub fn replace_field_names(target: &mut Vec<String>, old_name: &str, new_name: &
         })
         .for_each(drop);
 }
+
+pub fn replace_pk_field_names(target: &mut Vec<(String, Option<u32>)>, old_name: &str, new_name: &str) {
+    target
+        .iter_mut()
+        .map(|(v, _)| {
+            if v == old_name {
+                *v = new_name.to_string()
+            }
+        })
+        .for_each(drop);
+}

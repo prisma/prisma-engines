@@ -68,8 +68,7 @@ impl<'a> LiftAstToDml<'a> {
         model.primary_key = walker.primary_key().map(|pk| dml::PrimaryKeyDefinition {
             name: pk.name().map(String::from),
             db_name: pk.final_database_name().map(|c| c.into_owned()),
-            fields: pk.iter_ast_fields().map(|field| field.name.name.to_owned()).collect(),
-            field_options: pk
+            fields: pk
                 .iter_ast_field_options()
                 .map(|(field, length)| (field.name.name.to_owned(), length))
                 .collect(),

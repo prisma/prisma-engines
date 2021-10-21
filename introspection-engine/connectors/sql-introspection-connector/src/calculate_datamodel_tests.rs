@@ -202,8 +202,7 @@ mod tests {
                     primary_key: Some(PrimaryKeyDefinition {
                         name: None,
                         db_name: None,
-                        fields: vec!["primary".to_string()],
-                        field_options: vec![("primary".to_string(), None)],
+                        fields: vec![("primary".to_string(), None)],
                         defined_on_field: true,
                     }),
                 },
@@ -240,8 +239,7 @@ mod tests {
                     primary_key: Some(PrimaryKeyDefinition {
                         name: None,
                         db_name: None,
-                        fields: vec!["primary".to_string()],
-                        field_options: vec![("primary".to_string(), None)],
+                        fields: vec![("primary".to_string(), None)],
                         defined_on_field: true,
                     }),
                 },
@@ -278,8 +276,7 @@ mod tests {
                     primary_key: Some(PrimaryKeyDefinition {
                         name: None,
                         db_name: None,
-                        fields: vec!["primary".to_string()],
-                        field_options: vec![("primary".to_string(), None)],
+                        fields: vec![("primary".to_string(), None)],
                         defined_on_field: true,
                     }),
                 },
@@ -502,8 +499,7 @@ mod tests {
                     primary_key: Some(PrimaryKeyDefinition {
                         name: None,
                         db_name: None,
-                        fields: vec!["id".to_string()],
-                        field_options: vec![("id".to_string(), None)],
+                        fields: vec![("id".to_string(), None)],
                         defined_on_field: true,
                     }),
                 },
@@ -601,8 +597,7 @@ mod tests {
                     primary_key: Some(PrimaryKeyDefinition {
                         name: None,
                         db_name: None,
-                        fields: vec!["id".to_string()],
-                        field_options: vec![("id".to_string(), None)],
+                        fields: vec![("id".to_string(), None)],
                         defined_on_field: true,
                     }),
                 },
@@ -780,8 +775,7 @@ mod tests {
                 primary_key: Some(PrimaryKeyDefinition {
                     name: None,
                     db_name: None,
-                    fields: vec!["id".to_string()],
-                    field_options: vec![("id".to_string(), None)],
+                    fields: vec![("id".to_string(), None)],
                     defined_on_field: true,
                 }),
             }],
@@ -910,8 +904,7 @@ mod tests {
                     primary_key: Some(PrimaryKeyDefinition {
                         name: None,
                         db_name: None,
-                        fields: vec!["id".to_string()],
-                        field_options: vec![("id".to_string(), None)],
+                        fields: vec![("id".to_string(), None)],
                         defined_on_field: true,
                     }),
                 },
@@ -982,8 +975,7 @@ mod tests {
                     primary_key: Some(PrimaryKeyDefinition {
                         name: None,
                         db_name: None,
-                        fields: vec!["id".to_string()],
-                        field_options: vec![("id".to_string(), None)],
+                        fields: vec![("id".to_string(), None)],
                         defined_on_field: true,
                     }),
                 },

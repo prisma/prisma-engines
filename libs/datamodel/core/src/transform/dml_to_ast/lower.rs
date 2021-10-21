@@ -1,3 +1,4 @@
+use crate::ast::{Expression, Identifier};
 use crate::common::preview_features::PreviewFeature;
 use crate::{
     ast::{self},
@@ -95,6 +96,21 @@ impl<'a> LowerDmlToAst<'a> {
         fields
             .iter()
             .map(|f| ast::Expression::ConstantValue(f.to_string(), ast::Span::empty()))
+            .collect()
+    }
+
+    //TODO(matthias)
+    pub fn pk_field_array(fields: &[(String, Option<u32>)]) -> Vec<ast::Expression> {
+        fields
+            .iter()
+            .map(|(f, l)| {
+                let args = l
+                    .into_iter()
+                    .map(|length| ast::Argument::new_numeric("length", *length))
+                    .collect();
+
+                ast::Expression::FieldWithArgs(f.to_string(), args, ast::Span::empty())
+            })
             .collect()
     }
 }

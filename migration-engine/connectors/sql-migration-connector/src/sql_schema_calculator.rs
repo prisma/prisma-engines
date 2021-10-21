@@ -49,7 +49,7 @@ fn calculate_model_tables<'a>(
             columns: pk
                 .fields
                 .iter()
-                .map(|field| model.find_scalar_field(field).unwrap().db_name().to_string())
+                .map(|(field, _)| model.find_scalar_field(field).unwrap().db_name().to_string())
                 .collect(),
             sequence: None,
             constraint_name: pk.db_name.clone(),

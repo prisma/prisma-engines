@@ -97,8 +97,8 @@ impl Connector for MongoDbDatamodelConnector {
             }
 
             // singular id
-            let field_name = pk.fields.first().unwrap();
-            let field = model.find_scalar_field(field_name.as_str()).unwrap();
+            let first_field_options = pk.fields.first().unwrap();
+            let field = model.find_scalar_field(first_field_options.0.as_str()).unwrap();
 
             // The _id name check is superfluous because it's not a valid schema field at the moment.
             if field.name != "_id" {

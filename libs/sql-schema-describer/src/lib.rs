@@ -267,6 +267,7 @@ pub struct UserDefinedType {
     pub definition: Option<String>,
 }
 
+//TODO(matthias) this needs an optional length arg
 /// The primary key of a table.
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct PrimaryKey {
