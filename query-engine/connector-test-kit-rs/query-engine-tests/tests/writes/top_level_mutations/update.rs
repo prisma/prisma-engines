@@ -284,7 +284,7 @@ mod update {
     // TODO(dom): Not working on Mongo (first snapshot)
     // -{"data":{"updateOneTestModel":{"optInt":null}}}
     // +{"data":{"updateOneTestModel":{"optInt":10}}}
-    #[connector_test(schema(schema_6))]
+    #[connector_test(schema(schema_6), exclude(Cockroach))]
     async fn update_apply_number_ops_for_int(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1 }"#).await?;
         create_row(&runner, r#"{ id: 2, optInt: 3}"#).await?;
@@ -327,6 +327,66 @@ mod update {
         insta::assert_snapshot!(
           query_number_operation(&runner, "2", "optInt", "divide", "3").await?,
           @r###"{"data":{"updateOneTestModel":{"optInt":2}}}"###
+        );
+
+        // Set
+        insta::assert_snapshot!(
+          query_number_operation(&runner, "1", "optInt", "set", "5").await?,
+          @r###"{"data":{"updateOneTestModel":{"optInt":5}}}"###
+        );
+        insta::assert_snapshot!(
+          query_number_operation(&runner, "2", "optInt", "set", "5").await?,
+          @r###"{"data":{"updateOneTestModel":{"optInt":5}}}"###
+        );
+
+        // Set null
+        insta::assert_snapshot!(
+          query_number_operation(&runner, "1", "optInt", "set", "null").await?,
+          @r###"{"data":{"updateOneTestModel":{"optInt":null}}}"###
+        );
+        insta::assert_snapshot!(
+          query_number_operation(&runner, "2", "optInt", "set", "null").await?,
+          @r###"{"data":{"updateOneTestModel":{"optInt":null}}}"###
+        );
+
+        Ok(())
+    }
+
+    // CockroachDB does not support the "divide" operator as is.
+    // See https://github.com/cockroachdb/cockroach/issues/41448.
+    #[connector_test(schema(schema_6), only(Cockroach))]
+    async fn update_apply_number_ops_for_int_cockroach(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1 }"#).await?;
+        create_row(&runner, r#"{ id: 2, optInt: 3}"#).await?;
+
+        // Increment
+        insta::assert_snapshot!(
+          query_number_operation(&runner, "1", "optInt", "increment", "10").await?,
+          @r###"{"data":{"updateOneTestModel":{"optInt":null}}}"###
+        );
+        insta::assert_snapshot!(
+          query_number_operation(&runner, "2", "optInt", "increment", "10").await?,
+          @r###"{"data":{"updateOneTestModel":{"optInt":13}}}"###
+        );
+
+        // Decrement
+        insta::assert_snapshot!(
+          query_number_operation(&runner, "1", "optInt", "decrement", "10").await?,
+          @r###"{"data":{"updateOneTestModel":{"optInt":null}}}"###
+        );
+        insta::assert_snapshot!(
+          query_number_operation(&runner, "2", "optInt", "decrement", "10").await?,
+          @r###"{"data":{"updateOneTestModel":{"optInt":3}}}"###
+        );
+
+        // Multiply
+        insta::assert_snapshot!(
+          query_number_operation(&runner, "1", "optInt", "multiply", "2").await?,
+          @r###"{"data":{"updateOneTestModel":{"optInt":null}}}"###
+        );
+        insta::assert_snapshot!(
+          query_number_operation(&runner, "2", "optInt", "multiply", "2").await?,
+          @r###"{"data":{"updateOneTestModel":{"optInt":6}}}"###
         );
 
         // Set
