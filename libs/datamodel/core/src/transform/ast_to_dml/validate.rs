@@ -1,9 +1,7 @@
 #![allow(clippy::suspicious_operation_groupings)] // clippy is wrong there
 
 use crate::{
-    ast,
-    common::constraint_names::ConstraintNames,
-    configuration,
+    ast, configuration,
     diagnostics::{DatamodelError, Diagnostics},
     dml,
 };
@@ -33,46 +31,6 @@ impl<'a> Validator<'a> {
     pub(crate) fn validate(&self, ast: &ast::SchemaAst, schema: &dml::Datamodel, diagnostics: &mut Diagnostics) {
         for model in schema.models() {
             let ast_model = ast.find_model(&model.name).expect(STATE_ERROR);
-
-            //doing this here for now since I want to have all field names already generated
-            // it might be possible to move this
-            if let Some(pk) = &model.primary_key {
-                if let Some(name) = &pk.name {
-                    for field in model.fields() {
-                        if let Some(err) = ConstraintNames::client_name_already_in_use(
-                            name,
-                            field.name(),
-                            &model.name,
-                            ast_model.span,
-                            "@@id",
-                        ) {
-                            diagnostics.push_error(err);
-                        }
-                    }
-                }
-            }
-
-            for index in &model.indices {
-                //doing this here for now since I want to have all field names already generated
-                // it might be possible to move this
-                if let Some(name) = &index.name {
-                    for field in model.fields() {
-                        if let Some(err) = ConstraintNames::client_name_already_in_use(
-                            name,
-                            field.name(),
-                            &model.name,
-                            ast_model.span,
-                            "@@unique",
-                        ) {
-                            diagnostics.push_error(err);
-                        }
-                    }
-                }
-            }
-
-            if let Err(err) = self.validate_model_has_strict_unique_criteria(ast_model, model) {
-                diagnostics.push_error(err);
-            }
 
             if let Err(ref mut the_errors) = self.validate_field_connector_specific(ast_model, model) {
                 diagnostics.append(the_errors)
@@ -218,42 +176,6 @@ impl<'a> Validator<'a> {
         }
 
         diagnostics
-    }
-
-    fn validate_model_has_strict_unique_criteria(
-        &self,
-        ast_model: &ast::Model,
-        model: &dml::Model,
-    ) -> Result<(), DatamodelError> {
-        let loose_criterias = model.loose_unique_criterias();
-        let suffix = if loose_criterias.is_empty() {
-            "".to_string()
-        } else {
-            let criteria_descriptions: Vec<_> = loose_criterias
-                .iter()
-                .map(|criteria| {
-                    let field_names: Vec<_> = criteria.fields.iter().map(|f| f.name.clone()).collect();
-                    format!("- {}", field_names.join(", "))
-                })
-                .collect();
-            format!(
-                " The following unique criterias were not considered as they contain fields that are not required:\n{}",
-                criteria_descriptions.join("\n")
-            )
-        };
-
-        if model.strict_unique_criterias_disregarding_unsupported().is_empty() && !model.is_ignored {
-            return Err(DatamodelError::new_model_validation_error(
-                &format!(
-                    "Each model must have at least one unique criteria that has only required fields. Either mark a single field with `@id`, `@unique` or add a multi field criterion with `@@id([])` or `@@unique([])` to the model.{suffix}",
-                    suffix = suffix
-                ),
-                &model.name,
-                ast_model.span,
-            ));
-        }
-
-        Ok(())
     }
 
     fn validate_field_connector_specific(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {

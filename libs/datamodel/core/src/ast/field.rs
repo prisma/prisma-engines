@@ -116,4 +116,8 @@ impl FieldType {
             FieldType::Supported(_) => None,
         }
     }
+
+    pub(crate) fn is_unsupported(&self) -> bool {
+        matches!(self, FieldType::Unsupported(_, _))
+    }
 }

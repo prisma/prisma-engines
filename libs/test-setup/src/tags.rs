@@ -17,4 +17,5 @@ pub enum Tags {
     Mssql = 1 << 11,
     Vitess = 1 << 12,
     Cockroach = 1 << 13,
+    Postgres14 = 1 << 14,
 }

@@ -331,6 +331,19 @@ fn fail_on_duplicate_field_with_map() {
 }
 
 #[test]
+fn do_not_fail_on_duplicate_field_with_map_if_the_maps_differ() {
+    let dml = indoc! {r#"
+        model User {
+          id Int @id
+          firstName String @map("thirdName")
+          otherName String @map("firstName")
+        }
+    "#};
+
+    assert!(datamodel::parse_datamodel(dml).is_ok())
+}
+
+#[test]
 fn fail_on_duplicate_composite_type_field_with_map() {
     let dml = indoc! {r#"
         datasource db {
