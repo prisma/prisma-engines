@@ -1,10 +1,10 @@
 #![deny(warnings)]
 #![allow(clippy::from_over_into)]
 
-mod builder;
+mod builders;
 mod composite_type;
-mod datamodel_converter;
 mod error;
+mod extensions;
 mod field;
 mod fields;
 mod index;
@@ -20,9 +20,9 @@ mod relation;
 pub mod pk;
 pub mod prelude;
 
+pub use builders::InternalDataModelBuilder;
 pub use composite_type::*;
 pub use datamodel::dml;
-pub use datamodel_converter::*;
 pub use error::*;
 pub use field::*;
 pub use fields::*;

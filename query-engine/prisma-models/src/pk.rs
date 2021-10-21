@@ -28,7 +28,7 @@ impl PrimaryKeyTemplate {
 #[derive(Debug, Clone)]
 pub struct PrimaryKey {
     pub alias: Option<String>,
-    fields: Vec<ScalarFieldWeak>,
+    pub(crate) fields: Vec<ScalarFieldWeak>,
 }
 
 impl PrimaryKey {

@@ -3,11 +3,10 @@ use crate::{
     opt::{CliOpt, PrismaOpt, Subcommand},
     PrismaResult,
 };
-
 use datamodel::diagnostics::ValidatedConfiguration;
 use datamodel::{Configuration, Datamodel};
 use datamodel_connector::ConnectorCapabilities;
-use prisma_models::DatamodelConverter;
+use prisma_models::InternalDataModelBuilder;
 use query_core::{schema::QuerySchemaRef, schema_builder, BuildMode};
 use request_handlers::{dmmf, GraphQlHandler};
 use std::{env, sync::Arc};
@@ -87,15 +86,13 @@ impl CliCommand {
     }
 
     async fn dmmf(request: DmmfRequest) -> PrismaResult<()> {
-        let template = DatamodelConverter::convert(&request.datamodel);
-
         let capabilities = match request.config.datasources.first() {
             Some(datasource) => datasource.capabilities(),
             None => ConnectorCapabilities::empty(),
         };
 
         // temporary code duplication
-        let internal_data_model = template.build("".into());
+        let internal_data_model = InternalDataModelBuilder::from(&request.datamodel).build("".into());
         let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(
             internal_data_model,
             request.build_mode,

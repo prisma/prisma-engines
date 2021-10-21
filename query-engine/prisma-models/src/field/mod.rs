@@ -14,7 +14,7 @@ use std::{hash::Hash, sync::Arc};
 pub enum Field {
     Relation(RelationFieldRef),
     Scalar(ScalarFieldRef),
-    Composite(CompositeFieldRef),
+    // Composite(CompositeFieldRef),
 }
 
 impl Field {
@@ -22,7 +22,7 @@ impl Field {
         match self {
             Field::Scalar(ref sf) => &sf.name,
             Field::Relation(ref rf) => &rf.name,
-            Field::Composite(ref cf) => &cf.name,
+            // Field::Composite(ref cf) => &cf.name,
         }
     }
 
@@ -30,7 +30,7 @@ impl Field {
         match self {
             Field::Scalar(_) => true,
             Field::Relation(_) => false,
-            Field::Composite(_) => false,
+            // Field::Composite(_) => false,
         }
     }
 
@@ -38,7 +38,7 @@ impl Field {
         match self {
             Field::Scalar(sf) => sf.is_id,
             Field::Relation(_) => false,
-            Field::Composite(_) => false,
+            // Field::Composite(_) => false,
         }
     }
 
@@ -46,7 +46,7 @@ impl Field {
         match self {
             Field::Scalar(ref sf) => sf.is_list,
             Field::Relation(ref rf) => rf.is_list,
-            Field::Composite(ref cf) => cf.is_list(),
+            // Field::Composite(ref cf) => cf.is_list(),
         }
     }
 
@@ -61,7 +61,7 @@ impl Field {
         match self {
             Field::Scalar(ref sf) => sf.is_required,
             Field::Relation(ref rf) => rf.is_required,
-            Field::Composite(ref cf) => cf.is_required(),
+            // Field::Composite(ref cf) => cf.is_required(),
         }
     }
 
@@ -69,7 +69,7 @@ impl Field {
         match self {
             Field::Scalar(ref sf) => sf.unique(),
             Field::Relation(_) => false,
-            Field::Composite(_) => false,
+            // Field::Composite(_) => false,
         }
     }
 
@@ -77,7 +77,7 @@ impl Field {
         match self {
             Self::Scalar(sf) => sf.model(),
             Self::Relation(rf) => rf.model(),
-            Self::Composite(cf) => cf.model(),
+            // Self::Composite(cf) => cf.model(),
         }
     }
 
@@ -85,7 +85,7 @@ impl Field {
         match self {
             Self::Scalar(sf) => vec![sf.clone()],
             Self::Relation(rf) => rf.scalar_fields(),
-            Self::Composite(cf) => cf.scalar_fields(),
+            // Self::Composite(cf) => cf.scalar_fields(),
         }
     }
 
@@ -93,7 +93,7 @@ impl Field {
         match self {
             Field::Relation(field) => FieldWeak::Relation(Arc::downgrade(field)),
             Field::Scalar(field) => FieldWeak::Scalar(Arc::downgrade(field)),
-            Field::Composite(field) => FieldWeak::Composite(Arc::downgrade(field)),
+            // Field::Composite(field) => FieldWeak::Composite(Arc::downgrade(field)),
         }
     }
 }
@@ -102,7 +102,7 @@ impl Field {
 pub enum FieldWeak {
     Relation(RelationFieldWeak),
     Scalar(ScalarFieldWeak),
-    Composite(CompositeFieldWeak),
+    // Composite(CompositeFieldWeak),
 }
 
 impl FieldWeak {
@@ -110,7 +110,7 @@ impl FieldWeak {
         match self {
             Self::Relation(rf) => rf.upgrade().unwrap().into(),
             Self::Scalar(sf) => sf.upgrade().unwrap().into(),
-            Self::Composite(cf) => cf.upgrade().unwrap().into(),
+            // Self::Composite(cf) => cf.upgrade().unwrap().into(),
         }
     }
 }
@@ -120,7 +120,7 @@ impl From<&Field> for FieldWeak {
         match f {
             Field::Scalar(sf) => sf.into(),
             Field::Relation(rf) => rf.into(),
-            Field::Composite(cf) => cf.into(),
+            // Field::Composite(cf) => cf.into(),
         }
     }
 }
@@ -137,11 +137,11 @@ impl From<&RelationFieldRef> for FieldWeak {
     }
 }
 
-impl From<&CompositeFieldRef> for FieldWeak {
-    fn from(f: &CompositeFieldRef) -> Self {
-        FieldWeak::Composite(Arc::downgrade(f))
-    }
-}
+// impl From<&CompositeFieldRef> for FieldWeak {
+//     fn from(f: &CompositeFieldRef) -> Self {
+//         FieldWeak::Composite(Arc::downgrade(f))
+//     }
+// }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 #[allow(clippy::upper_case_acronyms)]
@@ -189,11 +189,11 @@ impl From<RelationFieldRef> for Field {
     }
 }
 
-impl From<CompositeFieldRef> for Field {
-    fn from(cf: CompositeFieldRef) -> Self {
-        Field::Composite(cf)
-    }
-}
+// impl From<CompositeFieldRef> for Field {
+//     fn from(cf: CompositeFieldRef) -> Self {
+//         Field::Composite(cf)
+//     }
+// }
 
 impl From<ScalarType> for TypeIdentifier {
     fn from(st: ScalarType) -> Self {

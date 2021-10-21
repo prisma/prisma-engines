@@ -7,10 +7,10 @@ pub type InternalDataModelWeakRef = Weak<InternalDataModel>;
 
 #[derive(Debug)]
 pub struct InternalDataModel {
-    models: OnceCell<Vec<ModelRef>>,
-    composite_types: OnceCell<Vec<CompositeTypeRef>>,
-    relations: OnceCell<Vec<RelationRef>>,
-    relation_fields: OnceCell<Vec<RelationFieldRef>>,
+    pub(crate) models: OnceCell<Vec<ModelRef>>,
+    pub(crate) composite_types: OnceCell<Vec<CompositeTypeRef>>,
+    pub(crate) relations: OnceCell<Vec<RelationRef>>,
+    pub(crate) relation_fields: OnceCell<Vec<RelationFieldRef>>,
 
     /// Todo clarify / rename.
     /// The db name influences how data is queried from the database.
@@ -22,7 +22,7 @@ pub struct InternalDataModel {
 }
 
 impl InternalDataModel {
-    fn finalize(&self) {
+    pub(crate) fn finalize(&self) {
         self.models().iter().for_each(|model| model.finalize());
     }
 
@@ -31,7 +31,7 @@ impl InternalDataModel {
     }
 
     pub fn models_cloned(&self) -> Vec<ModelRef> {
-        self.models.get().unwrap().into_iter().map(Arc::clone).collect()
+        self.models.get().unwrap().iter().map(Arc::clone).collect()
     }
 
     pub fn relations(&self) -> &[RelationRef] {

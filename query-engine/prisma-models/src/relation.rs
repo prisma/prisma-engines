@@ -14,17 +14,16 @@ pub type RelationWeakRef = Weak<Relation>;
 pub struct Relation {
     pub name: String,
 
-    model_a_name: String,
-    model_b_name: String,
+    pub(crate) model_a_name: String,
+    pub(crate) model_b_name: String,
 
-    model_a: OnceCell<ModelWeakRef>,
-    model_b: OnceCell<ModelWeakRef>,
+    pub(crate) model_a: OnceCell<ModelWeakRef>,
+    pub(crate) model_b: OnceCell<ModelWeakRef>,
 
-    field_a: OnceCell<Weak<RelationField>>,
-    field_b: OnceCell<Weak<RelationField>>,
+    pub(crate) field_a: OnceCell<Weak<RelationField>>,
+    pub(crate) field_b: OnceCell<Weak<RelationField>>,
 
     pub manifestation: RelationLinkManifestation,
-
     pub internal_data_model: InternalDataModelWeakRef,
 }
 

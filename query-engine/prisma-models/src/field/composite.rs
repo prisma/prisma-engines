@@ -9,40 +9,13 @@ use std::{
 pub type CompositeFieldRef = Arc<CompositeField>;
 pub type CompositeFieldWeak = Weak<CompositeField>;
 
-#[derive(Debug)]
-pub struct CompositeFieldTemplate {
-    pub name: String,
-    pub db_name: Option<String>,
-    pub is_required: bool,
-    pub arity: FieldArity,
-    pub type_name: String,
-}
-
-impl CompositeFieldTemplate {
-    pub fn build(self, model: ModelWeakRef, composite_types: &[CompositeTypeRef]) -> CompositeFieldRef {
-        let composite = CompositeField {
-            name: self.name,
-            db_name: self.db_name,
-            typ: composite_types
-                .into_iter()
-                .find(|typ| &typ.name == &self.type_name)
-                .expect(&format!("Invalid composite type reference: {}", self.type_name))
-                .clone(),
-            arity: self.arity,
-            model: model,
-        };
-
-        Arc::new(composite)
-    }
-}
-
 #[derive(Clone)]
 pub struct CompositeField {
     pub name: String,
     pub db_name: Option<String>,
     pub typ: CompositeTypeRef,
-    arity: FieldArity,
-    model: ModelWeakRef,
+    pub(crate) arity: FieldArity,
+    pub(crate) model: ModelWeakRef,
 }
 
 impl CompositeField {

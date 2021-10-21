@@ -13,16 +13,17 @@ pub struct CompositeFieldBuilder {
 
 impl CompositeFieldBuilder {
     pub fn build(self, model: ModelWeakRef, composite_types: &[CompositeTypeRef]) -> CompositeFieldRef {
+        let type_name = &self.type_name;
         let composite = CompositeField {
             name: self.name,
             db_name: self.db_name,
             typ: composite_types
-                .into_iter()
-                .find(|typ| &typ.name == &self.type_name)
-                .expect(&format!("Invalid composite type reference: {}", self.type_name))
+                .iter()
+                .find(|typ| &typ.name == type_name)
+                .unwrap_or_else(|| panic!("Invalid composite type reference: {}", type_name))
                 .clone(),
             arity: self.arity,
-            model: model,
+            model,
         };
 
         Arc::new(composite)

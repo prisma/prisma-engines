@@ -1,30 +1,11 @@
+use crate::model_extensions::ScalarFieldExt;
 use itertools::Itertools;
 use prisma_models::{Field, ModelProjection, RelationField, RelationLinkManifestation, ScalarField, TypeIdentifier};
 use quaint::ast::{Column, Row, TypeDataLength, TypeFamily};
 use std::convert::AsRef;
 
-use crate::model_extensions::ScalarFieldExt;
-
 pub struct ColumnIterator {
-    count: usize,
     inner: Box<dyn Iterator<Item = Column<'static>> + 'static>,
-}
-
-impl ColumnIterator {
-    pub fn new(inner: impl Iterator<Item = Column<'static>> + 'static, count: usize) -> Self {
-        Self {
-            inner: Box::new(inner),
-            count,
-        }
-    }
-
-    pub fn len(&self) -> usize {
-        self.count
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.count == 0
-    }
 }
 
 impl Iterator for ColumnIterator {
@@ -37,11 +18,8 @@ impl Iterator for ColumnIterator {
 
 impl From<Vec<Column<'static>>> for ColumnIterator {
     fn from(v: Vec<Column<'static>>) -> Self {
-        let count = v.len();
-
         Self {
             inner: Box::new(v.into_iter()),
-            count,
         }
     }
 }
@@ -61,6 +39,7 @@ impl AsColumns for ModelProjection {
             .flat_map(|f| f.as_columns())
             .unique_by(|c| c.name.clone())
             .collect();
+
         ColumnIterator::from(cols)
     }
 }
@@ -81,7 +60,6 @@ impl AsColumns for Field {
         match self {
             Field::Scalar(ref sf) => ColumnIterator::from(vec![sf.as_column()]),
             Field::Relation(ref rf) => rf.as_columns(),
-            Field::Composite(_) => unimplemented!(),
         }
     }
 }
