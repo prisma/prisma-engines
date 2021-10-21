@@ -168,7 +168,7 @@ mod order_by_dependent_pag {
             // Depends on how null values are handled.
             vec![
                 r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"id":1}}}]}}"#,
-                r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"id":1}}},{"id":2,"b":{"c":null}},{"id":3,"b":null}]}}"#
+                r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"id":1}}},{"id":2,"b":{"c":null}},{"id":3,"b":null}]}}"#,
             ]
         );
 
@@ -253,7 +253,9 @@ mod order_by_dependent_pag {
             // Depends on how null values are handled.
             vec![
                 r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}}]}}"#,
-                r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":3,"b":null},{"id":4,"b":null}]}}"#
+                r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":3,"b":null},{"id":4,"b":null}]}}"#,
+                // CockroachDB can order ModelA.id in any order if ModelB.a_id is NULL.
+                r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":4,"b":null},{"id":3,"b":null}]}}"#,
             ]
         );
 
