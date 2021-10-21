@@ -126,6 +126,11 @@ impl TestApi {
         self.root.is_postgres()
     }
 
+    /// Returns true only when testing on cockroach.
+    pub fn is_cockroach(&self) -> bool {
+        self.root.is_cockroach()
+    }
+
     /// Returns true only when testing on sqlite.
     pub fn is_sqlite(&self) -> bool {
         self.root.is_sqlite()
