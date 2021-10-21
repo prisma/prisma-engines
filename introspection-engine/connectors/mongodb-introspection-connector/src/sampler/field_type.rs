@@ -16,23 +16,37 @@ pub(super) enum FieldType {
     Timestamp,
     Int64,
     Decimal,
-    Json,
+    //Json,
+    Document(String),
     Array(Box<FieldType>),
     Unsupported(&'static str),
 }
 
+fn type_name(model: &str, field: &str) -> String {
+    let upper_first_char = |s: &str| {
+        let mut chars = s.chars();
+
+        match chars.next() {
+            None => String::new(),
+            Some(c) => c.to_uppercase().collect::<String>() + chars.as_str(),
+        }
+    };
+
+    format!("{}{}", upper_first_char(model), upper_first_char(field))
+}
+
 impl FieldType {
-    pub(super) fn from_bson(bson: Bson) -> Option<Self> {
+    pub(super) fn from_bson(model: &str, field: &str, bson: &Bson) -> Option<Self> {
         match bson {
             Bson::Double(_) => Some(Self::Double),
             Bson::String(_) => Some(Self::String),
             Bson::Array(docs) if docs.is_empty() => None,
-            Bson::Array(mut docs) => Some(Self::Array(Box::new(
-                docs.pop()
-                    .and_then(FieldType::from_bson)
+            Bson::Array(docs) => Some(Self::Array(Box::new(
+                docs.first()
+                    .and_then(|d| FieldType::from_bson(model, field, d))
                     .unwrap_or(Self::Unsupported("Unknown")),
             ))),
-            Bson::Document(_) => Some(Self::Json),
+            Bson::Document(_) => Some(Self::Document(type_name(model, field))),
             Bson::Boolean(_) => Some(Self::Bool),
             Bson::RegularExpression(_) => Some(Self::Unsupported("RegularExpression")),
             Bson::JavaScriptCode(_) => Some(Self::Unsupported("JavaScriptCode")),
@@ -71,9 +85,39 @@ impl fmt::Display for FieldType {
             FieldType::Timestamp => f.write_str("Timestamp"),
             FieldType::Int64 => f.write_str("Int64"),
             FieldType::Decimal => f.write_str("Decimal"),
-            FieldType::Json => f.write_str("Document"),
+            //FieldType::Json => f.write_str("Document"),
+            FieldType::Document(s) => f.write_str(&s),
             FieldType::Array(r#type) => write!(f, "Array({})", r#type),
             FieldType::Unsupported(r#type) => write!(f, "{}", r#type),
+        }
+    }
+}
+
+impl From<FieldType> for datamodel::CompositeTypeFieldType {
+    fn from(r#type: FieldType) -> Self {
+        match r#type {
+            FieldType::String => datamodel::CompositeTypeFieldType::Scalar(ScalarType::String, None, None),
+            FieldType::Double => datamodel::CompositeTypeFieldType::Scalar(ScalarType::Float, None, None),
+            FieldType::BinData => datamodel::CompositeTypeFieldType::Scalar(ScalarType::Bytes, None, None),
+            FieldType::ObjectId => datamodel::CompositeTypeFieldType::Scalar(
+                ScalarType::String,
+                None,
+                Some(NativeTypeInstance::new("ObjectId", Vec::new(), &MongoDbType::ObjectId)),
+            ),
+            FieldType::Bool => datamodel::CompositeTypeFieldType::Scalar(ScalarType::Boolean, None, None),
+            FieldType::Date => datamodel::CompositeTypeFieldType::Scalar(
+                ScalarType::DateTime,
+                None,
+                Some(NativeTypeInstance::new("Date", Vec::new(), &MongoDbType::Date)),
+            ),
+            FieldType::Int32 => datamodel::CompositeTypeFieldType::Scalar(ScalarType::Int, None, None),
+            FieldType::Timestamp => datamodel::CompositeTypeFieldType::Scalar(ScalarType::DateTime, None, None),
+            FieldType::Int64 => datamodel::CompositeTypeFieldType::Scalar(ScalarType::BigInt, None, None),
+            FieldType::Decimal => datamodel::CompositeTypeFieldType::Scalar(ScalarType::Decimal, None, None),
+            //FieldType::Json => datamodel::CompositeTypeFieldType::Scalar(ScalarType::Json, None, None),
+            FieldType::Document(name) => datamodel::CompositeTypeFieldType::CompositeType(name),
+            FieldType::Array(r#type) => datamodel::CompositeTypeFieldType::from(*r#type),
+            FieldType::Unsupported(_) => todo!("Composite type Unsupported"),
         }
     }
 }
@@ -99,7 +143,8 @@ impl From<FieldType> for datamodel::FieldType {
             FieldType::Timestamp => datamodel::FieldType::Scalar(ScalarType::DateTime, None, None),
             FieldType::Int64 => datamodel::FieldType::Scalar(ScalarType::BigInt, None, None),
             FieldType::Decimal => datamodel::FieldType::Scalar(ScalarType::Decimal, None, None),
-            FieldType::Json => datamodel::FieldType::Scalar(ScalarType::Json, None, None),
+            //FieldType::Json => datamodel::FieldType::Scalar(ScalarType::Json, None, None),
+            FieldType::Document(name) => datamodel::FieldType::CompositeType(name),
             FieldType::Array(r#type) => datamodel::FieldType::from(*r#type),
             FieldType::Unsupported(type_name) => datamodel::FieldType::Unsupported(type_name.to_string()),
         }

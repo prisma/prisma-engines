@@ -34,7 +34,7 @@ pub(super) async fn sample(database: Database) -> crate::Result<IntrospectionRes
             .await?;
 
         while let Some(document) = documents.try_next().await? {
-            statistics.track_document_types(&collection_name, document);
+            statistics.track_model_fields(&collection_name, document);
         }
 
         let mut indices = collection.list_indexes(None).await?;

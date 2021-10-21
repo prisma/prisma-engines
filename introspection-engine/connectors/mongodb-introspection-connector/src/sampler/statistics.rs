@@ -1,3 +1,5 @@
+mod name;
+
 use std::{
     borrow::Cow,
     cmp::Ordering,
@@ -8,11 +10,12 @@ use std::{
 
 use bson::Document;
 use datamodel::{
-    Datamodel, DefaultValue, Field, IndexDefinition, IndexType, Model, NativeTypeInstance, PrimaryKeyDefinition,
-    ScalarField, ScalarType, ValueGenerator, WithDatabaseName,
+    CompositeType, CompositeTypeField, Datamodel, DefaultValue, Field, IndexDefinition, IndexType, Model,
+    NativeTypeInstance, PrimaryKeyDefinition, ScalarField, ScalarType, ValueGenerator, WithDatabaseName,
 };
 use introspection_connector::Warning;
 use mongodb::IndexModel;
+pub(crate) use name::Name;
 use native_types::MongoDbType;
 use once_cell::sync::Lazy;
 use regex::Regex;
@@ -28,9 +31,9 @@ static RESERVED_NAMES: &[&str] = &["PrismaClient"];
 #[derive(Debug, Default)]
 pub(super) struct Statistics {
     /// (model_name, field_name) -> type percentages
-    fields: BTreeMap<(String, String), FieldSampler>,
+    fields: BTreeMap<(Name, String), FieldSampler>,
     /// model_name -> document count
-    models: HashMap<String, usize>,
+    models: HashMap<Name, usize>,
     /// model_name -> indices
     indices: BTreeMap<String, Vec<IndexModel>>,
 }
@@ -38,30 +41,15 @@ pub(super) struct Statistics {
 impl Statistics {
     /// Track a collection as prisma model.
     pub(super) fn track_model(&mut self, model: &str) {
-        if !self.models.contains_key(model) {
-            self.models.insert(model.to_string(), 0);
+        let name = Name::Model(model.to_string());
+
+        if !self.models.contains_key(&name) {
+            self.models.insert(name, 0);
         }
     }
 
-    /// Track all fields and field types from the given document.
-    pub(super) fn track_document_types(&mut self, model: &str, document: Document) {
-        let doc_count = self.models.entry(model.to_string()).or_default();
-        *doc_count += 1;
-
-        for (field, val) in document.into_iter() {
-            let sampler = self.fields.entry((model.to_string(), field.to_string())).or_default();
-            sampler.counter += 1;
-
-            match FieldType::from_bson(val) {
-                Some(field_type) => {
-                    let counter = sampler.types.entry(field_type).or_default();
-                    *counter += 1;
-                }
-                None => {
-                    sampler.nullable = true;
-                }
-            }
-        }
+    pub(super) fn track_model_fields(&mut self, model: &str, document: Document) {
+        self.track_document_types(Name::Model(model.to_string()), &document);
     }
 
     /// Track an index for the given model.
@@ -80,18 +68,20 @@ impl Statistics {
         let mut models: BTreeMap<String, Model> = self
             .models
             .iter()
-            .map(|(model_name, _)| (model_name.to_string(), new_model(model_name)))
+            .flat_map(|(name, _)| name.as_model_name())
+            .map(|model_name| (model_name.to_string(), new_model(model_name)))
             .collect();
 
-        for ((model_name, field_name), sampler) in self.fields.into_iter() {
-            let doc_count = *self.models.get(&model_name).unwrap_or(&0);
+        let mut types: BTreeMap<String, CompositeType> = self
+            .models
+            .iter()
+            .flat_map(|(name, _)| name.as_type_name())
+            .map(|type_name| (type_name.to_string(), new_composite_type(type_name)))
+            .collect();
+
+        for ((name, field_name), sampler) in self.fields.into_iter() {
+            let doc_count = *self.models.get(&name).unwrap_or(&0);
             let field_count = sampler.counter;
-
-            let model = models.get_mut(&model_name).unwrap();
-
-            if field_name == "_id" {
-                continue;
-            }
 
             let percentages = sampler.percentages();
 
@@ -101,11 +91,11 @@ impl Statistics {
             };
 
             if let FieldType::Unsupported(r#type) = field_type {
-                unsupported.push((model_name.to_string(), field_name.to_string(), r#type));
+                unsupported.push((name.to_string(), field_name.to_string(), r#type));
             }
 
             if percentages.data.len() > 1 {
-                undecided_types.push((model_name.to_string(), field_name.to_string(), field_type.to_string()));
+                undecided_types.push((name.to_string(), field_name.to_string(), field_type.to_string()));
             }
 
             let arity = if field_type.is_array() {
@@ -125,30 +115,54 @@ impl Statistics {
                 None
             };
 
-            let (name, database_name) = match sanitize_string(&field_name) {
+            let (sanitized_name, database_name) = match sanitize_string(&field_name) {
                 Some(sanitized) => (sanitized, Some(field_name)),
                 None if field_name == "id" => ("renamedId".to_string(), Some(field_name)),
                 None => (field_name, None),
             };
 
-            model.fields.push(Field::ScalarField(ScalarField {
-                name,
-                field_type: field_type.into(),
-                arity,
-                database_name,
-                default_value: None,
-                documentation,
-                is_generated: false,
-                is_updated_at: false,
-                is_commented_out: false,
-                is_ignored: false,
-            }))
+            match name {
+                Name::Model(model_name) => {
+                    let model = models.get_mut(&model_name).unwrap();
+
+                    if database_name.as_deref() == Some("_id") {
+                        continue;
+                    }
+
+                    model.fields.push(Field::ScalarField(ScalarField {
+                        name: sanitized_name,
+                        field_type: field_type.into(),
+                        arity,
+                        database_name,
+                        default_value: None,
+                        documentation,
+                        is_generated: false,
+                        is_updated_at: false,
+                        is_commented_out: false,
+                        is_ignored: false,
+                    }));
+                }
+                Name::CompositeType(type_name) => {
+                    let r#type = types.get_mut(&type_name).unwrap();
+
+                    r#type.fields.push(CompositeTypeField {
+                        name: sanitized_name,
+                        r#type: field_type.into(),
+                        arity,
+                        database_name,
+                    });
+                }
+            }
         }
 
         add_indices_to_models(&mut models, &mut indices);
 
         for (_, model) in models.into_iter() {
             data_model.add_model(model);
+        }
+
+        for (_, composite_type) in types.into_iter() {
+            data_model.composite_types.push(composite_type);
         }
 
         if !unsupported.is_empty() {
@@ -161,9 +175,48 @@ impl Statistics {
 
         data_model
     }
+
+    fn track_composite_type_fields(&mut self, model: &str, field: &str, document: &Document) {
+        let upper_first_char = |s: &str| {
+            let mut chars = s.chars();
+
+            match chars.next() {
+                None => String::new(),
+                Some(c) => c.to_uppercase().collect::<String>() + chars.as_str(),
+            }
+        };
+
+        let type_name = Name::CompositeType(format!("{}{}", upper_first_char(model), upper_first_char(field)));
+        self.track_document_types(type_name, document);
+    }
+
+    /// Track all fields and field types from the given document.
+    fn track_document_types(&mut self, name: Name, document: &Document) {
+        let doc_count = self.models.entry(name.clone()).or_default();
+        *doc_count += 1;
+
+        for (field, val) in document.into_iter() {
+            if let Some(doc) = val.as_document() {
+                self.track_composite_type_fields(name.as_ref(), &field, doc);
+            }
+
+            let sampler = self.fields.entry((name.clone(), field.to_string())).or_default();
+            sampler.counter += 1;
+
+            match FieldType::from_bson(name.as_ref(), field, &val) {
+                Some(field_type) => {
+                    let counter = sampler.types.entry(field_type).or_default();
+                    *counter += 1;
+                }
+                None => {
+                    sampler.nullable = true;
+                }
+            }
+        }
+    }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash, Clone)]
 pub struct FieldSampler {
     types: BTreeMap<FieldType, usize>,
     nullable: bool,
@@ -216,6 +269,13 @@ impl FieldPercentages {
     /// Dirty data...
     fn has_type_variety(&self) -> bool {
         self.data.len() > 1
+    }
+}
+
+fn new_composite_type(type_name: &str) -> CompositeType {
+    CompositeType {
+        name: type_name.to_string(),
+        fields: Vec::new(),
     }
 }
 

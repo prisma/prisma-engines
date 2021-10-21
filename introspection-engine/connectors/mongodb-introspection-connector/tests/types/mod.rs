@@ -60,10 +60,68 @@ fn double() {
 }
 
 #[test]
-fn json() {
+fn basic_singular_composite_type() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
-        let collection = db.collection("A");
+        let docs = vec![
+            doc! { "name": "Musti", "address": { "street": "Meowstrasse", "number": 123 }},
+            doc! { "name": "Naukio", "address": { "street": "Meowstrasse", "number": 123, "knock": true }},
+        ];
+
+        db.collection("Cat").insert_many(docs, None).await?;
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        type CatAddress {
+          knock  Boolean?
+          number Int
+          street String
+        }
+
+        model Cat {
+          id      String     @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          address CatAddress
+          name    String
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+// #[test]
+// fn basic_array_composite_type() {
+//     let res = introspect(|db| async move {
+//         let docs = vec![
+//             doc! { "title": "Test", "posts": [{ "street": "Meowstrasse", "number": 123 }]},
+//         ];
+//
+//         db.collection("Blog").insert_many(docs, None).await?;
+//
+//         Ok(())
+//     });
+//
+//     let expected = expect![[r#"
+//         type CatAddress {
+//           knock  Boolean?
+//           number Int
+//           street String
+//         }
+//
+//         model Cat {
+//           id      String     @id @default(dbgenerated()) @map("_id") @db.ObjectId
+//           address CatAddress
+//           name    String
+//         }
+//     "#]];
+//
+//     expected.assert_eq(res.datamodel());
+// }
+
+#[test]
+fn composite_types_nullability() {
+    let res = introspect(|db| async move {
+        let collection = db.collection("Model");
 
         let docs = vec![
             doc! {"first": {"foo": 1}, "second": {"foo": 1}, "third": {"foo": 1}},
@@ -77,11 +135,23 @@ fn json() {
     });
 
     let expected = expect![[r#"
-        model A {
-          id     String @id @default(dbgenerated()) @map("_id") @db.ObjectId
-          first  Json
-          second Json?
-          third  Json?
+        type ModelFirst {
+          foo Int
+        }
+
+        type ModelSecond {
+          foo Int
+        }
+
+        type ModelThird {
+          foo Int
+        }
+
+        model Model {
+          id     String       @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          first  ModelFirst
+          second ModelSecond?
+          third  ModelThird?
         }
     "#]];
 
