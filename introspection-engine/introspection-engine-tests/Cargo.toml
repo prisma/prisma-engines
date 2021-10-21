@@ -2,7 +2,7 @@
 name = "introspection-engine-tests"
 version = "0.1.0"
 authors = ["Julius de Bruijn <julius+github@nauk.io>"]
-edition = "2018"
+edition = "2021"
 
 [dependencies]
 sql-datamodel-connector = { path = "../../libs/datamodel/connectors/sql-datamodel-connector" }
