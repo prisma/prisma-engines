@@ -8,7 +8,7 @@ use std::{
     ops::Deref,
 };
 
-use bson::Document;
+use bson::{Bson, Document};
 use datamodel::{
     CompositeType, CompositeTypeField, Datamodel, DefaultValue, Field, IndexDefinition, IndexType, Model,
     NativeTypeInstance, PrimaryKeyDefinition, ScalarField, ScalarType, ValueGenerator, WithDatabaseName,
@@ -190,20 +190,54 @@ impl Statistics {
         self.track_document_types(type_name, document);
     }
 
+    fn find_and_track_composite_types(&mut self, model: &str, field: &str, bson: &Bson) -> (usize, bool) {
+        fn inner(s: &mut Statistics, model: &str, field: &str, bson: &Bson, depth: &mut usize, found: &mut bool) {
+            match bson {
+                Bson::Document(doc) => {
+                    *found = true;
+
+                    if *depth < 2 {
+                        s.track_composite_type_fields(model, field, doc);
+                    }
+                }
+                Bson::Array(ary) => {
+                    *depth += 1;
+
+                    for bson in ary.iter() {
+                        inner(s, model, field, bson, depth, found);
+                    }
+                }
+                _ => (),
+            }
+        }
+
+        let mut depth = 0;
+        let mut found = false;
+
+        inner(self, model, field, bson, &mut depth, &mut found);
+
+        (depth, found)
+    }
+
     /// Track all fields and field types from the given document.
     fn track_document_types(&mut self, name: Name, document: &Document) {
         let doc_count = self.models.entry(name.clone()).or_default();
         *doc_count += 1;
 
         for (field, val) in document.into_iter() {
-            if let Some(doc) = val.as_document() {
-                self.track_composite_type_fields(name.as_ref(), &field, doc);
-            }
+            let (depth, found_composite) = self.find_and_track_composite_types(name.as_ref(), field, val);
 
             let sampler = self.fields.entry((name.clone(), field.to_string())).or_default();
             sampler.counter += 1;
 
             match FieldType::from_bson(name.as_ref(), field, &val) {
+                Some(_) if found_composite && depth > 1 => {
+                    let counter = sampler
+                        .types
+                        .entry(FieldType::Array(Box::new(FieldType::Json)))
+                        .or_default();
+                    *counter += 1;
+                }
                 Some(field_type) => {
                     let counter = sampler.types.entry(field_type).or_default();
                     *counter += 1;

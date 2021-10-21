@@ -89,34 +89,59 @@ fn basic_singular_composite_type() {
     expected.assert_eq(res.datamodel());
 }
 
-// #[test]
-// fn basic_array_composite_type() {
-//     let res = introspect(|db| async move {
-//         let docs = vec![
-//             doc! { "title": "Test", "posts": [{ "street": "Meowstrasse", "number": 123 }]},
-//         ];
-//
-//         db.collection("Blog").insert_many(docs, None).await?;
-//
-//         Ok(())
-//     });
-//
-//     let expected = expect![[r#"
-//         type CatAddress {
-//           knock  Boolean?
-//           number Int
-//           street String
-//         }
-//
-//         model Cat {
-//           id      String     @id @default(dbgenerated()) @map("_id") @db.ObjectId
-//           address CatAddress
-//           name    String
-//         }
-//     "#]];
-//
-//     expected.assert_eq(res.datamodel());
-// }
+#[test]
+fn basic_array_composite_type() {
+    let res = introspect(|db| async move {
+        let docs = vec![doc! { "title": "Test", "posts": [
+            { "title": "Test", "published": false },
+            { "title": "Hello, world!", "content": "Like, whatever...", "published": true },
+        ]}];
+
+        db.collection("Blog").insert_many(docs, None).await?;
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        type BlogPosts {
+          content   String?
+          published Boolean
+          title     String
+        }
+
+        model Blog {
+          id    String      @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          posts BlogPosts[]
+          title String
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
+fn deep_array_composite_type() {
+    let res = introspect(|db| async move {
+        let docs = vec![doc! { "title": "Test", "posts": [
+            [{ "title": "Test", "published": false }],
+            [{ "title": "Hello, world!", "content": "Like, whatever...", "published": true }],
+        ]}];
+
+        db.collection("Blog").insert_many(docs, None).await?;
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model Blog {
+          id    String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          posts Json[]
+          title String
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
 
 #[test]
 fn composite_types_nullability() {
