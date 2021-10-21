@@ -25,7 +25,7 @@ services:
       - "6432:6432"
 
   postgres9:
-    image: postgres:9
+    image: postgres:14
     restart: always
     command: postgres -c 'max_connections=1000'
     environment:
@@ -38,7 +38,7 @@ services:
     tmpfs: /pgtmpfs9:size=4g
 
   postgres10:
-    image: postgres:10
+    image: postgres:14
     restart: always
     command: postgres -c 'max_connections=1000'
     environment:
@@ -51,7 +51,7 @@ services:
     tmpfs: /pgtmpfs10:size=4g
 
   postgres11:
-    image: postgres:11
+    image: postgres:14
     restart: always
     command: postgres -c 'max_connections=1000'
     environment:
@@ -64,7 +64,7 @@ services:
     tmpfs: /pgtmpfs11:size=4g
 
   postgres12:
-    image: postgres:12
+    image: postgres:14
     restart: always
     command: postgres -c 'max_connections=1000'
     environment:
@@ -77,7 +77,7 @@ services:
     tmpfs: /pgtmpfs12:size=4g
 
   postgres13:
-    image: postgres:13
+    image: postgres:14
     restart: always
     command: postgres -c 'max_connections=1000'
     environment:
