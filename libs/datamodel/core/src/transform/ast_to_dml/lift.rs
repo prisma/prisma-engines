@@ -206,30 +206,9 @@ impl<'a> LiftAstToDml<'a> {
 
                         common_dml_fields(&mut field, attributes, relation_field);
 
-                        // The entire conditional can be replaced with just unwrapping the primary key, once all the required validations happen inside ParserDatabase.
-                        // If you can simplify this block and the tests pass, it means that's the case.
-                        if attributes.references.is_some() {
-                            field.relation_info.references = attributes
-                                .references
-                                .as_ref()
-                                .map(|references| {
-                                    references
-                                        .iter()
-                                        .map(|s| relation_field.related_model().scalar_field(*s).name().to_owned())
-                                        .collect()
-                                })
-                                .unwrap_or_default();
-                        } else {
-                            // We can unwrap here once we validate the presence of an id field in the parser database. If you can unwrap
-                            // and the tests pass, do it.
-                            let primary_key = match relation_field.related_model().primary_key() {
-                                Some(pk) => pk,
-                                _ => continue, // Let this be handled as one of the leftover fields
-                            };
-
-                            field.relation_info.references =
-                                primary_key.fields().map(|field| field.name().to_owned()).collect();
-                        };
+                        let primary_key = relation_field.related_model().primary_key().unwrap();
+                        field.relation_info.references =
+                            primary_key.fields().map(|field| field.name().to_owned()).collect();
 
                         let model = schema.find_model_mut(relation_field.model().name());
                         model.add_field(dml::Field::RelationField(field));

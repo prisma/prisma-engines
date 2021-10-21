@@ -38,9 +38,7 @@ impl<'a> Validator<'a> {
                 diagnostics.append(the_errors)
             }
 
-            if let Err(ref mut the_errors) = self.validate_referenced_fields_for_relation(schema, ast_model, model) {
-                diagnostics.append(the_errors);
-            }
+            self.validate_referenced_fields_for_relation(schema, ast_model, model, diagnostics);
         }
     }
 
@@ -202,9 +200,8 @@ impl<'a> Validator<'a> {
         datamodel: &dml::Datamodel,
         ast_model: &ast::Model,
         model: &dml::Model,
-    ) -> Result<(), Diagnostics> {
-        let mut errors = Diagnostics::new();
-
+        errors: &mut Diagnostics,
+    ) {
         for field in model.relation_fields() {
             let ast_field = match ast_model.find_field(&field.name) {
                 Some(ast_field) => ast_field,
@@ -214,7 +211,7 @@ impl<'a> Validator<'a> {
             let rel_info = &field.relation_info;
             let related_model = datamodel.find_model(&rel_info.to).expect(STATE_ERROR);
 
-            let fields_with_wrong_type: Vec<DatamodelError> = rel_info.fields.iter().zip(rel_info.references.iter())
+            let fields_with_wrong_type = rel_info.fields.iter().zip(rel_info.references.iter())
                     .filter_map(|(base_field, referenced_field)| {
                         let base_field = model.find_field(base_field)?;
                         let referenced_field = related_model.find_field(referenced_field)?;
@@ -257,47 +254,11 @@ impl<'a> Validator<'a> {
                             RELATION_ATTRIBUTE_NAME,
                             ast_field.span,
                         ))
-                    })
-                    .collect();
+                    });
 
-            if !rel_info.references.is_empty() && !errors.has_errors() {
-                let references_singular_id_field = rel_info.references.len() == 1
-                    && related_model.field_is_primary(rel_info.references.first().unwrap());
-
-                let is_many_to_many = {
-                    // Back relation fields have not been added yet. So we must calculate this on our own.
-                    match datamodel.find_related_field(field) {
-                        Some((_, related_field)) => field.is_list() && related_field.is_list(),
-                        None => false,
-                    }
-                };
-
-                // TODO: This error is only valid for connectors that don't support native many to manys.
-                // We only render this error if there's a singular id field. Otherwise we render a better error in a different function.
-                if is_many_to_many
-                    && !references_singular_id_field
-                    && related_model.has_single_id_field()
-                    && model.has_single_id_field()
-                {
-                    errors.push_error(DatamodelError::new_validation_error(
-                            &format!(
-                                "Many to many relations must always reference the id field of the related model. Change the argument `references` to use the id field of the related model `{}`. But it is referencing the following fields that are not the id: {}",
-                                &related_model.name,
-                                rel_info.references.join(", ")
-                            ),
-                            ast_field.span)
-                        );
-                }
-            }
-
-            if !errors.has_errors() {
-                // don't output too much errors
-                for err in fields_with_wrong_type {
-                    errors.push_error(err);
-                }
+            for err in fields_with_wrong_type {
+                errors.push_error(err);
             }
         }
-
-        errors.to_result()
     }
 }

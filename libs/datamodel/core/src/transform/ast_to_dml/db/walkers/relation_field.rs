@@ -123,6 +123,20 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
         }
     }
 
+    /// Used for validation.
+    pub(crate) fn references_singular_id_field(self) -> bool {
+        let singular_referenced_id = match self.attributes().references.as_deref() {
+            Some([field_id]) => field_id,
+            Some(_) => return false,
+            None => return true, // implicitly, these are referencing the singular id
+        };
+
+        match self.related_model().primary_key() {
+            Some(pk) if pk.contains_exactly_fields_by_id(&[*singular_referenced_id]) => true,
+            _ => false,
+        }
+    }
+
     pub(crate) fn fields(self) -> Option<impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>>> {
         let model_id = self.model_id;
         let attributes = self.attributes();

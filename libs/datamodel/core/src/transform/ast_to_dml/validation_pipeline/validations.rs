@@ -50,6 +50,13 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics) {
             relations::referencing_fields_in_correct_order(relation, connector, diagnostics);
         }
     }
+
+    for relation in db
+        .walk_relations()
+        .filter_map(|relation| relation.refine().as_many_to_many())
+    {
+        relations::many_to_many::validate_singular_id(relation, diagnostics);
+    }
 }
 
 pub(super) fn validate_strict(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics) {
@@ -61,9 +68,7 @@ pub(super) fn validate_strict(db: &ParserDatabase<'_>, diagnostics: &mut Diagnos
             RefinedRelationWalker::Inline(relation) => {
                 relations::one_to_many::validate_strict(relation, diagnostics);
             }
-            RefinedRelationWalker::ImplicitManyToMany(relation) => {
-                relations::many_to_many::validate_strict(relation, diagnostics);
-            }
+            RefinedRelationWalker::ImplicitManyToMany(_) => {}
         }
     }
 }
