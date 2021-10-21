@@ -1,5 +1,4 @@
 use crate::{ScalarFieldRef, ScalarFieldWeak};
-use std::sync::Arc;
 
 #[derive(Debug)]
 pub struct Index {

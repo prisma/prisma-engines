@@ -1,18 +1,9 @@
-use crate::{prelude::*, CompositeTypeRef, CompositeTypeTemplate};
+use crate::{prelude::*, CompositeTypeRef, InternalEnumRef};
 use once_cell::sync::OnceCell;
 use std::sync::{Arc, Weak};
 
 pub type InternalDataModelRef = Arc<InternalDataModel>;
 pub type InternalDataModelWeakRef = Weak<InternalDataModel>;
-pub type InternalEnumRef = Arc<InternalEnum>;
-
-#[derive(Debug, Default)]
-pub struct InternalDataModelTemplate {
-    pub models: Vec<ModelTemplate>,
-    pub relations: Vec<RelationTemplate>,
-    pub enums: Vec<InternalEnum>,
-    pub composite_types: Vec<CompositeTypeRef>,
-}
 
 #[derive(Debug)]
 pub struct InternalDataModel {
@@ -28,83 +19,6 @@ pub struct InternalDataModel {
     /// influence the `database` part instead.
     pub db_name: String,
     pub enums: Vec<InternalEnumRef>,
-}
-
-#[derive(Debug, PartialEq, Eq, Hash, Clone)]
-pub struct InternalEnum {
-    pub name: String,
-    pub values: Vec<InternalEnumValue>,
-}
-
-impl InternalEnum {
-    pub fn new<N, I, V>(name: N, values: I) -> Self
-    where
-        N: Into<String>,
-        V: Into<InternalEnumValue>,
-        I: IntoIterator<Item = V>,
-    {
-        Self {
-            name: name.into(),
-            values: values.into_iter().map(|v| v.into()).collect(),
-        }
-    }
-}
-
-#[derive(Debug, PartialEq, Eq, Hash, Clone)]
-pub struct InternalEnumValue {
-    pub name: String,
-    pub database_name: Option<String>,
-}
-
-impl InternalEnumValue {
-    pub fn new<N, I, V>(name: N, database_name: I) -> Self
-    where
-        N: Into<String>,
-        V: Into<String>,
-        I: Into<Option<String>>,
-    {
-        Self {
-            name: name.into(),
-            database_name: database_name.into(),
-        }
-    }
-
-    pub fn db_name(&self) -> &String {
-        self.database_name.as_ref().unwrap_or(&self.name)
-    }
-}
-
-impl InternalDataModelTemplate {
-    pub fn build(self, db_name: String) -> InternalDataModelRef {
-        let internal_data_model = Arc::new(InternalDataModel {
-            models: OnceCell::new(),
-            composite_types: OnceCell::new(),
-            relations: OnceCell::new(),
-            relation_fields: OnceCell::new(),
-            db_name,
-            enums: self.enums.into_iter().map(Arc::new).collect(),
-        });
-
-        let composite_types = self.composite_types.into_iter().map(|template| template.build());
-
-        let models = self
-            .models
-            .into_iter()
-            .map(|mt| mt.build(Arc::downgrade(&internal_data_model)))
-            .collect();
-
-        internal_data_model.models.set(models).unwrap();
-
-        let relations = self
-            .relations
-            .into_iter()
-            .map(|rt| rt.build(Arc::downgrade(&internal_data_model)))
-            .collect();
-
-        internal_data_model.relations.set(relations).unwrap();
-        internal_data_model.finalize();
-        internal_data_model
-    }
 }
 
 impl InternalDataModel {

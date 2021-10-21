@@ -1,4 +1,4 @@
-use crate::prelude::*;
+use crate::{prelude::*, InternalEnum};
 use datamodel::{DefaultValue, FieldArity, NativeTypeInstance};
 use once_cell::sync::OnceCell;
 use std::{
@@ -9,24 +9,6 @@ use std::{
 
 pub type ScalarFieldRef = Arc<ScalarField>;
 pub type ScalarFieldWeak = Weak<ScalarField>;
-
-#[derive(Debug)]
-pub struct ScalarFieldTemplate {
-    pub name: String,
-    pub type_identifier: TypeIdentifier,
-    pub is_required: bool,
-    pub is_list: bool,
-    pub is_unique: bool,
-    pub is_id: bool,
-    pub is_auto_generated_int_id: bool,
-    pub is_autoincrement: bool,
-    pub behaviour: Option<FieldBehaviour>,
-    pub internal_enum: Option<InternalEnum>,
-    pub arity: FieldArity,
-    pub db_name: Option<String>,
-    pub default_value: Option<DefaultValue>,
-    pub native_type: Option<NativeTypeInstance>,
-}
 
 pub struct ScalarField {
     pub name: String,
@@ -46,6 +28,50 @@ pub struct ScalarField {
     pub model: ModelWeakRef,
     pub(crate) is_unique: bool,
     pub(crate) read_only: OnceCell<bool>,
+}
+
+impl ScalarField {
+    pub fn model(&self) -> ModelRef {
+        self.model
+            .upgrade()
+            .expect("Model does not exist anymore. Parent model got deleted without deleting the child.")
+    }
+
+    pub fn internal_data_model(&self) -> InternalDataModelRef {
+        self.model().internal_data_model()
+    }
+
+    pub fn is_id(&self) -> bool {
+        self.is_id
+    }
+
+    pub fn is_created_at(&self) -> bool {
+        matches!(self.behaviour, Some(FieldBehaviour::CreatedAt))
+    }
+
+    pub fn is_updated_at(&self) -> bool {
+        matches!(self.behaviour, Some(FieldBehaviour::UpdatedAt))
+    }
+
+    pub fn unique(&self) -> bool {
+        self.is_unique || self.is_id()
+    }
+
+    pub fn db_name(&self) -> &str {
+        self.db_name.as_deref().unwrap_or_else(|| self.name.as_str())
+    }
+
+    pub fn type_identifier_with_arity(&self) -> (TypeIdentifier, FieldArity) {
+        (self.type_identifier.clone(), self.arity)
+    }
+
+    pub fn is_read_only(&self) -> bool {
+        *self.read_only.get_or_init(|| false)
+    }
+
+    pub fn is_numeric(&self) -> bool {
+        self.type_identifier.is_numeric()
+    }
 }
 
 impl Debug for ScalarField {
@@ -118,73 +144,4 @@ pub enum FieldBehaviour {
 pub enum ScalarListStrategy {
     Embedded,
     Relation,
-}
-
-impl ScalarFieldTemplate {
-    pub fn build(self, model: ModelWeakRef) -> ScalarFieldRef {
-        let scalar = ScalarField {
-            name: self.name,
-            type_identifier: self.type_identifier,
-            is_id: self.is_id,
-            is_required: self.is_required,
-            is_list: self.is_list,
-            is_autoincrement: self.is_autoincrement,
-            is_auto_generated_int_id: self.is_auto_generated_int_id,
-            read_only: OnceCell::new(),
-            is_unique: self.is_unique,
-            internal_enum: self.internal_enum,
-            behaviour: self.behaviour,
-            arity: self.arity,
-            db_name: self.db_name,
-            default_value: self.default_value,
-            native_type: self.native_type,
-            model,
-        };
-
-        Arc::new(scalar)
-    }
-}
-
-impl ScalarField {
-    pub fn model(&self) -> ModelRef {
-        self.model
-            .upgrade()
-            .expect("Model does not exist anymore. Parent model got deleted without deleting the child.")
-    }
-
-    pub fn internal_data_model(&self) -> InternalDataModelRef {
-        self.model().internal_data_model()
-    }
-
-    pub fn is_id(&self) -> bool {
-        self.is_id
-    }
-
-    pub fn is_created_at(&self) -> bool {
-        matches!(self.behaviour, Some(FieldBehaviour::CreatedAt))
-    }
-
-    pub fn is_updated_at(&self) -> bool {
-        matches!(self.behaviour, Some(FieldBehaviour::UpdatedAt))
-    }
-
-    pub fn unique(&self) -> bool {
-        self.is_unique || self.is_id()
-    }
-
-    pub fn db_name(&self) -> &str {
-        self.db_name.as_deref().unwrap_or_else(|| self.name.as_str())
-    }
-
-    pub fn type_identifier_with_arity(&self) -> (TypeIdentifier, FieldArity) {
-        (self.type_identifier.clone(), self.arity)
-    }
-
-    pub fn is_read_only(&self) -> bool {
-        *self.read_only.get_or_init(|| false)
-    }
-
-    pub fn is_numeric(&self) -> bool {
-        self.type_identifier.is_numeric()
-    }
 }

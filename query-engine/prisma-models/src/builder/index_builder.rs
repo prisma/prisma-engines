@@ -1,3 +1,6 @@
+use crate::{Index, IndexType, ScalarFieldRef, ScalarFieldWeak};
+use std::sync::Arc;
+
 #[derive(Debug)]
 pub struct IndexBuilder {
     pub name: Option<String>,

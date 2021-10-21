@@ -1,6 +1,7 @@
 #![deny(warnings)]
 #![allow(clippy::from_over_into)]
 
+mod builder;
 mod composite_type;
 mod datamodel_converter;
 mod error;
@@ -8,6 +9,7 @@ mod field;
 mod fields;
 mod index;
 mod internal_data_model;
+mod internal_enum;
 mod model;
 mod order_by;
 mod prisma_value_ext;
@@ -26,6 +28,7 @@ pub use field::*;
 pub use fields::*;
 pub use index::*;
 pub use internal_data_model::*;
+pub use internal_enum::*;
 pub use model::*;
 pub use order_by::*;
 pub use prisma_value_ext::*;

@@ -1,3 +1,8 @@
+use super::{FieldBuilder, IndexBuilder, PrimaryKeyBuilder};
+use crate::{CompositeTypeRef, Fields, InternalDataModelWeakRef, Model, ModelRef};
+use once_cell::sync::OnceCell;
+use std::sync::Arc;
+
 #[derive(Debug)]
 pub struct ModelBuilder {
     pub name: String,
@@ -29,7 +34,7 @@ impl ModelBuilder {
         let all_fields: Vec<_> = self
             .fields
             .into_iter()
-            .map(|ft| ft.build(Arc::downgrade(&model, composite_types)))
+            .map(|ft| ft.build(Arc::downgrade(&model), composite_types))
             .collect();
 
         let pk = self.primary_key.map(|pk| pk.build(&all_fields));

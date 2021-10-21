@@ -1,3 +1,6 @@
+use crate::{pk::PrimaryKey, Field};
+use std::sync::Arc;
+
 #[derive(Debug)]
 pub struct PrimaryKeyBuilder {
     pub alias: Option<String>,

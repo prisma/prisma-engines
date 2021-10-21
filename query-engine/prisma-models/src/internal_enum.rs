@@ -1,3 +1,7 @@
+use std::sync::Arc;
+
+pub type InternalEnumRef = Arc<InternalEnum>;
+
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
 pub struct InternalEnum {
     pub name: String,

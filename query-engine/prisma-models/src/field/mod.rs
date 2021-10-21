@@ -6,101 +6,15 @@ pub use composite::*;
 pub use relation::*;
 pub use scalar::*;
 
-use crate::{prelude::*, CompositeTypeRef};
+use crate::prelude::*;
 use datamodel::ScalarType;
 use std::{hash::Hash, sync::Arc};
-
-#[derive(Debug)]
-pub enum FieldTemplate {
-    Relation(RelationFieldTemplate),
-    Scalar(ScalarFieldTemplate),
-    Composite(CompositeFieldTemplate),
-}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Field {
     Relation(RelationFieldRef),
     Scalar(ScalarFieldRef),
     Composite(CompositeFieldRef),
-}
-
-#[derive(Debug, Clone)]
-pub enum FieldWeak {
-    Relation(RelationFieldWeak),
-    Scalar(ScalarFieldWeak),
-    Composite(CompositeFieldWeak),
-}
-
-impl FieldWeak {
-    pub fn upgrade(&self) -> Field {
-        match self {
-            Self::Relation(rf) => rf.upgrade().unwrap().into(),
-            Self::Scalar(sf) => sf.upgrade().unwrap().into(),
-            Self::Composite(cf) => cf.upgrade().unwrap().into(),
-        }
-    }
-}
-
-impl From<&Field> for FieldWeak {
-    fn from(f: &Field) -> Self {
-        match f {
-            Field::Scalar(sf) => sf.into(),
-            Field::Relation(rf) => rf.into(),
-            Field::Composite(cf) => cf.into(),
-        }
-    }
-}
-
-impl From<&ScalarFieldRef> for FieldWeak {
-    fn from(f: &ScalarFieldRef) -> Self {
-        FieldWeak::Scalar(Arc::downgrade(f))
-    }
-}
-
-impl From<&RelationFieldRef> for FieldWeak {
-    fn from(f: &RelationFieldRef) -> Self {
-        FieldWeak::Relation(Arc::downgrade(f))
-    }
-}
-
-impl From<&CompositeFieldRef> for FieldWeak {
-    fn from(f: &CompositeFieldRef) -> Self {
-        FieldWeak::Composite(Arc::downgrade(f))
-    }
-}
-
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
-#[allow(clippy::upper_case_acronyms)]
-pub enum TypeIdentifier {
-    String,
-    Int,
-    BigInt,
-    Float,
-    Decimal,
-    Boolean,
-    Enum(String),
-    UUID,
-    Json,
-    Xml,
-    DateTime,
-    Bytes,
-    Unsupported,
-}
-
-impl TypeIdentifier {
-    pub fn is_numeric(&self) -> bool {
-        matches!(
-            self,
-            TypeIdentifier::Int | TypeIdentifier::BigInt | TypeIdentifier::Float | TypeIdentifier::Decimal
-        )
-    }
-}
-
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
-pub enum DateType {
-    Date,
-    Time,
-    DateTime,
 }
 
 impl Field {
@@ -184,14 +98,83 @@ impl Field {
     }
 }
 
-impl FieldTemplate {
-    pub fn build(self, model: ModelWeakRef, composite_types: &[CompositeTypeRef]) -> Field {
+#[derive(Debug, Clone)]
+pub enum FieldWeak {
+    Relation(RelationFieldWeak),
+    Scalar(ScalarFieldWeak),
+    Composite(CompositeFieldWeak),
+}
+
+impl FieldWeak {
+    pub fn upgrade(&self) -> Field {
         match self {
-            FieldTemplate::Scalar(st) => Field::Scalar(st.build(model)),
-            FieldTemplate::Relation(rt) => Field::Relation(rt.build(model)),
-            FieldTemplate::Composite(ct) => Field::Composite(ct.build(model, composite_types)),
+            Self::Relation(rf) => rf.upgrade().unwrap().into(),
+            Self::Scalar(sf) => sf.upgrade().unwrap().into(),
+            Self::Composite(cf) => cf.upgrade().unwrap().into(),
         }
     }
+}
+
+impl From<&Field> for FieldWeak {
+    fn from(f: &Field) -> Self {
+        match f {
+            Field::Scalar(sf) => sf.into(),
+            Field::Relation(rf) => rf.into(),
+            Field::Composite(cf) => cf.into(),
+        }
+    }
+}
+
+impl From<&ScalarFieldRef> for FieldWeak {
+    fn from(f: &ScalarFieldRef) -> Self {
+        FieldWeak::Scalar(Arc::downgrade(f))
+    }
+}
+
+impl From<&RelationFieldRef> for FieldWeak {
+    fn from(f: &RelationFieldRef) -> Self {
+        FieldWeak::Relation(Arc::downgrade(f))
+    }
+}
+
+impl From<&CompositeFieldRef> for FieldWeak {
+    fn from(f: &CompositeFieldRef) -> Self {
+        FieldWeak::Composite(Arc::downgrade(f))
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+#[allow(clippy::upper_case_acronyms)]
+pub enum TypeIdentifier {
+    String,
+    Int,
+    BigInt,
+    Float,
+    Decimal,
+    Boolean,
+    Enum(String),
+    UUID,
+    Json,
+    Xml,
+    DateTime,
+    Bytes,
+    Unsupported,
+}
+
+impl TypeIdentifier {
+    pub fn is_numeric(&self) -> bool {
+        matches!(
+            self,
+            TypeIdentifier::Int | TypeIdentifier::BigInt | TypeIdentifier::Float | TypeIdentifier::Decimal
+        )
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+pub enum DateType {
+    Date,
+    Time,
+    DateTime,
 }
 
 impl From<ScalarFieldRef> for Field {
