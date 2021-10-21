@@ -516,7 +516,7 @@ mod json_path {
     }
 
     // CockroachDB does not support JSON comparisons (https://github.com/cockroachdb/cockroach/issues/49144).
-    #[connector_test(exclude(Cockroach))]
+    #[connector_test(only(Postgres), exclude(Cockroach))]
     async fn gt_gte(runner: Runner) -> TestResult<()> {
         gt_gte_runner(runner).await?;
 
@@ -576,7 +576,7 @@ mod json_path {
     }
 
     // CockroachDB does not support JSON comparisons (https://github.com/cockroachdb/cockroach/issues/49144).
-    #[connector_test(exclude(Cockroach))]
+    #[connector_test(only(Postgres), exclude(Cockroach))]
     async fn lt_lte(runner: Runner) -> TestResult<()> {
         lt_lte_runner(runner).await?;
 
@@ -635,7 +635,7 @@ mod json_path {
     }
 
     // CockroachDB does not support JSON comparisons (https://github.com/cockroachdb/cockroach/issues/49144).
-    #[connector_test(exclude(Cockroach))]
+    #[connector_test(only(Postgres), exclude(Cockroach))]
     async fn multi_filtering(runner: Runner) -> TestResult<()> {
         multi_filtering_runner(runner).await?;
 
