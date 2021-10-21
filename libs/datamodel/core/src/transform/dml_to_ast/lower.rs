@@ -112,7 +112,7 @@ impl<'a> LowerDmlToAst<'a> {
                             ))],
                         )]
                     })
-                    .unwrap_or_else(|| Vec::new()),
+                    .unwrap_or_else(Vec::new),
                 documentation: None,
                 span: ast::Span::empty(),
                 is_commented_out: false,

@@ -41,11 +41,7 @@ pub(super) struct Statistics {
 impl Statistics {
     /// Track a collection as prisma model.
     pub(super) fn track_model(&mut self, model: &str) {
-        let name = Name::Model(model.to_string());
-
-        if !self.models.contains_key(&name) {
-            self.models.insert(name, 0);
-        }
+        self.models.entry(Name::Model(model.to_string())).or_insert(0);
     }
 
     pub(super) fn track_model_fields(&mut self, model: &str, document: Document) {
@@ -230,7 +226,7 @@ impl Statistics {
             let sampler = self.fields.entry((name.clone(), field.to_string())).or_default();
             sampler.counter += 1;
 
-            match FieldType::from_bson(name.as_ref(), field, &val) {
+            match FieldType::from_bson(name.as_ref(), field, val) {
                 Some(_) if found_composite && depth > 1 => {
                     let counter = sampler
                         .types

@@ -86,7 +86,7 @@ impl fmt::Display for FieldType {
             FieldType::Int64 => f.write_str("Int64"),
             FieldType::Decimal => f.write_str("Decimal"),
             FieldType::Json => f.write_str("Document"),
-            FieldType::Document(s) => f.write_str(&s),
+            FieldType::Document(s) => f.write_str(s),
             FieldType::Array(r#type) => write!(f, "Array({})", r#type),
             FieldType::Unsupported(r#type) => write!(f, "{}", r#type),
         }
