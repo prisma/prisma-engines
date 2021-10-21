@@ -72,6 +72,13 @@ dev-postgres13: start-postgres13
 	echo 'postgres13' > current_connector
 	cp $(CONFIG_PATH)/postgres13 $(CONFIG_FILE)
 
+start-postgres14:
+	docker-compose -f docker-compose.yml up -d --remove-orphans postgres14
+
+dev-postgres14: start-postgres14
+	echo 'postgres14' > current_connector
+	cp $(CONFIG_PATH)/postgres14 $(CONFIG_FILE)
+
 start-cockroach:
 	docker-compose -f docker-compose.yml up -d --remove-orphans cockroach
 	docker exec -d prisma-engines_cockroach_1 cockroach sql --insecure -e "set cluster setting sql.defaults.default_int_size = 4;"
