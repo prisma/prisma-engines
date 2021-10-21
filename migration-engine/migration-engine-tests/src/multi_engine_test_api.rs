@@ -147,6 +147,11 @@ impl TestApi {
         self.tags().contains(Tags::Postgres)
     }
 
+    /// Returns true only when testing on cockroach.
+    pub fn is_cockroach(&self) -> bool {
+        self.tags().contains(Tags::Cockroach)
+    }
+
     /// Returns true only when testing on sqlite.
     pub fn is_sqlite(&self) -> bool {
         self.tags().contains(Tags::Sqlite)
