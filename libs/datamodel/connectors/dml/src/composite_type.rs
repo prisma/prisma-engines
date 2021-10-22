@@ -16,6 +16,9 @@ pub struct CompositeTypeField {
 
     /// The database internal name.
     pub database_name: Option<String>,
+
+    /// Comments associated with this field.
+    pub documentation: Option<String>,
 }
 
 #[derive(Debug, PartialEq, Clone)]

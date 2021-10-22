@@ -113,7 +113,10 @@ impl<'a> LowerDmlToAst<'a> {
                         )]
                     })
                     .unwrap_or_else(Vec::new),
-                documentation: None,
+                documentation: field
+                    .documentation
+                    .as_ref()
+                    .map(|text| ast::Comment { text: text.to_owned() }),
                 span: ast::Span::empty(),
                 is_commented_out: false,
             });

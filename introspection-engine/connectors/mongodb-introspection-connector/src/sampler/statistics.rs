@@ -145,6 +145,7 @@ impl Statistics {
                         name: sanitized_name,
                         r#type: field_type.into(),
                         arity,
+                        documentation,
                         database_name,
                     });
                 }

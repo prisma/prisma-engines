@@ -58,6 +58,10 @@ impl<'ast, 'db> CompositeTypeFieldWalker<'ast, 'db> {
         }
     }
 
+    pub(crate) fn documentation(&self) -> Option<&str> {
+        self.ast_field().documentation.as_ref().map(|c| c.text.as_str())
+    }
+
     pub(crate) fn mapped_name(self) -> Option<&'ast str> {
         self.field.mapped_name
     }
