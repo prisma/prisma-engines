@@ -117,7 +117,7 @@ impl From<FieldType> for datamodel::CompositeTypeFieldType {
             FieldType::Json => datamodel::CompositeTypeFieldType::Scalar(ScalarType::Json, None, None),
             FieldType::Document(name) => datamodel::CompositeTypeFieldType::CompositeType(name),
             FieldType::Array(r#type) => datamodel::CompositeTypeFieldType::from(*r#type),
-            FieldType::Unsupported(_) => todo!("Composite type Unsupported"),
+            FieldType::Unsupported(name) => datamodel::CompositeTypeFieldType::Unsupported(name.to_string()),
         }
     }
 }

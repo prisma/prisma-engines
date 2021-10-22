@@ -1,4 +1,5 @@
 use crate::test_api::*;
+use bson::Bson;
 
 #[test]
 fn singular() {
@@ -149,6 +150,34 @@ fn nullability() {
           first  ModelFirst
           second ModelSecond?
           third  ModelThird?
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
+fn unsupported() {
+    let res = introspect(|db| async move {
+        let docs =
+            vec![doc! { "dataType": "Code", "data": { "code": Bson::JavaScriptCode("let a = 1 + 1;".to_string()) }}];
+
+        db.collection("FrontendEngineerWritesBackendCode")
+            .insert_many(docs, None)
+            .await?;
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        type FrontendEngineerWritesBackendCodeData {
+          code Unsupported("JavaScriptCode")
+        }
+
+        model FrontendEngineerWritesBackendCode {
+          id       String                                @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          data     FrontendEngineerWritesBackendCodeData
+          dataType String
         }
     "#]];
 
