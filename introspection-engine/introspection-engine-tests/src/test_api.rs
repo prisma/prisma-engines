@@ -127,6 +127,7 @@ impl TestApi {
         let ctx = IntrospectionContext {
             preview_features: self.preview_features(),
             source: config.datasources.into_iter().next().unwrap(),
+            composite_type_depth: Some(-1),
         };
 
         self.api
