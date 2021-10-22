@@ -183,3 +183,27 @@ fn unsupported() {
 
     expected.assert_eq(res.datamodel());
 }
+
+#[test]
+fn underscores_in_names() {
+    let res = introspect(|db| async move {
+        let docs = vec![doc! { "name": "Musti", "home_address": { "street": "Meowstrasse", "number": 123 }}];
+        db.collection("Cat").insert_many(docs, None).await?;
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        type CatHomeAddress {
+          number Int
+          street String
+        }
+
+        model Cat {
+          id           String         @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          home_address CatHomeAddress
+          name         String
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}

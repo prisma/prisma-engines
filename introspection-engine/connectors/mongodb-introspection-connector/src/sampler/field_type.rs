@@ -1,5 +1,6 @@
 use std::fmt;
 
+use convert_case::{Case, Casing};
 use datamodel::{NativeTypeInstance, ScalarType};
 use mongodb::bson::Bson;
 use native_types::MongoDbType;
@@ -22,19 +23,6 @@ pub(super) enum FieldType {
     Unsupported(&'static str),
 }
 
-fn type_name(model: &str, field: &str) -> String {
-    let upper_first_char = |s: &str| {
-        let mut chars = s.chars();
-
-        match chars.next() {
-            None => String::new(),
-            Some(c) => c.to_uppercase().collect::<String>() + chars.as_str(),
-        }
-    };
-
-    format!("{}{}", upper_first_char(model), upper_first_char(field))
-}
-
 impl FieldType {
     pub(super) fn from_bson(model: &str, field: &str, bson: &Bson) -> Option<Self> {
         match bson {
@@ -46,7 +34,7 @@ impl FieldType {
                     .and_then(|d| FieldType::from_bson(model, field, d))
                     .unwrap_or(Self::Unsupported("Unknown")),
             ))),
-            Bson::Document(_) => Some(Self::Document(type_name(model, field))),
+            Bson::Document(_) => Some(Self::Document(format!("{}_{}", model, field).to_case(Case::Pascal))),
             Bson::Boolean(_) => Some(Self::Bool),
             Bson::RegularExpression(_) => Some(Self::Unsupported("RegularExpression")),
             Bson::JavaScriptCode(_) => Some(Self::Unsupported("JavaScriptCode")),

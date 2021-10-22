@@ -9,6 +9,7 @@ use std::{
 };
 
 use bson::{Bson, Document};
+use convert_case::{Case, Casing};
 use datamodel::{
     CompositeType, CompositeTypeField, Datamodel, DefaultValue, Field, IndexDefinition, IndexType, Model,
     NativeTypeInstance, PrimaryKeyDefinition, ScalarField, ScalarType, ValueGenerator, WithDatabaseName,
@@ -174,16 +175,7 @@ impl Statistics {
     }
 
     fn track_composite_type_fields(&mut self, model: &str, field: &str, document: &Document) {
-        let upper_first_char = |s: &str| {
-            let mut chars = s.chars();
-
-            match chars.next() {
-                None => String::new(),
-                Some(c) => c.to_uppercase().collect::<String>() + chars.as_str(),
-            }
-        };
-
-        let type_name = Name::CompositeType(format!("{}{}", upper_first_char(model), upper_first_char(field)));
+        let type_name = Name::CompositeType(format!("{}_{}", model, field).to_case(Case::Pascal));
         self.track_document_types(type_name, document);
     }
 
