@@ -174,6 +174,7 @@ impl RpcImpl {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename = "camelCase")]
 pub struct IntrospectionInput {
     pub(crate) schema: String,
     #[serde(default = "default_false")]
