@@ -2,7 +2,7 @@ mod name;
 
 use std::{
     borrow::Cow,
-    cmp::Ordering,
+    cmp::{max, Ordering},
     collections::{BTreeMap, HashMap},
     fmt,
     ops::Deref,
@@ -37,16 +37,30 @@ pub(super) struct Statistics {
     models: HashMap<Name, usize>,
     /// model_name -> indices
     indices: BTreeMap<String, Vec<IndexModel>>,
+    /// How deep we travel in nested composite types until switching to Json. None will always use
+    /// Json, Some(-1) will never switch to Json.
+    composite_type_depth: Option<isize>,
 }
 
 impl Statistics {
+    pub(super) fn new(composite_type_depth: Option<isize>) -> Self {
+        Self {
+            composite_type_depth,
+            ..Default::default()
+        }
+    }
+
     /// Track a collection as prisma model.
     pub(super) fn track_model(&mut self, model: &str) {
         self.models.entry(Name::Model(model.to_string())).or_insert(0);
     }
 
     pub(super) fn track_model_fields(&mut self, model: &str, document: Document) {
-        self.track_document_types(Name::Model(model.to_string()), &document);
+        self.track_document_types(
+            Name::Model(model.to_string()),
+            &document,
+            self.composite_type_depth.unwrap_or(0),
+        );
     }
 
     /// Track an index for the given model.
@@ -174,53 +188,64 @@ impl Statistics {
         data_model
     }
 
-    fn track_composite_type_fields(&mut self, model: &str, field: &str, document: &Document) {
+    fn track_composite_type_fields(&mut self, model: &str, field: &str, document: &Document, depth: isize) {
         let type_name = Name::CompositeType(format!("{}_{}", model, field).to_case(Case::Pascal));
-        self.track_document_types(type_name, document);
+        self.track_document_types(type_name, document, depth);
     }
 
-    fn find_and_track_composite_types(&mut self, model: &str, field: &str, bson: &Bson) -> (usize, bool) {
-        fn inner(s: &mut Statistics, model: &str, field: &str, bson: &Bson, depth: &mut usize, found: &mut bool) {
+    fn find_and_track_composite_types(&mut self, model: &str, field: &str, bson: &Bson, depth: isize) -> (usize, bool) {
+        let mut array_depth = 0;
+        let mut found = false;
+
+        let mut documents = vec![bson];
+
+        while let Some(bson) = documents.pop() {
             match bson {
                 Bson::Document(doc) => {
-                    *found = true;
+                    found = true;
 
-                    if *depth < 2 {
-                        s.track_composite_type_fields(model, field, doc);
+                    if array_depth < 2 {
+                        self.track_composite_type_fields(model, field, doc, depth);
                     }
                 }
                 Bson::Array(ary) => {
-                    *depth += 1;
+                    array_depth += 1;
 
                     for bson in ary.iter() {
-                        inner(s, model, field, bson, depth, found);
+                        documents.push(bson);
                     }
                 }
                 _ => (),
             }
         }
 
-        let mut depth = 0;
-        let mut found = false;
-
-        inner(self, model, field, bson, &mut depth, &mut found);
-
-        (depth, found)
+        (array_depth, found)
     }
 
     /// Track all fields and field types from the given document.
-    fn track_document_types(&mut self, name: Name, document: &Document) {
+    fn track_document_types(&mut self, name: Name, document: &Document, depth: isize) {
+        if name.is_composite_type() && depth == 0 {
+            return;
+        }
+
         let doc_count = self.models.entry(name.clone()).or_default();
         *doc_count += 1;
 
+        let depth = match name {
+            Name::CompositeType(_) if depth > -1 => max(depth - 1, 0),
+            _ => depth,
+        };
+
         for (field, val) in document.into_iter() {
-            let (depth, found_composite) = self.find_and_track_composite_types(name.as_ref(), field, val);
+            let (array_layers, found_composite) = self.find_and_track_composite_types(name.as_ref(), field, val, depth);
+
+            let uses_compound_types = depth == -1 || depth > 0;
 
             let sampler = self.fields.entry((name.clone(), field.to_string())).or_default();
             sampler.counter += 1;
 
-            match FieldType::from_bson(name.as_ref(), field, val) {
-                Some(_) if found_composite && depth > 1 => {
+            match FieldType::from_bson(name.as_ref(), field, val, uses_compound_types) {
+                Some(_) if found_composite && array_layers > 1 => {
                     let counter = sampler
                         .types
                         .entry(FieldType::Array(Box::new(FieldType::Json)))

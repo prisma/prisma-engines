@@ -207,3 +207,150 @@ fn underscores_in_names() {
 
     expected.assert_eq(res.datamodel());
 }
+
+#[test]
+fn depth_0() {
+    let res = introspect_depth(0, |db| async move {
+        let docs = vec![doc! { "name": "Musti", "home_address": { "street": "Meowstrasse", "number": 123 }}];
+        db.collection("Cat").insert_many(docs, None).await?;
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model Cat {
+          id           String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          home_address Json
+          name         String
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
+fn depth_0_level_1_array() {
+    let res = introspect_depth(0, |db| async move {
+        let docs = vec![doc! { "name": "Musti", "home_address": [{ "street": "Meowstrasse", "number": 123 }]}];
+        db.collection("Cat").insert_many(docs, None).await?;
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model Cat {
+          id           String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          home_address Json[]
+          name         String
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
+fn depth_1_level_1() {
+    let res = introspect_depth(1, |db| async move {
+        let docs = vec![doc! { "name": "Musti", "home_address": { "street": "Meowstrasse", "number": 123 }}];
+        db.collection("Cat").insert_many(docs, None).await?;
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        type CatHomeAddress {
+          number Int
+          street String
+        }
+
+        model Cat {
+          id           String         @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          home_address CatHomeAddress
+          name         String
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
+fn depth_1_level_2() {
+    let res = introspect_depth(1, |db| async move {
+        let docs = vec![
+            doc! { "name": "Musti", "home_address": { "street": "Meowstrasse", "number": 123, "data": { "something": "other" } } },
+        ];
+        db.collection("Cat").insert_many(docs, None).await?;
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        type CatHomeAddress {
+          data   Json
+          number Int
+          street String
+        }
+
+        model Cat {
+          id           String         @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          home_address CatHomeAddress
+          name         String
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
+fn depth_1_level_2_array() {
+    let res = introspect_depth(1, |db| async move {
+        let docs = vec![
+            doc! { "name": "Musti", "home_address": [{ "street": "Meowstrasse", "number": 123, "data": [{ "something": "other" }] }] },
+        ];
+        db.collection("Cat").insert_many(docs, None).await?;
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        type CatHomeAddress {
+          data   Json[]
+          number Int
+          street String
+        }
+
+        model Cat {
+          id           String           @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          home_address CatHomeAddress[]
+          name         String
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
+fn depth_2_level_2_array() {
+    let res = introspect_depth(2, |db| async move {
+        let docs = vec![
+            doc! { "name": "Musti", "home_address": [{ "street": "Meowstrasse", "number": 123, "data": [{ "something": "other" }] }] },
+        ];
+        db.collection("Cat").insert_many(docs, None).await?;
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        type CatHomeAddress {
+          data   CatHomeAddressData[]
+          number Int
+          street String
+        }
+
+        type CatHomeAddressData {
+          something String
+        }
+
+        model Cat {
+          id           String           @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          home_address CatHomeAddress[]
+          name         String
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}

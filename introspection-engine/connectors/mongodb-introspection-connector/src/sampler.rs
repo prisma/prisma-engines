@@ -17,9 +17,12 @@ use statistics::*;
 /// common type or if even, the latest type and adds a warning.
 /// - Missing fields count as null.
 /// - Indices are taken, but not if they are partial.
-pub(super) async fn sample(database: Database) -> crate::Result<IntrospectionResult> {
+pub(super) async fn sample(
+    database: Database,
+    composite_type_depth: Option<isize>,
+) -> crate::Result<IntrospectionResult> {
     let collections = database.list_collection_names(None).await?;
-    let mut statistics = Statistics::default();
+    let mut statistics = Statistics::new(composite_type_depth);
     let mut warnings = Vec::new();
 
     for collection_name in collections {

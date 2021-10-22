@@ -20,6 +20,10 @@ impl Name {
             Name::CompositeType(name) => Some(name),
         }
     }
+
+    pub(super) fn is_composite_type(&self) -> bool {
+        matches!(self, Self::CompositeType(_))
+    }
 }
 
 impl fmt::Display for Name {

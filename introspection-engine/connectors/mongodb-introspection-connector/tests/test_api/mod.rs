@@ -43,7 +43,7 @@ impl TestResult {
     }
 }
 
-pub(super) fn introspect<F, U>(init_database: F) -> TestResult
+pub(super) fn introspect_depth<F, U>(depth: isize, init_database: F) -> TestResult
 where
     F: FnOnce(Database) -> U,
     U: Future<Output = mongodb::error::Result<()>>,
@@ -73,6 +73,7 @@ where
 
     let ctx = IntrospectionContext {
         source: config.subject.datasources.pop().unwrap(),
+        composite_type_depth: Some(depth),
         preview_features: PreviewFeature::MongoDb.into(),
     };
 
@@ -96,4 +97,12 @@ where
             warnings: res.warnings,
         }
     })
+}
+
+pub(super) fn introspect<F, U>(init_database: F) -> TestResult
+where
+    F: FnOnce(Database) -> U,
+    U: Future<Output = mongodb::error::Result<()>>,
+{
+    introspect_depth(-1, init_database)
 }

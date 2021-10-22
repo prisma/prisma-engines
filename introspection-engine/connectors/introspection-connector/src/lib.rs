@@ -82,6 +82,7 @@ impl fmt::Display for IntrospectionResultOutput {
 
 pub struct IntrospectionContext {
     pub source: Datasource,
+    pub composite_type_depth: Option<isize>,
     pub preview_features: BitFlags<PreviewFeature>,
 }
 

@@ -24,17 +24,20 @@ pub(super) enum FieldType {
 }
 
 impl FieldType {
-    pub(super) fn from_bson(model: &str, field: &str, bson: &Bson) -> Option<Self> {
+    pub(super) fn from_bson(model: &str, field: &str, bson: &Bson, composite_types_enabled: bool) -> Option<Self> {
         match bson {
             Bson::Double(_) => Some(Self::Double),
             Bson::String(_) => Some(Self::String),
             Bson::Array(docs) if docs.is_empty() => None,
             Bson::Array(docs) => Some(Self::Array(Box::new(
                 docs.first()
-                    .and_then(|d| FieldType::from_bson(model, field, d))
+                    .and_then(|d| FieldType::from_bson(model, field, d, composite_types_enabled))
                     .unwrap_or(Self::Unsupported("Unknown")),
             ))),
-            Bson::Document(_) => Some(Self::Document(format!("{}_{}", model, field).to_case(Case::Pascal))),
+            Bson::Document(_) if composite_types_enabled => {
+                Some(Self::Document(format!("{}_{}", model, field).to_case(Case::Pascal)))
+            }
+            Bson::Document(_) => Some(Self::Json),
             Bson::Boolean(_) => Some(Self::Bool),
             Bson::RegularExpression(_) => Some(Self::Unsupported("RegularExpression")),
             Bson::JavaScriptCode(_) => Some(Self::Unsupported("JavaScriptCode")),
