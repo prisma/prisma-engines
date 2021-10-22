@@ -1,6 +1,6 @@
 use crate::{
     join_utils::AliasedJoin,
-    model_extensions::{AsColumns, AsTable, ScalarFieldExt},
+    model_extensions::{AsColumn, AsColumns, AsTable, ScalarFieldExt},
     ordering::OrderByDefinition,
     query_arguments_ext::QueryArgumentsExt,
 };
