@@ -81,6 +81,13 @@ impl<'a> LowerDmlToAst<'a> {
                     };
                 }
 
+                if let Some(length) = pk.fields.first().unwrap().1 {
+                    args.push(ast::Argument::new(
+                        "length",
+                        ast::Expression::NumericValue(length.to_string(), Span::empty()),
+                    ));
+                }
+
                 attributes.push(ast::Attribute::new("id", args));
             }
         }
