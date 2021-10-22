@@ -1,8 +1,10 @@
 use super::env_function::EnvFunction;
 use crate::diagnostics::DatamodelError;
+use crate::transform::helpers::value_validator;
 use crate::{
     ast::{self, Expression, Span},
     configuration::StringFromEnvVar,
+    SortOrder,
 };
 use crate::{DefaultValue, ValueGenerator};
 use bigdecimal::BigDecimal;
@@ -170,24 +172,66 @@ impl<'a> ValueValidator<'a> {
     }
 
     /// Unwraps the value as an array of constants.
-    pub fn as_field_array_with_args(&self) -> Result<Vec<(&'a str, Option<&str>, Option<u32>)>, DatamodelError> {
+    pub fn as_field_array_with_args(&self) -> Result<Vec<(&'a str, Option<SortOrder>, Option<u32>)>, DatamodelError> {
         if let ast::Expression::ExpressionArray(values, _) = &self.value {
             values
                 .iter()
-                .map(|val| ValueValidator::new(val).naming_is_hard())
+                .map(|val| ValueValidator::new(val).as_field_with_args())
                 .collect()
         } else {
             // Single values are accepted as array literals, for example in `@relation(fields: userId)`.
-            Ok(vec![self.naming_is_hard()?])
+            Ok(vec![self.as_field_with_args()?])
         }
     }
 
-    pub fn naming_is_hard(&self) -> Result<(&'a str, Option<&'a str>, Option<u32>), DatamodelError> {
+    pub fn as_field_with_args(&self) -> Result<(&'a str, Option<SortOrder>, Option<u32>), DatamodelError> {
         match &self.value {
             Expression::ConstantValue(field_name, _) => Ok((field_name, None, None)),
-            Expression::FieldWithArgs(field_name, args, _) => Ok((field_name, None, None)),
+            Expression::FieldWithArgs(field_name, args, _) => {
+                let (sort, length) = value_validator::ValueValidator::<'a>::field_args(args)?;
+                Ok((field_name, sort, length))
+            }
+
             _ => Err(self.construct_type_mismatch_error("constant literal")),
         }
+    }
+
+    /// Unwraps the wrapped value as a constant literal.
+    pub fn field_args(args: &[ast::Argument]) -> Result<(Option<SortOrder>, Option<u32>), DatamodelError> {
+        let sort = args
+            .into_iter()
+            .find(|arg| arg.name.name == "sort")
+            .map(|arg| arg.value.as_string_value())
+            .flatten()
+            .map(|(v, span)| match v {
+                "Asc" => Ok(SortOrder::Asc),
+                "Desc" => Ok(SortOrder::Desc),
+                _ => Err(DatamodelError::ParserError {
+                    expected: vec![],
+                    expected_str: "".to_string(),
+                    span,
+                }),
+            })
+            .transpose()?;
+
+        let length = args
+            .into_iter()
+            .find(|arg| arg.name.name == "length")
+            .map(|arg| match &arg.value {
+                Expression::NumericValue(s, _) => s.parse::<u32>().map_err(|_| DatamodelError::ParserError {
+                    expected: vec![],
+                    expected_str: "".to_string(),
+                    span: arg.span,
+                }),
+                _ => Err(DatamodelError::ParserError {
+                    expected: vec![],
+                    expected_str: "".to_string(),
+                    span: arg.span,
+                }),
+            })
+            .transpose()?;
+
+        Ok((sort, length))
     }
 
     /// Unwraps the wrapped value as a constant literal.

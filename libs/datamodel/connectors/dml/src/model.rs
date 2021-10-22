@@ -57,7 +57,7 @@ pub struct PrimaryKeyDefinition {
 
 impl PrimaryKeyDefinition {
     pub fn fields(self) -> Vec<String> {
-        self.fields.into_iter().map(|(field, length)| field).collect()
+        self.fields.into_iter().map(|(field, _length)| field).collect()
     }
 }
 

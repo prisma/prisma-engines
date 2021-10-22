@@ -100,7 +100,11 @@ pub(super) fn model<'ast>(
         name,
         db_name,
         fields: resolved_fields.0.clone(),
-        field_lengths: resolved_fields.0.iter().map(|x| (*x, None)).collect(), //TODO(matthias)
+        field_lengths: resolved_fields
+            .1
+            .into_iter()
+            .map(|(field_id, _sort, length)| (field_id, length))
+            .collect(),
         source_field: None,
     });
 }

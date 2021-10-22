@@ -32,13 +32,6 @@ impl<'ast, 'db> PrimaryKeyWalker<'ast, 'db> {
         self.attribute.source_field.is_some()
     }
 
-    pub(crate) fn iter_ast_fields(&self) -> impl Iterator<Item = &'ast ast::Field> + '_ {
-        self.attribute
-            .fields
-            .iter()
-            .map(move |id| &self.db.ast[self.model_id][*id])
-    }
-
     pub(crate) fn iter_ast_field_options(&self) -> impl Iterator<Item = (&'ast ast::Field, Option<u32>)> + '_ {
         self.attribute
             .field_lengths

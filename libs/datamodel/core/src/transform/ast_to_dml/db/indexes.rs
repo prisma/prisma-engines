@@ -4,7 +4,7 @@ use crate::common::constraint_names::ConstraintNames;
 
 use super::{context::Context, types::IndexAttribute};
 use crate::ast::FieldId;
-use crate::transform::ast_to_dml::db::types::AstSortOrder;
+use crate::SortOrder;
 
 /// Prisma forces a 1:1 relation to be unique from the defining side. If the
 /// field is not a primary key or already defined in a unique index, we add an
@@ -57,7 +57,7 @@ pub(super) fn infer_implicit_indexes(ctx: &mut Context<'_>) {
         let field_options = fields
             .clone()
             .iter()
-            .map(|field_id| (*field_id, Some(AstSortOrder::Asc), None))
+            .map(|field_id| (*field_id, Some(SortOrder::Asc), None))
             .collect();
 
         indexes.push((

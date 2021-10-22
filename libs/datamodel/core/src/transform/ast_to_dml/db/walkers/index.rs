@@ -6,7 +6,6 @@ use crate::{
 use std::borrow::Cow;
 
 use super::ScalarFieldWalker;
-use crate::transform::ast_to_dml::db::types::AstSortOrder;
 use dml::model::SortOrder;
 
 #[allow(dead_code)]
@@ -61,8 +60,8 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
                 (
                     &self.db.ast[self.model_id][*field_id],
                     match sort {
-                        Some(AstSortOrder::Asc) => SortOrder::Asc,
-                        Some(AstSortOrder::Desc) => SortOrder::Desc,
+                        Some(SortOrder::Asc) => SortOrder::Asc,
+                        Some(SortOrder::Desc) => SortOrder::Desc,
                         None => SortOrder::Asc,
                     },
                     *length,

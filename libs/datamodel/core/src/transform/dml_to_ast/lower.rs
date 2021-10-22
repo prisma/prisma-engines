@@ -1,4 +1,3 @@
-use crate::ast::{Expression, Identifier};
 use crate::common::preview_features::PreviewFeature;
 use crate::{
     ast::{self},
