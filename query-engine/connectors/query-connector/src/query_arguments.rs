@@ -71,7 +71,12 @@ impl QueryArguments {
 
     /// A null cursor is a cursor that is used in conjunction with a nullable order by (i.e. a field is optional).
     pub fn contains_null_cursor(&self) -> bool {
-        self.cursor.is_some() && self.order_by.iter().any(|o| !o.field.is_required)
+        self.cursor.is_some()
+            && self.order_by.iter().any(|o| match o {
+                OrderBy::Scalar(o) => !o.field.is_required,
+                OrderBy::Aggregation(_) => false,
+                OrderBy::Relevance(_) => false,
+            })
     }
 
     /// Checks if the orderBy provided is guaranteeing a stable ordering of records for the model.
@@ -104,10 +109,21 @@ impl QueryArguments {
             return true;
         }
 
+        // We're filtering order bys aggregation & relevance since they will never lead to stable ordering anyway.
+        let maybe_stable_order_bys: Vec<_> = self
+            .order_by
+            .iter()
+            .filter_map(|o| match o {
+                OrderBy::Scalar(o) => Some(o),
+                OrderBy::Aggregation(_) => None,
+                OrderBy::Relevance(_) => None,
+            })
+            .collect();
+
         // Partition into orderings on the same model and ones that require relation hops.
         // Note: One ordering is always on one scalar in the end.
-        let (on_model, on_relation): (Vec<&OrderBy>, Vec<&OrderBy>) =
-            self.order_by.iter().partition(|o| o.path.is_empty());
+        let (on_model, on_relation): (Vec<&OrderByScalar>, Vec<&OrderByScalar>) =
+            maybe_stable_order_bys.iter().partition(|o| o.path.is_empty());
 
         // Indicates whether or not a combination of contained fields is on the source model (we don't check for relations for now).
         let order_by_contains_unique_index = self.model.unique_indexes().into_iter().any(|index| {
@@ -127,6 +143,14 @@ impl QueryArguments {
 
     pub fn take_abs(&self) -> Option<i64> {
         self.take.map(|t| if t < 0 { -t } else { t })
+    }
+
+    pub fn has_unbatchable_ordering(&self) -> bool {
+        self.order_by.iter().any(|o| match o {
+            OrderBy::Scalar(_) => false,
+            OrderBy::Aggregation(_) => true,
+            OrderBy::Relevance(_) => true,
+        })
     }
 
     pub fn should_batch(&self, chunk_size: usize) -> bool {

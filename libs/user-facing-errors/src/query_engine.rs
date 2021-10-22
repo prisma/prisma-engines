@@ -291,3 +291,9 @@ pub struct MultiError {
 pub struct InteractiveTransactionError {
     pub error: String,
 }
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P2029", message = "Query parameter limit exceeded error: {message}.")]
+pub struct QueryParameterLimitExceeded {
+    pub message: String,
+}

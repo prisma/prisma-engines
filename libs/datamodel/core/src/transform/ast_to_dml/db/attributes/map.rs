@@ -81,7 +81,7 @@ pub(super) fn scalar_field<'ast>(
             .get(&(model_id, *field_id))
             .and_then(|sf| sf.mapped_name)
         {
-            Some(name) if name != mapped_name => return,
+            Some(name) if name != mapped_name => {}
             _ => ctx.push_error(DatamodelError::new_duplicate_field_error(
                 &ast_model.name.name,
                 &ast_field.name.name,

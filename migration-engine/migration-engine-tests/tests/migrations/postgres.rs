@@ -154,9 +154,12 @@ fn native_type_columns_can_be_created(api: TestApi) {
 
 #[test_connector(tags(Postgres))]
 fn uuids_do_not_generate_drift_issue_5282(api: TestApi) {
+    if !api.is_cockroach() {
+        api.raw_cmd(r#"CREATE EXTENSION IF NOT EXISTS "uuid-ossp";"#)
+    }
+
     api.raw_cmd(
         r#"
-        CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
         CREATE TABLE a (id uuid DEFAULT uuid_generate_v4() primary key);
         CREATE TABLE b (id uuid DEFAULT uuid_generate_v4() primary key, a_id uuid, CONSTRAINT aaa FOREIGN KEY (a_id) REFERENCES a(id) ON DELETE SET NULL ON UPDATE CASCADE);
         "#
@@ -182,7 +185,8 @@ fn uuids_do_not_generate_drift_issue_5282(api: TestApi) {
         .assert_no_steps();
 }
 
-#[test_connector(tags(Postgres))]
+// CockroachDB does not support uuid-ossp functions in a separate schema.
+#[test_connector(tags(Postgres), exclude(Cockroach))]
 fn functions_with_schema_prefix_in_dbgenerated_are_idempotent(api: TestApi) {
     api.raw_cmd(r#"CREATE SCHEMA "myschema"; CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA "myschema";"#);
 

@@ -77,7 +77,11 @@ impl ConnectorError {
                     actual: *actual,
                 },
             )),
-
+            ErrorKind::QueryParameterLimitExceeded(message) => Some(KnownError::new(
+                user_facing_errors::query_engine::QueryParameterLimitExceeded {
+                    message: message.clone(),
+                },
+            )),
             _ => None,
         };
 
@@ -198,6 +202,9 @@ pub enum ErrorKind {
 
     #[error("{}", message)]
     TransactionAlreadyClosed { message: String },
+
+    #[error("The query parameter limit supported by your database is exceeded: {0}.")]
+    QueryParameterLimitExceeded(String),
 }
 
 impl From<DomainError> for ConnectorError {

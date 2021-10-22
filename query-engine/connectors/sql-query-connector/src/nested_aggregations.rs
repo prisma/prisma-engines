@@ -7,12 +7,13 @@ pub struct RelAggregationJoins {
     // Joins necessary to perform the relation aggregations
     pub(crate) joins: Vec<AliasedJoin>,
     // Aggregator columns
-    pub(crate) columns: Vec<Column<'static>>,
+    pub(crate) columns: Vec<Expression<'static>>,
 }
 
 pub fn build(aggr_selections: &[RelAggregationSelection]) -> RelAggregationJoins {
     let mut joins = vec![];
-    let mut columns: Vec<Column<'static>> = vec![];
+    let mut columns: Vec<Expression<'static>> = vec![];
+
     for (index, selection) in aggr_selections.iter().enumerate() {
         match selection {
             RelAggregationSelection::Count(rf) => {
@@ -20,13 +21,13 @@ pub fn build(aggr_selections: &[RelAggregationSelection]) -> RelAggregationJoins
                 let aggregator_alias = selection.db_alias();
                 let join = compute_aggr_join(
                     rf,
-                    AggregationType::Count { _all: true },
+                    AggregationType::Count,
                     aggregator_alias.as_str(),
                     join_alias.as_str(),
                     None,
                 );
 
-                columns.push(Column::from((join.alias.clone(), aggregator_alias)));
+                columns.push(Column::from((join.alias.clone(), aggregator_alias)).into());
                 joins.push(join);
             }
         }
