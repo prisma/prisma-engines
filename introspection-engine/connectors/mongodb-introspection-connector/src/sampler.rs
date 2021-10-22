@@ -25,9 +25,11 @@ pub(super) async fn sample(
     let mut statistics = Statistics::new(composite_type_depth);
     let mut warnings = Vec::new();
 
-    for collection_name in collections {
-        statistics.track_model(&collection_name);
+    for collection_name in &collections {
+        statistics.track_model(collection_name);
+    }
 
+    for collection_name in collections {
         let collection = database.collection::<Document>(&collection_name);
 
         let options = AggregateOptions::builder().allow_disk_use(Some(true)).build();

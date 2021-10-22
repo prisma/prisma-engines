@@ -188,9 +188,21 @@ impl Statistics {
         data_model
     }
 
+    fn composite_type_name(&self, model: &str, field: &str) -> Name {
+        let name = Name::Model(format!("{}_{}", model, field).to_case(Case::Pascal));
+
+        let name = if self.models.contains_key(&name) {
+            format!("{}Rename", name)
+        } else {
+            name.take()
+        };
+
+        Name::CompositeType(name)
+    }
+
     fn track_composite_type_fields(&mut self, model: &str, field: &str, document: &Document, depth: isize) {
-        let type_name = Name::CompositeType(format!("{}_{}", model, field).to_case(Case::Pascal));
-        self.track_document_types(type_name, document, depth);
+        let name = self.composite_type_name(model, field);
+        self.track_document_types(name, document, depth);
     }
 
     fn find_and_track_composite_types(&mut self, model: &str, field: &str, bson: &Bson, depth: isize) -> (usize, bool) {
@@ -239,12 +251,16 @@ impl Statistics {
         for (field, val) in document.into_iter() {
             let (array_layers, found_composite) = self.find_and_track_composite_types(name.as_ref(), field, val, depth);
 
-            let uses_compound_types = depth == -1 || depth > 0;
+            let compound_name = if found_composite && (depth == -1 || depth > 0) {
+                Some(self.composite_type_name(name.as_ref(), field))
+            } else {
+                None
+            };
 
             let sampler = self.fields.entry((name.clone(), field.to_string())).or_default();
             sampler.counter += 1;
 
-            match FieldType::from_bson(name.as_ref(), field, val, uses_compound_types) {
+            match FieldType::from_bson(val, compound_name) {
                 Some(_) if found_composite && array_layers > 1 => {
                     let counter = sampler
                         .types

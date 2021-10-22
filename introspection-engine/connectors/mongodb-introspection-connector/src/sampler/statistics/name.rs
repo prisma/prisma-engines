@@ -1,6 +1,6 @@
-use std::{cmp::Ordering, fmt, hash};
+use std::fmt;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub(crate) enum Name {
     Model(String),
     CompositeType(String),
@@ -18,6 +18,13 @@ impl Name {
         match self {
             Name::Model(_) => None,
             Name::CompositeType(name) => Some(name),
+        }
+    }
+
+    pub(crate) fn take(self) -> String {
+        match self {
+            Name::Model(name) => name,
+            Name::CompositeType(name) => name,
         }
     }
 
@@ -40,50 +47,6 @@ impl AsRef<str> for Name {
         match self {
             Name::Model(name) => name.as_ref(),
             Name::CompositeType(name) => name.as_ref(),
-        }
-    }
-}
-
-impl PartialEq for Name {
-    fn eq(&self, other: &Self) -> bool {
-        match (self, other) {
-            (Name::Model(left), Name::Model(right)) => left == right,
-            (Name::Model(left), Name::CompositeType(right)) => left == right,
-            (Name::CompositeType(left), Name::Model(right)) => left == right,
-            (Name::CompositeType(left), Name::CompositeType(right)) => left == right,
-        }
-    }
-}
-
-impl Eq for Name {}
-
-impl PartialOrd for Name {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        match (self, other) {
-            (Name::Model(left), Name::Model(right)) => left.partial_cmp(right),
-            (Name::Model(left), Name::CompositeType(right)) => left.partial_cmp(right),
-            (Name::CompositeType(left), Name::Model(right)) => left.partial_cmp(right),
-            (Name::CompositeType(left), Name::CompositeType(right)) => left.partial_cmp(right),
-        }
-    }
-}
-
-impl Ord for Name {
-    fn cmp(&self, other: &Self) -> Ordering {
-        match (self, other) {
-            (Name::Model(left), Name::Model(right)) => left.cmp(right),
-            (Name::Model(left), Name::CompositeType(right)) => left.cmp(right),
-            (Name::CompositeType(left), Name::Model(right)) => left.cmp(right),
-            (Name::CompositeType(left), Name::CompositeType(right)) => left.cmp(right),
-        }
-    }
-}
-
-impl hash::Hash for Name {
-    fn hash<H: hash::Hasher>(&self, state: &mut H) {
-        match self {
-            Name::Model(name) => name.hash(state),
-            Name::CompositeType(name) => name.hash(state),
         }
     }
 }

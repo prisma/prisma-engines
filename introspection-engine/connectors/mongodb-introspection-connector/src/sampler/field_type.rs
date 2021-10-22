@@ -1,9 +1,9 @@
-use std::fmt;
-
-use convert_case::{Case, Casing};
 use datamodel::{NativeTypeInstance, ScalarType};
 use mongodb::bson::Bson;
 use native_types::MongoDbType;
+use std::fmt;
+
+use super::statistics::Name;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub(super) enum FieldType {
@@ -24,20 +24,20 @@ pub(super) enum FieldType {
 }
 
 impl FieldType {
-    pub(super) fn from_bson(model: &str, field: &str, bson: &Bson, composite_types_enabled: bool) -> Option<Self> {
+    pub(super) fn from_bson(bson: &Bson, composite_name: Option<Name>) -> Option<Self> {
         match bson {
             Bson::Double(_) => Some(Self::Double),
             Bson::String(_) => Some(Self::String),
             Bson::Array(docs) if docs.is_empty() => None,
             Bson::Array(docs) => Some(Self::Array(Box::new(
                 docs.first()
-                    .and_then(|d| FieldType::from_bson(model, field, d, composite_types_enabled))
+                    .and_then(|d| FieldType::from_bson(d, composite_name))
                     .unwrap_or(Self::Unsupported("Unknown")),
             ))),
-            Bson::Document(_) if composite_types_enabled => {
-                Some(Self::Document(format!("{}_{}", model, field).to_case(Case::Pascal)))
-            }
-            Bson::Document(_) => Some(Self::Json),
+            Bson::Document(_) => match composite_name {
+                Some(name) => Some(Self::Document(name.take())),
+                None => Some(Self::Json),
+            },
             Bson::Boolean(_) => Some(Self::Bool),
             Bson::RegularExpression(_) => Some(Self::Unsupported("RegularExpression")),
             Bson::JavaScriptCode(_) => Some(Self::Unsupported("JavaScriptCode")),

@@ -354,3 +354,38 @@ fn depth_2_level_2_array() {
 
     expected.assert_eq(res.datamodel());
 }
+
+#[test]
+fn name_clashes() {
+    let res = introspect(|db| async move {
+        let docs = vec![doc! { "name": "Musti", "address": { "street": "Meowstrasse", "number": 123 }}];
+        db.collection("Cat").insert_many(docs, None).await?;
+
+        let docs = vec![doc! { "knock": false, "number": 420, "street": "Meowstrasse" }];
+        db.collection("CatAddress").insert_many(docs, None).await?;
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        type CatAddressRename {
+          number Int
+          street String
+        }
+
+        model Cat {
+          id      String           @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          address CatAddressRename
+          name    String
+        }
+
+        model CatAddress {
+          id     String  @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          knock  Boolean
+          number Int
+          street String
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
