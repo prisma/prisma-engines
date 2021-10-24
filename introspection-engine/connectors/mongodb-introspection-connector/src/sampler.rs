@@ -2,7 +2,7 @@ mod field_type;
 mod statistics;
 
 use futures::TryStreamExt;
-use introspection_connector::{IntrospectionResult, Version};
+use introspection_connector::{CompositeTypeDepth, IntrospectionResult, Version};
 use mongodb::{
     bson::{doc, Document},
     options::AggregateOptions,
@@ -19,7 +19,7 @@ use statistics::*;
 /// - Indices are taken, but not if they are partial.
 pub(super) async fn sample(
     database: Database,
-    composite_type_depth: Option<isize>,
+    composite_type_depth: CompositeTypeDepth,
 ) -> crate::Result<IntrospectionResult> {
     let collections = database.list_collection_names(None).await?;
     let mut statistics = Statistics::new(composite_type_depth);

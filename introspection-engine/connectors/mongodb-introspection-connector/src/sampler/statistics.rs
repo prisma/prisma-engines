@@ -2,7 +2,7 @@ mod name;
 
 use std::{
     borrow::Cow,
-    cmp::{max, Ordering},
+    cmp::Ordering,
     collections::{BTreeMap, HashMap},
     fmt,
     ops::Deref,
@@ -21,7 +21,7 @@ use native_types::MongoDbType;
 use once_cell::sync::Lazy;
 use regex::Regex;
 
-use super::field_type::FieldType;
+use super::{field_type::FieldType, CompositeTypeDepth};
 
 pub(super) const SAMPLE_SIZE: i32 = 1000;
 
@@ -39,11 +39,11 @@ pub(super) struct Statistics {
     indices: BTreeMap<String, Vec<IndexModel>>,
     /// How deep we travel in nested composite types until switching to Json. None will always use
     /// Json, Some(-1) will never switch to Json.
-    composite_type_depth: Option<isize>,
+    composite_type_depth: CompositeTypeDepth,
 }
 
 impl Statistics {
-    pub(super) fn new(composite_type_depth: Option<isize>) -> Self {
+    pub(super) fn new(composite_type_depth: CompositeTypeDepth) -> Self {
         Self {
             composite_type_depth,
             ..Default::default()
@@ -56,11 +56,7 @@ impl Statistics {
     }
 
     pub(super) fn track_model_fields(&mut self, model: &str, document: Document) {
-        self.track_document_types(
-            Name::Model(model.to_string()),
-            &document,
-            self.composite_type_depth.unwrap_or(0),
-        );
+        self.track_document_types(Name::Model(model.to_string()), &document, self.composite_type_depth);
     }
 
     /// Track an index for the given model.
@@ -200,12 +196,24 @@ impl Statistics {
         Name::CompositeType(name)
     }
 
-    fn track_composite_type_fields(&mut self, model: &str, field: &str, document: &Document, depth: isize) {
+    fn track_composite_type_fields(
+        &mut self,
+        model: &str,
+        field: &str,
+        document: &Document,
+        depth: CompositeTypeDepth,
+    ) {
         let name = self.composite_type_name(model, field);
         self.track_document_types(name, document, depth);
     }
 
-    fn find_and_track_composite_types(&mut self, model: &str, field: &str, bson: &Bson, depth: isize) -> (usize, bool) {
+    fn find_and_track_composite_types(
+        &mut self,
+        model: &str,
+        field: &str,
+        bson: &Bson,
+        depth: CompositeTypeDepth,
+    ) -> (usize, bool) {
         let mut array_depth = 0;
         let mut found = false;
 
@@ -235,8 +243,8 @@ impl Statistics {
     }
 
     /// Track all fields and field types from the given document.
-    fn track_document_types(&mut self, name: Name, document: &Document, depth: isize) {
-        if name.is_composite_type() && depth == 0 {
+    fn track_document_types(&mut self, name: Name, document: &Document, depth: CompositeTypeDepth) {
+        if name.is_composite_type() && depth.is_none() {
             return;
         }
 
@@ -244,14 +252,14 @@ impl Statistics {
         *doc_count += 1;
 
         let depth = match name {
-            Name::CompositeType(_) if depth > -1 => max(depth - 1, 0),
+            Name::CompositeType(_) => depth.level_down(),
             _ => depth,
         };
 
         for (field, val) in document.into_iter() {
             let (array_layers, found_composite) = self.find_and_track_composite_types(name.as_ref(), field, val, depth);
 
-            let compound_name = if found_composite && (depth == -1 || depth > 0) {
+            let compound_name = if found_composite && !depth.is_none() {
                 Some(self.composite_type_name(name.as_ref(), field))
             } else {
                 None

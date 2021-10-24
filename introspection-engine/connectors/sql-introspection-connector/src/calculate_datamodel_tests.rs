@@ -34,7 +34,7 @@ mod tests {
 
         IntrospectionContext {
             source,
-            composite_type_depth: None,
+            composite_type_depth: Default::default(),
             preview_features: BitFlags::empty(),
         }
     }

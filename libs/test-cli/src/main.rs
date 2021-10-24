@@ -4,6 +4,7 @@ mod diagnose_migration_history;
 
 use anyhow::Context;
 use colored::Colorize;
+use introspection_connector::CompositeTypeDepth;
 use migration_connector::{DestructiveChangeDiagnostics, DiffTarget};
 use migration_core::commands::{ApplyMigrationsInput, CreateMigrationInput, SchemaPushInput};
 use std::{
@@ -189,9 +190,13 @@ async fn main() -> anyhow::Result<()> {
             };
 
             //todo configurable
-            let introspected = introspection_core::RpcImpl::introspect_internal(schema, false, composite_type_depth)
-                .await
-                .map_err(|err| anyhow::anyhow!("{:?}", err.data))?;
+            let introspected = introspection_core::RpcImpl::introspect_internal(
+                schema,
+                false,
+                CompositeTypeDepth::from(composite_type_depth.unwrap_or(0)),
+            )
+            .await
+            .map_err(|err| anyhow::anyhow!("{:?}", err.data))?;
 
             println!("{}", introspected);
         }
@@ -286,9 +291,10 @@ async fn generate_dmmf(cmd: &DmmfCommand) -> anyhow::Result<()> {
         if let Some(url) = cmd.url.as_ref() {
             let skeleton = minimal_schema_from_url(url)?;
             //todo make this configurable
-            let introspected = introspection_core::RpcImpl::introspect_internal(skeleton, false, Some(-1))
-                .await
-                .map_err(|err| anyhow::anyhow!("{:?}", err.data))?;
+            let introspected =
+                introspection_core::RpcImpl::introspect_internal(skeleton, false, CompositeTypeDepth::Infinite)
+                    .await
+                    .map_err(|err| anyhow::anyhow!("{:?}", err.data))?;
 
             eprintln!("{}", "Schema was successfully introspected from database URL".green());
 

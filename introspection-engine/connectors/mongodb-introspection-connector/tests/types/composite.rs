@@ -1,5 +1,6 @@
 use crate::test_api::*;
 use bson::Bson;
+use introspection_connector::CompositeTypeDepth;
 
 #[test]
 fn singular() {
@@ -209,8 +210,8 @@ fn underscores_in_names() {
 }
 
 #[test]
-fn depth_0() {
-    let res = introspect_depth(0, |db| async move {
+fn depth_none() {
+    let res = introspect_depth(CompositeTypeDepth::None, |db| async move {
         let docs = vec![doc! { "name": "Musti", "home_address": { "street": "Meowstrasse", "number": 123 }}];
         db.collection("Cat").insert_many(docs, None).await?;
         Ok(())
@@ -228,8 +229,8 @@ fn depth_0() {
 }
 
 #[test]
-fn depth_0_level_1_array() {
-    let res = introspect_depth(0, |db| async move {
+fn depth_none_level_1_array() {
+    let res = introspect_depth(CompositeTypeDepth::None, |db| async move {
         let docs = vec![doc! { "name": "Musti", "home_address": [{ "street": "Meowstrasse", "number": 123 }]}];
         db.collection("Cat").insert_many(docs, None).await?;
         Ok(())
@@ -248,7 +249,7 @@ fn depth_0_level_1_array() {
 
 #[test]
 fn depth_1_level_1() {
-    let res = introspect_depth(1, |db| async move {
+    let res = introspect_depth(CompositeTypeDepth::Level(1), |db| async move {
         let docs = vec![doc! { "name": "Musti", "home_address": { "street": "Meowstrasse", "number": 123 }}];
         db.collection("Cat").insert_many(docs, None).await?;
         Ok(())
@@ -272,7 +273,7 @@ fn depth_1_level_1() {
 
 #[test]
 fn depth_1_level_2() {
-    let res = introspect_depth(1, |db| async move {
+    let res = introspect_depth(CompositeTypeDepth::Level(1), |db| async move {
         let docs = vec![
             doc! { "name": "Musti", "home_address": { "street": "Meowstrasse", "number": 123, "data": { "something": "other" } } },
         ];
@@ -299,7 +300,7 @@ fn depth_1_level_2() {
 
 #[test]
 fn depth_1_level_2_array() {
-    let res = introspect_depth(1, |db| async move {
+    let res = introspect_depth(CompositeTypeDepth::Level(1), |db| async move {
         let docs = vec![
             doc! { "name": "Musti", "home_address": [{ "street": "Meowstrasse", "number": 123, "data": [{ "something": "other" }] }] },
         ];
@@ -326,7 +327,7 @@ fn depth_1_level_2_array() {
 
 #[test]
 fn depth_2_level_2_array() {
-    let res = introspect_depth(2, |db| async move {
+    let res = introspect_depth(CompositeTypeDepth::Level(2), |db| async move {
         let docs = vec![
             doc! { "name": "Musti", "home_address": [{ "street": "Meowstrasse", "number": 123, "data": [{ "something": "other" }] }] },
         ];

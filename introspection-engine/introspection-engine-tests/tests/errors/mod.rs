@@ -70,7 +70,7 @@ async fn bad_connection_string_in_datamodel_returns_nice_error() {
     }
     "#;
 
-    let error = RpcImpl::introspect_internal(schema.into(), false, None)
+    let error = RpcImpl::introspect_internal(schema.into(), false, Default::default())
         .await
         .unwrap_err();
 

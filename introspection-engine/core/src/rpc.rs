@@ -1,7 +1,8 @@
 use crate::error::Error;
 use datamodel::{Configuration, Datamodel};
 use introspection_connector::{
-    ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionContext, IntrospectionResultOutput,
+    CompositeTypeDepth, ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionContext,
+    IntrospectionResultOutput,
 };
 use jsonrpc_core::BoxFuture;
 use jsonrpc_derive::rpc;
@@ -57,7 +58,7 @@ impl Rpc for RpcImpl {
         Box::pin(Self::introspect_internal(
             input.schema,
             input.force,
-            input.composite_type_depth,
+            CompositeTypeDepth::from(input.composite_type_depth.unwrap_or(0)),
         ))
     }
 
@@ -100,7 +101,7 @@ impl RpcImpl {
     pub async fn introspect_internal(
         schema: String,
         force: bool,
-        composite_type_depth: Option<isize>,
+        composite_type_depth: CompositeTypeDepth,
     ) -> RpcResult<IntrospectionResultOutput> {
         let (config, url, connector) = RpcImpl::load_connector(&schema).await?;
 
