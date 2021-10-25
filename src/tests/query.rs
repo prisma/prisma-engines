@@ -483,8 +483,6 @@ async fn table_left_join(api: &mut dyn TestApi) -> crate::Result<()> {
 
     let res = api.conn().select(query).await?;
 
-    println!("{:?}", &res);
-
     assert_eq!(2, res.len());
 
     let row = res.get(0).unwrap();
@@ -2815,6 +2813,61 @@ async fn text_search_relevance_fun(api: &mut dyn TestApi) -> crate::Result<()> {
     assert_eq!(res.next().unwrap()["relevance"], Value::float(0.06079271));
     assert_eq!(res.next().unwrap()["relevance"], Value::float(0.0));
     assert_eq!(res.next(), None);
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn select_comment(api: &mut dyn TestApi) -> crate::Result<()> {
+    let select = Select::default()
+        .value("foo")
+        .comment("trace_id='5bd66ef5095369c7b0d1f8f4bd33716a', parent_id='c532cb4098ac3dd2'");
+    let res = api.conn().select(select).await?.into_single()?;
+
+    assert_eq!(Value::text("foo"), res[0]);
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn insert_comment(api: &mut dyn TestApi) -> crate::Result<()> {
+    let table = api.create_table("name varchar(255)").await?;
+
+    let query = Insert::single_into(&table).value("name", "Chicken Curry");
+    let insert =
+        Insert::from(query).comment("trace_id='5bd66ef5095369c7b0d1f8f4bd33716a', parent_id='c532cb4098ac3dd2'");
+    api.conn().insert(insert.into()).await?;
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn update_comment(api: &mut dyn TestApi) -> crate::Result<()> {
+    let table = api.create_table("name varchar(255)").await?;
+
+    let insert = Insert::single_into(&table).value("name", "Chicken Curry");
+    api.conn().insert(insert.into()).await?;
+
+    let update = Update::table(&table)
+        .set("name", "Caesar Salad")
+        .comment("trace_id='5bd66ef5095369c7b0d1f8f4bd33716a', parent_id='c532cb4098ac3dd2'");
+    let res = api.conn().update(update.into()).await?;
+
+    assert_eq!(res, 1);
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn delete_comment(api: &mut dyn TestApi) -> crate::Result<()> {
+    let table = api.create_table("name varchar(255)").await?;
+
+    let insert = Insert::single_into(&table).value("name", "Chicken Curry");
+    api.conn().insert(insert.into()).await?;
+
+    let delete =
+        Delete::from_table(&table).comment("trace_id='5bd66ef5095369c7b0d1f8f4bd33716a', parent_id='c532cb4098ac3dd2'");
+    api.conn().delete(delete.into()).await?;
 
     Ok(())
 }

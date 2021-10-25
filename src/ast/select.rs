@@ -1,4 +1,5 @@
 use crate::ast::*;
+use std::borrow::Cow;
 
 /// A builder for a `SELECT` statement.
 #[derive(Debug, PartialEq, Clone, Default)]
@@ -14,6 +15,7 @@ pub struct Select<'a> {
     pub(crate) offset: Option<Value<'a>>,
     pub(crate) joins: Vec<Join<'a>>,
     pub(crate) ctes: Vec<CommonTableExpression<'a>>,
+    pub(crate) comment: Option<Cow<'a, str>>,
 }
 
 impl<'a> From<Select<'a>> for Expression<'a> {
@@ -103,7 +105,7 @@ impl<'a> Select<'a> {
     {
         Select {
             tables: vec![table.into()],
-            ..Default::default()
+            ..Select::default()
         }
     }
 
@@ -553,6 +555,23 @@ impl<'a> Select<'a> {
     /// # }
     pub fn offset(mut self, offset: usize) -> Self {
         self.offset = Some(Value::from(offset));
+        self
+    }
+
+    /// Adds a comment to the select.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
+    /// let query = Select::from_table("users").comment("trace_id='5bd66ef5095369c7b0d1f8f4bd33716a', parent_id='c532cb4098ac3dd2'");
+    /// let (sql, _) = Sqlite::build(query)?;
+    ///
+    /// assert_eq!("SELECT `users`.* FROM `users` /* trace_id='5bd66ef5095369c7b0d1f8f4bd33716a', parent_id='c532cb4098ac3dd2' */", sql);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn comment<C: Into<Cow<'a, str>>>(mut self, comment: C) -> Self {
+        self.comment = Some(comment.into());
         self
     }
 

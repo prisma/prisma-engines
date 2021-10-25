@@ -1,10 +1,12 @@
 use crate::ast::*;
+use std::borrow::Cow;
 
 #[derive(Debug, PartialEq, Clone)]
 /// A builder for a `DELETE` statement.
 pub struct Delete<'a> {
     pub(crate) table: Table<'a>,
     pub(crate) conditions: Option<ConditionTree<'a>>,
+    pub(crate) comment: Option<Cow<'a, str>>,
 }
 
 impl<'a> From<Delete<'a>> for Query<'a> {
@@ -33,7 +35,25 @@ impl<'a> Delete<'a> {
         Self {
             table: table.into(),
             conditions: None,
+            comment: None,
         }
+    }
+
+    /// Adds a comment to the delete.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
+    /// let query = Delete::from_table("users").comment("trace_id='5bd66ef5095369c7b0d1f8f4bd33716a', parent_id='c532cb4098ac3dd2'");
+    /// let (sql, _) = Sqlite::build(query)?;
+    ///
+    /// assert_eq!("DELETE FROM `users` /* trace_id='5bd66ef5095369c7b0d1f8f4bd33716a', parent_id='c532cb4098ac3dd2' */", sql);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn comment<C: Into<Cow<'a, str>>>(mut self, comment: C) -> Self {
+        self.comment = Some(comment.into());
+        self
     }
 
     /// Adds `WHERE` conditions to the query. See

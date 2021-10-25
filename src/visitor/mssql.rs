@@ -450,6 +450,11 @@ impl<'a> Visitor<'a> for Mssql<'a> {
             self.select_generated_keys(returning, table)?;
         }
 
+        if let Some(comment) = insert.comment {
+            self.write(" ")?;
+            self.visit_comment(comment)?;
+        }
+
         Ok(())
     }
 
@@ -1582,6 +1587,18 @@ mod tests {
             .column(("bar", "a"));
 
         let (sql, _) = Mssql::build(query).unwrap();
+        assert_eq!(expected_sql, sql);
+    }
+
+    #[test]
+    fn test_comment_insert() {
+        let expected_sql = "INSERT INTO [users] DEFAULT VALUES /* trace_id='5bd66ef5095369c7b0d1f8f4bd33716a', parent_id='c532cb4098ac3dd2' */";
+        let query = Insert::single_into("users");
+        let insert =
+            Insert::from(query).comment("trace_id='5bd66ef5095369c7b0d1f8f4bd33716a', parent_id='c532cb4098ac3dd2'");
+
+        let (sql, _) = Mssql::build(insert).unwrap();
+
         assert_eq!(expected_sql, sql);
     }
 

@@ -1,4 +1,5 @@
 use crate::ast::*;
+use std::borrow::Cow;
 
 /// A builder for an `UPDATE` statement.
 #[derive(Debug, PartialEq, Clone)]
@@ -7,6 +8,7 @@ pub struct Update<'a> {
     pub(crate) columns: Vec<Column<'a>>,
     pub(crate) values: Vec<Expression<'a>>,
     pub(crate) conditions: Option<ConditionTree<'a>>,
+    pub(crate) comment: Option<Cow<'a, str>>,
 }
 
 impl<'a> From<Update<'a>> for Query<'a> {
@@ -26,6 +28,7 @@ impl<'a> Update<'a> {
             columns: Vec::new(),
             values: Vec::new(),
             conditions: None,
+            comment: None,
         }
     }
 
@@ -57,6 +60,23 @@ impl<'a> Update<'a> {
         self.columns.push(column.into());
         self.values.push(value.into());
 
+        self
+    }
+
+    /// Adds a comment to the update.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
+    /// let query = Update::table("users").set("foo", 10).comment("trace_id='5bd66ef5095369c7b0d1f8f4bd33716a', parent_id='c532cb4098ac3dd2'");
+    /// let (sql, _) = Sqlite::build(query)?;
+    ///
+    /// assert_eq!("UPDATE `users` SET `foo` = ? /* trace_id='5bd66ef5095369c7b0d1f8f4bd33716a', parent_id='c532cb4098ac3dd2' */", sql);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn comment<C: Into<Cow<'a, str>>>(mut self, comment: C) -> Self {
+        self.comment = Some(comment.into());
         self
     }
 

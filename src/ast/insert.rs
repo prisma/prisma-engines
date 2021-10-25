@@ -1,4 +1,5 @@
 use crate::ast::*;
+use std::borrow::Cow;
 
 /// A builder for an `INSERT` statement.
 #[derive(Clone, Debug, PartialEq)]
@@ -8,6 +9,7 @@ pub struct Insert<'a> {
     pub(crate) values: Expression<'a>,
     pub(crate) on_conflict: Option<OnConflict>,
     pub(crate) returning: Option<Vec<Column<'a>>>,
+    pub(crate) comment: Option<Cow<'a, str>>,
 }
 
 /// A builder for an `INSERT` statement for a single row.
@@ -106,6 +108,7 @@ impl<'a> From<SingleRowInsert<'a>> for Insert<'a> {
             values,
             on_conflict: None,
             returning: None,
+            comment: None,
         }
     }
 }
@@ -120,6 +123,7 @@ impl<'a> From<MultiRowInsert<'a>> for Insert<'a> {
             values,
             on_conflict: None,
             returning: None,
+            comment: None,
         }
     }
 }
@@ -207,12 +211,31 @@ impl<'a> Insert<'a> {
             values: expression.into(),
             on_conflict: None,
             returning: None,
+            comment: None,
         }
     }
 
     /// Sets the conflict resolution strategy.
     pub fn on_conflict(mut self, on_conflict: OnConflict) -> Self {
         self.on_conflict = Some(on_conflict);
+        self
+    }
+
+    /// Adds a comment to the insert.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
+    /// let query = Insert::single_into("users");
+    /// let insert = Insert::from(query).comment("trace_id='5bd66ef5095369c7b0d1f8f4bd33716a', parent_id='c532cb4098ac3dd2'");
+    /// let (sql, _) = Sqlite::build(insert)?;
+    ///
+    /// assert_eq!("INSERT INTO `users` DEFAULT VALUES /* trace_id='5bd66ef5095369c7b0d1f8f4bd33716a', parent_id='c532cb4098ac3dd2' */", sql);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn comment<C: Into<Cow<'a, str>>>(mut self, comment: C) -> Self {
+        self.comment = Some(comment.into());
         self
     }
 

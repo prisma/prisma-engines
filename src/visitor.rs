@@ -25,7 +25,7 @@ pub use self::postgres::Postgres;
 pub use self::sqlite::Sqlite;
 
 use crate::ast::*;
-use std::fmt;
+use std::{borrow::Cow, fmt};
 
 pub type Result = crate::Result<()>;
 
@@ -275,6 +275,11 @@ pub trait Visitor<'a> {
             self.visit_columns(select.columns)?;
         }
 
+        if let Some(comment) = select.comment {
+            self.write(" ")?;
+            self.visit_comment(comment)?;
+        }
+
         Ok(())
     }
 
@@ -304,6 +309,11 @@ pub trait Visitor<'a> {
             self.visit_conditions(conditions)?;
         }
 
+        if let Some(comment) = update.comment {
+            self.write(" ")?;
+            self.visit_comment(comment)?;
+        }
+
         Ok(())
     }
 
@@ -315,6 +325,11 @@ pub trait Visitor<'a> {
         if let Some(conditions) = delete.conditions {
             self.write(" WHERE ")?;
             self.visit_conditions(conditions)?;
+        }
+
+        if let Some(comment) = delete.comment {
+            self.write(" ")?;
+            self.visit_comment(comment)?;
         }
 
         Ok(())
@@ -1084,5 +1099,9 @@ pub trait Visitor<'a> {
 
         let selection = cte.selection;
         self.surround_with("(", ")", |ref mut s| s.visit_selection(selection))
+    }
+
+    fn visit_comment(&mut self, comment: Cow<'a, str>) -> Result {
+        self.surround_with("/* ", " */", |ref mut s| s.write(comment))
     }
 }
