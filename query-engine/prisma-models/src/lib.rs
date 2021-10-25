@@ -12,6 +12,7 @@ mod internal_data_model;
 mod internal_enum;
 mod model;
 mod order_by;
+mod parent_container;
 mod prisma_value_ext;
 mod projections;
 mod record;

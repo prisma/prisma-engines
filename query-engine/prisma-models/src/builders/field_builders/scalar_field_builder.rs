@@ -1,4 +1,4 @@
-use crate::{prelude::*, InternalEnum};
+use crate::{parent_container::ParentContainer, prelude::*, InternalEnum};
 use datamodel::{DefaultValue, FieldArity, NativeTypeInstance};
 use once_cell::sync::OnceCell;
 use std::{fmt::Debug, sync::Arc};
@@ -22,7 +22,7 @@ pub struct ScalarFieldBuilder {
 }
 
 impl ScalarFieldBuilder {
-    pub fn build(self, model: ModelWeakRef) -> ScalarFieldRef {
+    pub fn build(self, container: ParentContainer) -> ScalarFieldRef {
         let scalar = ScalarField {
             name: self.name,
             type_identifier: self.type_identifier,
@@ -39,7 +39,7 @@ impl ScalarFieldBuilder {
             db_name: self.db_name,
             default_value: self.default_value,
             native_type: self.native_type,
-            model,
+            container,
         };
 
         Arc::new(scalar)

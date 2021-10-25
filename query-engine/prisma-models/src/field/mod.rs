@@ -6,7 +6,7 @@ pub use composite::*;
 pub use relation::*;
 pub use scalar::*;
 
-use crate::prelude::*;
+// use crate::prelude::*;
 use datamodel::ScalarType;
 use std::{hash::Hash, sync::Arc};
 
@@ -73,13 +73,13 @@ impl Field {
         }
     }
 
-    pub fn model(&self) -> ModelRef {
-        match self {
-            Self::Scalar(sf) => sf.model(),
-            Self::Relation(rf) => rf.model(),
-            // Self::Composite(cf) => cf.model(),
-        }
-    }
+    // pub fn model(&self) -> ModelRef {
+    //     match self {
+    //         Self::Scalar(sf) => sf.model(),
+    //         Self::Relation(rf) => rf.model(),
+    //         // Self::Composite(cf) => cf.model(),
+    //     }
+    // }
 
     pub fn scalar_fields(&self) -> Vec<ScalarFieldRef> {
         match self {

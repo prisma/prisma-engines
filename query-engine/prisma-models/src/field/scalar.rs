@@ -1,4 +1,4 @@
-use crate::{prelude::*, InternalEnum};
+use crate::{parent_container::ParentContainer, prelude::*, InternalEnum};
 use datamodel::{DefaultValue, FieldArity, NativeTypeInstance};
 use once_cell::sync::OnceCell;
 use std::{
@@ -25,20 +25,24 @@ pub struct ScalarField {
     pub default_value: Option<DefaultValue>,
     pub native_type: Option<NativeTypeInstance>,
 
-    pub model: ModelWeakRef,
+    pub container: ParentContainer,
     pub(crate) is_unique: bool,
     pub(crate) read_only: OnceCell<bool>,
 }
 
 impl ScalarField {
-    pub fn model(&self) -> ModelRef {
-        self.model
-            .upgrade()
-            .expect("Model does not exist anymore. Parent model got deleted without deleting the child.")
-    }
+    // pub fn container(&self) -> &ParentContainer {
+    //     &self.container
+    // }
+
+    // pub fn model(&self) -> ModelRef {
+    //     self.model
+    //         .upgrade()
+    //         .expect("Model does not exist anymore. Parent model got deleted without deleting the child.")
+    // }
 
     pub fn internal_data_model(&self) -> InternalDataModelRef {
-        self.model().internal_data_model()
+        self.container.internal_data_model()
     }
 
     pub fn is_id(&self) -> bool {
@@ -109,7 +113,7 @@ impl Hash for ScalarField {
         self.internal_enum.hash(state);
         self.behaviour.hash(state);
         self.is_unique.hash(state);
-        self.model().hash(state);
+        self.container.hash(state);
         self.arity.hash(state);
         self.db_name.hash(state);
     }
@@ -127,7 +131,7 @@ impl PartialEq for ScalarField {
             && self.behaviour == other.behaviour
             && self.default_value == other.default_value
             && self.is_unique == other.is_unique
-            && self.model() == other.model()
+            && self.container == other.container
             && self.arity == other.arity
             && self.db_name == other.db_name
     }

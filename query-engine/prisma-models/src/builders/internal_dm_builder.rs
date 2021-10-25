@@ -3,14 +3,14 @@ use super::{
     PrimaryKeyBuilder,
 };
 use crate::{
-    builders::ScalarFieldBuilder, extensions::*, CompositeTypeRef, IndexType, InlineRelation, InternalDataModel,
-    InternalDataModelRef, InternalEnum, InternalEnumValue, RelationLinkManifestation, RelationSide, RelationTable,
-    TypeIdentifier,
+    builders::ScalarFieldBuilder, extensions::*, CompositeType, CompositeTypeRef, IndexType, InlineRelation,
+    InternalDataModel, InternalDataModelRef, InternalEnum, InternalEnumValue, RelationLinkManifestation, RelationSide,
+    RelationTable, TypeIdentifier,
 };
 use datamodel::{dml, Datamodel, Ignorable, WithDatabaseName};
 use itertools::Itertools;
 use once_cell::sync::OnceCell;
-use std::sync::Arc;
+use std::{collections::HashMap, sync::Arc};
 
 #[derive(Debug, Default)]
 pub struct InternalDataModelBuilder {
@@ -39,8 +39,6 @@ impl InternalDataModelBuilder {
             enums: self.enums.into_iter().map(Arc::new).collect(),
         });
 
-        // let composite_types = self.composite_types.into_iter().map(|builder| builder.build());
-
         let models = self
             .models
             .into_iter()
@@ -64,6 +62,7 @@ impl InternalDataModelBuilder {
 impl From<&dml::Datamodel> for InternalDataModelBuilder {
     fn from(datamodel: &dml::Datamodel) -> Self {
         let relation_placeholders = relation_placeholders(datamodel);
+        let composite_types = convert_composite_types(datamodel);
 
         Self {
             models: model_builders(datamodel, &relation_placeholders),
@@ -162,25 +161,6 @@ fn relation_builders(placeholders: &[RelationPlaceholder]) -> Vec<RelationBuilde
         .collect()
 }
 
-fn convert_enums(datamodel: &Datamodel) -> Vec<InternalEnum> {
-    datamodel
-        .enums()
-        .map(|e| InternalEnum {
-            name: e.name.clone(),
-            values: convert_enum_values(e),
-        })
-        .collect()
-}
-
-fn convert_enum_values(enm: &dml::Enum) -> Vec<InternalEnumValue> {
-    enm.values()
-        .map(|enum_value| InternalEnumValue {
-            name: enum_value.name.clone(),
-            database_name: enum_value.database_name.clone(),
-        })
-        .collect()
-}
-
 fn index_builders(model: &dml::Model) -> Vec<IndexBuilder> {
     model
         .indices
@@ -202,6 +182,57 @@ fn pk_builder(model: &dml::Model) -> Option<PrimaryKeyBuilder> {
         fields: pk.fields.to_owned(),
         alias: pk.name.to_owned(),
     })
+}
+
+fn composite_type_builders(datamodel: &Datamodel) -> Vec<CompositeTypeBuilder> {
+    todo!()
+}
+
+fn convert_enums(datamodel: &Datamodel) -> Vec<InternalEnum> {
+    datamodel
+        .enums()
+        .map(|e| InternalEnum {
+            name: e.name.clone(),
+            values: convert_enum_values(e),
+        })
+        .collect()
+}
+
+fn convert_enum_values(enm: &dml::Enum) -> Vec<InternalEnumValue> {
+    enm.values()
+        .map(|enum_value| InternalEnumValue {
+            name: enum_value.name.clone(),
+            database_name: enum_value.database_name.clone(),
+        })
+        .collect()
+}
+
+fn convert_composite_types(datamodel: &Datamodel) -> Vec<CompositeTypeRef> {
+    // First pass: Create all composite type arcs and
+    // let mut fields = HashMap::new();
+
+    // let composites: Vec<_> = datamodel
+    //     .composite_types
+    //     .iter()
+    //     .map(|ct| {
+    //         fields.insert(ct.name.clone(), ct.fields.clone());
+
+    //         Arc::new(CompositeType {
+    //             name: ct.name.clone(),
+    //             fields: OnceCell::new(),
+    //         })
+    //     })
+    //     .collect();
+
+    // for composite in composites.iter() {
+    //     let fields = fields.get(&composite.name);
+
+    //     field_builders(datamodel)
+    // }
+
+    // composites.first().unwrap().fields.set();
+
+    todo!()
 }
 
 /// Calculates placeholders that are used to compute builders dependent on some relation information being present already.

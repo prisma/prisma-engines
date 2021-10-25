@@ -6,7 +6,7 @@ pub use composite_field_builder::*;
 pub use relation_field_builder::*;
 pub use scalar_field_builder::*;
 
-use crate::{CompositeTypeRef, Field, ModelWeakRef};
+use crate::{parent_container::ParentContainer, CompositeTypeRef, Field};
 
 #[derive(Debug)]
 pub enum FieldBuilder {
@@ -16,10 +16,10 @@ pub enum FieldBuilder {
 }
 
 impl FieldBuilder {
-    pub fn build(self, model: ModelWeakRef, _composite_types: &[CompositeTypeRef]) -> Field {
+    pub fn build(self, container: ParentContainer, _composite_types: &[CompositeTypeRef]) -> Field {
         match self {
-            FieldBuilder::Scalar(st) => Field::Scalar(st.build(model)),
-            FieldBuilder::Relation(rt) => Field::Relation(rt.build(model)),
+            FieldBuilder::Scalar(st) => Field::Scalar(st.build(container)),
+            FieldBuilder::Relation(rt) => Field::Relation(rt.build(container.as_model_weak().unwrap())), // Relations are only possible between models.
             FieldBuilder::Composite(_ct) => todo!(), // Field::Composite(ct.build(model, composite_types)),
         }
     }
