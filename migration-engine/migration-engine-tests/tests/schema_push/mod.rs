@@ -367,7 +367,7 @@ fn duplicate_constraint_names_across_models_work_on_mysql(api: TestApi) {
     api.schema_push_w_datasource(plain_dm).send().assert_green();
 }
 
-#[test_connector(tags(Mysql))]
+#[test_connector(tags(Mysql8))]
 fn binary_uuid_default_value(api: TestApi) {
     let dm = r#"
       model Test {
