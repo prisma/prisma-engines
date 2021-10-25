@@ -124,7 +124,7 @@ impl Statistics {
 
             let (sanitized_name, database_name) = match sanitize_string(&field_name) {
                 Some(sanitized) => (sanitized, Some(field_name)),
-                None if field_name == "id" => ("renamedId".to_string(), Some(field_name)),
+                None if field_name == "id" => ("id_".to_string(), Some(field_name)),
                 None => (field_name, None),
             };
 
@@ -188,7 +188,7 @@ impl Statistics {
         let name = Name::Model(format!("{}_{}", model, field).to_case(Case::Pascal));
 
         let name = if self.models.contains_key(&name) {
-            format!("{}Rename", name)
+            format!("{}_", name)
         } else {
             name.take()
         };

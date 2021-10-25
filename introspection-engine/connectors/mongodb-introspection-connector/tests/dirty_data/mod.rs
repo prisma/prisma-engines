@@ -15,8 +15,8 @@ fn explicit_id_field() {
 
     let expected = expect![[r#"
         model A {
-          id        String @id @default(dbgenerated()) @map("_id") @db.ObjectId
-          renamedId Int    @map("id")
+          id  String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id_ Int    @map("id")
         }
     "#]];
 

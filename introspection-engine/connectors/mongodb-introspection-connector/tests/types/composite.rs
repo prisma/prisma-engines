@@ -369,14 +369,14 @@ fn name_clashes() {
     });
 
     let expected = expect![[r#"
-        type CatAddressRename {
+        type CatAddress_ {
           number Int
           street String
         }
 
         model Cat {
-          id      String           @id @default(dbgenerated()) @map("_id") @db.ObjectId
-          address CatAddressRename
+          id      String      @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          address CatAddress_
           name    String
         }
 
