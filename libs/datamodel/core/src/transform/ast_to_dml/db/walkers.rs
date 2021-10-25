@@ -37,6 +37,13 @@ impl<'ast> ParserDatabase<'ast> {
         CompositeTypeWalker { ctid, db: self }
     }
 
+    pub(crate) fn walk_composite_types(&self) -> impl Iterator<Item = CompositeTypeWalker<'ast, '_>> + '_ {
+        self.ast()
+            .iter_tops()
+            .filter_map(|(top_id, _)| top_id.as_composite_type_id())
+            .map(move |ctid| CompositeTypeWalker { ctid, db: self })
+    }
+
     /// Iterate all complete relations that are not many to many and are
     /// correctly defined from both sides.
     #[track_caller]

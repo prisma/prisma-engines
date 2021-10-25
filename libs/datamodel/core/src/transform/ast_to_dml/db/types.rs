@@ -1,11 +1,13 @@
-use super::context::Context;
-use crate::{ast, diagnostics::DatamodelError};
+use super::{context::Context, walkers::CompositeTypeFieldWalker};
+use crate::{ast, diagnostics::DatamodelError, transform::ast_to_dml::db::walkers::CompositeTypeWalker};
 use itertools::Itertools;
 use once_cell::sync::Lazy;
 use regex::Regex;
 use std::{
     borrow::Cow,
     collections::{BTreeMap, HashMap},
+    fmt,
+    rc::Rc,
     str::FromStr,
 };
 
@@ -22,6 +24,7 @@ pub(super) fn resolve_types(ctx: &mut Context<'_>) {
     }
 
     detect_alias_cycles(ctx);
+    detect_composite_cycles(ctx);
 }
 
 #[derive(Debug, Default)]
@@ -238,6 +241,122 @@ fn visit_model<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::Model, ctx: &
                 ast_field.field_type.span(),
             )),
         }
+    }
+}
+
+struct CompositeTypePath<'ast, 'db> {
+    previous: Option<Rc<CompositeTypePath<'ast, 'db>>>,
+    current: CompositeTypeWalker<'ast, 'db>,
+}
+
+impl<'ast, 'db> CompositeTypePath<'ast, 'db> {
+    fn root(current: CompositeTypeWalker<'ast, 'db>) -> Self {
+        Self {
+            previous: None,
+            current,
+        }
+    }
+
+    fn link(self: &Rc<Self>, current: CompositeTypeWalker<'ast, 'db>) -> Self {
+        Self {
+            previous: Some(self.clone()),
+            current,
+        }
+    }
+}
+
+impl<'ast, 'db> fmt::Display for CompositeTypePath<'ast, 'db> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut traversed = vec![self.current];
+        let mut this = self;
+
+        while let Some(next) = this.previous.as_ref() {
+            traversed.push(next.current);
+            this = next;
+        }
+
+        let path = traversed
+            .into_iter()
+            .map(|w| w.name())
+            .map(|n| format!("`{}`", n))
+            .join(" → ");
+
+        f.write_str(&path)
+    }
+}
+
+/// Detect compound type chains that form a cycle, that is not broken with either an optional or an
+/// array type.
+fn detect_composite_cycles(ctx: &mut Context<'_>) {
+    let mut visited: Vec<ast::CompositeTypeId> = Vec::new();
+    let mut errors: Vec<(ast::CompositeTypeId, DatamodelError)> = Vec::new();
+
+    let mut fields_to_traverse: Vec<(CompositeTypeFieldWalker<'_, '_>, Option<Rc<CompositeTypePath<'_, '_>>>)> = ctx
+        .db
+        .walk_composite_types()
+        .flat_map(|ct| ct.fields())
+        .filter(|f| f.arity().is_required())
+        .map(|f| (f, None))
+        .collect();
+
+    while let Some((field, path)) = fields_to_traverse.pop() {
+        let path = match path {
+            Some(path) => path,
+            None => {
+                visited.clear();
+                Rc::new(CompositeTypePath::root(field.composite_type()))
+            }
+        };
+
+        match field.r#type() {
+            ScalarFieldType::CompositeType(ctid) if field.composite_type().composite_type_id() == *ctid => {
+                let msg = "The type is the same as the parent and causes an endless cycle. Please change the field to be either optional or a list.";
+                errors.push((
+                    *ctid,
+                    DatamodelError::new_composite_type_field_validation_error(
+                        msg,
+                        field.composite_type().name(),
+                        field.name(),
+                        field.ast_field().span,
+                    ),
+                ));
+            }
+            ScalarFieldType::CompositeType(ctid) if visited.first() == Some(ctid) => {
+                let msg = format!(
+                    "The types cause an endless cycle in the path {}. Please change one of the fields to be either optional or a list to break the cycle.",
+                    path,
+                );
+
+                errors.push((
+                    *ctid,
+                    DatamodelError::new_composite_type_field_validation_error(
+                        &msg,
+                        field.composite_type().name(),
+                        field.name(),
+                        field.ast_field().span,
+                    ),
+                ));
+            }
+            ScalarFieldType::CompositeType(ctid) => {
+                visited.push(*ctid);
+
+                for field in ctx
+                    .db
+                    .walk_composite_type(*ctid)
+                    .fields()
+                    .filter(|f| f.arity().is_required())
+                {
+                    let path = Rc::new(path.link(field.composite_type()));
+                    fields_to_traverse.push((field, Some(path)));
+                }
+            }
+            _ => (),
+        }
+    }
+
+    errors.sort_by_key(|(id, _err)| *id);
+    for (_, error) in errors {
+        ctx.push_error(error);
     }
 }
 
