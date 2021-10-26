@@ -13,7 +13,6 @@ fn should_not_remove_whitespace() {
 
     let schema = parse(dml);
     let user_model = schema.assert_has_model("User");
-    user_model.assert_is_embedded(false);
     user_model
         .assert_has_scalar_field("firstName")
         .assert_base_type(&ScalarType::String)
@@ -33,7 +32,6 @@ fn should_not_try_to_interpret_comments_in_strings() {
 
     let schema = parse(dml);
     let user_model = schema.assert_has_model("User");
-    user_model.assert_is_embedded(false);
     user_model
         .assert_has_scalar_field("firstName")
         .assert_base_type(&ScalarType::String)

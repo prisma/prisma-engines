@@ -15,8 +15,6 @@ pub struct Model {
     pub documentation: Option<String>,
     /// The database internal name of this model.
     pub database_name: Option<String>,
-    /// Indicates if this model is embedded or not.
-    pub is_embedded: bool,
     /// Describes Composite Indexes
     pub indices: Vec<IndexDefinition>,
     /// Describes the Primary Keys
@@ -82,7 +80,6 @@ impl Model {
             primary_key: None,
             documentation: None,
             database_name,
-            is_embedded: false,
             is_generated: false,
             is_commented_out: false,
             is_ignored: false,
