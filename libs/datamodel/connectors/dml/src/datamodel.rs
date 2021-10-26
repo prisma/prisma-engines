@@ -1,9 +1,10 @@
+use crate::composite_type::CompositeType;
 use crate::field::{Field, RelationField, ScalarField};
 use crate::model::Model;
 use crate::r#enum::Enum;
 use crate::relation_info::RelationInfo;
 
-/// Entities in the datamodel can be flagged as `is_commented_out`. This let's the renderer
+/// Entities in the datamodel can be flagged as `is_commented_out`. This lets the renderer
 /// know that introspection encountered unsupported names or features and these are supposed
 /// to be rendered as comments. Since the parser will not set these flags when reading a schema
 /// string, only introspection and the lowering of the datamodel to the ast care about these flags.
@@ -13,6 +14,7 @@ use crate::relation_info::RelationInfo;
 pub struct Datamodel {
     pub enums: Vec<Enum>,
     pub models: Vec<Model>,
+    pub composite_types: Vec<CompositeType>,
 }
 
 impl Datamodel {
@@ -84,6 +86,7 @@ impl Datamodel {
     }
 
     /// Finds a mutable relation field reference by a model and field name.
+    #[track_caller]
     pub fn find_relation_field_mut(&mut self, model: &str, field: &str) -> &mut RelationField {
         self.find_model_mut(model).find_relation_field_mut(field)
     }

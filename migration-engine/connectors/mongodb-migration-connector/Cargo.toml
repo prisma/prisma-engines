@@ -8,5 +8,5 @@ version = "0.1.0"
 migration-connector = { path = "../migration-connector" }
 
 async-trait = "0.1.17"
-mongodb = "2.0.0"
+mongodb = "2.0.1"
 url = "2.1.1"

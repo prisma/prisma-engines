@@ -116,8 +116,7 @@ pub fn schema_with_relation(
         FULL_ID_OPTIONS.to_vec()
     };
 
-    // TODO: Remove if we're sure we don't ever wanna keep the simple mode
-    let simple = false;
+    let simple = std::env::var("SIMPLE_TEST_MODE").is_ok();
     let mut datamodels: Vec<DatamodelWithParams> = vec![];
     let mut required_capabilities: Vec<Vec<ConnectorCapability>> = vec![];
 
@@ -171,10 +170,10 @@ pub fn schema_with_relation(
                                     {parent_field}
                                     non_unique    String?
                                     {parent_id}
-                
+
                                     @@unique([p_1, p_2])
                                 }}
-                
+
                                 model Child {{
                                     c              String    @unique
                                     c_1            String
@@ -182,7 +181,7 @@ pub fn schema_with_relation(
                                     {child_field}
                                     non_unique     String?
                                     {child_id}
-                
+
                                     @@unique([c_1, c_2])
                                 }}
                             ",

@@ -9,7 +9,7 @@ pub trait SelectDefinition {
         self,
         _: &ModelRef,
         aggr_selections: &[RelAggregationSelection],
-    ) -> (Select<'static>, Vec<Column<'static>>);
+    ) -> (Select<'static>, Vec<Expression<'static>>);
 }
 
 impl SelectDefinition for Filter {
@@ -17,7 +17,7 @@ impl SelectDefinition for Filter {
         self,
         model: &ModelRef,
         aggr_selections: &[RelAggregationSelection],
-    ) -> (Select<'static>, Vec<Column<'static>>) {
+    ) -> (Select<'static>, Vec<Expression<'static>>) {
         let args = QueryArguments::from((model.clone(), self));
         args.into_select(model, aggr_selections)
     }
@@ -28,13 +28,13 @@ impl SelectDefinition for &Filter {
         self,
         model: &ModelRef,
         aggr_selections: &[RelAggregationSelection],
-    ) -> (Select<'static>, Vec<Column<'static>>) {
+    ) -> (Select<'static>, Vec<Expression<'static>>) {
         self.clone().into_select(model, aggr_selections)
     }
 }
 
 impl SelectDefinition for Select<'static> {
-    fn into_select(self, _: &ModelRef, _: &[RelAggregationSelection]) -> (Select<'static>, Vec<Column<'static>>) {
+    fn into_select(self, _: &ModelRef, _: &[RelAggregationSelection]) -> (Select<'static>, Vec<Expression<'static>>) {
         (self, vec![])
     }
 }
@@ -45,9 +45,9 @@ impl SelectDefinition for QueryArguments {
         self,
         model: &ModelRef,
         aggr_selections: &[RelAggregationSelection],
-    ) -> (Select<'static>, Vec<Column<'static>>) {
-        let (orderings, ordering_joins) = ordering::build(&self, &model);
-        let (table_opt, cursor_condition) = cursor_condition::build(&self, &model, &ordering_joins);
+    ) -> (Select<'static>, Vec<Expression<'static>>) {
+        let order_by_definitions = ordering::build(&self, &model);
+        let (table_opt, cursor_condition) = cursor_condition::build(&self, &model, &order_by_definitions);
         let aggregation_joins = nested_aggregations::build(aggr_selections);
 
         let limit = if self.ignore_take { None } else { self.take_abs() };
@@ -65,10 +65,10 @@ impl SelectDefinition for QueryArguments {
         };
 
         // Add joins necessary to the ordering
-        let joined_table = ordering_joins
-            .into_iter()
-            .flat_map(|j| j.joins)
-            .fold(model.as_table(), |acc, join| acc.left_join(join.data));
+        let joined_table = order_by_definitions
+            .iter()
+            .flat_map(|j| &j.joins)
+            .fold(model.as_table(), |acc, join| acc.left_join(join.clone().data));
 
         // Add joins necessary to the nested aggregations
         let joined_table = aggregation_joins
@@ -86,7 +86,9 @@ impl SelectDefinition for QueryArguments {
             select_ast
         };
 
-        let select_ast = orderings.into_iter().fold(select_ast, |acc, ord| acc.order_by(ord));
+        let select_ast = order_by_definitions
+            .iter()
+            .fold(select_ast, |acc, o| acc.order_by(o.order_definition.clone()));
 
         match limit {
             Some(limit) => (select_ast.limit(limit as usize), aggregation_joins.columns),
@@ -105,10 +107,12 @@ pub fn get_records<T>(
 where
     T: SelectDefinition,
 {
-    let (select, aggr_columns) = query.into_select(model, aggr_selections);
+    let (select, additional_selection_set) = query.into_select(model, aggr_selections);
     let select = columns.fold(select, |acc, col| acc.column(col));
 
-    aggr_columns.into_iter().fold(select, |acc, col| acc.column(col))
+    additional_selection_set
+        .into_iter()
+        .fold(select, |acc, col| acc.value(col))
 }
 
 /// Generates a query of the form:

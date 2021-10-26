@@ -2,6 +2,7 @@ mod mssql;
 mod mysql;
 
 use barrel::{functions, types};
+use expect_test::expect;
 use indoc::{formatdoc, indoc};
 use introspection_engine_tests::test_api::*;
 use quaint::prelude::Queryable;
@@ -472,7 +473,7 @@ async fn default_values(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(Cockroach))]
+#[test_connector(tags(Postgres), exclude(Cockroach, Postgres14))]
 async fn pg_default_value_as_dbgenerated(api: &TestApi) -> TestResult {
     let sequence = "CREATE SEQUENCE test_seq START 1".to_string();
     api.database().execute_raw(&sequence, &[]).await?;
@@ -491,7 +492,7 @@ async fn pg_default_value_as_dbgenerated(api: &TestApi) -> TestResult {
         })
         .await?;
 
-    let dm = indoc! {r#"
+    let expected = expect![[r#"
         model Test {
           id              Int       @id @default(autoincrement())
           string_function String?   @default(dbgenerated("(('  '::text || '>'::text) || ' '::text)"))
@@ -500,10 +501,46 @@ async fn pg_default_value_as_dbgenerated(api: &TestApi) -> TestResult {
           int_sequence    Int?      @default(autoincrement())
           datetime_now    DateTime? @default(now()) @db.Timestamp(6)
           datetime_now_lc DateTime? @default(now()) @db.Timestamp(6)
-          }
-    "#};
+        }
+    "#]];
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    expected.assert_eq(&api.introspect_dml().await?);
+
+    Ok(())
+}
+
+#[test_connector(tags(Postgres14))]
+async fn pg14_default_value_as_dbgenerated(api: &TestApi) -> TestResult {
+    let sequence = "CREATE SEQUENCE test_seq START 1".to_string();
+    api.database().execute_raw(&sequence, &[]).await?;
+
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("Test", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("string_function text Default E'  ' || '>' || ' '");
+                t.inject_custom("int_serial Serial4");
+                t.inject_custom("int_function Integer DEFAULT EXTRACT(year from TIMESTAMP '2001-02-16 20:38:40')");
+                t.inject_custom("int_sequence Integer DEFAULT nextval('test_seq')");
+                t.inject_custom("datetime_now TIMESTAMP DEFAULT NOW()");
+                t.inject_custom("datetime_now_lc TIMESTAMP DEFAULT now()");
+            });
+        })
+        .await?;
+
+    let expected = expect![[r#"
+        model Test {
+          id              Int       @id @default(autoincrement())
+          string_function String?   @default(dbgenerated("(('  '::text || '>'::text) || ' '::text)"))
+          int_serial      Int       @default(autoincrement())
+          int_function    Int?      @default(dbgenerated("EXTRACT(year FROM '2001-02-16 20:38:40'::timestamp without time zone)"))
+          int_sequence    Int?      @default(autoincrement())
+          datetime_now    DateTime? @default(now()) @db.Timestamp(6)
+          datetime_now_lc DateTime? @default(now()) @db.Timestamp(6)
+        }
+    "#]];
+
+    expected.assert_eq(&api.introspect_dml().await?);
 
     Ok(())
 }
@@ -940,6 +977,8 @@ async fn unique_and_id_on_same_field_works_mssql(api: &TestApi) -> TestResult {
 // is both unique and primary. We only render it as @id then.
 // If a later alter table statement adds another unique constraint then it is persisted as its own
 // entity and can be introspected.
+// In CockroachDB, index OIDs are statically hashed. However, the ordering means that either index
+// can be returned. As such, the test is skipped. See https://github.com/cockroachdb/cockroach/issues/71098.
 async fn unique_and_index_on_same_field_works_postgres(api: &TestApi) -> TestResult {
     api.raw_cmd(
         "
@@ -971,45 +1010,6 @@ async fn unique_and_index_on_same_field_works_postgres(api: &TestApi) -> TestRes
 
     let result = api.introspect_dml().await?;
     expectation.assert_eq(&result);
-
-    Ok(())
-}
-
-#[test_connector(tags(Cockroach))]
-// In CockroachDB, index OIDs are statically hashed. However, the ordering means that either index
-// can be returned. Ensure we return one of the expected values.
-async fn unique_and_index_on_same_field_works_cockroach(api: &TestApi) -> TestResult {
-    api.raw_cmd(
-        "
-        CREATE TABLE users (
-            id Integer primary key not null,
-            CONSTRAINT really_must_be_different UNIQUE (id),
-            CONSTRAINT must_be_different UNIQUE (id)
-        );",
-    )
-    .await;
-
-    let expected_a = expect![[r#"
-        model users {
-          id Int @id @unique(map: "really_must_be_different")
-        }
-    "#]];
-    let expected_b = expect![[r#"
-        model users {
-          id Int @id @unique(map: "must_be_different")
-        }
-    "#]];
-
-    let result = api.introspect_dml().await?;
-
-    let expected = if result.eq(expected_a.data) {
-        expected_a
-    } else {
-        expected_b
-    };
-
-    let result = api.introspect_dml().await?;
-    expected.assert_eq(&result);
 
     Ok(())
 }

@@ -123,6 +123,7 @@ mod tests {
                         is_ignored: false,
                     },
                 ],
+                composite_types: [],
             }
         "#]];
 
@@ -166,6 +167,7 @@ mod tests {
     #[test]
     fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
         let ref_data_model = Datamodel {
+            composite_types: Vec::new(),
             models: vec![
                 // Model with auto-incrementing primary key
                 Model {
@@ -359,6 +361,7 @@ mod tests {
     #[test]
     fn uniqueness_is_preserved_when_generating_data_model_from_a_schema() {
         let ref_data_model = Datamodel {
+            composite_types: Vec::new(),
             models: vec![Model {
                 database_name: None,
                 name: "Table1".to_string(),
@@ -432,6 +435,7 @@ mod tests {
     #[test]
     fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
         let expected_data_model = Datamodel {
+            composite_types: Vec::new(),
             models: vec![
                 Model {
                     database_name: None,
@@ -699,6 +703,7 @@ mod tests {
     #[test]
     fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() {
         let ref_data_model = Datamodel {
+            composite_types: Vec::new(),
             models: vec![Model {
                 database_name: None,
                 name: "User".to_string(),
@@ -831,6 +836,7 @@ mod tests {
     #[test]
     fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
         let ref_data_model = Datamodel {
+            composite_types: Vec::new(),
             models: vec![
                 Model {
                     database_name: None,
@@ -1059,6 +1065,7 @@ mod tests {
     #[test]
     fn enums_are_preserved_when_generating_data_model_from_a_schema() {
         let ref_data_model = Datamodel {
+            composite_types: Vec::new(),
             models: vec![],
             enums: vec![dml::Enum {
                 name: "Enum".to_string(),

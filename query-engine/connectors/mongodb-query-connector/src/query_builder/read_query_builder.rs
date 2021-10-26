@@ -163,7 +163,7 @@ impl MongoReadQueryBuilder {
         let query = match args.filter {
             Some(filter) => {
                 // If a filter comes with joins, it needs to be run _after_ the initial filter query / $matches.
-                let (filter, filter_joins) = convert_filter(filter, false)?.render();
+                let (filter, filter_joins) = convert_filter(filter, false, false)?.render();
                 if !filter_joins.is_empty() {
                     joins.extend(filter_joins);
                     post_filters.push(filter);
@@ -260,14 +260,17 @@ impl MongoReadQueryBuilder {
         // Joins ($lookup)
         let joins = self.joins.into_iter().chain(self.order_joins);
 
-        stages.extend(joins.flat_map(|nested_stage| {
+        let mut unwinds: Vec<Document> = vec![];
+
+        for nested_stage in joins {
             let (join, unwind) = nested_stage.build();
 
-            match unwind {
-                Some(unwind) => vec![join, unwind],
-                None => vec![join],
+            if let Some(u) = unwind {
+                unwinds.push(u);
             }
-        }));
+
+            stages.push(join);
+        }
 
         // Post-join $matches
         stages.extend(self.join_filters.into_iter().map(|filter| doc! { "$match": filter }));
@@ -287,6 +290,11 @@ impl MongoReadQueryBuilder {
                     .map(|filter| doc! { "$match": filter }),
             );
         }
+
+        // Join's $unwind placed before sorting
+        // because Mongo does not support sorting multiple arrays
+        // https://jira.mongodb.org/browse/SERVER-32859
+        stages.extend(unwinds);
 
         // $sort
         if let Some(order) = self.order {
@@ -357,13 +365,10 @@ impl MongoReadQueryBuilder {
             .order_joins
             .clone()
             .into_iter()
-            .flat_map(|nested_stage| {
-                let (join, unwind) = nested_stage.build();
+            .map(|nested_stage| {
+                let (join, _) = nested_stage.build();
 
-                match unwind {
-                    Some(unwind) => vec![join, unwind],
-                    None => vec![join],
-                }
+                join
             })
             .collect_vec();
 
@@ -530,7 +535,7 @@ impl MongoReadQueryBuilder {
     /// Adds aggregation filters based on a having scalar filter.
     pub fn with_having(mut self, having: Option<Filter>) -> crate::Result<Self> {
         if let Some(filter) = having {
-            let (filter_doc, _) = convert_filter(filter, false)?.render();
+            let (filter_doc, _) = convert_filter(filter, false, true)?.render();
             self.aggregation_filters.push(filter_doc);
         }
 

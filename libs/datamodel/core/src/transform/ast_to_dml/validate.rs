@@ -1,15 +1,11 @@
 #![allow(clippy::suspicious_operation_groupings)] // clippy is wrong there
 
-mod names;
-
 use crate::{
-    ast,
-    common::constraint_names::ConstraintNames,
-    configuration,
+    ast, configuration,
     diagnostics::{DatamodelError, Diagnostics},
     dml,
 };
-use names::NamesValidator;
+use datamodel_connector::ConstraintType;
 
 /// Helper for validating a datamodel.
 ///
@@ -21,6 +17,8 @@ pub struct Validator<'a> {
 /// State error message. Seeing this error means something went really wrong internally. It's the datamodel equivalent of a bluescreen.
 const STATE_ERROR: &str = "Failed lookup of model, field or optional property during internal processing. This means that the internal representation was mutated incorrectly.";
 const RELATION_ATTRIBUTE_NAME: &str = "relation";
+const INDEX_ATTRIBUTE_NAME: &str = "index";
+const UNIQUE_ATTRIBUTE_NAME: &str = "unique";
 const RELATION_ATTRIBUTE_NAME_WITH_AT: &str = "@relation";
 const PRISMA_FORMAT_HINT: &str = "You can run `prisma format` to fix this automatically.";
 
@@ -33,50 +31,6 @@ impl<'a> Validator<'a> {
     pub(crate) fn validate(&self, ast: &ast::SchemaAst, schema: &dml::Datamodel, diagnostics: &mut Diagnostics) {
         for model in schema.models() {
             let ast_model = ast.find_model(&model.name).expect(STATE_ERROR);
-
-            //doing this here for now since I want to have all field names already generated
-            // it might be possible to move this
-            if let Some(pk) = &model.primary_key {
-                if let Some(name) = &pk.name {
-                    for field in model.fields() {
-                        if let Some(err) = ConstraintNames::client_name_already_in_use(
-                            name,
-                            field.name(),
-                            &model.name,
-                            ast_model.span,
-                            "@@id",
-                        ) {
-                            diagnostics.push_error(err);
-                        }
-                    }
-                }
-            }
-
-            for index in &model.indices {
-                //doing this here for now since I want to have all field names already generated
-                // it might be possible to move this
-                if let Some(name) = &index.name {
-                    for field in model.fields() {
-                        if let Some(err) = ConstraintNames::client_name_already_in_use(
-                            name,
-                            field.name(),
-                            &model.name,
-                            ast_model.span,
-                            "@@unique",
-                        ) {
-                            diagnostics.push_error(err);
-                        }
-                    }
-                }
-            }
-
-            if let Err(err) = self.validate_model_has_strict_unique_criteria(ast_model, model) {
-                diagnostics.push_error(err);
-            }
-
-            if let Err(err) = self.validate_relations_not_ambiguous(ast, model) {
-                diagnostics.push_error(err);
-            }
 
             if let Err(ref mut the_errors) = self.validate_field_connector_specific(ast_model, model) {
                 diagnostics.append(the_errors)
@@ -95,23 +49,55 @@ impl<'a> Validator<'a> {
     pub(crate) fn post_standardisation_validate(
         &self,
         ast_schema: &ast::SchemaAst,
-        schema: &dml::Datamodel,
+        datamodel: &dml::Datamodel,
         diagnostics: &mut Diagnostics,
     ) {
-        let constraint_names = NamesValidator::new(schema, self.source);
+        let mut diagnostics_2 = self.validate_constraint_names_connector_specific(ast_schema, datamodel);
 
-        for model in schema.models() {
+        diagnostics.append(&mut diagnostics_2);
+        for model in datamodel.models() {
+            let mut new_errors = self.validate_relation_arguments_bla(
+                datamodel,
+                ast_schema.find_model(&model.name).expect(STATE_ERROR),
+                model,
+            );
+
+            diagnostics.append(&mut new_errors);
+        }
+    }
+
+    fn validate_constraint_names_connector_specific(
+        &self,
+        ast_schema: &ast::SchemaAst,
+        datamodel: &dml::Datamodel,
+    ) -> Diagnostics {
+        let mut diagnostics = Diagnostics::new();
+
+        let source = if let Some(source) = self.source {
+            source
+        } else {
+            return diagnostics;
+        };
+
+        let namespace_violations = source.active_connector.get_constraint_namespace_violations(datamodel);
+
+        for model in datamodel.models() {
+            let namespace_violation_scope = |name: &str, tpe: ConstraintType| {
+                namespace_violations
+                    .iter()
+                    .find(|ns| ns.name == name && ns.tpe == tpe && model.name == ns.table)
+                    .map(|ns| ns.scope)
+            };
             let ast_model = ast_schema.find_model(&model.name).expect(STATE_ERROR);
 
             if let Some(pk) = &model.primary_key {
-                if let Some(name) = &pk.db_name {
-                    // Only for SQL Server for now...
-                    if constraint_names.is_duplicate(name) {
+                if let Some(pk_name) = &pk.db_name {
+                    if let Some(scope) = namespace_violation_scope(pk_name, ConstraintType::PrimaryKey) {
                         let span = ast_model.id_attribute().span;
 
                         let message = format!(
-                            "The given constraint name `{}` is already in use in the data model. Please provide a different name using the `map` argument.",
-                            name
+                            "The given constraint name `{}` has to be unique in the following namespace: {}. Please provide a different name using the `map` argument.",
+                            pk_name,scope
                         );
 
                         let error = DatamodelError::new_attribute_validation_error(&message, "id", span);
@@ -121,16 +107,14 @@ impl<'a> Validator<'a> {
                 }
             }
 
-            //TODO(matthias): Extend this check for other constraints. Now only used
-            // for SQL Server default constraint names.
-            for field in model.fields().filter(|f| f.is_scalar_field()) {
-                if let Some(name) = field.default_value().and_then(|d| d.db_name()) {
-                    let ast_field = ast_model.find_field_bang(field.name());
+            for field in model.scalar_fields() {
+                if let Some(df_name) = field.default_value().and_then(|d| d.db_name()) {
+                    let ast_field = ast_model.find_field_bang(&field.name);
 
-                    if constraint_names.is_duplicate(name) {
+                    if let Some(scope) = namespace_violation_scope(df_name, ConstraintType::Default) {
                         let message = format!(
-                            "The given constraint name `{}` is already in use in the data model. Please provide a different name using the `map` argument.",
-                            name
+                            "The given constraint name `{}` has to be unique in the following namespace: {}. Please provide a different name using the `map` argument.",
+                            df_name,scope
                         );
 
                         let span = ast_field.span_for_argument("default", "map").unwrap_or(ast_field.span);
@@ -141,51 +125,57 @@ impl<'a> Validator<'a> {
                 }
             }
 
-            let mut new_errors = self.validate_relation_arguments_bla(
-                schema,
-                ast_schema.find_model(&model.name).expect(STATE_ERROR),
-                model,
-                &constraint_names,
-            );
+            for field in model.relation_fields() {
+                let ast_field = ast_model
+                    .fields
+                    .iter()
+                    .find(|ast_field| ast_field.name.name == field.name);
 
-            diagnostics.append(&mut new_errors);
+                let field_span = ast_field.map(|f| f.span).unwrap_or_else(ast::Span::empty);
+
+                if let Some(fk_name) = field.relation_info.fk_name.as_ref() {
+                    if let Some(scope) = namespace_violation_scope(fk_name, ConstraintType::ForeignKey) {
+                        let span = ast_field
+                            .and_then(|f| f.span_for_argument("relation", "map"))
+                            .unwrap_or(field_span);
+
+                        let message = format!(
+                            "The given constraint name `{}` has to be unique in the following namespace: {}. Please provide a different name using the `map` argument.",
+                            fk_name, scope
+                        );
+
+                        let error =
+                            DatamodelError::new_attribute_validation_error(&message, RELATION_ATTRIBUTE_NAME, span);
+                        diagnostics.push_error(error);
+                    }
+                }
+            }
+
+            for index in &model.indices {
+                if let Some(idx_name) = &index.db_name {
+                    if let Some(scope) = namespace_violation_scope(idx_name, ConstraintType::KeyOrIdx) {
+                        let span = ast_model.span;
+                        let message = format!(
+                            "The given constraint name `{}` has to be unique in the following namespace: {}. Please provide a different name using the `map` argument.",
+                            idx_name, scope
+                        );
+
+                        let error = DatamodelError::new_attribute_validation_error(
+                            &message,
+                            if index.is_unique() {
+                                UNIQUE_ATTRIBUTE_NAME
+                            } else {
+                                INDEX_ATTRIBUTE_NAME
+                            },
+                            span,
+                        );
+                        diagnostics.push_error(error);
+                    }
+                }
+            }
         }
-    }
 
-    fn validate_model_has_strict_unique_criteria(
-        &self,
-        ast_model: &ast::Model,
-        model: &dml::Model,
-    ) -> Result<(), DatamodelError> {
-        let loose_criterias = model.loose_unique_criterias();
-        let suffix = if loose_criterias.is_empty() {
-            "".to_string()
-        } else {
-            let criteria_descriptions: Vec<_> = loose_criterias
-                .iter()
-                .map(|criteria| {
-                    let field_names: Vec<_> = criteria.fields.iter().map(|f| f.name.clone()).collect();
-                    format!("- {}", field_names.join(", "))
-                })
-                .collect();
-            format!(
-                " The following unique criterias were not considered as they contain fields that are not required:\n{}",
-                criteria_descriptions.join("\n")
-            )
-        };
-
-        if model.strict_unique_criterias_disregarding_unsupported().is_empty() && !model.is_ignored {
-            return Err(DatamodelError::new_model_validation_error(
-                &format!(
-                    "Each model must have at least one unique criteria that has only required fields. Either mark a single field with `@id`, `@unique` or add a multi field criterion with `@@id([])` or `@@unique([])` to the model.{suffix}",
-                    suffix = suffix
-                ),
-                &model.name,
-                ast_model.span,
-            ));
-        }
-
-        Ok(())
+        diagnostics
     }
 
     fn validate_field_connector_specific(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {
@@ -325,7 +315,6 @@ impl<'a> Validator<'a> {
         datamodel: &'dml dml::Datamodel,
         ast_model: &ast::Model,
         model: &dml::Model,
-        constraint_names: &NamesValidator<'dml>,
     ) -> Diagnostics {
         let mut errors = Diagnostics::new();
 
@@ -339,23 +328,6 @@ impl<'a> Validator<'a> {
 
             let rel_info = &field.relation_info;
             let related_model = datamodel.find_model(&rel_info.to).expect(STATE_ERROR);
-
-            if let Some(name) = field.relation_info.fk_name.as_ref() {
-                // Only for SQL Server for now...
-                if constraint_names.is_duplicate(name) {
-                    let span = ast_field
-                        .and_then(|f| f.span_for_argument("relation", "map"))
-                        .unwrap_or(field_span);
-
-                    let message = format!(
-                        "The given constraint name `{}` is already in use in the data model. Please provide a different name using the `map` argument.",
-                        name
-                    );
-
-                    let error = DatamodelError::new_attribute_validation_error(&message, RELATION_ATTRIBUTE_NAME, span);
-                    errors.push_error(error);
-                }
-            }
 
             if let Some((_rel_field_idx, related_field)) = datamodel.find_related_field(field) {
                 let related_field_rel_info = &related_field.relation_info;
@@ -581,128 +553,5 @@ impl<'a> Validator<'a> {
         }
 
         errors
-    }
-
-    /// Elegantly checks if any relations in the model are ambigious.
-    fn validate_relations_not_ambiguous(
-        &self,
-        ast_schema: &ast::SchemaAst,
-        model: &dml::Model,
-    ) -> Result<(), DatamodelError> {
-        for field_a in model.relation_fields() {
-            for field_b in model.relation_fields() {
-                if field_a != field_b {
-                    let rel_a = &field_a.relation_info;
-                    let rel_b = &field_b.relation_info;
-                    if rel_a.to != model.name && rel_b.to != model.name {
-                        // Not a self relation
-                        // but pointing to the same foreign model,
-                        // and also no names set.
-                        if rel_a.to == rel_b.to && rel_a.name == rel_b.name {
-                            if rel_a.name.is_empty() {
-                                let message = format!(
-                                    "Ambiguous relation detected. The fields `{}` and `{}` in model `{}` both refer to `{}`. Please provide different relation names for them by adding `@relation(<name>).",
-                                    &field_a.name,
-                                    &field_b.name,
-                                    &model.name,
-                                    &rel_a.to
-                                );
-
-                                // unnamed relation
-                                return Err(DatamodelError::new_model_validation_error(
-                                    &message,
-                                    &model.name,
-                                    ast_schema
-                                        .find_field(&model.name, &field_a.name)
-                                        .expect(STATE_ERROR)
-                                        .span,
-                                ));
-                            } else {
-                                let message = format!(
-                                    "Wrongly named relation detected. The fields `{}` and `{}` in model `{}` both use the same relation name. Please provide different relation names for them through `@relation(<name>).",
-                                    &field_a.name,
-                                    &field_b.name,
-                                    &model.name,
-                                );
-
-                                // explicitly named relation
-                                return Err(DatamodelError::new_model_validation_error(
-                                    &message,
-                                    &model.name,
-                                    ast_schema
-                                        .find_field(&model.name, &field_a.name)
-                                        .expect(STATE_ERROR)
-                                        .span,
-                                ));
-                            }
-                        }
-                    } else if rel_a.to == model.name && rel_b.to == model.name {
-                        // This is a self-relation with at least two fields.
-
-                        // Named self relations are ambiguous when they involve more than two fields.
-                        for field_c in model.relation_fields() {
-                            if field_a != field_c && field_b != field_c {
-                                let rel_c = &field_c.relation_info;
-                                if rel_c.to == model.name && rel_a.name == rel_b.name && rel_a.name == rel_c.name {
-                                    if rel_a.name.is_empty() {
-                                        // unnamed relation
-                                        return Err(DatamodelError::new_model_validation_error(
-                                                        &format!(
-                                                            "Unnamed self relation detected. The fields `{}`, `{}` and `{}` in model `{}` have no relation name. Please provide a relation name for one of them by adding `@relation(<name>).",
-                                                            &field_a.name,
-                                                            &field_b.name,
-                                                            &field_c.name,
-                                                            &model.name
-                                                        ),
-                                                        &model.name,
-                                                        ast_schema
-                                                            .find_field(&model.name, &field_a.name)
-                                                            .expect(STATE_ERROR)
-                                                            .span,
-                                                    ));
-                                    } else {
-                                        return Err(DatamodelError::new_model_validation_error(
-                                            &format!(
-                                                "Wrongly named self relation detected. The fields `{}`, `{}` and `{}` in model `{}` have the same relation name. At most two relation fields can belong to the same relation and therefore have the same name. Please assign a different relation name to one of them.",
-                                                &field_a.name,
-                                                &field_b.name,
-                                                &field_c.name,
-                                                &model.name
-                                            ),
-                                            &model.name,
-                                            ast_schema
-                                                .find_field(&model.name, &field_a.name)
-                                                .expect(STATE_ERROR)
-                                                .span,
-                                        ));
-                                    }
-                                }
-                            }
-                        }
-
-                        // Ambiguous unnamed self relation: two fields are enough.
-                        if rel_a.name.is_empty() && rel_b.name.is_empty() {
-                            // A self relation, but there are at least two fields without a name.
-                            return Err(DatamodelError::new_model_validation_error(
-                                &format!(
-                                    "Ambiguous self relation detected. The fields `{}` and `{}` in model `{}` both refer to `{}`. If they are part of the same relation add the same relation name for them with `@relation(<name>)`.",
-                                    &field_a.name,
-                                    &field_b.name,
-                                    &model.name,
-                                    &rel_a.to
-                                ),
-                                &model.name,
-                                ast_schema
-                                    .find_field(&model.name, &field_a.name)
-                                    .expect(STATE_ERROR)
-                                    .span,
-                            ));
-                        }
-                    }
-                }
-            }
-        }
-
-        Ok(())
     }
 }

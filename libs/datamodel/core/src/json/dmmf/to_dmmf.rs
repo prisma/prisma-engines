@@ -121,6 +121,7 @@ fn field_to_dmmf(model: &dml::Model, field: &dml::Field) -> Field {
 
 fn get_field_kind(field: &dml::Field) -> String {
     match field.field_type() {
+        dml::FieldType::CompositeType(_) => String::from("object"),
         dml::FieldType::Relation(_) => String::from("object"),
         dml::FieldType::Enum(_) => String::from("enum"),
         dml::FieldType::Scalar(_, _, _) => String::from("scalar"),
@@ -168,6 +169,7 @@ fn function_to_serde(name: &str, args: &[PrismaValue]) -> serde_json::Value {
 
 fn get_field_type(field: &dml::Field) -> String {
     match &field.field_type() {
+        dml::FieldType::CompositeType(t) => t.clone(),
         dml::FieldType::Relation(relation_info) => relation_info.to.clone(),
         dml::FieldType::Enum(t) => t.clone(),
         dml::FieldType::Unsupported(t) => t.clone(),

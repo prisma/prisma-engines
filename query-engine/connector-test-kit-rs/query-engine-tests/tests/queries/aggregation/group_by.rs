@@ -4,7 +4,7 @@ use query_engine_tests::*;
 mod aggregation_group_by {
     use query_engine_tests::{assert_error, run_query};
 
-    #[connector_test(exclude(MongoDb))]
+    #[connector_test]
     async fn group_by_no_records(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
             run_query!(
@@ -269,7 +269,7 @@ mod aggregation_group_by {
         Ok(())
     }
 
-    #[connector_test(exclude(MongoDb))]
+    #[connector_test]
     async fn group_by_relation_filters(runner: Runner) -> TestResult<()> {
         create_row(
             &runner,
@@ -340,7 +340,7 @@ mod aggregation_group_by {
         Ok(())
     }
 
-    #[connector_test(exclude(MongoDb))]
+    #[connector_test]
     async fn group_by_ordering_count_aggregation(runner: Runner) -> TestResult<()> {
         create_row(
             &runner,
@@ -620,7 +620,7 @@ mod aggregation_group_by {
         Ok(())
     }
 
-    #[connector_test(exclude(MongoDb))]
+    #[connector_test]
     async fn group_by_ordering_aggr_multiple_fields(runner: Runner) -> TestResult<()> {
         create_row(
             &runner,
@@ -665,7 +665,7 @@ mod aggregation_group_by {
         Ok(())
     }
 
-    #[connector_test(exclude(MongoDb))]
+    #[connector_test]
     async fn group_by_ordering_aggr_and_having(runner: Runner) -> TestResult<()> {
         create_row(
             &runner,

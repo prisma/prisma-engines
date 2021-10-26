@@ -18,8 +18,10 @@
 schema = { SOI ~ NEWLINE* ~ (model_declaration | enum_declaration | source_block | generator_block | type_alias | arbitrary_block | comment_block | NEWLINE | CATCH_ALL)* ~ EOI }
 
 // ######################################
-// Model
+// Model and composite types
 // ######################################
+
+// At the syntax level, models and composite types are the same.
 model_declaration = { comment_block? ~ (MODEL_KEYWORD | TYPE_KEYWORD) ~ non_empty_identifier ~ BLOCK_OPEN ~ ( field_declaration | ( block_level_attribute ) | NEWLINE | doc_comment_and_new_line | comment_and_new_line | BLOCK_LEVEL_CATCH_ALL )* ~ BLOCK_CLOSE }
 
 field_declaration = { doc_comment_and_new_line* ~ non_empty_identifier ~ LEGACY_COLON? ~ (field_type ~ ( "@" ~ attribute )+ | field_type)? ~ doc_comment? ~ comment? ~ NEWLINE }
@@ -100,7 +102,6 @@ BLOCK_OPEN = { "{" ~ (!NEWLINE ~ ANY)* ~ NEWLINE }
 BLOCK_CLOSE = { "}" }
 
 // those rules are silent because we don't want to handle the tokens
-MODEL_KEYWORD = _{ "model" }
 ENUM_KEYWORD = _{ "enum" }
 GENERATOR_KEYWORD = _{ "generator" }
 DATASOURCE_KEYWORD = _{ "datasource" }
@@ -108,6 +109,7 @@ INTERPOLATION_START = _{ "${" }
 INTERPOLATION_END = _{ "}" }
 
 // rules that we want to handle explicitly
+MODEL_KEYWORD = { "model" }
 TYPE_KEYWORD = { "type" }
 LEGACY_COLON = { ":" }
 

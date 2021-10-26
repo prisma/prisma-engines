@@ -72,10 +72,21 @@ dev-postgres13: start-postgres13
 	echo 'postgres13' > current_connector
 	cp $(CONFIG_PATH)/postgres13 $(CONFIG_FILE)
 
+start-postgres14:
+	docker-compose -f docker-compose.yml up -d --remove-orphans postgres14
+
+dev-postgres14: start-postgres14
+	echo 'postgres14' > current_connector
+	cp $(CONFIG_PATH)/postgres14 $(CONFIG_FILE)
+
 start-cockroach:
 	docker-compose -f docker-compose.yml up -d --remove-orphans cockroach
 	docker exec -d prisma-engines_cockroach_1 cockroach sql --insecure -e "set cluster setting sql.defaults.default_int_size = 4;"
 	docker exec -d prisma-engines_cockroach_1 cockroach sql --insecure -e "set cluster setting sql.defaults.serial_normalization = 'sql_sequence_cached';"
+
+dev-cockroach: start-cockroach
+	echo 'cockroach' > current_connector
+	cp $(CONFIG_PATH)/cockroach $(CONFIG_FILE)
 
 dev-pgbouncer:
 	docker-compose -f docker-compose.yml up -d --remove-orphans pgbouncer postgres11
@@ -123,18 +134,25 @@ dev-mssql2017: start-mssql_2017
 	echo 'mssql2017' > current_connector
 	cp $(CONFIG_PATH)/sqlserver2017 $(CONFIG_FILE)
 
-start-mongodb:
-	docker-compose -f docker-compose.yml up -d --remove-orphans mongo4
-
 start-mongodb4-single:
 	docker-compose -f docker-compose.yml up -d --remove-orphans mongo4-single
 
 start-mongodb5-single:
 	docker-compose -f docker-compose.yml up -d --remove-orphans mongo5-single
 
-dev-mongodb: start-mongodb
+start-mongodb4:
+	docker-compose -f docker-compose.yml up -d --remove-orphans mongo4
+
+dev-mongodb4: start-mongodb4
 	echo 'mongodb' > current_connector
 	cp $(CONFIG_PATH)/mongodb4 $(CONFIG_FILE)
+
+start-mongodb5:
+	docker-compose -f docker-compose.yml up -d --remove-orphans mongo5
+
+dev-mongodb5: start-mongodb5
+	echo 'mongodb' > current_connector
+	cp $(CONFIG_PATH)/mongodb5 $(CONFIG_FILE)
 
 start-vitess_5_7:
 	docker-compose -f docker-compose.yml up -d --remove-orphans vitess-test-5_7 vitess-shadow-5_7

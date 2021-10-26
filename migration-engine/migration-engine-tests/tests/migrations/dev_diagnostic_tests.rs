@@ -524,6 +524,46 @@ fn drift_can_be_detected_without_migrations_table_dev(api: TestApi) {
 
         It should be understood as the set of changes to get from the expected schema to the actual schema.
 
+        If you are running this the first time on an existing database, please make sure to read this documentation page:
+        https://www.prisma.io/docs/guides/database/developing-with-prisma-migrate/troubleshooting-development
+
+        [+] Added tables
+          - cat
+    "#]];
+
+    expect.assert_eq(action.as_reset().unwrap());
+}
+
+#[test_connector(tags(Postgres))]
+fn drift_detect_first_time_message_should_not_be_dispyed_if_migration_table_exists(api: TestApi) {
+    let directory = api.create_migrations_directory();
+
+    let dm1 = api.datamodel_with_provider(
+        r#"
+        model catcat {
+            id      Int @id
+            name    String
+        }
+    "#,
+    );
+
+    api.create_migration("initial", &dm1, &directory).send_sync();
+
+    api.apply_migrations(&directory)
+        .send_sync()
+        .assert_applied_migrations(&["initial"]);
+
+    api.raw_cmd("CREATE TABLE \"cat\" (\nid SERIAL PRIMARY KEY\n);");
+
+    let DevDiagnosticOutput { action } = api.dev_diagnostic(&directory).send().into_output();
+
+    let expect = expect![[r#"
+        Drift detected: Your database schema is not in sync with your migration history.
+
+        The following is a summary of the differences between the expected database schema given your migrations files, and the actual schema of the database.
+
+        It should be understood as the set of changes to get from the expected schema to the actual schema.
+
         [+] Added tables
           - cat
     "#]];

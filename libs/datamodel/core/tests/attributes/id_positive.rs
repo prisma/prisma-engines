@@ -1,4 +1,4 @@
-use crate::attributes::with_named_constraints;
+use crate::attributes::with_postgres_provider;
 use crate::common::*;
 use datamodel::dml::*;
 use prisma_value::PrismaValue;
@@ -177,7 +177,7 @@ fn should_allow_unique_and_id_on_same_field() {
 
 #[test]
 fn unnamed_and_unmapped_multi_field_ids_must_work() {
-    let dml = with_named_constraints(indoc! {r#"
+    let dml = with_postgres_provider(indoc! {r#"
         model Model {
           a String
           b Int
@@ -193,7 +193,7 @@ fn unnamed_and_unmapped_multi_field_ids_must_work() {
 
 #[test]
 fn unmapped_singular_id_must_work() {
-    let dml = with_named_constraints(indoc! {r#"
+    let dml = with_postgres_provider(indoc! {r#"
         model Model {
           a String @id
         }
@@ -207,7 +207,7 @@ fn unmapped_singular_id_must_work() {
 
 #[test]
 fn named_multi_field_ids_must_work() {
-    let dml = with_named_constraints(indoc! {r#"
+    let dml = with_postgres_provider(indoc! {r#"
         model Model {
           a String
           b Int
@@ -223,7 +223,7 @@ fn named_multi_field_ids_must_work() {
 
 #[test]
 fn mapped_multi_field_ids_must_work() {
-    let dml = with_named_constraints(indoc! {r#"
+    let dml = with_postgres_provider(indoc! {r#"
         model Model {
           a String
           b Int
@@ -239,7 +239,7 @@ fn mapped_multi_field_ids_must_work() {
 
 #[test]
 fn mapped_singular_id_must_work() {
-    let dml = with_named_constraints(indoc! {r#"
+    let dml = with_postgres_provider(indoc! {r#"
         model Model {
           a String @id(map: "test")
         }
@@ -261,7 +261,7 @@ fn mapped_singular_id_must_work() {
 
 #[test]
 fn named_and_mapped_multi_field_ids_must_work() {
-    let dml = with_named_constraints(indoc! {r#"
+    let dml = with_postgres_provider(indoc! {r#"
         model Model {
           a String
           b Int

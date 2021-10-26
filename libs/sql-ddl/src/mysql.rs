@@ -150,6 +150,8 @@ impl Display for Column<'_> {
 
         if self.not_null {
             f.write_str(" NOT NULL")?;
+        } else {
+            f.write_str(" NULL")?;
         }
 
         if self.auto_increment {
@@ -326,15 +328,26 @@ mod tests {
     fn full_create_table() {
         let stmt = CreateTable {
             table_name: "Cat".into(),
-            columns: vec![Column {
-                column_type: "INTEGER".into(),
-                column_name: "id".into(),
-                not_null: false,
-                default: None,
-                auto_increment: true,
-                primary_key: true,
-                references: None,
-            }],
+            columns: vec![
+                Column {
+                    column_type: "INTEGER".into(),
+                    column_name: "id".into(),
+                    not_null: false,
+                    default: None,
+                    auto_increment: true,
+                    primary_key: true,
+                    references: None,
+                },
+                Column {
+                    column_type: "BINARY(16)".into(),
+                    column_name: "test".into(),
+                    not_null: true,
+                    default: Some("(uuid_to_bin(uuid()))".into()),
+                    auto_increment: false,
+                    primary_key: false,
+                    references: None,
+                },
+            ],
             indexes: vec![],
             default_character_set: Some("utf8mb4".into()),
             collate: Some("utf8mb4_unicode_ci".into()),
@@ -344,7 +357,8 @@ mod tests {
         let expected = indoc!(
             r#"
             CREATE TABLE `Cat` (
-                `id` INTEGER AUTO_INCREMENT PRIMARY KEY
+                `id` INTEGER NULL AUTO_INCREMENT PRIMARY KEY,
+                `test` BINARY(16) NOT NULL DEFAULT (uuid_to_bin(uuid()))
             ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
             "#,
         )

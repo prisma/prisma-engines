@@ -4,6 +4,7 @@ use itertools::Itertools;
 use once_cell::sync::Lazy;
 use regex::Regex;
 use std::{
+    borrow::Cow,
     collections::{BTreeMap, HashMap},
     str::FromStr,
 };
@@ -14,6 +15,7 @@ pub(super) fn resolve_types(ctx: &mut Context<'_>) {
             (ast::TopId::Alias(alias_id), ast::Top::Type(type_alias)) => visit_type_alias(alias_id, type_alias, ctx),
             (ast::TopId::Model(model_id), ast::Top::Model(model)) => visit_model(model_id, model, ctx),
             (ast::TopId::Enum(_), ast::Top::Enum(enm)) => visit_enum(enm, ctx),
+            (ast::TopId::CompositeType(ct_id), ast::Top::CompositeType(ct)) => visit_composite_type(ct_id, ct, ctx),
             (_, ast::Top::Source(_)) | (_, ast::Top::Generator(_)) => (),
             _ => unreachable!(),
         }
@@ -24,6 +26,7 @@ pub(super) fn resolve_types(ctx: &mut Context<'_>) {
 
 #[derive(Debug, Default)]
 pub(super) struct Types<'ast> {
+    pub(super) composite_type_fields: BTreeMap<(ast::CompositeTypeId, ast::FieldId), CompositeTypeField<'ast>>,
     pub(super) type_aliases: HashMap<ast::AliasId, ScalarFieldType>,
     pub(super) scalar_fields: BTreeMap<(ast::ModelId, ast::FieldId), ScalarField<'ast>>,
     /// This contains only the relation fields actually present in the schema
@@ -34,6 +37,15 @@ pub(super) struct Types<'ast> {
 }
 
 impl<'ast> Types<'ast> {
+    pub(super) fn range_model_scalar_fields(
+        &self,
+        model_id: ast::ModelId,
+    ) -> impl Iterator<Item = (ast::FieldId, &ScalarField<'ast>)> {
+        self.scalar_fields
+            .range((model_id, ast::FieldId::ZERO)..=(model_id, ast::FieldId::MAX))
+            .map(|((_, field_id), scalar_field)| (*field_id, scalar_field))
+    }
+
     pub(super) fn take_scalar_field(
         &mut self,
         model_id: ast::ModelId,
@@ -51,6 +63,12 @@ impl<'ast> Types<'ast> {
     }
 }
 
+#[derive(Debug, Clone)]
+pub(super) struct CompositeTypeField<'ast> {
+    pub(super) r#type: ScalarFieldType,
+    pub(super) mapped_name: Option<&'ast str>,
+}
+
 #[derive(Debug)]
 enum FieldType {
     Model(ast::ModelId),
@@ -59,6 +77,7 @@ enum FieldType {
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub(crate) enum ScalarFieldType {
+    CompositeType(ast::CompositeTypeId),
     Enum(ast::EnumId),
     BuiltInScalar(dml::scalars::ScalarType),
     Alias(ast::AliasId),
@@ -73,7 +92,7 @@ pub(crate) struct ScalarField<'ast> {
     pub(crate) default: Option<dml::default_value::DefaultValue>,
     /// @map
     pub(crate) mapped_name: Option<&'ast str>,
-    // Native type name and arguments
+    /// Native type name and arguments
     pub(crate) native_type: Option<(&'ast str, Vec<String>)>,
 }
 
@@ -121,8 +140,10 @@ pub(crate) struct ModelAttributes<'ast> {
     pub(super) primary_key: Option<IdAttribute<'ast>>,
     /// @@ignore
     pub(crate) is_ignored: bool,
-    /// @@index and @(@)unique.
-    pub(super) indexes: Vec<(&'ast ast::Attribute, IndexAttribute<'ast>)>,
+    /// @@index and @(@)unique explicitely written to the schema AST.
+    pub(super) ast_indexes: Vec<(&'ast ast::Attribute, IndexAttribute<'ast>)>,
+    /// @(@)unique added implicitely to the datamodel by us.
+    pub(super) implicit_indexes: Vec<IndexAttribute<'static>>,
     /// @@map
     pub(crate) mapped_name: Option<&'ast str>,
 }
@@ -135,7 +156,9 @@ impl ModelAttributes<'_> {
 
     /// Whether MySQL would consider the field indexed for autoincrement purposes.
     pub(super) fn field_is_indexed_for_autoincrement(&self, field_id: ast::FieldId) -> bool {
-        self.indexes.iter().any(|(_, idx)| idx.fields.get(0) == Some(&field_id))
+        self.ast_indexes
+            .iter()
+            .any(|(_, idx)| idx.fields.get(0) == Some(&field_id))
             || self
                 .primary_key
                 .as_ref()
@@ -150,7 +173,7 @@ pub(crate) struct IndexAttribute<'ast> {
     pub(crate) fields: Vec<ast::FieldId>,
     pub(crate) source_field: Option<ast::FieldId>,
     pub(crate) name: Option<&'ast str>,
-    pub(crate) db_name: Option<&'ast str>,
+    pub(crate) db_name: Option<Cow<'ast, str>>,
 }
 
 #[derive(Debug, Default)]
@@ -280,6 +303,28 @@ fn detect_alias_cycles(ctx: &mut Context<'_>) {
     }
 }
 
+fn visit_composite_type<'ast>(ct_id: ast::CompositeTypeId, ct: &'ast ast::CompositeType, ctx: &mut Context<'ast>) {
+    for (field_id, ast_field) in ct.iter_fields() {
+        match field_type(ast_field, ctx) {
+            Ok(FieldType::Scalar(scalar_type)) => {
+                let field = CompositeTypeField {
+                    r#type: scalar_type,
+                    mapped_name: None,
+                };
+                ctx.db.types.composite_type_fields.insert((ct_id, field_id), field);
+            }
+            Ok(FieldType::Model(referenced_model_id)) => {
+                let referenced_model_name = ctx.db.ast[referenced_model_id].name();
+                ctx.push_error(DatamodelError::new_composite_type_validation_error(format!("{} refers to a model, making this a relation field. Relation fields inside composite types are not supported.", referenced_model_name), ct.name.name.clone(), ast_field.field_type.span()))
+            }
+            Err(supported) => ctx.push_error(DatamodelError::new_type_not_found_error(
+                supported,
+                ast_field.field_type.span(),
+            )),
+        }
+    }
+}
+
 fn visit_enum<'ast>(enm: &'ast ast::Enum, ctx: &mut Context<'ast>) {
     if !ctx.db.active_connector().supports_enums() {
         ctx.push_error(DatamodelError::new_validation_error(
@@ -315,6 +360,8 @@ fn visit_type_alias<'ast>(alias_id: ast::AliasId, alias: &'ast ast::Field, ctx: 
     };
 }
 
+/// Either a structured, supported type, or an Err(unsupported) if the type name
+/// does not match any we know of.
 fn field_type<'ast>(field: &'ast ast::Field, ctx: &mut Context<'ast>) -> Result<FieldType, &'ast str> {
     let supported = match &field.field_type {
         ast::FieldType::Supported(ident) => &ident.name,
@@ -335,6 +382,9 @@ fn field_type<'ast>(field: &'ast ast::Field, ctx: &mut Context<'ast>) -> Result<
         Some((ast::TopId::Model(model_id), ast::Top::Model(_))) => Ok(FieldType::Model(model_id)),
         Some((ast::TopId::Enum(enum_id), ast::Top::Enum(_))) => Ok(FieldType::Scalar(ScalarFieldType::Enum(enum_id))),
         Some((ast::TopId::Alias(id), ast::Top::Type(_))) => Ok(FieldType::Scalar(ScalarFieldType::Alias(id))),
+        Some((ast::TopId::CompositeType(ctid), ast::Top::CompositeType(_))) => {
+            Ok(FieldType::Scalar(ScalarFieldType::CompositeType(ctid)))
+        }
         Some((_, ast::Top::Generator(_))) | Some((_, ast::Top::Source(_))) => unreachable!(),
         None => Err(supported),
         _ => unreachable!(),
