@@ -47,7 +47,6 @@ pub(crate) trait ModelAsserts {
     fn assert_field_count(&self, count: usize) -> &Self;
     fn assert_has_scalar_field(&self, t: &str) -> &dml::ScalarField;
     fn assert_has_relation_field(&self, t: &str) -> &dml::RelationField;
-    fn assert_is_embedded(&self, t: bool) -> &Self;
     fn assert_with_db_name(&self, t: &str) -> &Self;
     fn assert_with_documentation(&self, t: &str) -> &Self;
     fn assert_has_index(&self, def: IndexDefinition) -> &Self;
@@ -255,11 +254,6 @@ impl ModelAsserts for dml::Model {
     fn assert_has_relation_field(&self, t: &str) -> &dml::RelationField {
         self.find_relation_field(&t.to_owned())
             .unwrap_or_else(|| panic!("Field {} not found", t))
-    }
-
-    fn assert_is_embedded(&self, t: bool) -> &Self {
-        assert_eq!(self.is_embedded, t);
-        self
     }
 
     fn assert_with_db_name(&self, t: &str) -> &Self {

@@ -60,7 +60,7 @@ impl<'a> DatamodelConverter<'a> {
             .filter(|model| model.is_supported())
             .map(|model| ModelTemplate {
                 name: model.name.clone(),
-                is_embedded: model.is_embedded,
+                is_embedded: false,
                 fields: self.convert_fields(model),
                 manifestation: model.database_name().map(|s| s.to_owned()),
                 primary_key: self.convert_pk(model),
