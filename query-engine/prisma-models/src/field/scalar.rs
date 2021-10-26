@@ -13,19 +13,17 @@ pub type ScalarFieldWeak = Weak<ScalarField>;
 pub struct ScalarField {
     pub name: String,
     pub type_identifier: TypeIdentifier,
-    pub is_required: bool,
-    pub is_list: bool,
     pub is_id: bool,
     pub is_auto_generated_int_id: bool,
     pub is_autoincrement: bool,
+    pub is_updated_at: bool,
     pub internal_enum: Option<InternalEnum>,
-    pub behaviour: Option<FieldBehaviour>,
     pub arity: FieldArity,
     pub db_name: Option<String>,
     pub default_value: Option<DefaultValue>,
     pub native_type: Option<NativeTypeInstance>,
-
     pub container: ParentContainer,
+
     pub(crate) is_unique: bool,
     pub(crate) read_only: OnceCell<bool>,
 }
@@ -49,12 +47,12 @@ impl ScalarField {
         self.is_id
     }
 
-    pub fn is_created_at(&self) -> bool {
-        matches!(self.behaviour, Some(FieldBehaviour::CreatedAt))
+    pub fn is_list(&self) -> bool {
+        matches!(self.arity, FieldArity::List)
     }
 
-    pub fn is_updated_at(&self) -> bool {
-        matches!(self.behaviour, Some(FieldBehaviour::UpdatedAt))
+    pub fn is_required(&self) -> bool {
+        matches!(self.arity, FieldArity::Required)
     }
 
     pub fn unique(&self) -> bool {
@@ -83,13 +81,11 @@ impl Debug for ScalarField {
         f.debug_struct("ScalarField")
             .field("name", &self.name)
             .field("type_identifier", &self.type_identifier)
-            .field("is_required", &self.is_required)
-            .field("is_list", &self.is_list)
             .field("is_id", &self.is_id)
             .field("is_auto_generated_int_id", &self.is_auto_generated_int_id)
             .field("is_autoincrement", &self.is_autoincrement)
             .field("internal_enum", &self.internal_enum)
-            .field("behaviour", &self.behaviour)
+            .field("is_updated_at", &self.is_updated_at)
             .field("arity", &self.arity)
             .field("db_name", &self.db_name)
             .field("default_value", &self.default_value)
@@ -106,12 +102,10 @@ impl Hash for ScalarField {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.name.hash(state);
         self.type_identifier.hash(state);
-        self.is_required.hash(state);
-        self.is_list.hash(state);
         self.is_id.hash(state);
         self.is_auto_generated_int_id.hash(state);
         self.internal_enum.hash(state);
-        self.behaviour.hash(state);
+        self.is_updated_at.hash(state);
         self.is_unique.hash(state);
         self.container.hash(state);
         self.arity.hash(state);
@@ -123,29 +117,14 @@ impl PartialEq for ScalarField {
     fn eq(&self, other: &Self) -> bool {
         self.name == other.name
             && self.type_identifier == other.type_identifier
-            && self.is_required == other.is_required
-            && self.is_list == other.is_list
             && self.is_id == other.is_id
             && self.is_auto_generated_int_id == other.is_auto_generated_int_id
             && self.internal_enum == other.internal_enum
-            && self.behaviour == other.behaviour
+            && self.is_updated_at == other.is_updated_at
             && self.default_value == other.default_value
             && self.is_unique == other.is_unique
             && self.container == other.container
             && self.arity == other.arity
             && self.db_name == other.db_name
     }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum FieldBehaviour {
-    CreatedAt,
-    UpdatedAt,
-    ScalarList { strategy: ScalarListStrategy },
-}
-
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
-pub enum ScalarListStrategy {
-    Embedded,
-    Relation,
 }

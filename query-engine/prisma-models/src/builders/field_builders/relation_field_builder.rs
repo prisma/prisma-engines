@@ -1,13 +1,12 @@
 use crate::prelude::*;
-use datamodel::{ReferentialAction, RelationInfo};
+use datamodel::{FieldArity, ReferentialAction, RelationInfo};
 use once_cell::sync::OnceCell;
 use std::{fmt::Debug, sync::Arc};
 
 #[derive(Debug)]
 pub struct RelationFieldBuilder {
     pub name: String,
-    pub is_required: bool,
-    pub is_list: bool,
+    pub arity: FieldArity,
     pub relation_name: String,
     pub relation_side: RelationSide,
     pub relation_info: RelationInfo,
@@ -19,8 +18,7 @@ impl RelationFieldBuilder {
     pub fn build(self, model: ModelWeakRef) -> RelationFieldRef {
         Arc::new(RelationField {
             name: self.name,
-            is_required: self.is_required,
-            is_list: self.is_list,
+            arity: self.arity,
             relation_name: self.relation_name,
             relation_side: self.relation_side,
             model,

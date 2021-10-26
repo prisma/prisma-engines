@@ -44,8 +44,8 @@ impl Field {
 
     pub fn is_list(&self) -> bool {
         match self {
-            Field::Scalar(ref sf) => sf.is_list,
-            Field::Relation(ref rf) => rf.is_list,
+            Field::Scalar(ref sf) => sf.is_list(),
+            Field::Relation(ref rf) => rf.is_list(),
             // Field::Composite(ref cf) => cf.is_list(),
         }
     }
@@ -59,8 +59,8 @@ impl Field {
 
     pub fn is_required(&self) -> bool {
         match self {
-            Field::Scalar(ref sf) => sf.is_required,
-            Field::Relation(ref rf) => rf.is_required,
+            Field::Scalar(ref sf) => sf.is_required(),
+            Field::Relation(ref rf) => rf.is_required(),
             // Field::Composite(ref cf) => cf.is_required(),
         }
     }

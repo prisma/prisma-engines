@@ -1,4 +1,4 @@
-use crate::{Fields, InternalDataModelRef, InternalDataModelWeakRef};
+use crate::{Field, InternalDataModelRef, InternalDataModelWeakRef};
 use once_cell::sync::OnceCell;
 use std::{
     hash::{Hash, Hasher},
@@ -32,7 +32,7 @@ pub struct CompositeType {
 
     /// Fields of this composite type.
     /// May contain other composites and even cycles.
-    fields: OnceCell<Fields>,
+    pub(crate) fields: OnceCell<Vec<Field>>,
 }
 
 impl CompositeType {

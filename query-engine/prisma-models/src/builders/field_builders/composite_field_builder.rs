@@ -1,4 +1,4 @@
-use crate::{CompositeField, CompositeFieldRef, CompositeTypeRef, ModelWeakRef};
+use crate::{parent_container::ParentContainer, CompositeField, CompositeFieldRef, CompositeTypeRef};
 use datamodel::FieldArity;
 use std::{fmt::Debug, sync::Arc};
 
@@ -6,13 +6,12 @@ use std::{fmt::Debug, sync::Arc};
 pub struct CompositeFieldBuilder {
     pub name: String,
     pub db_name: Option<String>,
-    pub is_required: bool,
     pub arity: FieldArity,
     pub type_name: String,
 }
 
 impl CompositeFieldBuilder {
-    pub fn build(self, model: ModelWeakRef, composite_types: &[CompositeTypeRef]) -> CompositeFieldRef {
+    pub fn build(self, container: ParentContainer, composite_types: &[CompositeTypeRef]) -> CompositeFieldRef {
         let type_name = &self.type_name;
         let composite = CompositeField {
             name: self.name,
@@ -23,7 +22,7 @@ impl CompositeFieldBuilder {
                 .unwrap_or_else(|| panic!("Invalid composite type reference: {}", type_name))
                 .clone(),
             arity: self.arity,
-            model,
+            container,
         };
 
         Arc::new(composite)

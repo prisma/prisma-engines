@@ -1,23 +1,24 @@
 use super::{
-    field_builders::RelationFieldBuilder, relation_builder::RelationBuilder, FieldBuilder, IndexBuilder, ModelBuilder,
-    PrimaryKeyBuilder,
+    build_composites, field_builders::RelationFieldBuilder, relation_builder::RelationBuilder, CompositeTypeBuilder,
+    FieldBuilder, IndexBuilder, ModelBuilder, PrimaryKeyBuilder,
 };
 use crate::{
-    builders::ScalarFieldBuilder, extensions::*, CompositeType, CompositeTypeRef, IndexType, InlineRelation,
-    InternalDataModel, InternalDataModelRef, InternalEnum, InternalEnumValue, RelationLinkManifestation, RelationSide,
-    RelationTable, TypeIdentifier,
+    builders::{CompositeFieldBuilder, ScalarFieldBuilder},
+    extensions::*,
+    IndexType, InlineRelation, InternalDataModel, InternalDataModelRef, InternalEnum, InternalEnumValue,
+    RelationLinkManifestation, RelationSide, RelationTable, TypeIdentifier,
 };
-use datamodel::{dml, Datamodel, Ignorable, WithDatabaseName};
+use datamodel::{dml, CompositeTypeFieldType, Datamodel, Ignorable, WithDatabaseName};
 use itertools::Itertools;
 use once_cell::sync::OnceCell;
-use std::{collections::HashMap, sync::Arc};
+use std::sync::Arc;
 
 #[derive(Debug, Default)]
 pub struct InternalDataModelBuilder {
     pub models: Vec<ModelBuilder>,
     pub relations: Vec<RelationBuilder>,
     pub enums: Vec<InternalEnum>,
-    pub composite_types: Vec<CompositeTypeRef>,
+    pub composite_types: Vec<CompositeTypeBuilder>,
 }
 
 impl InternalDataModelBuilder {
@@ -38,6 +39,9 @@ impl InternalDataModelBuilder {
             db_name,
             enums: self.enums.into_iter().map(Arc::new).collect(),
         });
+
+        let composite_types = build_composites(self.composite_types, Arc::downgrade(&internal_data_model));
+        internal_data_model.composite_types.set(composite_types).unwrap();
 
         let models = self
             .models
@@ -62,13 +66,12 @@ impl InternalDataModelBuilder {
 impl From<&dml::Datamodel> for InternalDataModelBuilder {
     fn from(datamodel: &dml::Datamodel) -> Self {
         let relation_placeholders = relation_placeholders(datamodel);
-        let composite_types = convert_composite_types(datamodel);
 
         Self {
             models: model_builders(datamodel, &relation_placeholders),
             relations: relation_builders(&relation_placeholders),
             enums: convert_enums(datamodel),
-            composite_types: vec![],
+            composite_types: composite_type_builders(datamodel),
         }
     }
 }
@@ -80,7 +83,7 @@ fn model_builders(datamodel: &Datamodel, relation_placeholders: &[RelationPlaceh
         .filter(|model| model.is_supported())
         .map(|model| ModelBuilder {
             name: model.name.clone(),
-            fields: field_builders(datamodel, model, relation_placeholders),
+            fields: model_field_builders(datamodel, model, relation_placeholders),
             manifestation: model.database_name().map(|s| s.to_owned()),
             primary_key: pk_builder(model),
             indexes: index_builders(model),
@@ -90,7 +93,11 @@ fn model_builders(datamodel: &Datamodel, relation_placeholders: &[RelationPlaceh
         .collect()
 }
 
-fn field_builders(datamodel: &Datamodel, model: &dml::Model, relations: &[RelationPlaceholder]) -> Vec<FieldBuilder> {
+fn model_field_builders(
+    datamodel: &Datamodel,
+    model: &dml::Model,
+    relations: &[RelationPlaceholder],
+) -> Vec<FieldBuilder> {
     model
         .fields()
         .filter(|field| !field.is_ignored())
@@ -113,8 +120,7 @@ fn field_builders(datamodel: &Datamodel, model: &dml::Model, relations: &[Relati
 
                 Some(FieldBuilder::Relation(RelationFieldBuilder {
                     name: rf.name.clone(),
-                    is_required: rf.is_required(),
-                    is_list: rf.is_list(),
+                    arity: rf.arity,
                     relation_name: relation.name.clone(),
                     relation_side: relation.relation_side(rf),
                     relation_info: rf.relation_info.clone(),
@@ -124,25 +130,60 @@ fn field_builders(datamodel: &Datamodel, model: &dml::Model, relations: &[Relati
             }
             dml::Field::ScalarField(sf) => {
                 if sf.type_identifier() == TypeIdentifier::Unsupported {
-                    return None;
+                    None
+                } else {
+                    Some(FieldBuilder::Scalar(ScalarFieldBuilder {
+                        name: sf.name.clone(),
+                        type_identifier: sf.type_identifier(),
+                        is_unique: model.field_is_unique(&sf.name),
+                        is_id: model.field_is_primary(&sf.name),
+                        is_auto_generated_int_id: model.field_is_auto_generated_int_id(&sf.name),
+                        is_autoincrement: sf.is_auto_increment(),
+                        is_updated_at: sf.is_updated_at,
+                        internal_enum: sf.internal_enum(datamodel),
+                        arity: sf.arity,
+                        db_name: sf.database_name.clone(),
+                        default_value: sf.default_value.clone(),
+                        native_type: sf.native_type(),
+                    }))
                 }
+            }
+        })
+        .collect()
+}
 
-                Some(FieldBuilder::Scalar(ScalarFieldBuilder {
-                    name: sf.name.clone(),
-                    type_identifier: sf.type_identifier(),
-                    is_required: sf.is_required(),
-                    is_list: sf.is_list(),
-                    is_unique: model.field_is_unique(&sf.name),
-                    is_id: model.field_is_primary(&sf.name),
-                    is_auto_generated_int_id: model.field_is_auto_generated_int_id(&sf.name),
-                    is_autoincrement: sf.is_auto_increment(),
-                    behaviour: sf.behaviour(),
-                    internal_enum: sf.internal_enum(datamodel),
-                    db_name: sf.database_name.clone(),
-                    arity: sf.arity,
-                    default_value: sf.default_value.clone(),
-                    native_type: sf.native_type(),
-                }))
+fn composite_field_builders(composite: &dml::CompositeType) -> Vec<FieldBuilder> {
+    composite
+        .fields
+        .iter()
+        // .filter(|field| !field.is_ignored()) // Todo(?): Composites are not ignorable at the moment.
+        .filter_map(|field| match &field.r#type {
+            CompositeTypeFieldType::CompositeType(type_name) => Some(FieldBuilder::Composite(CompositeFieldBuilder {
+                name: field.name.clone(),
+                db_name: field.database_name.clone(),
+                arity: field.arity.clone(),
+                type_name: type_name.clone(),
+            })),
+            CompositeTypeFieldType::Scalar(st, _alias, nt) => {
+                let type_ident = st.clone().into();
+                if type_ident == TypeIdentifier::Unsupported {
+                    None
+                } else {
+                    Some(FieldBuilder::Scalar(ScalarFieldBuilder {
+                        name: field.name.clone(),
+                        type_identifier: type_ident,
+                        is_unique: false, // Composites can't have uniques or ids at the moment.
+                        is_id: false,
+                        is_auto_generated_int_id: false,
+                        is_autoincrement: false,
+                        is_updated_at: false, // Todo: This info isn't available here.
+                        internal_enum: None,  // Todo: No enums on composites?
+                        arity: field.arity.clone(),
+                        db_name: field.database_name.clone(),
+                        default_value: None, // Todo: No defaults?
+                        native_type: nt.clone(),
+                    }))
+                }
             }
         })
         .collect()
@@ -185,7 +226,14 @@ fn pk_builder(model: &dml::Model) -> Option<PrimaryKeyBuilder> {
 }
 
 fn composite_type_builders(datamodel: &Datamodel) -> Vec<CompositeTypeBuilder> {
-    todo!()
+    datamodel
+        .composite_types
+        .iter()
+        .map(|ct| CompositeTypeBuilder {
+            name: ct.name.clone(),
+            fields: composite_field_builders(ct),
+        })
+        .collect()
 }
 
 fn convert_enums(datamodel: &Datamodel) -> Vec<InternalEnum> {
@@ -205,34 +253,6 @@ fn convert_enum_values(enm: &dml::Enum) -> Vec<InternalEnumValue> {
             database_name: enum_value.database_name.clone(),
         })
         .collect()
-}
-
-fn convert_composite_types(datamodel: &Datamodel) -> Vec<CompositeTypeRef> {
-    // First pass: Create all composite type arcs and
-    // let mut fields = HashMap::new();
-
-    // let composites: Vec<_> = datamodel
-    //     .composite_types
-    //     .iter()
-    //     .map(|ct| {
-    //         fields.insert(ct.name.clone(), ct.fields.clone());
-
-    //         Arc::new(CompositeType {
-    //             name: ct.name.clone(),
-    //             fields: OnceCell::new(),
-    //         })
-    //     })
-    //     .collect();
-
-    // for composite in composites.iter() {
-    //     let fields = fields.get(&composite.name);
-
-    //     field_builders(datamodel)
-    // }
-
-    // composites.first().unwrap().fields.set();
-
-    todo!()
 }
 
 /// Calculates placeholders that are used to compute builders dependent on some relation information being present already.

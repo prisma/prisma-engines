@@ -19,7 +19,8 @@ impl From<Field> for ModelProjection {
 
 impl ModelProjection {
     pub fn model(&self) -> ModelRef {
-        self.fields[0].model()
+        // self.fields[0].model()
+        todo!()
     }
 
     pub fn new(fields: Vec<Field>) -> Self {

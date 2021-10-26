@@ -1,4 +1,4 @@
-use crate::{prelude::*, CompositeTypeRef, InternalEnumRef};
+use crate::{parent_container::ParentContainer, prelude::*, CompositeTypeRef, InternalEnumRef};
 use once_cell::sync::OnceCell;
 use std::sync::{Arc, Weak};
 
@@ -69,21 +69,27 @@ impl InternalDataModel {
             .iter()
             .filter(|rf| &rf.related_model() == model) // All relation fields pointing to `model`.
             .filter(|rf| rf.is_inlined_on_enclosing_model()) // Not a list, not a virtual field.
-            .filter(|rf| !required || rf.is_required) // If only required fields should be returned
+            .filter(|rf| !required || rf.is_required()) // If only required fields should be returned
             .map(Arc::clone)
             .collect()
     }
 
     /// Finds all relation fields where the foreign key refers to the given field (as either singular or compound).
     pub fn fields_refering_to_field(&self, field: &ScalarFieldRef) -> Vec<RelationFieldRef> {
-        let model_name = &field.model().name;
+        match &field.container {
+            ParentContainer::Model(model) => {
+                let model_name = &model.upgrade().unwrap().name;
 
-        self.relation_fields()
-            .iter()
-            .filter(|rf| &rf.relation_info.to == model_name)
-            .filter(|rf| rf.relation_info.references.contains(&field.name))
-            .map(Arc::clone)
-            .collect()
+                self.relation_fields()
+                    .iter()
+                    .filter(|rf| &rf.relation_info.to == model_name)
+                    .filter(|rf| rf.relation_info.references.contains(&field.name))
+                    .map(Arc::clone)
+                    .collect()
+            }
+            // Relation fields can not refer to composite fields.
+            ParentContainer::CompositeType(_) => vec![],
+        }
     }
 
     pub fn relation_fields(&self) -> &[RelationFieldRef] {

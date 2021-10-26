@@ -15,7 +15,7 @@ pub struct Fields {
     relation: OnceCell<Vec<RelationFieldWeak>>,
     composite: OnceCell<Vec<CompositeFieldWeak>>,
     model: ModelWeakRef,
-    created_at: OnceCell<Option<ScalarFieldRef>>,
+    // created_at: OnceCell<Option<ScalarFieldRef>>,
     updated_at: OnceCell<Option<ScalarFieldRef>>,
 }
 
@@ -27,7 +27,7 @@ impl Fields {
             scalar: OnceCell::new(),
             relation: OnceCell::new(),
             composite: OnceCell::new(),
-            created_at: OnceCell::new(),
+            // created_at: OnceCell::new(),
             updated_at: OnceCell::new(),
             model,
         }
@@ -81,21 +81,22 @@ impl Fields {
         }
     }
 
-    pub fn created_at(&self) -> &Option<ScalarFieldRef> {
-        self.created_at.get_or_init(|| {
-            self.scalar_weak()
-                .iter()
-                .map(|sf| sf.upgrade().unwrap())
-                .find(|sf| sf.is_created_at())
-        })
-    }
+    // Todo / WIP: Doesn't seem to exist anymore.
+    // pub fn created_at(&self) -> &Option<ScalarFieldRef> {
+    //     self.created_at.get_or_init(|| {
+    //         self.scalar_weak()
+    //             .iter()
+    //             .map(|sf| sf.upgrade().unwrap())
+    //             .find(|sf| sf.is_created_at())
+    //     })
+    // }
 
     pub fn updated_at(&self) -> &Option<ScalarFieldRef> {
         self.updated_at.get_or_init(|| {
             self.scalar_weak()
                 .iter()
                 .map(|sf| sf.upgrade().unwrap())
-                .find(|sf| sf.is_updated_at())
+                .find(|sf| sf.is_updated_at)
         })
     }
 
@@ -108,7 +109,7 @@ impl Fields {
     }
 
     pub fn scalar_list(&self) -> Vec<ScalarFieldRef> {
-        self.scalar().into_iter().filter(|sf| sf.is_list).collect()
+        self.scalar().into_iter().filter(|sf| sf.is_list()).collect()
     }
 
     fn scalar_weak(&self) -> &[ScalarFieldWeak] {

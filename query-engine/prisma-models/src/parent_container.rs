@@ -39,6 +39,18 @@ impl ParentContainer {
     }
 }
 
+impl From<ModelWeakRef> for ParentContainer {
+    fn from(model: ModelWeakRef) -> Self {
+        Self::Model(model)
+    }
+}
+
+impl From<CompositeTypeWeakRef> for ParentContainer {
+    fn from(composite: CompositeTypeWeakRef) -> Self {
+        Self::CompositeType(composite)
+    }
+}
+
 impl Debug for ParentContainer {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

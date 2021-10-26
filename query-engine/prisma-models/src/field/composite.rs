@@ -1,4 +1,4 @@
-use crate::{CompositeTypeRef, ModelRef, ModelWeakRef, ScalarFieldRef};
+use crate::{parent_container::ParentContainer, CompositeTypeRef, ScalarFieldRef};
 use datamodel::FieldArity;
 use std::{
     fmt::Debug,
@@ -15,7 +15,7 @@ pub struct CompositeField {
     pub db_name: Option<String>,
     pub typ: CompositeTypeRef,
     pub(crate) arity: FieldArity,
-    pub(crate) model: ModelWeakRef,
+    pub(crate) container: ParentContainer,
 }
 
 impl CompositeField {
@@ -27,11 +27,11 @@ impl CompositeField {
         matches!(self.arity, FieldArity::Required)
     }
 
-    pub fn model(&self) -> ModelRef {
-        self.model
-            .upgrade()
-            .expect("Model does not exist anymore. Parent model got deleted without deleting the child.")
-    }
+    // pub fn model(&self) -> ModelRef {
+    //     self.model
+    //         .upgrade()
+    //         .expect("Model does not exist anymore. Parent model got deleted without deleting the child.")
+    // }
 
     pub fn scalar_fields(&self) -> Vec<ScalarFieldRef> {
         // let fields = self.fields.get_or_init(|| {
@@ -62,8 +62,8 @@ impl Debug for CompositeField {
         f.debug_struct("CompositeField")
             .field("name", &self.name)
             .field("arity", &self.arity)
-            .field("model", &"#ModelWeakRef#")
-            .field("composite type", &self.typ.name)
+            .field("container", &self.container)
+            .field("composite_type", &self.typ.name)
             .finish()
     }
 }

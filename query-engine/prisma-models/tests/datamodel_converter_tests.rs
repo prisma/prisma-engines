@@ -76,31 +76,33 @@ fn models_with_only_scalar_fields() {
     );
 
     let model = datamodel.assert_model("Test");
+
     model
         .assert_scalar_field("id")
         .assert_type_identifier(TypeIdentifier::Int)
         .assert_is_auto_generated_int_id_by_db();
+
     model
         .assert_scalar_field("int")
-        .assert_type_identifier(TypeIdentifier::Int)
-        .assert_no_behaviour();
+        .assert_type_identifier(TypeIdentifier::Int);
+
     model
         .assert_scalar_field("float")
-        .assert_type_identifier(TypeIdentifier::Float)
-        .assert_no_behaviour();
+        .assert_type_identifier(TypeIdentifier::Float);
+
     model
         .assert_scalar_field("boolean")
-        .assert_type_identifier(TypeIdentifier::Boolean)
-        .assert_no_behaviour();
+        .assert_type_identifier(TypeIdentifier::Boolean);
+
     model
         .assert_scalar_field("dateTime")
-        .assert_type_identifier(TypeIdentifier::DateTime)
-        .assert_no_behaviour();
+        .assert_type_identifier(TypeIdentifier::DateTime);
+
     model
         .assert_scalar_field("stringOpt")
         .assert_type_identifier(TypeIdentifier::String)
-        .assert_optional()
-        .assert_no_behaviour();
+        .assert_optional();
+
     model
         .assert_scalar_field("intList")
         .assert_type_identifier(TypeIdentifier::Int)
@@ -524,8 +526,6 @@ trait FieldAssertions {
 
 trait ScalarFieldAssertions {
     fn assert_updated_at(&self) -> &Self;
-    fn assert_behaviour(&self, behaviour: FieldBehaviour) -> &Self;
-    fn assert_no_behaviour(&self) -> &Self;
     fn assert_is_auto_generated_int_id_by_db(&self) -> &Self;
     fn assert_is_id(&self) -> &Self;
     fn assert_unique(&self) -> &Self;
@@ -543,29 +543,19 @@ impl FieldAssertions for ScalarField {
     }
 
     fn assert_optional(&self) -> &Self {
-        assert!(!self.is_required);
+        assert!(!self.is_required());
         self
     }
 
     fn assert_list(&self) -> &Self {
-        assert!(self.is_list);
+        assert!(self.is_list());
         self
     }
 }
 
 impl ScalarFieldAssertions for ScalarField {
     fn assert_updated_at(&self) -> &Self {
-        self.assert_behaviour(FieldBehaviour::UpdatedAt);
-        self
-    }
-
-    fn assert_behaviour(&self, behaviour: FieldBehaviour) -> &Self {
-        assert_eq!(self.behaviour, Some(behaviour));
-        self
-    }
-
-    fn assert_no_behaviour(&self) -> &Self {
-        assert!(self.behaviour.is_none());
+        assert!(self.is_updated_at);
         self
     }
 
@@ -591,12 +581,12 @@ impl FieldAssertions for RelationField {
     }
 
     fn assert_optional(&self) -> &Self {
-        assert!(!self.is_required);
+        assert!(!self.is_required());
         self
     }
 
     fn assert_list(&self) -> &Self {
-        assert!(self.is_list);
+        assert!(self.is_list());
         self
     }
 }

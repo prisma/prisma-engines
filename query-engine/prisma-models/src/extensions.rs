@@ -1,6 +1,6 @@
 use datamodel::{dml, Ignorable, NativeTypeInstance};
 
-use crate::{FieldBehaviour, InternalEnum, InternalEnumValue, TypeIdentifier};
+use crate::{InternalEnum, InternalEnumValue, TypeIdentifier};
 
 pub trait ModelConverterUtilities {
     // A model is supported if it has at least one indexed/unique field or compound index that's supported.
@@ -91,7 +91,6 @@ impl ModelConverterUtilities for dml::Model {
 
 pub trait DatamodelFieldExtensions {
     fn type_identifier(&self) -> TypeIdentifier;
-    fn behaviour(&self) -> Option<FieldBehaviour>;
     fn internal_enum(&self, datamodel: &dml::Datamodel) -> Option<InternalEnum>;
     fn internal_enum_value(&self, enum_value: &dml::EnumValue) -> InternalEnumValue;
     fn native_type(&self) -> Option<NativeTypeInstance>;
@@ -106,10 +105,6 @@ impl DatamodelFieldExtensions for dml::ScalarField {
             dml::FieldType::Scalar(scalar, _, _) => (*scalar).into(),
             dml::FieldType::Unsupported(_) => TypeIdentifier::Unsupported,
         }
-    }
-
-    fn behaviour(&self) -> Option<FieldBehaviour> {
-        self.is_updated_at.then(|| FieldBehaviour::UpdatedAt)
     }
 
     fn internal_enum(&self, datamodel: &dml::Datamodel) -> Option<InternalEnum> {

@@ -13,8 +13,7 @@ pub type RelationFieldWeak = Weak<RelationField>;
 #[derive(Clone)]
 pub struct RelationField {
     pub name: String,
-    pub is_required: bool,
-    pub is_list: bool,
+    pub arity: FieldArity,
     pub relation_name: String,
     pub relation_side: RelationSide,
     pub relation: OnceCell<RelationWeakRef>,
@@ -28,6 +27,14 @@ pub struct RelationField {
 }
 
 impl RelationField {
+    pub fn is_list(&self) -> bool {
+        matches!(self.arity, FieldArity::List)
+    }
+
+    pub fn is_required(&self) -> bool {
+        matches!(self.arity, FieldArity::Required)
+    }
+
     /// Returns the `ModelProjection` used for this relation fields model.
     ///
     /// ## What is the model projection of a relation field?
@@ -68,7 +75,7 @@ impl RelationField {
     }
 
     pub fn is_optional(&self) -> bool {
-        !self.is_required
+        !self.is_required()
     }
 
     pub fn model(&self) -> ModelRef {
@@ -220,8 +227,7 @@ impl Debug for RelationField {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("RelationField")
             .field("name", &self.name)
-            .field("is_required", &self.is_required)
-            .field("is_list", &self.is_list)
+            .field("arity", &self.arity)
             .field("relation_name", &self.relation_name)
             .field("relation_side", &self.relation_side)
             .field("relation", &self.relation)
@@ -237,8 +243,7 @@ impl Eq for RelationField {}
 impl Hash for RelationField {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.name.hash(state);
-        self.is_required.hash(state);
-        self.is_list.hash(state);
+        self.arity.hash(state);
         self.relation_name.hash(state);
         self.relation_side.hash(state);
         self.model().hash(state);
@@ -248,8 +253,7 @@ impl Hash for RelationField {
 impl PartialEq for RelationField {
     fn eq(&self, other: &Self) -> bool {
         self.name == other.name
-            && self.is_required == other.is_required
-            && self.is_list == other.is_list
+            && self.arity == other.arity
             && self.relation_name == other.relation_name
             && self.relation_side == other.relation_side
             && self.model() == other.model()
