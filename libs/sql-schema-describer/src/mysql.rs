@@ -162,7 +162,7 @@ impl<'a> SqlSchemaDescriber<'a> {
     #[tracing::instrument(skip(self))]
     async fn get_table_names(&self, schema: &str) -> DescriberResult<Vec<String>> {
         let sql = indoc! {r#"
-            SELECT DISTINCT(t.table_name) AS table_name
+            SELECT DISTINCT(BINARY t.table_name) AS table_name
             FROM information_schema.columns c
             INNER JOIN information_schema.tables t
                 ON c.table_schema = t.table_schema
