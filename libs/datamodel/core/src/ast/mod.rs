@@ -175,6 +175,13 @@ impl TopId {
             _ => None,
         }
     }
+
+    pub(crate) fn as_composite_type_id(&self) -> Option<CompositeTypeId> {
+        match self {
+            TopId::CompositeType(ctid) => Some(*ctid),
+            _ => None,
+        }
+    }
 }
 
 impl std::ops::Index<TopId> for SchemaAst {
