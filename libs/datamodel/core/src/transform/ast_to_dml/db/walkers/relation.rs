@@ -36,6 +36,7 @@ pub(crate) enum RefinedRelationWalker<'ast, 'db> {
 }
 
 impl<'ast, 'db> RefinedRelationWalker<'ast, 'db> {
+    #[allow(clippy::wrong_self_convention)] // disagree with clippy on this one.
     pub(crate) fn as_many_to_many(self) -> Option<ImplicitManyToManyRelationWalker<'ast, 'db>> {
         match self {
             RefinedRelationWalker::ImplicitManyToMany(w) => Some(w),

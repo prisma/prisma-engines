@@ -131,10 +131,7 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
             None => return true, // implicitly, these are referencing the singular id
         };
 
-        match self.related_model().primary_key() {
-            Some(pk) if pk.contains_exactly_fields_by_id(&[*singular_referenced_id]) => true,
-            _ => false,
-        }
+        matches!(self.related_model().primary_key(), Some(pk) if pk.contains_exactly_fields_by_id(&[*singular_referenced_id]))
     }
 
     pub(crate) fn fields(self) -> Option<impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>>> {

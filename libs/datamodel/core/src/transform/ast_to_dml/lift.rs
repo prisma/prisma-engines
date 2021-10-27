@@ -126,6 +126,8 @@ impl<'a> LiftAstToDml<'a> {
                         relation_field.relation_info.fields = match relation.referencing_fields() {
                             ReferencingFields::Concrete(fields) => fields.map(|f| f.name().to_owned()).collect(),
                             ReferencingFields::Inferred(fields) => {
+                                // In this branch, we are creating the underlying scalar fields
+                                // from thin air.  This is part of reformatting.
                                 let mut field_names = Vec::with_capacity(fields.len());
 
                                 for field in fields {
@@ -178,6 +180,7 @@ impl<'a> LiftAstToDml<'a> {
 
                             field
                         } else {
+                            // This is part of reformatting.
                             let arity = dml::FieldArity::List;
                             let referential_arity = dml::FieldArity::List;
                             let mut field = dml::RelationField::new(
