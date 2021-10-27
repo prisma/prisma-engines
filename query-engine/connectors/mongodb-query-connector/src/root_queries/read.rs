@@ -106,13 +106,7 @@ pub async fn get_related_m2m_record_ids<'conn>(
     let filter = doc! { id_field.db_name(): { "$in": ids } };
 
     // Scalar field name where the relation ids list is on `model`.
-    let relation_ids_field_name = &from_field
-        .model()
-        .primary_identifier()
-        .scalar_fields()
-        .next()
-        .unwrap()
-        .name;
+    let relation_ids_field_name = from_field.relation_info.fields.get(0).unwrap();
 
     let find_options = FindOptions::builder()
         .projection(doc! { id_field.db_name(): 1, relation_ids_field_name: 1 })
