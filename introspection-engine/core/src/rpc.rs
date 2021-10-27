@@ -1,7 +1,8 @@
 use crate::error::Error;
 use datamodel::{Configuration, Datamodel};
 use introspection_connector::{
-    ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionContext, IntrospectionResultOutput,
+    CompositeTypeDepth, ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionContext,
+    IntrospectionResultOutput,
 };
 use jsonrpc_core::BoxFuture;
 use jsonrpc_derive::rpc;
@@ -54,7 +55,11 @@ impl Rpc for RpcImpl {
     }
 
     fn introspect(&self, input: IntrospectionInput) -> RpcFutureResult<IntrospectionResultOutput> {
-        Box::pin(Self::introspect_internal(input.schema, input.force))
+        Box::pin(Self::introspect_internal(
+            input.schema,
+            input.force,
+            CompositeTypeDepth::from(input.composite_type_depth.unwrap_or(0)),
+        ))
     }
 
     fn debug_panic(&self) -> RpcFutureResult<()> {
@@ -93,7 +98,11 @@ impl RpcImpl {
         }
     }
 
-    pub async fn introspect_internal(schema: String, force: bool) -> RpcResult<IntrospectionResultOutput> {
+    pub async fn introspect_internal(
+        schema: String,
+        force: bool,
+        composite_type_depth: CompositeTypeDepth,
+    ) -> RpcResult<IntrospectionResultOutput> {
         let (config, url, connector) = RpcImpl::load_connector(&schema).await?;
 
         let input_data_model = if !force {
@@ -107,6 +116,7 @@ impl RpcImpl {
         let ctx = IntrospectionContext {
             preview_features: config2.preview_features(),
             source: config2.datasources.into_iter().next().unwrap(),
+            composite_type_depth,
         };
 
         let result = match connector.introspect(&input_data_model, ctx).await {
@@ -165,10 +175,13 @@ impl RpcImpl {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename = "camelCase")]
 pub struct IntrospectionInput {
     pub(crate) schema: String,
     #[serde(default = "default_false")]
     pub(crate) force: bool,
+    #[serde(default)]
+    pub(crate) composite_type_depth: Option<isize>,
 }
 
 fn default_false() -> bool {

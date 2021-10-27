@@ -1,3 +1,4 @@
+pub use dml::composite_type::*;
 pub use dml::datamodel::*;
 pub use dml::default_value::*;
 pub use dml::field::*;

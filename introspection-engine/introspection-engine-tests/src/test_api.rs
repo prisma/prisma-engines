@@ -7,7 +7,8 @@ use crate::{BarrelMigrationExecutor, Result};
 use datamodel::common::preview_features::PreviewFeature;
 use datamodel::{Configuration, Datamodel};
 use introspection_connector::{
-    ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionContext, IntrospectionResult, Version,
+    CompositeTypeDepth, ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionContext,
+    IntrospectionResult, Version,
 };
 use migration_connector::MigrationConnector;
 use quaint::{
@@ -127,6 +128,7 @@ impl TestApi {
         let ctx = IntrospectionContext {
             preview_features: self.preview_features(),
             source: config.datasources.into_iter().next().unwrap(),
+            composite_type_depth: CompositeTypeDepth::Infinite,
         };
 
         self.api
