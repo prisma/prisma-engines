@@ -79,6 +79,14 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
         }
     }
 
+    pub(crate) fn referenced_fields(self) -> Option<impl Iterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db> {
+        self.attributes().references.as_ref().map(|references| {
+            references
+                .iter()
+                .map(move |field_id| self.related_model().scalar_field(*field_id))
+        })
+    }
+
     /// This will be None for virtual relation fields (when no `fields` argument is passed).
     pub(crate) fn final_foreign_key_name(self) -> Option<Cow<'ast, str>> {
         self.attributes().fk_name.map(Cow::Borrowed).or_else(|| {
@@ -103,7 +111,10 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
     }
 
     pub(crate) fn referential_arity(self) -> FieldArity {
-        let some_required = self.fields().any(|f| f.ast_field().arity.is_required());
+        let some_required = self
+            .fields()
+            .map(|mut f| f.any(|f| f.ast_field().arity.is_required()))
+            .unwrap_or(false);
 
         if some_required {
             FieldArity::Required
@@ -112,22 +123,28 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
         }
     }
 
-    fn fields(self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db {
-        let f = move |field_id: &ast::FieldId| {
-            let model_id = self.model_id;
+    /// Used for validation.
+    pub(crate) fn references_singular_id_field(self) -> bool {
+        let singular_referenced_id = match self.attributes().references.as_deref() {
+            Some([field_id]) => field_id,
+            Some(_) => return false,
+            None => return true, // implicitly, these are referencing the singular id
+        };
 
-            ScalarFieldWalker {
+        matches!(self.related_model().primary_key(), Some(pk) if pk.contains_exactly_fields_by_id(&[*singular_referenced_id]))
+    }
+
+    pub(crate) fn fields(self) -> Option<impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>>> {
+        let model_id = self.model_id;
+        let attributes = self.attributes();
+        attributes.fields.as_ref().map(move |fields| {
+            fields.iter().map(move |field_id| ScalarFieldWalker {
                 model_id,
                 field_id: *field_id,
                 db: self.db,
                 scalar_field: &self.db.types.scalar_fields[&(model_id, *field_id)],
-            }
-        };
-
-        match self.attributes().fields.as_ref() {
-            Some(references) => references.iter().map(f),
-            None => [].iter().map(f),
-        }
+            })
+        })
     }
 }
 
@@ -182,7 +199,7 @@ impl<'ast> std::hash::Hash for RelationName<'ast> {
 }
 
 impl<'ast> RelationName<'ast> {
-    fn generated(model_a: &str, model_b: &str) -> Self {
+    pub(crate) fn generated(model_a: &str, model_b: &str) -> Self {
         if model_a < model_b {
             Self::Generated(format!("{}To{}", model_a, model_b))
         } else {

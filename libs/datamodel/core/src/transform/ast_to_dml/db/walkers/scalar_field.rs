@@ -43,10 +43,6 @@ impl<'ast, 'db> ScalarFieldWalker<'ast, 'db> {
         self.ast_field().arity.is_optional()
     }
 
-    pub(crate) fn is_unsupported(self) -> bool {
-        self.ast_field().field_type.is_unsupported()
-    }
-
     #[allow(dead_code)] // we'll need this
     pub(crate) fn attributes(self) -> &'db ScalarField<'ast> {
         self.scalar_field
@@ -59,5 +55,9 @@ impl<'ast, 'db> ScalarFieldWalker<'ast, 'db> {
             db: self.db,
             model_attributes: &self.db.types.model_attributes[&self.model_id],
         }
+    }
+
+    pub(crate) fn is_unsupported(self) -> bool {
+        matches!(self.ast_field().field_type, ast::FieldType::Unsupported(_, _))
     }
 }

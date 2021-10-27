@@ -22,10 +22,12 @@ impl<'ast, 'db> UniqueCriteriaWalker<'ast, 'db> {
         })
     }
 
-    /// A model must have at least one strict unique criteria. The underlying
-    /// scalar fields cannot be false or of
     pub(crate) fn is_strict_criteria(self) -> bool {
-        self.fields().all(|field| !field.is_optional())
+        !self.has_optional_fields() && !self.has_unsupported_fields()
+    }
+
+    pub(crate) fn has_optional_fields(self) -> bool {
+        self.fields().any(|field| field.is_optional())
     }
 
     pub(crate) fn has_unsupported_fields(self) -> bool {

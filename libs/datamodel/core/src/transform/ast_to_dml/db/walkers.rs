@@ -44,6 +44,10 @@ impl<'ast> ParserDatabase<'ast> {
             .map(move |ctid| CompositeTypeWalker { ctid, db: self })
     }
 
+    pub(crate) fn walk_relations(&self) -> impl Iterator<Item = RelationWalker<'ast, '_>> + '_ {
+        (0..self.relations.relations_storage.len()).map(move |relation_id| RelationWalker { db: self, relation_id })
+    }
+
     /// Iterate all complete relations that are not many to many and are
     /// correctly defined from both sides.
     #[track_caller]

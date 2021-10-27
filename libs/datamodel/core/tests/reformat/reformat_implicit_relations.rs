@@ -484,16 +484,16 @@ fn forward_relation_fields_must_be_added() {
     "#};
 
     let expected = expect![[r#"
-         model PostableEntity {
-           id     String  @id
-           Post   Post?   @relation(fields: [postId], references: [id])
-           postId String?
-         }
+        model PostableEntity {
+          id     String  @id
+          Post   Post?   @relation(fields: [postId], references: [id])
+          postId String?
+        }
 
-         model Post {
-           id               String           @id
-           postableEntities PostableEntity[]
-         }
+        model Post {
+          id               String           @id
+          postableEntities PostableEntity[]
+        }
     "#]];
 
     let result = Reformatter::new(input).reformat_to_string();
@@ -832,7 +832,7 @@ fn must_handle_conflicts_with_existing_fields_if_types_are_compatible() {
 }
 
 #[test]
-fn must_handle_conflicts_with_existing_fields_if_types_are_incompatible() {
+fn forward_relation_field_generation_picks_up_types_of_existing_underlying_scalar_fields() {
     let input = indoc! {r#"
         model Blog {
           id    String @id
@@ -852,10 +852,9 @@ fn must_handle_conflicts_with_existing_fields_if_types_are_incompatible() {
         }
 
         model Post {
-          id                String  @id
-          blogId            Int? // this is not compatible with Blog.id
-          Blog              Blog?   @relation(fields: [blogId_BlogToPost], references: [id])
-          blogId_BlogToPost String?
+          id     String @id
+          blogId Int? // this is not compatible with Blog.id
+          Blog   Blog?  @relation(fields: [blogId], references: [id])
         }
     "#]];
 
@@ -1096,8 +1095,6 @@ fn should_not_get_confused_with_complicated_self_relations() {
 
 #[test]
 fn back_relations_must_be_added_even_when_env_vars_are_missing() {
-    // missing env vars led to errors in datamodel validation. A successful validation is prerequisite to find missing back relation fields though.
-    // I changed the Reformatter to ignore env var errors.
     let input = indoc! {r#"
         datasource db {
           provider = "sqlite"
@@ -1129,40 +1126,6 @@ fn back_relations_must_be_added_even_when_env_vars_are_missing() {
           id     Int   @id
           Blog   Blog? @relation(fields: [blogId], references: [id])
           blogId Int?
-        }
-    "#]];
-
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
-}
-
-//todo formatter failure??
-#[test]
-fn must_handle_conflicts_with_existing_fields_if_types_are_incompatible_and_name_generation_breaks_down() {
-    //just dont add anything
-    let input = indoc! {r#"
-        model Blog {
-          id    String @id
-          posts Post[]
-        }
-
-        model Post {
-          id                String @id
-          blogId            Int? // this is not compatible with Blog.id
-          blogId_BlogToPost Int? // clashes with the auto generated name
-        }
-    "#};
-
-    let expected = expect![[r#"
-        model Blog {
-          id    String @id
-          posts Post[]
-        }
-
-        model Post {
-          id                String @id
-          blogId            Int? // this is not compatible with Blog.id
-          blogId_BlogToPost Int? // clashes with the auto generated name
         }
     "#]];
 

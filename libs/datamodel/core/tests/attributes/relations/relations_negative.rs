@@ -138,20 +138,6 @@ fn should_fail_on_colliding_implicit_self_relations() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `husband` on Model `User` and `wife` on Model `User` do not provide the `fields` argument in the @relation attribute. You have to provide it on one of the two fields.[0m
-          [1;94m-->[0m  [4mschema.prisma:5[0m
-        [1;94m   | [0m
-        [1;94m 4 | [0m
-        [1;94m 5 | [0m  [1;91mhusband     User?    @relation("MarriagePartners")[0m
-        [1;94m 6 | [0m  wife        User     @relation("MarriagePartners")
-        [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `husband` on Model `User` and `wife` on Model `User` do not provide the `references` argument in the @relation attribute. You have to provide it on one of the two fields.[0m
-          [1;94m-->[0m  [4mschema.prisma:5[0m
-        [1;94m   | [0m
-        [1;94m 4 | [0m
-        [1;94m 5 | [0m  [1;91mhusband     User?    @relation("MarriagePartners")[0m
-        [1;94m 6 | [0m  wife        User     @relation("MarriagePartners")
-        [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `wife` on Model `User` and `husband` on Model `User` do not provide the `fields` argument in the @relation attribute. You have to provide it on one of the two fields.[0m
           [1;94m-->[0m  [4mschema.prisma:6[0m
         [1;94m   | [0m
@@ -159,12 +145,26 @@ fn should_fail_on_colliding_implicit_self_relations() {
         [1;94m 6 | [0m  [1;91mwife        User     @relation("MarriagePartners")[0m
         [1;94m 7 | [0m
         [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `husband` on Model `User` and `wife` on Model `User` do not provide the `fields` argument in the @relation attribute. You have to provide it on one of the two fields.[0m
+          [1;94m-->[0m  [4mschema.prisma:5[0m
+        [1;94m   | [0m
+        [1;94m 4 | [0m
+        [1;94m 5 | [0m  [1;91mhusband     User?    @relation("MarriagePartners")[0m
+        [1;94m 6 | [0m  wife        User     @relation("MarriagePartners")
+        [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `wife` on Model `User` and `husband` on Model `User` do not provide the `references` argument in the @relation attribute. You have to provide it on one of the two fields.[0m
           [1;94m-->[0m  [4mschema.prisma:6[0m
         [1;94m   | [0m
         [1;94m 5 | [0m  husband     User?    @relation("MarriagePartners")
         [1;94m 6 | [0m  [1;91mwife        User     @relation("MarriagePartners")[0m
         [1;94m 7 | [0m
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `husband` on Model `User` and `wife` on Model `User` do not provide the `references` argument in the @relation attribute. You have to provide it on one of the two fields.[0m
+          [1;94m-->[0m  [4mschema.prisma:5[0m
+        [1;94m   | [0m
+        [1;94m 4 | [0m
+        [1;94m 5 | [0m  [1;91mhusband     User?    @relation("MarriagePartners")[0m
+        [1;94m 6 | [0m  wife        User     @relation("MarriagePartners")
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": The relation field `teacher` on Model `User` must specify the `fields` argument in the @relation attribute. You can run `prisma format` to fix this automatically.[0m
           [1;94m-->[0m  [4mschema.prisma:8[0m
@@ -401,20 +401,6 @@ fn should_fail_when_relation_attribute_is_missing_for_one_to_one_relations() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `post` on Model `User` and `user` on Model `Post` do not provide the `fields` argument in the @relation attribute. You have to provide it on one of the two fields.[0m
-          [1;94m-->[0m  [4mschema.prisma:3[0m
-        [1;94m   | [0m
-        [1;94m 2 | [0m  user_id Int  @id
-        [1;94m 3 | [0m  [1;91mpost    Post[0m
-        [1;94m 4 | [0m}
-        [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `post` on Model `User` and `user` on Model `Post` do not provide the `references` argument in the @relation attribute. You have to provide it on one of the two fields.[0m
-          [1;94m-->[0m  [4mschema.prisma:3[0m
-        [1;94m   | [0m
-        [1;94m 2 | [0m  user_id Int  @id
-        [1;94m 3 | [0m  [1;91mpost    Post[0m
-        [1;94m 4 | [0m}
-        [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `user` on Model `Post` and `post` on Model `User` do not provide the `fields` argument in the @relation attribute. You have to provide it on one of the two fields.[0m
           [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
@@ -422,12 +408,26 @@ fn should_fail_when_relation_attribute_is_missing_for_one_to_one_relations() {
         [1;94m 8 | [0m  [1;91muser    User[0m
         [1;94m 9 | [0m}
         [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `post` on Model `User` and `user` on Model `Post` do not provide the `fields` argument in the @relation attribute. You have to provide it on one of the two fields.[0m
+          [1;94m-->[0m  [4mschema.prisma:3[0m
+        [1;94m   | [0m
+        [1;94m 2 | [0m  user_id Int  @id
+        [1;94m 3 | [0m  [1;91mpost    Post[0m
+        [1;94m 4 | [0m}
+        [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `user` on Model `Post` and `post` on Model `User` do not provide the `references` argument in the @relation attribute. You have to provide it on one of the two fields.[0m
           [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
         [1;94m 7 | [0m  post_id Int  @id
         [1;94m 8 | [0m  [1;91muser    User[0m
         [1;94m 9 | [0m}
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `post` on Model `User` and `user` on Model `Post` do not provide the `references` argument in the @relation attribute. You have to provide it on one of the two fields.[0m
+          [1;94m-->[0m  [4mschema.prisma:3[0m
+        [1;94m   | [0m
+        [1;94m 2 | [0m  user_id Int  @id
+        [1;94m 3 | [0m  [1;91mpost    Post[0m
+        [1;94m 4 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -574,10 +574,8 @@ fn issue4822() {
     expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
-//todo this is also accepted and adds a organizationId scalar field under the hood
 #[test]
 fn issue5216() {
-    //reject,
     let dml = indoc! {r#"
         model user {
           id             String        @id
@@ -727,19 +725,19 @@ fn should_fail_on_missing_embed_ids_on_self_relations() {
         [1;94m 3 | [0m  [1;91mfather Human? @relation("paternity")[0m
         [1;94m 4 | [0m  son Human? @relation("paternity")
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `father` on Model `Human` and `son` on Model `Human` do not provide the `references` argument in the @relation attribute. You have to provide it on one of the two fields.[0m
-          [1;94m-->[0m  [4mschema.prisma:3[0m
-        [1;94m   | [0m
-        [1;94m 2 | [0m  id Int @id
-        [1;94m 3 | [0m  [1;91mfather Human? @relation("paternity")[0m
-        [1;94m 4 | [0m  son Human? @relation("paternity")
-        [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `son` on Model `Human` and `father` on Model `Human` do not provide the `fields` argument in the @relation attribute. You have to provide it on one of the two fields.[0m
           [1;94m-->[0m  [4mschema.prisma:4[0m
         [1;94m   | [0m
         [1;94m 3 | [0m  father Human? @relation("paternity")
         [1;94m 4 | [0m  [1;91mson Human? @relation("paternity")[0m
         [1;94m 5 | [0m}
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `father` on Model `Human` and `son` on Model `Human` do not provide the `references` argument in the @relation attribute. You have to provide it on one of the two fields.[0m
+          [1;94m-->[0m  [4mschema.prisma:3[0m
+        [1;94m   | [0m
+        [1;94m 2 | [0m  id Int @id
+        [1;94m 3 | [0m  [1;91mfather Human? @relation("paternity")[0m
+        [1;94m 4 | [0m  son Human? @relation("paternity")
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `son` on Model `Human` and `father` on Model `Human` do not provide the `references` argument in the @relation attribute. You have to provide it on one of the two fields.[0m
           [1;94m-->[0m  [4mschema.prisma:4[0m
