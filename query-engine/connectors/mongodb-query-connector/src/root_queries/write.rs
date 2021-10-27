@@ -298,7 +298,7 @@ pub async fn m2m_connect<'conn>(
 
     let parent_id = parent_id.values().next().unwrap();
     let parent_id_field = parent_model.primary_identifier().scalar_fields().next().unwrap();
-    let parent_ids_scalar_field_name = field.relation_info.fields.get(0).unwrap();
+    let parent_ids_scalar_field_name = &parent_id_field.name;
     let parent_id = (&parent_id_field, parent_id).into_bson()?;
 
     let parent_filter = doc! { "_id": { "$eq": parent_id.clone() } };
@@ -319,7 +319,7 @@ pub async fn m2m_connect<'conn>(
 
     // Then update all children and add the parent
     let child_filter = doc! { "_id": { "$in": child_ids } };
-    let child_ids_scalar_field_name = field.related_field().relation_info.fields.get(0).unwrap().clone();
+    let child_ids_scalar_field_name = &child_model.primary_identifier().scalar_fields().next().unwrap().name;
     let child_update = doc! { "$addToSet": { child_ids_scalar_field_name: parent_id } };
 
     child_coll
