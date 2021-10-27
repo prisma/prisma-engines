@@ -29,7 +29,8 @@ mod scalar_lists {
     }
 
     // "Scalar lists" should "be behave like regular values for create and update operations"
-    #[connector_test]
+    // Skipped for CockroachDB as enum array concatenation is not supported (https://github.com/cockroachdb/cockroach/issues/71388).
+    #[connector_test(exclude(Cockroach))]
     async fn behave_like_regular_val_for_create_and_update(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, format!(r#"mutation {{
@@ -235,7 +236,8 @@ mod scalar_lists {
     }
 
     // "An Update Mutation that pushes to some empty scalar lists" should "work"
-    #[connector_test]
+    // Skipped for CockroachDB as enum array concatenation is not supported (https://github.com/cockroachdb/cockroach/issues/71388).
+    #[connector_test(exclude(Cockroach))]
     async fn update_mut_push_empty_scalar_list(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1 }"#).await?;
         create_row(&runner, r#"{ id: 2 }"#).await?;

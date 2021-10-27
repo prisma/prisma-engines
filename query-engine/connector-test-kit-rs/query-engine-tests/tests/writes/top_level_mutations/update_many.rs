@@ -129,7 +129,7 @@ mod update_many {
     }
 
     // "An updateMany mutation" should "correctly apply all number operations for Int"
-    #[connector_test]
+    #[connector_test(exclude(Cockroach))]
     async fn apply_number_ops_for_int(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, optStr: "str1" }"#).await?;
         create_row(&runner, r#"{ id: 2, optStr: "str2", optInt: 2 }"#).await?;
@@ -172,6 +172,59 @@ mod update_many {
                 ]
             );
         }
+
+        is_one_of!(
+            query_number_operation(&runner, "optInt", "set", "5").await?,
+            vec![
+                r#"{"data":{"findManyTestModel":[{"optInt":5},{"optInt":5},{"optInt":5}]}}"#,
+                r#"{"data":{"findManyTestModel":[{"optInt":5},{"optInt":5},{"optInt":5}]}}"#
+            ]
+        );
+
+        is_one_of!(
+            query_number_operation(&runner, "optInt", "set", "null").await?,
+            vec![
+                r#"{"data":{"findManyTestModel":[{"optInt":null},{"optInt":null},{"optInt":null}]}}"#,
+                r#"{"data":{"findManyTestModel":[{"optInt":null},{"optInt":null},{"optInt":null}]}}"#
+            ]
+        );
+
+        Ok(())
+    }
+
+    // CockroachDB does not support the "divide" operator as is.
+    // See https://github.com/cockroachdb/cockroach/issues/41448.
+    #[connector_test(only(Cockroach))]
+    async fn apply_number_ops_for_int_cockroach(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, optStr: "str1" }"#).await?;
+        create_row(&runner, r#"{ id: 2, optStr: "str2", optInt: 2 }"#).await?;
+        create_row(&runner, r#"{ id: 3, optStr: "str3", optInt: 3, optFloat: 3.1 }"#).await?;
+
+        is_one_of!(
+            query_number_operation(&runner, "optInt", "increment", "10").await?,
+            vec![
+                r#"{"data":{"findManyTestModel":[{"optInt":null},{"optInt":12},{"optInt":13}]}}"#,
+                r#"{"data":{"findManyTestModel":[{"optInt":10},{"optInt":12},{"optInt":13}]}}"#
+            ]
+        );
+
+        // optInts before this op are now: null/10, 12, 13
+        is_one_of!(
+            query_number_operation(&runner, "optInt", "decrement", "10").await?,
+            vec![
+                r#"{"data":{"findManyTestModel":[{"optInt":null},{"optInt":2},{"optInt":3}]}}"#,
+                r#"{"data":{"findManyTestModel":[{"optInt":0},{"optInt":2},{"optInt":3}]}}"#
+            ]
+        );
+
+        // optInts before this op are now: null/0, 2, 3
+        is_one_of!(
+            query_number_operation(&runner, "optInt", "multiply", "2").await?,
+            vec![
+                r#"{"data":{"findManyTestModel":[{"optInt":null},{"optInt":4},{"optInt":6}]}}"#,
+                r#"{"data":{"findManyTestModel":[{"optInt":0},{"optInt":4},{"optInt":6}]}}"#
+            ]
+        );
 
         is_one_of!(
             query_number_operation(&runner, "optInt", "set", "5").await?,

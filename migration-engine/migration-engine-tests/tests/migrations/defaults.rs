@@ -15,7 +15,9 @@ fn datetime_defaults_work(api: TestApi) {
 
     api.schema_push_w_datasource(dm).send().assert_green();
 
-    let expected_default = if api.is_postgres() {
+    let expected_default = if api.is_cockroach() {
+        DefaultValue::db_generated("'2018-01-27 08:00:00':::TIMESTAMP")
+    } else if api.is_postgres() {
         DefaultValue::db_generated("'2018-01-27 08:00:00'::timestamp without time zone")
     } else if api.is_mssql() {
         let mut df = DefaultValue::db_generated("2018-01-27 08:00:00 +00:00");
@@ -51,7 +53,7 @@ fn function_expressions_as_dbgenerated_work(api: TestApi) {
     });
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(Cockroach))]
 fn default_dbgenerated_with_type_definitions_should_work(api: TestApi) {
     let dm = r#"
         model A {
@@ -68,7 +70,24 @@ fn default_dbgenerated_with_type_definitions_should_work(api: TestApi) {
     });
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Cockroach))]
+fn default_dbgenerated_with_type_definitions_should_work_cockroach(api: TestApi) {
+    let dm = r#"
+        model A {
+            id String @id @default(dbgenerated("(now()::text)"))
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm).send().assert_green();
+
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_column("id", |col| {
+            col.assert_default(Some(DefaultValue::db_generated("now():::TIMESTAMPTZ::STRING")))
+        })
+    });
+}
+
+#[test_connector(tags(Postgres), exclude(Cockroach))]
 fn default_dbgenerated_should_work(api: TestApi) {
     let dm = r#"
         model A {
@@ -85,7 +104,24 @@ fn default_dbgenerated_should_work(api: TestApi) {
     });
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Cockroach))]
+fn default_dbgenerated_should_work_cockroach(api: TestApi) {
+    let dm = r#"
+        model A {
+            id DateTime @id @default(dbgenerated("(now())"))
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm).send().assert_green();
+
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_column("id", |col| {
+            col.assert_default(Some(DefaultValue::db_generated("now():::TIMESTAMP")))
+        })
+    });
+}
+
+#[test_connector(tags(Postgres), exclude(Cockroach))]
 fn uuid_default(api: TestApi) {
     let dm = r#"
         model A {
@@ -100,6 +136,26 @@ fn uuid_default(api: TestApi) {
         table.assert_column("uuid", |col| {
             col.assert_default(Some(DefaultValue::db_generated(
                 "'00000000-0000-0000-0016-000000000004'::uuid",
+            )))
+        })
+    });
+}
+
+#[test_connector(tags(Cockroach))]
+fn uuid_default_cockroach(api: TestApi) {
+    let dm = r#"
+        model A {
+            id   String @id @db.Uuid
+            uuid String @db.Uuid @default("00000000-0000-0000-0016-000000000004")
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm).send().assert_green();
+
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_column("uuid", |col| {
+            col.assert_default(Some(DefaultValue::db_generated(
+                "'00000000-0000-0000-0016-000000000004':::UUID",
             )))
         })
     });

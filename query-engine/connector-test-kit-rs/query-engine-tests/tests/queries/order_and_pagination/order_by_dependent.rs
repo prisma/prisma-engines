@@ -164,6 +164,8 @@ mod order_by_dependent {
                 r#"{"data":{"findManyModelA":[{"id":2,"b":{"c":null}},{"id":3,"b":null},{"id":1,"b":{"c":{"id":1}}}]}}"#,
                 r#"{"data":{"findManyModelA":[{"id":3,"b":null},{"id":2,"b":{"c":null}},{"id":1,"b":{"c":{"id":1}}}]}}"#,
                 r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"id":1}}},{"id":2,"b":{"c":null}},{"id":3,"b":null}]}}"#,
+                // CockroachDB can order ModelA.id in any order if ModelC.b_id is NULL.
+                r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"id":1}}},{"id":3,"b":null},{"id":2,"b":{"c":null}}]}}"#,
             ]
         );
 
@@ -307,7 +309,7 @@ mod order_by_dependent {
         schema.to_string()
     }
 
-    #[connector_test(schema(multiple_rel_same_model), exclude(MongoDb))] // Mongo is excluded due to CI issues (version drift?).
+    #[connector_test(schema(multiple_rel_same_model))]
     async fn multiple_rel_same_model_order_by(runner: Runner) -> TestResult<()> {
         // test data
         run_query!(

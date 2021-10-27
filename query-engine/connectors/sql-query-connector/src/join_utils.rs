@@ -11,7 +11,7 @@ pub struct AliasedJoin {
 
 #[derive(Debug, Clone)]
 pub enum AggregationType {
-    Count { _all: bool },
+    Count,
 }
 
 pub fn compute_aggr_join(
@@ -50,7 +50,7 @@ fn compute_aggr_join_one2m(
     // + SELECT A.fk FROM A
     let query = Select::from_table(rf.related_model().as_table()).columns(select_columns);
     let aggr_expr = match aggregation {
-        AggregationType::Count { _all } => count(asterisk()),
+        AggregationType::Count => count(asterisk()),
     };
 
     // SELECT A.fk,
@@ -106,7 +106,7 @@ fn compute_aggr_join_m2m(
     let query = Select::from_table(model_a.as_table()).columns(a_columns.clone());
 
     let aggr_expr = match aggregation {
-        AggregationType::Count { _all } => count(rf.related_field().m2m_columns()),
+        AggregationType::Count => count(rf.related_field().m2m_columns()),
     };
 
     // SELECT A.id,

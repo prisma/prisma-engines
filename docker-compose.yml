@@ -89,6 +89,19 @@ services:
       - databases
     tmpfs: /pgtmpfs13:size=4g
 
+  postgres14:
+    image: postgres:14
+    restart: always
+    command: postgres -c 'max_connections=1000'
+    environment:
+      POSTGRES_PASSWORD: "prisma"
+      POSTGRES_HOST_AUTH_METHOD: "md5"
+      POSTGRES_INITDB_ARGS: "--auth-host=md5"
+    ports:
+      - "5437:5432"
+    networks:
+      - databases
+
   mysql-5-6:
     image: mysql:5.6.50
     command: mysqld
@@ -233,6 +246,18 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: "prisma"
     ports:
       - "27017:27017"
+    networks:
+      - databases
+
+  mongo5:
+    image: prismagraphql/mongo-single-replica:5.0.3
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: "prisma"
+      MONGO_INITDB_ROOT_PASSWORD: "prisma"
+      MONGO_PORT: 27018
+    ports:
+      - "27018:27018"
     networks:
       - databases
 

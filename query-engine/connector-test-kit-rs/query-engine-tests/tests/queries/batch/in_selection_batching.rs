@@ -4,7 +4,7 @@ use query_engine_tests::*;
 #[test_suite(schema(schema))]
 mod isb {
     use indoc::indoc;
-    use query_engine_tests::run_query;
+    use query_engine_tests::{assert_error, run_query};
 
     fn schema() -> String {
         let schema = indoc! {
@@ -13,6 +13,7 @@ mod isb {
                 #id(id, Int, @id)
                 b_id Int
                 c_id Int
+                text String
 
                 b B @relation(fields: [b_id], references: [id])
                 c C @relation(fields: [c_id], references: [id])
@@ -81,12 +82,64 @@ mod isb {
         Ok(())
     }
 
+    #[connector_test(exclude(MongoDb))]
+    async fn order_by_aggregation_should_fail(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
+
+        assert_error!(
+            runner,
+            r#"query {
+              findManyA(where: {id: { in: [5,4,3,2,1,1,1,2,3,4,5,6,7,6,5,4,3,2,1,2,3,4,5,6] }}, orderBy: { b: { as: { _count: asc } } }) { id }
+            }"#,
+            2029,
+            "Your query cannot be split into multiple queries because of the order by aggregation or relevance."
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(exclude(MongoDb), capabilities(FullTextSearchWithoutIndex))]
+    async fn order_by_relevance_should_fail(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
+
+        assert_error!(
+            runner,
+            r#"query {
+              findManyA(where: {id: { in: [5,4,3,2,1,1,1,2,3,4,5,6,7,6,5,4,3,2,1,2,3,4,5,6] }}, orderBy: { _relevance: { fields: text, search: "something", sort: asc } }) { id }
+            }"#,
+            2029,
+            "Your query cannot be split into multiple queries because of the order by aggregation or relevance."
+        );
+
+        Ok(())
+    }
+
     async fn create_test_data(runner: &Runner) -> TestResult<()> {
-        create_a(runner, r#"{ id: 1, b: { create: { id: 1 }} c: { create: { id: 1 }} }"#).await?;
-        create_a(runner, r#"{ id: 2, b: { connect: { id: 1 }} c: { create: { id: 2 }} }"#).await?;
-        create_a(runner, r#"{ id: 3, b: { create: { id: 3 }} c: { create: { id: 3 }} }"#).await?;
-        create_a(runner, r#"{ id: 4, b: { create: { id: 4 }} c: { create: { id: 4 }} }"#).await?;
-        create_a(runner, r#"{ id: 5, b: { create: { id: 5 }} c: { create: { id: 5 }} }"#).await?;
+        create_a(
+            runner,
+            r#"{ id: 1, text: "", b: { create: { id: 1 }} c: { create: { id: 1 }} }"#,
+        )
+        .await?;
+        create_a(
+            runner,
+            r#"{ id: 2, text: "", b: { connect: { id: 1 }} c: { create: { id: 2 }} }"#,
+        )
+        .await?;
+        create_a(
+            runner,
+            r#"{ id: 3, text: "", b: { create: { id: 3 }} c: { create: { id: 3 }} }"#,
+        )
+        .await?;
+        create_a(
+            runner,
+            r#"{ id: 4, text: "", b: { create: { id: 4 }} c: { create: { id: 4 }} }"#,
+        )
+        .await?;
+        create_a(
+            runner,
+            r#"{ id: 5, text: "", b: { create: { id: 5 }} c: { create: { id: 5 }} }"#,
+        )
+        .await?;
 
         Ok(())
     }

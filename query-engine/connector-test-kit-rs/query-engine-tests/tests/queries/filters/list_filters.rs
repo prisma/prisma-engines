@@ -204,7 +204,9 @@ mod lists {
     }
 }
 
-#[test_suite(schema(schema), capabilities(ScalarLists, Json))]
+// CockroachDB cannot store Json[], but can process them in memory.
+// See https://github.com/cockroachdb/cockroach/issues/23468.
+#[test_suite(schema(schema), capabilities(ScalarLists, Json), exclude(Cockroach))]
 mod json_lists {
     use indoc::indoc;
 

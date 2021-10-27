@@ -1,4 +1,5 @@
 mod composite_type;
+mod field;
 mod index;
 mod model;
 mod relation;
@@ -6,6 +7,7 @@ mod relation_field;
 mod scalar_field;
 
 pub(crate) use composite_type::*;
+pub(crate) use field::*;
 pub(crate) use index::*;
 pub(crate) use model::*;
 pub(crate) use relation::*;
