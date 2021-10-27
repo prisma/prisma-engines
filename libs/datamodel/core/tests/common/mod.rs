@@ -297,7 +297,7 @@ impl ModelAsserts for dml::Model {
         self
     }
 
-    fn assert_has_id_fields(&self, fields: &[&str]) -> &Self {
+    fn assert_has_id_fields(&self, _fields: &[&str]) -> &Self {
         //TODO(matthias)
 
         // assert_eq!(self.primary_key.as_ref().unwrap().fields, fields);

@@ -235,7 +235,7 @@ fn composite_primary_keys_must_work(api: TestApi) {
             columns: expected_columns,
             indices: vec![],
             primary_key: Some(PrimaryKey {
-                columns: vec!["id".to_string(), "name".to_string()],
+                columns: vec![("id".to_string(), None), ("name".to_string(), None)],
                 sequence: None,
                 constraint_name: match api.sql_family() {
                     SqlFamily::Postgres => Some("User_pkey".into()),
@@ -312,7 +312,7 @@ fn indices_must_work(api: TestApi) {
 
     let pk = user_table.primary_key.as_ref().unwrap();
 
-    assert_eq!(pk.columns, &["id"]);
+    assert_eq!(pk.columns, &[("id".to_string(), None)]);
     assert_eq!(pk_sequence, pk.sequence);
 
     match api.sql_family() {

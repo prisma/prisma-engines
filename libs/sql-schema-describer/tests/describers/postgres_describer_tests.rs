@@ -568,7 +568,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                 tpe: IndexType::Unique,
             },],
             primary_key: Some(PrimaryKey {
-                columns: vec!["primary_col".into()],
+                columns: vec![("primary_col".into(), None)],
                 sequence: Some(Sequence {
                     name: "User_primary_col_seq".into(),
                 },),

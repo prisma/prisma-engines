@@ -121,7 +121,7 @@ async fn sqlite_column_types_must_work() {
             columns: expected_columns,
             indices: vec![],
             primary_key: Some(PrimaryKey {
-                columns: vec!["primary_col".to_string()],
+                columns: vec![("primary_col".to_string(), None)],
                 sequence: None,
                 constraint_name: None,
             }),
@@ -220,7 +220,7 @@ async fn sqlite_foreign_key_on_delete_must_be_handled() {
             ],
             indices: vec![],
             primary_key: Some(PrimaryKey {
-                columns: vec!["id".to_string()],
+                columns: vec![("id".to_string(), None)],
                 sequence: None,
                 constraint_name: None,
             }),
@@ -293,7 +293,7 @@ async fn sqlite_text_primary_keys_must_be_inferred_on_table_and_not_as_separate_
     assert_eq!(
         table.primary_key.as_ref().unwrap(),
         &PrimaryKey {
-            columns: vec!["primary_col".to_owned()],
+            columns: vec![("primary_col".to_owned(), None)],
             sequence: None,
             constraint_name: None,
         }

@@ -73,7 +73,7 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
                 let (indexes, table_pk_wrapped) = table_indexes;
 
                 let table_pk = table_pk_wrapped.as_mut().unwrap();
-                table_pk.columns.retain(|c| table_columns.contains(c));
+                table_pk.columns.retain(|(c, _)| table_columns.contains(c));
                 if table_pk.columns.is_empty() {
                     table_indexes.1 = None;
                 }
@@ -604,7 +604,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
                 match entry.1.as_mut() {
                     Some(pk) => {
-                        pk.columns.push(column_name);
+                        pk.columns.push((column_name, None));
                     }
                     None => {
                         let sequence = sequence_name.and_then(|sequence_name| {
@@ -617,7 +617,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                         });
 
                         entry.1 = Some(PrimaryKey {
-                            columns: vec![column_name],
+                            columns: vec![(column_name, None)],
                             sequence,
                             constraint_name: Some(name.clone()),
                         });

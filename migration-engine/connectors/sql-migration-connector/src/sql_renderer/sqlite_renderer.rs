@@ -130,7 +130,7 @@ impl SqlRenderer for SqliteFlavour {
         if !table.columns().any(|col| col.is_single_primary_key()) {
             create_table.primary_key = table
                 .primary_key_column_names()
-                .map(|slice| slice.iter().map(|name| name.into()).collect());
+                .map(|slice| slice.iter().map(|(name, _)| name.into()).collect());
         }
 
         create_table.to_string()

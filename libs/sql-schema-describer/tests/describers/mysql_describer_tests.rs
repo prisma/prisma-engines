@@ -584,7 +584,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
             columns: expected_columns,
             indices: vec![],
             primary_key: Some(PrimaryKey {
-                columns: vec!["primary_col".to_string()],
+                columns: vec![("primary_col".to_string(), None)],
                 sequence: None,
                 constraint_name: None,
             }),
@@ -1114,7 +1114,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
             columns: expected_columns,
             indices: vec![],
             primary_key: Some(PrimaryKey {
-                columns: vec!["primary_col".to_string()],
+                columns: vec![("primary_col".to_string(), None)],
                 sequence: None,
                 constraint_name: None,
             }),

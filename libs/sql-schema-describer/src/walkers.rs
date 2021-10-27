@@ -137,7 +137,7 @@ impl<'a> ColumnWalker<'a> {
     pub fn is_single_primary_key(&self) -> bool {
         self.table()
             .primary_key()
-            .map(|pk| pk.columns == [self.name()])
+            .map(|pk| pk.columns.len() == 1 && pk.columns.first().unwrap().0 == self.name())
             .unwrap_or(false)
     }
 
@@ -349,7 +349,7 @@ impl<'a> TableWalker<'a> {
 
     /// The names of the columns that are part of the primary key. `None` means
     /// there is no primary key on the table.
-    pub fn primary_key_column_names(&self) -> Option<&[String]> {
+    pub fn primary_key_column_names(&self) -> Option<&[(String, Option<u32>)]> {
         self.table().primary_key.as_ref().map(|pk| pk.columns.as_slice())
     }
 

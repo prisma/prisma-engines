@@ -432,11 +432,8 @@ impl<'a> SqlSchemaDescriber<'a> {
 
                         match primary_key {
                             Some(pk) => {
-                                if pk.columns.len() < (pos + 1) as usize {
-                                    pk.columns.resize((pos + 1) as usize, "".to_string());
-                                }
-
-                                pk.columns[pos as usize] = column_name;
+                                pk.resize_columns_if_necessary(pos);
+                                pk.columns[pos as usize] = (column_name, None);
 
                                 debug!(
                                     "The primary key has already been created, added column to it: {:?}",
@@ -447,7 +444,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                                 debug!("Instantiating primary key");
 
                                 primary_key.replace(PrimaryKey {
-                                    columns: vec![column_name],
+                                    columns: vec![(column_name, None)],
                                     sequence: None,
                                     constraint_name: Some(index_name),
                                 });

@@ -119,7 +119,7 @@ impl SqlRenderer for MysqlFlavour {
                         .primary_key_column_names()
                         .iter()
                         .flat_map(|c| c.iter())
-                        .map(|colname| self.quote(colname))
+                        .map(|(colname, _)| self.quote(colname))
                         .join(", ")
                 )),
                 TableChange::AddColumn { column_id } => {
@@ -209,7 +209,7 @@ impl SqlRenderer for MysqlFlavour {
                 .primary_key_column_names()
                 .unwrap_or_default()
                 .iter()
-                .map(|s| Cow::Borrowed(s.as_str()))
+                .map(|(s, _)| Cow::Borrowed(s.as_str())) //TODO(matthias)
                 .collect(),
             default_character_set: Some("utf8mb4".into()),
             collate: Some("utf8mb4_unicode_ci".into()),

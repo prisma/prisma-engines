@@ -191,14 +191,14 @@ impl Table {
 
     pub fn is_part_of_primary_key(&self, column: &str) -> bool {
         match &self.primary_key {
-            Some(pk) => pk.columns.contains(&column.to_string()),
+            Some(pk) => pk.columns.iter().any(|(name, _)| name == column),
             None => false,
         }
     }
 
     pub fn primary_key_columns(&self) -> Vec<String> {
         match &self.primary_key {
-            Some(pk) => pk.columns.clone(),
+            Some(pk) => pk.columns.clone().into_iter().map(|(name, _)| name).collect(),
             None => Vec::new(),
         }
     }
@@ -272,7 +272,7 @@ pub struct UserDefinedType {
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct PrimaryKey {
     /// Columns.
-    pub columns: Vec<String>,
+    pub columns: Vec<(String, Option<u32>)>,
     /// The sequence optionally seeding this primary key.
     pub sequence: Option<Sequence>,
     /// The name of the primary key constraint, when available.
@@ -281,7 +281,13 @@ pub struct PrimaryKey {
 
 impl PrimaryKey {
     pub fn is_single_primary_key(&self, column: &str) -> bool {
-        self.columns.len() == 1 && self.columns.iter().any(|col| col == column)
+        self.columns.len() == 1 && self.columns.iter().any(|(col, _)| col == column)
+    }
+
+    pub fn resize_columns_if_necessary(&mut self, pos: i64) {
+        if self.columns.len() < (pos + 1) as usize {
+            self.columns.resize((pos + 1) as usize, ("".to_string(), None));
+        }
     }
 }
 

@@ -152,7 +152,7 @@ mod tests {
             ],
             indices: vec![],
             primary_key: Some(PrimaryKey {
-                columns: vec!["required".to_string()],
+                columns: vec![("required".to_string(), None)],
                 sequence: None,
                 constraint_name: None,
             }),
@@ -301,7 +301,7 @@ mod tests {
                 }],
                 indices: vec![],
                 primary_key: Some(PrimaryKey {
-                    columns: vec!["primary".to_string()],
+                    columns: vec![("primary".to_string(), None)],
                     sequence: None,
                     constraint_name: None,
                 }),
@@ -322,7 +322,7 @@ mod tests {
                 }],
                 indices: vec![],
                 primary_key: Some(PrimaryKey {
-                    columns: vec!["primary".to_string()],
+                    columns: vec![("primary".to_string(), None)],
                     sequence: None,
                     constraint_name: None,
                 }),
@@ -343,7 +343,7 @@ mod tests {
                 }],
                 indices: vec![],
                 primary_key: Some(PrimaryKey {
-                    columns: vec!["primary".to_string()],
+                    columns: vec![("primary".to_string(), None)],
                     sequence: Some(Sequence {
                         name: "sequence".to_string(),
                     }),
@@ -635,7 +635,7 @@ mod tests {
                 ],
                 indices: vec![],
                 primary_key: Some(PrimaryKey {
-                    columns: vec!["id".to_string()],
+                    columns: vec![("id".to_string(), None)],
                     sequence: None,
                     constraint_name: None,
                 }),
@@ -680,7 +680,7 @@ mod tests {
                 ],
                 indices: vec![],
                 primary_key: Some(PrimaryKey {
-                    columns: vec!["id".to_string()],
+                    columns: vec![("id".to_string(), None)],
                     sequence: None,
                     constraint_name: None,
                 }),
@@ -826,7 +826,7 @@ mod tests {
                 tpe: IndexType::Unique,
             }],
             primary_key: Some(PrimaryKey {
-                columns: vec!["id".to_string()],
+                columns: vec![("id".to_string(), None)],
                 sequence: None,
                 constraint_name: None,
             }),
@@ -1013,7 +1013,7 @@ mod tests {
                 ],
                 indices: vec![],
                 primary_key: Some(PrimaryKey {
-                    columns: vec!["id".to_string()],
+                    columns: vec![("id".to_string(), None)],
                     sequence: None,
                     constraint_name: None,
                 }),
@@ -1047,7 +1047,7 @@ mod tests {
                 ],
                 indices: vec![],
                 primary_key: Some(PrimaryKey {
-                    columns: vec!["id".to_string()],
+                    columns: vec![("id".to_string(), None)],
                     sequence: None,
                     constraint_name: None,
                 }),

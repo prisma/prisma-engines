@@ -289,17 +289,51 @@ impl SqlMigration {
                             }
                             TableChange::DropPrimaryKey => {
                                 out.push_str("  [-] Dropped the primary key on columns (");
-                                out.push_str(&tables.previous().primary_key_column_names().unwrap().join(", "));
+                                out.push_str(
+                                    //TODO(matthias) display impl
+                                    &tables
+                                        .previous()
+                                        .primary_key_column_names()
+                                        .unwrap()
+                                        .into_iter()
+                                        .map(|(column, length)| match length {
+                                            Some(l) => format!("{}({})", column, *l),
+                                            None => column.to_string(),
+                                        })
+                                        .join(", "),
+                                );
                                 out.push_str(")\n");
                             }
                             TableChange::RenamePrimaryKey => {
                                 out.push_str("  [*] Renamed the primary key on columns (");
-                                out.push_str(&tables.previous().primary_key_column_names().unwrap().join(", "));
+                                out.push_str(
+                                    &tables
+                                        .previous()
+                                        .primary_key_column_names()
+                                        .unwrap()
+                                        .into_iter()
+                                        .map(|(column, length)| match length {
+                                            Some(l) => format!("{}({})", column, *l),
+                                            None => column.to_string(),
+                                        })
+                                        .join(", "),
+                                );
                                 out.push_str(")\n");
                             }
                             TableChange::AddPrimaryKey => {
                                 out.push_str("  [+] Added primary key on columns (");
-                                out.push_str(&tables.next().primary_key_column_names().unwrap().join(", "));
+                                out.push_str(
+                                    &tables
+                                        .next()
+                                        .primary_key_column_names()
+                                        .unwrap()
+                                        .into_iter()
+                                        .map(|(column, length)| match length {
+                                            Some(l) => format!("{}({})", column, *l),
+                                            None => column.to_string(),
+                                        })
+                                        .join(", "),
+                                );
                                 out.push_str(")\n");
                             }
                         }

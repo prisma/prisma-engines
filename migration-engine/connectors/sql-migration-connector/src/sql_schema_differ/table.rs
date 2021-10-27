@@ -114,6 +114,7 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
         }
     }
 
+    //TODO(matthias) needs to be sensitive to length changes
     /// Returns true if any of the columns of the primary key changed type.
     fn primary_key_column_changed(&self, previous_pk: &PrimaryKey) -> bool {
         self.column_pairs()
@@ -121,7 +122,7 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
                 previous_pk
                     .columns
                     .iter()
-                    .any(|pk_col| pk_col == columns.previous.name())
+                    .any(|(pk_col, _)| pk_col == columns.previous.name())
             })
             .any(|columns| self.db.column_changes_for_walkers(columns).type_changed())
     }

@@ -585,7 +585,10 @@ pub struct PrimaryKeyAssertion<'a> {
 
 impl<'a> PrimaryKeyAssertion<'a> {
     pub fn assert_columns(self, column_names: &[&str]) -> Self {
-        assert_eq!(self.pk.columns, column_names);
+        let length_is_same = self.pk.columns.len() == column_names.len();
+        let columns_match = self.pk.columns.iter().all(|(c, _)| column_names.contains(&&**c));
+
+        assert!(length_is_same && columns_match);
 
         self
     }
@@ -595,7 +598,7 @@ impl<'a> PrimaryKeyAssertion<'a> {
             self.table
                 .columns
                 .iter()
-                .any(|column| self.pk.columns.contains(&column.name) && column.auto_increment),
+                .any(|column| self.pk.columns.iter().any(|(c, _)| c == &column.name) && column.auto_increment),
             "Assertion failed: expected a sequence on the primary key, found none."
         );
 
@@ -608,7 +611,7 @@ impl<'a> PrimaryKeyAssertion<'a> {
                 .table
                 .columns
                 .iter()
-                .any(|column| self.pk.columns.contains(&column.name) && column.auto_increment),
+                .any(|column| self.pk.columns.iter().any(|(c, _)| c == &column.name) && column.auto_increment),
             "Assertion failed: expected no sequence on the primary key, but found one."
         );
 

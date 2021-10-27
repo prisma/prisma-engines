@@ -156,7 +156,7 @@ impl SqlRenderer for MssqlFlavour {
             .join(",\n    ");
 
         let primary_key = if let Some(pk) = table.primary_key() {
-            let column_names = pk.columns.iter().map(|col| self.quote(col)).join(",");
+            let column_names = pk.columns.iter().map(|(col, _)| self.quote(col)).join(",");
 
             format!(
                 ",\n    CONSTRAINT {} PRIMARY KEY ({})",

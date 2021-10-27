@@ -61,7 +61,8 @@ impl SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
         }
 
         for (table_index, fk_index, columns) in foreign_keys_without_referenced_columns {
-            tables[table_index].foreign_keys[fk_index].referenced_columns = columns
+            tables[table_index].foreign_keys[fk_index].referenced_columns =
+                columns.into_iter().map(|(name, _)| name).collect()
         }
 
         let views = self.get_views().await?;
@@ -271,16 +272,16 @@ impl<'a> SqlSchemaDescriber<'a> {
             trace!("Determined that table has no primary key");
             None
         } else {
-            let mut columns: Vec<String> = vec![];
+            let mut columns: Vec<(String, Option<u32>)> = vec![];
             let mut col_idxs: Vec<&i64> = pk_cols.keys().collect();
             col_idxs.sort_unstable();
             for i in col_idxs {
-                columns.push(pk_cols[i].clone());
+                columns.push((pk_cols[i].clone(), None));
             }
 
             //Integer Id columns are always implemented with either row id or autoincrement
             if pk_cols.len() == 1 {
-                let pk_col = &columns[0];
+                let pk_col = &columns[0].0;
                 for col in cols.iter_mut() {
                     if &col.name == pk_col && &col.tpe.full_data_type.to_lowercase() == "integer" {
                         trace!(

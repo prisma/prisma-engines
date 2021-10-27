@@ -418,7 +418,6 @@ impl<'a> SqlSchemaDescriber<'a> {
     ) -> DescriberResult<BTreeMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)>> {
         let mut map = BTreeMap::new();
         let mut indexes_with_expressions: HashSet<(String, String)> = HashSet::new();
-        let mut indexes_with_partially_covered_columns: HashSet<(String, String)> = HashSet::new();
 
         // We alias all the columns because MySQL column names are case-insensitive in queries, but the
         // information schema column names became upper-case in MySQL 8, causing the code fetching
@@ -441,9 +440,8 @@ impl<'a> SqlSchemaDescriber<'a> {
             trace!("Got index row: {:#?}", row);
             let table_name = row.get_expect_string("table_name");
             let index_name = row.get_expect_string("index_name");
-            if row.get_u32("partial").is_some() {
-                indexes_with_partially_covered_columns.insert((table_name.clone(), index_name.clone()));
-            };
+            let length = row.get_u32("partial");
+
             match row.get_string("column_name") {
                 Some(column_name) => {
                     let seq_in_index = row.get_expect_i64("seq_in_index");
@@ -461,10 +459,8 @@ impl<'a> SqlSchemaDescriber<'a> {
                         trace!("Column '{}' is part of the primary key", column_name);
                         match primary_key {
                             Some(pk) => {
-                                if pk.columns.len() < (pos + 1) as usize {
-                                    pk.columns.resize((pos + 1) as usize, "".to_string());
-                                }
-                                pk.columns[pos as usize] = column_name;
+                                pk.resize_columns_if_necessary(pos);
+                                pk.columns[pos as usize] = (column_name, length);
                                 trace!(
                                     "The primary key has already been created, added column to it: {:?}",
                                     pk.columns
@@ -474,7 +470,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                                 trace!("Instantiating primary key");
 
                                 primary_key.replace(PrimaryKey {
-                                    columns: vec![column_name],
+                                    columns: vec![(column_name, length)],
                                     sequence: None,
                                     constraint_name: None,
                                 });
@@ -506,11 +502,6 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         for (table, (index_map, _)) in &mut map {
             for (tble, index_name) in &indexes_with_expressions {
-                if tble == table {
-                    index_map.remove(index_name);
-                }
-            }
-            for (tble, index_name) in &indexes_with_partially_covered_columns {
                 if tble == table {
                     index_map.remove(index_name);
                 }

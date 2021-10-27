@@ -504,7 +504,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
 
     let pk = table.primary_key.as_ref().unwrap();
 
-    assert_eq!(vec!["primary_col".to_string()], pk.columns);
+    assert_eq!(vec![("primary_col".to_string(), None)], pk.columns);
     assert_eq!(None, pk.sequence);
     assert!(pk
         .constraint_name
@@ -611,7 +611,7 @@ fn mssql_foreign_key_on_delete_must_be_handled(api: TestApi) {
             ],
             indices: vec![],
             primary_key: Some(PrimaryKey {
-                columns: vec!["id".to_string()],
+                columns: vec![("id".to_string(), None)],
                 sequence: None,
                 constraint_name: Some("PK__User".into()),
             }),

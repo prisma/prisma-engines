@@ -173,7 +173,7 @@ impl<'a> AlterTableConstructor<'a> {
         let columns = self.tables.next().primary_key_column_names().unwrap();
         let mut quoted_columns = Vec::with_capacity(columns.len());
 
-        for colname in columns {
+        for (colname, _) in columns {
             quoted_columns.push(format!("{}", self.renderer.quote(colname)));
         }
 

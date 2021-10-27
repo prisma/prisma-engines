@@ -22,3 +22,26 @@ async fn a_table_with_non_id_autoincrement(api: &TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_connector(tags(Mysql))]
+async fn a_table_with_partial_primary_key(api: &TestApi) -> TestResult {
+    let setup = r#"
+        CREATE TABLE `Test` (
+            `id` varchar(3000),
+            Primary Key(`id`(100))
+        );
+    "#;
+
+    api.raw_cmd(setup).await;
+
+    let expected = expect![[r#"
+        model Test {
+          id       Int @id
+          authorId Int @unique(map: "authorId") @default(autoincrement())
+        }
+    "#]];
+
+    expected.assert_eq(&api.introspect_dml().await?);
+
+    Ok(())
+}

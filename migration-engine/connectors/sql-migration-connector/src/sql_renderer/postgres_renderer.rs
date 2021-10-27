@@ -287,7 +287,7 @@ impl SqlRenderer for PostgresFlavour {
                             .primary_key_column_names()
                             .unwrap()
                             .iter()
-                            .map(|colname| self.quote(colname))
+                            .map(|(colname, _)| self.quote(colname))
                             .join(", ")
                     )
                 }),
@@ -379,7 +379,7 @@ impl SqlRenderer for PostgresFlavour {
                 pk.columns
                     .as_slice()
                     .iter()
-                    .map(|col| self.quote(col.as_ref()))
+                    .map(|(col, _)| self.quote(col.as_ref()))
                     .join(",")
             )
         } else {
