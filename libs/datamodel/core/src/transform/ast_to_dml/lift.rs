@@ -209,9 +209,16 @@ impl<'a> LiftAstToDml<'a> {
 
                         common_dml_fields(&mut field, attributes, relation_field);
 
-                        let primary_key = relation_field.related_model().primary_key().unwrap();
-                        field.relation_info.references =
-                            primary_key.fields().map(|field| field.name().to_owned()).collect();
+                        let related_primary_key = relation_field.related_model().primary_key().unwrap();
+                        field.relation_info.references = related_primary_key
+                            .fields()
+                            .map(|field| field.name().to_owned())
+                            .collect();
+
+                        // This is expected in the query engine.
+                        let own_primary_key = relation_field.model().primary_key().unwrap();
+                        field.relation_info.fields =
+                            own_primary_key.fields().map(|field| field.name().to_owned()).collect();
 
                         let model = schema.find_model_mut(relation_field.model().name());
                         model.add_field(dml::Field::RelationField(field));
