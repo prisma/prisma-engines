@@ -213,6 +213,13 @@ impl<'a> LiftAstToDml<'a> {
                         field.relation_info.references =
                             primary_key.fields().map(|field| field.name().to_owned()).collect();
 
+                        field.relation_info.fields = relation_field
+                            .fields()
+                            .into_iter()
+                            .flatten()
+                            .map(|f| f.name().to_owned())
+                            .collect();
+
                         let model = schema.find_model_mut(relation_field.model().name());
                         model.add_field(dml::Field::RelationField(field));
                         field_ids_for_sorting.insert(
