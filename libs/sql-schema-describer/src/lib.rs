@@ -166,6 +166,7 @@ pub struct Table {
 }
 
 impl Table {
+    #[track_caller]
     pub fn column_bang(&self, name: &str) -> &Column {
         self.column(name)
             .unwrap_or_else(|| panic!("Column {} not found in Table {}", name, self.name))

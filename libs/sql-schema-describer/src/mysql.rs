@@ -161,11 +161,17 @@ impl<'a> SqlSchemaDescriber<'a> {
 
     #[tracing::instrument(skip(self))]
     async fn get_table_names(&self, schema: &str) -> DescriberResult<Vec<String>> {
-        let sql = "SELECT table_name as table_name FROM information_schema.tables
-            WHERE table_schema = ?
-            -- Views are not supported yet
-            AND table_type = 'BASE TABLE'
-            ORDER BY Binary table_name";
+        let sql = indoc! {r#"
+            SELECT DISTINCT(t.table_name) AS table_name
+            FROM information_schema.columns c
+            INNER JOIN information_schema.tables t
+                ON c.table_schema = t.table_schema
+                AND c.table_name = t.table_name
+            WHERE c.table_schema = ?
+                AND t.table_type = 'BASE TABLE'
+            ORDER BY BINARY t.table_name;
+        "#};
+
         let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
         let names = rows
             .into_iter()

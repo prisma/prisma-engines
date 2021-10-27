@@ -1857,6 +1857,7 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-futures",
+ "url",
  "user-facing-errors",
 ]
 

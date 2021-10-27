@@ -242,6 +242,10 @@ impl TestApi {
         }
     }
 
+    pub fn connection_string(&self) -> &str {
+        &self.connection_string
+    }
+
     pub fn configuration(&self) -> Configuration {
         datamodel::parse_configuration(&format!(
             "{}\n{}",
