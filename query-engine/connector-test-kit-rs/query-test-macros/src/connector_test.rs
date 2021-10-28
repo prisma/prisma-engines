@@ -93,6 +93,7 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
                     let runner = Runner::load(config.runner(), datamodel.clone(), connector).await.unwrap();
                     query_tests_setup::setup_project(&datamodel).await.unwrap();
                     #runner_fn_ident(runner).await.unwrap();
+                    query_tests_setup::teardown_project(&datamodel).await.unwrap();
                 }.with_subscriber(test_tracing_subscriber(std::env::var("LOG_LEVEL").unwrap_or("info".to_string()))));
             }
         }

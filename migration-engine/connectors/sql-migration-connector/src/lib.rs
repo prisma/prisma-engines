@@ -68,6 +68,15 @@ impl SqlMigrationConnector {
         flavour.qe_setup(database_str).await
     }
 
+    /// Testing
+    pub async fn qe_teardown(database_str: &str) -> ConnectorResult<()> {
+        let connection_info = ConnectionInfo::from_url(database_str).map_err(ConnectorError::url_parse_error)?;
+
+        let flavour = flavour::from_connection_info(&connection_info, BitFlags::empty());
+
+        flavour.qe_teardown(database_str).await
+    }
+
     async fn conn(&self) -> ConnectorResult<&Connection> {
         self.connection
             .get_or_init(|| {

@@ -353,6 +353,10 @@ impl SqlFlavour for MssqlFlavour {
         Ok(())
     }
 
+    async fn qe_teardown(&self, _database_str: &str) -> ConnectorResult<()> {
+        Ok(())
+    }
+
     async fn ensure_connection_validity(&self, connection: &Connection) -> ConnectorResult<()> {
         connection.raw_cmd("SELECT 1").await?;
 

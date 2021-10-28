@@ -105,6 +105,10 @@ impl SqlFlavour for SqliteFlavour {
         Ok(())
     }
 
+    async fn qe_teardown(&self, _database_url: &str) -> ConnectorResult<()> {
+        Ok(())
+    }
+
     async fn reset(&self, connection: &Connection) -> ConnectorResult<()> {
         let connection_info = connection.connection_info();
         let file_path = connection_info.file_path().unwrap();

@@ -53,7 +53,7 @@ impl ConnectorTagInterface for PostgresConnectorTag {
             // Use the same database and schema name for CockroachDB - unfortunately CockroachDB
             // can't handle 1 schema per test in a database well at this point in time.
             Some(PostgresVersion::Cockroach) if is_ci => {
-                format!("postgresql://root@test-db-cockroach:5436/{0}?schema={0}", database)
+                format!("postgresql://prisma@test-db-cockroach:5436/{0}?schema={0}", database)
             }
             Some(PostgresVersion::V9) => format!("postgresql://postgres:prisma@127.0.0.1:5431/db?schema={}", database),
             Some(PostgresVersion::V10) => format!("postgresql://postgres:prisma@127.0.0.1:5432/db?schema={}", database),
@@ -61,7 +61,7 @@ impl ConnectorTagInterface for PostgresConnectorTag {
             Some(PostgresVersion::V12) => format!("postgresql://postgres:prisma@127.0.0.1:5434/db?schema={}", database),
             Some(PostgresVersion::V13) => format!("postgresql://postgres:prisma@127.0.0.1:5435/db?schema={}", database),
             Some(PostgresVersion::V14) => format!("postgresql://postgres:prisma@127.0.0.1:5437/db?schema={}", database),
-            Some(PostgresVersion::Cockroach) => format!("postgresql://root@127.0.0.1:5436/{0}?schema={0}", database),
+            Some(PostgresVersion::Cockroach) => format!("postgresql://prisma@127.0.0.1:5436/{0}?schema={0}", database),
             Some(PostgresVersion::PgBouncer) => format!(
                 "postgresql://postgres:prisma@127.0.0.1:6432/db?schema={}&pgbouncer=true",
                 database

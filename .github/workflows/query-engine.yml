@@ -6,14 +6,16 @@ on:
   pull_request:
 jobs:
   rust-vitess-tests:
-    name: "Rust test suite: ${{ matrix.database }} on Linux"
+    name: "Rust test suite: ${{ matrix.database.name }} on Linux"
 
     strategy:
       fail-fast: false
       matrix:
         database:
-          - "vitess_5_7"
-          - "vitess_8_0"
+          - name: "vitess_5_7"
+          - name: "vitess_8_0"
+          - name: "cockroach"
+            is_cockroach: true
 
     env:
       LOG_LEVEL: "info"
@@ -26,8 +28,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: "Start ${{ matrix.database }}"
-        run: make dev-${{ matrix.database }}
+      - name: "Start ${{ matrix.database.name }}"
+        run: make dev-${{ matrix.database.name }}
 
       - uses: actions-rs/toolchain@v1
         with:
@@ -43,5 +45,11 @@ jobs:
           key: query-engine-rust-${{ runner.os }}-cargo-vitess-${{ matrix.version }}-${{ hashFiles('**/Cargo.lock') }}
 
       - run: export WORKSPACE_ROOT=$(pwd) && cargo test --package query-engine-tests -- --test-threads=1
+        if: ${{ !matrix.database.is_cockroach }}
+        env:
+          CLICOLOR_FORCE: 1
+
+      - run: export WORKSPACE_ROOT=$(pwd) && export SIMPLE_TEST_MODE=true && export TEARDOWN_DATABASE=1 && cargo test --package query-engine-tests
+        if: ${{ matrix.database.is_cockroach }}
         env:
           CLICOLOR_FORCE: 1

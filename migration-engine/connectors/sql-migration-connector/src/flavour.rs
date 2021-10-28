@@ -88,6 +88,8 @@ pub(crate) trait SqlFlavour:
     /// Perform the initialization required by connector-test-kit tests.
     async fn qe_setup(&self, database_url: &str) -> ConnectorResult<()>;
 
+    async fn qe_teardown(&self, database_url: &str) -> ConnectorResult<()>;
+
     /// Drop the database and recreate it empty.
     async fn reset(&self, connection: &Connection) -> ConnectorResult<()>;
 
