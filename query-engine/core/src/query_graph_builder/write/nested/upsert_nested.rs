@@ -104,7 +104,7 @@ pub fn nested_upsert(
         let update_input = as_map.remove(args::UPDATE).expect("update argument is missing");
 
         // Read child(ren) node
-        let filter: Filter = if parent_relation_field.is_list {
+        let filter: Filter = if parent_relation_field.is_list() {
             let where_input: ParsedInputMap = as_map
                 .remove(args::WHERE)
                 .expect("where argument is missing")

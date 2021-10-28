@@ -36,7 +36,7 @@ pub fn nested_update(
     child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
     for value in utils::coerce_vec(value) {
-        let (data, filter) = if parent_relation_field.is_list {
+        let (data, filter) = if parent_relation_field.is_list() {
             // We have to have a single record filter in "where".
             // This is used to read the children first, to make sure they're actually connected.
             // The update itself operates on the record found by the read check.

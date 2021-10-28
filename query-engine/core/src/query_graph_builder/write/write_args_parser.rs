@@ -24,7 +24,7 @@ impl WriteArgsParser {
                 let field = model.fields().find_from_all(&k).unwrap();
 
                 match field {
-                    Field::Scalar(sf) if sf.is_list => match v {
+                    Field::Scalar(sf) if sf.is_list() => match v {
                         ParsedInputValue::List(_) => {
                             let set_value: PrismaValue = v.try_into()?;
 

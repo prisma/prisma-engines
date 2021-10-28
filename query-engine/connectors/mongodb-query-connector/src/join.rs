@@ -108,7 +108,7 @@ impl JoinStage {
                 }
             });
 
-            if right_field.is_list {
+            if right_field.is_list() {
                 doc! { "$in": ["$$left", right_ref] }
             } else {
                 doc! { "$in": [right_ref, "$$left"] }
@@ -121,7 +121,7 @@ impl JoinStage {
         pipeline.extend(nested_stages);
 
         // If the field is a to-one, add and unwind stage.
-        let unwind_stage = if !from_field.is_list {
+        let unwind_stage = if !from_field.is_list() {
             Some(doc! {
                 "$unwind": { "path": format!("${}", as_name), "preserveNullAndEmptyArrays": true }
             })

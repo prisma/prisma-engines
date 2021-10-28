@@ -31,7 +31,7 @@ pub(crate) fn initialize_model_object_type_cache(ctx: &mut BuilderContext) {
             let mut fields = compute_model_object_type_fields(ctx, &model);
 
             // Add _count field. Only include to-many fields.
-            let relation_fields = model.fields().relation().into_iter().filter(|f| f.is_list).collect();
+            let relation_fields = model.fields().relation().into_iter().filter(|f| f.is_list()).collect();
 
             append_opt(
                 &mut fields,
@@ -86,7 +86,7 @@ pub(crate) fn map_output_type(ctx: &mut BuilderContext, model_field: &ModelField
 }
 
 pub(crate) fn map_scalar_output_type_for_field(ctx: &mut BuilderContext, field: &ScalarFieldRef) -> OutputType {
-    map_scalar_output_type(ctx, &field.type_identifier, field.is_list)
+    map_scalar_output_type(ctx, &field.type_identifier, field.is_list())
 }
 
 pub(crate) fn map_scalar_output_type(ctx: &mut BuilderContext, typ: &TypeIdentifier, list: bool) -> OutputType {
@@ -116,7 +116,7 @@ pub(crate) fn map_scalar_output_type(ctx: &mut BuilderContext, typ: &TypeIdentif
 pub(crate) fn map_relation_output_type(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> OutputType {
     let related_model_obj = OutputType::object(map_model_object_type(ctx, &rf.related_model()));
 
-    if rf.is_list {
+    if rf.is_list() {
         OutputType::list(related_model_obj)
     } else {
         related_model_obj

@@ -201,7 +201,7 @@ pub fn insert_existing_1to1_related_model_checks(
     let child_linking_fields = parent_relation_field.related_field().linking_fields();
 
     let child_model = parent_relation_field.related_model();
-    let child_side_required = parent_relation_field.related_field().is_required;
+    let child_side_required = parent_relation_field.related_field().is_required();
     let relation_inlined_parent = parent_relation_field.relation_is_inlined_in_parent();
     let rf = Arc::clone(&parent_relation_field);
 

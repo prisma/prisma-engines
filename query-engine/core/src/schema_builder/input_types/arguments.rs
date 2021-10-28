@@ -99,8 +99,8 @@ pub(crate) fn delete_many_arguments(ctx: &mut BuilderContext, model: &ModelRef) 
 pub(crate) fn many_records_field_arguments(ctx: &mut BuilderContext, field: &ModelField) -> Vec<InputField> {
     match field {
         ModelField::Scalar(_) => vec![],
-        ModelField::Relation(rf) if rf.is_list => many_records_arguments(ctx, &rf.related_model(), true),
-        ModelField::Relation(rf) if !rf.is_list => vec![],
+        ModelField::Relation(rf) if rf.is_list() => many_records_arguments(ctx, &rf.related_model(), true),
+        ModelField::Relation(rf) if !rf.is_list() => vec![],
         _ => unreachable!(),
     }
 }

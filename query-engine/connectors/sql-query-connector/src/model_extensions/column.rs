@@ -124,7 +124,9 @@ where
     fn as_column(&self) -> Column<'static> {
         let sf = self.as_ref();
         let db = sf.internal_data_model().db_name.clone();
-        let table = sf.model().db_name().to_string();
+
+        // Unwrap is safe: SQL connectors do not anything other than models as field containers.
+        let table = sf.container.as_model().unwrap().db_name().to_string();
         let col = sf.db_name().to_string();
 
         let parse_len = |sf: &ScalarField| {
