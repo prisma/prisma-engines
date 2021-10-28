@@ -70,7 +70,15 @@ impl<'ast> Relations<'ast> {
         })
     }
 
+    /// Iterator over relation id
+    pub(crate) fn from_model(&self, model_a_id: ast::ModelId) -> impl Iterator<Item = usize> + '_ {
+        self.forward
+            .range((model_a_id, ast::ModelId::ZERO, 0)..(model_a_id, ast::ModelId::MAX, usize::MAX))
+            .map(move |(_, _, relation_idx)| *relation_idx)
+    }
+
     /// Iterator over (model_b_id, relation)
+    #[allow(dead_code)] // not used _yet_
     pub(crate) fn relations_from_model(
         &self,
         model_a_id: ast::ModelId,
