@@ -35,7 +35,6 @@ fn interpolate_environment_variables() {
 
     let schema = parse(dml);
     let user_model = schema.assert_has_model("User");
-    user_model.assert_is_embedded(false);
     user_model
         .assert_has_scalar_field("firstName")
         .assert_base_type(&ScalarType::String)
@@ -61,7 +60,6 @@ fn interpolate_nested_environment_variables() {
 
     let schema = parse(dml);
     let user_model = schema.assert_has_model("User");
-    user_model.assert_is_embedded(false);
     user_model
         .assert_has_scalar_field("firstName")
         .assert_base_type(&ScalarType::String)
@@ -85,7 +83,6 @@ fn ducktype_environment_variables() {
 
     let schema = parse(dml);
     let user_model = schema.assert_has_model("User");
-    user_model.assert_is_embedded(false);
     user_model
         .assert_has_scalar_field("age")
         .assert_base_type(&ScalarType::Int)

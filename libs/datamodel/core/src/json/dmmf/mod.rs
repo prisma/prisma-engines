@@ -46,7 +46,6 @@ pub struct Function {
 #[serde(rename_all = "camelCase")]
 pub struct Model {
     pub name: String,
-    pub is_embedded: bool,
     pub db_name: Option<String>,
     pub fields: Vec<Field>,
     #[serde(skip_serializing_if = "Option::is_none")]

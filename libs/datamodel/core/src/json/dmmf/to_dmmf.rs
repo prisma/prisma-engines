@@ -66,7 +66,6 @@ fn model_to_dmmf(model: &dml::Model) -> Model {
     Model {
         name: model.name.clone(),
         db_name: model.database_name.clone(),
-        is_embedded: model.is_embedded,
         fields: model
             .fields()
             .filter(|field| !field.is_ignored() && !matches!(field.field_type(), FieldType::Unsupported(_)))
