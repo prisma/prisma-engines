@@ -4,7 +4,7 @@ pub(super) fn index_covers_fk(table: &TableWalker<'_>, index: &IndexWalker<'_>) 
     table.foreign_keys().any(|fk| {
         fk.constrained_column_names()
             == index
-                .columns()
+                .column_definitions()
                 .into_iter()
                 .map(|(c, _, _)| c.to_owned())
                 .collect::<Vec<String>>()

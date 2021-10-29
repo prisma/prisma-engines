@@ -81,7 +81,9 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
             // We do not rename them for now.
             let number_of_identical_indexes = self
                 .previous_indexes()
-                .filter(|right| left.columns() == right.columns() && left.index_type() == right.index_type())
+                .filter(|right| {
+                    left.column_definitions() == right.column_definitions() && left.index_type() == right.index_type()
+                })
                 .count();
 
             number_of_identical_indexes == 1
@@ -154,5 +156,5 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
 
 /// Compare two SQL indexes and return whether they only differ by name.
 fn indexes_match(first: &IndexWalker<'_>, second: &IndexWalker<'_>) -> bool {
-    first.columns() == second.columns() && first.index_type() == second.index_type()
+    first.column_definitions() == second.column_definitions() && first.index_type() == second.index_type()
 }

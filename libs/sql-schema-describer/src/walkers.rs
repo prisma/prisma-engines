@@ -488,12 +488,12 @@ impl<'a> fmt::Debug for IndexWalker<'a> {
 
 impl<'a> IndexWalker<'a> {
     /// The names of the indexed columns.
-    pub fn columns(&self) -> &'a [(String, Option<SQLSortOrder>, Option<u32>)] {
+    pub fn column_definitions(&self) -> &'a [(String, Option<SQLSortOrder>, Option<u32>)] {
         &self.get().columns
     }
 
     /// Traverse the indexed columns.
-    pub fn index_columns(&self) -> Vec<&String> {
+    pub fn column_names(&self) -> Vec<&String> {
         self.get()
             .columns
             .iter()

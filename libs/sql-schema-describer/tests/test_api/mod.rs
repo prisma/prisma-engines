@@ -210,7 +210,7 @@ impl TableAssertion<'_> {
         columns: &[&str],
         assertions: impl for<'i> FnOnce(&'i IndexAssertion<'i>) -> &'i IndexAssertion<'i>,
     ) -> &Self {
-        let index = self.table.indexes().find(|idx| idx.index_columns() == columns).unwrap();
+        let index = self.table.indexes().find(|idx| idx.column_names() == columns).unwrap();
 
         assertions(&IndexAssertion { index });
 

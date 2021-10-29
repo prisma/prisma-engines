@@ -205,7 +205,7 @@ impl SqlRenderer for MysqlFlavour {
                     },
                     unique: index.index_type().is_unique(),
                     columns: index
-                        .columns()
+                        .column_definitions()
                         .iter()
                         .map(|(column, sort, length)| {
                             let sort = match sort {
