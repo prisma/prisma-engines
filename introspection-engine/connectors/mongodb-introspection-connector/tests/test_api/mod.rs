@@ -51,7 +51,13 @@ where
     let mut names = Generator::default();
 
     let database_name = names.next().unwrap().replace('-', "");
-    let connection_string = format!("{}{}", &*CONN_STR, database_name);
+    let mut connection_string: url::Url = CONN_STR.parse().unwrap();
+    connection_string.set_path(&format!(
+        "/{}{}",
+        database_name,
+        connection_string.path().trim_start_matches('/')
+    ));
+    let connection_string = connection_string.to_string();
 
     let datamodel_string = indoc::formatdoc!(
         r#"
