@@ -115,6 +115,6 @@ impl IntrospectionConnector for MongoDbIntrospectionConnector {
             return Err(error);
         }
 
-        Ok(sampler::sample(self.database()).await?)
+        Ok(sampler::sample(self.database(), ctx.composite_type_depth).await?)
     }
 }

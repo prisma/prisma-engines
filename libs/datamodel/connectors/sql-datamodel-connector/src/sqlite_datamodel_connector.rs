@@ -4,8 +4,8 @@ use datamodel_connector::{
 };
 use dml::datamodel::Datamodel;
 use dml::{
-    field::Field, model::Model, native_type_constructor::NativeTypeConstructor,
-    native_type_instance::NativeTypeInstance, relation_info::ReferentialAction, scalars::ScalarType,
+    native_type_constructor::NativeTypeConstructor, native_type_instance::NativeTypeInstance,
+    relation_info::ReferentialAction, scalars::ScalarType,
 };
 use enumflags2::BitFlags;
 use std::borrow::Cow;
@@ -76,14 +76,6 @@ impl Connector for SqliteDatamodelConnector {
         _scalar_type: &ScalarType,
     ) -> bool {
         false
-    }
-
-    fn validate_field(&self, _field: &Field) -> Result<(), ConnectorError> {
-        Ok(())
-    }
-
-    fn validate_model(&self, _model: &Model) -> Result<(), ConnectorError> {
-        Ok(())
     }
 
     fn get_constraint_namespace_violations<'dml>(&self, schema: &'dml Datamodel) -> Vec<ConstraintNameSpace<'dml>> {

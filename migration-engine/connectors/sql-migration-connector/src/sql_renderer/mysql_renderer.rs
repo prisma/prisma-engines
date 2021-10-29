@@ -27,13 +27,14 @@ impl MysqlFlavour {
             default: col
                 .default()
                 .filter(|default| {
-                    !matches!(default.kind(),  DefaultKind::Sequence(_))
-                    // We do not want to render JSON defaults because
-                    // they are not supported by MySQL.
-                    && !matches!(col.column_type_family(), ColumnTypeFamily::Json)
-                    // We do not want to render binary defaults because
-                    // they are not supported by MySQL.
-                    && !matches!(col.column_type_family(), ColumnTypeFamily::Binary)
+                    match (default.kind(), col.column_type_family()) {
+                        (DefaultKind::Sequence(_), _) => false,
+                        (DefaultKind::DbGenerated(_), _) => true,
+                        // We do not want to render JSON or binary defaults because
+                        // they are not supported by MySQL.
+                        (_, ColumnTypeFamily::Json | ColumnTypeFamily::Binary) => false,
+                        _ => true,
+                    }
                 })
                 .map(|default| render_default(col, default)),
             auto_increment: col.is_autoincrement(),
@@ -451,7 +452,7 @@ impl MysqlAlterColumn {
 
 fn render_default<'a>(column: &ColumnWalker<'a>, default: &'a DefaultValue) -> Cow<'a, str> {
     match default.kind() {
-        DefaultKind::DbGenerated(val) => val.as_str().into(),
+        DefaultKind::DbGenerated(val) => format!("({})", val.as_str()).into(),
         DefaultKind::Value(PrismaValue::String(val)) | DefaultKind::Value(PrismaValue::Enum(val)) => {
             Quoted::mysql_string(escape_string_literal(val)).to_string().into()
         }

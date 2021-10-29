@@ -185,6 +185,7 @@ fn composite_field_builders(composite: &dml::CompositeType) -> Vec<FieldBuilder>
                     }))
                 }
             }
+            CompositeTypeFieldType::Unsupported(_) => None,
         })
         .collect()
 }

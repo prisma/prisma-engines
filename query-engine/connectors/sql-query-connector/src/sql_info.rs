@@ -44,7 +44,8 @@ impl SqlInfo {
         Self {
             family: SqlFamily::MySQL,
             max_rows: None,
-            max_bind_values: *BATCH_SIZE_OVERRIDE,
+            // See https://stackoverflow.com/a/11131824/788562
+            max_bind_values: (*BATCH_SIZE_OVERRIDE).or(Some(65535)),
         }
     }
 

@@ -4,6 +4,7 @@ mod diagnose_migration_history;
 
 use anyhow::Context;
 use colored::Colorize;
+use introspection_connector::CompositeTypeDepth;
 use migration_connector::{DestructiveChangeDiagnostics, DiffTarget};
 use migration_core::commands::{ApplyMigrationsInput, CreateMigrationInput, SchemaPushInput};
 use std::{
@@ -25,6 +26,9 @@ enum Command {
         /// Path to the schema file to introspect for.
         #[structopt(long = "file-path")]
         file_path: Option<String>,
+        /// How many layers of composite types we introspect before switching to Json.
+        #[structopt(long)]
+        composite_type_depth: Option<isize>,
     },
     /// Generate DMMF from a schema, or directly from a database URL.
     Dmmf(DmmfCommand),
@@ -165,7 +169,11 @@ async fn main() -> anyhow::Result<()> {
         Command::Dmmf(cmd) => generate_dmmf(&cmd).await?,
         Command::SchemaPush(cmd) => schema_push(&cmd).await?,
         Command::MigrateDiff(cmd) => migrate_diff(&cmd).await?,
-        Command::Introspect { url, file_path } => {
+        Command::Introspect {
+            url,
+            file_path,
+            composite_type_depth,
+        } => {
             if url.as_ref().xor(file_path.as_ref()).is_none() {
                 anyhow::bail!(
                     "{}",
@@ -182,9 +190,13 @@ async fn main() -> anyhow::Result<()> {
             };
 
             //todo configurable
-            let introspected = introspection_core::RpcImpl::introspect_internal(schema, false)
-                .await
-                .map_err(|err| anyhow::anyhow!("{:?}", err.data))?;
+            let introspected = introspection_core::RpcImpl::introspect_internal(
+                schema,
+                false,
+                CompositeTypeDepth::from(composite_type_depth.unwrap_or(0)),
+            )
+            .await
+            .map_err(|err| anyhow::anyhow!("{:?}", err.data))?;
 
             println!("{}", introspected);
         }
@@ -279,9 +291,10 @@ async fn generate_dmmf(cmd: &DmmfCommand) -> anyhow::Result<()> {
         if let Some(url) = cmd.url.as_ref() {
             let skeleton = minimal_schema_from_url(url)?;
             //todo make this configurable
-            let introspected = introspection_core::RpcImpl::introspect_internal(skeleton, false)
-                .await
-                .map_err(|err| anyhow::anyhow!("{:?}", err.data))?;
+            let introspected =
+                introspection_core::RpcImpl::introspect_internal(skeleton, false, CompositeTypeDepth::Infinite)
+                    .await
+                    .map_err(|err| anyhow::anyhow!("{:?}", err.data))?;
 
             eprintln!("{}", "Schema was successfully introspected from database URL".green());
 

@@ -35,14 +35,14 @@ pub(super) fn infer_relations(ctx: &mut Context<'_>) {
 #[derive(Debug, Default)]
 pub(crate) struct Relations<'ast> {
     /// Storage. Private. Do not use directly.
-    relations_storage: Vec<Relation<'ast>>,
+    pub(super) relations_storage: Vec<Relation<'ast>>,
 
     // Indexes for efficient querying.
     //
     // Why BTreeSets?
     //
     // - We can't use a BTreeMap because there can be more than one relation
-    //   between two models
+    //   between two models.
     // - We use a BTree because we want range queries. Meaning that with a
     //   BTreeSet, we can efficiently ask:
     //   - Give me all the relations on other models that point to this model
@@ -70,25 +70,11 @@ impl<'ast> Relations<'ast> {
         })
     }
 
-    /// Iterator over (model_b_id, relation)
-    pub(crate) fn relations_from_model(
-        &self,
-        model_a_id: ast::ModelId,
-    ) -> impl Iterator<Item = (ast::ModelId, &Relation<'ast>)> + '_ {
+    /// Iterator over relation id
+    pub(crate) fn from_model(&self, model_a_id: ast::ModelId) -> impl Iterator<Item = usize> + '_ {
         self.forward
             .range((model_a_id, ast::ModelId::ZERO, 0)..(model_a_id, ast::ModelId::MAX, usize::MAX))
-            .map(move |(_model_a_id, model_b_id, relation_idx)| (*model_b_id, &self.relations_storage[*relation_idx]))
-    }
-
-    /// Iterator over (model_a_id, relation)
-    #[allow(dead_code)] // not used _yet_
-    pub(crate) fn relations_to_model(
-        &self,
-        model_b_id: ast::ModelId,
-    ) -> impl Iterator<Item = (ast::ModelId, &Relation<'ast>)> {
-        self.back
-            .range((model_b_id, ast::ModelId::ZERO, 0)..(model_b_id, ast::ModelId::MAX, usize::MAX))
-            .map(move |(_model_b_id, model_a_id, relation_idx)| (*model_a_id, &self.relations_storage[*relation_idx]))
+            .map(move |(_, _, relation_idx)| *relation_idx)
     }
 }
 
@@ -131,8 +117,10 @@ impl RelationType {
 #[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
 pub(crate) struct Relation<'ast> {
     /// The `name` argument in `@relation`.
-    relation_name: Option<&'ast str>,
-    attributes: RelationAttributes,
+    pub(super) relation_name: Option<&'ast str>,
+    pub(super) attributes: RelationAttributes,
+    pub(super) model_a: ast::ModelId,
+    pub(super) model_b: ast::ModelId,
 }
 
 impl<'ast> Relation<'ast> {
@@ -208,6 +196,9 @@ pub(super) fn ingest_relation<'ast, 'db>(
     relations: &mut Relations<'ast>,
     ctx: &'db Context<'ast>,
 ) {
+    // In this function, we want to ingest the relation only once,
+    // so if we know that we will create a relation for the opposite
+    // field, we skip the field by returning early.
     let relation_type = match (evidence.ast_field.arity, evidence.opposite_relation_field) {
         // m:n
         (ast::FieldArity::List, Some((opp_field_id, opp_field, _))) if opp_field.arity.is_list() => {
@@ -237,23 +228,45 @@ pub(super) fn ingest_relation<'ast, 'db>(
             // This is a required 1:1 relation, and we are on the required side.
             RelationAttributes::OneToOne(OneToOneRelationFields::Both(evidence.field_id, opp_field_id))
         }
+        (ast::FieldArity::Required, Some((opp_field_id, opp_field, _))) if opp_field.arity.is_required() => {
+            // This is a 1:1 relation that is required on both sides. We are going to reject this later,
+            // so which model is model A doesn't matter.
+
+            if [evidence.ast_model.name.name.as_str(), evidence.ast_field.name()]
+                > [evidence.opposite_model.name.name.as_str(), opp_field.name()]
+            {
+                return;
+            }
+
+            RelationAttributes::OneToOne(OneToOneRelationFields::Both(evidence.field_id, opp_field_id))
+        }
         (ast::FieldArity::Optional, Some((_, opp_field, _))) if opp_field.arity.is_required() => {
             // This is a required 1:1 relation, and we are on the virtual side. Skip.
             return;
         }
-        (ast::FieldArity::Required, Some((_, opp_field, _))) if opp_field.arity.is_required() => {
-            // This is a 1:1 relation that is required on both sides. Error.
-            return; // TODO: error
-        }
-        (ast::FieldArity::Optional, Some((opp_field_id, opp_field, _))) if opp_field.arity.is_optional() => {
+        (ast::FieldArity::Optional, Some((opp_field_id, opp_field, opp_field_attributes)))
+            if opp_field.arity.is_optional() =>
+        {
             // This is a 1:1 relation that is optional on both sides. We must infer which side is model A.
 
             if evidence.relation_field.fields.is_some() {
                 RelationAttributes::OneToOne(OneToOneRelationFields::Both(evidence.field_id, opp_field_id))
+            } else if opp_field_attributes.fields.is_none() {
+                // No fields defined, we have to break the tie: take the first model name / field name (self relations)
+                // in lexicographic order.
+                if [evidence.ast_model.name.name.as_str(), evidence.ast_field.name()]
+                    > [evidence.opposite_model.name.name.as_str(), opp_field.name()]
+                {
+                    return;
+                }
+
+                RelationAttributes::OneToOne(OneToOneRelationFields::Both(evidence.field_id, opp_field_id))
             } else {
+                // Opposite field has fields, it's the forward side. Return.
                 return;
             }
         }
+
         // 1:m
         (ast::FieldArity::List, Some(_)) => {
             // This is a 1:m relation defined on both sides. We skip the virtual side.
@@ -282,9 +295,21 @@ pub(super) fn ingest_relation<'ast, 'db>(
         }
     };
 
-    let relation = Relation {
-        attributes: relation_type,
-        relation_name: evidence.relation_field.name,
+    let relation = match relation_type {
+        // Back-only relation fields are special, because we always take the forward side when defining the relation type,
+        // except in this case, because there is no forward side.
+        RelationAttributes::OneToMany(OneToManyRelationFields::Back(_)) => Relation {
+            attributes: relation_type,
+            relation_name: evidence.relation_field.name,
+            model_a: evidence.relation_field.referenced_model,
+            model_b: evidence.model_id,
+        },
+        _ => Relation {
+            attributes: relation_type,
+            relation_name: evidence.relation_field.name,
+            model_a: evidence.model_id,
+            model_b: evidence.relation_field.referenced_model,
+        },
     };
 
     let relation_idx = relations.relations_storage.len();
