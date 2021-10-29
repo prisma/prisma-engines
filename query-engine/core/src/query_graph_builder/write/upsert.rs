@@ -9,6 +9,47 @@ use connector::IdFilter;
 use prisma_models::ModelRef;
 use std::{convert::TryInto, sync::Arc};
 
+//                                               ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐
+//                                                     Parent       ────────────────────────┐
+//                                               └ ─ ─ ─ ─ ─ ─ ─ ─ ┘         │              │
+//                                                        │                                 │
+//                                                        │                  │              │
+//                                                        │                                 │
+//                                                        ▼                  ▼              │
+//                                               ┌─────────────────┐  ┌ ─ ─ ─ ─ ─ ─         │
+// ┌───────────────────┬─────────────────────────│   Read Child    │      Result   │        │
+// │                   │                         └─────────────────┘  └ ─ ─ ─ ─ ─ ─         │
+// │                   │                                  │                                 │
+// │                   │                                  │                                 │
+// │                   │                                  │                                 │
+// │                   ▼                                  ▼                                 │
+// │          ┌─────────────────┐                ┌─────────────────┐                        │
+// │          │    Join Node    │◀──────┐        │   If (exists)   │────────────┐           │
+// │          └─────────────────┘       │        └─────────────────┘            │           │
+// │                   │                │                 │                     │           │
+// │                   │                │                 │                     │           │
+// │                   │                └────────Then─────┘                     │           │
+// │                   │                                                        ▼           │
+// │      ┌ ─ ─ ─ ─ ─ ─▼─ ─ ─ ─ ─ ─                                    ┌─────────────────┐  │
+// │        ┌────────────────────┐ │                                   │  Create Child   │  │
+// │      │ │  Insert onUpdate   │                                     └─────────────────┘  │
+// │        │ emulation subtree  │ │                                            │           │
+// │      │ │ for all relations  │                                              │           │
+// │        │   pointing to D.   │ │                                            │           │
+// │      │ └────────────────────┘                                              ▼           │
+// │       ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘                                   ┌─────────────────┐  │
+// │                   │                                               │  Update Parent  │◀─┘
+// │                   │                                               └─────────────────┘
+// │                   │
+// │                   │
+// │                   │
+// │                   │
+// │                   │
+// │                   │
+// │                   │
+// │                   │     ┌─────────────────┐
+// └───────────────────┴────▶│  Update Child   │
+//                           └─────────────────┘
 #[tracing::instrument(skip(graph, model, field))]
 pub fn upsert_record(
     graph: &mut QueryGraph,
@@ -69,7 +110,34 @@ pub fn upsert_record(
         ),
     )?;
 
-    graph.create_edge(&if_node, &update_node, QueryGraphDependency::Then)?;
+    // TODO: Add comment to explain this
+    if let Some(emulation_node) = utils::insert_emulated_on_update_with_intermediary_node(
+        graph,
+        connector_ctx,
+        &model,
+        &read_parent_records_node,
+        &update_node,
+    )? {
+        // graph.create_edge(
+        //     &emulation_node,
+        //     &update_node,
+        //     QueryGraphDependency::ParentProjection(
+        //         model_id.clone(),
+        //         Box::new(move |mut update_node, parent_ids| {
+        //             if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut wq))) = update_node {
+        //                 wq.record_filter = parent_ids.into();
+        //             }
+
+        //             Ok(update_node)
+        //         }),
+        //     ),
+        // )?;
+        graph.create_edge(&if_node, &emulation_node, QueryGraphDependency::Then)?;
+    } else {
+        graph.create_edge(&if_node, &update_node, QueryGraphDependency::Then)?;
+    }
+
+    // graph.create_edge(&if_node, &update_node, QueryGraphDependency::Then)?;
     graph.create_edge(&if_node, &create_node, QueryGraphDependency::Else)?;
     graph.create_edge(
         &update_node,

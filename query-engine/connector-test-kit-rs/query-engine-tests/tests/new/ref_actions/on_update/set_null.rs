@@ -25,7 +25,7 @@ mod one2one_req {
 
     /// Updating the parent must fail if a child is connected (because of null key violation).
     #[connector_test]
-    async fn delete_parent_failure(runner: Runner) -> TestResult<()> {
+    async fn update_parent_failure(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", child: { create: { id: 1 }}}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
@@ -72,7 +72,7 @@ mod one2one_opt {
 
     /// Updating the parent suceeds and sets the FK null.
     #[connector_test]
-    async fn delete_parent(runner: Runner) -> TestResult<()> {
+    async fn update_parent(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", child: { create: { id: 1 }}}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
@@ -86,6 +86,50 @@ mod one2one_opt {
         insta::assert_snapshot!(
           run_query!(&runner, r#"query { findManyChild { id parent_uniq }}"#),
           @r###"{"data":{"findManyChild":[{"id":1,"parent_uniq":null}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn upsert_parent(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", child: { create: { id: 1 }}}) { id }}"#),
+          @r###"{"data":{"createOneParent":{"id":1}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { upsertOneParent(where: { id: 1 }, update: { uniq: "u1" }, create: { id: 1, uniq: "1" }) { id }}"#),
+          @r###"{"data":{"upsertOneParent":{"id":1}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyChild { id parent_uniq }}"#),
+          @r###"{"data":{"findManyChild":[{"id":1,"parent_uniq":null}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn update_many_parent(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", child: { create: { id: 1 }}}) { id }}"#),
+          @r###"{"data":{"createOneParent":{"id":1}}}"###
+        );
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 2, uniq: "2", child: { create: { id: 2 }}}) { id }}"#),
+          @r###"{"data":{"createOneParent":{"id":2}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { updateManyParent(data: { uniq: "u1" }) { count }}"#),
+          @r###"{"data":{"updateManyParent":{"count":2}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyChild { id parent_uniq }}"#),
+          @r###"{"data":{"findManyChild":[{"id":1,"parent_uniq":null},{"id":2,"parent_uniq":null}]}}"###
         );
 
         Ok(())
@@ -114,7 +158,7 @@ mod one2many_req {
 
     /// Updating the parent must fail if a child is connected (because of null key violation).
     #[connector_test]
-    async fn delete_parent_failure(runner: Runner) -> TestResult<()> {
+    async fn update_parent_failure(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
@@ -159,9 +203,9 @@ mod one2many_opt {
         schema.to_owned()
     }
 
-    /// Updating the parent suceeds and sets the FK null.
+    /// Updating the parent succeeds and sets the FK null.
     #[connector_test]
-    async fn delete_parent(runner: Runner) -> TestResult<()> {
+    async fn update_parent(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
@@ -175,6 +219,96 @@ mod one2many_opt {
         insta::assert_snapshot!(
           run_query!(&runner, r#"query { findManyChild { id parent_uniq }}"#),
           @r###"{"data":{"findManyChild":[{"id":1,"parent_uniq":null}]}}"###
+        );
+
+        Ok(())
+    }
+
+    /// Updating the parent succeeds and sets the FK null.
+    #[connector_test]
+    async fn update_parent_nested(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
+          @r###"{"data":{"createOneParent":{"id":1}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { updateOneChild(where: { id: 1 }, data: { parent: { update: { uniq: "u1" } } }) { id }}"#),
+          @r###"{"data":{"updateOneChild":{"id":1}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyChild { id parent_uniq }}"#),
+          @r###"{"data":{"findManyChild":[{"id":1,"parent_uniq":null}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn upsert_parent(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
+          @r###"{"data":{"createOneParent":{"id":1}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { upsertOneParent(where: { id: 1 }, update: { uniq: "u1" }, create: { id: 1, uniq: "1", children: { create: { id: 1 }} }) { id }}"#),
+          @r###"{"data":{"upsertOneParent":{"id":1}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyChild { id parent_uniq }}"#),
+          @r###"{"data":{"findManyChild":[{"id":1,"parent_uniq":null}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn upsert_parent_nested(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
+          @r###"{"data":{"createOneParent":{"id":1}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { updateOneChild(
+              where: { id: 1 }
+              data: {
+                parent: { upsert: { update: { uniq: "u1" }, create: { id: 3, uniq: "3" } } }
+              }
+          ) { id }}"#),
+          @r###"{"data":{"updateOneChild":{"id":1}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyChild { id parent_uniq }}"#),
+          @r###"{"data":{"findManyChild":[{"id":1,"parent_uniq":null}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn update_many_parent(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
+          @r###"{"data":{"createOneParent":{"id":1}}}"###
+        );
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 2, uniq: "2", children: { create: { id: 2 }}}) { id }}"#),
+          @r###"{"data":{"createOneParent":{"id":2}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { updateManyParent(data: { uniq: "u1" }) { count }}"#),
+          @r###"{"data":{"updateManyParent":{"count":2}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyChild { id parent_uniq }}"#),
+          @r###"{"data":{"findManyChild":[{"id":1,"parent_uniq":null},{"id":2,"parent_uniq":null}]}}"###
         );
 
         Ok(())

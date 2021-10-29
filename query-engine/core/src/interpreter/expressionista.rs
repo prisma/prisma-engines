@@ -294,6 +294,10 @@ impl Expressionista {
         node: &NodeRef,
         parent_edges: Vec<EdgeRef>,
     ) -> InterpretationResult<Expression> {
+        // Child edges are ordered, evaluation order is low to high in the graph, unless other rules override.
+        let direct_children = graph.direct_child_pairs(&node);
+        let child_expressions = Self::process_children(graph, direct_children)?;
+
         let into_expr = Box::new(move |node: Node| {
             let flow: Flow = node.try_into()?;
 
@@ -309,8 +313,17 @@ impl Expressionista {
             }
         });
 
+        let node_binding_name = node.id();
         let node = graph.pluck_node(node);
-        Self::transform_node(graph, parent_edges, node, into_expr)
+        let expr = Self::transform_node(graph, parent_edges, node, into_expr)?;
+
+        Ok(Expression::Let {
+            bindings: vec![Binding {
+                name: node_binding_name,
+                expr,
+            }],
+            expressions: child_expressions,
+        })
     }
 
     /// Runs transformer functions (e.g. `ParentIdsFn`) via `Expression::Func` if necessary, or if none present,
@@ -347,6 +360,8 @@ impl Expressionista {
                                             parent_binding_name
                                         ))),
                                     }?;
+
+                                    dbg!(&binding);
 
                                     let res = match dependency {
                                         QueryGraphDependency::ParentProjection(projection, f) => binding

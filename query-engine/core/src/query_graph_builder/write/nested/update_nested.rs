@@ -52,7 +52,7 @@ pub fn nested_update(
         };
 
         let find_child_records_node =
-            utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter)?;
+            utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter.clone())?;
 
         let update_node = update::update_record_node(
             graph,
@@ -84,6 +84,14 @@ pub fn nested_update(
                     Ok(update_node)
                 }),
             ),
+        )?;
+
+        utils::insert_emulated_on_update(
+            graph,
+            connector_ctx,
+            &child_model,
+            &find_child_records_node,
+            &update_node,
         )?;
     }
 

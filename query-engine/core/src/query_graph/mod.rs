@@ -648,6 +648,11 @@ impl QueryGraph {
         Ok(())
     }
 
+    #[tracing::instrument(skip(self))]
+    fn ensure_reload_has_parent_dependency(&mut self) -> QueryGraphResult<()> {
+        Ok(())
+    }
+
     /// Traverses the query graph and checks if reloads of nodes are necessary.
     /// Whether or not a node needs to be reloaded is determined based on the
     /// outgoing edges of parent-projection-based transformers, as those hold the `ModelProjection`s

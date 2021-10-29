@@ -69,7 +69,7 @@ use std::{convert::TryInto, sync::Arc};
 /// │  │   If (exists)   │────────────┐           │        │  │   If (exists)   │────────────┐           │
 /// │  └─────────────────┘            │           │        │  └─────────────────┘            │           │
 /// │           │                     │           │        │           │                     │           │
-/// │           │                     │           │        │           │                     │           │
+/// |           |                     │           │        │           │                     │           │
 /// │           │                     │           │        │           │                     │           │
 /// │           ▼                     ▼           │        │           ▼                     ▼           │
 /// │  ┌─────────────────┐   ┌─────────────────┐  │        │  ┌─────────────────┐   ┌─────────────────┐  │
@@ -134,6 +134,7 @@ pub fn nested_upsert(
             QueryGraphDependency::ParentProjection(
                 child_model_identifier.clone(),
                 Box::new(|if_node, child_ids| {
+                    dbg!(&child_ids);
                     if let Node::Flow(Flow::If(_)) = if_node {
                         Ok(Node::Flow(Flow::If(Box::new(move || !child_ids.is_empty()))))
                     } else {
@@ -169,7 +170,22 @@ pub fn nested_upsert(
             ),
         )?;
 
-        graph.create_edge(&if_node, &update_node, QueryGraphDependency::Then)?;
+        // TODO: Add comment to explain this
+        // TODO: This isn't working. Figure out why
+        let then_node = if let Some(emulation_node) = utils::insert_emulated_on_update_with_intermediary_node(
+            graph,
+            connector_ctx,
+            &child_model,
+            &read_children_node,
+            &update_node,
+        )? {
+            dbg!("comes here mf");
+            emulation_node
+        } else {
+            update_node
+        };
+
+        graph.create_edge(&if_node, &then_node, QueryGraphDependency::Then)?;
         graph.create_edge(&if_node, &create_node, QueryGraphDependency::Else)?;
 
         // Specific handling based on relation type and inlining side.

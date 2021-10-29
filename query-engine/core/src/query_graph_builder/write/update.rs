@@ -5,7 +5,7 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ArgumentListLookup, ParsedField, ParsedInputMap,
 };
-use connector::{Filter, IdFilter, RecordFilter};
+use connector::{Filter, IdFilter};
 use datamodel_connector::ConnectorCapability;
 use prisma_models::ModelRef;
 use std::{convert::TryInto, sync::Arc};
@@ -26,10 +26,35 @@ pub fn update_record(
     let data_argument = field.arguments.lookup(args::DATA).unwrap();
     let data_map: ParsedInputMap = data_argument.value.try_into()?;
 
-    let update_node = update_record_node(graph, connector_ctx, filter, Arc::clone(&model), data_map)?;
+    let update_node = update_record_node(graph, connector_ctx, filter.clone(), Arc::clone(&model), data_map)?;
 
     let read_query = read::find_unique(field, model.clone())?;
     let read_node = graph.create_node(Query::Read(read_query));
+
+    if !connector_ctx.capabilities.contains(&ConnectorCapability::ForeignKeys) {
+        let read_parent_node = graph.create_node(utils::read_ids_infallible(
+            model.clone(),
+            model.primary_identifier(),
+            filter,
+        ));
+
+        utils::insert_emulated_on_update(graph, connector_ctx, &model, &read_parent_node, &update_node)?;
+
+        graph.create_edge(
+            &read_parent_node,
+            &update_node,
+            QueryGraphDependency::ParentProjection(
+                model.primary_identifier(),
+                Box::new(move |mut update_node, parent_ids| {
+                    if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut ur))) = update_node {
+                        ur.record_filter = parent_ids.into();
+                    }
+
+                    Ok(update_node)
+                }),
+            ),
+        )?;
+    }
 
     graph.add_result_node(&read_node);
     graph.create_edge(
@@ -77,7 +102,32 @@ pub fn update_many_records(
     let data_argument = field.arguments.lookup(args::DATA).unwrap();
     let data_map: ParsedInputMap = data_argument.value.try_into()?;
 
-    update_many_record_node(graph, connector_ctx, filter, model, data_map)?;
+    let update_many_node = update_many_record_node(graph, connector_ctx, Filter::empty(), model.clone(), data_map)?;
+
+    if !connector_ctx.capabilities.contains(&ConnectorCapability::ForeignKeys) {
+        let pre_read_node = graph.create_node(utils::read_ids_infallible(
+            model.clone(),
+            model.primary_identifier(),
+            filter,
+        ));
+
+        graph.create_edge(
+            &pre_read_node,
+            &update_many_node,
+            QueryGraphDependency::ParentProjection(
+                model.primary_identifier(),
+                Box::new(move |mut update_node, parent_ids| {
+                    if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = update_node {
+                        ur.record_filter = parent_ids.into();
+                    }
+
+                    Ok(update_node)
+                }),
+            ),
+        )?;
+
+        utils::insert_emulated_on_update(graph, connector_ctx, &model, &pre_read_node, &update_many_node)?;
+    }
 
     Ok(())
 }
@@ -101,58 +151,19 @@ where
 
     args.update_datetimes(Arc::clone(&model));
 
-    let filter: Filter = filter.clone().into();
-    let (update_node, read_node) = if connector_ctx.capabilities.contains(&ConnectorCapability::ForeignKeys) {
-        let update_parent = Query::Write(WriteQuery::UpdateRecord(UpdateRecord {
-            model: model.clone(),
-            record_filter: filter.into(),
-            args,
-        }));
-        let update_node = graph.create_node(update_parent);
-
-        (update_node, None)
-    } else {
-        // When the connector needs referential actions emulation, we need an extra parent read so that we can read the children.
-        // Therefore, we temporarily set the record_filter to empty and later set it to the ids fetched by the prior parent read
-        // to avoid fetching the parent twice
-        let update_parent = Query::Write(WriteQuery::UpdateRecord(UpdateRecord {
-            model: model.clone(),
-            record_filter: RecordFilter::empty(),
-            args,
-        }));
-        let update_node = graph.create_node(update_parent);
-
-        let read_node = graph.create_node(utils::read_ids_infallible(
-            model.clone(),
-            model.primary_identifier(),
-            filter,
-        ));
-
-        graph.create_edge(
-            &read_node,
-            &update_node,
-            QueryGraphDependency::ParentProjection(
-                model.primary_identifier(),
-                Box::new(move |mut update_node, parent_ids| {
-                    if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut ur))) = update_node {
-                        ur.record_filter = parent_ids.into();
-                    }
-
-                    Ok(update_node)
-                }),
-            ),
-        )?;
-
-        utils::insert_emulated_on_update(graph, connector_ctx, &model, &read_node, &update_node)?;
-
-        (update_node, Some(read_node))
-    };
+    let filter: Filter = filter.into();
+    let update_parent = Query::Write(WriteQuery::UpdateRecord(UpdateRecord {
+        model: model.clone(),
+        record_filter: filter.into(),
+        args,
+    }));
+    let update_node = graph.create_node(update_parent);
 
     for (relation_field, data_map) in update_args.nested {
         nested::connect_nested_query(graph, connector_ctx, update_node, relation_field, data_map)?;
     }
 
-    Ok(read_node.unwrap_or(update_node))
+    Ok(update_node)
 }
 
 /// Creates an update many record query node and adds it to the query graph.
@@ -182,10 +193,11 @@ where
         args,
     };
 
-    let node = graph.create_node(Query::Write(WriteQuery::UpdateManyRecords(update_many)));
+    let update_many_node = graph.create_node(Query::Write(WriteQuery::UpdateManyRecords(update_many)));
+
     for (relation_field, data_map) in update_args.nested {
-        nested::connect_nested_query(graph, connector_ctx, node, relation_field, data_map)?;
+        nested::connect_nested_query(graph, connector_ctx, update_many_node, relation_field, data_map)?;
     }
 
-    Ok(node)
+    Ok(update_many_node)
 }
