@@ -244,30 +244,25 @@ impl Connector for PostgresDatamodelConnector {
     }
 
     fn validate_field(&self, field: &Field, errors: &mut Vec<ConnectorError>) {
-        match field.field_type() {
-            FieldType::Scalar(_scalar_type, _, Some(native_type_instance)) => {
-                let native_type: PostgresType = native_type_instance.deserialize_native_type();
-                let error = self.native_instance_error(native_type_instance);
+        if let FieldType::Scalar(_scalar_type, _, Some(native_type_instance)) = field.field_type() {
+            let native_type: PostgresType = native_type_instance.deserialize_native_type();
+            let error = self.native_instance_error(native_type_instance);
 
-                match native_type {
-                    Decimal(Some((precision, scale))) if scale > precision => {
-                        errors.push(error.new_scale_larger_than_precision_error())
-                    }
-                    Decimal(Some((prec, _))) if prec > 1000 || prec == 0 => {
-                        errors.push(error.new_argument_m_out_of_range_error(
-                            "Precision must be positive with a maximum value of 1000.",
-                        ))
-                    }
-                    Bit(Some(0)) | VarBit(Some(0)) => {
-                        errors.push(error.new_argument_m_out_of_range_error("M must be a positive integer."))
-                    }
-                    Timestamp(Some(p)) | Timestamptz(Some(p)) | Time(Some(p)) | Timetz(Some(p)) if p > 6 => {
-                        errors.push(error.new_argument_m_out_of_range_error("M can range from 0 to 6."))
-                    }
-                    _ => (),
+            match native_type {
+                Decimal(Some((precision, scale))) if scale > precision => {
+                    errors.push(error.new_scale_larger_than_precision_error())
                 }
+                Decimal(Some((prec, _))) if prec > 1000 || prec == 0 => errors.push(
+                    error.new_argument_m_out_of_range_error("Precision must be positive with a maximum value of 1000."),
+                ),
+                Bit(Some(0)) | VarBit(Some(0)) => {
+                    errors.push(error.new_argument_m_out_of_range_error("M must be a positive integer."))
+                }
+                Timestamp(Some(p)) | Timestamptz(Some(p)) | Time(Some(p)) | Timetz(Some(p)) if p > 6 => {
+                    errors.push(error.new_argument_m_out_of_range_error("M can range from 0 to 6."))
+                }
+                _ => (),
             }
-            _ => (),
         }
     }
 

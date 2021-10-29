@@ -241,42 +241,39 @@ impl Connector for MsSqlDatamodelConnector {
     }
 
     fn validate_field(&self, field: &Field, errors: &mut Vec<ConnectorError>) {
-        match field.field_type() {
-            FieldType::Scalar(_, _, Some(native_type)) => {
-                let r#type: MsSqlType = native_type.deserialize_native_type();
-                let error = self.native_instance_error(native_type);
+        if let FieldType::Scalar(_, _, Some(native_type)) = field.field_type() {
+            let r#type: MsSqlType = native_type.deserialize_native_type();
+            let error = self.native_instance_error(native_type);
 
-                match r#type {
-                    Decimal(Some((precision, scale))) if scale > precision => {
-                        errors.push(error.new_scale_larger_than_precision_error());
-                    }
-                    Decimal(Some((prec, _))) if prec == 0 || prec > 38 => {
-                        errors.push(error.new_argument_m_out_of_range_error("Precision can range from 1 to 38."));
-                    }
-                    Decimal(Some((_, scale))) if scale > 38 => {
-                        errors.push(error.new_argument_m_out_of_range_error("Scale can range from 0 to 38."))
-                    }
-                    Float(Some(bits)) if bits == 0 || bits > 53 => {
-                        errors.push(error.new_argument_m_out_of_range_error("Bits can range from 1 to 53."))
-                    }
-                    NVarChar(Some(Number(p))) if p > 4000 => errors.push(error.new_argument_m_out_of_range_error(
-                        "Length can range from 1 to 4000. For larger sizes, use the `Max` variant.",
-                    )),
-                    VarChar(Some(Number(p))) | VarBinary(Some(Number(p))) if p > 8000 => {
-                        errors.push(error.new_argument_m_out_of_range_error(
-                            r#"Length can range from 1 to 8000. For larger sizes, use the `Max` variant."#,
-                        ))
-                    }
-                    NChar(Some(p)) if p > 4000 => {
-                        errors.push(error.new_argument_m_out_of_range_error("Length can range from 1 to 4000."))
-                    }
-                    Char(Some(p)) | Binary(Some(p)) if p > 8000 => {
-                        errors.push(error.new_argument_m_out_of_range_error("Length can range from 1 to 8000."))
-                    }
-                    _ => (),
+            match r#type {
+                Decimal(Some((precision, scale))) if scale > precision => {
+                    errors.push(error.new_scale_larger_than_precision_error());
                 }
+                Decimal(Some((prec, _))) if prec == 0 || prec > 38 => {
+                    errors.push(error.new_argument_m_out_of_range_error("Precision can range from 1 to 38."));
+                }
+                Decimal(Some((_, scale))) if scale > 38 => {
+                    errors.push(error.new_argument_m_out_of_range_error("Scale can range from 0 to 38."))
+                }
+                Float(Some(bits)) if bits == 0 || bits > 53 => {
+                    errors.push(error.new_argument_m_out_of_range_error("Bits can range from 1 to 53."))
+                }
+                NVarChar(Some(Number(p))) if p > 4000 => errors.push(error.new_argument_m_out_of_range_error(
+                    "Length can range from 1 to 4000. For larger sizes, use the `Max` variant.",
+                )),
+                VarChar(Some(Number(p))) | VarBinary(Some(Number(p))) if p > 8000 => {
+                    errors.push(error.new_argument_m_out_of_range_error(
+                        r#"Length can range from 1 to 8000. For larger sizes, use the `Max` variant."#,
+                    ))
+                }
+                NChar(Some(p)) if p > 4000 => {
+                    errors.push(error.new_argument_m_out_of_range_error("Length can range from 1 to 4000."))
+                }
+                Char(Some(p)) | Binary(Some(p)) if p > 8000 => {
+                    errors.push(error.new_argument_m_out_of_range_error("Length can range from 1 to 8000."))
+                }
+                _ => (),
             }
-            _ => (),
         }
     }
 

@@ -280,37 +280,34 @@ impl Connector for MySqlDatamodelConnector {
     }
 
     fn validate_field(&self, field: &Field, errors: &mut Vec<ConnectorError>) {
-        match field.field_type() {
-            FieldType::Scalar(scalar_type, _, Some(native_type_instance)) => {
-                let native_type: MySqlType = native_type_instance.deserialize_native_type();
-                let error = self.native_instance_error(native_type_instance);
+        if let FieldType::Scalar(scalar_type, _, Some(native_type_instance)) = field.field_type() {
+            let native_type: MySqlType = native_type_instance.deserialize_native_type();
+            let error = self.native_instance_error(native_type_instance);
 
-                match native_type {
-                    Decimal(Some((precision, scale))) if scale > precision => {
-                        errors.push(error.new_scale_larger_than_precision_error())
-                    }
-                    Decimal(Some((precision, _))) if precision > 65 => {
-                        errors.push(error.new_argument_m_out_of_range_error("Precision can range from 1 to 65."))
-                    }
-                    Decimal(Some((_, scale))) if scale > 30 => {
-                        errors.push(error.new_argument_m_out_of_range_error("Scale can range from 0 to 30."))
-                    }
-                    Bit(length) if length == 0 || length > 64 => {
-                        errors.push(error.new_argument_m_out_of_range_error("M can range from 1 to 64."))
-                    }
-                    Char(length) if length > 255 => {
-                        errors.push(error.new_argument_m_out_of_range_error("M can range from 0 to 255."))
-                    }
-                    VarChar(length) if length > 65535 => {
-                        errors.push(error.new_argument_m_out_of_range_error("M can range from 0 to 65,535."))
-                    }
-                    Bit(n) if n > 1 && scalar_type.is_boolean() => {
-                        errors.push(error.new_argument_m_out_of_range_error("only Bit(1) can be used as Boolean."))
-                    }
-                    _ => (),
+            match native_type {
+                Decimal(Some((precision, scale))) if scale > precision => {
+                    errors.push(error.new_scale_larger_than_precision_error())
                 }
+                Decimal(Some((precision, _))) if precision > 65 => {
+                    errors.push(error.new_argument_m_out_of_range_error("Precision can range from 1 to 65."))
+                }
+                Decimal(Some((_, scale))) if scale > 30 => {
+                    errors.push(error.new_argument_m_out_of_range_error("Scale can range from 0 to 30."))
+                }
+                Bit(length) if length == 0 || length > 64 => {
+                    errors.push(error.new_argument_m_out_of_range_error("M can range from 1 to 64."))
+                }
+                Char(length) if length > 255 => {
+                    errors.push(error.new_argument_m_out_of_range_error("M can range from 0 to 255."))
+                }
+                VarChar(length) if length > 65535 => {
+                    errors.push(error.new_argument_m_out_of_range_error("M can range from 0 to 65,535."))
+                }
+                Bit(n) if n > 1 && scalar_type.is_boolean() => {
+                    errors.push(error.new_argument_m_out_of_range_error("only Bit(1) can be used as Boolean."))
+                }
+                _ => (),
             }
-            _ => (),
         }
     }
 
