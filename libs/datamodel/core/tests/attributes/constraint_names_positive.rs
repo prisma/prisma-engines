@@ -33,7 +33,7 @@ fn multiple_indexes_with_same_name_on_different_models_are_supported_by_mysql() 
         name: None,
         db_name: Some("MyIndexName".to_string()),
         fields: vec!["id".to_string()],
-        field_options: vec![("id".to_string(), SortOrder::Asc, None)],
+        field_options: vec![("id".to_string(), Some(SortOrder::Asc), None)],
         tpe: IndexType::Normal,
         defined_on_field: false,
     });
@@ -42,7 +42,7 @@ fn multiple_indexes_with_same_name_on_different_models_are_supported_by_mysql() 
         name: None,
         db_name: Some("MyIndexName".to_string()),
         fields: vec!["id".to_string()],
-        field_options: vec![("id".to_string(), SortOrder::Asc, None)],
+        field_options: vec![("id".to_string(), Some(SortOrder::Asc), None)],
         tpe: IndexType::Normal,
         defined_on_field: false,
     });
@@ -78,7 +78,7 @@ fn foreign_keys_and_indexes_with_same_name_on_same_table_are_not_supported_on_my
         name: None,
         db_name: Some("foo".to_string()),
         fields: vec!["bId".to_string()],
-        field_options: vec![("bId".to_string(), SortOrder::Asc, None)],
+        field_options: vec![("bId".to_string(), Some(SortOrder::Asc), None)],
         tpe: IndexType::Normal,
         defined_on_field: false,
     });
@@ -116,7 +116,7 @@ fn multiple_indexes_with_same_name_on_different_models_are_supported_by_mssql() 
         name: None,
         db_name: Some("MyIndexName".to_string()),
         fields: vec!["id".to_string()],
-        field_options: vec![("id".to_string(), SortOrder::Asc, None)],
+        field_options: vec![("id".to_string(), Some(SortOrder::Asc), None)],
         tpe: IndexType::Normal,
         defined_on_field: false,
     });
@@ -125,7 +125,7 @@ fn multiple_indexes_with_same_name_on_different_models_are_supported_by_mssql() 
         name: None,
         db_name: Some("MyIndexName".to_string()),
         fields: vec!["id".to_string()],
-        field_options: vec![("id".to_string(), SortOrder::Asc, None)],
+        field_options: vec![("id".to_string(), Some(SortOrder::Asc), None)],
         tpe: IndexType::Normal,
         defined_on_field: false,
     });
@@ -165,7 +165,7 @@ fn multiple_constraints_with_same_name_in_different_namespaces_are_supported_by_
         name: None,
         db_name: Some("MyName".to_string()),
         fields: vec!["id".to_string()],
-        field_options: vec![("id".to_string(), SortOrder::Asc, None)],
+        field_options: vec![("id".to_string(), Some(SortOrder::Asc), None)],
         tpe: IndexType::Normal,
         defined_on_field: false,
     });
@@ -174,7 +174,7 @@ fn multiple_constraints_with_same_name_in_different_namespaces_are_supported_by_
         name: None,
         db_name: Some("MyOtherName".to_string()),
         fields: vec!["id".to_string()],
-        field_options: vec![("id".to_string(), SortOrder::Asc, None)],
+        field_options: vec![("id".to_string(), Some(SortOrder::Asc), None)],
         tpe: IndexType::Normal,
         defined_on_field: false,
     });

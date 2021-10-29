@@ -390,8 +390,15 @@ fn binary_uuid_default_value(api: TestApi) {
 #[test_connector(tags(Mysql))]
 fn partial_primary_key_works(api: TestApi) {
     let dm = r#"
-      model Test {
+      model A {
         id   String  @id(length: 30) @db.VarChar(3000)
+      }
+      
+      model B {
+        id_1   String  @db.VarChar(3000)
+        id_2   String  
+        
+        @@id([id_1(length: 30), id_2])
       }
     "#;
 
@@ -401,5 +408,8 @@ fn partial_primary_key_works(api: TestApi) {
         .assert_has_executed_steps();
 
     api.assert_schema()
-        .assert_table("Test", |table| table.assert_pk(|pk| pk.assert_columns(&["id"])));
+        .assert_table("A", |table| table.assert_pk(|pk| pk.assert_columns(&["id"])));
+
+    api.assert_schema()
+        .assert_table("B", |table| table.assert_pk(|pk| pk.assert_columns(&["id_1", "id_2"])));
 }

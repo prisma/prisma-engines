@@ -5,10 +5,10 @@ pub(super) use sql_schema_calculator_flavour::SqlSchemaCalculatorFlavour;
 use crate::flavour::SqlFlavour;
 use datamodel::{
     walkers::{walk_models, walk_relations, ModelWalker, ScalarFieldWalker, TypeWalker},
-    Configuration, Datamodel, DefaultValue, FieldArity, IndexDefinition, IndexType, ScalarType,
+    Configuration, Datamodel, DefaultValue, FieldArity, IndexDefinition, IndexType, ScalarType, SortOrder,
 };
 use prisma_value::PrismaValue;
-use sql_schema_describer::{self as sql, walkers::SqlSchemaExt, ColumnType};
+use sql_schema_describer::{self as sql, walkers::SqlSchemaExt, ColumnType, SQLSortOrder};
 
 pub(crate) fn calculate_sql_schema(
     (configuration, datamodel): (&Configuration, &Datamodel),
@@ -58,13 +58,23 @@ fn calculate_model_tables<'a>(
         let indices = model
             .indexes()
             .map(|index_definition: &IndexDefinition| {
-                let referenced_fields: Vec<ScalarFieldWalker<'_>> = index_definition
-                    .fields
+                let referenced_fields = index_definition
+                    .field_options
                     .iter()
-                    .map(|field_name| {
-                        model
+                    .map(|(field_name, sort, length)| {
+                        let db_name = model
                             .find_scalar_field(field_name)
                             .expect("Unknown field in index directive.")
+                            .db_name()
+                            .to_owned();
+
+                        let sort = match sort {
+                            Some(SortOrder::Asc) => Some(SQLSortOrder::Asc),
+                            Some(SortOrder::Desc) => Some(SQLSortOrder::Desc),
+                            None => None,
+                        };
+
+                        (db_name, sort, *length)
                     })
                     .collect();
 
@@ -76,10 +86,7 @@ fn calculate_model_tables<'a>(
                 sql::Index {
                     name: index_definition.db_name.clone().unwrap(),
                     // The model index definition uses the model field names, but the SQL Index wants the column names.
-                    columns: referenced_fields
-                        .iter()
-                        .map(|field| field.db_name().to_owned())
-                        .collect(),
+                    columns: referenced_fields,
                     tpe: index_type,
                 }
             })
@@ -159,12 +166,15 @@ fn calculate_relation_tables<'a>(
             let indexes = vec![
                 sql::Index {
                     name: format!("{}_AB_unique", &table_name),
-                    columns: vec![m2m.model_a_column().into(), m2m.model_b_column().into()],
+                    columns: vec![
+                        (m2m.model_a_column().into(), None, None),
+                        (m2m.model_b_column().into(), None, None),
+                    ],
                     tpe: sql::IndexType::Unique,
                 },
                 sql::Index {
                     name: format!("{}_B_index", &table_name),
-                    columns: vec![m2m.model_b_column().into()],
+                    columns: vec![(m2m.model_b_column().into(), None, None)],
                     tpe: sql::IndexType::Normal,
                 },
             ];

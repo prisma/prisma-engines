@@ -269,7 +269,7 @@ impl ModelAsserts for dml::Model {
     fn assert_has_index(&self, def: IndexDefinition) -> &Self {
         assert!(
             self.indices.contains(&def),
-            "could not find index {:?} in the indexes of this model \n {:?}",
+            "could not find index {:#?} in the indexes of this model \n {:#?}",
             def,
             self.indices
         );

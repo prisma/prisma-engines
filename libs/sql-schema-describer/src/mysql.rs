@@ -429,7 +429,8 @@ impl<'a> SqlSchemaDescriber<'a> {
                 Binary column_name AS column_name,
                 seq_in_index AS seq_in_index,
                 Binary table_name AS table_name,
-                sub_part AS partial
+                sub_part AS partial, 
+                collation AS order
             FROM INFORMATION_SCHEMA.STATISTICS
             WHERE table_schema = ?
             ORDER BY index_name, seq_in_index
@@ -441,6 +442,12 @@ impl<'a> SqlSchemaDescriber<'a> {
             let table_name = row.get_expect_string("table_name");
             let index_name = row.get_expect_string("index_name");
             let length = row.get_u32("partial");
+            let order = row.get_string("order");
+            let order = order.map(|v| match v.as_ref() {
+                "A" => SQLSortOrder::Asc,
+                "D" => SQLSortOrder::Desc,
+                _ => panic!("This is unexpected, collation should be A, D or Null"),
+            });
 
             match row.get_string("column_name") {
                 Some(column_name) => {
@@ -478,14 +485,14 @@ impl<'a> SqlSchemaDescriber<'a> {
                         };
                     } else if indexes_map.contains_key(&index_name) {
                         if let Some(index) = indexes_map.get_mut(&index_name) {
-                            index.columns.push(column_name);
+                            index.columns.push((column_name, order, length));
                         }
                     } else {
                         indexes_map.insert(
                             index_name.clone(),
                             Index {
                                 name: index_name,
-                                columns: vec![column_name],
+                                columns: vec![(column_name, order, length)],
                                 tpe: match is_unique {
                                     true => IndexType::Unique,
                                     false => IndexType::Normal,

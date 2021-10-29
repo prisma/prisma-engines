@@ -4,7 +4,7 @@
 
 use crate::{
     Column, ColumnArity, ColumnId, ColumnType, ColumnTypeFamily, DefaultValue, Enum, ForeignKey, ForeignKeyAction,
-    Index, IndexType, PrimaryKey, SqlSchema, Table, TableId, UserDefinedType, View,
+    Index, IndexType, PrimaryKey, SQLSortOrder, SqlSchema, Table, TableId, UserDefinedType, View,
 };
 use serde::de::DeserializeOwned;
 use std::fmt;
@@ -488,13 +488,22 @@ impl<'a> fmt::Debug for IndexWalker<'a> {
 
 impl<'a> IndexWalker<'a> {
     /// The names of the indexed columns.
-    pub fn column_names(&self) -> &'a [String] {
+    pub fn columns(&self) -> &'a [(String, Option<SQLSortOrder>, Option<u32>)] {
         &self.get().columns
     }
 
     /// Traverse the indexed columns.
+    pub fn index_columns(&self) -> Vec<&String> {
+        self.get()
+            .columns
+            .iter()
+            .map(move |(column_name, _, _)| column_name)
+            .collect::<Vec<&String>>()
+    }
+
+    /// Traverse the indexed columns.
     pub fn columns<'b>(&'b self) -> impl Iterator<Item = ColumnWalker<'a>> + 'b {
-        self.get().columns.iter().map(move |column_name| {
+        self.get().columns.iter().map(move |(column_name, _, _)| {
             self.table()
                 .column(column_name)
                 .expect("Failed to find column referenced in index")
@@ -503,7 +512,7 @@ impl<'a> IndexWalker<'a> {
 
     /// True if index contains the given column.
     pub fn contains_column(&self, column_name: &str) -> bool {
-        self.get().columns.iter().any(|column| column == column_name)
+        self.get().columns.iter().any(|(column, _, _)| column == column_name)
     }
 
     fn get(&self) -> &'a Index {

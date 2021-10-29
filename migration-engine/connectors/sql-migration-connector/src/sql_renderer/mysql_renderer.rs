@@ -14,7 +14,7 @@ use sql_schema_describer::{
     walkers::{
         ColumnWalker, EnumWalker, ForeignKeyWalker, IndexWalker, TableWalker, UserDefinedTypeWalker, ViewWalker,
     },
-    ColumnTypeFamily, DefaultKind, DefaultValue, ForeignKeyAction, SqlSchema,
+    ColumnTypeFamily, DefaultKind, DefaultValue, ForeignKeyAction, SQLSortOrder, SqlSchema,
 };
 use std::borrow::Cow;
 
@@ -197,13 +197,25 @@ impl SqlRenderer for MysqlFlavour {
             indexes: table
                 .indexes()
                 .map(move |index| ddl::IndexClause {
+                    //TODO(matthias) The named constraint validations should have made this obsolete
                     index_name: if index.name().len() > MYSQL_IDENTIFIER_SIZE_LIMIT {
                         Some(Cow::Borrowed(&index.name()[0..MYSQL_IDENTIFIER_SIZE_LIMIT]))
                     } else {
                         Some(Cow::Borrowed(index.name()))
                     },
                     unique: index.index_type().is_unique(),
-                    columns: index.column_names().iter().map(Cow::from).collect(),
+                    columns: index
+                        .columns()
+                        .iter()
+                        .map(|(column, sort, length)| {
+                            let sort = match sort {
+                                None => None,
+                                Some(SQLSortOrder::Asc) => Some(" ASC"),
+                                Some(SQLSortOrder::Desc) => Some(" DESC"),
+                            };
+                            (Cow::from(column), *length, sort)
+                        })
+                        .collect(),
                 })
                 .collect(),
             primary_key: table

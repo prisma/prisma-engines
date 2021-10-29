@@ -301,7 +301,7 @@ fn indices_must_work(api: TestApi) {
     assert_eq!(
         vec![Index {
             name: "count".to_string(),
-            columns: vec!["count".to_string()],
+            columns: vec![("count".to_string(), None, None)],
             tpe: IndexType::Normal,
         }],
         user_table.indices

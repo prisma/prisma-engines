@@ -101,7 +101,7 @@ impl<'a> LowerDmlToAst<'a> {
                     .iter()
                     .find(|id| id.is_unique() && id.defined_on_field && id.fields == [field.name()])
                 {
-                    self.push_index_map_argument(model, idx, &mut arguments)
+                    self.push_field_index_arguments(model, idx, &mut arguments)
                 }
 
                 attributes.push(ast::Attribute::new("unique", arguments));

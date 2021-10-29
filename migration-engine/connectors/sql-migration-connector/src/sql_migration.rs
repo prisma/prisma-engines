@@ -243,7 +243,7 @@ impl SqlMigration {
                     }
 
                     out.push_str("index on columns (");
-                    out.push_str(&index.column_names().join(", "));
+                    out.push_str(&index.columns().into_iter().map(|(name, _, _)| name).join(", "));
                     out.push_str(")\n");
                 }
                 SqlMigrationStep::AlterTable(alter_table) => {
@@ -379,7 +379,7 @@ impl SqlMigration {
                     }
 
                     out.push_str("index on columns (");
-                    out.push_str(&index.column_names().join(", "));
+                    out.push_str(&index.columns().into_iter().map(|(name, _, _)| name).join(", "));
                     out.push_str(")\n");
                 }
                 SqlMigrationStep::AddForeignKey {

@@ -5,8 +5,8 @@ fn expanded_index_capability_rendering_works() {
     let dm = r#"
         model User {
         id         Int    @id
-        firstName  String @unique(sort:Desc, length: 5)
-        middleName String @unique(sort:Desc)
+        firstName  String @unique(sort: Desc, length: 5)
+        middleName String @unique(sort: Desc)
         lastName   String @unique(length: 5)
         generation Int    @unique
         
@@ -16,16 +16,16 @@ fn expanded_index_capability_rendering_works() {
     "#;
 
     let expected = expect![[r#"
-        model User {
-        id         Int    @id
-        firstName  String @unique(sort:Desc, length: 5)
-        middleName String @unique(sort:Desc)
-        lastName   String @unique(length: 5)
-        generation Int    @unique
-        
-        @@index([firstName(sort: Desc), middleName(length: 5), lastName(sort: Desc, length: 5), generation])
-        @@unique([firstName(sort: Desc), middleName(length: 5), lastName(sort: Desc, length: 5), generation])
-    }
+     model User {
+       id         Int    @id
+       firstName  String @unique(length: 5, sort: Desc)
+       middleName String @unique(sort: Desc)
+       lastName   String @unique(length: 5)
+       generation Int    @unique
+     
+       @@unique([firstName(sort: Desc), middleName(length: 5), lastName(length: 5, sort: Desc), generation])
+       @@index([firstName(sort: Desc), middleName(length: 5), lastName(length: 5, sort: Desc), generation])
+     }
     "#]];
 
     let dml = datamodel::parse_datamodel(dm).unwrap().subject;

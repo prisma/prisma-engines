@@ -280,7 +280,7 @@ impl<'a> TableAssertion<'a> {
     where
         F: FnOnce(IndexAssertion<'a>) -> IndexAssertion<'a>,
     {
-        if let Some(idx) = self.table.indices.iter().find(|idx| idx.columns == columns) {
+        if let Some(idx) = self.table.indices.iter().find(|idx| idx.index_columns() == columns) {
             index_assertions(IndexAssertion(idx));
         } else {
             panic!("Could not find index on {}.{:?}", self.table.name, columns);

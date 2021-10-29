@@ -3,7 +3,7 @@ use crate::common::constraint_names::ConstraintNames;
 use crate::transform::dml_to_ast::LowerDmlToAst;
 use crate::{
     ast::{self, Span},
-    dml, Ignorable, IndexDefinition, IndexType, Model, WithDatabaseName,
+    dml, Ignorable, IndexDefinition, IndexType, Model, SortOrder, WithDatabaseName,
 };
 
 impl<'a> LowerDmlToAst<'a> {
@@ -15,8 +15,6 @@ impl<'a> LowerDmlToAst<'a> {
 
         if let Some(pk) = &model.primary_key {
             if !pk.defined_on_field {
-                //TODO(matthias)
-                //render field options if there are some / there are not the Asc default
                 let mut args = vec![ast::Argument::new_array("", LowerDmlToAst::pk_field_array(&pk.fields))];
 
                 if pk.name.is_some() {
@@ -49,14 +47,14 @@ impl<'a> LowerDmlToAst<'a> {
             .for_each(|index_def| {
                 let mut args = vec![ast::Argument::new_array(
                     "",
-                    LowerDmlToAst::field_array(&index_def.fields),
+                    LowerDmlToAst::index_field_array(&index_def.field_options),
                 )];
 
                 if let Some(name) = &index_def.name {
                     args.push(ast::Argument::new_string("name", name.to_string()));
                 }
 
-                self.push_index_map_argument(model, index_def, &mut args);
+                self.push_model_index_map(model, index_def, &mut args);
 
                 attributes.push(ast::Attribute::new("unique", args));
             });
@@ -69,10 +67,10 @@ impl<'a> LowerDmlToAst<'a> {
             .for_each(|index_def| {
                 let mut args = vec![ast::Argument::new_array(
                     "",
-                    LowerDmlToAst::field_array(&index_def.fields),
+                    LowerDmlToAst::index_field_array(&index_def.field_options),
                 )];
 
-                self.push_index_map_argument(model, index_def, &mut args);
+                self.push_model_index_map(model, index_def, &mut args);
 
                 attributes.push(ast::Attribute::new("index", args));
             });
@@ -88,7 +86,39 @@ impl<'a> LowerDmlToAst<'a> {
         attributes
     }
 
-    pub(crate) fn push_index_map_argument(&self, model: &Model, index_def: &IndexDefinition, args: &mut Vec<Argument>) {
+    pub(crate) fn push_field_index_arguments(
+        &self,
+        model: &Model,
+        index_def: &IndexDefinition,
+        args: &mut Vec<Argument>,
+    ) {
+        let (_field, sort, length) = index_def.field_options.first().unwrap();
+
+        if let Some(src) = self.datasource {
+            if !ConstraintNames::index_name_matches(index_def, model, &*src.active_connector) {
+                args.push(ast::Argument::new(
+                    "map",
+                    ast::Expression::StringValue(String::from(index_def.db_name.as_ref().unwrap()), Span::empty()),
+                ));
+            }
+        }
+
+        if let Some(length) = length {
+            args.push(ast::Argument::new(
+                "length",
+                ast::Expression::NumericValue(length.to_string(), Span::empty()),
+            ));
+        }
+
+        if *sort == Some(SortOrder::Desc) {
+            args.push(ast::Argument::new(
+                "sort",
+                ast::Expression::ConstantValue("Desc".to_string(), Span::empty()),
+            ));
+        }
+    }
+
+    pub(crate) fn push_model_index_map(&self, model: &Model, index_def: &IndexDefinition, args: &mut Vec<Argument>) {
         if let Some(src) = self.datasource {
             if !ConstraintNames::index_name_matches(index_def, model, &*src.active_connector) {
                 args.push(ast::Argument::new(

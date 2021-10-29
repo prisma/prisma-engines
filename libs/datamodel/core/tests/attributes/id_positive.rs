@@ -170,7 +170,7 @@ fn should_allow_unique_and_id_on_same_field() {
         name: None,
         db_name: Some("Model_id_key".to_string()),
         fields: vec!["id".into()],
-        field_options: vec![("id".into(), SortOrder::Asc, None)],
+        field_options: vec![("id".into(), Some(SortOrder::Asc), None)],
         tpe: IndexType::Unique,
         defined_on_field: true,
     });
@@ -302,7 +302,7 @@ fn id_accepts_length_arg_on_mysql() {
         db_name: Some("User_pkey".to_string()),
         fields: vec![
             ("firstName".to_string(), None),
-            ("middleName".to_string(), None),
+            ("middleName".to_string(), Some(1)),
             ("lastName".to_string(), None),
         ],
         defined_on_field: false,

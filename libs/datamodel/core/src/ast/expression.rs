@@ -52,6 +52,13 @@ impl Expression {
         }
     }
 
+    pub fn extract_constant_value(&self) -> Option<(&str, Span)> {
+        match self {
+            Expression::ConstantValue(s, span) => Some((s, *span)),
+            _ => None,
+        }
+    }
+
     // pub fn with_lifted_span(&self, offset: usize) -> Expression {
     //     match self {
     //         Expression::NumericValue(v, s) => Expression::NumericValue(v.clone(), s.lift_span(offset)),

@@ -30,14 +30,26 @@ async fn a_table_with_partial_primary_key(api: &TestApi) -> TestResult {
             `id` varchar(3000),
             Primary Key(`id`(100))
         );
+        
+        CREATE TABLE `Test2` (
+            `id_1` varchar(3000),
+            `id_2` varchar(3000),
+            Primary Key(`id_1`(100), `id_2`(10))
+        );
     "#;
 
     api.raw_cmd(setup).await;
 
     let expected = expect![[r#"
         model Test {
-          id       Int @id
-          authorId Int @unique(map: "authorId") @default(autoincrement())
+          id String @id(length: 100) @default("") @db.VarChar(3000)
+        }
+        
+        model Test2 {
+          id_1 String @default("") @db.VarChar(3000)
+          id_2 String @default("") @db.VarChar(3000)
+        
+          @@id([id_1(length: 100), id_2(length: 10)])
         }
     "#]];
 

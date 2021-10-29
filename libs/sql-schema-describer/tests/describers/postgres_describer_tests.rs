@@ -564,7 +564,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
             columns: expected_columns,
             indices: vec![Index {
                 name: "User_uuid_col_key".into(),
-                columns: vec!["uuid_col".into(),],
+                columns: vec![("uuid_col".into(), None, None)],
                 tpe: IndexType::Unique,
             },],
             primary_key: Some(PrimaryKey {
@@ -703,13 +703,19 @@ fn postgres_multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi
     let table = schema.table_bang("indexes_test");
     let index = &table.indices[0];
 
-    assert_eq!(&index.columns, &["name", "age"]);
+    assert_eq!(
+        &index.columns,
+        &[("name".to_string(), None, None), ("age".to_string(), None, None)]
+    );
     assert!(index.tpe.is_unique());
 
     let index = &table.indices[1];
 
     assert!(!index.tpe.is_unique());
-    assert_eq!(&index.columns, &["age", "name"]);
+    assert_eq!(
+        &index.columns,
+        &[("age".to_string(), None, None), ("name".to_string(), None, None)]
+    );
 }
 
 #[test_connector(tags(Postgres))]

@@ -205,7 +205,7 @@ impl Table {
 
     pub fn is_column_unique(&self, column_name: &str) -> bool {
         self.indices.iter().any(|index| {
-            index.is_unique() && index.columns.len() == 1 && index.columns.contains(&column_name.to_owned())
+            index.is_unique() && index.columns.len() == 1 && index.columns.iter().any(|(c, _, _)| c == &column_name)
         })
     }
 
@@ -238,9 +238,22 @@ pub struct Index {
     /// Index name.
     pub name: String,
     /// Index columns.
-    pub columns: Vec<String>,
+    pub columns: Vec<(String, Option<SQLSortOrder>, Option<u32>)>,
     /// Type of index.
     pub tpe: IndexType,
+}
+
+impl Index {
+    pub fn index_columns(&self) -> Vec<String> {
+        self.columns.clone().into_iter().map(|(name, _, _)| name).collect()
+    }
+}
+
+/// The sort order of an index.
+#[derive(Serialize, Deserialize, PartialEq, Debug, Copy, Clone)]
+pub enum SQLSortOrder {
+    Asc,
+    Desc,
 }
 
 impl Index {
@@ -267,7 +280,6 @@ pub struct UserDefinedType {
     pub definition: Option<String>,
 }
 
-//TODO(matthias) this needs an optional length arg
 /// The primary key of a table.
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct PrimaryKey {

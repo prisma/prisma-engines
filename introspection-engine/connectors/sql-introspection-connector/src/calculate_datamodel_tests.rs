@@ -388,7 +388,7 @@ mod tests {
                     name: None,
                     db_name: Some("unique_unique".to_string()),
                     fields: vec!["unique".to_string()],
-                    field_options: vec![("unique".to_string(), SortOrder::Asc, None)],
+                    field_options: vec![("unique".to_string(), Some(SortOrder::Asc), None)],
                     tpe: dml::IndexType::Unique,
                     defined_on_field: true,
                 }],
@@ -416,7 +416,7 @@ mod tests {
             ],
             indices: vec![Index {
                 name: "unique_unique".to_string(),
-                columns: vec!["unique".to_string()],
+                columns: vec![("unique".to_string(), None, None)],
                 tpe: IndexType::Unique,
             }],
             primary_key: None,
@@ -758,8 +758,8 @@ mod tests {
                     db_name: Some("name_last_name_unique".to_string()),
                     fields: vec!["name".to_string(), "lastname".to_string()],
                     field_options: vec![
-                        ("name".to_string(), SortOrder::Asc, None),
-                        ("lastname".to_string(), SortOrder::Asc, None),
+                        ("name".to_string(), Some(SortOrder::Asc), None),
+                        ("lastname".to_string(), Some(SortOrder::Asc), None),
                     ],
                     tpe: datamodel::dml::IndexType::Unique,
                     defined_on_field: false,
@@ -814,7 +814,7 @@ mod tests {
             ],
             indices: vec![Index {
                 name: "name_last_name_unique".to_string(),
-                columns: vec!["name".to_string(), "lastname".to_string()],
+                columns: vec![("name".to_string(), None, None), ("lastname".to_string(), None, None)],
                 tpe: IndexType::Unique,
             }],
             primary_key: Some(PrimaryKey {

@@ -452,14 +452,14 @@ impl<'a> SqlSchemaDescriber<'a> {
                         };
                     } else if indexes_map.contains_key(&index_name) {
                         if let Some(index) = indexes_map.get_mut(&index_name) {
-                            index.columns.push(column_name);
+                            index.columns.push((column_name, None, None));
                         }
                     } else {
                         indexes_map.insert(
                             index_name.clone(),
                             Index {
                                 name: index_name,
-                                columns: vec![column_name],
+                                columns: vec![(column_name, None, None)],
                                 tpe: match is_unique {
                                     true => IndexType::Unique,
                                     false => IndexType::Normal,

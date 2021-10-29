@@ -26,7 +26,6 @@ fn parse_constant_literal_with_args(token: &Token<'_>) -> Expression {
     let mut arguments: Vec<Argument> = vec![];
 
     for current in token.relevant_children() {
-        dbg!(current.as_str());
         match current.as_rule() {
             Rule::non_empty_identifier => name = Some(current.as_str().to_string()),
             Rule::argument => arguments.push(parse_attribute_arg(&current)),

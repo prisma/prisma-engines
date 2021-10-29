@@ -1188,7 +1188,10 @@ fn mysql_multi_field_indexes_must_be_inferred(api: TestApi) {
         table.indices,
         &[Index {
             name: "age_and_name_index".into(),
-            columns: vec!["name".to_owned(), "age".to_owned()],
+            columns: vec![
+                ("name".to_owned(), Some(SQLSortOrder::Asc), None),
+                ("age".to_owned(), Some(SQLSortOrder::Asc), None)
+            ],
             tpe: IndexType::Unique,
         }]
     );

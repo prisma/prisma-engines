@@ -201,18 +201,18 @@ impl<'a> ValueValidator<'a> {
         let sort = args
             .into_iter()
             .find(|arg| arg.name.name == "sort")
-            .map(|arg| arg.value.as_string_value())
-            .flatten()
-            .map(|(v, span)| match v {
-                "Asc" => Ok(SortOrder::Asc),
-                "Desc" => Ok(SortOrder::Desc),
+            .map(|arg| match arg.value.extract_constant_value() {
+                Some(("Asc", _)) => Ok(Some(SortOrder::Asc)),
+                Some(("Desc", _)) => Ok(Some(SortOrder::Desc)),
+                None => Ok(None),
                 _ => Err(DatamodelError::ParserError {
                     expected: vec![],
                     expected_str: "".to_string(),
-                    span,
+                    span: arg.span,
                 }),
             })
-            .transpose()?;
+            .transpose()?
+            .flatten();
 
         let length = args
             .into_iter()

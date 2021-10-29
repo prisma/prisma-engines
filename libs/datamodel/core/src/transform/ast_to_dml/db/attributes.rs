@@ -247,7 +247,7 @@ fn visit_field_unique<'ast>(
 
     let sort = match args.optional_arg("sort").map(|sort| sort.as_constant_literal()) {
         Some(Ok("Desc")) => Some(SortOrder::Desc),
-        Some(Ok("Asc")) => Some(SortOrder::Desc),
+        Some(Ok("Asc")) => Some(SortOrder::Asc),
         Some(Ok(other)) => {
             ctx.push_error(args.new_attribute_validation_error(&format!(
                 "The `sort` argument can only be `Asc` or `Desc` you provided: {}.",

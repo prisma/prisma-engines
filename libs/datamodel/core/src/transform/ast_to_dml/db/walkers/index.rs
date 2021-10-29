@@ -6,7 +6,6 @@ use crate::{
 use std::borrow::Cow;
 
 use super::ScalarFieldWalker;
-use dml::model::SortOrder;
 
 #[allow(dead_code)]
 #[derive(Copy, Clone)]
@@ -52,21 +51,11 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
 
     pub(crate) fn field_options(
         &self,
-    ) -> impl ExactSizeIterator<Item = (&ast::Field, dml::model::SortOrder, std::option::Option<u32>)> + '_ {
+    ) -> impl ExactSizeIterator<Item = (&ast::Field, Option<dml::model::SortOrder>, Option<u32>)> + '_ {
         self.index_attribute
             .field_options
             .iter()
-            .map(move |(field_id, sort, length)| {
-                (
-                    &self.db.ast[self.model_id][*field_id],
-                    match sort {
-                        Some(SortOrder::Asc) => SortOrder::Asc,
-                        Some(SortOrder::Desc) => SortOrder::Desc,
-                        None => SortOrder::Asc,
-                    },
-                    *length,
-                )
-            })
+            .map(move |(field_id, sort, length)| (&self.db.ast[self.model_id][*field_id], *sort, *length))
     }
 
     pub(crate) fn contains_exactly_fields(

@@ -283,7 +283,7 @@ impl Display for DropIndex<'_> {
 pub struct IndexClause<'a> {
     pub index_name: Option<Cow<'a, str>>,
     pub unique: bool,
-    pub columns: Vec<Cow<'a, str>>,
+    pub columns: Vec<(Cow<'a, str>, Option<u32>, Option<&'static str>)>,
 }
 
 impl Display for IndexClause<'_> {
@@ -300,7 +300,15 @@ impl Display for IndexClause<'_> {
 
         f.write_str("(")?;
 
-        self.columns.iter().map(|col| Ident(col.as_ref())).join(", ", f)?;
+        self.columns
+            .iter()
+            .map(|(col, length, sort)| {
+                // `col`(15) ASC
+                let sort = sort.unwrap_or_default();
+                let length = length.map(|l| format!("({})", l.to_string())).unwrap_or("".to_string());
+                format!("{}{}{}", Ident(col.as_ref()), length, sort)
+            })
+            .join(", ", f)?;
 
         f.write_str(")")
     }

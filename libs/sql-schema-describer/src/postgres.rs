@@ -78,7 +78,7 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
                     table_indexes.1 = None;
                 }
                 for index in indexes.iter_mut() {
-                    index.columns.retain(|c| table_columns.contains(c))
+                    index.columns.retain(|(c, _, _)| table_columns.contains(c))
                 }
                 indexes.retain(|i| !i.columns.is_empty());
             }
@@ -627,11 +627,11 @@ impl<'a> SqlSchemaDescriber<'a> {
                 let entry: &mut (Vec<Index>, _) = indexes_map.entry(table_name).or_insert_with(|| (Vec::new(), None));
 
                 if let Some(existing_index) = entry.0.iter_mut().find(|idx| idx.name == name) {
-                    existing_index.columns.push(column_name);
+                    existing_index.columns.push((column_name, None, None));
                 } else {
                     entry.0.push(Index {
                         name,
-                        columns: vec![column_name],
+                        columns: vec![(column_name, None, None)],
                         tpe: match is_unique {
                             true => IndexType::Unique,
                             false => IndexType::Normal,

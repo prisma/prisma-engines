@@ -2,10 +2,12 @@ use crate::Dedup;
 use crate::SqlError;
 use datamodel::{
     common::RelationNames, Datamodel, DefaultValue as DMLDef, FieldArity, FieldType, IndexDefinition, Model,
-    ReferentialAction, RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator as VG,
+    ReferentialAction, RelationField, RelationInfo, ScalarField, ScalarType, SortOrder, ValueGenerator as VG,
 };
 use introspection_connector::IntrospectionContext;
-use sql_schema_describer::{Column, ColumnArity, ColumnTypeFamily, ForeignKey, Index, IndexType, SqlSchema, Table};
+use sql_schema_describer::{
+    Column, ColumnArity, ColumnTypeFamily, ForeignKey, Index, IndexType, SQLSortOrder, SqlSchema, Table,
+};
 use sql_schema_describer::{DefaultKind, ForeignKeyAction};
 use tracing::debug;
 
@@ -74,15 +76,15 @@ fn common_prisma_m_to_n_relation_conditions(table: &Table) -> bool {
         //UNIQUE INDEX [A,B]
         && table.indices.iter().any(|i| {
             i.columns.len() == 2
-                && is_a(&i.columns[0])
-                && is_b(&i.columns[1])
+                && is_a(&i.columns[0].0)
+                && is_b(&i.columns[1].0)
                 && i.is_unique()
         })
         //INDEX [B]
         && table
             .indices
             .iter()
-            .any(|i| i.columns.len() == 1 && is_b(&i.columns[0]) && i.tpe == IndexType::Normal)
+            .any(|i| i.columns.len() == 1 && is_b(&i.columns[0].0) && i.tpe == IndexType::Normal)
         // 2 FKs
         && table.foreign_keys.len() == 2
         // Lexicographically lower model referenced by A
@@ -135,8 +137,20 @@ pub(crate) fn calculate_index(index: &Index) -> IndexDefinition {
     IndexDefinition {
         name: None,
         db_name: Some(index.name.clone()),
-        fields: index.columns.clone(),
-        field_options: vec![], //TODO(matthias)
+        fields: index.columns.clone().into_iter().map(|(name, _, _)| name).collect(),
+        field_options: index
+            .columns
+            .clone()
+            .into_iter()
+            .map(|(name, sort, length)| {
+                let sort = match sort {
+                    Some(SQLSortOrder::Asc) => Some(SortOrder::Asc),
+                    Some(SQLSortOrder::Desc) => Some(SortOrder::Desc),
+                    None => None,
+                };
+                (name, sort, length)
+            })
+            .collect(),
         tpe,
         defined_on_field: index.columns.len() == 1,
     }
@@ -247,7 +261,7 @@ pub(crate) fn calculate_backrelation_field(
             let other_is_unique = table
                 .indices
                 .iter()
-                .any(|i| columns_match(&i.columns, &relation_info.fields) && i.is_unique())
+                .any(|i| columns_match(&i.index_columns(), &relation_info.fields) && i.is_unique())
                 || columns_match(&table.primary_key_columns(), &relation_info.fields);
 
             let arity = match relation_field.arity {

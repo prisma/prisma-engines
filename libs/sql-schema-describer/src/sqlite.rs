@@ -460,9 +460,9 @@ impl<'a> SqlSchemaDescriber<'a> {
                     Some(name) => {
                         let pos = row.get("seqno").and_then(|x| x.as_i64()).expect("get seqno") as usize;
                         if index.columns.len() <= pos {
-                            index.columns.resize(pos + 1, "".to_string());
+                            index.columns.resize(pos + 1, ("".to_string(), None, None));
                         }
-                        index.columns[pos] = name;
+                        index.columns[pos] = (name, None, None);
                     }
                     None => break 'index_loop,
                 }
