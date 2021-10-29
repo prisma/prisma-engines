@@ -170,11 +170,14 @@ impl<'a> Validator<'a> {
         if let Some(source) = self.source {
             let connector = &source.active_connector;
             for field in model.fields.iter() {
-                if let Err(err) = connector.validate_field(field) {
-                    diagnostics.push_error(DatamodelError::new_connector_error(
-                        &err.to_string(),
-                        ast_model.find_field_bang(field.name()).span,
-                    ));
+                let mut errors = Vec::new();
+                connector.validate_field(field, &mut errors);
+
+                for error in errors {
+                    diagnostics.push_error(DatamodelError::ConnectorError {
+                        message: error.to_string(),
+                        span: ast_model.find_field_bang(field.name()).span,
+                    });
                 }
             }
         }
@@ -187,8 +190,12 @@ impl<'a> Validator<'a> {
 
         if let Some(source) = self.source {
             let connector = &source.active_connector;
-            if let Err(err) = connector.validate_model(model) {
-                diagnostics.push_error(DatamodelError::new_connector_error(&err.to_string(), ast_model.span))
+            let mut errors = Vec::new();
+
+            connector.validate_model(model, &mut errors);
+
+            for error in errors {
+                diagnostics.push_error(DatamodelError::new_connector_error(&error.to_string(), ast_model.span))
             }
         }
 

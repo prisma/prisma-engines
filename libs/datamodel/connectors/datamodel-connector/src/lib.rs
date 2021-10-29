@@ -58,9 +58,9 @@ pub trait Connector: Send + Sync {
         false
     }
 
-    fn validate_field(&self, field: &Field) -> Result<(), ConnectorError>;
+    fn validate_field(&self, _: &Field, _: &mut Vec<ConnectorError>) {}
 
-    fn validate_model(&self, model: &Model) -> Result<(), ConnectorError>;
+    fn validate_model(&self, _: &Model, _: &mut Vec<ConnectorError>) {}
 
     fn get_constraint_namespace_violations<'dml>(&self, _schema: &'dml Datamodel) -> Vec<ConstraintNameSpace<'dml>> {
         Vec::new()
