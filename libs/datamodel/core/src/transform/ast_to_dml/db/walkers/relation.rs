@@ -49,6 +49,8 @@ pub(crate) enum ReferencingFields<'ast, 'db> {
     NA,
 }
 
+/// An explicitly defined 1:1 or 1:n relation. This walker doesn't expect the relation to be
+/// defined on both sides.
 #[derive(Copy, Clone)]
 pub(crate) struct InlineRelationWalker<'ast, 'db> {
     relation_id: usize,
@@ -72,12 +74,12 @@ impl<'ast, 'db> InlineRelationWalker<'ast, 'db> {
         self.db.walk_model(self.get().model_b)
     }
 
-    /// If the relation is correctly defined from both sides, convert to an explicit relation
+    /// If the relation is defined from both sides, convert to an explicit relation
     /// walker.
-    pub(crate) fn as_complete(self) -> Option<ExplicitCompleteRelationWalker<'ast, 'db>> {
+    pub(crate) fn as_complete(self) -> Option<CompleteInlineRelationWalker<'ast, 'db>> {
         match (self.forward_relation_field(), self.back_relation_field()) {
             (Some(field_a), Some(field_b)) => {
-                let walker = ExplicitCompleteRelationWalker {
+                let walker = CompleteInlineRelationWalker {
                     side_a: (self.referencing_model().model_id, field_a.field_id),
                     side_b: (self.referenced_model().model_id, field_b.field_id),
                     relation: &self.db.relations.relations_storage[self.relation_id],
@@ -237,17 +239,16 @@ impl<'ast, 'db> ImplicitManyToManyRelationWalker<'ast, 'db> {
 }
 
 /// Represents a relation that has fields and references defined in one of the
-/// relation fields. Includes 1:1 and 1:n relations that are defined correctly
-/// from both sides.
+/// relation fields. Includes 1:1 and 1:n relations that are defined from both sides.
 #[derive(Copy, Clone)]
-pub(crate) struct ExplicitCompleteRelationWalker<'ast, 'db> {
+pub(crate) struct CompleteInlineRelationWalker<'ast, 'db> {
     pub(crate) side_a: (ast::ModelId, ast::FieldId),
     pub(crate) side_b: (ast::ModelId, ast::FieldId),
     pub(crate) relation: &'db Relation<'ast>,
     pub(crate) db: &'db ParserDatabase<'ast>,
 }
 
-impl<'ast, 'db> ExplicitCompleteRelationWalker<'ast, 'db> {
+impl<'ast, 'db> CompleteInlineRelationWalker<'ast, 'db> {
     /// The model that defines the relation fields and actions.
     pub(crate) fn referencing_model(self) -> ModelWalker<'ast, 'db> {
         ModelWalker {

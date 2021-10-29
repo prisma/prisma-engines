@@ -4,7 +4,10 @@ mod unique_criteria;
 pub(crate) use primary_key::*;
 pub(crate) use unique_criteria::*;
 
-use super::{IndexWalker, InlineRelationWalker, RelationFieldWalker, RelationWalker, ScalarFieldWalker};
+use super::{
+    CompleteInlineRelationWalker, IndexWalker, InlineRelationWalker, RelationFieldWalker, RelationWalker,
+    ScalarFieldWalker,
+};
 use crate::{
     ast,
     transform::ast_to_dml::db::{types::ModelAttributes, ParserDatabase},
@@ -216,7 +219,8 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
         }
     }
 
-    pub(crate) fn explicit_relations_from(self) -> impl Iterator<Item = InlineRelationWalker<'ast, 'db>> + 'db {
+    /// All relations that start from this model.
+    pub(crate) fn relations_from(self) -> impl Iterator<Item = RelationWalker<'ast, 'db>> + 'db {
         self.db
             .relations
             .from_model(self.model_id)
@@ -224,9 +228,21 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
                 relation_id,
                 db: self.db,
             })
-            .flat_map(|relation| match relation.refine() {
-                super::RefinedRelationWalker::Inline(relation) => Some(relation),
-                super::RefinedRelationWalker::ImplicitManyToMany(_) => None,
-            })
+    }
+
+    /// 1:n and 1:1 relations that start from this model.
+    pub(crate) fn inline_relations_from(self) -> impl Iterator<Item = InlineRelationWalker<'ast, 'db>> + 'db {
+        self.relations_from().filter_map(|relation| match relation.refine() {
+            super::RefinedRelationWalker::Inline(relation) => Some(relation),
+            super::RefinedRelationWalker::ImplicitManyToMany(_) => None,
+        })
+    }
+
+    /// 1:n and 1:1 relations, starting from this model and having both sides defined.
+    pub(crate) fn complete_inline_relations_from(
+        self,
+    ) -> impl Iterator<Item = CompleteInlineRelationWalker<'ast, 'db>> + 'db {
+        self.inline_relations_from()
+            .filter_map(|relation| relation.as_complete())
     }
 }

@@ -76,28 +76,6 @@ impl<'ast> Relations<'ast> {
             .range((model_a_id, ast::ModelId::ZERO, 0)..(model_a_id, ast::ModelId::MAX, usize::MAX))
             .map(move |(_, _, relation_idx)| *relation_idx)
     }
-
-    /// Iterator over (model_b_id, relation)
-    #[allow(dead_code)] // not used _yet_
-    pub(crate) fn relations_from_model(
-        &self,
-        model_a_id: ast::ModelId,
-    ) -> impl Iterator<Item = (ast::ModelId, &Relation<'ast>)> + '_ {
-        self.forward
-            .range((model_a_id, ast::ModelId::ZERO, 0)..(model_a_id, ast::ModelId::MAX, usize::MAX))
-            .map(move |(_model_a_id, model_b_id, relation_idx)| (*model_b_id, &self.relations_storage[*relation_idx]))
-    }
-
-    /// Iterator over (model_a_id, relation)
-    #[allow(dead_code)] // not used _yet_
-    pub(crate) fn relations_to_model(
-        &self,
-        model_b_id: ast::ModelId,
-    ) -> impl Iterator<Item = (ast::ModelId, &Relation<'ast>)> {
-        self.back
-            .range((model_b_id, ast::ModelId::ZERO, 0)..(model_b_id, ast::ModelId::MAX, usize::MAX))
-            .map(move |(_model_b_id, model_a_id, relation_idx)| (*model_a_id, &self.relations_storage[*relation_idx]))
-    }
 }
 
 #[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
