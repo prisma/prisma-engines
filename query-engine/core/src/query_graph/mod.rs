@@ -219,6 +219,7 @@ impl QueryGraph {
     pub fn finalize(&mut self) -> QueryGraphResult<()> {
         if !self.finalized {
             self.swap_marked()?;
+            self.ensure_reload_has_parent_dependency()?;
             self.insert_reloads()?;
             self.normalize_if_nodes()?;
             self.finalized = true;
@@ -650,6 +651,61 @@ impl QueryGraph {
 
     #[tracing::instrument(skip(self))]
     fn ensure_reload_has_parent_dependency(&mut self) -> QueryGraphResult<()> {
+        let returns: Vec<NodeRef> = self
+            .graph
+            .node_indices()
+            .filter_map(|ix| {
+                let node = NodeRef { node_ix: ix };
+
+                match self.node_content(&node).unwrap() {
+                    Node::Flow(Flow::Return(_)) => Some(node),
+                    _ => None,
+                }
+            })
+            .collect();
+
+        for node in returns {
+            let out_edges = self.outgoing_edges(&node);
+
+            let dependencies: Vec<ModelProjection> = out_edges
+                .into_iter()
+                .filter_map(|edge| match self.edge_content(&edge).unwrap() {
+                    QueryGraphDependency::ParentProjection(ref requested_projection, _) => {
+                        Some(requested_projection.clone())
+                    }
+                    _ => None,
+                })
+                .collect();
+
+            let merged = ModelProjection::union(dependencies);
+            let in_edges = self.incoming_edges(&node);
+
+            if let Some(edge) = in_edges.into_iter().find(|edge| {
+                matches!(
+                    self.edge_content(edge),
+                    Some(QueryGraphDependency::ParentProjection(_, _))
+                )
+            }) {
+                let source = self.edge_source(&edge);
+                let target = self.edge_target(&edge);
+
+                let content = self
+                    .remove_edge(edge)
+                    .expect("Expected edges between marked nodes to be non-empty.");
+
+                if let QueryGraphDependency::ParentProjection(existing, transformer) = content {
+                    let merged = merged.merge(existing);
+                    self.create_edge(
+                        &source,
+                        &target,
+                        QueryGraphDependency::ParentProjection(merged, transformer),
+                    )?;
+                } else {
+                    panic!()
+                }
+            }
+        }
+
         Ok(())
     }
 
