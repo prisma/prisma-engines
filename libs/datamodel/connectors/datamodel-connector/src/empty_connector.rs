@@ -27,14 +27,6 @@ impl Connector for EmptyDatamodelConnector {
         usize::MAX
     }
 
-    fn validate_field(&self, _field: &dml::field::Field) -> Result<(), ConnectorError> {
-        Ok(())
-    }
-
-    fn validate_model(&self, _model: &dml::model::Model) -> Result<(), ConnectorError> {
-        Ok(())
-    }
-
     fn available_native_type_constructors(&self) -> &[dml::native_type_constructor::NativeTypeConstructor] {
         &[]
     }
