@@ -51,14 +51,14 @@ impl<'ast> ParserDatabase<'ast> {
     /// Iterate all complete relations that are not many to many and are
     /// correctly defined from both sides.
     #[track_caller]
-    pub(crate) fn walk_explicit_relations(&self) -> impl Iterator<Item = ExplicitRelationWalker<'ast, '_>> + '_ {
+    pub(crate) fn walk_explicit_relations(&self) -> impl Iterator<Item = CompleteInlineRelationWalker<'ast, '_>> + '_ {
         self.relations
             .iter_relations()
             .filter(|(_, _, relation)| !relation.is_many_to_many())
             .filter_map(move |(model_a, model_b, relation)| {
                 relation
                     .as_complete_fields()
-                    .map(|(field_a, field_b)| ExplicitRelationWalker {
+                    .map(|(field_a, field_b)| CompleteInlineRelationWalker {
                         side_a: (model_a, field_a),
                         side_b: (model_b, field_b),
                         db: self,

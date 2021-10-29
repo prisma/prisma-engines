@@ -53,7 +53,7 @@ impl<'a, 'b> ValidationPipeline<'a> {
         diagnostics.to_result()?;
 
         // Phase 3: Global validations after we have consistent data model.
-        validations::validate(&db, &mut diagnostics);
+        validations::validate(&db, &mut diagnostics, relation_transformation_enabled);
         diagnostics.to_result()?;
 
         // Phase 4: Lift AST to DML. This can't fail.
@@ -64,13 +64,6 @@ impl<'a, 'b> ValidationPipeline<'a> {
 
         // Phase 5: Validation (deprecated, move stuff out from here if you can)
         self.validator.validate(db.ast(), &schema, &mut diagnostics);
-
-        if relation_transformation_enabled {
-            // do nothing
-        } else {
-            // Assume this is the schema we want. Run the rest of the validations.
-            validations::validate_strict(&db, &mut diagnostics)
-        }
 
         // Phase 6: Post Standardisation Validation (deprecated, move stuff out from here if you can)
         self.validator

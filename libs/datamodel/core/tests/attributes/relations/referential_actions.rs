@@ -437,19 +437,19 @@ fn actions_should_be_defined_only_from_one_side() {
     "#};
 
     let expected = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `a` on Model `B` and `b` on Model `A` both provide the `onDelete` or `onUpdate` argument in the @relation attribute. You have to provide it only on one of the two fields.[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
-        [1;94m   | [0m
-        [1;94m13 | [0m    aId Int
-        [1;94m14 | [0m    [1;91ma A @relation(fields: [aId], references: [id], onUpdate: NoAction, onDelete: NoAction)[0m
-        [1;94m15 | [0m}
-        [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `b` on Model `A` and `a` on Model `B` both provide the `onDelete` or `onUpdate` argument in the @relation attribute. You have to provide it only on one of the two fields.[0m
           [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
         [1;94m 7 | [0m    id Int @id
         [1;94m 8 | [0m    [1;91mb B? @relation(onUpdate: NoAction, onDelete: NoAction)[0m
         [1;94m 9 | [0m}
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `a` on Model `B` and `b` on Model `A` both provide the `onDelete` or `onUpdate` argument in the @relation attribute. You have to provide it only on one of the two fields.[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m    aId Int
+        [1;94m14 | [0m    [1;91ma A @relation(fields: [aId], references: [id], onUpdate: NoAction, onDelete: NoAction)[0m
+        [1;94m15 | [0m}
         [1;94m   | [0m
     "#]];
 

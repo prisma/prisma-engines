@@ -79,7 +79,7 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
         }
     }
 
-    pub(crate) fn referenced_fields(self) -> Option<impl Iterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db> {
+    pub(crate) fn referenced_fields(self) -> Option<impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db> {
         self.attributes().references.as_ref().map(|references| {
             references
                 .iter()

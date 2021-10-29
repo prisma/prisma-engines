@@ -7,7 +7,7 @@ mod visited_relation;
 use crate::{
     ast,
     diagnostics::{DatamodelError, Diagnostics},
-    transform::ast_to_dml::db::walkers::ExplicitRelationWalker,
+    transform::ast_to_dml::db::walkers::CompleteInlineRelationWalker,
 };
 use datamodel_connector::{Connector, ConnectorCapability};
 use itertools::Itertools;
@@ -23,7 +23,7 @@ const RELATION_ATTRIBUTE_NAME_WITH_AT: &str = "@relation";
 const STATE_ERROR: &str = "Failed lookup of model, field or optional property during internal processing. This means that the internal representation was mutated incorrectly.";
 
 /// Required relational fields should point to required scalar fields.
-pub(super) fn field_arity(relation: ExplicitRelationWalker<'_, '_>, diagnostics: &mut Diagnostics) {
+pub(super) fn field_arity(relation: CompleteInlineRelationWalker<'_, '_>, diagnostics: &mut Diagnostics) {
     if !relation.referencing_field().ast_field().arity.is_required() {
         return;
     }
@@ -44,7 +44,7 @@ pub(super) fn field_arity(relation: ExplicitRelationWalker<'_, '_>, diagnostics:
 
 /// The `fields` and `references` arguments should hold the same number of fields.
 pub(super) fn same_length_in_referencing_and_referenced(
-    relation: ExplicitRelationWalker<'_, '_>,
+    relation: CompleteInlineRelationWalker<'_, '_>,
     diagnostics: &mut Diagnostics,
 ) {
     if relation.referenced_fields().len() == 0 || relation.referencing_fields().len() == 0 {
@@ -66,7 +66,7 @@ pub(super) fn same_length_in_referencing_and_referenced(
 
 /// Some connectors expect us to refer only unique fields from the foreign key.
 pub(super) fn references_unique_fields(
-    relation: ExplicitRelationWalker<'_, '_>,
+    relation: CompleteInlineRelationWalker<'_, '_>,
     connector: &dyn Connector,
     diagnostics: &mut Diagnostics,
 ) {
@@ -104,7 +104,7 @@ pub(super) fn references_unique_fields(
 
 /// Some connectors want the fields and references in the same order.
 pub(super) fn referencing_fields_in_correct_order(
-    relation: ExplicitRelationWalker<'_, '_>,
+    relation: CompleteInlineRelationWalker<'_, '_>,
     connector: &dyn Connector,
     diagnostics: &mut Diagnostics,
 ) {
@@ -112,7 +112,7 @@ pub(super) fn referencing_fields_in_correct_order(
         return;
     }
 
-    if connector.allows_relation_fields_in_arbitrary_order() || !relation.is_compound() {
+    if connector.allows_relation_fields_in_arbitrary_order() || relation.referenced_fields().len() == 1 {
         return;
     }
 
@@ -154,7 +154,7 @@ pub(super) fn referencing_fields_in_correct_order(
 /// foreign key. Many to many relations we skip. The user must set one of the
 /// relation links to NoAction for both referential actions.
 pub(super) fn cycles<'ast, 'db>(
-    relation: ExplicitRelationWalker<'ast, 'db>,
+    relation: CompleteInlineRelationWalker<'ast, 'db>,
     connector: &dyn Connector,
     diagnostics: &mut Diagnostics,
 ) {
@@ -195,7 +195,7 @@ pub(super) fn cycles<'ast, 'db>(
                 return;
             }
 
-            for relation in related_model.explicit_complete_relations_fwd() {
+            for relation in related_model.complete_inline_relations_from() {
                 next_relations.push((relation, Rc::new(visited_relations.link_next(relation))));
             }
         }
@@ -215,7 +215,7 @@ pub(super) fn cycles<'ast, 'db>(
 /// The user must set one of these relations to use NoAction for onUpdate and
 /// onDelete.
 pub(super) fn multiple_cascading_paths(
-    relation: ExplicitRelationWalker<'_, '_>,
+    relation: CompleteInlineRelationWalker<'_, '_>,
     connector: &dyn Connector,
     diagnostics: &mut Diagnostics,
 ) {
@@ -242,7 +242,7 @@ pub(super) fn multiple_cascading_paths(
     // function from corresponding models.
     let mut next_relations: Vec<_> = relation
         .referencing_model()
-        .explicit_complete_relations_fwd()
+        .complete_inline_relations_from()
         .filter(|relation| relation.on_delete().triggers_modification() || relation.on_update().triggers_modification())
         .map(|relation| (relation, Rc::new(VisitedRelation::root(relation))))
         .collect();
@@ -264,7 +264,7 @@ pub(super) fn multiple_cascading_paths(
         }
 
         let mut forward_relations = related_model
-            .explicit_complete_relations_fwd()
+            .complete_inline_relations_from()
             .filter(|relation| !visited.contains(&relation.referencing_field()))
             .map(|relation| (relation, Rc::new(visited_relations.link_next(relation))))
             .peekable();
@@ -335,7 +335,7 @@ pub(super) fn multiple_cascading_paths(
     }
 }
 
-fn cascade_error_with_default_values(relation: ExplicitRelationWalker<'_, '_>, msg: &str) -> DatamodelError {
+fn cascade_error_with_default_values(relation: CompleteInlineRelationWalker<'_, '_>, msg: &str) -> DatamodelError {
     let on_delete = match relation.referencing_field().attributes().on_delete {
         None if relation.on_delete().triggers_modification() => Some(relation.on_delete()),
         _ => None,
