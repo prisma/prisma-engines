@@ -60,7 +60,7 @@ impl MongoDbMigrationConnector {
         match target {
             DiffTarget::Datamodel((_config, schema)) => Ok(schema_calculator::calculate(schema)),
             DiffTarget::Database => self.client().await?.describe().await,
-            DiffTarget::Migrations(_) => panic!("Diff migrations on mongodb"),
+            DiffTarget::Migrations(_) => Err(unsupported_command_error()),
             DiffTarget::Empty => Ok(MongoSchema::default()),
         }
     }
@@ -97,7 +97,7 @@ impl MigrationConnector for MongoDbMigrationConnector {
     }
 
     fn migration_file_extension(&self) -> &'static str {
-        unreachable!("migration_file_extension on MongoDB");
+        unreachable!("migration_file_extension")
     }
 
     fn migration_len(&self, migration: &Migration) -> usize {
@@ -134,4 +134,11 @@ impl MigrationConnector for MongoDbMigrationConnector {
     ) -> migration_connector::ConnectorResult<()> {
         Ok(())
     }
+}
+
+fn unsupported_command_error() -> ConnectorError {
+    ConnectorError::from_msg(
+"The \"mongodb\" provider is not supported with this command. For more info see https://www.prisma.io/docs/concepts/database-connectors/mongodb".to_owned()
+
+        )
 }

@@ -61,6 +61,6 @@ impl DatabaseMigrationStepApplier for MongoDbMigrationConnector {
     }
 
     async fn apply_script(&self, _migration_name: &str, _script: &str) -> ConnectorResult<()> {
-        unreachable!()
+        Err(crate::unsupported_command_error())
     }
 }
