@@ -1,58 +1,68 @@
 //! The MongoDB migration connector.
+//!
+//! It is intentionally structured after sql-migration-connector and implements the same
+//! [MigrationConnector](/trait.MigrationConnector.html) API.
 
-mod error;
-mod mongodb_destructive_change_checker;
-mod mongodb_migration;
-mod mongodb_migration_persistence;
-mod mongodb_migration_step_applier;
+mod client_wrapper;
+mod destructive_change_checker;
+mod differ;
+mod migration;
+mod migration_persistence;
+mod migration_step_applier;
+mod schema;
+mod schema_calculator;
 
-use error::IntoConnectorResult;
+use client_wrapper::Client;
+use migration::MongoDbMigration;
 use migration_connector::{ConnectorError, ConnectorResult, DiffTarget, Migration, MigrationConnector};
-use mongodb::{
-    options::{ClientOptions, WriteConcern},
-    Client,
-};
-use mongodb_migration::*;
-use url::Url;
+use schema::MongoSchema;
+use tokio::sync::OnceCell;
 
 /// The top-level MongoDB migration connector.
 pub struct MongoDbMigrationConnector {
-    client: Client,
-    db_name: String,
+    connection_string: String,
+    client: OnceCell<Client>,
 }
 
 impl MongoDbMigrationConnector {
-    /// Construct and initialize the SQL migration connector.
-    pub async fn new(database_str: &str) -> ConnectorResult<Self> {
-        let (client, db_name) = Self::create_client(database_str).await?;
-
-        Ok(Self { client, db_name })
+    pub fn new(connection_string: String) -> Self {
+        Self {
+            connection_string,
+            client: OnceCell::new(),
+        }
     }
 
-    /// Set up the database for connector-test-kit, without initializing the connector.
-    pub async fn qe_setup(database_str: &str) -> ConnectorResult<()> {
-        let (client, db_name) = Self::create_client(database_str).await?;
+    async fn client(&self) -> ConnectorResult<&Client> {
+        let client: &Client = self
+            .client
+            .get_or_try_init(move || Box::pin(async move { Client::connect(&self.connection_string).await }))
+            .await?;
 
-        // Drop database. Creation is automatically done when collections are created.
-        client
-            .database(&db_name)
-            .drop(Some(
-                mongodb::options::DropDatabaseOptions::builder()
-                    .write_concern(WriteConcern::builder().journal(true).build())
-                    .build(),
-            ))
-            .await
-            .into_connector_result()?;
+        Ok(client)
+    }
+
+    /// Only for qe_setup. This should disappear soon.
+    pub async fn create_collections(&self, schema: &datamodel::dml::Datamodel) -> ConnectorResult<()> {
+        let client = self.client().await?;
+
+        for model in &schema.models {
+            client
+                .database()
+                .create_collection(model.database_name.as_deref().unwrap_or(&model.name), None)
+                .await
+                .unwrap();
+        }
 
         Ok(())
     }
 
-    async fn create_client(database_str: &str) -> ConnectorResult<(Client, String)> {
-        let url = Url::parse(database_str).map_err(ConnectorError::url_parse_error)?;
-        let db_name = url.path().trim_start_matches('/').to_string();
-
-        let client_options = ClientOptions::parse(database_str).await.into_connector_result()?;
-        Ok((Client::with_options(client_options).into_connector_result()?, db_name))
+    async fn mongodb_schema_from_diff_target(&self, target: DiffTarget<'_>) -> ConnectorResult<MongoSchema> {
+        match target {
+            DiffTarget::Datamodel((_config, schema)) => Ok(schema_calculator::calculate(schema)),
+            DiffTarget::Database => self.client().await?.describe().await,
+            DiffTarget::Migrations(_) => panic!("Diff migrations on mongodb"),
+            DiffTarget::Empty => Ok(MongoSchema::default()),
+        }
     }
 }
 
@@ -63,7 +73,9 @@ impl MigrationConnector for MongoDbMigrationConnector {
     }
 
     async fn create_database(&self) -> ConnectorResult<String> {
-        todo!();
+        Err(ConnectorError::from_msg(
+            "create_database() is not supported on mongodb: databases are created automatically when used.".to_owned(),
+        ))
     }
 
     async fn ensure_connection_validity(&self) -> ConnectorResult<()> {
@@ -71,32 +83,21 @@ impl MigrationConnector for MongoDbMigrationConnector {
     }
 
     async fn version(&self) -> migration_connector::ConnectorResult<String> {
-        Ok("4".to_owned())
+        Ok("4 or 5".to_owned())
     }
 
     async fn diff(&self, from: DiffTarget<'_>, to: DiffTarget<'_>) -> ConnectorResult<Migration> {
-        match (from, to) {
-            (DiffTarget::Empty, DiffTarget::Datamodel((_, datamodel))) => {
-                let steps = datamodel
-                    .models()
-                    .map(|model| {
-                        let name = model.database_name.as_ref().unwrap_or(&model.name).to_owned();
-                        MongoDbMigrationStep::CreateCollection(name)
-                    })
-                    .collect();
-
-                Ok(Migration::new(MongoDbMigration { steps }))
-            }
-            _ => todo!(),
-        }
+        let from = self.mongodb_schema_from_diff_target(from).await?;
+        let to = self.mongodb_schema_from_diff_target(to).await?;
+        Ok(Migration::new(differ::diff(from, to)))
     }
 
     async fn drop_database(&self) -> ConnectorResult<()> {
-        todo!();
+        self.client().await?.drop_database().await
     }
 
     fn migration_file_extension(&self) -> &'static str {
-        "mongo"
+        unreachable!("migration_file_extension on MongoDB");
     }
 
     fn migration_len(&self, migration: &Migration) -> usize {
@@ -108,11 +109,7 @@ impl MigrationConnector for MongoDbMigrationConnector {
     }
 
     async fn reset(&self) -> migration_connector::ConnectorResult<()> {
-        self.client
-            .database(&self.db_name)
-            .drop(None)
-            .await
-            .into_connector_result()
+        self.client().await?.drop_database().await
     }
 
     fn migration_persistence(&self) -> &dyn migration_connector::MigrationPersistence {
@@ -128,7 +125,7 @@ impl MigrationConnector for MongoDbMigrationConnector {
     }
 
     async fn acquire_lock(&self) -> ConnectorResult<()> {
-        todo!()
+        Ok(())
     }
 
     async fn validate_migrations(

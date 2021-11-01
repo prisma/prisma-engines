@@ -1,0 +1,53 @@
+[-] Index `UserExistingIndex`
+[+] Index `UserExistingIndex` on ({"firstName":1})
+
+------
+
+{
+  "collections": {
+    "Post": {
+      "indexes": [
+        {
+          "name": "_id_",
+          "is_unique": false,
+          "keys": {
+            "_id": 1
+          }
+        }
+      ],
+      "documents": [
+        {
+          "_id": 2
+        }
+      ]
+    },
+    "User": {
+      "indexes": [
+        {
+          "name": "_id_",
+          "is_unique": false,
+          "keys": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "UserExistingIndex",
+          "is_unique": false,
+          "keys": {
+            "firstName": 1
+          }
+        }
+      ],
+      "documents": [
+        {
+          "_id": 1,
+          "firstName": "George",
+          "address": {
+            "street": "Downing Street",
+            "city": "London"
+          }
+        }
+      ]
+    }
+  }
+}
