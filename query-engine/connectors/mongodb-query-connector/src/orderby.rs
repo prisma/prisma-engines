@@ -109,6 +109,8 @@ impl OrderByData {
     /// document all the way to the scalar to order through all hops.
     pub(crate) fn full_reference_path(&self, use_bindings: bool) -> String {
         if let Some(ref prefix) = self.prefix {
+            // Order by aggregates are always used by their join prefix and no specific field name
+            // since they are performed on relations
             if matches!(self.order_by, OrderBy::Aggregation(_)) {
                 prefix.to_string()
             } else {
@@ -198,13 +200,16 @@ impl OrderByBuilder {
                     format!("_id.{}", data.scalar_field_name())
                 }
             // Since Order by aggregate with middle to-one path will be unwinded,
-            // we need to refer to it with its top-level
+            // we need to refer to it with its top-level join alias
             } else if matches!(&data.order_by, OrderBy::Aggregation(_)) && data.order_by.has_middle_to_one_path() {
                 data.binding_names().0
             } else {
                 data.full_reference_path(false)
             };
 
+            // Unwind order by aggregate to-one middle joins into the top level join
+            // to prevent nested join result which break the stages that come after
+            // See `unwind_aggregate_joins` for more explanation
             if let OrderBy::Aggregation(order_by_aggregate) = &data.order_by {
                 if !order_by_aggregate.path.is_empty() {
                     match order_by_aggregate.sort_aggregation {
@@ -242,10 +247,10 @@ impl OrderByBuilder {
 }
 
 /// In order to enable computing aggregation on nested joins,
-/// we unwind & replace the root field by the nested to-one joins so that we can apply a $size operation.
+/// we unwind & replace the top-level join by the nested to-one joins so that we can apply a $size operation.
 ///
 /// Let's consider these relations:
-/// A to-one B to-one C to-many D
+/// (one or many) A to-one B to-one C to-many D
 /// We'll get the following joins result: { orderby_AToB: [{ BToC: [{ CToD: [1, 2, 3] }] }] }
 /// This function will generate the following stages:
 /// 1. { $unwind: { path: "$orderby_AToB" } } -> { orderby_AToB: { BToC: [{ CToD: [1, 2, 3] }] } }
