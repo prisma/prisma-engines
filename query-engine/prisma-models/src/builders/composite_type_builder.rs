@@ -42,5 +42,5 @@ pub(crate) fn build_composites(
         composite.fields.set(fields).unwrap();
     }
 
-    todo!()
+    composites
 }

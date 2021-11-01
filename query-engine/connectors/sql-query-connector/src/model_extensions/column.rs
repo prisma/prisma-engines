@@ -60,6 +60,7 @@ impl AsColumns for Field {
         match self {
             Field::Scalar(ref sf) => ColumnIterator::from(vec![sf.as_column()]),
             Field::Relation(ref rf) => rf.as_columns(),
+            Field::Composite(_) => unimplemented!(),
         }
     }
 }

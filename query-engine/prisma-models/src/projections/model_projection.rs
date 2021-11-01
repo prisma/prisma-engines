@@ -18,9 +18,14 @@ impl From<Field> for ModelProjection {
 }
 
 impl ModelProjection {
+    /// Retrieves the model based on the first field of the projection.
+    /// Assumes:
+    /// - All fields are of the same model.
+    /// - First field is contained on a model. This makes the unwrap safe.
     pub fn model(&self) -> ModelRef {
-        // self.fields[0].model()
-        todo!()
+        self.fields[0]
+            .model()
+            .expect("ModelProjection fields must be contained on a model.")
     }
 
     pub fn new(fields: Vec<Field>) -> Self {
@@ -67,6 +72,7 @@ impl ModelProjection {
             .flat_map(|field| match field {
                 Field::Scalar(sf) => vec![sf.clone()],
                 Field::Relation(rf) => rf.scalar_fields(),
+                Field::Composite(_) => todo!(), // [Composites] todo
             })
             .into_iter()
             .unique_by(|field| field.name.clone())

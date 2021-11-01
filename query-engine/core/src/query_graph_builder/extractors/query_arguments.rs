@@ -146,6 +146,7 @@ fn process_order_object(
                         Ok(Some(OrderBy::scalar(sf.clone(), path, sort_order)))
                     }
                 }
+                Field::Composite(_) => Ok(None), // [Composites] todo
             }
         }
     }

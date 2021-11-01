@@ -82,6 +82,7 @@ pub(crate) fn map_output_type(ctx: &mut BuilderContext, model_field: &ModelField
     match model_field {
         ModelField::Scalar(sf) => map_scalar_output_type_for_field(ctx, sf),
         ModelField::Relation(rf) => map_relation_output_type(ctx, rf),
+        ModelField::Composite(_) => OutputType::Scalar(ScalarType::Null), // [Composites] todo
     }
 }
 

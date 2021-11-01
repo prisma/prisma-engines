@@ -16,11 +16,11 @@ pub enum FieldBuilder {
 }
 
 impl FieldBuilder {
-    pub fn build(self, container: ParentContainer, _composite_types: &[CompositeTypeRef]) -> Field {
+    pub fn build(self, container: ParentContainer, composite_types: &[CompositeTypeRef]) -> Field {
         match self {
             FieldBuilder::Scalar(st) => Field::Scalar(st.build(container)),
             FieldBuilder::Relation(rt) => Field::Relation(rt.build(container.as_model_weak().unwrap())), // Relations are only possible between models.
-            FieldBuilder::Composite(_ct) => todo!(), // Field::Composite(ct.build(model, composite_types)),
+            FieldBuilder::Composite(ct) => Field::Composite(ct.build(container, composite_types)),
         }
     }
 }

@@ -75,6 +75,8 @@ impl WriteArgsParser {
                         ParsedInputValue::Single(PrismaValue::Null) => (),
                         _ => args.nested.push((Arc::clone(rf), v.try_into()?)),
                     },
+
+                    Field::Composite(_) => todo!(), // [Composites] todo
                 };
 
                 Ok(args)
