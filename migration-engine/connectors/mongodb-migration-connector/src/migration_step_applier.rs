@@ -3,12 +3,21 @@ use crate::{
     migration::{MongoDbMigration, MongoDbMigrationStep},
     MongoDbMigrationConnector,
 };
-use migration_connector::{ConnectorResult, DatabaseMigrationStepApplier, DestructiveChangeDiagnostics, Migration};
+use migration_connector::{
+    ConnectorResult, DatabaseMigrationStepApplier, DestructiveChangeDiagnostics, Migration, MigrationConnector,
+};
 
 #[async_trait::async_trait]
 impl DatabaseMigrationStepApplier for MongoDbMigrationConnector {
     async fn apply_migration(&self, migration: &Migration) -> ConnectorResult<u32> {
         let db = self.client().await?.database();
+
+        tracing::info!(
+            migrate_action = "log",
+            "Applying the following changes:\n\n{}",
+            self.migration_summary(migration)
+        );
+
         let migration: &MongoDbMigration = migration.downcast_ref();
 
         for step in migration.steps.iter() {
@@ -52,6 +61,6 @@ impl DatabaseMigrationStepApplier for MongoDbMigrationConnector {
     }
 
     async fn apply_script(&self, _migration_name: &str, _script: &str) -> ConnectorResult<()> {
-        unreachable!()
+        Err(crate::unsupported_command_error())
     }
 }
