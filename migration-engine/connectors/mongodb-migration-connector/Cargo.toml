@@ -15,6 +15,7 @@ mongodb = "2.0.1"
 serde_json = "1"
 tokio = { version = "1.0", features = ["parking_lot"] }
 url = "2.1.1"
+tracing = "0.1.29"
 
 [dev-dependencies]
 dissimilar = "1.0.3"
