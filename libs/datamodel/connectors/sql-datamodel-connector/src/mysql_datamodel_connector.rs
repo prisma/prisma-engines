@@ -1,10 +1,8 @@
 use datamodel_connector::{
     connector_error::ConnectorError,
     helper::{args_vec_from_opt, parse_one_opt_u32, parse_one_u32, parse_two_opt_u32},
-    Connector, ConnectorCapability, ConstraintNameSpace, ConstraintType, ConstraintViolationScope,
-    ReferentialIntegrity,
+    Connector, ConnectorCapability, ConstraintScope, ReferentialIntegrity,
 };
-use dml::datamodel::Datamodel;
 use dml::{
     field::{Field, FieldType},
     model::Model,
@@ -15,7 +13,6 @@ use dml::{
 };
 use enumflags2::BitFlags;
 use native_types::MySqlType::{self, *};
-use std::collections::BTreeMap;
 
 const INT_TYPE_NAME: &str = "Int";
 const UNSIGNED_INT_TYPE_NAME: &str = "UnsignedInt";
@@ -65,6 +62,7 @@ pub struct MySqlDatamodelConnector {
     capabilities: Vec<ConnectorCapability>,
     constructors: Vec<NativeTypeConstructor>,
     referential_integrity: ReferentialIntegrity,
+    constraint_violation_scopes: Vec<ConstraintScope>,
 }
 
 impl MySqlDatamodelConnector {
@@ -170,6 +168,7 @@ impl MySqlDatamodelConnector {
             capabilities,
             constructors,
             referential_integrity,
+            constraint_violation_scopes: vec![ConstraintScope::GlobalForeignKey, ConstraintScope::ModelKeyIndex],
         }
     }
 }
@@ -355,36 +354,8 @@ impl Connector for MySqlDatamodelConnector {
         }
     }
 
-    fn get_constraint_namespace_violations<'dml>(&self, schema: &'dml Datamodel) -> Vec<ConstraintNameSpace<'dml>> {
-        let mut potential_name_space_violations: BTreeMap<
-            (&str, ConstraintViolationScope),
-            Vec<(&str, ConstraintType)>,
-        > = BTreeMap::new();
-
-        //Foreign Keys have a global namespace
-        //Keys and Indexes have a model namespace
-        for model in schema.models() {
-            for name in model
-                .relation_fields()
-                .filter_map(|rf| rf.relation_info.fk_name.as_ref())
-            {
-                let entry = potential_name_space_violations
-                    .entry((name, ConstraintViolationScope::GlobalForeignKey))
-                    .or_insert_with(Vec::new);
-
-                entry.push((&model.name, ConstraintType::ForeignKey));
-            }
-
-            for name in model.indices.iter().filter_map(|i| i.db_name.as_ref()) {
-                let entry = potential_name_space_violations
-                    .entry((name, ConstraintViolationScope::ModelKeyIndex(&model.name)))
-                    .or_insert_with(Vec::new);
-
-                entry.push((&model.name, ConstraintType::KeyOrIdx));
-            }
-        }
-
-        ConstraintNameSpace::flatten(potential_name_space_violations)
+    fn constraint_violation_scopes(&self) -> &[ConstraintScope] {
+        &self.constraint_violation_scopes
     }
 
     fn available_native_type_constructors(&self) -> &[NativeTypeConstructor] {

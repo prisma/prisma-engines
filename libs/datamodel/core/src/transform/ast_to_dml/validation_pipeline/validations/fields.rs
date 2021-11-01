@@ -1,7 +1,10 @@
 use super::names::{NameTaken, Names};
 use crate::{
     diagnostics::{DatamodelError, Diagnostics},
-    transform::ast_to_dml::db::walkers::FieldWalker,
+    transform::ast_to_dml::db::{
+        walkers::{FieldWalker, ScalarFieldWalker},
+        ConstraintName, ParserDatabase,
+    },
 };
 
 pub(super) fn validate_client_name(field: FieldWalker<'_, '_>, names: &Names<'_>, diagnostics: &mut Diagnostics) {
@@ -37,5 +40,33 @@ pub(super) fn validate_client_name(field: FieldWalker<'_, '_>, names: &Names<'_>
                 diagnostics.push_error(error);
             }
         }
+    }
+}
+
+pub(crate) fn has_a_unique_default_constraint_name(
+    db: &ParserDatabase<'_>,
+    field: ScalarFieldWalker<'_, '_>,
+    diagnostics: &mut Diagnostics,
+) {
+    let name = match field.default_value().map(|w| w.constraint_name()) {
+        Some(name) => name,
+        None => return,
+    };
+
+    for violation in db.scope_violations(field.model().model_id(), ConstraintName::Default(name.as_ref())) {
+        let message = format!(
+            "The given constraint name `{}` has to be unique in the following namespace: {}. Please provide a different name using the `map` argument.",
+            name,
+            violation.description(field.model().name()),
+        );
+
+        let span = field
+            .ast_field()
+            .span_for_argument("default", "map")
+            .unwrap_or(field.ast_field().span);
+
+        diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+            &message, "default", span,
+        ));
     }
 }

@@ -225,3 +225,12 @@ impl<'ast> AsRef<str> for RelationName<'ast> {
         }
     }
 }
+
+impl<'ast> From<RelationName<'ast>> for Cow<'ast, str> {
+    fn from(name: RelationName<'ast>) -> Self {
+        match name {
+            RelationName::Explicit(name) => Cow::from(name),
+            RelationName::Generated(name) => Cow::from(name),
+        }
+    }
+}

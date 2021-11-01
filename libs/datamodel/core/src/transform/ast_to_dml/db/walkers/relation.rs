@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use super::{ModelWalker, RelationFieldWalker, RelationName, ScalarFieldWalker};
 use crate::{
     ast,
@@ -14,9 +16,7 @@ pub(crate) struct RelationWalker<'ast, 'db> {
 
 impl<'ast, 'db> RelationWalker<'ast, 'db> {
     pub(crate) fn refine(self) -> RefinedRelationWalker<'ast, 'db> {
-        let relation = &self.db.relations.relations_storage[self.relation_id];
-
-        if relation.is_many_to_many() {
+        if self.get().is_many_to_many() {
             RefinedRelationWalker::ImplicitManyToMany(ImplicitManyToManyRelationWalker {
                 db: self.db,
                 relation_id: self.relation_id,
@@ -27,6 +27,35 @@ impl<'ast, 'db> RelationWalker<'ast, 'db> {
                 db: self.db,
             })
         }
+    }
+
+    pub(crate) fn get(self) -> &'db Relation<'ast> {
+        &self.db.relations.relations_storage[self.relation_id]
+    }
+
+    pub(crate) fn foreign_key_name(self) -> Option<Cow<'ast, str>> {
+        let from_forward = self.referencing_field().and_then(|f| f.final_foreign_key_name());
+        let from_back = self.referenced_field().and_then(|f| f.final_foreign_key_name());
+
+        from_forward.or(from_back)
+    }
+
+    fn referencing_field(self) -> Option<RelationFieldWalker<'ast, 'db>> {
+        self.get().forward_field().map(|field_id| RelationFieldWalker {
+            model_id: self.get().model_a,
+            field_id,
+            db: self.db,
+            relation_field: &self.db.types.relation_fields[&(self.get().model_a, field_id)],
+        })
+    }
+
+    fn referenced_field(self) -> Option<RelationFieldWalker<'ast, 'db>> {
+        self.get().back_field().map(|field_id| RelationFieldWalker {
+            model_id: self.get().model_b,
+            field_id,
+            db: self.db,
+            relation_field: &self.db.types.relation_fields[&(self.get().model_b, field_id)],
+        })
     }
 }
 

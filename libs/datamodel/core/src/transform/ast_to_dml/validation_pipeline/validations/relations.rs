@@ -7,7 +7,10 @@ mod visited_relation;
 use crate::{
     ast,
     diagnostics::{DatamodelError, Diagnostics},
-    transform::ast_to_dml::db::walkers::CompleteInlineRelationWalker,
+    transform::ast_to_dml::db::{
+        walkers::{CompleteInlineRelationWalker, RefinedRelationWalker, RelationWalker},
+        ConstraintName, ParserDatabase,
+    },
 };
 use datamodel_connector::{Connector, ConnectorCapability};
 use itertools::Itertools;
@@ -21,6 +24,58 @@ const PRISMA_FORMAT_HINT: &str = "You can run `prisma format` to fix this automa
 const RELATION_ATTRIBUTE_NAME: &str = "relation";
 const RELATION_ATTRIBUTE_NAME_WITH_AT: &str = "@relation";
 const STATE_ERROR: &str = "Failed lookup of model, field or optional property during internal processing. This means that the internal representation was mutated incorrectly.";
+
+pub(crate) fn has_a_unique_constraint_name(
+    db: &ParserDatabase<'_>,
+    relation: RelationWalker<'_, '_>,
+    diagnostics: &mut Diagnostics,
+) {
+    let name = match relation.foreign_key_name() {
+        Some(name) => name,
+        None => return,
+    };
+
+    let (model, field) = match relation.refine() {
+        RefinedRelationWalker::Inline(relation) => {
+            let field = match relation.forward_relation_field() {
+                Some(field) => field,
+                None => return,
+            };
+
+            (relation.referencing_model(), field)
+        }
+        RefinedRelationWalker::ImplicitManyToMany(relation) => {
+            let name_a = relation.field_a().attributes().fk_name;
+            let name_b = relation.field_b().attributes().fk_name;
+
+            match (name_a, name_b) {
+                (None, Some(_)) => (relation.model_b(), relation.field_b()),
+                (Some(_), None) => (relation.model_a(), relation.field_a()),
+                (Some(_), Some(_)) => (relation.model_a(), relation.field_a()),
+                (None, None) => return,
+            }
+        }
+    };
+
+    for violation in db.scope_violations(model.model_id(), ConstraintName::Relation(name.as_ref())) {
+        let span = field
+            .ast_field()
+            .span_for_argument("relation", "map")
+            .unwrap_or_else(|| field.ast_field().span);
+
+        let message = format!(
+            "The given constraint name `{}` has to be unique in the following namespace: {}. Please provide a different name using the `map` argument.",
+            name,
+            violation.description(model.name())
+        );
+
+        diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+            &message,
+            RELATION_ATTRIBUTE_NAME,
+            span,
+        ));
+    }
+}
 
 /// Required relational fields should point to required scalar fields.
 pub(super) fn field_arity(relation: CompleteInlineRelationWalker<'_, '_>, diagnostics: &mut Diagnostics) {

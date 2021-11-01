@@ -128,6 +128,27 @@ impl<'ast> Relation<'ast> {
         matches!(self.attributes, RelationAttributes::ImplicitManyToMany { .. })
     }
 
+    pub(crate) fn forward_field(&self) -> Option<ast::FieldId> {
+        match &self.attributes {
+            RelationAttributes::ImplicitManyToMany { field_a, .. } => Some(*field_a),
+            RelationAttributes::OneToOne(OneToOneRelationFields::Both(field_a, _)) => Some(*field_a),
+            RelationAttributes::OneToOne(OneToOneRelationFields::Forward(field_a)) => Some(*field_a),
+            RelationAttributes::OneToMany(OneToManyRelationFields::Both(field_a, _)) => Some(*field_a),
+            RelationAttributes::OneToMany(OneToManyRelationFields::Forward(field_a)) => Some(*field_a),
+            _ => None,
+        }
+    }
+
+    pub(crate) fn back_field(&self) -> Option<ast::FieldId> {
+        match &self.attributes {
+            RelationAttributes::ImplicitManyToMany { field_b, .. } => Some(*field_b),
+            RelationAttributes::OneToOne(OneToOneRelationFields::Both(_, field_b)) => Some(*field_b),
+            RelationAttributes::OneToMany(OneToManyRelationFields::Both(_, field_b)) => Some(*field_b),
+            RelationAttributes::OneToMany(OneToManyRelationFields::Back(field_b)) => Some(*field_b),
+            _ => None,
+        }
+    }
+
     pub(crate) fn as_complete_fields(&self) -> Option<(ast::FieldId, ast::FieldId)> {
         match &self.attributes {
             RelationAttributes::ImplicitManyToMany { field_a, field_b } => Some((*field_a, *field_b)),

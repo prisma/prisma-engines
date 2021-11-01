@@ -479,7 +479,7 @@ fn primary_key_and_foreign_key_names_cannot_clash() {
           [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
         [1;94m 6 | [0mmodel A {
-        [1;94m 7 | [0m    id Int @[1;91mid(map: "foo")[0m 
+        [1;94m 7 | [0m    id Int @id([1;91mmap: "foo"[0m) 
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": The given constraint name `foo` has to be unique in the following namespace: on model `A` for primary key, indexes, unique constraints and foreign keys. Please provide a different name using the `map` argument.[0m
           [1;94m-->[0m  [4mschema.prisma:9[0m
