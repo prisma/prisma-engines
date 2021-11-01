@@ -109,7 +109,7 @@ impl OrderByData {
     /// document all the way to the scalar to order through all hops.
     pub(crate) fn full_reference_path(&self, use_bindings: bool) -> String {
         if let Some(ref prefix) = self.prefix {
-            // Order by aggregates are always used by their join prefix and no specific field name
+            // Order by aggregates are always referenced by their join prefix and not a specific field name.
             // since they are performed on relations
             if matches!(self.order_by, OrderBy::Aggregation(_)) {
                 prefix.to_string()
