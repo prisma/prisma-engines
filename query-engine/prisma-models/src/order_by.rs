@@ -41,7 +41,7 @@ impl OrderBy {
         if len < 2 {
             false
         } else {
-            path.get(len - 2).map(|rf| !rf.is_list).unwrap_or(false)
+            path.get(len - 2).map(|rf| !rf.is_list()).unwrap_or(false)
         }
     }
 }

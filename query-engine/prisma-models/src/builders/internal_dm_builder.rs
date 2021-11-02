@@ -46,7 +46,12 @@ impl InternalDataModelBuilder {
         let models = self
             .models
             .into_iter()
-            .map(|mt| mt.build(Arc::downgrade(&internal_data_model), &[]))
+            .map(|mt| {
+                mt.build(
+                    Arc::downgrade(&internal_data_model),
+                    &internal_data_model.composite_types.get().unwrap(),
+                )
+            })
             .collect();
 
         internal_data_model.models.set(models).unwrap();
@@ -102,7 +107,12 @@ fn model_field_builders(
         .fields()
         .filter(|field| !field.is_ignored())
         .filter_map(|field| match field {
-            dml::Field::CompositeField(_cf) => todo!(),
+            dml::Field::CompositeField(cf) => Some(FieldBuilder::Composite(CompositeFieldBuilder {
+                name: cf.name.clone(),
+                db_name: cf.database_name.clone(),
+                arity: cf.arity.clone(),
+                type_name: cf.composite_type.clone(),
+            })),
             dml::Field::RelationField(rf) => {
                 let relation = relations
                     .iter()

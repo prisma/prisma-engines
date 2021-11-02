@@ -267,7 +267,7 @@ fn unwind_aggregate_joins(
         .iter()
         .enumerate()
         .filter_map(|(i, rf)| {
-            if rf.is_list {
+            if rf.is_list() {
                 None
             } else {
                 // Prefix parts are mapped 1-1 with order by path.

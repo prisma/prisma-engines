@@ -1,6 +1,6 @@
-datasource db {
-  provider = "postgres"
-  url      = "postgresql://postgres:prisma@localhost:5432"
+datasource chinook {
+  provider = "sqlite"
+  url      = "file:./db/Chinook.db?connection_limit=5&socket_timeout=20"
 }
 
 generator js {

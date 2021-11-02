@@ -101,7 +101,7 @@ pub(crate) fn many_records_field_arguments(ctx: &mut BuilderContext, field: &Mod
         ModelField::Scalar(_) => vec![],
         ModelField::Relation(rf) if rf.is_list() => many_records_arguments(ctx, &rf.related_model(), true),
         ModelField::Relation(rf) if !rf.is_list() => vec![],
-        _ => unreachable!(),
+        _ => vec![], // [Composites] todo
     }
 }
 
