@@ -378,15 +378,6 @@ pub struct IndexWalker<'a> {
 }
 
 impl<'a> IndexWalker<'a> {
-    pub fn fields<'b>(&'b self) -> impl Iterator<Item = ScalarFieldWalker<'a>> + 'b {
-        self.index.fields.iter().map(move |field_name| {
-            self.model
-                .scalar_fields()
-                .find(|f| f.name() == field_name.as_str())
-                .expect("index on unknown model field")
-        })
-    }
-
     pub fn is_unique(&self) -> bool {
         self.index.is_unique()
     }

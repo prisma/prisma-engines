@@ -259,7 +259,7 @@ fn visit_field_unique<'ast>(
             ctx.push_error(err);
             None
         }
-        None => None,
+        None => Some(SortOrder::Asc), //TODO(matthias) once index types are introduced this needs to distinguish on them. Fulltext has no order for example
     };
 
     model_attributes.ast_indexes.push((
@@ -966,15 +966,15 @@ fn resolve_field_array_with_args<'ast>(
             relation_fields,
         })
     } else {
-        let other_field_ids = field_ids.clone();
+        let cloned_field_ids = field_ids.clone();
 
-        let field_ids = constant_array
+        let fields_with_args = constant_array
             .into_iter()
             .zip(field_ids)
             .map(|((_, sort, length), field_id)| (field_id, sort, length))
             .collect();
 
-        Ok((other_field_ids, field_ids))
+        Ok((cloned_field_ids, fields_with_args))
     }
 }
 

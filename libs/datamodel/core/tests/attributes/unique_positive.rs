@@ -142,12 +142,16 @@ fn multiple_unique_must_work() {
                 field_options: [
                     (
                         "firstName",
-                        Asc,
+                        Some(
+                            Asc,
+                        ),
                         None,
                     ),
                     (
                         "lastName",
-                        Asc,
+                        Some(
+                            Asc,
+                        ),
                         None,
                     ),
                 ],
@@ -168,12 +172,16 @@ fn multiple_unique_must_work() {
                 field_options: [
                     (
                         "firstName",
-                        Asc,
+                        Some(
+                            Asc,
+                        ),
                         None,
                     ),
                     (
                         "lastName",
-                        Asc,
+                        Some(
+                            Asc,
+                        ),
                         None,
                     ),
                 ],

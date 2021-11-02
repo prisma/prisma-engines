@@ -246,13 +246,49 @@ fn index_accepts_sort_order() {
         generation Int    @unique
         
         @@index([firstName(sort: Desc), middleName(length: 5), lastName(sort: Desc, length: 5), generation])
-        @@unique([firstName(sort: Desc), middleName(length: 5), lastName(sort: Desc, length: 5), generation])
+        @@unique([firstName(sort: Desc), middleName(length: 6), lastName(sort: Desc, length: 6), generation])
     }
     "#,
     );
 
     let schema = parse(&dml);
     let user_model = schema.assert_has_model("User");
+
+    user_model.assert_has_index(IndexDefinition {
+        name: None,
+        db_name: Some("User_firstName_key".to_string()),
+        fields: vec!["firstName".to_string()],
+        field_options: vec![("firstName".to_string(), Some(SortOrder::Desc), Some(5))],
+        tpe: IndexType::Unique,
+        defined_on_field: true,
+    });
+
+    user_model.assert_has_index(IndexDefinition {
+        name: None,
+        db_name: Some("User_middleName_key".to_string()),
+        fields: vec!["middleName".to_string()],
+        field_options: vec![("middleName".to_string(), Some(SortOrder::Desc), None)],
+        tpe: IndexType::Unique,
+        defined_on_field: true,
+    });
+
+    user_model.assert_has_index(IndexDefinition {
+        name: None,
+        db_name: Some("User_lastName_key".to_string()),
+        fields: vec!["lastName".to_string()],
+        field_options: vec![("lastName".to_string(), Some(SortOrder::Asc), Some(5))],
+        tpe: IndexType::Unique,
+        defined_on_field: true,
+    });
+
+    user_model.assert_has_index(IndexDefinition {
+        name: None,
+        db_name: Some("User_generation_key".to_string()),
+        fields: vec!["generation".to_string()],
+        field_options: vec![("generation".to_string(), Some(SortOrder::Asc), None)],
+        tpe: IndexType::Unique,
+        defined_on_field: true,
+    });
 
     user_model.assert_has_index(IndexDefinition {
         name: None,
@@ -270,6 +306,25 @@ fn index_accepts_sort_order() {
             ("generation".to_string(), Some(SortOrder::Asc), None),
         ],
         tpe: IndexType::Normal,
+        defined_on_field: false,
+    });
+
+    user_model.assert_has_index(IndexDefinition {
+        name: None,
+        db_name: Some("User_firstName_middleName_lastName_generation_key".to_string()),
+        fields: vec![
+            "firstName".to_string(),
+            "middleName".to_string(),
+            "lastName".to_string(),
+            "generation".to_string(),
+        ],
+        field_options: vec![
+            ("firstName".to_string(), Some(SortOrder::Desc), None),
+            ("middleName".to_string(), Some(SortOrder::Asc), Some(6)),
+            ("lastName".to_string(), Some(SortOrder::Desc), Some(6)),
+            ("generation".to_string(), Some(SortOrder::Asc), None),
+        ],
+        tpe: IndexType::Unique,
         defined_on_field: false,
     });
 }
