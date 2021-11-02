@@ -19,6 +19,22 @@ impl<'a> LowerDmlToAst<'a> {
         }
     }
 
+    pub(crate) fn lower_composite_field_type(&self, field_type: &dml::CompositeTypeFieldType) -> ast::FieldType {
+        match field_type {
+            ::dml::composite_type::CompositeTypeFieldType::CompositeType(name) => {
+                ast::FieldType::Supported(ast::Identifier::new(name))
+            }
+            ::dml::composite_type::CompositeTypeFieldType::Unsupported(name) => {
+                ast::FieldType::Unsupported(name.clone(), Span::empty())
+            }
+            ::dml::composite_type::CompositeTypeFieldType::Scalar(tpe, custom_type_name, _) => {
+                ast::FieldType::Supported(ast::Identifier::new(
+                    custom_type_name.as_ref().unwrap_or(&tpe.to_string()),
+                ))
+            }
+        }
+    }
+
     /// Internal: Lowers a field's type.
     pub(crate) fn lower_type(&self, field_type: &dml::FieldType) -> ast::FieldType {
         match field_type {

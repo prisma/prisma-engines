@@ -405,18 +405,18 @@ fn multiple_cascading_complex() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError validating: When any of the records in models `Address`, `User` are updated or deleted, the referential actions on the relations cascade to model `Cement` through multiple paths. Please break one of these paths by setting the `onUpdate` and `onDelete` to `NoAction`. (Implicit default `onUpdate`: `Cascade`) Read more at https://pris.ly/d/cyclic-referential-actions[0m
-          [1;94m-->[0m  [4mschema.prisma:35[0m
-        [1;94m   | [0m
-        [1;94m34 | [0m    post        Post      @relation(fields: [postId], references: [id])
-        [1;94m35 | [0m    [1;91muser        User      @relation(fields: [userId], references: [id])[0m
-        [1;94m36 | [0m    tag         Tag       @relation(fields: [tagId], references: [id])
-        [1;94m   | [0m
-        [1;91merror[0m: [1mError validating: When any of the records in models `Address`, `User` are updated or deleted, the referential actions on the relations cascade to model `Cement` through multiple paths. Please break one of these paths by setting the `onUpdate` and `onDelete` to `NoAction`. (Implicit default `onUpdate`: `Cascade`) Read more at https://pris.ly/d/cyclic-referential-actions[0m
           [1;94m-->[0m  [4mschema.prisma:34[0m
         [1;94m   | [0m
         [1;94m33 | [0m    tagId       Int
         [1;94m34 | [0m    [1;91mpost        Post      @relation(fields: [postId], references: [id])[0m
         [1;94m35 | [0m    user        User      @relation(fields: [userId], references: [id])
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError validating: When any of the records in models `Address`, `User` are updated or deleted, the referential actions on the relations cascade to model `Cement` through multiple paths. Please break one of these paths by setting the `onUpdate` and `onDelete` to `NoAction`. (Implicit default `onUpdate`: `Cascade`) Read more at https://pris.ly/d/cyclic-referential-actions[0m
+          [1;94m-->[0m  [4mschema.prisma:35[0m
+        [1;94m   | [0m
+        [1;94m34 | [0m    post        Post      @relation(fields: [postId], references: [id])
+        [1;94m35 | [0m    [1;91muser        User      @relation(fields: [userId], references: [id])[0m
+        [1;94m36 | [0m    tag         Tag       @relation(fields: [tagId], references: [id])
         [1;94m   | [0m
         [1;91merror[0m: [1mError validating: When any of the records in models `Address`, `User` are updated or deleted, the referential actions on the relations cascade to model `Comment` through multiple paths. Please break one of these paths by setting the `onUpdate` and `onDelete` to `NoAction`. (Implicit default `onUpdate`: `Cascade`) Read more at https://pris.ly/d/cyclic-referential-actions[0m
           [1;94m-->[0m  [4mschema.prisma:45[0m

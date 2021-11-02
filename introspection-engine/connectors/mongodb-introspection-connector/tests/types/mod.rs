@@ -1,3 +1,5 @@
+mod composite;
+
 use crate::test_api::*;
 use bson::{oid::ObjectId, Binary, Bson, DateTime, Decimal128, Timestamp};
 
@@ -53,35 +55,6 @@ fn double() {
           first  Float
           second Float?
           third  Float?
-        }
-    "#]];
-
-    expected.assert_eq(res.datamodel());
-}
-
-#[test]
-fn json() {
-    let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
-        let collection = db.collection("A");
-
-        let docs = vec![
-            doc! {"first": {"foo": 1}, "second": {"foo": 1}, "third": {"foo": 1}},
-            doc! {"first": {"foo": 1}, "second": null, "third": {"foo": 1}},
-            doc! {"first": {"foo": 1}, "second": {"foo": 1}},
-        ];
-
-        collection.insert_many(docs, None).await.unwrap();
-
-        Ok(())
-    });
-
-    let expected = expect![[r#"
-        model A {
-          id     String @id @default(dbgenerated()) @map("_id") @db.ObjectId
-          first  Json
-          second Json?
-          third  Json?
         }
     "#]];
 

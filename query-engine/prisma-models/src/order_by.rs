@@ -33,6 +33,17 @@ impl OrderBy {
             OrderBy::Relevance(_) => None,
         }
     }
+
+    pub fn has_middle_to_one_path(&self) -> bool {
+        let path = self.path();
+        let len = path.len();
+
+        if len < 2 {
+            false
+        } else {
+            path.get(len - 2).map(|rf| !rf.is_list).unwrap_or(false)
+        }
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]

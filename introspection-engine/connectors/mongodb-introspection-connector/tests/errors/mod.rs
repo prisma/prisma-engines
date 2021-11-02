@@ -46,6 +46,7 @@ fn using_without_preview_feature_enabled() {
 
             let ctx = IntrospectionContext {
                 source: config.subject.datasources.pop().unwrap(),
+                composite_type_depth: Default::default(),
                 preview_features: Default::default(),
             };
 

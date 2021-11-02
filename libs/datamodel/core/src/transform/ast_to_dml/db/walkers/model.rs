@@ -4,7 +4,10 @@ mod unique_criteria;
 pub(crate) use primary_key::*;
 pub(crate) use unique_criteria::*;
 
-use super::{ExplicitRelationWalker, IndexWalker, RelationFieldWalker, ScalarFieldWalker};
+use super::{
+    CompleteInlineRelationWalker, IndexWalker, InlineRelationWalker, RelationFieldWalker, RelationWalker,
+    ScalarFieldWalker,
+};
 use crate::{
     ast,
     transform::ast_to_dml::db::{types::ModelAttributes, ParserDatabase},
@@ -83,6 +86,11 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
         })
     }
 
+    /// Used in validation. True only if the model has a single field id.
+    pub(crate) fn has_single_id_field(self) -> bool {
+        matches!(&self.attributes().primary_key, Some(pk) if pk.fields.len() == 1)
+    }
+
     /// The primary key of the model, if defined.
     pub(crate) fn primary_key(self) -> Option<PrimaryKeyWalker<'ast, 'db>> {
         self.model_attributes.primary_key.as_ref().map(|pk| PrimaryKeyWalker {
@@ -90,6 +98,17 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
             attribute: pk,
             db: self.db,
         })
+    }
+
+    /// Walk a scalar field by id.
+    #[track_caller]
+    pub(crate) fn scalar_field(&self, field_id: ast::FieldId) -> ScalarFieldWalker<'ast, 'db> {
+        ScalarFieldWalker {
+            model_id: self.model_id,
+            field_id,
+            db: self.db,
+            scalar_field: &self.db.types.scalar_fields[&(self.model_id, field_id)],
+        }
     }
 
     /// Iterate all the scalar fields in a given model in the order they were defined.
@@ -152,7 +171,7 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
             })
     }
 
-    /// Iterate all the relation fields in the model in the order they were
+    /// Iterate all the indexes in the model in the order they were
     /// defined, followed by the implicit indexes.
     pub(crate) fn indexes(self) -> impl Iterator<Item = IndexWalker<'ast, 'db>> + 'db {
         let implicit_indexes = self
@@ -200,26 +219,30 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
         }
     }
 
-    /// All relations that fit in the following definition:
-    ///
-    /// - Is either 1:n or 1:1 relation.
-    /// - Has both sides defined.
-    pub(crate) fn explicit_complete_relations_fwd(
-        self,
-    ) -> impl Iterator<Item = ExplicitRelationWalker<'ast, 'db>> + 'db {
+    /// All relations that start from this model.
+    pub(crate) fn relations_from(self) -> impl Iterator<Item = RelationWalker<'ast, 'db>> + 'db {
         self.db
             .relations
-            .relations_from_model(self.model_id)
-            .filter(|(_, relation)| !relation.is_many_to_many())
-            .filter_map(move |(model_b, relation)| {
-                relation
-                    .as_complete_fields()
-                    .map(|(field_a, field_b)| ExplicitRelationWalker {
-                        side_a: (self.model_id, field_a),
-                        side_b: (model_b, field_b),
-                        db: self.db,
-                        relation,
-                    })
+            .from_model(self.model_id)
+            .map(move |relation_id| RelationWalker {
+                relation_id,
+                db: self.db,
             })
+    }
+
+    /// 1:n and 1:1 relations that start from this model.
+    pub(crate) fn inline_relations_from(self) -> impl Iterator<Item = InlineRelationWalker<'ast, 'db>> + 'db {
+        self.relations_from().filter_map(|relation| match relation.refine() {
+            super::RefinedRelationWalker::Inline(relation) => Some(relation),
+            super::RefinedRelationWalker::ImplicitManyToMany(_) => None,
+        })
+    }
+
+    /// 1:n and 1:1 relations, starting from this model and having both sides defined.
+    pub(crate) fn complete_inline_relations_from(
+        self,
+    ) -> impl Iterator<Item = CompleteInlineRelationWalker<'ast, 'db>> + 'db {
+        self.inline_relations_from()
+            .filter_map(|relation| relation.as_complete())
     }
 }

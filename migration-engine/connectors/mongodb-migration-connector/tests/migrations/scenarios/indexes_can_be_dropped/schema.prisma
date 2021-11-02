@@ -1,0 +1,12 @@
+ model User {
+     id Int @id
+     firstName String
+     lastName String
+     age Int
+ }
+
+ model Post {
+     id Int @id
+     title String
+ }
+

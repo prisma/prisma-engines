@@ -82,11 +82,56 @@ impl fmt::Display for IntrospectionResultOutput {
 
 pub struct IntrospectionContext {
     pub source: Datasource,
+    pub composite_type_depth: CompositeTypeDepth,
     pub preview_features: BitFlags<PreviewFeature>,
 }
 
 impl IntrospectionContext {
     pub fn foreign_keys_enabled(&self) -> bool {
         self.source.referential_integrity().uses_foreign_keys()
+    }
+}
+
+/// Control type for composite type traversal.
+#[derive(Debug, Clone, Copy)]
+pub enum CompositeTypeDepth {
+    /// Allow maximum of n layers of nested types.
+    Level(usize),
+    /// Unrestricted traversal.
+    Infinite,
+    /// No traversal, typing into dynamic Json.
+    None,
+}
+
+impl From<isize> for CompositeTypeDepth {
+    fn from(size: isize) -> Self {
+        match size {
+            size if size < 0 => Self::Infinite,
+            size if size == 0 => Self::None,
+            _ => Self::Level(size as usize),
+        }
+    }
+}
+
+impl Default for CompositeTypeDepth {
+    fn default() -> Self {
+        Self::None
+    }
+}
+
+impl CompositeTypeDepth {
+    /// Traversal is not allowed.
+    pub fn is_none(self) -> bool {
+        matches!(self, Self::None)
+    }
+
+    /// Go one level down in nested composite types.
+    pub fn level_down(self) -> CompositeTypeDepth {
+        match self {
+            CompositeTypeDepth::Level(level) if level > 1 => Self::Level(level - 1),
+            CompositeTypeDepth::Level(_) => Self::None,
+            CompositeTypeDepth::Infinite => Self::Infinite,
+            CompositeTypeDepth::None => Self::None,
+        }
     }
 }

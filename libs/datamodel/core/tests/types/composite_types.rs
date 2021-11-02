@@ -1,5 +1,6 @@
 use datamodel::{parse_schema, parse_schema_ast};
 use expect_test::expect;
+use indoc::indoc;
 
 #[test]
 fn composite_types_are_parsed_without_error() {
@@ -283,4 +284,139 @@ fn composite_types_can_nest() {
     "#;
 
     assert!(parse_schema(schema).is_ok());
+}
+
+#[test]
+fn required_cycles_to_self_are_not_allowed() {
+    let datamodel = indoc! {r#"
+        datasource db {
+          provider = "mongodb"
+          url = "mongodb://"
+        }
+
+        generator client {
+          provider = "prisma-client-js"
+          previewFeatures = ["mongoDb"]
+        }
+
+        type Address {
+          name String?
+          secondaryAddress Address
+        }
+    "#};
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError validating field `secondaryAddress` in composite type `Address`: The type is the same as the parent and causes an endless cycle. Please change the field to be either optional or a list.[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
+        [1;94m   | [0m
+        [1;94m12 | [0m  name String?
+        [1;94m13 | [0m  [1;91msecondaryAddress Address[0m
+        [1;94m14 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&parse_schema(datamodel).unwrap_err());
+}
+
+#[test]
+fn list_cycles_to_self_are_allowed() {
+    let datamodel = indoc! {r#"
+        datasource db {
+          provider = "mongodb"
+          url = "mongodb://"
+        }
+
+        generator client {
+          provider = "prisma-client-js"
+          previewFeatures = ["mongoDb"]
+        }
+
+        type Address {
+          name String?
+          secondaryAddresses Address[]
+        }
+    "#};
+
+    assert!(parse_schema(datamodel).is_ok())
+}
+
+#[test]
+fn required_cycles_are_not_allowed() {
+    let datamodel = indoc! {r#"
+        datasource db {
+          provider = "mongodb"
+          url = "mongodb://"
+        }
+
+        generator client {
+          provider = "prisma-client-js"
+          previewFeatures = ["mongoDb"]
+        }
+
+        type PostCode {
+          code Int
+        }
+
+        type Address {
+          name String?
+          city City
+          code PostCode
+        }
+
+        type City {
+          name         String?
+          worldAddress Address
+        }
+    "#};
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError validating field `worldAddress` in composite type `City`: The types cause an endless cycle in the path `City` → `Address` → `City`. Please change one of the fields to be either optional or a list to break the cycle.[0m
+          [1;94m-->[0m  [4mschema.prisma:23[0m
+        [1;94m   | [0m
+        [1;94m22 | [0m  name         String?
+        [1;94m23 | [0m  [1;91mworldAddress Address[0m
+        [1;94m24 | [0m}
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError validating field `city` in composite type `Address`: The types cause an endless cycle in the path `Address` → `City` → `Address`. Please change one of the fields to be either optional or a list to break the cycle.[0m
+          [1;94m-->[0m  [4mschema.prisma:17[0m
+        [1;94m   | [0m
+        [1;94m16 | [0m  name String?
+        [1;94m17 | [0m  [1;91mcity City[0m
+        [1;94m18 | [0m  code PostCode
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&parse_schema(datamodel).unwrap_err());
+}
+
+#[test]
+fn cycles_broken_with_an_optional_are_allowed() {
+    let datamodel = indoc! {r#"
+        datasource db {
+          provider = "mongodb"
+          url = "mongodb://"
+        }
+
+        generator client {
+          provider = "prisma-client-js"
+          previewFeatures = ["mongoDb"]
+        }
+
+        type PostCode {
+          code Int
+        }
+
+        type Address {
+          name String?
+          city City
+          code PostCode
+        }
+
+        type City {
+          name         String?
+          worldAddress Address?
+        }
+    "#};
+
+    assert!(parse_schema(datamodel).is_ok());
 }

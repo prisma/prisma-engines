@@ -1,5 +1,5 @@
 use datamodel::common::preview_features::PreviewFeature;
-use introspection_connector::{IntrospectionConnector, IntrospectionContext, Warning};
+use introspection_connector::{CompositeTypeDepth, IntrospectionConnector, IntrospectionContext, Warning};
 use mongodb::{Client, Database};
 use mongodb_introspection_connector::MongoDbIntrospectionConnector;
 use names::Generator;
@@ -43,7 +43,7 @@ impl TestResult {
     }
 }
 
-pub(super) fn introspect<F, U>(init_database: F) -> TestResult
+pub(super) fn introspect_depth<F, U>(composite_type_depth: CompositeTypeDepth, init_database: F) -> TestResult
 where
     F: FnOnce(Database) -> U,
     U: Future<Output = mongodb::error::Result<()>>,
@@ -51,7 +51,13 @@ where
     let mut names = Generator::default();
 
     let database_name = names.next().unwrap().replace('-', "");
-    let connection_string = format!("{}{}?authSource=admin&retryWrites=true", &*CONN_STR, database_name);
+    let mut connection_string: url::Url = CONN_STR.parse().unwrap();
+    connection_string.set_path(&format!(
+        "/{}{}",
+        database_name,
+        connection_string.path().trim_start_matches('/')
+    ));
+    let connection_string = connection_string.to_string();
 
     let datamodel_string = indoc::formatdoc!(
         r#"
@@ -73,6 +79,7 @@ where
 
     let ctx = IntrospectionContext {
         source: config.subject.datasources.pop().unwrap(),
+        composite_type_depth,
         preview_features: PreviewFeature::MongoDb.into(),
     };
 
@@ -96,4 +103,12 @@ where
             warnings: res.warnings,
         }
     })
+}
+
+pub(super) fn introspect<F, U>(init_database: F) -> TestResult
+where
+    F: FnOnce(Database) -> U,
+    U: Future<Output = mongodb::error::Result<()>>,
+{
+    introspect_depth(CompositeTypeDepth::Infinite, init_database)
 }

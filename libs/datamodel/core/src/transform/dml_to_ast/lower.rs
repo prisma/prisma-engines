@@ -22,6 +22,10 @@ impl<'a> LowerDmlToAst<'a> {
     pub fn lower(&self, datamodel: &dml::Datamodel) -> ast::SchemaAst {
         let mut tops: Vec<ast::Top> = Vec::new();
 
+        for r#type in datamodel.composite_types.iter() {
+            tops.push(ast::Top::CompositeType(self.lower_composite_type(r#type)));
+        }
+
         for model in datamodel.models() {
             if !model.is_generated {
                 tops.push(ast::Top::Model(self.lower_model(model, datamodel)))
@@ -88,6 +92,44 @@ impl<'a> LowerDmlToAst<'a> {
             documentation: field.documentation().map(|text| ast::Comment { text: text.to_owned() }),
             span: ast::Span::empty(),
             is_commented_out: field.is_commented_out(),
+        }
+    }
+
+    pub(super) fn lower_composite_type(&self, r#type: &dml::CompositeType) -> ast::CompositeType {
+        let mut fields: Vec<ast::Field> = Vec::new();
+
+        for field in r#type.fields.iter() {
+            fields.push(ast::Field {
+                field_type: self.lower_composite_field_type(&field.r#type),
+                name: ast::Identifier::new(&field.name),
+                arity: self.lower_field_arity(&field.arity),
+                attributes: field
+                    .database_name
+                    .as_ref()
+                    .map(|db_name| {
+                        vec![ast::Attribute::new(
+                            "map",
+                            vec![ast::Argument::new_unnamed(ast::Expression::StringValue(
+                                String::from(db_name),
+                                ast::Span::empty(),
+                            ))],
+                        )]
+                    })
+                    .unwrap_or_else(Vec::new),
+                documentation: field
+                    .documentation
+                    .as_ref()
+                    .map(|text| ast::Comment { text: text.to_owned() }),
+                span: ast::Span::empty(),
+                is_commented_out: false,
+            });
+        }
+
+        ast::CompositeType {
+            name: ast::Identifier::new(&r#type.name),
+            fields,
+            documentation: None,
+            span: ast::Span::empty(),
         }
     }
 

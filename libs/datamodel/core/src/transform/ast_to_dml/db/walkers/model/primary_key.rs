@@ -52,6 +52,10 @@ impl<'ast, 'db> PrimaryKeyWalker<'ast, 'db> {
         })
     }
 
+    pub(crate) fn contains_exactly_fields_by_id(self, fields: &[ast::FieldId]) -> bool {
+        self.attribute.fields == fields
+    }
+
     pub(crate) fn contains_exactly_fields(
         self,
         fields: impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>>,

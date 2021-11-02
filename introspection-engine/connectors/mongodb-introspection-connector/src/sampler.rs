@@ -2,7 +2,7 @@ mod field_type;
 mod statistics;
 
 use futures::TryStreamExt;
-use introspection_connector::{IntrospectionResult, Version};
+use introspection_connector::{CompositeTypeDepth, IntrospectionResult, Version};
 use mongodb::{
     bson::{doc, Document},
     options::AggregateOptions,
@@ -17,14 +17,19 @@ use statistics::*;
 /// common type or if even, the latest type and adds a warning.
 /// - Missing fields count as null.
 /// - Indices are taken, but not if they are partial.
-pub(super) async fn sample(database: Database) -> crate::Result<IntrospectionResult> {
+pub(super) async fn sample(
+    database: Database,
+    composite_type_depth: CompositeTypeDepth,
+) -> crate::Result<IntrospectionResult> {
     let collections = database.list_collection_names(None).await?;
-    let mut statistics = Statistics::default();
+    let mut statistics = Statistics::new(composite_type_depth);
     let mut warnings = Vec::new();
 
-    for collection_name in collections {
-        statistics.track_model(&collection_name);
+    for collection_name in &collections {
+        statistics.track_model(collection_name);
+    }
 
+    for collection_name in collections {
         let collection = database.collection::<Document>(&collection_name);
 
         let options = AggregateOptions::builder().allow_disk_use(Some(true)).build();
@@ -34,7 +39,7 @@ pub(super) async fn sample(database: Database) -> crate::Result<IntrospectionRes
             .await?;
 
         while let Some(document) = documents.try_next().await? {
-            statistics.track_document_types(&collection_name, document);
+            statistics.track_model_fields(&collection_name, document);
         }
 
         let mut indices = collection.list_indexes(None).await?;

@@ -73,25 +73,23 @@ impl Connector for MongoDbDatamodelConnector {
         true
     }
 
-    fn validate_field(&self, field: &dml::field::Field) -> Result<()> {
+    fn validate_field(&self, field: &dml::field::Field, errors: &mut Vec<ConnectorError>) {
         // If the field is _not_ a native-type-annotated field and it has a `dbgenerated` default, we error.
         if !matches!(field.field_type(), FieldType::Scalar(_, _, Some(_)))
             && matches!(field.default_value().as_ref().map(|v| v.kind()), Some(DefaultKind::Expression(expr)) if expr.is_dbgenerated())
         {
-            return Err(ConnectorError::from_kind(ErrorKind::FieldValidationError {
+            errors.push(ConnectorError::from_kind(ErrorKind::FieldValidationError {
                 field: field.name().to_owned(),
                 message: "MongoDB `@default(dbgenerated())` fields must have a native type annotation.".to_owned(),
             }));
         }
-
-        Ok(())
     }
 
-    fn validate_model(&self, model: &dml::model::Model) -> Result<()> {
+    fn validate_model(&self, model: &dml::model::Model, errors: &mut Vec<ConnectorError>) {
         if let Some(pk) = &model.primary_key {
             // no compound ids
             if pk.fields.len() > 1 {
-                return Err(ConnectorError::from_kind(ErrorKind::InvalidModelError {
+                errors.push(ConnectorError::from_kind(ErrorKind::InvalidModelError {
                     message: "MongoDB models require exactly one identity field annotated with @id".to_owned(),
                 }));
             }
@@ -103,25 +101,25 @@ impl Connector for MongoDbDatamodelConnector {
             // The _id name check is superfluous because it's not a valid schema field at the moment.
             if field.name != "_id" {
                 match field.database_name() {
-                    Some("_id") => Ok(()),
-                    Some(mapped_name) => Err(ConnectorError::from_kind(ErrorKind::FieldValidationError {
+                    Some("_id") => (),
+                    Some(mapped_name) => errors.push(ConnectorError::from_kind(ErrorKind::FieldValidationError {
                         field: field.name.to_owned(),
                         message: format!(
                             "MongoDB model IDs must have a @map(\"_id\") annotation, found @map(\"{}\").",
                             mapped_name
                         ),
                     })),
-                    None => Err(ConnectorError::from_kind(ErrorKind::FieldValidationError {
+                    None => errors.push(ConnectorError::from_kind(ErrorKind::FieldValidationError {
                         field: field.name.to_owned(),
                         message: "MongoDB model IDs must have a @map(\"_id\") annotations.".to_owned(),
                     })),
-                }?;
+                };
             }
 
             if !matches!(field.field_type, FieldType::Scalar(_, _, Some(_)))
                 && matches!(field.default_value.as_ref().map(|v| v.kind()), Some(DefaultKind::Expression(expr)) if expr.is_dbgenerated())
             {
-                return Err(ConnectorError::from_kind(ErrorKind::FieldValidationError {
+                errors.push(ConnectorError::from_kind(ErrorKind::FieldValidationError {
                     field: field.name.to_owned(),
                     message: format!(
                         "MongoDB `@default(dbgenerated())` IDs must have an `ObjectID` native type annotation. `{}` is an ID field, so you probably want `ObjectId` as your native type.",
@@ -129,10 +127,8 @@ impl Connector for MongoDbDatamodelConnector {
                     ),
                 }));
             }
-
-            Ok(())
         } else {
-            Err(ConnectorError::from_kind(ErrorKind::InvalidModelError {
+            errors.push(ConnectorError::from_kind(ErrorKind::InvalidModelError {
                 message: "MongoDB models require exactly one identity field annotated with @id".to_owned(),
             }))
         }
