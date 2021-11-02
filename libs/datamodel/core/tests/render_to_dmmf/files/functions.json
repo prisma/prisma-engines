@@ -3,7 +3,6 @@
   "models": [
     {
       "name": "User",
-      "isEmbedded": false,
       "dbName": null,
       "fields": [
         {
