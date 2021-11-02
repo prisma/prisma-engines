@@ -1,0 +1,26 @@
+{
+    "User": {
+        "documents": [
+            {
+                "_id": 1,
+                "age": 52,
+                "firstName": "George"
+            }
+        ],
+        "indexes": [
+            {
+                "name": "UserExistingIndex",
+                "is_unique": true,
+                "keys": {
+                    "firstName": 1,
+                    "lastName": 1,
+                    "age": 1
+                }
+            }
+        ]
+    },
+    "Post": {
+        "documents": [{ "_id": 1 }],
+        "indexes": [{"name": "Post_title_idx", "is_unique": false, "keys": {"title": 1}}]
+    }
+}

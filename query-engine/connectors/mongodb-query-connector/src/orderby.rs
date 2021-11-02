@@ -1,6 +1,6 @@
 use crate::join::JoinStage;
 use itertools::Itertools;
-use mongodb::bson::Document;
+use mongodb::bson::{doc, Document};
 use prisma_models::{OrderBy, SortOrder};
 
 #[derive(Debug)]
@@ -109,7 +109,13 @@ impl OrderByData {
     /// document all the way to the scalar to order through all hops.
     pub(crate) fn full_reference_path(&self, use_bindings: bool) -> String {
         if let Some(ref prefix) = self.prefix {
-            format!("{}.{}", prefix.to_string(), self.scalar_field_name())
+            // Order by aggregates are always referenced by their join prefix and not a specific field name.
+            // since they are performed on relations
+            if matches!(self.order_by, OrderBy::Aggregation(_)) {
+                prefix.to_string()
+            } else {
+                format!("{}.{}", prefix.to_string(), self.scalar_field_name())
+            }
         } else if use_bindings {
             self.binding_names().0
         } else {
@@ -166,12 +172,13 @@ impl OrderByBuilder {
     /// Builds and renders a Mongo sort document.
     /// `is_group_by` signals that the ordering is for a grouping,
     /// requiring a prefix to refer to the correct document nesting.
-    pub(crate) fn build(self, is_group_by: bool) -> (Option<Document>, Vec<JoinStage>) {
+    pub(crate) fn build(self, is_group_by: bool) -> (Option<Document>, Vec<Document>, Vec<JoinStage>) {
         if self.order_bys.is_empty() {
-            return (None, vec![]);
+            return (None, vec![], vec![]);
         }
 
         let mut order_doc = Document::new();
+        let mut order_aggregate_proj_doc: Vec<Document> = vec![];
         let mut joins = vec![];
 
         for data in self.order_bys.into_iter() {
@@ -192,9 +199,37 @@ impl OrderByBuilder {
                     // we need to refer to the object
                     format!("_id.{}", data.scalar_field_name())
                 }
+            // Since Order by aggregate with middle to-one path will be unwinded,
+            // we need to refer to it with its top-level join alias
+            } else if matches!(&data.order_by, OrderBy::Aggregation(_)) && data.order_by.has_middle_to_one_path() {
+                data.binding_names().0
             } else {
                 data.full_reference_path(false)
             };
+
+            // Unwind order by aggregate to-one middle joins into the top level join
+            // to prevent nested join result which break the stages that come after
+            // See `unwind_aggregate_joins` for more explanation
+            if let OrderBy::Aggregation(order_by_aggregate) = &data.order_by {
+                if !order_by_aggregate.path.is_empty() {
+                    match order_by_aggregate.sort_aggregation {
+                        prisma_models::SortAggregation::Count => {
+                            if data.order_by.has_middle_to_one_path() {
+                                order_aggregate_proj_doc.extend(unwind_aggregate_joins(
+                                    field.clone().as_str(),
+                                    order_by_aggregate,
+                                    &data,
+                                ));
+                            }
+
+                            order_aggregate_proj_doc.push(
+                                doc! { "$addFields": { field.clone(): { "$size": format!("${}", field.clone()) } } },
+                            );
+                        }
+                        _ => unimplemented!("Order by aggregate only supports COUNT"),
+                    }
+                }
+            }
 
             // Mongo: -1 -> DESC, 1 -> ASC
             match (data.sort_order(), self.reverse) {
@@ -207,6 +242,49 @@ impl OrderByBuilder {
             joins.extend(data.join);
         }
 
-        (Some(order_doc), joins)
+        (Some(order_doc), order_aggregate_proj_doc, joins)
     }
+}
+
+/// In order to enable computing aggregation on nested joins,
+/// we unwind & replace the top-level join by the nested to-one joins so that we can apply a $size operation.
+///
+/// Let's consider these relations:
+/// (one or many) A to-one B to-one C to-many D
+/// We'll get the following joins result: { orderby_AToB: [{ BToC: [{ CToD: [1, 2, 3] }] }] }
+/// This function will generate the following stages:
+/// 1. { $unwind: { path: "$orderby_AToB" } } -> { orderby_AToB: { BToC: [{ CToD: [1, 2, 3] }] } }
+/// 2. { $addFields: { orderby_AToB: "$orderby_AToB.BToC" } } -> [{ CToD: [1, 2, 3] }]
+/// 3. { $unwind: { path: "$orderby_AToB" } } ->  { CToD: [1, 2, 3] }
+/// 4. { $addFields: { orderby_AToB: "$orderby_AToB.CToD" } } -> [1, 2, 3]
+fn unwind_aggregate_joins(
+    join_name: &str,
+    order_by_aggregate: &prisma_models::OrderByAggregation,
+    data: &OrderByData,
+) -> Vec<Document> {
+    order_by_aggregate
+        .path
+        .iter()
+        .enumerate()
+        .filter_map(|(i, rf)| {
+            if rf.is_list {
+                None
+            } else {
+                // Prefix parts are mapped 1-1 with order by path.
+                // We can safely access (i + 1) here since the last path cannot be a to-one relation for an order by aggregate.
+                let next_part_name = data.prefix.as_ref().unwrap().parts.get(i + 1).unwrap();
+
+                Some(vec![
+                    doc! {
+                        "$unwind": {
+                            "path": format!("${}", join_name),
+                            "preserveNullAndEmptyArrays": true
+                        }
+                    },
+                    doc! { "$addFields": { join_name: format!("${}.{}", join_name, next_part_name) } },
+                ])
+            }
+        })
+        .flatten()
+        .collect_vec()
 }

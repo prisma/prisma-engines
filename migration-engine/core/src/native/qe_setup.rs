@@ -14,7 +14,7 @@ use sql_migration_connector::SqlMigrationConnector;
 pub async fn run(prisma_schema: &str) -> CoreResult<()> {
     let (source, url, preview_features, _shadow_database_url) = super::parse_configuration(prisma_schema)?;
 
-    let api: Box<dyn GenericApi> = match &source.active_provider {
+    match &source.active_provider {
         provider
             if [
                 MYSQL_SOURCE_NAME,
@@ -26,24 +26,27 @@ pub async fn run(prisma_schema: &str) -> CoreResult<()> {
         {
             // 1. creates schema & database
             SqlMigrationConnector::qe_setup(&url).await?;
-            Box::new(SqlMigrationConnector::new(url, preview_features, None)?)
+            let api = SqlMigrationConnector::new(url, preview_features, None)?;
+
+            // 2. create the database schema for given Prisma schema
+            let schema_push_input = SchemaPushInput {
+                schema: prisma_schema.to_string(),
+                assume_empty: true,
+                force: true,
+            };
+
+            api.schema_push(&schema_push_input).await?;
         }
         #[cfg(feature = "mongodb")]
         provider if provider == MONGODB_SOURCE_NAME => {
-            MongoDbMigrationConnector::qe_setup(&url).await?;
-            let connector = MongoDbMigrationConnector::new(&url).await?;
-            Box::new(connector)
+            let connector = MongoDbMigrationConnector::new(url);
+            // Drop database. Creation is automatically done when collections are created.
+            connector.drop_database().await?;
+            let (_, schema) = crate::parse_schema(prisma_schema).unwrap();
+            connector.create_collections(&schema).await?;
         }
         x => unimplemented!("Connector {} is not supported yet", x),
     };
 
-    // 2. create the database schema for given Prisma schema
-    let schema_push_input = SchemaPushInput {
-        schema: prisma_schema.to_string(),
-        assume_empty: true,
-        force: true,
-    };
-
-    api.schema_push(&schema_push_input).await?;
     Ok(())
 }

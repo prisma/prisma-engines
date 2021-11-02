@@ -1,0 +1,36 @@
+[-] Index `UserExistingIndex`
+
+------
+
+{
+  "collections": {
+    "Post": {
+      "indexes": [
+        {
+          "name": "_id_",
+          "is_unique": false,
+          "keys": {
+            "_id": 1
+          }
+        }
+      ],
+      "documents": [
+        {
+          "_id": 2
+        }
+      ]
+    },
+    "User": {
+      "indexes": [
+        {
+          "name": "_id_",
+          "is_unique": false,
+          "keys": {
+            "_id": 1
+          }
+        }
+      ],
+      "documents": []
+    }
+  }
+}

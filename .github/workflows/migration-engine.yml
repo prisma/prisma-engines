@@ -5,16 +5,16 @@ on:
       - master
   pull_request:
 jobs:
-  test-mongodb-introspection-connector:
+  test-mongodb-introspection-and-migration-connector:
     name: "Test ${{ matrix.database.name }} on Linux"
     strategy:
       fail-fast: false
       matrix:
         database:
           - name: "mongodb4"
-            url: "mongodb://prisma:prisma@localhost:27017/"
+            url: "mongodb://prisma:prisma@localhost:27017/?authSource=admin&retryWrites=true"
           - name: "mongodb5"
-            url: "mongodb://prisma:prisma@localhost:27018/"
+            url: "mongodb://prisma:prisma@localhost:27018/?authSource=admin&retryWrites=true"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -39,6 +39,12 @@ jobs:
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
+
+      - run: cargo test -p mongodb-migration-connector
+        env:
+          CLICOLOR_FORCE: 1
+          TEST_DATABASE_URL: ${{ matrix.database.url }}
+
 
   test-linux:
     name: "Test ${{ matrix.database.name }} on Linux"

@@ -48,7 +48,7 @@ fn dirty_data() {
 
     let expected = expect![[r#"
         type CatAddress {
-          /// Multiple data types found: String: 66.7%, Int32: 33.3% out of 1000 sampled entries
+          /// Multiple data types found: String: 66.7%, Int32: 33.3% out of 3 sampled entries
           number String
           street String
         }

@@ -70,6 +70,7 @@ fn datasource_from_database_str(database_str: &str) -> Result<String, ConnectorE
     let provider = match database_str.split(':').next() {
         Some("postgres") => "postgresql",
         Some("file") => "sqlite",
+        Some("mongodb+srv") => "mongodb",
         Some(other) => other,
         None => {
             return Err(ConnectorError::user_facing(InvalidConnectionString {

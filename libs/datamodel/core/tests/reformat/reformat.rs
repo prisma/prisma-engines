@@ -1068,3 +1068,21 @@ fn reformatting_ignore_with_relations_works() {
     let result = Reformatter::new(input).reformat_to_string();
     expected.assert_eq(&result);
 }
+
+#[test]
+fn composite_types_are_not_reformatted_into_models() {
+    let input = indoc! {r#"
+      type User {
+        id       Int       @id
+      }
+    "#};
+
+    let expected = expect![[r#"
+      type User {
+        id Int @id
+      }
+  "#]];
+
+    let result = Reformatter::new(input).reformat_to_string();
+    expected.assert_eq(&result);
+}
