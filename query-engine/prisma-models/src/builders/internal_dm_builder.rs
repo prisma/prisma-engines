@@ -49,7 +49,7 @@ impl InternalDataModelBuilder {
             .map(|mt| {
                 mt.build(
                     Arc::downgrade(&internal_data_model),
-                    &internal_data_model.composite_types.get().unwrap(),
+                    internal_data_model.composite_types.get().unwrap(),
                 )
             })
             .collect();
@@ -110,7 +110,7 @@ fn model_field_builders(
             dml::Field::CompositeField(cf) => Some(FieldBuilder::Composite(CompositeFieldBuilder {
                 name: cf.name.clone(),
                 db_name: cf.database_name.clone(),
-                arity: cf.arity.clone(),
+                arity: cf.arity,
                 type_name: cf.composite_type.clone(),
             })),
             dml::Field::RelationField(rf) => {
@@ -171,11 +171,11 @@ fn composite_field_builders(composite: &dml::CompositeType) -> Vec<FieldBuilder>
             CompositeTypeFieldType::CompositeType(type_name) => Some(FieldBuilder::Composite(CompositeFieldBuilder {
                 name: field.name.clone(),
                 db_name: field.database_name.clone(),
-                arity: field.arity.clone(),
+                arity: field.arity,
                 type_name: type_name.clone(),
             })),
             CompositeTypeFieldType::Scalar(st, _alias, nt) => {
-                let type_ident = st.clone().into();
+                let type_ident = (*st).into();
                 if type_ident == TypeIdentifier::Unsupported {
                     None
                 } else {
@@ -188,7 +188,7 @@ fn composite_field_builders(composite: &dml::CompositeType) -> Vec<FieldBuilder>
                         is_autoincrement: false,
                         is_updated_at: false, // Todo: This info isn't available here.
                         internal_enum: None,  // Todo: No enums on composites?
-                        arity: field.arity.clone(),
+                        arity: field.arity,
                         db_name: field.database_name.clone(),
                         default_value: None, // Todo: No defaults?
                         native_type: nt.clone(),
