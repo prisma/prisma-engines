@@ -282,7 +282,7 @@ impl<'a> Reformatter<'a> {
             "datasource",
             target,
             token,
-            Box::new(|table, _, token, _| match token.as_rule() {
+            &(|table, _, token, _| match token.as_rule() {
                 Rule::key_value => Self::reformat_key_value(table, token),
                 _ => Self::reformat_generic_token(table, token),
             }),
@@ -294,7 +294,7 @@ impl<'a> Reformatter<'a> {
             "generator",
             target,
             token,
-            Box::new(|table, _, token, _| {
+            &(|table, _, token, _| {
                 //
                 match token.as_rule() {
                     Rule::key_value => Self::reformat_key_value(table, token),
@@ -327,7 +327,7 @@ impl<'a> Reformatter<'a> {
             "model",
             target,
             token,
-            Box::new(|table, renderer, token, model_name| {
+            &(|table, renderer, token, model_name| {
                 match token.as_rule() {
                     Rule::block_level_attribute => {
                         // model level attributes reset the table. -> .render() does that
@@ -338,7 +338,7 @@ impl<'a> Reformatter<'a> {
                     _ => Self::reformat_generic_token(table, token),
                 }
             }),
-            Box::new(|table, _, model_name| {
+            &(|table, _, model_name| {
                 // TODO: what is the right thing to do on error?
                 if let Ok(missing_fields) = self.missing_fields.as_ref() {
                     for missing_back_relation_field in missing_fields.subject.iter() {
@@ -356,7 +356,7 @@ impl<'a> Reformatter<'a> {
             "type",
             target,
             token,
-            Box::new(|table, renderer, token, model_name| {
+            &(|table, renderer, token, model_name| {
                 match token.as_rule() {
                     Rule::block_level_attribute => {
                         // model level attributes reset the table. -> .render() does that
@@ -367,7 +367,7 @@ impl<'a> Reformatter<'a> {
                     _ => Self::reformat_generic_token(table, token),
                 }
             }),
-            Box::new(|_, _, _| ())
+            &(|_, _, _| ()),
         );
     }
 
@@ -376,11 +376,11 @@ impl<'a> Reformatter<'a> {
         block_type: &'static str,
         renderer: &'a mut Renderer<'_>,
         token: &'a Token<'_>,
-        the_fn: Box<dyn Fn(&mut TableFormat, &mut Renderer<'_>, &Token<'_>, &str) + 'a>,
+        the_fn: &(dyn Fn(&mut TableFormat, &mut Renderer<'_>, &Token<'_>, &str) + 'a),
     ) {
         self.reformat_block_element_internal(block_type, renderer, token, the_fn, {
             // a no op
-            Box::new(|_, _, _| ())
+            &(|_, _, _| ())
         })
     }
 
@@ -389,8 +389,8 @@ impl<'a> Reformatter<'a> {
         block_type: &'static str,
         renderer: &'a mut Renderer<'_>,
         token: &'a Token<'_>,
-        the_fn: Box<dyn Fn(&mut TableFormat, &mut Renderer<'_>, &Token<'_>, &str) + 'a>,
-        after_fn: Box<dyn Fn(&mut TableFormat, &mut Renderer<'_>, &str) + 'a>,
+        the_fn: &(dyn Fn(&mut TableFormat, &mut Renderer<'_>, &Token<'_>, &str) + 'a),
+        after_fn: &(dyn Fn(&mut TableFormat, &mut Renderer<'_>, &str) + 'a),
     ) {
         let mut table = TableFormat::new();
         let mut block_name = "";
@@ -483,7 +483,7 @@ impl<'a> Reformatter<'a> {
             "enum",
             target,
             token,
-            Box::new(|table, target, token, _| {
+            &(|table, target, token, _| {
                 //
                 match token.as_rule() {
                     Rule::block_level_attribute => {
