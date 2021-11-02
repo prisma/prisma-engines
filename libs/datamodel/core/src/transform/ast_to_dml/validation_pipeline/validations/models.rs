@@ -51,6 +51,8 @@ pub(super) fn has_a_strict_unique_criteria(model: ModelWalker<'_, '_>, diagnosti
     ))
 }
 
+/// A primary key name can be unique in different namespaces, depending on a database. Validates
+/// model's primary key against the database requirements.
 pub(crate) fn has_a_unique_primary_key_name(
     db: &ParserDatabase<'_>,
     model: ModelWalker<'_, '_>,

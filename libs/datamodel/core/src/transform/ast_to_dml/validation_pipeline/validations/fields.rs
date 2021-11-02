@@ -43,6 +43,8 @@ pub(super) fn validate_client_name(field: FieldWalker<'_, '_>, names: &Names<'_>
     }
 }
 
+/// Some databases use constraints for default values, with a name that can be unique in a certain
+/// namespace. Validates the field default constraint against name clases.
 pub(crate) fn has_a_unique_default_constraint_name(
     db: &ParserDatabase<'_>,
     field: ScalarFieldWalker<'_, '_>,

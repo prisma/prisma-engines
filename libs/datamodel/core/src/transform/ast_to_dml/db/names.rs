@@ -139,6 +139,8 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
     ctx.db.names = names;
 }
 
+/// Generate namespaces per database requirements, and add the names to it from the constraints
+/// part of the namespace.
 pub(super) fn infer_namespaces(ctx: &mut Context<'_>) {
     let mut namespaces = ConstraintNamespace::default();
 

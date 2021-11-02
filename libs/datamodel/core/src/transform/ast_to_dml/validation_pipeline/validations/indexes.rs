@@ -3,6 +3,8 @@ use crate::{
     transform::ast_to_dml::db::{walkers::IndexWalker, ConstraintName, ParserDatabase},
 };
 
+/// Different databases validate index and unique constraint names in a certain namespace.
+/// Validates index and unique constraint names against the database requirements.
 pub(crate) fn has_a_unique_constraint_name(
     db: &ParserDatabase<'_>,
     index: IndexWalker<'_, '_>,

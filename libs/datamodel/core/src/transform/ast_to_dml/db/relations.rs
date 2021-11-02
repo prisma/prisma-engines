@@ -128,7 +128,7 @@ impl<'ast> Relation<'ast> {
         matches!(self.attributes, RelationAttributes::ImplicitManyToMany { .. })
     }
 
-    pub(crate) fn forward_field(&self) -> Option<ast::FieldId> {
+    pub(crate) fn referencing_field_id(&self) -> Option<ast::FieldId> {
         match &self.attributes {
             RelationAttributes::ImplicitManyToMany { field_a, .. } => Some(*field_a),
             RelationAttributes::OneToOne(OneToOneRelationFields::Both(field_a, _)) => Some(*field_a),
@@ -139,7 +139,7 @@ impl<'ast> Relation<'ast> {
         }
     }
 
-    pub(crate) fn back_field(&self) -> Option<ast::FieldId> {
+    pub(crate) fn referenced_field_id(&self) -> Option<ast::FieldId> {
         match &self.attributes {
             RelationAttributes::ImplicitManyToMany { field_b, .. } => Some(*field_b),
             RelationAttributes::OneToOne(OneToOneRelationFields::Both(_, field_b)) => Some(*field_b),

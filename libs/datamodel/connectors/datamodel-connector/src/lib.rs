@@ -60,6 +60,8 @@ pub trait Connector: Send + Sync {
 
     fn validate_model(&self, _: &Model, _: &mut Vec<ConnectorError>) {}
 
+    /// The scopes in which a constraint name should be validated. If empty, doesn't check for name
+    /// clashes in the validation phase.
     fn constraint_violation_scopes(&self) -> &[ConstraintScope] {
         &[]
     }
@@ -307,6 +309,7 @@ pub enum ConstraintType {
     Default,
 }
 
+/// A scope where a constraint name must be unique.
 #[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy)]
 pub enum ConstraintScope {
     /// Globally indices and unique constraints
@@ -326,6 +329,7 @@ pub enum ConstraintScope {
 }
 
 impl ConstraintScope {
+    /// A beefed-up display for errors.
     pub fn description(self, model_name: &str) -> Cow<'static, str> {
         match self {
             ConstraintScope::GlobalKeyIndex => Cow::from("global for indexes and unique constraints"),

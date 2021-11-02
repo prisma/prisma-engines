@@ -113,6 +113,8 @@ impl<'ast> ParserDatabase<'ast> {
         ctx.finish()
     }
 
+    /// Gives an iterator of scopes which the given constraint name violates, globally or in the
+    /// given model.
     pub(crate) fn scope_violations(
         &self,
         model_id: ast::ModelId,

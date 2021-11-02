@@ -4,6 +4,10 @@ use datamodel_connector::ConstraintScope;
 
 use crate::{ast, transform::ast_to_dml::db::context::Context};
 
+/// A constraint namespace consists of two kinds of namespaces:
+///
+/// - Global ones can be triggering validation errors between different models.
+/// - Local ones are only valid in the given model.
 #[derive(Debug, Default)]
 pub(crate) struct ConstraintNamespace<'ast> {
     global: HashMap<(ConstraintScope, Cow<'ast, str>), usize>,
@@ -11,6 +15,8 @@ pub(crate) struct ConstraintNamespace<'ast> {
 }
 
 impl<'ast> ConstraintNamespace<'ast> {
+    /// An iterator of namespace violations with the given name, first globally followed up with
+    /// local violations in the given model.
     pub(crate) fn scope_violations(
         &self,
         model_id: ast::ModelId,
@@ -42,6 +48,7 @@ impl<'ast> ConstraintNamespace<'ast> {
         })
     }
 
+    /// Add all index and unique constraints from the data model to a global validation scope.
     pub(super) fn add_global_indexes(&mut self, ctx: &Context<'ast>, scope: ConstraintScope) {
         for index in ctx.db.walk_models().flat_map(|m| m.indexes()) {
             let counter = self.global.entry((scope, index.final_database_name())).or_default();
@@ -49,6 +56,7 @@ impl<'ast> ConstraintNamespace<'ast> {
         }
     }
 
+    /// Add all foreign key constraints from the data model to a global validation scope.
     pub(super) fn add_global_relations(&mut self, ctx: &Context<'ast>, scope: ConstraintScope) {
         for name in ctx.db.walk_relations().filter_map(|r| r.foreign_key_name()) {
             let counter = self.global.entry((scope, name)).or_default();
@@ -56,6 +64,7 @@ impl<'ast> ConstraintNamespace<'ast> {
         }
     }
 
+    /// Add all primary key constraints from the data model to a global validation scope.
     pub(super) fn add_global_primary_keys(&mut self, ctx: &Context<'ast>, scope: ConstraintScope) {
         for model in ctx.db.walk_models() {
             if let Some(name) = model.primary_key().and_then(|k| k.final_database_name()) {
@@ -65,6 +74,7 @@ impl<'ast> ConstraintNamespace<'ast> {
         }
     }
 
+    /// Add all default constraints from the data model to a global validation scope.
     pub(super) fn add_global_default_constraints(&mut self, ctx: &Context<'ast>, scope: ConstraintScope) {
         for field in ctx.db.walk_models().flat_map(|m| m.scalar_fields()) {
             if let Some(name) = field.default_value().map(|d| d.constraint_name()) {
@@ -79,6 +89,7 @@ impl<'ast> ConstraintNamespace<'ast> {
         }
     }
 
+    /// Add all index and unique constraints to separate namespaces per model.
     pub(super) fn add_local_indexes(&mut self, ctx: &Context<'ast>, scope: ConstraintScope) {
         for model in ctx.db.walk_models() {
             for index in model.indexes() {
@@ -92,6 +103,7 @@ impl<'ast> ConstraintNamespace<'ast> {
         }
     }
 
+    /// Add all primary key constraints to separate namespaces per model.
     pub(super) fn add_local_primary_keys(&mut self, ctx: &Context<'ast>, scope: ConstraintScope) {
         for model in ctx.db.walk_models() {
             if let Some(name) = model.primary_key().and_then(|pk| pk.final_database_name()) {
@@ -101,6 +113,7 @@ impl<'ast> ConstraintNamespace<'ast> {
         }
     }
 
+    /// Add all foreign key constraints to separate namespaces per model.
     pub(super) fn add_local_relations(&mut self, ctx: &Context<'ast>, scope: ConstraintScope) {
         for model in ctx.db.walk_models() {
             for name in model.relations_from().filter_map(|r| r.foreign_key_name()) {
@@ -112,6 +125,8 @@ impl<'ast> ConstraintNamespace<'ast> {
     }
 }
 
+/// A constraint name marked by the constraint type it belongs. The variant decides on which
+/// validation scopes it will be checked on.
 #[derive(Clone, Copy, Debug)]
 pub(crate) enum ConstraintName<'ast> {
     Index(&'ast str),
@@ -121,6 +136,7 @@ pub(crate) enum ConstraintName<'ast> {
 }
 
 impl<'ast> ConstraintName<'ast> {
+    /// An iterator of scopes the given name should be checked against.
     pub(crate) fn possible_scopes(self) -> impl Iterator<Item = &'ast ConstraintScope> {
         use ConstraintScope::*;
 
