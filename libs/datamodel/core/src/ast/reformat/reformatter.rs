@@ -240,7 +240,19 @@ impl<'a> Reformatter<'a> {
                         comment(target, current.as_str());
                     }
                 }
-                Rule::model_declaration => self.reformat_model(target, &current),
+                Rule::model_declaration => {
+                    let keyword = current
+                        .clone()
+                        .into_inner()
+                        .find(|pair| matches!(pair.as_rule(), Rule::TYPE_KEYWORD | Rule::MODEL_KEYWORD))
+                        .expect("Expected model or type keyword");
+
+                    match keyword.as_rule() {
+                        Rule::TYPE_KEYWORD => self.reformat_composite_type(target, &current),
+                        Rule::MODEL_KEYWORD => self.reformat_model(target, &current),
+                        _ => unreachable!(),
+                    };
+                }
                 Rule::enum_declaration => self.reformat_enum(target, &current),
                 Rule::source_block => self.reformat_datasource(target, &current),
                 Rule::generator_block => self.reformat_generator(target, &current),
@@ -336,6 +348,26 @@ impl<'a> Reformatter<'a> {
                     }
                 }
             }),
+        );
+    }
+
+    fn reformat_composite_type(&self, target: &mut Renderer<'_>, token: &Token<'_>) {
+        self.reformat_block_element_internal(
+            "type",
+            target,
+            token,
+            Box::new(|table, renderer, token, model_name| {
+                match token.as_rule() {
+                    Rule::block_level_attribute => {
+                        // model level attributes reset the table. -> .render() does that
+                        table.render(renderer);
+                        Self::reformat_attribute(renderer, token, "@@", vec![]);
+                    }
+                    Rule::field_declaration => self.reformat_field(table, token, model_name),
+                    _ => Self::reformat_generic_token(table, token),
+                }
+            }),
+            Box::new(|_, _, _| ())
         );
     }
 
