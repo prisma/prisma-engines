@@ -430,7 +430,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 seq_in_index AS seq_in_index,
                 Binary table_name AS table_name,
                 sub_part AS partial, 
-                collation AS order
+                Binary collation AS column_order
             FROM INFORMATION_SCHEMA.STATISTICS
             WHERE table_schema = ?
             ORDER BY index_name, seq_in_index
@@ -442,7 +442,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             let table_name = row.get_expect_string("table_name");
             let index_name = row.get_expect_string("index_name");
             let length = row.get_u32("partial");
-            let order = row.get_string("order");
+            let order = row.get_string("column_order");
             let order = order.map(|v| match v.as_ref() {
                 "A" => SQLSortOrder::Asc,
                 "D" => SQLSortOrder::Desc,
