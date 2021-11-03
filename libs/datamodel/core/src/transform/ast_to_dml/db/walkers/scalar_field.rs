@@ -1,5 +1,10 @@
+use std::borrow::Cow;
+
+use dml::default_value::DefaultValue;
+
 use crate::{
     ast,
+    common::constraint_names::ConstraintNames,
     transform::ast_to_dml::db::{ParserDatabase, ScalarField},
 };
 
@@ -43,7 +48,6 @@ impl<'ast, 'db> ScalarFieldWalker<'ast, 'db> {
         self.ast_field().arity.is_optional()
     }
 
-    #[allow(dead_code)] // we'll need this
     pub(crate) fn attributes(self) -> &'db ScalarField<'ast> {
         self.scalar_field
     }
@@ -59,5 +63,45 @@ impl<'ast, 'db> ScalarFieldWalker<'ast, 'db> {
 
     pub(crate) fn is_unsupported(self) -> bool {
         matches!(self.ast_field().field_type, ast::FieldType::Unsupported(_, _))
+    }
+
+    pub(crate) fn default_value(self) -> Option<DefaultValueWalker<'ast, 'db>> {
+        self.attributes().default.as_ref().map(|d| DefaultValueWalker {
+            model_id: self.model_id,
+            field_id: self.field_id,
+            db: self.db,
+            default: d,
+        })
+    }
+}
+
+#[derive(Clone, Copy)]
+pub(crate) struct DefaultValueWalker<'ast, 'db> {
+    model_id: ast::ModelId,
+    field_id: ast::FieldId,
+    db: &'db ParserDatabase<'ast>,
+    default: &'db DefaultValue,
+}
+
+impl<'ast, 'db> DefaultValueWalker<'ast, 'db> {
+    pub(crate) fn constraint_name(self) -> Cow<'db, str> {
+        self.default.db_name().map(Cow::from).unwrap_or_else(|| {
+            let name = ConstraintNames::default_name(
+                self.field().model().final_database_name(),
+                self.field().final_database_name(),
+                self.db.active_connector(),
+            );
+
+            Cow::from(name)
+        })
+    }
+
+    fn field(self) -> ScalarFieldWalker<'ast, 'db> {
+        ScalarFieldWalker {
+            model_id: self.model_id,
+            field_id: self.field_id,
+            db: self.db,
+            scalar_field: &self.db.types.scalar_fields[&(self.model_id, self.field_id)],
+        }
     }
 }

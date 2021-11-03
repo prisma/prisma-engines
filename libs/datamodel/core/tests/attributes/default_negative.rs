@@ -561,7 +561,7 @@ fn named_default_constraints_cannot_clash_with_pk_names() {
           [1;94m-->[0m  [4mschema.prisma:17[0m
         [1;94m   | [0m
         [1;94m16 | [0mmodel B {
-        [1;94m17 | [0m  id Int @[1;91mid(map: "reserved")[0m @default(autoincrement())
+        [1;94m17 | [0m  id Int @id([1;91mmap: "reserved"[0m) @default(autoincrement())
         [1;94m   | [0m
     "#]];
 

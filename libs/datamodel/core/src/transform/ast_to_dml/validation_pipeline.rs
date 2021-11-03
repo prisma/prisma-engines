@@ -64,11 +64,6 @@ impl<'a, 'b> ValidationPipeline<'a> {
 
         // Phase 5: Validation (deprecated, move stuff out from here if you can)
         self.validator.validate(db.ast(), &schema, &mut diagnostics);
-
-        // Phase 6: Post Standardisation Validation (deprecated, move stuff out from here if you can)
-        self.validator
-            .post_standardisation_validate(ast_schema, &schema, &mut diagnostics);
-
         diagnostics.to_result()?;
 
         Ok(ValidatedDatamodel {

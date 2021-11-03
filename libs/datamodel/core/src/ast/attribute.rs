@@ -16,6 +16,10 @@ impl Attribute {
         }
     }
 
+    pub fn span_for_argument(&self, argument: &str) -> Option<Span> {
+        self.arguments.iter().find(|a| a.name.name == argument).map(|a| a.span)
+    }
+
     pub fn name(&self) -> &str {
         &self.name.name
     }

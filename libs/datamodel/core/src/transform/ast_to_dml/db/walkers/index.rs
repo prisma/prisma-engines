@@ -5,7 +5,7 @@ use crate::{
 };
 use std::borrow::Cow;
 
-use super::ScalarFieldWalker;
+use super::{ModelWalker, ScalarFieldWalker};
 
 #[allow(dead_code)]
 #[derive(Copy, Clone)]
@@ -33,6 +33,18 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
         }
     }
 
+    pub(crate) fn attribute_name(self) -> &'static str {
+        if self.is_unique() {
+            "unique"
+        } else {
+            "index"
+        }
+    }
+
+    pub(crate) fn ast_attribute(self) -> Option<&'ast ast::Attribute> {
+        self.index
+    }
+
     pub(crate) fn attribute(self) -> &'db IndexAttribute<'ast> {
         self.index_attribute
     }
@@ -58,5 +70,13 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
 
     pub(crate) fn is_unique(self) -> bool {
         self.index_attribute.is_unique
+    }
+
+    pub(crate) fn model(self) -> ModelWalker<'ast, 'db> {
+        ModelWalker {
+            model_id: self.model_id,
+            db: self.db,
+            model_attributes: &self.db.types.model_attributes[&self.model_id],
+        }
     }
 }

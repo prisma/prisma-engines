@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use super::{ModelWalker, RelationFieldWalker, RelationName, ScalarFieldWalker};
 use crate::{
     ast,
@@ -6,6 +8,8 @@ use crate::{
 use datamodel_connector::ConnectorCapability;
 use dml::relation_info::ReferentialAction;
 
+/// A relation that has the minimal amount of information for us to create one. Useful for
+/// validation purposes. Holds all possible relation types.
 #[derive(Copy, Clone)]
 pub(crate) struct RelationWalker<'ast, 'db> {
     pub(super) relation_id: usize,
@@ -13,10 +17,10 @@ pub(crate) struct RelationWalker<'ast, 'db> {
 }
 
 impl<'ast, 'db> RelationWalker<'ast, 'db> {
+    /// Converts the walker to either an implicit many to many, or a inline relation walker
+    /// gathering 1:1 and 1:n relations.
     pub(crate) fn refine(self) -> RefinedRelationWalker<'ast, 'db> {
-        let relation = &self.db.relations.relations_storage[self.relation_id];
-
-        if relation.is_many_to_many() {
+        if self.get().is_many_to_many() {
             RefinedRelationWalker::ImplicitManyToMany(ImplicitManyToManyRelationWalker {
                 db: self.db,
                 relation_id: self.relation_id,
@@ -28,10 +32,18 @@ impl<'ast, 'db> RelationWalker<'ast, 'db> {
             })
         }
     }
+
+    /// The relation attributes parsed from the AST.
+    pub(crate) fn get(self) -> &'db Relation<'ast> {
+        &self.db.relations.relations_storage[self.relation_id]
+    }
 }
 
+/// Splits the relation to different types.
 pub(crate) enum RefinedRelationWalker<'ast, 'db> {
+    /// 1:1 and 1:n relations, where one side defines the relation arguments.
     Inline(InlineRelationWalker<'ast, 'db>),
+    /// Implicit m:n relation. The arguments are inferred by Prisma.
     ImplicitManyToMany(ImplicitManyToManyRelationWalker<'ast, 'db>),
 }
 
@@ -49,8 +61,8 @@ pub(crate) enum ReferencingFields<'ast, 'db> {
     NA,
 }
 
-/// An explicitly defined 1:1 or 1:n relation. This walker doesn't expect the relation to be
-/// defined on both sides.
+/// An explicitly defined 1:1 or 1:n relation. The walker has the referencing side defined, but
+/// might miss the back relation in the AST.
 #[derive(Copy, Clone)]
 pub(crate) struct InlineRelationWalker<'ast, 'db> {
     relation_id: usize,
@@ -58,18 +70,22 @@ pub(crate) struct InlineRelationWalker<'ast, 'db> {
 }
 
 impl<'ast, 'db> InlineRelationWalker<'ast, 'db> {
+    /// Get the relation attributes defined in the AST.
     fn get(self) -> &'db Relation<'ast> {
         &self.db.relations.relations_storage[self.relation_id]
     }
 
+    /// The relation is 1:1, having at most one record on both sides of the relation.
     pub(crate) fn is_one_to_one(self) -> bool {
         matches!(self.get().attributes, RelationAttributes::OneToOne(_))
     }
 
+    /// The model which holds the relation arguments.
     pub(crate) fn referencing_model(self) -> ModelWalker<'ast, 'db> {
         self.db.walk_model(self.get().model_a)
     }
 
+    /// The model referenced and which hold the back-relation field.
     pub(crate) fn referenced_model(self) -> ModelWalker<'ast, 'db> {
         self.db.walk_model(self.get().model_b)
     }
@@ -204,6 +220,8 @@ impl<'ast, 'db> InlineRelationWalker<'ast, 'db> {
     }
 }
 
+/// Describes an implicit m:n relation between two models. Neither side defines fields, attributes
+/// or referential actions, which are all inferred by Prisma.
 #[derive(Copy, Clone)]
 pub(crate) struct ImplicitManyToManyRelationWalker<'ast, 'db> {
     relation_id: usize,
@@ -211,18 +229,22 @@ pub(crate) struct ImplicitManyToManyRelationWalker<'ast, 'db> {
 }
 
 impl<'ast, 'db> ImplicitManyToManyRelationWalker<'ast, 'db> {
+    /// Gets the relation attributes from the AST.
     fn get(&self) -> &'db Relation<'ast> {
         &self.db.relations.relations_storage[self.relation_id]
     }
 
+    /// The model which comes first in the alphabetical order.
     pub(crate) fn model_a(self) -> ModelWalker<'ast, 'db> {
         self.db.walk_model(self.get().model_a)
     }
 
+    /// The model which comes after model a in the alphabetical order.
     pub(crate) fn model_b(self) -> ModelWalker<'ast, 'db> {
         self.db.walk_model(self.get().model_b)
     }
 
+    /// The field that defines the relation in model a.
     pub(crate) fn field_a(self) -> RelationFieldWalker<'ast, 'db> {
         match self.get().attributes {
             RelationAttributes::ImplicitManyToMany { field_a, field_b: _ } => self.model_a().relation_field(field_a),
@@ -230,6 +252,7 @@ impl<'ast, 'db> ImplicitManyToManyRelationWalker<'ast, 'db> {
         }
     }
 
+    /// The field that defines the relation in model b.
     pub(crate) fn field_b(self) -> RelationFieldWalker<'ast, 'db> {
         match self.get().attributes {
             RelationAttributes::ImplicitManyToMany { field_a: _, field_b } => self.model_b().relation_field(field_b),
@@ -274,6 +297,24 @@ impl<'ast, 'db> CompleteInlineRelationWalker<'ast, 'db> {
             db: self.db,
             relation_field: &self.db.types.relation_fields[&(self.side_a.0, self.side_a.1)],
         }
+    }
+
+    pub(crate) fn referenced_field(self) -> RelationFieldWalker<'ast, 'db> {
+        RelationFieldWalker {
+            model_id: self.side_b.0,
+            field_id: self.side_b.1,
+            db: self.db,
+            relation_field: &self.db.types.relation_fields[&(self.side_b.0, self.side_b.1)],
+        }
+    }
+
+    /// The name of the foreign key. Either taken from the `map` attribute, or generated following
+    /// the Prisma defaults.
+    pub(crate) fn foreign_key_name(self) -> Option<Cow<'ast, str>> {
+        let from_forward = self.referencing_field().final_foreign_key_name();
+        let from_back = self.referenced_field().final_foreign_key_name();
+
+        from_forward.or(from_back)
     }
 
     /// The scalar fields defining the relation on the referenced model.

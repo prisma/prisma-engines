@@ -1,10 +1,8 @@
 use datamodel_connector::{
     connector_error::ConnectorError,
     helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32},
-    Connector, ConnectorCapability, ConstraintNameSpace, ConstraintType, ConstraintViolationScope,
-    ReferentialIntegrity,
+    Connector, ConnectorCapability, ConstraintScope, ReferentialIntegrity,
 };
-use dml::datamodel::Datamodel;
 use dml::{
     field::{Field, FieldType},
     model::Model,
@@ -15,7 +13,6 @@ use dml::{
 };
 use enumflags2::BitFlags;
 use native_types::PostgresType::{self, *};
-use std::collections::BTreeMap;
 
 const SMALL_INT_TYPE_NAME: &str = "SmallInt";
 const INTEGER_TYPE_NAME: &str = "Integer";
@@ -48,6 +45,7 @@ pub struct PostgresDatamodelConnector {
     capabilities: Vec<ConnectorCapability>,
     constructors: Vec<NativeTypeConstructor>,
     referential_integrity: ReferentialIntegrity,
+    constraint_violation_scopes: Vec<ConstraintScope>,
 }
 
 //todo should this also contain the pretty printed output for SQL rendering?
@@ -143,6 +141,10 @@ impl PostgresDatamodelConnector {
             capabilities,
             constructors,
             referential_integrity,
+            constraint_violation_scopes: vec![
+                ConstraintScope::GlobalPrimaryKeyKeyIndex,
+                ConstraintScope::ModelPrimaryKeyKeyIndexForeignKey,
+            ],
         }
     }
 }
@@ -289,66 +291,8 @@ impl Connector for PostgresDatamodelConnector {
         }
     }
 
-    fn get_constraint_namespace_violations<'dml>(&self, schema: &'dml Datamodel) -> Vec<ConstraintNameSpace<'dml>> {
-        let mut potential_name_space_violations: BTreeMap<
-            (&str, ConstraintViolationScope),
-            Vec<(&str, ConstraintType)>,
-        > = BTreeMap::new();
-
-        //Primary Key, Unique and Index names have to be globally unique
-        //Additionally, within a table they cannot conflict with Foreign Key names
-
-        for model in schema.models() {
-            if let Some(name) = model.primary_key.as_ref().and_then(|pk| pk.db_name.as_ref()) {
-                let entry = potential_name_space_violations
-                    .entry((name, ConstraintViolationScope::GlobalPrimaryKeyKeyIndex))
-                    .or_insert_with(Vec::new);
-
-                entry.push((&model.name, ConstraintType::PrimaryKey));
-
-                let entry = potential_name_space_violations
-                    .entry((
-                        name,
-                        ConstraintViolationScope::ModelPrimaryKeyKeyIndexForeignKey(&model.name),
-                    ))
-                    .or_insert_with(Vec::new);
-
-                entry.push((&model.name, ConstraintType::PrimaryKey));
-            }
-
-            for name in model
-                .relation_fields()
-                .filter_map(|rf| rf.relation_info.fk_name.as_ref())
-            {
-                let entry = potential_name_space_violations
-                    .entry((
-                        name,
-                        ConstraintViolationScope::ModelPrimaryKeyKeyIndexForeignKey(&model.name),
-                    ))
-                    .or_insert_with(Vec::new);
-
-                entry.push((&model.name, ConstraintType::ForeignKey));
-            }
-
-            for name in model.indices.iter().filter_map(|i| i.db_name.as_ref()) {
-                let entry = potential_name_space_violations
-                    .entry((name, ConstraintViolationScope::GlobalPrimaryKeyKeyIndex))
-                    .or_insert_with(Vec::new);
-
-                entry.push((&model.name, ConstraintType::KeyOrIdx));
-
-                let entry = potential_name_space_violations
-                    .entry((
-                        name,
-                        ConstraintViolationScope::ModelPrimaryKeyKeyIndexForeignKey(&model.name),
-                    ))
-                    .or_insert_with(Vec::new);
-
-                entry.push((&model.name, ConstraintType::KeyOrIdx));
-            }
-        }
-
-        ConstraintNameSpace::flatten(potential_name_space_violations)
+    fn constraint_violation_scopes(&self) -> &[ConstraintScope] {
+        &self.constraint_violation_scopes
     }
 
     fn available_native_type_constructors(&self) -> &[NativeTypeConstructor] {
