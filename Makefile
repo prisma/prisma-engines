@@ -156,12 +156,18 @@ start-mongodb4-single:
 start-mongodb5-single:
 	docker-compose -f docker-compose.yml up -d --remove-orphans mongo5-single
 
-start-mongodb4:
-	docker-compose -f docker-compose.yml up -d --remove-orphans mongo4
+start-mongodb42-single:
+	docker-compose -f docker-compose.yml up -d --remove-orphans mongo42-single
 
-dev-mongodb4: start-mongodb4
+start-mongodb42:
+	docker-compose -f docker-compose.yml up -d --remove-orphans mongo42
+
+start-mongodb44:
+	docker-compose -f docker-compose.yml up -d --remove-orphans mongo44
+
+dev-mongodb44: start-mongodb44
 	echo 'mongodb' > current_connector
-	cp $(CONFIG_PATH)/mongodb4 $(CONFIG_FILE)
+	cp $(CONFIG_PATH)/mongodb44 $(CONFIG_FILE)
 
 start-mongodb5:
 	docker-compose -f docker-compose.yml up -d --remove-orphans mongo5
@@ -169,6 +175,10 @@ start-mongodb5:
 dev-mongodb5: start-mongodb5
 	echo 'mongodb' > current_connector
 	cp $(CONFIG_PATH)/mongodb5 $(CONFIG_FILE)
+
+dev-mongodb42: start-mongodb42
+	echo 'mongodb' > current_connector
+	cp $(CONFIG_PATH)/mongodb42 $(CONFIG_FILE)
 
 start-vitess_5_7:
 	docker-compose -f docker-compose.yml up -d --remove-orphans vitess-test-5_7 vitess-shadow-5_7
