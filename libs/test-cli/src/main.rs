@@ -67,8 +67,6 @@ struct SchemaPush {
     schema_path: String,
     #[structopt(long)]
     force: bool,
-    #[structopt(long)]
-    recreate: bool,
 }
 
 #[derive(StructOpt, Debug)]
@@ -340,7 +338,6 @@ async fn schema_push(cmd: &SchemaPush) -> anyhow::Result<()> {
         .schema_push(&SchemaPushInput {
             schema,
             force: cmd.force,
-            assume_empty: cmd.recreate,
         })
         .await?;
 

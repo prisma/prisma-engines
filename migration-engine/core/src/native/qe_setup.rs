@@ -1,17 +1,17 @@
 //! Query Engine test setup.
 
-use crate::{api::GenericApi, commands::SchemaPushInput, core_error::CoreResult};
 #[cfg(feature = "mongodb")]
 use datamodel::common::provider_names::MONGODB_SOURCE_NAME;
 use datamodel::common::provider_names::{
     MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME,
 };
+use migration_connector::{ConnectorResult, DiffTarget, MigrationConnector};
 #[cfg(feature = "mongodb")]
 use mongodb_migration_connector::MongoDbMigrationConnector;
 use sql_migration_connector::SqlMigrationConnector;
 
 /// Database setup for connector-test-kit.
-pub async fn run(prisma_schema: &str) -> CoreResult<()> {
+pub async fn run(prisma_schema: &str) -> ConnectorResult<()> {
     let (source, url, preview_features, _shadow_database_url) = super::parse_configuration(prisma_schema)?;
 
     match &source.active_provider {
@@ -29,13 +29,17 @@ pub async fn run(prisma_schema: &str) -> CoreResult<()> {
             let api = SqlMigrationConnector::new(url, preview_features, None)?;
 
             // 2. create the database schema for given Prisma schema
-            let schema_push_input = SchemaPushInput {
-                schema: prisma_schema.to_string(),
-                assume_empty: true,
-                force: true,
+            {
+                let (config, schema) = crate::parse_schema(prisma_schema).unwrap();
+                let migration = api
+                    .diff(DiffTarget::Empty, DiffTarget::Datamodel((&config, &schema)))
+                    .await
+                    .unwrap();
+                api.database_migration_step_applier()
+                    .apply_migration(&migration)
+                    .await
+                    .unwrap();
             };
-
-            api.schema_push(&schema_push_input).await?;
         }
         #[cfg(feature = "mongodb")]
         provider if provider == MONGODB_SOURCE_NAME => {
