@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Origin","`allow_origin` enum"]],"struct":[["CorsMiddleware","Middleware for CORS"]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["FieldIter","An iterator over fields of a `TextMapPropagator`"]],"trait":[["TextMapPropagator","Methods to inject and extract a value as text into injectors and extractors that travel in-band across process boundaries."]]});

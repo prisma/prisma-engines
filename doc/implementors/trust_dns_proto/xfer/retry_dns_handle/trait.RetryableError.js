@@ -1,0 +1,4 @@
+(function() {var implementors = {};
+implementors["trust_dns_proto"] = [];
+implementors["trust_dns_resolver"] = [{"text":"impl <a class=\"trait\" href=\"trust_dns_proto/xfer/retry_dns_handle/trait.RetryableError.html\" title=\"trait trust_dns_proto::xfer::retry_dns_handle::RetryableError\">RetryableError</a> for <a class=\"struct\" href=\"trust_dns_resolver/error/struct.ResolveError.html\" title=\"struct trust_dns_resolver::error::ResolveError\">ResolveError</a>","synthetic":false,"types":["trust_dns_resolver::error::ResolveError"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

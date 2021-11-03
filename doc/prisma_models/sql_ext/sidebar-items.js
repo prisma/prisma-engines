@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["convert_lossy","Attempts to convert a PrismaValue to a database value without any additional type information. Can’t reliably map Null values."]],"struct":[["ColumnIterator",""]],"trait":[["AsColumn",""],["AsColumns",""],["AsRow",""],["AsTable",""],["RecordProjectionExt",""],["RelationFieldExt",""],["ScalarFieldExt",""]]});

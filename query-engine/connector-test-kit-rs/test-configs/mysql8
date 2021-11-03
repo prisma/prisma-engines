@@ -1,5 +1,0 @@
-{
-    "connector": "mysql",
-    "version": "8",
-    "runner": "direct"
-}

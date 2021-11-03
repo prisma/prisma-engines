@@ -1,0 +1,268 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="BSON, short for Binary JSON, is a binary-encoded serialization of JSON-like documents. Like JSON, BSON supports the embedding of documents and arrays within other documents and arrays. BSON also contains extensions that allow representation of data types that are not part of the JSON spec. For example, BSON has a datetime type and a binary data type."><meta name="keywords" content="rust, rustlang, rust-lang, bson"><title>bson - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script id="default-settings" ></script><script src="../storage.js"></script><script src="../crates.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../favicon.svg"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../bson/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><h2 class="location">Crate bson</h2><div class="block version"><div class="narrow-helper"></div><p>Version 2.0.1</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all bson's items</p></a><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#macros">Macros</a></li><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#functions">Functions</a></li><li><a href="#types">Type Definitions</a></li></ul></div><div id="sidebar-vars" data-name="bson" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../wheel.svg"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">bson</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/bson/lib.rs.html#22-337" title="goto source code">[src]</a></span></h1><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>BSON, short for Binary JSON, is a binary-encoded serialization of JSON-like documents.
+Like JSON, BSON supports the embedding of documents and arrays within other documents
+and arrays. BSON also contains extensions that allow representation of data types that
+are not part of the JSON spec. For example, BSON has a datetime type and a binary data type.</p>
+<div class="example-wrap"><pre class="language-text"><code>// JSON equivalent
+{&quot;hello&quot;: &quot;world&quot;}
+
+// BSON encoding
+\x16\x00\x00\x00                   // total document size
+\x02                               // 0x02 = type String
+hello\x00                          // field name
+\x06\x00\x00\x00world\x00          // field value
+\x00                               // 0x00 = type EOO (&#39;end of object&#39;)</code></pre></div>
+<p>BSON is the primary data representation for <a href="https://www.mongodb.com/">MongoDB</a>, and this crate is used in the
+<a href="https://docs.rs/mongodb/latest/mongodb/"><code>mongodb</code></a> driver crate in its API and implementation.</p>
+<p>For more information about BSON itself, see <a href="http://bsonspec.org">bsonspec.org</a>.</p>
+<h2 id="installation" class="section-header"><a href="#installation">Installation</a></h2><h3 id="requirements" class="section-header"><a href="#requirements">Requirements</a></h3>
+<ul>
+<li>Rust 1.48+</li>
+</ul>
+<h3 id="importing" class="section-header"><a href="#importing">Importing</a></h3>
+<p>This crate is available on <a href="https://crates.io/crates/bson">crates.io</a>. To use it in your application,
+simply add it to your project’s <code>Cargo.toml</code>.</p>
+<div class="example-wrap"><pre class="language-toml"><code>[dependencies]
+bson = &quot;2.0.1&quot;</code></pre></div>
+<p>Note that if you are using <code>bson</code> through the <code>mongodb</code> crate, you do not need to specify it in
+your <code>Cargo.toml</code>, since the <code>mongodb</code> crate already re-exports it.</p>
+<h4 id="feature-flags" class="section-header"><a href="#feature-flags">Feature Flags</a></h4><table><thead><tr><th align="left">Feature</th><th align="left">Description</th><th align="left">Extra dependencies</th><th align="left">Default</th></tr></thead><tbody>
+<tr><td align="left"><code>chrono-0_4</code></td><td align="left">Enable support for v0.4 of the <a href="docs.rs/chrono/0.4"><code>chrono</code></a> crate in the public API.</td><td align="left">n/a</td><td align="left">no</td></tr>
+<tr><td align="left"><code>uuid-0_8</code></td><td align="left">Enable support for v0.8 of the <a href="docs.rs/uuid/0.8"><code>uuid</code></a> crate in the public API.</td><td align="left">n/a</td><td align="left">no</td></tr>
+</tbody></table>
+<h2 id="bson-values" class="section-header"><a href="#bson-values">BSON values</a></h2>
+<p>Many different types can be represented as a BSON value, including 32-bit and 64-bit signed
+integers, 64 bit floating point numbers, strings, datetimes, embedded documents, and more. To
+see a full list of possible BSON values, see the <a href="http://bsonspec.org/spec.html">BSON specification</a>. The various
+possible BSON values are modeled in this crate by the <a href="enum.Bson.html"><code>Bson</code></a> enum.</p>
+<h3 id="creating-bson-instances" class="section-header"><a href="#creating-bson-instances">Creating <code>Bson</code> instances</a></h3>
+<p><a href="enum.Bson.html"><code>Bson</code></a> values can be instantiated directly or via the
+<a href="macro.bson.html"><code>bson!</code></a> macro:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">bson</span>::{<span class="ident">bson</span>, <span class="ident">Bson</span>};
+
+<span class="kw">let</span> <span class="ident">string</span> <span class="op">=</span> <span class="ident">Bson::String</span>(<span class="string">&quot;hello world&quot;</span>.<span class="ident">to_string</span>());
+<span class="kw">let</span> <span class="ident">int</span> <span class="op">=</span> <span class="ident">Bson::Int32</span>(<span class="number">5</span>);
+<span class="kw">let</span> <span class="ident">array</span> <span class="op">=</span> <span class="ident">Bson::Array</span>(<span class="macro">vec!</span>[<span class="ident">Bson::Int32</span>(<span class="number">5</span>), <span class="ident">Bson::Boolean</span>(<span class="bool-val">false</span>)]);
+
+<span class="kw">let</span> <span class="ident">string</span>: <span class="ident">Bson</span> <span class="op">=</span> <span class="string">&quot;hello world&quot;</span>.<span class="ident">into</span>();
+<span class="kw">let</span> <span class="ident">int</span>: <span class="ident">Bson</span> <span class="op">=</span> <span class="number">5i32</span>.<span class="ident">into</span>();
+
+<span class="kw">let</span> <span class="ident">string</span> <span class="op">=</span> <span class="macro">bson!</span>(<span class="string">&quot;hello world&quot;</span>);
+<span class="kw">let</span> <span class="ident">int</span> <span class="op">=</span> <span class="macro">bson!</span>(<span class="number">5</span>);
+<span class="kw">let</span> <span class="ident">array</span> <span class="op">=</span> <span class="macro">bson!</span>([<span class="number">5</span>, <span class="bool-val">false</span>]);</code></pre></div>
+<p><a href="macro.bson.html"><code>bson!</code></a> has supports both array and object literals, and it automatically
+converts any values specified to <a href="enum.Bson.html"><code>Bson</code></a>, provided they are <code>Into&lt;Bson&gt;</code>.</p>
+<h3 id="bson-value-unwrapping" class="section-header"><a href="#bson-value-unwrapping"><code>Bson</code> value unwrapping</a></h3>
+<p><a href="enum.Bson.html"><code>Bson</code></a> has a number of helper methods for accessing the underlying native Rust
+types. These helpers can be useful in circumstances in which the specific type of a BSON value
+is known ahead of time.</p>
+<p>e.g.:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">bson</span>::{<span class="ident">bson</span>, <span class="ident">Bson</span>};
+
+<span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">Bson::Int32</span>(<span class="number">5</span>);
+<span class="kw">let</span> <span class="ident">int</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">as_i32</span>(); <span class="comment">// Some(5)</span>
+<span class="kw">let</span> <span class="ident">bool</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">as_bool</span>(); <span class="comment">// None</span>
+
+<span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="macro">bson!</span>([<span class="bool-val">true</span>]);
+<span class="kw">let</span> <span class="ident">array</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">as_array</span>(); <span class="comment">// Some(&amp;Vec&lt;Bson&gt;)</span></code></pre></div>
+<h2 id="bson-documents" class="section-header"><a href="#bson-documents">BSON documents</a></h2>
+<p>BSON documents are ordered maps of UTF-8 encoded strings to BSON values. They are logically
+similar to JSON objects in that they can contain subdocuments, arrays, and values of several
+different types. This crate models BSON documents via the
+<a href="document/struct.Document.html"><code>Document</code></a> struct.</p>
+<h3 id="creating-documents" class="section-header"><a href="#creating-documents">Creating <code>Document</code>s</a></h3>
+<p><a href="document/struct.Document.html"><code>Document</code></a>s can be created directly either from a byte
+reader containing BSON data or via the <code>doc!</code> macro:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">bson</span>::{<span class="ident">doc</span>, <span class="ident">Document</span>};
+<span class="kw">use</span> <span class="ident">std::io::Read</span>;
+
+<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">hex::decode</span>(<span class="string">&quot;0C0000001069000100000000&quot;</span>).<span class="ident">unwrap</span>();
+<span class="kw">let</span> <span class="ident">doc</span> <span class="op">=</span> <span class="ident">Document::from_reader</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bytes</span>.<span class="ident">as_slice</span>()).<span class="ident">unwrap</span>(); <span class="comment">// { &quot;i&quot;: 1 }</span>
+
+<span class="kw">let</span> <span class="ident">doc</span> <span class="op">=</span> <span class="macro">doc!</span> {
+   <span class="string">&quot;hello&quot;</span>: <span class="string">&quot;world&quot;</span>,
+   <span class="string">&quot;int&quot;</span>: <span class="number">5</span>,
+   <span class="string">&quot;subdoc&quot;</span>: { <span class="string">&quot;cat&quot;</span>: <span class="bool-val">true</span> },
+};</code></pre></div>
+<p><a href="macro.doc.html"><code>doc!</code></a> works similarly to <a href="macro.bson.html"><code>bson!</code></a>, except that it always
+returns a <a href="document/struct.Document.html"><code>Document</code></a> rather than a <a href="enum.Bson.html"><code>Bson</code></a>.</p>
+<h3 id="document-member-access" class="section-header"><a href="#document-member-access"><code>Document</code> member access</a></h3>
+<p><a href="document/struct.Document.html"><code>Document</code></a> has a number of methods on it to facilitate member
+access:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">bson::doc</span>;
+
+<span class="kw">let</span> <span class="ident">doc</span> <span class="op">=</span> <span class="macro">doc!</span> {
+   <span class="string">&quot;string&quot;</span>: <span class="string">&quot;string&quot;</span>,
+   <span class="string">&quot;bool&quot;</span>: <span class="bool-val">true</span>,
+   <span class="string">&quot;i32&quot;</span>: <span class="number">5</span>,
+   <span class="string">&quot;doc&quot;</span>: { <span class="string">&quot;x&quot;</span>: <span class="bool-val">true</span> },
+};
+
+<span class="comment">// attempt get values as untyped Bson</span>
+<span class="kw">let</span> <span class="ident">none</span> <span class="op">=</span> <span class="ident">doc</span>.<span class="ident">get</span>(<span class="string">&quot;asdfadsf&quot;</span>); <span class="comment">// None</span>
+<span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">doc</span>.<span class="ident">get</span>(<span class="string">&quot;string&quot;</span>); <span class="comment">// Some(&amp;Bson::String(&quot;string&quot;))</span>
+
+<span class="comment">// attempt to get values with explicit typing</span>
+<span class="kw">let</span> <span class="ident">string</span> <span class="op">=</span> <span class="ident">doc</span>.<span class="ident">get_str</span>(<span class="string">&quot;string&quot;</span>); <span class="comment">// Ok(&quot;string&quot;)</span>
+<span class="kw">let</span> <span class="ident">subdoc</span> <span class="op">=</span> <span class="ident">doc</span>.<span class="ident">get_document</span>(<span class="string">&quot;doc&quot;</span>); <span class="comment">// Some(Document({ &quot;x&quot;: true }))</span>
+<span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">doc</span>.<span class="ident">get_i64</span>(<span class="string">&quot;i32&quot;</span>); <span class="comment">// Err(...)</span></code></pre></div>
+<h2 id="modeling-bson-with-strongly-typed-data-structures" class="section-header"><a href="#modeling-bson-with-strongly-typed-data-structures">Modeling BSON with strongly typed data structures</a></h2>
+<p>While it is possible to work with documents and BSON values directly, it will often introduce a
+lot of boilerplate for verifying the necessary keys are present and their values are the correct
+types. <a href="https://serde.rs/"><code>serde</code></a> provides a powerful way of mapping BSON data into Rust data structures largely
+automatically, removing the need for all that boilerplate.</p>
+<p>e.g.:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="kw">use</span> <span class="ident">bson</span>::{<span class="ident">bson</span>, <span class="ident">Bson</span>};
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
+<span class="kw">struct</span> <span class="ident">Person</span> {
+    <span class="ident">name</span>: <span class="ident">String</span>,
+    <span class="ident">age</span>: <span class="ident">i32</span>,
+    <span class="ident">phones</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+}
+
+<span class="comment">// Some BSON input data as a `Bson`.</span>
+<span class="kw">let</span> <span class="ident">bson_data</span>: <span class="ident">Bson</span> <span class="op">=</span> <span class="macro">bson!</span>({
+    <span class="string">&quot;name&quot;</span>: <span class="string">&quot;John Doe&quot;</span>,
+    <span class="string">&quot;age&quot;</span>: <span class="number">43</span>,
+    <span class="string">&quot;phones&quot;</span>: [
+        <span class="string">&quot;+44 1234567&quot;</span>,
+        <span class="string">&quot;+44 2345678&quot;</span>
+    ]
+});
+
+<span class="comment">// Deserialize the Person struct from the BSON data, automatically</span>
+<span class="comment">// verifying that the necessary keys are present and that they are of</span>
+<span class="comment">// the correct types.</span>
+<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">person</span>: <span class="ident">Person</span> <span class="op">=</span> <span class="ident">bson::from_bson</span>(<span class="ident">bson_data</span>).<span class="ident">unwrap</span>();
+
+<span class="comment">// Do things just like with any other Rust data structure.</span>
+<span class="macro">println!</span>(<span class="string">&quot;Redacting {}&#39;s record.&quot;</span>, <span class="ident">person</span>.<span class="ident">name</span>);
+<span class="ident">person</span>.<span class="ident">name</span> <span class="op">=</span> <span class="string">&quot;REDACTED&quot;</span>.<span class="ident">to_string</span>();
+
+<span class="comment">// Get a serialized version of the input data as a `Bson`.</span>
+<span class="kw">let</span> <span class="ident">redacted_bson</span> <span class="op">=</span> <span class="ident">bson::to_bson</span>(<span class="kw-2">&amp;</span><span class="ident">person</span>).<span class="ident">unwrap</span>();</code></pre></div>
+<p>Any types that implement <code>Serialize</code> and <code>Deserialize</code> can be used in this way. Doing so helps
+separate the “business logic” that operates over the data from the (de)serialization logic that
+translates the data to/from its serialized form. This can lead to more clear and concise code
+that is also less error prone.</p>
+<h2 id="working-with-datetimes" class="section-header"><a href="#working-with-datetimes">Working with datetimes</a></h2>
+<p>The BSON format includes a datetime type, which is modeled in this crate by the
+<a href="struct.DateTime.html" title="DateTime"><code>DateTime</code></a> struct, and the
+<code>Serialize</code> and <code>Deserialize</code> implementations for this struct produce and parse BSON datetimes
+when serializing to or deserializing from BSON. The popular crate <a href="docs.rs/chrono"><code>chrono</code></a>
+also provides a <code>DateTime</code> type, but its <code>Serialize</code> and <code>Deserialize</code> implementations operate
+on strings instead, so when using it with BSON, the BSON datetime type is not used. To work
+around this, the <code>chrono-0_4</code> feature flag can be enabled. This flag exposes a number of
+convenient conversions between <code>bson::DateTime</code> and <code>chrono::DateTime</code>, including the
+<a href="serde_helpers/chrono_datetime_as_bson_datetime/index.html" title="serde_helpers::chrono_datetime_as_bson_datetime"><code>serde_helpers::chrono_datetime_as_bson_datetime</code></a>
+serde helper, which can be used to (de)serialize <code>chrono::DateTime</code>s to/from BSON datetimes, and
+the <code>From&lt;chrono::DateTime&gt;</code> implementation for <a href="enum.Bson.html" title="Bson"><code>Bson</code></a>, which allows <code>chrono::DateTime</code> values
+to be used in the <code>doc!</code> and <code>bson!</code> macros.</p>
+<p>e.g.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>};
+<span class="kw">use</span> <span class="ident">bson::doc</span>;
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
+<span class="kw">struct</span> <span class="ident">Foo</span> {
+    <span class="comment">// serializes as a BSON datetime.</span>
+    <span class="ident">date_time</span>: <span class="ident">bson::DateTime</span>,
+
+    <span class="comment">// serializes as an RFC 3339 / ISO-8601 string.</span>
+    <span class="ident">chrono_datetime</span>: <span class="ident">chrono::DateTime</span><span class="op">&lt;</span><span class="ident">chrono::Utc</span><span class="op">&gt;</span>,
+
+    <span class="comment">// serializes as a BSON datetime.</span>
+    <span class="comment">// this requires the &quot;chrono-0_4&quot; feature flag</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;bson::serde_helpers::chrono_datetime_as_bson_datetime&quot;</span>)]</span>
+    <span class="ident">chrono_as_bson</span>: <span class="ident">chrono::DateTime</span><span class="op">&lt;</span><span class="ident">chrono::Utc</span><span class="op">&gt;</span>,
+}
+
+<span class="comment">// this automatic conversion also requires the &quot;chrono-0_4&quot; feature flag</span>
+<span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="macro">doc!</span> {
+    <span class="string">&quot;created_at&quot;</span>: <span class="ident">chrono::Utc::now</span>(),
+};</code></pre></div>
+<h2 id="working-with-uuids" class="section-header"><a href="#working-with-uuids">Working with UUIDs</a></h2>
+<p>The BSON format does not contain a dedicated UUID type, though it does have a “binary” type
+which has UUID subtypes. Accordingly, this crate provides a
+<a href="struct.Binary.html" title="Binary"><code>Binary</code></a> struct which models this binary type and
+serializes to and deserializes from it. The popular <code>uuid</code> crate does provide a UUID type
+(<code>Uuid</code>), though its <code>Serialize</code> and <code>Deserialize</code> implementations operate on strings, so when
+using it with BSON, the BSON binary type will not be used. To facilitate the conversion between
+<code>Uuid</code> values and BSON binary values, the <code>uuid-0_8</code> feature flag can be enabled. This flag
+exposes a number of convenient conversions from <code>Uuid</code>, including the
+<a href="serde_helpers/uuid_as_binary/index.html" title="serde_helpers::uuid_as_binary"><code>serde_helpers::uuid_as_binary</code></a>
+serde helper, which can be used to (de)serialize <code>Uuid</code>s to/from BSON binaries with the UUID
+subtype, and the <code>From&lt;Uuid&gt;</code> implementation for <code>Bson</code>, which allows <code>Uuid</code> values to be used
+in the <code>doc!</code> and <code>bson!</code> macros.</p>
+<p>e.g.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>};
+<span class="kw">use</span> <span class="ident">bson::doc</span>;
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
+<span class="kw">struct</span> <span class="ident">Foo</span> {
+    <span class="comment">// serializes as a String.</span>
+    <span class="ident">uuid</span>: <span class="ident">uuid::Uuid</span>,
+
+    <span class="comment">// serializes as a BSON binary with subtype 4.</span>
+    <span class="comment">// this requires the &quot;uuid-0_8&quot; feature flag</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;bson::serde_helpers::uuid_as_binary&quot;</span>)]</span>
+    <span class="ident">uuid_as_bson</span>: <span class="ident">uuid::Uuid</span>,
+}
+
+<span class="comment">// this automatic conversion also requires the &quot;uuid-0_8&quot; feature flag</span>
+<span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="macro">doc!</span> {
+    <span class="string">&quot;uuid&quot;</span>: <span class="ident">uuid::Uuid::new_v4</span>(),
+};</code></pre></div>
+<h2 id="minimum-supported-rust-version-msrv" class="section-header"><a href="#minimum-supported-rust-version-msrv">Minimum supported Rust version (MSRV)</a></h2>
+<p>The MSRV for this crate is currently 1.48.0. This will be rarely be increased, and if it ever is,
+it will only happen in a minor or major version release.</p>
+</div></details><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
+<div class="item-table"><div class="item-left module-item"><a class="mod" href="de/index.html" title="bson::de mod">de</a></div><div class="item-right docblock-short"><p>Deserializer</p>
+</div><div class="item-left module-item"><a class="mod" href="decimal128/index.html" title="bson::decimal128 mod">decimal128</a></div><div class="item-right docblock-short"><p><a href="https://github.com/mongodb/specifications/blob/master/source/bson-decimal128/decimal128.rst">BSON Decimal128</a> data type representation</p>
+</div><div class="item-left module-item"><a class="mod" href="document/index.html" title="bson::document mod">document</a></div><div class="item-right docblock-short"><p>A BSON document represented as an associative HashMap with insertion ordering.</p>
+</div><div class="item-left module-item"><a class="mod" href="extjson/index.html" title="bson::extjson mod">extjson</a></div><div class="item-right docblock-short"><p>Deserialization and serialization of <a href="https://docs.mongodb.com/manual/reference/mongodb-extended-json/">MongoDB Extended JSON v2</a></p>
+</div><div class="item-left module-item"><a class="mod" href="oid/index.html" title="bson::oid mod">oid</a></div><div class="item-right docblock-short"><p>ObjectId</p>
+</div><div class="item-left module-item"><a class="mod" href="ser/index.html" title="bson::ser mod">ser</a></div><div class="item-right docblock-short"><p>Serializer</p>
+</div><div class="item-left module-item"><a class="mod" href="serde_helpers/index.html" title="bson::serde_helpers mod">serde_helpers</a></div><div class="item-right docblock-short"><p>Collection of helper functions for serializing to and deserializing from BSON using Serde</p>
+</div><div class="item-left module-item"><a class="mod" href="spec/index.html" title="bson::spec mod">spec</a></div><div class="item-right docblock-short"><p>Constants derived from the <a href="http://bsonspec.org/spec.html">BSON Specification Version 1.1</a>.</p>
+</div></div><h2 id="macros" class="section-header"><a href="#macros">Macros</a></h2>
+<div class="item-table"><div class="item-left module-item"><a class="macro" href="macro.bson.html" title="bson::bson macro">bson</a></div><div class="item-right docblock-short"><p>Construct a bson::BSON value from a literal.</p>
+</div><div class="item-left module-item"><a class="macro" href="macro.doc.html" title="bson::doc macro">doc</a></div><div class="item-right docblock-short"><p>Construct a bson::Document value.</p>
+</div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.Binary.html" title="bson::Binary struct">Binary</a></div><div class="item-right docblock-short"><p>Represents a BSON binary value.</p>
+</div><div class="item-left module-item"><a class="struct" href="struct.DateTime.html" title="bson::DateTime struct">DateTime</a></div><div class="item-right docblock-short"><p>Struct representing a BSON datetime.
+Note: BSON datetimes have millisecond precision.</p>
+</div><div class="item-left module-item"><a class="struct" href="struct.DbPointer.html" title="bson::DbPointer struct">DbPointer</a></div><div class="item-right docblock-short"><p>Represents a DBPointer. (Deprecated)</p>
+</div><div class="item-left module-item"><a class="struct" href="struct.Decimal128.html" title="bson::Decimal128 struct">Decimal128</a></div><div class="item-right docblock-short"><p>Struct representing a BSON Decimal128 type.</p>
+</div><div class="item-left module-item"><a class="struct" href="struct.Deserializer.html" title="bson::Deserializer struct">Deserializer</a></div><div class="item-right docblock-short"><p>Serde Deserializer</p>
+</div><div class="item-left module-item"><a class="struct" href="struct.Document.html" title="bson::Document struct">Document</a></div><div class="item-right docblock-short"><p>A BSON document represented as an associative HashMap with insertion ordering.</p>
+</div><div class="item-left module-item"><a class="struct" href="struct.JavaScriptCodeWithScope.html" title="bson::JavaScriptCodeWithScope struct">JavaScriptCodeWithScope</a></div><div class="item-right docblock-short"><p>Represents a BSON code with scope value.</p>
+</div><div class="item-left module-item"><a class="struct" href="struct.Regex.html" title="bson::Regex struct">Regex</a></div><div class="item-right docblock-short"><p>Represents a BSON regular expression value.</p>
+</div><div class="item-left module-item"><a class="struct" href="struct.Serializer.html" title="bson::Serializer struct">Serializer</a></div><div class="item-right docblock-short"><p>Serde Serializer</p>
+</div><div class="item-left module-item"><a class="struct" href="struct.Timestamp.html" title="bson::Timestamp struct">Timestamp</a></div><div class="item-right docblock-short"><p>Represents a BSON timestamp value.</p>
+</div></div><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
+<div class="item-table"><div class="item-left module-item"><a class="enum" href="enum.Bson.html" title="bson::Bson enum">Bson</a></div><div class="item-right docblock-short"><p>Possible BSON value types.</p>
+</div></div><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
+<div class="item-table"><div class="item-left module-item"><a class="fn" href="fn.from_bson.html" title="bson::from_bson fn">from_bson</a></div><div class="item-right docblock-short"><p>Decode a BSON <code>Value</code> into a <code>T</code> Deserializable.</p>
+</div><div class="item-left module-item"><a class="fn" href="fn.from_document.html" title="bson::from_document fn">from_document</a></div><div class="item-right docblock-short"><p>Decode a BSON <code>Document</code> into a <code>T</code> Deserializable.</p>
+</div><div class="item-left module-item"><a class="fn" href="fn.from_reader.html" title="bson::from_reader fn">from_reader</a></div><div class="item-right docblock-short"><p>Deserialize an instance of type <code>T</code> from an I/O stream of BSON.</p>
+</div><div class="item-left module-item"><a class="fn" href="fn.from_reader_utf8_lossy.html" title="bson::from_reader_utf8_lossy fn">from_reader_utf8_lossy</a></div><div class="item-right docblock-short"><p>Deserialize an instance of type <code>T</code> from an I/O stream of BSON, replacing any invalid UTF-8
+sequences with the Unicode replacement character.</p>
+</div><div class="item-left module-item"><a class="fn" href="fn.from_slice.html" title="bson::from_slice fn">from_slice</a></div><div class="item-right docblock-short"><p>Deserialize an instance of type <code>T</code> from a slice of BSON bytes.</p>
+</div><div class="item-left module-item"><a class="fn" href="fn.from_slice_utf8_lossy.html" title="bson::from_slice_utf8_lossy fn">from_slice_utf8_lossy</a></div><div class="item-right docblock-short"><p>Deserialize an instance of type <code>T</code> from a slice of BSON bytes, replacing any invalid UTF-8
+sequences with the Unicode replacement character.</p>
+</div><div class="item-left module-item"><a class="fn" href="fn.to_bson.html" title="bson::to_bson fn">to_bson</a></div><div class="item-right docblock-short"><p>Encode a <code>T</code> Serializable into a BSON <code>Value</code>.</p>
+</div><div class="item-left module-item"><a class="fn" href="fn.to_document.html" title="bson::to_document fn">to_document</a></div><div class="item-right docblock-short"><p>Encode a <code>T</code> Serializable into a BSON <code>Document</code>.</p>
+</div><div class="item-left module-item"><a class="fn" href="fn.to_vec.html" title="bson::to_vec fn">to_vec</a></div><div class="item-right docblock-short"><p>Serialize the given <code>T</code> as a BSON byte vector.</p>
+</div></div><h2 id="types" class="section-header"><a href="#types">Type Definitions</a></h2>
+<div class="item-table"><div class="item-left module-item"><a class="type" href="type.Array.html" title="bson::Array type">Array</a></div><div class="item-right docblock-short"><p>Alias for <code>Vec&lt;Bson&gt;</code>.</p>
+</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="bson" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+    <script src="../main.js"></script>
+</body></html>

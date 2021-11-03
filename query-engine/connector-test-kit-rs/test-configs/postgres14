@@ -1,5 +1,0 @@
-{
-    "connector": "postgres",
-    "version": "14",
-    "runner": "direct"
-}

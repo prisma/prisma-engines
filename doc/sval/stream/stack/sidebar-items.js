@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Depth","The depth of a position."],["Pos","The expected position in the stream."],["Stack","A container for the stream state."]]});

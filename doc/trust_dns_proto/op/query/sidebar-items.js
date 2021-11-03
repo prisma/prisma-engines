@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Query","Query struct for looking up resource records, basically a resource record without RDATA."],["QueryParts","Consumes `Query` giving public access to fields of `Query` so they can be destructured and taken by value."]]});

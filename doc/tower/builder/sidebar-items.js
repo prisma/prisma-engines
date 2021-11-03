@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["ServiceBuilder","Declaratively construct `Service` values."]]});

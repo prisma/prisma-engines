@@ -1,5 +1,0 @@
-{
-    "connector": "mongodb",
-    "version": "5",
-    "runner": "direct"
-}

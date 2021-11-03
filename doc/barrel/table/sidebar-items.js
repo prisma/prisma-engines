@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["SqlChanges",""],["Table",""],["TableMeta","Some metadata about a table that was just created"]]});

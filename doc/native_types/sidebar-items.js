@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["MongoDbType","MongoDB native types. Ignores deprecated and unsupported types for now. Taken from: https://docs.mongodb.com/manual/reference/bson-types/"],["MsSqlType","Representing a type in SQL Server database."],["MsSqlTypeParameter",""],["MySqlType","The MySQL native type enum."],["PostgresType",""]],"trait":[["NativeType",""]]});

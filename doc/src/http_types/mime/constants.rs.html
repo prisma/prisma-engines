@@ -1,0 +1,150 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;tom&#x2F;.cache&#x2F;cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;http-types-2.12.0&#x2F;src&#x2F;mime&#x2F;constants.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>constants.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="shortcut icon" href="https:&#x2F;&#x2F;yoshuawuyts.com&#x2F;assets&#x2F;http-rs&#x2F;favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../http_types/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;yoshuawuyts.com&#x2F;assets&#x2F;http-rs&#x2F;logo-rounded.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1"> 1</span>
+<span id="2"> 2</span>
+<span id="3"> 3</span>
+<span id="4"> 4</span>
+<span id="5"> 5</span>
+<span id="6"> 6</span>
+<span id="7"> 7</span>
+<span id="8"> 8</span>
+<span id="9"> 9</span>
+<span id="10">10</span>
+<span id="11">11</span>
+<span id="12">12</span>
+<span id="13">13</span>
+<span id="14">14</span>
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Mime</span>;
+<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
+
+<span class="macro">macro_rules!</span> <span class="ident">utf8_mime_const</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">desc</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sub</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="macro">mime_const!</span>(
+            <span class="ident">with_params</span>,
+            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>,
+            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">desc</span>,
+            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>,
+            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sub</span>,
+            <span class="bool-val">true</span>,
+            <span class="string">&quot;;charset=utf-8&quot;</span>
+        );
+    };
+}
+<span class="macro">macro_rules!</span> <span class="ident">mime_const</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">desc</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sub</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="macro">mime_const!</span>(<span class="ident">with_params</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">desc</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sub</span>, <span class="bool-val">false</span>, <span class="string">&quot;&quot;</span>);
+    };
+
+    (<span class="ident">with_params</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">desc</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sub</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">is_utf8</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">doccomment</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="macro">mime_const!</span>(
+            <span class="ident">doc_expanded</span>,
+            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>,
+            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">desc</span>,
+            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>,
+            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sub</span>,
+            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">is_utf8</span>,
+            <span class="macro">concat!</span>(
+                <span class="string">&quot;Content-Type for &quot;</span>,
+                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">desc</span>,
+                <span class="string">&quot;.\n\n# Mime Type\n\n```text\n&quot;</span>,
+                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>,
+                <span class="string">&quot;/&quot;</span>,
+                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sub</span>,
+                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">doccomment</span>,
+                <span class="string">&quot;\n```&quot;</span>
+            )
+        );
+    };
+
+    (<span class="ident">doc_expanded</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">desc</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sub</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">is_utf8</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">doccomment</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">doccomment</span>]</span>
+        <span class="kw">pub</span> <span class="kw">const</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="ident">Mime</span> <span class="op">=</span> <span class="ident">Mime</span> {
+            <span class="ident">essence</span>: <span class="ident">Cow::Borrowed</span>(<span class="macro">concat!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="string">&quot;/&quot;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sub</span>)),
+            <span class="ident">basetype</span>: <span class="ident">Cow::Borrowed</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>),
+            <span class="ident">subtype</span>: <span class="ident">Cow::Borrowed</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">sub</span>),
+            <span class="ident">is_utf8</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">is_utf8</span>,
+            <span class="ident">params</span>: <span class="macro">vec!</span>[],
+        };
+    };
+}
+
+<span class="macro">utf8_mime_const!</span>(<span class="ident">JAVASCRIPT</span>, <span class="string">&quot;JavaScript&quot;</span>, <span class="string">&quot;application&quot;</span>, <span class="string">&quot;javascript&quot;</span>);
+<span class="macro">utf8_mime_const!</span>(<span class="ident">CSS</span>, <span class="string">&quot;CSS&quot;</span>, <span class="string">&quot;text&quot;</span>, <span class="string">&quot;css&quot;</span>);
+<span class="macro">utf8_mime_const!</span>(<span class="ident">HTML</span>, <span class="string">&quot;HTML&quot;</span>, <span class="string">&quot;text&quot;</span>, <span class="string">&quot;html&quot;</span>);
+<span class="macro">utf8_mime_const!</span>(<span class="ident">PLAIN</span>, <span class="string">&quot;Plain text&quot;</span>, <span class="string">&quot;text&quot;</span>, <span class="string">&quot;plain&quot;</span>);
+<span class="macro">utf8_mime_const!</span>(<span class="ident">XML</span>, <span class="string">&quot;XML&quot;</span>, <span class="string">&quot;application&quot;</span>, <span class="string">&quot;xml&quot;</span>);
+<span class="macro">mime_const!</span>(<span class="ident">ANY</span>, <span class="string">&quot;matching anything&quot;</span>, <span class="string">&quot;*&quot;</span>, <span class="string">&quot;*&quot;</span>);
+<span class="macro">mime_const!</span>(<span class="ident">JSON</span>, <span class="string">&quot;JSON&quot;</span>, <span class="string">&quot;application&quot;</span>, <span class="string">&quot;json&quot;</span>);
+<span class="macro">mime_const!</span>(<span class="ident">SVG</span>, <span class="string">&quot;SVG&quot;</span>, <span class="string">&quot;image&quot;</span>, <span class="string">&quot;svg+xml&quot;</span>);
+<span class="macro">mime_const!</span>(<span class="ident">PNG</span>, <span class="string">&quot;PNG images&quot;</span>, <span class="string">&quot;image&quot;</span>, <span class="string">&quot;png&quot;</span>);
+<span class="macro">mime_const!</span>(<span class="ident">JPEG</span>, <span class="string">&quot;JPEG images&quot;</span>, <span class="string">&quot;image&quot;</span>, <span class="string">&quot;jpeg&quot;</span>);
+<span class="macro">mime_const!</span>(<span class="ident">SSE</span>, <span class="string">&quot;Server Sent Events&quot;</span>, <span class="string">&quot;text&quot;</span>, <span class="string">&quot;event-stream&quot;</span>);
+<span class="macro">mime_const!</span>(<span class="ident">BYTE_STREAM</span>, <span class="string">&quot;byte streams&quot;</span>, <span class="string">&quot;application&quot;</span>, <span class="string">&quot;octet-stream&quot;</span>);
+<span class="macro">mime_const!</span>(<span class="ident">FORM</span>, <span class="string">&quot;forms&quot;</span>, <span class="string">&quot;application&quot;</span>, <span class="string">&quot;x-www-form-urlencoded&quot;</span>);
+<span class="macro">mime_const!</span>(<span class="ident">MULTIPART_FORM</span>, <span class="string">&quot;multipart forms&quot;</span>, <span class="string">&quot;multipart&quot;</span>, <span class="string">&quot;form-data&quot;</span>);
+<span class="macro">mime_const!</span>(<span class="ident">WASM</span>, <span class="string">&quot;webassembly&quot;</span>, <span class="string">&quot;application&quot;</span>, <span class="string">&quot;wasm&quot;</span>);
+<span class="comment">// There are multiple `.ico` mime types known, but `image/x-icon`</span>
+<span class="comment">// is what most browser use. See:</span>
+<span class="comment">// https://en.wikipedia.org/wiki/ICO_%28file_format%29#MIME_type</span>
+<span class="macro">mime_const!</span>(<span class="ident">ICO</span>, <span class="string">&quot;ICO icons&quot;</span>, <span class="string">&quot;image&quot;</span>, <span class="string">&quot;x-icon&quot;</span>);
+</code></pre></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="http_types" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
+    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
+</body></html>

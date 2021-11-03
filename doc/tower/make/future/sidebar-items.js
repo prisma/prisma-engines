@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["SharedFuture","Response future from [`Shared`] services."]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["html_text2dest","Parse an HTML inline hyperlink."],["html_text2dest_link","Wrapper around `html_text2dest()` that packs the result in `Link::Text2Dest`."]]});

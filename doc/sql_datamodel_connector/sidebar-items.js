@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["MsSqlDatamodelConnector",""],["MySqlDatamodelConnector",""],["PostgresDatamodelConnector",""],["SqlDatamodelConnectors",""],["SqliteDatamodelConnector",""]]});

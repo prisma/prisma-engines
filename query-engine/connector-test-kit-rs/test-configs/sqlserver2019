@@ -1,5 +1,0 @@
-{
-    "connector": "sqlserver",
-    "version": "2019",
-    "runner": "direct"
-}

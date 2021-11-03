@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["LevelFilter","An enum representing the available verbosity level filters of the logger."]],"fn":[["start","Starts logging depending on current environment."],["with_level","Start logging with a log level."]]});

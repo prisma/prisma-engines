@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["OwnedValue","An owned, immutable value."],["Stream","A borrowed stream wrapper."]],"trait":[["Value","A value with a streamable structure."]],"type":[["Result","The type returned by streaming methods."]]});

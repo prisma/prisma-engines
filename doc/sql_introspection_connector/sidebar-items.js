@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["SqlError",""]],"mod":[["calculate_datamodel",""]],"struct":[["SqlIntrospectionConnector",""]],"type":[["SqlIntrospectionResult",""],["SqlResult",""]]});

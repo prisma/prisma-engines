@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["reformat",""]],"struct":[["SchemaAst","AST representation of a prisma schema."],["Span","Represents a location in a datamodel’s text representation."]]});

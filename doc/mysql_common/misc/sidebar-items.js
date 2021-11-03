@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["lenenc_int_len","Returns length of length-encoded-integer representation of `x`."],["lenenc_str_len","Returns length of lenght-encoded-string representation of `s`."]]});

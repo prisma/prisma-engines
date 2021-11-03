@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["BoxBody","A type erased http body."]],"trait":[["Body","A trait alias for [`http_body::Body`]."]]});
