@@ -19,9 +19,7 @@ use sql_migration_connector::SqlMigrationConnector;
 use std::env;
 use user_facing_errors::{common::InvalidConnectionString, KnownError};
 
-#[cfg(feature = "mongodb")]
 use datamodel::common::provider_names::MONGODB_SOURCE_NAME;
-#[cfg(feature = "mongodb")]
 use mongodb_migration_connector::MongoDbMigrationConnector;
 
 /// Top-level constructor for the migration engine API.
@@ -29,7 +27,6 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Box<dyn api::GenericAp
     let (source, url, preview_features, shadow_database_url) = parse_configuration(datamodel)?;
 
     match source.active_provider.as_str() {
-        #[cfg(feature = "sql")]
         POSTGRES_SOURCE_NAME => {
             let mut u = url::Url::parse(&url).map_err(|err| {
                 let details = user_facing_errors::quaint::invalid_connection_string_description(&format!(
@@ -60,13 +57,11 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Box<dyn api::GenericAp
 
             Ok(Box::new(connector))
         }
-        #[cfg(feature = "sql")]
         MYSQL_SOURCE_NAME | SQLITE_SOURCE_NAME | MSSQL_SOURCE_NAME => {
             let connector = SqlMigrationConnector::new(url, preview_features, shadow_database_url)?;
 
             Ok(Box::new(connector))
         }
-        #[cfg(feature = "mongodb")]
         MONGODB_SOURCE_NAME => Ok(Box::new(MongoDbMigrationConnector::new(url))),
         provider => Err(CoreError::from_msg(format!(
             "`{}` is not a supported connector.",
