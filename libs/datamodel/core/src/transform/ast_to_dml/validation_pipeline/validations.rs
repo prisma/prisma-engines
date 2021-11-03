@@ -47,8 +47,6 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, r
     }
 
     for relation in db.walk_relations() {
-        relations::has_a_unique_constraint_name(db, relation, diagnostics);
-
         match relation.refine() {
             // 1:1, 1:n
             RefinedRelationWalker::Inline(relation) => {
@@ -57,6 +55,7 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, r
                     relations::same_length_in_referencing_and_referenced(relation, diagnostics);
                     relations::cycles(relation, connector, diagnostics);
                     relations::multiple_cascading_paths(relation, connector, diagnostics);
+                    relations::has_a_unique_constraint_name(db, relation, diagnostics);
 
                     // These needs to run last to prevent error spam.
                     relations::references_unique_fields(relation, connector, diagnostics);

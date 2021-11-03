@@ -37,33 +37,6 @@ impl<'ast, 'db> RelationWalker<'ast, 'db> {
     pub(crate) fn get(self) -> &'db Relation<'ast> {
         &self.db.relations.relations_storage[self.relation_id]
     }
-
-    /// The name of the foreign key. Either taken from the `map` attribute, or generated following
-    /// the Prisma defaults.
-    pub(crate) fn foreign_key_name(self) -> Option<Cow<'ast, str>> {
-        let from_forward = self.referencing_field().and_then(|f| f.final_foreign_key_name());
-        let from_back = self.referenced_field().and_then(|f| f.final_foreign_key_name());
-
-        from_forward.or(from_back)
-    }
-
-    fn referencing_field(self) -> Option<RelationFieldWalker<'ast, 'db>> {
-        self.get().referencing_field_id().map(|field_id| RelationFieldWalker {
-            model_id: self.get().model_a,
-            field_id,
-            db: self.db,
-            relation_field: &self.db.types.relation_fields[&(self.get().model_a, field_id)],
-        })
-    }
-
-    fn referenced_field(self) -> Option<RelationFieldWalker<'ast, 'db>> {
-        self.get().referenced_field_id().map(|field_id| RelationFieldWalker {
-            model_id: self.get().model_b,
-            field_id,
-            db: self.db,
-            relation_field: &self.db.types.relation_fields[&(self.get().model_b, field_id)],
-        })
-    }
 }
 
 /// Splits the relation to different types.
@@ -324,6 +297,24 @@ impl<'ast, 'db> CompleteInlineRelationWalker<'ast, 'db> {
             db: self.db,
             relation_field: &self.db.types.relation_fields[&(self.side_a.0, self.side_a.1)],
         }
+    }
+
+    pub(crate) fn referenced_field(self) -> RelationFieldWalker<'ast, 'db> {
+        RelationFieldWalker {
+            model_id: self.side_b.0,
+            field_id: self.side_b.1,
+            db: self.db,
+            relation_field: &self.db.types.relation_fields[&(self.side_b.0, self.side_b.1)],
+        }
+    }
+
+    /// The name of the foreign key. Either taken from the `map` attribute, or generated following
+    /// the Prisma defaults.
+    pub(crate) fn foreign_key_name(self) -> Option<Cow<'ast, str>> {
+        let from_forward = self.referencing_field().final_foreign_key_name();
+        let from_back = self.referenced_field().final_foreign_key_name();
+
+        from_forward.or(from_back)
     }
 
     /// The scalar fields defining the relation on the referenced model.

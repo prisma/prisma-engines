@@ -58,7 +58,11 @@ impl<'ast> ConstraintNamespace<'ast> {
 
     /// Add all foreign key constraints from the data model to a global validation scope.
     pub(super) fn add_global_relations(&mut self, ctx: &Context<'ast>, scope: ConstraintScope) {
-        for name in ctx.db.walk_relations().filter_map(|r| r.foreign_key_name()) {
+        for name in ctx
+            .db
+            .walk_complete_inline_relations()
+            .filter_map(|r| r.foreign_key_name())
+        {
             let counter = self.global.entry((scope, name)).or_default();
             *counter += 1;
         }
@@ -116,7 +120,10 @@ impl<'ast> ConstraintNamespace<'ast> {
     /// Add all foreign key constraints to separate namespaces per model.
     pub(super) fn add_local_relations(&mut self, ctx: &Context<'ast>, scope: ConstraintScope) {
         for model in ctx.db.walk_models() {
-            for name in model.relations_from().filter_map(|r| r.foreign_key_name()) {
+            for name in model
+                .complete_inline_relations_from()
+                .filter_map(|r| r.foreign_key_name())
+            {
                 let counter = self.local.entry((model.model_id(), scope, name)).or_default();
 
                 *counter += 1;
@@ -137,7 +144,7 @@ pub(crate) enum ConstraintName<'ast> {
 
 impl<'ast> ConstraintName<'ast> {
     /// An iterator of scopes the given name should be checked against.
-    pub(crate) fn possible_scopes(self) -> impl Iterator<Item = &'ast ConstraintScope> {
+    fn possible_scopes(self) -> impl Iterator<Item = &'ast ConstraintScope> {
         use ConstraintScope::*;
 
         match self {

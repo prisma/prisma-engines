@@ -7,10 +7,7 @@ mod visited_relation;
 use crate::{
     ast,
     diagnostics::{DatamodelError, Diagnostics},
-    transform::ast_to_dml::db::{
-        walkers::{CompleteInlineRelationWalker, RefinedRelationWalker, RelationWalker},
-        ConstraintName, ParserDatabase,
-    },
+    transform::ast_to_dml::db::{walkers::CompleteInlineRelationWalker, ConstraintName, ParserDatabase},
 };
 use datamodel_connector::{Connector, ConnectorCapability};
 use itertools::Itertools;
@@ -25,9 +22,11 @@ const RELATION_ATTRIBUTE_NAME: &str = "relation";
 const RELATION_ATTRIBUTE_NAME_WITH_AT: &str = "@relation";
 const STATE_ERROR: &str = "Failed lookup of model, field or optional property during internal processing. This means that the internal representation was mutated incorrectly.";
 
+/// Depending on the database, a constraint name might need to be unique in a certain namespace.
+/// Validates per database that we do not use a name that is already in use.
 pub(crate) fn has_a_unique_constraint_name(
     db: &ParserDatabase<'_>,
-    relation: RelationWalker<'_, '_>,
+    relation: CompleteInlineRelationWalker<'_, '_>,
     diagnostics: &mut Diagnostics,
 ) {
     let name = match relation.foreign_key_name() {
@@ -35,27 +34,8 @@ pub(crate) fn has_a_unique_constraint_name(
         None => return,
     };
 
-    let (model, field) = match relation.refine() {
-        RefinedRelationWalker::Inline(relation) => {
-            let field = match relation.forward_relation_field() {
-                Some(field) => field,
-                None => return,
-            };
-
-            (relation.referencing_model(), field)
-        }
-        RefinedRelationWalker::ImplicitManyToMany(relation) => {
-            let name_a = relation.field_a().attributes().fk_name;
-            let name_b = relation.field_b().attributes().fk_name;
-
-            match (name_a, name_b) {
-                (None, Some(_)) => (relation.model_b(), relation.field_b()),
-                (Some(_), None) => (relation.model_a(), relation.field_a()),
-                (Some(_), Some(_)) => (relation.model_a(), relation.field_a()),
-                (None, None) => return,
-            }
-        }
-    };
+    let field = relation.referencing_field();
+    let model = relation.referencing_model();
 
     for violation in db.scope_violations(model.model_id(), ConstraintName::Relation(name.as_ref())) {
         let span = field
