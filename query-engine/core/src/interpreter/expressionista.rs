@@ -361,8 +361,6 @@ impl Expressionista {
                                         ))),
                                     }?;
 
-                                    dbg!(&binding);
-
                                     let res = match dependency {
                                         QueryGraphDependency::ParentProjection(projection, f) => binding
                                             .as_projections(&projection)

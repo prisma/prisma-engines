@@ -666,7 +666,6 @@ impl QueryGraph {
 
         for node in returns {
             let out_edges = self.outgoing_edges(&node);
-
             let dependencies: Vec<ModelProjection> = out_edges
                 .into_iter()
                 .filter_map(|edge| match self.edge_content(&edge).unwrap() {
@@ -676,32 +675,33 @@ impl QueryGraph {
                     _ => None,
                 })
                 .collect();
+            let dependencies = ModelProjection::union(dependencies);
 
-            let merged = ModelProjection::union(dependencies);
+            // Assumption: We currently always have at most one single incoming ParentProjection edge
+            // connected to return nodes. This will break if we ever have more.
             let in_edges = self.incoming_edges(&node);
-
-            if let Some(edge) = in_edges.into_iter().find(|edge| {
+            let in_parent_projection_edge = in_edges.into_iter().find(|edge| {
                 matches!(
                     self.edge_content(edge),
                     Some(QueryGraphDependency::ParentProjection(_, _))
                 )
-            }) {
-                let source = self.edge_source(&edge);
-                let target = self.edge_target(&edge);
+            });
 
+            if let Some(incoming_edge) = in_parent_projection_edge {
+                let source = self.edge_source(&incoming_edge);
+                let target = self.edge_target(&incoming_edge);
                 let content = self
-                    .remove_edge(edge)
+                    .remove_edge(incoming_edge)
                     .expect("Expected edges between marked nodes to be non-empty.");
 
                 if let QueryGraphDependency::ParentProjection(existing, transformer) = content {
-                    let merged = merged.merge(existing);
+                    let merged_dependencies = dependencies.merge(existing);
+
                     self.create_edge(
                         &source,
                         &target,
-                        QueryGraphDependency::ParentProjection(merged, transformer),
+                        QueryGraphDependency::ParentProjection(merged_dependencies, transformer),
                     )?;
-                } else {
-                    panic!()
                 }
             }
         }

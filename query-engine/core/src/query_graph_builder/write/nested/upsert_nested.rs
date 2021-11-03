@@ -134,7 +134,6 @@ pub fn nested_upsert(
             QueryGraphDependency::ParentProjection(
                 child_model_identifier.clone(),
                 Box::new(|if_node, child_ids| {
-                    dbg!(&child_ids);
                     if let Node::Flow(Flow::If(_)) = if_node {
                         Ok(Node::Flow(Flow::If(Box::new(move || !child_ids.is_empty()))))
                     } else {
@@ -171,7 +170,6 @@ pub fn nested_upsert(
         )?;
 
         // TODO: Add comment to explain this
-        // TODO: This isn't working. Figure out why
         let then_node = if let Some(emulation_node) = utils::insert_emulated_on_update_with_intermediary_node(
             graph,
             connector_ctx,
@@ -179,7 +177,6 @@ pub fn nested_upsert(
             &read_children_node,
             &update_node,
         )? {
-            dbg!("comes here mf");
             emulation_node
         } else {
             update_node

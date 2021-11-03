@@ -111,6 +111,8 @@ pub fn update_many_records(
             filter,
         ));
 
+        utils::insert_emulated_on_update(graph, connector_ctx, &model, &pre_read_node, &update_many_node)?;
+
         graph.create_edge(
             &pre_read_node,
             &update_many_node,
@@ -125,8 +127,6 @@ pub fn update_many_records(
                 }),
             ),
         )?;
-
-        utils::insert_emulated_on_update(graph, connector_ctx, &model, &pre_read_node, &update_many_node)?;
     }
 
     Ok(())

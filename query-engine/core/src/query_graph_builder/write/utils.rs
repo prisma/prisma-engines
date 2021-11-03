@@ -32,7 +32,6 @@ where
     T: Into<Filter>,
 {
     let selected_fields = get_selected_fields(&model, projection);
-    dbg!(&selected_fields);
     let filter: Filter = filter.into();
 
     let read_query = ReadQuery::ManyRecordsQuery(ManyRecordsQuery {
@@ -99,7 +98,6 @@ where
     let parent_model_id = parent_relation_field.model().primary_identifier();
     let parent_linking_fields = parent_relation_field.linking_fields();
     let projection = parent_model_id.merge(parent_linking_fields);
-    dbg!(&projection);
     let child_model = parent_relation_field.related_model();
 
     let selected_fields = get_selected_fields(
@@ -668,18 +666,11 @@ pub fn emulate_set_null(
         })
         .collect();
 
-    dbg!("Updating model: {}", &dependent_model.name);
-    dbg!(&parent_update_args);
-    dbg!(&child_update_args);
-    dbg!("--------");
-
     if child_update_args.is_empty() {
         graph.create_edge(&parent_node, &child_node, QueryGraphDependency::ExecutionOrder)?;
 
         return Ok(());
     }
-
-    dbg!("Updating child");
 
     // Records that need to be updated for the cascade.
     let dependent_records_node =
@@ -780,8 +771,6 @@ pub fn insert_emulated_on_update_with_intermediary_node(
 
     let join_node = graph.create_node(Flow::Return(None));
 
-    dbg!(&model_to_update.primary_identifier());
-
     graph.create_edge(
         &parent_node,
         &join_node,
@@ -798,7 +787,6 @@ pub fn insert_emulated_on_update_with_intermediary_node(
     )?;
 
     for rf in relation_fields {
-        dbg!(&rf.relation().on_update());
         match rf.relation().on_update() {
             ReferentialAction::NoAction => continue, // Explicitly do nothing.
             ReferentialAction::Restrict => emulate_restrict(graph, &rf, &join_node, child_node)?,
@@ -831,7 +819,6 @@ pub fn insert_emulated_on_update(
     let relation_fields = internal_model.fields_pointing_to_model(model_to_update, has_fks);
 
     for rf in relation_fields {
-        dbg!(&rf.relation().on_update());
         match rf.relation().on_update() {
             ReferentialAction::NoAction => continue, // Explicitly do nothing.
             ReferentialAction::Restrict => emulate_restrict(graph, &rf, &parent_node, child_node)?,

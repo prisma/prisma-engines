@@ -61,25 +61,12 @@ impl ExpressionResult {
                 _ => None,
             },
 
-            Self::RawProjections(p) => {
-                dbg!(&p);
-                dbg!(&model_projection);
-
-                let res = p
-                    .clone()
-                    .into_iter()
-                    .map(|p| {
-                        let assim = model_projection.assimilate(p);
-                        dbg!(&assim);
-                        assim
-                    })
-                    .collect::<std::result::Result<Vec<_>, _>>()
-                    .ok();
-
-                dbg!(&res);
-
-                res
-            }
+            Self::RawProjections(p) => p
+                .clone()
+                .into_iter()
+                .map(|p| model_projection.assimilate(p))
+                .collect::<std::result::Result<Vec<_>, _>>()
+                .ok(),
 
             _ => None,
         };
