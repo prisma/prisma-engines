@@ -169,10 +169,10 @@ dev-mongodb_4_4: start-mongodb_4_4
 	echo 'mongodb' > current_connector
 	cp $(CONFIG_PATH)/mongodb44 $(CONFIG_FILE)
 
-start-mongodb5:
+start-mongodb_5:
 	docker-compose -f docker-compose.yml up -d --remove-orphans mongo5
 
-dev-mongodb5: start-mongodb5
+dev-mongodb_5: start-mongodb_5
 	echo 'mongodb' > current_connector
 	cp $(CONFIG_PATH)/mongodb5 $(CONFIG_FILE)
 
