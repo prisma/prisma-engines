@@ -117,19 +117,15 @@ mod one2one_opt {
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", child: { create: { id: 1 }}}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation { createOneParent(data: { id: 2, uniq: "2", child: { create: { id: 2 }}}) { id }}"#),
-          @r###"{"data":{"createOneParent":{"id":2}}}"###
-        );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation { updateManyParent(data: { uniq: "u1" }) { count }}"#),
-          @r###"{"data":{"updateManyParent":{"count":2}}}"###
+          run_query!(&runner, r#"mutation { updateManyParent(where: { id: 1 }, data: { uniq: "u1" }) { count }}"#),
+          @r###"{"data":{"updateManyParent":{"count":1}}}"###
         );
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"query { findManyChild { id parent_uniq }}"#),
-          @r###"{"data":{"findManyChild":[{"id":1,"parent_uniq":null},{"id":2,"parent_uniq":null}]}}"###
+          @r###"{"data":{"findManyChild":[{"id":1,"parent_uniq":null}]}}"###
         );
 
         Ok(())
@@ -296,19 +292,15 @@ mod one2many_opt {
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation { createOneParent(data: { id: 2, uniq: "2", children: { create: { id: 2 }}}) { id }}"#),
-          @r###"{"data":{"createOneParent":{"id":2}}}"###
-        );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation { updateManyParent(data: { uniq: "u1" }) { count }}"#),
-          @r###"{"data":{"updateManyParent":{"count":2}}}"###
+          run_query!(&runner, r#"mutation { updateManyParent(where: { id: 2 }, data: { uniq: "u1" }) { count }}"#),
+          @r###"{"data":{"updateManyParent":{"count":1}}}"###
         );
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"query { findManyChild { id parent_uniq }}"#),
-          @r###"{"data":{"findManyChild":[{"id":1,"parent_uniq":null},{"id":2,"parent_uniq":null}]}}"###
+          @r###"{"data":{"findManyChild":[{"id":1,"parent_uniq":null}]}}"###
         );
 
         Ok(())
