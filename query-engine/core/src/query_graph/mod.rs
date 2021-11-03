@@ -219,7 +219,7 @@ impl QueryGraph {
     pub fn finalize(&mut self) -> QueryGraphResult<()> {
         if !self.finalized {
             self.swap_marked()?;
-            self.ensure_reload_has_parent_dependency()?;
+            self.ensure_return_nodes_have_parent_dependency()?;
             self.insert_reloads()?;
             self.normalize_if_nodes()?;
             self.finalized = true;
@@ -650,7 +650,7 @@ impl QueryGraph {
     }
 
     #[tracing::instrument(skip(self))]
-    fn ensure_reload_has_parent_dependency(&mut self) -> QueryGraphResult<()> {
+    fn ensure_return_nodes_have_parent_dependency(&mut self) -> QueryGraphResult<()> {
         let returns: Vec<NodeRef> = self
             .graph
             .node_indices()
