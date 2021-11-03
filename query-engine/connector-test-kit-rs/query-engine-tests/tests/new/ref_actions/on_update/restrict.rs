@@ -50,6 +50,62 @@ mod one2one_req {
 
         Ok(())
     }
+
+    /// Updating the parent must fail if a child is connected.
+    #[connector_test]
+    async fn update_many_parent_failure(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", child: { create: { id: 1 }}}) { id }}"#),
+          @r###"{"data":{"createOneParent":{"id":1}}}"###
+        );
+
+        let query = r#"mutation { updateManyParent(where: { id: 1 }, data: { uniq: "u1" }) { count }}"#;
+
+        match runner.connector() {
+            ConnectorTag::MongoDb(_) => assert_error!(
+                runner,
+                query,
+                2014,
+                "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+            ),
+            _ => assert_error!(
+                runner,
+                query,
+                2003,
+                "Foreign key constraint failed on the field"
+            ),
+        };
+
+        Ok(())
+    }
+
+    /// Updating the parent must fail if a child is connected.
+    #[connector_test]
+    async fn upsert_parent_failure(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", child: { create: { id: 1 }}}) { id }}"#),
+          @r###"{"data":{"createOneParent":{"id":1}}}"###
+        );
+
+        let query = r#"mutation { upsertOneParent(where: { id: 1 }, update: { uniq: "u1" }, create: { id: 1, uniq: "1", child: { create: { id: 1 }} }) { id }}"#;
+
+        match runner.connector() {
+            ConnectorTag::MongoDb(_) => assert_error!(
+                runner,
+                query,
+                2014,
+                "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+            ),
+            _ => assert_error!(
+                runner,
+                query,
+                2003,
+                "Foreign key constraint failed on the field"
+            ),
+        };
+
+        Ok(())
+    }
 }
 
 #[test_suite(suite = "restrict_onU_1to1_opt", schema(optional), exclude(SqlServer))]
@@ -81,6 +137,62 @@ mod one2one_opt {
         );
 
         let query = r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#;
+
+        match runner.connector() {
+            ConnectorTag::MongoDb(_) => assert_error!(
+                runner,
+                query,
+                2014,
+                "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+            ),
+            _ => assert_error!(
+                runner,
+                query,
+                2003,
+                "Foreign key constraint failed on the field"
+            ),
+        };
+
+        Ok(())
+    }
+
+    /// Updating the parent must fail if a child is connected.
+    #[connector_test]
+    async fn update_many_parent_failure(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", child: { create: { id: 1 }}}) { id }}"#),
+          @r###"{"data":{"createOneParent":{"id":1}}}"###
+        );
+
+        let query = r#"mutation { updateManyParent(where: { id: 1 }, data: { uniq: "u1" }) { count }}"#;
+
+        match runner.connector() {
+            ConnectorTag::MongoDb(_) => assert_error!(
+                runner,
+                query,
+                2014,
+                "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+            ),
+            _ => assert_error!(
+                runner,
+                query,
+                2003,
+                "Foreign key constraint failed on the field"
+            ),
+        };
+
+        Ok(())
+    }
+
+    /// Updating the parent must fail if a child is connected.
+    #[connector_test]
+    async fn upsert_parent_failure(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", child: { create: { id: 1 }}}) { id }}"#),
+          @r###"{"data":{"createOneParent":{"id":1}}}"###
+        );
+
+        let query = r#"mutation { upsertOneParent(where: { id: 1 }, update: { uniq: "u1" }, create: { id: 1, uniq: "1", child: { create: { id: 1 }} }) { id }}"#;
 
         match runner.connector() {
             ConnectorTag::MongoDb(_) => assert_error!(
@@ -175,6 +287,62 @@ mod one2many_req {
         Ok(())
     }
 
+    /// Updating the parent must fail if a child is connected.
+    #[connector_test]
+    async fn update_many_parent_failure(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
+          @r###"{"data":{"createOneParent":{"id":1}}}"###
+        );
+
+        let query = r#"mutation { updateManyParent(where: { id: 1 }, data: { uniq: "u1" }) { count }}"#;
+
+        match runner.connector() {
+            ConnectorTag::MongoDb(_) => assert_error!(
+                runner,
+                query,
+                2014,
+                "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+            ),
+            _ => assert_error!(
+                runner,
+                query,
+                2003,
+                "Foreign key constraint failed on the field"
+            ),
+        };
+
+        Ok(())
+    }
+
+    /// Updating the parent must fail if a child is connected.
+    #[connector_test]
+    async fn upsert_parent_failure(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
+          @r###"{"data":{"createOneParent":{"id":1}}}"###
+        );
+
+        let query = r#"mutation { upsertOneParent(where: { id: 1 }, update: { uniq: "u1" }, create: { id: 1, uniq: "1", children: { create: { id: 1 }} }) { id }}"#;
+
+        match runner.connector() {
+            ConnectorTag::MongoDb(_) => assert_error!(
+                runner,
+                query,
+                2014,
+                "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+            ),
+            _ => assert_error!(
+                runner,
+                query,
+                2003,
+                "Foreign key constraint failed on the field"
+            ),
+        };
+
+        Ok(())
+    }
+
     /// Updating the parent succeeds if no child is connected.
     #[connector_test]
     async fn update_parent(runner: Runner) -> TestResult<()> {
@@ -231,6 +399,62 @@ mod one2many_opt {
         );
 
         let query = r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#;
+
+        match runner.connector() {
+            ConnectorTag::MongoDb(_) => assert_error!(
+                runner,
+                query,
+                2014,
+                "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+            ),
+            _ => assert_error!(
+                runner,
+                query,
+                2003,
+                "Foreign key constraint failed on the field"
+            ),
+        };
+
+        Ok(())
+    }
+
+    /// Updating the parent must fail if a child is connected.
+    #[connector_test]
+    async fn update_many_parent_failure(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
+          @r###"{"data":{"createOneParent":{"id":1}}}"###
+        );
+
+        let query = r#"mutation { updateManyParent(where: { id: 1 }, data: { uniq: "u1" }) { count }}"#;
+
+        match runner.connector() {
+            ConnectorTag::MongoDb(_) => assert_error!(
+                runner,
+                query,
+                2014,
+                "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+            ),
+            _ => assert_error!(
+                runner,
+                query,
+                2003,
+                "Foreign key constraint failed on the field"
+            ),
+        };
+
+        Ok(())
+    }
+
+    /// Updating the parent must fail if a child is connected.
+    #[connector_test]
+    async fn upsert_parent_failure(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
+          @r###"{"data":{"createOneParent":{"id":1}}}"###
+        );
+
+        let query = r#"mutation { upsertOneParent(where: { id: 1 }, update: { uniq: "u1" }, create: { id: 1, uniq: "1", children: { create: { id: 1 }} }) { id }}"#;
 
         match runner.connector() {
             ConnectorTag::MongoDb(_) => assert_error!(
