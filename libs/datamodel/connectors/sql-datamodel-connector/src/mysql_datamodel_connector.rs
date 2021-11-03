@@ -50,7 +50,7 @@ const TIMESTAMP_TYPE_NAME: &str = "Timestamp";
 const YEAR_TYPE_NAME: &str = "Year";
 const JSON_TYPE_NAME: &str = "Json";
 
-const NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION: &[&str] = &[
+const NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION_WITHOUT_LENGTH_LIMIT: &[&str] = &[
     TEXT_TYPE_NAME,
     LONG_TEXT_TYPE_NAME,
     MEDIUM_TEXT_TYPE_NAME,
@@ -313,12 +313,19 @@ impl Connector for MySqlDatamodelConnector {
 
     fn validate_model(&self, model: &Model, errors: &mut Vec<ConnectorError>) {
         for index_definition in model.indices.iter() {
-            let fields = index_definition.fields.iter().map(|f| model.find_field(f).unwrap());
-            for f in fields {
+            let fields = index_definition
+                .field_options
+                .iter()
+                .map(|(field, sort, length)| (model.find_field(field).unwrap(), sort, length));
+            for (f, _sort, length) in fields {
                 if let FieldType::Scalar(_, _, Some(native_type)) = f.field_type() {
                     let native_type_name = native_type.name.as_str();
 
-                    if NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name) {
+                    //TODO(matthias) this can add validation of the allowed length, this probably needs info on collation
+                    if NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION_WITHOUT_LENGTH_LIMIT
+                        .contains(&native_type_name)
+                        && length.is_none()
+                    {
                         if index_definition.is_unique() {
                             errors.push(
                                 self.native_instance_error(native_type.clone())
@@ -342,7 +349,9 @@ impl Connector for MySqlDatamodelConnector {
                 let field = model.find_field(id_field).unwrap();
                 if let FieldType::Scalar(_, _, Some(native_type)) = field.field_type() {
                     let native_type_name = native_type.name.as_str();
-                    if NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name) {
+                    if NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION_WITHOUT_LENGTH_LIMIT
+                        .contains(&native_type_name)
+                    {
                         errors.push(
                             self.native_instance_error(native_type.clone())
                                 .new_incompatible_native_type_with_id(),

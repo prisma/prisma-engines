@@ -1,3 +1,5 @@
+use barrel::types;
+use indoc::indoc;
 use introspection_engine_tests::test_api::*;
 
 #[test_connector(tags(Mysql))]
@@ -55,6 +57,37 @@ async fn a_table_with_partial_primary_key(api: &TestApi) -> TestResult {
     "#]];
 
     expected.assert_eq(&api.introspect_dml().await?);
+
+    Ok(())
+}
+
+#[test_connector(tags(Mysql))]
+async fn partial_indexes_should_work_on_mysql(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("Blog", move |t| {
+                t.add_column("id", types::primary());
+                t.add_column("int_col", types::integer());
+                t.inject_custom("blob_col mediumblob");
+                t.inject_custom("Index `partial_blob_col_index` (blob_col(10))");
+                t.inject_custom("Index `partial_compound` (blob_col(11), int_col)");
+            });
+        })
+        .await?;
+
+    let dm = indoc! {r##"
+        model Blog {
+          id                Int     @id @default(autoincrement())
+          int_col           Int
+          blob_col          Bytes?  @db.MediumBlob
+
+          @@index([blob_col(length: 10)], map: "partial_blob_col_index")
+          @@index([blob_col(length: 11), int_col], map: "partial_compound")
+        }
+    "##};
+
+    let result = &api.introspect().await?;
+    api.assert_eq_datamodels(dm, result);
 
     Ok(())
 }
