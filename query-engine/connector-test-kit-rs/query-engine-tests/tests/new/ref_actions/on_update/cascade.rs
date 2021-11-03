@@ -138,6 +138,26 @@ mod one2one_opt {
           @r###"{"data":{"findManyParent":[{"uniq":2,"childOpt":{"parentUniq":2,"child2Opt":{"childUniq":2}}}]}}"###
         );
 
+        insta::assert_snapshot!(
+            run_query!(runner, r#"mutation { updateManyParent(where: { id: 1 }, data: { uniq: 3 }) { count } }"#),
+            @r###"{"data":{"updateManyParent":{"count":1}}}"###
+          );
+  
+          insta::assert_snapshot!(
+            run_query!(runner, r#"query { findManyParent { uniq childOpt { parentUniq child2Opt { childUniq } } } }"#),
+            @r###"{"data":{"findManyParent":[{"uniq":3,"childOpt":{"parentUniq":3,"child2Opt":{"childUniq":3}}}]}}"###
+          );
+
+          insta::assert_snapshot!(
+            run_query!(runner, r#"mutation { upsertOneParent(where: { id: 1 }, update: { uniq: 4 }, create: { id: 1, uniq: 1 }) { uniq } }"#),
+            @r###"{"data":{"upsertOneParent":{"uniq":4}}}"###
+          );
+  
+          insta::assert_snapshot!(
+            run_query!(runner, r#"query { findManyParent { uniq childOpt { parentUniq child2Opt { childUniq } } } }"#),
+            @r###"{"data":{"findManyParent":[{"uniq":4,"childOpt":{"parentUniq":4,"child2Opt":{"childUniq":4}}}]}}"###
+          );
+
         Ok(())
     }
 }
