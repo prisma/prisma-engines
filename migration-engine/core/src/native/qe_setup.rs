@@ -27,13 +27,17 @@ pub async fn run(prisma_schema: &str) -> CoreResult<()> {
             let api = SqlMigrationConnector::new(url, preview_features, None)?;
 
             // 2. create the database schema for given Prisma schema
-            let schema_push_input = SchemaPushInput {
-                schema: prisma_schema.to_string(),
-                assume_empty: true,
-                force: true,
+            {
+                let (config, schema) = crate::parse_schema(prisma_schema).unwrap();
+                let migration = api
+                    .diff(DiffTarget::Empty, DiffTarget::Datamodel((&config, &schema)))
+                    .await
+                    .unwrap();
+                api.database_migration_step_applier()
+                    .apply_migration(&migration)
+                    .await
+                    .unwrap();
             };
-
-            api.schema_push(&schema_push_input).await?;
         }
         provider if provider == MONGODB_SOURCE_NAME => {
             let connector = MongoDbMigrationConnector::new(url);

@@ -17,14 +17,11 @@ pub(crate) async fn schema_push(
         return Err(ConnectorError::user_facing(err));
     };
 
-    let from = if input.assume_empty {
-        DiffTarget::Empty
-    } else {
-        DiffTarget::Database
-    };
-
     let database_migration = connector
-        .diff(from, DiffTarget::Datamodel((&configuration, &datamodel)))
+        .diff(
+            DiffTarget::Database,
+            DiffTarget::Datamodel((&configuration, &datamodel)),
+        )
         .await?;
 
     let checks = checker.check(&database_migration).await?;
@@ -64,9 +61,6 @@ pub struct SchemaPushInput {
     pub schema: String,
     /// Push the schema ignoring destructive change warnings.
     pub force: bool,
-    /// Expect the schema to be empty, skipping describing the existing schema.
-    #[serde(default)]
-    pub assume_empty: bool,
 }
 
 /// Output of the `schemaPush` command.
