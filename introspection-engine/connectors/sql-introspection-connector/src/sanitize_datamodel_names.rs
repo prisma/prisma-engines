@@ -1,7 +1,7 @@
 use crate::SqlFamilyTrait;
 use datamodel::{
     reserved_model_names::is_reserved_type_name, Datamodel, DefaultKind, DefaultValue, Field, FieldType, Model,
-    ValueGenerator, WithDatabaseName, WithName,
+    SortOrder, ValueGenerator, WithDatabaseName, WithName,
 };
 use introspection_connector::IntrospectionContext;
 use once_cell::sync::Lazy;
@@ -52,7 +52,7 @@ fn sanitize_models(datamodel: &mut Datamodel, ctx: &IntrospectionContext) -> Has
         let model_db_name = model.database_name().map(|s| s.to_owned());
 
         if let Some(pk) = &mut model.primary_key {
-            pk.fields = sanitize_pk_strings(pk.fields.as_slice());
+            pk.fields = sanitize_pk_field_names(pk.fields.as_slice());
         }
 
         for field in model.fields_mut() {
@@ -65,8 +65,8 @@ fn sanitize_models(datamodel: &mut Datamodel, ctx: &IntrospectionContext) -> Has
                     info.name = sanitize_string(&info.name);
                     info.to = sanitize_string(&reformat_reserved_string(&info.to));
 
-                    info.references = sanitize_strings(&info.references);
-                    info.fields = sanitize_strings(&info.fields);
+                    info.references = sanitize_relation_field_names(&info.references);
+                    info.fields = sanitize_relation_field_names(&info.fields);
                 }
 
                 Field::ScalarField(sf) => {
@@ -123,7 +123,7 @@ fn sanitize_models(datamodel: &mut Datamodel, ctx: &IntrospectionContext) -> Has
         }
 
         for index in &mut model.indices {
-            index.fields = sanitize_strings(&index.fields);
+            index.fields = sanitize_index_field_names(&index.fields);
         }
     }
 
@@ -153,12 +153,18 @@ fn sanitize_enums(datamodel: &mut Datamodel, enum_renames: &HashMap<String, (Str
     }
 }
 
-fn sanitize_strings(strings: &[String]) -> Vec<String> {
+fn sanitize_relation_field_names(strings: &[String]) -> Vec<String> {
     strings.iter().map(|f| sanitize_string(f)).collect()
 }
 
-fn sanitize_pk_strings(strings: &[(String, Option<u32>)]) -> Vec<(String, Option<u32>)> {
+fn sanitize_pk_field_names(strings: &[(String, Option<u32>)]) -> Vec<(String, Option<u32>)> {
     strings.iter().map(|(f, l)| (sanitize_string(f), *l)).collect()
+}
+
+fn sanitize_index_field_names(
+    strings: &[(String, Option<SortOrder>, Option<u32>)],
+) -> Vec<(String, Option<SortOrder>, Option<u32>)> {
+    strings.iter().map(|(f, s, l)| (sanitize_string(f), *s, *l)).collect()
 }
 
 // Todo: This is now widely used, we can make this smarter at some point.

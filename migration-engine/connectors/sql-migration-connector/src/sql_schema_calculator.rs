@@ -59,7 +59,7 @@ fn calculate_model_tables<'a>(
             .indexes()
             .map(|index_definition: &IndexDefinition| {
                 let referenced_fields = index_definition
-                    .field_options
+                    .fields
                     .iter()
                     .map(|(field_name, sort, length)| {
                         let db_name = model

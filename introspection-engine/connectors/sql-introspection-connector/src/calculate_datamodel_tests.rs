@@ -388,8 +388,7 @@ mod tests {
                 indices: vec![IndexDefinition {
                     name: None,
                     db_name: Some("unique_unique".to_string()),
-                    fields: vec!["unique".to_string()],
-                    field_options: vec![("unique".to_string(), Some(SortOrder::Asc), None)],
+                    fields: vec![("unique".to_string(), Some(SortOrder::Asc), None)],
                     tpe: dml::IndexType::Unique,
                     defined_on_field: true,
                 }],
@@ -757,8 +756,7 @@ mod tests {
                 indices: vec![datamodel::dml::IndexDefinition {
                     name: None,
                     db_name: Some("name_last_name_unique".to_string()),
-                    fields: vec!["name".to_string(), "lastname".to_string()],
-                    field_options: vec![
+                    fields: vec![
                         ("name".to_string(), Some(SortOrder::Asc), None),
                         ("lastname".to_string(), Some(SortOrder::Asc), None),
                     ],

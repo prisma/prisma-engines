@@ -32,8 +32,7 @@ pub struct Model {
 pub struct IndexDefinition {
     pub name: Option<String>,
     pub db_name: Option<String>,
-    pub fields: Vec<String>,
-    pub field_options: Vec<(String, Option<SortOrder>, Option<u32>)>,
+    pub fields: Vec<(String, Option<SortOrder>, Option<u32>)>,
     pub tpe: IndexType,
     pub defined_on_field: bool,
 }
@@ -41,6 +40,10 @@ pub struct IndexDefinition {
 impl IndexDefinition {
     pub fn is_unique(&self) -> bool {
         matches!(self.tpe, IndexType::Unique)
+    }
+
+    pub fn fields_names(&self) -> Vec<&String> {
+        self.fields.iter().map(|(f, _, _)| f).collect()
     }
 }
 
@@ -274,7 +277,11 @@ impl Model {
                 .iter()
                 .filter(|id| id.is_unique())
                 .filter_map(|id| {
-                    let fields: Vec<_> = id.fields.iter().map(|f| self.find_scalar_field(f).unwrap()).collect();
+                    let fields: Vec<_> = id
+                        .fields
+                        .iter()
+                        .map(|(f, _, _)| self.find_scalar_field(f).unwrap())
+                        .collect();
                     let no_fields_are_ineligible = !fields.iter().any(|f| in_eligible(f));
                     let all_fields_are_required = fields.iter().all(|f| f.is_required());
                     ((all_fields_are_required || allow_optional) && no_fields_are_ineligible)
@@ -300,7 +307,7 @@ impl Model {
         let is_first_in_index = self
             .indices
             .iter()
-            .any(|index| index.fields.first().unwrap() == field_name);
+            .any(|index| index.fields.first().unwrap().0 == field_name);
 
         let is_first_in_primary_key = matches!(&self.primary_key, Some(PrimaryKeyDefinition{ fields, ..}) if fields.first().unwrap().0 == field_name);
 
@@ -332,13 +339,13 @@ impl Model {
     }
 
     pub fn field_is_unique(&self, name: &str) -> bool {
-        self.indices.iter().any(|i| i.is_unique() && i.fields == [name])
+        self.indices.iter().any(|i| i.is_unique() && i.fields_names() == [name])
     }
 
     pub fn field_is_unique_and_defined_on_field(&self, name: &str) -> bool {
         self.indices
             .iter()
-            .any(|i| i.is_unique() && i.fields == [name] && i.defined_on_field)
+            .any(|i| i.is_unique() && i.fields_names() == [name] && i.defined_on_field)
     }
 
     pub fn field_is_primary(&self, field_name: &str) -> bool {

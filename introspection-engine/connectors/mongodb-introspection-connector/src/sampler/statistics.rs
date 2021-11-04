@@ -7,7 +7,7 @@ use bson::{Bson, Document};
 use convert_case::{Case, Casing};
 use datamodel::{
     CompositeType, CompositeTypeField, Datamodel, DefaultValue, Field, IndexDefinition, IndexType, Model,
-    NativeTypeInstance, PrimaryKeyDefinition, ScalarField, ScalarType, ValueGenerator, WithDatabaseName,
+    NativeTypeInstance, PrimaryKeyDefinition, ScalarField, ScalarType, SortOrder, ValueGenerator, WithDatabaseName,
 };
 use introspection_connector::Warning;
 use mongodb::IndexModel;
@@ -441,15 +441,18 @@ fn add_indices_to_models(models: &mut BTreeMap<String, Model>, indices: &mut BTr
             let fields = index
                 .keys
                 .into_iter()
-                .map(|(k, _)| match sanitize_string(&k) {
-                    Some(sanitized) => sanitized,
-                    None => k,
+                .map(|(k, _)| {
+                    let name = match sanitize_string(&k) {
+                        Some(sanitized) => sanitized,
+                        None => k,
+                    };
+                    //TODO(matthias) collect actual order
+                    (name, Some(SortOrder::Asc), None)
                 })
                 .collect();
 
             model.add_index(IndexDefinition {
                 fields,
-                field_options: vec![], //TODO(matthias)
                 tpe,
                 defined_on_field,
                 name: None,

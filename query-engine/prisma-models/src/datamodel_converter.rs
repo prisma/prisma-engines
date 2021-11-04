@@ -150,7 +150,7 @@ impl<'a> DatamodelConverter<'a> {
             .filter(|i| i.fields.len() > 1 && model.is_compound_index_supported(i)) // @@unique for 1 field are transformed to is_unique instead
             .map(|i| IndexTemplate {
                 name: i.name.clone(),
-                fields: i.fields.clone(),
+                fields: i.fields.clone().into_iter().map(|(f, _, _)| f).collect(),
                 typ: match i.tpe {
                     dml::IndexType::Unique => IndexType::Unique,
                     dml::IndexType::Normal => IndexType::Normal,
@@ -420,7 +420,7 @@ impl ModelConverterUtilities for dml::Model {
     }
 
     fn is_compound_index_supported(&self, index: &dml::IndexDefinition) -> bool {
-        index.fields.iter().all(|field_name| {
+        index.fields.iter().all(|(field_name, _, _)| {
             let field = self.find_field(field_name).unwrap();
             let is_supported = match field {
                 dml::Field::ScalarField(sf) => sf.type_identifier() != TypeIdentifier::Unsupported,

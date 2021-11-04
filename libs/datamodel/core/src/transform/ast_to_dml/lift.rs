@@ -284,12 +284,6 @@ impl<'a> LiftAstToDml<'a> {
                 name: idx.attribute().name.map(String::from),
                 db_name: Some(idx.final_database_name().into_owned()),
                 fields: idx
-                    .attribute()
-                    .fields
-                    .iter()
-                    .map(|id| self.db.ast()[model_id][*id].name.name.clone())
-                    .collect(),
-                field_options: idx
                     .field_options()
                     .map(|(field, sort, length)| (field.name.name.to_owned(), sort, length))
                     .collect(),

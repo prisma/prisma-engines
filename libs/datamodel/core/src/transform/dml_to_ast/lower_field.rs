@@ -115,7 +115,7 @@ impl<'a> LowerDmlToAst<'a> {
                 if let Some(idx) = model
                     .indices
                     .iter()
-                    .find(|id| id.is_unique() && id.defined_on_field && id.fields == [field.name()])
+                    .find(|id| id.is_unique() && id.defined_on_field && id.fields_names() == [field.name()])
                 {
                     self.push_field_index_arguments(model, idx, &mut arguments)
                 }

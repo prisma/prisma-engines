@@ -386,8 +386,7 @@ fn implicit_unique_constraint_on_one_to_one() {
     schema.assert_has_model("Post").assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("PostMap_user_id_map_on_post_key".to_string()),
-        fields: vec!["user_id".to_string()],
-        field_options: vec![("user_id".to_string(), Some(SortOrder::Asc), None)],
+        fields: vec![("user_id".to_string(), Some(SortOrder::Asc), None)],
         tpe: IndexType::Unique,
         defined_on_field: true,
     });
@@ -429,8 +428,7 @@ fn implicit_unique_constraint_on_compound_one_to_one() {
     schema.assert_has_model("Post").assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("Post_user_id_1_user_id_2_key".to_string()),
-        fields: vec!["user_id_1".to_string(), "user_id_2".to_string()],
-        field_options: vec![
+        fields: vec![
             ("user_id_1".to_string(), Some(SortOrder::Asc), None),
             ("user_id_2".to_string(), Some(SortOrder::Asc), None),
         ],

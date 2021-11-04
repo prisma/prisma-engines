@@ -1,4 +1,6 @@
-use crate::introspection_helpers::{replace_field_names, replace_pk_field_names};
+use crate::introspection_helpers::{
+    replace_index_field_names, replace_pk_field_names, replace_relationinfo_field_names,
+};
 use crate::{warnings::*, SqlFamilyTrait};
 use datamodel::{Datamodel, DefaultValue, Field, FieldType, Ignorable, ValueGenerator, WithName};
 use introspection_connector::{IntrospectionContext, Warning};
@@ -306,10 +308,10 @@ fn merge_changed_scalar_key_names(
         }
 
         for index in &mut model.indices {
-            replace_field_names(&mut index.fields, &changed_field_name.0.field, &changed_field_name.1);
+            replace_index_field_names(&mut index.fields, &changed_field_name.0.field, &changed_field_name.1);
         }
         for field in model.relation_fields_mut() {
-            replace_field_names(
+            replace_relationinfo_field_names(
                 &mut field.relation_info.fields,
                 &changed_field_name.0.field,
                 &changed_field_name.1,
@@ -322,7 +324,7 @@ fn merge_changed_scalar_key_names(
         let fields_to_be_changed = new_data_model.find_relation_fields_for_model(&changed_field_name.0.model);
         for f in fields_to_be_changed {
             let field = new_data_model.find_relation_field_mut(&f.0, &f.1);
-            replace_field_names(
+            replace_relationinfo_field_names(
                 &mut field.relation_info.references,
                 &changed_field_name.0.field,
                 &changed_field_name.1,

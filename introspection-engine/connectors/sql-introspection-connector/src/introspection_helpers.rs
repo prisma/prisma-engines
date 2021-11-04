@@ -137,8 +137,7 @@ pub(crate) fn calculate_index(index: &Index) -> IndexDefinition {
     IndexDefinition {
         name: None,
         db_name: Some(index.name.clone()),
-        fields: index.columns.clone().into_iter().map(|(name, _, _)| name).collect(),
-        field_options: index
+        fields: index
             .columns
             .clone()
             .into_iter()
@@ -449,7 +448,7 @@ pub fn columns_match(a_cols: &[String], b_cols: &[String]) -> bool {
     a_cols.len() == b_cols.len() && a_cols.iter().all(|a_col| b_cols.iter().any(|b_col| a_col == b_col))
 }
 
-pub fn replace_field_names(target: &mut Vec<String>, old_name: &str, new_name: &str) {
+pub fn replace_relationinfo_field_names(target: &mut Vec<String>, old_name: &str, new_name: &str) {
     target
         .iter_mut()
         .map(|v| {
@@ -464,6 +463,21 @@ pub fn replace_pk_field_names(target: &mut Vec<(String, Option<u32>)>, old_name:
     target
         .iter_mut()
         .map(|(v, _)| {
+            if v == old_name {
+                *v = new_name.to_string()
+            }
+        })
+        .for_each(drop);
+}
+
+pub fn replace_index_field_names(
+    target: &mut Vec<(String, Option<SortOrder>, Option<u32>)>,
+    old_name: &str,
+    new_name: &str,
+) {
+    target
+        .iter_mut()
+        .map(|(v, _, _)| {
             if v == old_name {
                 *v = new_name.to_string()
             }

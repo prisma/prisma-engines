@@ -279,7 +279,10 @@ impl Connector for MsSqlDatamodelConnector {
 
     fn validate_model(&self, model: &Model, errors: &mut Vec<ConnectorError>) {
         for index_definition in model.indices.iter() {
-            let fields = index_definition.fields.iter().map(|f| model.find_field(f).unwrap());
+            let fields = index_definition
+                .fields
+                .iter()
+                .map(|(f, _, _)| model.find_field(f).unwrap());
 
             for field in fields {
                 if let FieldType::Scalar(_, _, Some(native_type)) = field.field_type() {

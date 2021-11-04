@@ -20,8 +20,7 @@ fn basic_index_must_work() {
     user_model.assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("User_firstName_lastName_idx".to_string()),
-        fields: vec!["firstName".to_string(), "lastName".to_string()],
-        field_options: vec![
+        fields: vec![
             ("firstName".to_string(), Some(SortOrder::Asc), None),
             ("lastName".to_string(), Some(SortOrder::Asc), None),
         ],
@@ -51,8 +50,7 @@ fn indexes_on_enum_fields_must_work() {
     user_model.assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("User_role_idx".to_string()),
-        fields: vec!["role".to_string()],
-        field_options: vec![("role".to_string(), Some(SortOrder::Asc), None)],
+        fields: vec![("role".to_string(), Some(SortOrder::Asc), None)],
         tpe: IndexType::Normal,
         defined_on_field: false,
     });
@@ -76,8 +74,7 @@ fn the_name_argument_must_work() {
     user_model.assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("MyIndexName".to_string()),
-        fields: vec!["firstName".to_string(), "lastName".to_string()],
-        field_options: vec![
+        fields: vec![
             ("firstName".to_string(), Some(SortOrder::Asc), None),
             ("lastName".to_string(), Some(SortOrder::Asc), None),
         ],
@@ -108,8 +105,7 @@ fn the_map_argument_must_work() {
     user_model.assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("MyIndexName".to_string()),
-        fields: vec!["firstName".to_string(), "lastName".to_string()],
-        field_options: vec![
+        fields: vec![
             ("firstName".to_string(), Some(SortOrder::Asc), None),
             ("lastName".to_string(), Some(SortOrder::Asc), None),
         ],
@@ -137,8 +133,7 @@ fn multiple_index_must_work() {
     user_model.assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("User_firstName_lastName_idx".to_string()),
-        fields: vec!["firstName".to_string(), "lastName".to_string()],
-        field_options: vec![
+        fields: vec![
             ("firstName".to_string(), Some(SortOrder::Asc), None),
             ("lastName".to_string(), Some(SortOrder::Asc), None),
         ],
@@ -149,8 +144,7 @@ fn multiple_index_must_work() {
     user_model.assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("MyIndexName".to_string()),
-        fields: vec!["firstName".to_string(), "lastName".to_string()],
-        field_options: vec![
+        fields: vec![
             ("firstName".to_string(), Some(SortOrder::Asc), None),
             ("lastName".to_string(), Some(SortOrder::Asc), None),
         ],
@@ -200,8 +194,7 @@ fn index_accepts_three_different_notations() {
     user_model.assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("OtherIndexName".to_string()),
-        fields: vec!["firstName".to_string(), "lastName".to_string()],
-        field_options: vec![
+        fields: vec![
             ("firstName".to_string(), Some(SortOrder::Asc), None),
             ("lastName".to_string(), Some(SortOrder::Asc), None),
         ],
@@ -212,8 +205,7 @@ fn index_accepts_three_different_notations() {
     user_model.assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("MyIndexName".to_string()),
-        fields: vec!["firstName".to_string(), "lastName".to_string()],
-        field_options: vec![
+        fields: vec![
             ("firstName".to_string(), Some(SortOrder::Asc), None),
             ("lastName".to_string(), Some(SortOrder::Asc), None),
         ],
@@ -224,8 +216,7 @@ fn index_accepts_three_different_notations() {
     user_model.assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("User_firstName_lastName_idx".to_string()),
-        fields: vec!["firstName".to_string(), "lastName".to_string()],
-        field_options: vec![
+        fields: vec![
             ("firstName".to_string(), Some(SortOrder::Asc), None),
             ("lastName".to_string(), Some(SortOrder::Asc), None),
         ],
@@ -257,8 +248,7 @@ fn index_accepts_sort_order() {
     user_model.assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("User_firstName_key".to_string()),
-        fields: vec!["firstName".to_string()],
-        field_options: vec![("firstName".to_string(), Some(SortOrder::Desc), Some(5))],
+        fields: vec![("firstName".to_string(), Some(SortOrder::Desc), Some(5))],
         tpe: IndexType::Unique,
         defined_on_field: true,
     });
@@ -266,8 +256,7 @@ fn index_accepts_sort_order() {
     user_model.assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("User_middleName_key".to_string()),
-        fields: vec!["middleName".to_string()],
-        field_options: vec![("middleName".to_string(), Some(SortOrder::Desc), None)],
+        fields: vec![("middleName".to_string(), Some(SortOrder::Desc), None)],
         tpe: IndexType::Unique,
         defined_on_field: true,
     });
@@ -275,8 +264,7 @@ fn index_accepts_sort_order() {
     user_model.assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("User_lastName_key".to_string()),
-        fields: vec!["lastName".to_string()],
-        field_options: vec![("lastName".to_string(), Some(SortOrder::Asc), Some(5))],
+        fields: vec![("lastName".to_string(), Some(SortOrder::Asc), Some(5))],
         tpe: IndexType::Unique,
         defined_on_field: true,
     });
@@ -284,8 +272,7 @@ fn index_accepts_sort_order() {
     user_model.assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("User_generation_key".to_string()),
-        fields: vec!["generation".to_string()],
-        field_options: vec![("generation".to_string(), Some(SortOrder::Asc), None)],
+        fields: vec![("generation".to_string(), Some(SortOrder::Asc), None)],
         tpe: IndexType::Unique,
         defined_on_field: true,
     });
@@ -294,12 +281,6 @@ fn index_accepts_sort_order() {
         name: None,
         db_name: Some("User_firstName_middleName_lastName_generation_idx".to_string()),
         fields: vec![
-            "firstName".to_string(),
-            "middleName".to_string(),
-            "lastName".to_string(),
-            "generation".to_string(),
-        ],
-        field_options: vec![
             ("firstName".to_string(), Some(SortOrder::Desc), None),
             ("middleName".to_string(), Some(SortOrder::Asc), Some(5)),
             ("lastName".to_string(), Some(SortOrder::Desc), Some(5)),
@@ -313,12 +294,6 @@ fn index_accepts_sort_order() {
         name: None,
         db_name: Some("User_firstName_middleName_lastName_generation_key".to_string()),
         fields: vec![
-            "firstName".to_string(),
-            "middleName".to_string(),
-            "lastName".to_string(),
-            "generation".to_string(),
-        ],
-        field_options: vec![
             ("firstName".to_string(), Some(SortOrder::Desc), None),
             ("middleName".to_string(), Some(SortOrder::Asc), Some(6)),
             ("lastName".to_string(), Some(SortOrder::Desc), Some(6)),

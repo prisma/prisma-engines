@@ -314,7 +314,7 @@ impl Connector for MySqlDatamodelConnector {
     fn validate_model(&self, model: &Model, errors: &mut Vec<ConnectorError>) {
         for index_definition in model.indices.iter() {
             let fields = index_definition
-                .field_options
+                .fields
                 .iter()
                 .map(|(field, sort, length)| (model.find_field(field).unwrap(), sort, length));
             for (f, _sort, length) in fields {

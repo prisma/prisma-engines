@@ -47,7 +47,7 @@ impl<'a> LowerDmlToAst<'a> {
             .for_each(|index_def| {
                 let mut args = vec![ast::Argument::new_array(
                     "",
-                    LowerDmlToAst::index_field_array(&index_def.field_options),
+                    LowerDmlToAst::index_field_array(&index_def.fields),
                 )];
 
                 if let Some(name) = &index_def.name {
@@ -67,7 +67,7 @@ impl<'a> LowerDmlToAst<'a> {
             .for_each(|index_def| {
                 let mut args = vec![ast::Argument::new_array(
                     "",
-                    LowerDmlToAst::index_field_array(&index_def.field_options),
+                    LowerDmlToAst::index_field_array(&index_def.fields),
                 )];
 
                 self.push_model_index_map(model, index_def, &mut args);
@@ -92,7 +92,7 @@ impl<'a> LowerDmlToAst<'a> {
         index_def: &IndexDefinition,
         args: &mut Vec<Argument>,
     ) {
-        let (_field, sort, length) = index_def.field_options.first().unwrap();
+        let (_field, sort, length) = index_def.fields.first().unwrap();
 
         if let Some(src) = self.datasource {
             if !ConstraintNames::index_name_matches(index_def, model, &*src.active_connector) {
