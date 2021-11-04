@@ -317,13 +317,17 @@ impl Expressionista {
         let node = graph.pluck_node(node);
         let expr = Self::transform_node(graph, parent_edges, node, into_expr)?;
 
-        Ok(Expression::Let {
-            bindings: vec![Binding {
-                name: node_binding_name,
-                expr,
-            }],
-            expressions: child_expressions,
-        })
+        if child_expressions.is_empty() {
+            Ok(expr)
+        } else {
+            Ok(Expression::Let {
+                bindings: vec![Binding {
+                    name: node_binding_name,
+                    expr,
+                }],
+                expressions: child_expressions,
+            })
+        }
     }
 
     /// Runs transformer functions (e.g. `ParentIdsFn`) via `Expression::Func` if necessary, or if none present,
