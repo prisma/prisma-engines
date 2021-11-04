@@ -294,7 +294,7 @@ mod one2many_opt {
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation { updateManyParent(where: { id: 2 }, data: { uniq: "u1" }) { count }}"#),
+          run_query!(&runner, r#"mutation { updateManyParent(where: { id: 1 }, data: { uniq: "u1" }) { count }}"#),
           @r###"{"data":{"updateManyParent":{"count":1}}}"###
         );
 
