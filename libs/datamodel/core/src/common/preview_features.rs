@@ -61,6 +61,7 @@ features!(
     NamedConstraints,
     FullTextSearch,
     DataProxy,
+    ExtendedIndexes,
 );
 
 // Mapping of which active, deprecated and hidden
@@ -76,6 +77,7 @@ pub static GENERATOR: Lazy<FeatureMap> = Lazy::new(|| {
             InteractiveTransactions,
             FullTextSearch,
             DataProxy,
+            ExtendedIndexes,
         ])
         .with_deprecated(vec![
             AtomicNumberOperations,
