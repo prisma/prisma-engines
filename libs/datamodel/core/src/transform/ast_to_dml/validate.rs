@@ -1,7 +1,9 @@
 #![allow(clippy::suspicious_operation_groupings)] // clippy is wrong there
 
 use crate::{
-    ast, configuration,
+    ast,
+    common::provider_names::MONGODB_SOURCE_NAME,
+    configuration,
     diagnostics::{DatamodelError, Diagnostics},
     dml,
 };
@@ -84,6 +86,16 @@ impl<'a> Validator<'a> {
         model: &dml::Model,
         errors: &mut Diagnostics,
     ) {
+        // see https://github.com/prisma/prisma/issues/10105
+        if self
+            .source
+            .as_ref()
+            .map(|source| source.provider == MONGODB_SOURCE_NAME)
+            .unwrap_or(false)
+        {
+            return;
+        }
+
         for field in model.relation_fields() {
             let ast_field = match ast_model.find_field(&field.name) {
                 Some(ast_field) => ast_field,
