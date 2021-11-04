@@ -305,4 +305,52 @@ mod one2many_opt {
 
         Ok(())
     }
+
+    fn optional_composite() -> String {
+        let schema = indoc! {
+            r#"model Parent {
+              #id(id, Int, @id)
+              name     String?
+              uniq_1   String?
+              uniq_2   String?
+              children Child[]
+            
+              @@unique([uniq_1, uniq_2])
+            }
+            
+            model Child {
+              #id(id, Int, @id)
+              name          String?
+              parent_uniq_1 String?
+              parent_uniq_2 String?
+              parent        Parent? @relation(fields: [parent_uniq_1, parent_uniq_2], references: [uniq_1, uniq_2], onUpdate: SetNull)
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(optional_composite))]
+    async fn update_composite_parent(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation {
+            createOneParent(data: { id: 1, uniq_1: "u1", uniq_2: "u2", children: { create: { id: 1 }}}) {
+              id
+            }
+          }"#),
+          @r###"{"data":{"createOneParent":{"id":1}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq_1: "u3" }) { id }}"#),
+          @r###"{"data":{"updateOneParent":{"id":1}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyChild { id parent_uniq_1 parent_uniq_2 }}"#),
+          @r###"{"data":{"findManyChild":[{"id":1,"parent_uniq_1":null,"parent_uniq_2":"u2"}]}}"###
+        );
+
+        Ok(())
+    }
 }
