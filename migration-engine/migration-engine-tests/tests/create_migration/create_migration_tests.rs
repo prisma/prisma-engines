@@ -641,9 +641,9 @@ fn create_constraint_name_tests_w_implicit_names(api: TestApi) {
                      `a` VARCHAR(191) NOT NULL,
                      `b` VARCHAR(191) NOT NULL,
                  
-                     UNIQUE INDEX `A_name_key`(`name`),
-                     INDEX `A_a_idx`(`a`),
-                     UNIQUE INDEX `A_a_b_key`(`a`, `b`),
+                     UNIQUE INDEX `A_name_key`(`name` ASC),
+                     INDEX `A_a_idx`(`a` ASC),
+                     UNIQUE INDEX `A_a_b_key`(`a` ASC, `b` ASC),
                      PRIMARY KEY (`id`)
                  ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
                  
@@ -653,7 +653,7 @@ fn create_constraint_name_tests_w_implicit_names(api: TestApi) {
                      `b` VARCHAR(191) NOT NULL,
                      `aId` INTEGER NOT NULL,
                  
-                     INDEX `B_a_b_idx`(`a`, `b`),
+                     INDEX `B_a_b_idx`(`a` ASC, `b` ASC),
                      PRIMARY KEY (`a`, `b`)
                  ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
                  
@@ -835,10 +835,10 @@ fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
                      `a` VARCHAR(191) NOT NULL,
                      `b` VARCHAR(191) NOT NULL,
                  
-                     UNIQUE INDEX `SingleUnique`(`name`),
-                     INDEX `SingleIndex`(`a`),
-                     UNIQUE INDEX `NamedCompoundUnique`(`a`, `b`),
-                     UNIQUE INDEX `UnNamedCompoundUnique`(`a`, `b`),
+                     UNIQUE INDEX `SingleUnique`(`name` ASC),
+                     INDEX `SingleIndex`(`a` ASC),
+                     UNIQUE INDEX `NamedCompoundUnique`(`a` ASC, `b` ASC),
+                     UNIQUE INDEX `UnNamedCompoundUnique`(`a` ASC, `b` ASC),
                      PRIMARY KEY (`id`)
                  ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
                  
@@ -848,7 +848,7 @@ fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
                      `b` VARCHAR(191) NOT NULL,
                      `aId` INTEGER NOT NULL,
                  
-                     INDEX `CompoundIndex`(`a`, `b`),
+                     INDEX `CompoundIndex`(`a` ASC, `b` ASC),
                      PRIMARY KEY (`a`, `b`)
                  ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
                  
