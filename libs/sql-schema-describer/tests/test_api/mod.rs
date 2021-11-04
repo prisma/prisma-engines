@@ -222,10 +222,8 @@ impl TableAssertion<'_> {
         self
     }
 
-    pub fn assert_pk_on_columns(&self, _columns: &[&str]) -> &Self {
-        //TODO(matthias)
-
-        // assert_eq!(self.table.primary_key().unwrap().columns, columns);
+    pub fn assert_pk_on_columns(&self, columns: &[&str]) -> &Self {
+        assert_eq!(self.table.primary_key().unwrap().column_names(), columns);
         self
     }
 }

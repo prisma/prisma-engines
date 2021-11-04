@@ -803,7 +803,6 @@ impl<'a> Reformatter<'a> {
             if idx > 0 {
                 target.write(", ");
             }
-            //TODO(matthias) get rid of the duplication?
             Self::render_argument(target, arg);
         }
         target.write(")");

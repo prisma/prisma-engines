@@ -52,13 +52,13 @@ impl IndexDefinition {
 pub struct PrimaryKeyDefinition {
     pub name: Option<String>,
     pub db_name: Option<String>,
-    pub fields: Vec<(String, Option<u32>)>, //TODO(matthias) unify this into fields and try to make it work with pk only for now
+    pub fields: Vec<(String, Option<u32>)>,
     pub defined_on_field: bool,
 }
 
 impl PrimaryKeyDefinition {
-    pub fn fields(self) -> Vec<String> {
-        self.fields.into_iter().map(|(field, _length)| field).collect()
+    pub fn field_names(&self) -> Vec<&String> {
+        self.fields.iter().map(|(field, _)| field).collect()
     }
 }
 

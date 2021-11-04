@@ -296,6 +296,10 @@ impl PrimaryKey {
         self.columns.len() == 1 && self.columns.iter().any(|(col, _)| col == column)
     }
 
+    pub fn column_names(&self) -> Vec<&String> {
+        self.columns.iter().map(|(col, _)| col).collect()
+    }
+
     pub fn resize_columns_if_necessary(&mut self, pos: i64) {
         if self.columns.len() < (pos + 1) as usize {
             self.columns.resize((pos + 1) as usize, ("".to_string(), None));
