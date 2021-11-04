@@ -130,6 +130,149 @@ mod one2one_opt {
 
         Ok(())
     }
+
+    fn one2one2one_opt_set_null() -> String {
+        let schema = indoc! {
+            r#"model A {
+              #id(id, Int, @id)
+              b_id Int? @unique
+              b B?
+            }
+            
+            model B {
+              #id(id, Int, @id)
+              a_id Int? @unique
+              a A? @relation(fields: [a_id], references: [b_id], onUpdate: SetNull)
+
+              c C?
+            }
+            
+            model C {
+              #id(id, Int, @id)
+              b_id Int? @unique
+              b B? @relation(fields: [b_id], references: [a_id])
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(one2one2one_opt_set_null))]
+    async fn update_parent_recurse_set_null(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation {
+            createOneA(data: {
+              id: 1,
+              b_id: 1,
+              b: {
+                create: {
+                  id: 1,
+                  c: {
+                    create: {
+                      id: 1
+                    }
+                  }
+                }
+              }
+            }) {
+              id
+            }
+          }"#),
+          @r###"{"data":{"createOneA":{"id":1}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation { updateOneA(where: { id: 1 }, data: { b_id: 2 }) { id } }"#),
+          @r###"{"data":{"updateOneA":{"id":1}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{ findManyB { id a_id } }"#),
+          @r###"{"data":{"findManyB":[{"id":1,"a_id":null}]}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{ findManyC { id b_id } }"#),
+          @r###"{"data":{"findManyC":[{"id":1,"b_id":null}]}}"###
+        );
+
+        Ok(())
+    }
+
+    fn one2one2one_opt_restrict() -> String {
+        let schema = indoc! {
+            r#"model A {
+            #id(id, Int, @id)
+            b_id Int? @unique
+            b B?
+          }
+          
+          model B {
+            #id(id, Int, @id)
+            a_id Int? @unique
+            a A? @relation(fields: [a_id], references: [b_id], onUpdate: SetNull)
+
+            c C?
+          }
+          
+          model C {
+            #id(id, Int, @id)
+            b_id Int? @unique
+            b B? @relation(fields: [b_id], references: [a_id], onUpdate: Restrict)
+          }"#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(one2one2one_opt_restrict))]
+    async fn update_parent_recurse_restrict_failure(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation {
+          createOneA(data: {
+            id: 1,
+            b_id: 1,
+            b: {
+              create: {
+                id: 1,
+                c: {
+                  create: {
+                    id: 1
+                  }
+                }
+              }
+            }
+          }) {
+            id
+          }
+        }"#),
+          @r###"{"data":{"createOneA":{"id":1}}}"###
+        );
+
+        let query = r#"mutation { updateOneA(where: { id: 1 }, data: { b_id: 2 }) { id } }"#;
+
+        match runner.connector() {
+          ConnectorTag::MongoDb(_) => assert_error!(
+              runner,
+              query,
+              2014,
+              "The change you are trying to make would violate the required relation 'BToC' between the `B` and `C` models."
+          ),
+          _ => assert_error!(
+              runner,
+              query,
+              2003,
+              "Foreign key constraint failed on the field"
+          ),
+        };
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{ findManyA { id b_id b { id a_id c { id b_id } } } }"#),
+          @r###"{"data":{"findManyA":[{"id":1,"b_id":1,"b":{"id":1,"a_id":1,"c":{"id":1,"b_id":1}}}]}}"###
+        );
+
+        Ok(())
+    }
 }
 
 #[test_suite(suite = "setnull_onU_1toM_req", schema(required), only(Postgres), exclude(Cockroach))]
@@ -306,7 +449,7 @@ mod one2many_opt {
         Ok(())
     }
 
-    fn optional_composite() -> String {
+    fn optional_compound_uniq() -> String {
         let schema = indoc! {
             r#"model Parent {
               #id(id, Int, @id)
@@ -330,8 +473,8 @@ mod one2many_opt {
         schema.to_owned()
     }
 
-    #[connector_test(schema(optional_composite))]
-    async fn update_composite_parent(runner: Runner) -> TestResult<()> {
+    #[connector_test(schema(optional_compound_uniq))]
+    async fn update_compound_parent(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {
             createOneParent(data: { id: 1, uniq_1: "u1", uniq_2: "u2", children: { create: { id: 1 }}}) {

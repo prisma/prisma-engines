@@ -330,7 +330,9 @@ pub fn insert_emulated_on_delete(
         match rf.relation().on_delete() {
             ReferentialAction::NoAction => continue, // Explicitly do nothing.
             ReferentialAction::Restrict => emulate_restrict(graph, &rf, parent_node, child_node)?,
-            ReferentialAction::SetNull => emulate_on_delete_set_null(graph, &rf, parent_node, child_node)?,
+            ReferentialAction::SetNull => {
+                emulate_on_delete_set_null(graph, connector_ctx, &rf, parent_node, child_node)?
+            }
             ReferentialAction::Cascade => {
                 emulate_on_delete_cascade(graph, &rf, connector_ctx, model_to_delete, parent_node, child_node)?
             }
@@ -532,6 +534,7 @@ pub fn emulate_on_delete_cascade(
 /// ```
 pub fn emulate_on_delete_set_null(
     graph: &mut QueryGraph,
+    connector_ctx: &ConnectorContext,
     relation_field: &RelationFieldRef,
     parent_node: &NodeRef,
     child_node: &NodeRef,
@@ -590,6 +593,14 @@ pub fn emulate_on_delete_set_null(
         QueryGraphDependency::ExecutionOrder,
     )?;
 
+    insert_emulated_on_delete(
+        graph,
+        connector_ctx,
+        &dependent_model,
+        &dependent_records_node,
+        &set_null_dependents_node,
+    )?;
+
     Ok(())
 }
 
@@ -631,9 +642,10 @@ pub fn emulate_on_delete_set_null(
 ///           Update        │◀ ┘
 ///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
 /// ```
-pub fn emulate_set_null(
+pub fn emulate_on_update_set_null(
     graph: &mut QueryGraph,
     relation_field: &RelationFieldRef,
+    connector_ctx: &ConnectorContext,
     parent_node: &NodeRef,
     child_node: &NodeRef,
 ) -> QueryGraphBuilderResult<()> {
@@ -702,6 +714,14 @@ pub fn emulate_set_null(
         &set_null_dependents_node,
         child_node,
         QueryGraphDependency::ExecutionOrder,
+    )?;
+
+    insert_emulated_on_update(
+        graph,
+        connector_ctx,
+        &dependent_model,
+        &dependent_records_node,
+        &set_null_dependents_node,
     )?;
 
     Ok(())
@@ -788,7 +808,9 @@ pub fn insert_emulated_on_update_with_intermediary_node(
         match rf.relation().on_update() {
             ReferentialAction::NoAction => continue, // Explicitly do nothing.
             ReferentialAction::Restrict => emulate_restrict(graph, &rf, &join_node, child_node)?,
-            ReferentialAction::SetNull => emulate_set_null(graph, &rf, &join_node, child_node)?,
+            ReferentialAction::SetNull => {
+                emulate_on_update_set_null(graph, &rf, connector_ctx, &join_node, child_node)?
+            }
             ReferentialAction::Cascade => emulate_on_update_cascade(graph, &rf, connector_ctx, &join_node, child_node)?,
             x => panic!("Unsupported referential action emulation: {}", x),
         }
@@ -820,7 +842,9 @@ pub fn insert_emulated_on_update(
         match rf.relation().on_update() {
             ReferentialAction::NoAction => continue, // Explicitly do nothing.
             ReferentialAction::Restrict => emulate_restrict(graph, &rf, &parent_node, child_node)?,
-            ReferentialAction::SetNull => emulate_set_null(graph, &rf, &parent_node, child_node)?,
+            ReferentialAction::SetNull => {
+                emulate_on_update_set_null(graph, &rf, connector_ctx, &parent_node, child_node)?
+            }
             ReferentialAction::Cascade => {
                 emulate_on_update_cascade(graph, &rf, connector_ctx, &parent_node, child_node)?
             }

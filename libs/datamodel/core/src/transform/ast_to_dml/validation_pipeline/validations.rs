@@ -15,8 +15,6 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, r
     let names = Names::new(db);
     let connector = db.active_connector();
 
-    let referential_integrity = db.datasource().map(|ds| ds.referential_integrity()).unwrap_or_default();
-
     for model in db.walk_models() {
         models::has_a_strict_unique_criteria(model, diagnostics);
         models::has_a_unique_primary_key_name(db, model, diagnostics);
