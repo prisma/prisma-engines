@@ -443,6 +443,9 @@ impl<'a> SqlSchemaDescriber<'a> {
             let index_name = row.get_expect_string("index_name");
             let length = row.get_u32("partial");
             let order = row.get_string("column_order");
+
+            //TODO(matthias) https://dev.mysql.com/doc/refman/5.7/en/create-index.html
+            // on 5.6 and 5.7 this is null in the db, but should probably return Asc for most indices
             let order = order.map(|v| match v.as_ref() {
                 "A" => SQLSortOrder::Asc,
                 "D" => SQLSortOrder::Desc,

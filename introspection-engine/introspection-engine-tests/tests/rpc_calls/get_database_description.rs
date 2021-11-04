@@ -30,7 +30,7 @@ async fn database_description_for_mysql_should_work(api: &TestApi) -> TestResult
 async fn database_description_for_mysql_8_should_work(api: &TestApi) -> TestResult {
     setup_blog(&api.barrel()).await?;
 
-    let expected = r#"{"tables":[{"name":"Blog","columns":[{"name":"id","tpe":{"full_data_type":"int","family":"Int","arity":"Required","native_type":"Int"},"default":null,"auto_increment":true},{"name":"string","tpe":{"full_data_type":"text","family":"String","arity":"Required","native_type":"Text"},"default":null,"auto_increment":false}],"indices":[],"primary_key":{"columns":["id"],"sequence":null,"constraint_name":null},"foreign_keys":[]}],"enums":[],"sequences":[],"views":[],"procedures":[],"user_defined_types":[]}"#;
+    let expected = r#"{"tables":[{"name":"Blog","columns":[{"name":"id","tpe":{"full_data_type":"int","family":"Int","arity":"Required","native_type":"Int"},"default":null,"auto_increment":true},{"name":"string","tpe":{"full_data_type":"text","family":"String","arity":"Required","native_type":"Text"},"default":null,"auto_increment":false}],"indices":[],"primary_key":{"columns":[["id", null]],"sequence":null,"constraint_name":null},"foreign_keys":[]}],"enums":[],"sequences":[],"views":[],"procedures":[],"user_defined_types":[]}"#;
 
     assert_eq_schema!(expected, api.get_database_description().await?);
 

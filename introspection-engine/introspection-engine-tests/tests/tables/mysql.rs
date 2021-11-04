@@ -45,12 +45,12 @@ async fn a_table_with_partial_primary_key(api: &TestApi) -> TestResult {
 
     let expected = expect![[r#"
         model Test {
-          id String @id(length: 100) @default("") @db.VarChar(3000)
+          id String @id(length: 100) @db.VarChar(3000)
         }
         
         model Test2 {
-          id_1 String @default("") @db.VarChar(3000)
-          id_2 String @default("") @db.VarChar(3000)
+          id_1 String @db.VarChar(3000)
+          id_2 String @db.VarChar(3000)
         
           @@id([id_1(length: 100), id_2(length: 10)])
         }
@@ -118,7 +118,7 @@ async fn a_table_with_partial_and_sorted_indices(api: &TestApi) -> TestResult {
           id_1 String @db.VarChar(3000)
           id_2 String @db.VarChar(3000)
         
-          @@unique([id_1(length: 100), id_2(length: 10)], map: "id_1")
+          @@unique([id_1(length: 100, sort: Desc), id_2(length: 10)], map: "id_1")
         }
     "#]];
 
