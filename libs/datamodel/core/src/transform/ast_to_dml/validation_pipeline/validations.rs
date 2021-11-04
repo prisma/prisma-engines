@@ -39,7 +39,6 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, r
 
             relation_fields::ignored_related_model(field, diagnostics);
             relation_fields::referential_actions(field, db, diagnostics);
-            relation_fields::on_update_without_foreign_keys(field, referential_integrity, diagnostics);
         }
 
         for index in model.indexes() {

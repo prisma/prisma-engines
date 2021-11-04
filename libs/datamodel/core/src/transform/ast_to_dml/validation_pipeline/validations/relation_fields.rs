@@ -114,32 +114,6 @@ pub(super) fn ambiguity(field: RelationFieldWalker<'_, '_>, names: &Names<'_>) -
     }
 }
 
-/// Validates usage of `onUpdate` with the `referentialIntegrity` set to
-/// `prisma`.
-///
-/// This is temporary to the point until Query Engine supports `onUpdate`
-/// actions on emulations.
-pub(super) fn on_update_without_foreign_keys(
-    field: RelationFieldWalker<'_, '_>,
-    referential_integrity: ReferentialIntegrity,
-    _diagnostics: &mut Diagnostics,
-) {
-    if referential_integrity.uses_foreign_keys() {
-        return;
-    }
-
-    if field
-        .attributes()
-        .on_update
-        .filter(|act| *act != ReferentialAction::NoAction)
-        .is_none()
-    {
-        return;
-    }
-
-    // TODO: Check if other validations are needed
-}
-
 /// Validates if the related model for the relation is ignored.
 pub(super) fn ignored_related_model(field: RelationFieldWalker<'_, '_>, diagnostics: &mut Diagnostics) {
     let related_model = field.related_model();
