@@ -649,9 +649,18 @@ impl QueryGraph {
         Ok(())
     }
 
+    /// Traverses the graph and ensures that return nodes have correct `ParentProjection` dependencies on their incoming edges.
+    ///
+    /// Steps:
+    /// - Collect & merge the outgoing edge dependencies into a single `ModelProjection`
+    /// - Transform the incoming edge dependencies of the return nodes with the merged outgoing edge dependencies of the previous step
+    ///
+    /// This ensures that children nodes of return nodes have the proper projections at their disposal.
+    /// In case the parent nodes of return nodes do not have a field selection that fullfils the new dependency,
+    /// a reload node will be inserted in between the parent and the return node by the `insert_reloads` method.
     #[tracing::instrument(skip(self))]
     fn ensure_return_nodes_have_parent_dependency(&mut self) -> QueryGraphResult<()> {
-        let returns: Vec<NodeRef> = self
+        let return_nodes: Vec<NodeRef> = self
             .graph
             .node_indices()
             .filter_map(|ix| {
@@ -664,8 +673,8 @@ impl QueryGraph {
             })
             .collect();
 
-        for node in returns {
-            let out_edges = self.outgoing_edges(&node);
+        for return_node in return_nodes {
+            let out_edges = self.outgoing_edges(&return_node);
             let dependencies: Vec<ModelProjection> = out_edges
                 .into_iter()
                 .filter_map(|edge| match self.edge_content(&edge).unwrap() {
@@ -679,7 +688,7 @@ impl QueryGraph {
 
             // Assumption: We currently always have at most one single incoming ParentProjection edge
             // connected to return nodes. This will break if we ever have more.
-            let in_edges = self.incoming_edges(&node);
+            let in_edges = self.incoming_edges(&return_node);
             let in_parent_projection_edge = in_edges.into_iter().find(|edge| {
                 matches!(
                     self.edge_content(edge),
