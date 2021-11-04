@@ -177,6 +177,8 @@ pub fn nested_upsert(
             &read_children_node,
             &update_node,
         )? {
+            graph.create_edge(&emulation_node, &update_node, QueryGraphDependency::ExecutionOrder)?;
+
             emulation_node
         } else {
             update_node

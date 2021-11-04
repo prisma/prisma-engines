@@ -103,14 +103,14 @@ pub fn update_many_records(
     let data_map: ParsedInputMap = data_argument.value.try_into()?;
 
     if connector_ctx.capabilities.contains(&ConnectorCapability::ForeignKeys) {
-        update_many_record_node(graph, connector_ctx, filter, model.clone(), data_map)?;
+        update_many_record_node(graph, connector_ctx, filter, model, data_map)?;
     } else {
-        let update_many_node = update_many_record_node(graph, connector_ctx, Filter::empty(), model.clone(), data_map)?;
         let pre_read_node = graph.create_node(utils::read_ids_infallible(
             model.clone(),
             model.primary_identifier(),
             filter,
         ));
+        let update_many_node = update_many_record_node(graph, connector_ctx, Filter::empty(), model.clone(), data_map)?;
 
         utils::insert_emulated_on_update(graph, connector_ctx, &model, &pre_read_node, &update_many_node)?;
 

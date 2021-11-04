@@ -667,8 +667,6 @@ pub fn emulate_set_null(
         .collect();
 
     if child_update_args.is_empty() {
-        graph.create_edge(&parent_node, &child_node, QueryGraphDependency::ExecutionOrder)?;
-
         return Ok(());
     }
 

@@ -118,21 +118,8 @@ pub fn upsert_record(
         &read_parent_records_node,
         &update_node,
     )? {
-        // graph.create_edge(
-        //     &emulation_node,
-        //     &update_node,
-        //     QueryGraphDependency::ParentProjection(
-        //         model_id.clone(),
-        //         Box::new(move |mut update_node, parent_ids| {
-        //             if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut wq))) = update_node {
-        //                 wq.record_filter = parent_ids.into();
-        //             }
-
-        //             Ok(update_node)
-        //         }),
-        //     ),
-        // )?;
         graph.create_edge(&if_node, &emulation_node, QueryGraphDependency::Then)?;
+        graph.create_edge(&emulation_node, &update_node, QueryGraphDependency::ExecutionOrder)?;
     } else {
         graph.create_edge(&if_node, &update_node, QueryGraphDependency::Then)?;
     }
