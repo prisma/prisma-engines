@@ -51,7 +51,9 @@ impl<'ast> ParserDatabase<'ast> {
     /// Iterate all complete relations that are not many to many and are
     /// correctly defined from both sides.
     #[track_caller]
-    pub(crate) fn walk_explicit_relations(&self) -> impl Iterator<Item = CompleteInlineRelationWalker<'ast, '_>> + '_ {
+    pub(crate) fn walk_complete_inline_relations(
+        &self,
+    ) -> impl Iterator<Item = CompleteInlineRelationWalker<'ast, '_>> + '_ {
         self.relations
             .iter_relations()
             .filter(|(_, _, relation)| !relation.is_many_to_many())

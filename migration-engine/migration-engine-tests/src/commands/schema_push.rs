@@ -39,7 +39,6 @@ impl<'a> SchemaPush<'a> {
         let input = SchemaPushInput {
             schema: self.schema,
             force: self.force,
-            assume_empty: false,
         };
 
         let fut = self

@@ -118,18 +118,13 @@ fn index_and_primary_cannot_have_same_name_on_sqlserver() {
           [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
         [1;94m 6 | [0mmodel User {
-        [1;94m 7 | [0m  id         Int @[1;91mid(map: "MyName")[0m
+        [1;94m 7 | [0m  id         Int @id([1;91mmap: "MyName"[0m)
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@index": The given constraint name `MyName` has to be unique in the following namespace: on model `User` for primary key, indexes and unique constraints. Please provide a different name using the `map` argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:6[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
-        [1;94m 5 | [0m
-        [1;94m 6 | [0m[1;91mmodel User {[0m
-        [1;94m 7 | [0m  id         Int @id(map: "MyName")
-        [1;94m 8 | [0m  test       Int
         [1;94m 9 | [0m
-        [1;94m10 | [0m  @@index([test], map: "MyName")
-        [1;94m11 | [0m}
+        [1;94m10 | [0m  @@index([test], [1;91mmap: "MyName"[0m)
         [1;94m   | [0m
     "#]];
 
@@ -154,28 +149,16 @@ fn index_and_unique_cannot_have_same_name_on_sqlserver() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@index": The given constraint name `MyName` has to be unique in the following namespace: on model `User` for primary key, indexes and unique constraints. Please provide a different name using the `map` argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:6[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
-        [1;94m 5 | [0m
-        [1;94m 6 | [0m[1;91mmodel User {[0m
-        [1;94m 7 | [0m  id         Int
-        [1;94m 8 | [0m  test       Int
         [1;94m 9 | [0m
-        [1;94m10 | [0m  @@index([test], map: "MyName")
-        [1;94m11 | [0m  @@unique([id], map: "MyName")
-        [1;94m12 | [0m}
+        [1;94m10 | [0m  @@index([test], [1;91mmap: "MyName"[0m)
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@unique": The given constraint name `MyName` has to be unique in the following namespace: on model `User` for primary key, indexes and unique constraints. Please provide a different name using the `map` argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:6[0m
+          [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
-        [1;94m 5 | [0m
-        [1;94m 6 | [0m[1;91mmodel User {[0m
-        [1;94m 7 | [0m  id         Int
-        [1;94m 8 | [0m  test       Int
-        [1;94m 9 | [0m
         [1;94m10 | [0m  @@index([test], map: "MyName")
-        [1;94m11 | [0m  @@unique([id], map: "MyName")
-        [1;94m12 | [0m}
+        [1;94m11 | [0m  @@unique([id], [1;91mmap: "MyName"[0m)
         [1;94m   | [0m
     "#]];
 
@@ -205,24 +188,16 @@ fn multiple_indexes_with_same_name_are_not_supported_by_postgres() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@index": The given constraint name `MyIndexName` has to be unique in the following namespace: global for primary key, indexes and unique constraints. Please provide a different name using the `map` argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:6[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
-        [1;94m 5 | [0m
-        [1;94m 6 | [0m[1;91mmodel User {[0m
-        [1;94m 7 | [0m  id         Int @id
         [1;94m 8 | [0m
-        [1;94m 9 | [0m  @@index([id], name: "MyIndexName")
-        [1;94m10 | [0m}
+        [1;94m 9 | [0m  @@index([id], [1;91mname: "MyIndexName"[0m)
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@index": The given constraint name `MyIndexName` has to be unique in the following namespace: global for primary key, indexes and unique constraints. Please provide a different name using the `map` argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:12[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
-        [1;94m11 | [0m
-        [1;94m12 | [0m[1;91mmodel Post {[0m
-        [1;94m13 | [0m  id Int @id
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@index([id], name: "MyIndexName")
-        [1;94m16 | [0m}
+        [1;94m15 | [0m  @@index([id], [1;91mname: "MyIndexName"[0m)
         [1;94m   | [0m
     "#]];
 
@@ -253,26 +228,16 @@ fn unique_indexes_with_same_name_are_not_supported_by_postgres() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@index": The given constraint name `MyIndexName` has to be unique in the following namespace: global for primary key, indexes and unique constraints. Please provide a different name using the `map` argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:6[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
-        [1;94m 5 | [0m
-        [1;94m 6 | [0m[1;91mmodel User {[0m
-        [1;94m 7 | [0m  id         Int @id
-        [1;94m 8 | [0m  neighborId Int
         [1;94m 9 | [0m
-        [1;94m10 | [0m  @@index([id], map: "MyIndexName")
-        [1;94m11 | [0m}
+        [1;94m10 | [0m  @@index([id], [1;91mmap: "MyIndexName"[0m)
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@unique": The given constraint name `MyIndexName` has to be unique in the following namespace: global for primary key, indexes and unique constraints. Please provide a different name using the `map` argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
+          [1;94m-->[0m  [4mschema.prisma:17[0m
         [1;94m   | [0m
-        [1;94m12 | [0m
-        [1;94m13 | [0m[1;91mmodel Post {[0m
-        [1;94m14 | [0m  id Int @id
-        [1;94m15 | [0m  optionId Int
         [1;94m16 | [0m
-        [1;94m17 | [0m  @@unique([id], map: "MyIndexName")
-        [1;94m18 | [0m}
+        [1;94m17 | [0m  @@unique([id], [1;91mmap: "MyIndexName"[0m)
         [1;94m   | [0m
     "#]];
 
@@ -303,7 +268,7 @@ fn foreign_keys_and_primary_keys_with_same_name_on_same_table_are_not_supported_
           [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
         [1;94m 6 | [0mmodel A {
-        [1;94m 7 | [0m  id  Int @[1;91mid(map: "foo")[0m
+        [1;94m 7 | [0m  id  Int @id([1;91mmap: "foo"[0m)
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": The given constraint name `foo` has to be unique in the following namespace: on model `A` for primary key, indexes, unique constraints and foreign keys. Please provide a different name using the `map` argument.[0m
           [1;94m-->[0m  [4mschema.prisma:9[0m
@@ -436,26 +401,16 @@ fn multiple_indexes_with_same_name_are_not_supported_by_sqlite() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@index": The given constraint name `MyIndexName` has to be unique in the following namespace: global for indexes and unique constraints. Please provide a different name using the `map` argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:6[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
-        [1;94m 5 | [0m
-        [1;94m 6 | [0m[1;91mmodel User {[0m
-        [1;94m 7 | [0m  id         Int @id
-        [1;94m 8 | [0m  neighborId Int
         [1;94m 9 | [0m
-        [1;94m10 | [0m  @@index([id], name: "MyIndexName")
-        [1;94m11 | [0m}
+        [1;94m10 | [0m  @@index([id], [1;91mname: "MyIndexName"[0m)
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@index": The given constraint name `MyIndexName` has to be unique in the following namespace: global for indexes and unique constraints. Please provide a different name using the `map` argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
+          [1;94m-->[0m  [4mschema.prisma:17[0m
         [1;94m   | [0m
-        [1;94m12 | [0m
-        [1;94m13 | [0m[1;91mmodel Post {[0m
-        [1;94m14 | [0m  id Int @id
-        [1;94m15 | [0m  optionId Int
         [1;94m16 | [0m
-        [1;94m17 | [0m  @@index([id], name: "MyIndexName")
-        [1;94m18 | [0m}
+        [1;94m17 | [0m  @@index([id], [1;91mname: "MyIndexName"[0m)
         [1;94m   | [0m
     "#]];
 

@@ -87,6 +87,7 @@ pub(super) fn model<'ast>(
     let (name, db_name) = {
         let db_name = primary_key_constraint_name(ast_model, args, "@@id", ctx);
         let name = super::get_name_argument(args, ctx);
+
         if let Some(err) = ConstraintNames::is_client_name_valid(args.span(), &ast_model.name.name, name, "@@id") {
             ctx.push_error(err);
         }
