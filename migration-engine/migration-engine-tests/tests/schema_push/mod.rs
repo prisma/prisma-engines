@@ -396,7 +396,7 @@ fn partial_primary_key_works(api: TestApi) {
       
       model B {
         id_1   String  @db.VarChar(3000)
-        id_2   String  
+        id_2   String  @db.VarChar(100)
         
         @@id([id_1(length: 30), id_2])
       }
@@ -412,4 +412,26 @@ fn partial_primary_key_works(api: TestApi) {
 
     api.assert_schema()
         .assert_table("B", |table| table.assert_pk(|pk| pk.assert_columns(&["id_1", "id_2"])));
+}
+
+#[test_connector(tags(Mysql))]
+fn partial_and_sorted_indices_work(api: TestApi) {
+    let dm = r#"
+      model A {
+        id   String  @unique(length: 30, sort: Desc) @db.VarChar(3000)
+      }
+      
+      model B {
+        id_1   String  @db.VarChar(3000)
+        id_2   String  @db.VarChar(100)
+        
+        @@unique([id_1(length: 30), id_2(sort: Desc)])
+        @@index([id_1(length: 30, sort: Desc), id_2])
+      }
+    "#;
+
+    api.schema_push_w_datasource(dm)
+        .send()
+        .assert_green()
+        .assert_has_executed_steps();
 }

@@ -1105,3 +1105,54 @@ fn alter_constraint_name(api: TestApi) {
             migration.assert_contents(expected_script)
         });
 }
+
+#[test_connector(tags(Mysql))]
+fn partial_and_sorted_mysql_indices(api: TestApi) {
+    let dm = r#"
+        datasource test {
+          provider = "mysql"
+          url = "mysql://unreachable:unreachable@example.com/unreachable"
+        }
+
+        model A {
+        id   String  @unique(length: 30, sort: Desc) @test.VarChar(3000)
+      }
+      
+      model B {
+        id_1   String  @test.VarChar(3000)
+        id_2   String  @test.VarChar(100)
+        
+        @@unique([id_1(length: 30), id_2(sort: Desc)])
+        @@index([id_1(length: 30, sort: Desc), id_2])
+      }
+    "#;
+
+    let dir = api.create_migrations_directory();
+
+    api.create_migration("create-cats", dm, &dir)
+        .send_sync()
+        .assert_migration_directories_count(1)
+        .assert_migration("create-cats", |migration| {
+            let expected_script = indoc! {
+                r#"
+                -- CreateTable
+                CREATE TABLE `A` (
+                    `id` VARCHAR(3000) NOT NULL,
+        
+                    UNIQUE INDEX `A_id_key`(`id`(30) DESC)
+                ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+                
+                -- CreateTable
+                CREATE TABLE `B` (
+                    `id_1` VARCHAR(3000) NOT NULL,
+                    `id_2` VARCHAR(100) NOT NULL,
+                
+                    INDEX `B_id_1_id_2_idx`(`id_1`(30) DESC, `id_2` ASC),
+                    UNIQUE INDEX `B_id_1_id_2_key`(`id_1`(30) ASC, `id_2` DESC)
+                ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+                "#
+            };
+
+            migration.assert_contents(expected_script)
+        });
+}
