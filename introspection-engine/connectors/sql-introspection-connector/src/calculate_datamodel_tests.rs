@@ -14,8 +14,8 @@ mod tests {
     use pretty_assertions::assert_eq;
     use sql_datamodel_connector::PostgresDatamodelConnector;
     use sql_schema_describer::{
-        Column, ColumnArity, ColumnType, ColumnTypeFamily, Enum, ForeignKey, ForeignKeyAction, Index, IndexType,
-        PrimaryKey, Sequence, SqlSchema, Table,
+        Column, ColumnArity, ColumnType, ColumnTypeFamily, Enum, ForeignKey, ForeignKeyAction, Index, IndexColumn,
+        IndexType, PrimaryKey, PrimaryKeyColumn, Sequence, SqlSchema, Table,
     };
 
     fn postgres_context() -> IntrospectionContext {
@@ -152,7 +152,7 @@ mod tests {
             ],
             indices: vec![],
             primary_key: Some(PrimaryKey {
-                columns: vec!["required".to_string()],
+                columns: vec![PrimaryKeyColumn::new("required")],
                 sequence: None,
                 constraint_name: None,
             }),
@@ -298,7 +298,7 @@ mod tests {
                 }],
                 indices: vec![],
                 primary_key: Some(PrimaryKey {
-                    columns: vec!["primary".to_string()],
+                    columns: vec![PrimaryKeyColumn::new("primary")],
                     sequence: None,
                     constraint_name: None,
                 }),
@@ -319,7 +319,7 @@ mod tests {
                 }],
                 indices: vec![],
                 primary_key: Some(PrimaryKey {
-                    columns: vec!["primary".to_string()],
+                    columns: vec![PrimaryKeyColumn::new("primary")],
                     sequence: None,
                     constraint_name: None,
                 }),
@@ -340,7 +340,7 @@ mod tests {
                 }],
                 indices: vec![],
                 primary_key: Some(PrimaryKey {
-                    columns: vec!["primary".to_string()],
+                    columns: vec![PrimaryKeyColumn::new("primary")],
                     sequence: Some(Sequence {
                         name: "sequence".to_string(),
                     }),
@@ -416,7 +416,7 @@ mod tests {
             ],
             indices: vec![Index {
                 name: "unique_unique".to_string(),
-                columns: vec!["unique".to_string()],
+                columns: vec![IndexColumn::new("unique")],
                 tpe: IndexType::Unique,
             }],
             primary_key: None,
@@ -628,7 +628,7 @@ mod tests {
                 ],
                 indices: vec![],
                 primary_key: Some(PrimaryKey {
-                    columns: vec!["id".to_string()],
+                    columns: vec![PrimaryKeyColumn::new("id")],
                     sequence: None,
                     constraint_name: None,
                 }),
@@ -673,7 +673,7 @@ mod tests {
                 ],
                 indices: vec![],
                 primary_key: Some(PrimaryKey {
-                    columns: vec!["id".to_string()],
+                    columns: vec![PrimaryKeyColumn::new("id")],
                     sequence: None,
                     constraint_name: None,
                 }),
@@ -810,11 +810,11 @@ mod tests {
             ],
             indices: vec![Index {
                 name: "name_last_name_unique".to_string(),
-                columns: vec!["name".to_string(), "lastname".to_string()],
+                columns: vec![IndexColumn::new("name"), IndexColumn::new("lastname")],
                 tpe: IndexType::Unique,
             }],
             primary_key: Some(PrimaryKey {
-                columns: vec!["id".to_string()],
+                columns: vec![PrimaryKeyColumn::new("id")],
                 sequence: None,
                 constraint_name: None,
             }),
@@ -999,7 +999,7 @@ mod tests {
                 ],
                 indices: vec![],
                 primary_key: Some(PrimaryKey {
-                    columns: vec!["id".to_string()],
+                    columns: vec![PrimaryKeyColumn::new("id")],
                     sequence: None,
                     constraint_name: None,
                 }),
@@ -1033,7 +1033,7 @@ mod tests {
                 ],
                 indices: vec![],
                 primary_key: Some(PrimaryKey {
-                    columns: vec!["id".to_string()],
+                    columns: vec![PrimaryKeyColumn::new("id")],
                     sequence: None,
                     constraint_name: None,
                 }),

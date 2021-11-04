@@ -73,12 +73,16 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
                 let (indexes, table_pk_wrapped) = table_indexes;
 
                 let table_pk = table_pk_wrapped.as_mut().unwrap();
-                table_pk.columns.retain(|c| table_columns.contains(c));
+
+                table_pk
+                    .columns
+                    .retain(|c| table_columns.iter().any(|tc| tc == c.name()));
+
                 if table_pk.columns.is_empty() {
                     table_indexes.1 = None;
                 }
                 for index in indexes.iter_mut() {
-                    index.columns.retain(|c| table_columns.contains(c))
+                    index.columns.retain(|c| table_columns.iter().any(|tc| tc == c.name()))
                 }
                 indexes.retain(|i| !i.columns.is_empty());
             }
@@ -604,7 +608,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
                 match entry.1.as_mut() {
                     Some(pk) => {
-                        pk.columns.push(column_name);
+                        pk.columns.push(PrimaryKeyColumn::new(column_name));
                     }
                     None => {
                         let sequence = sequence_name.and_then(|sequence_name| {
@@ -617,7 +621,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                         });
 
                         entry.1 = Some(PrimaryKey {
-                            columns: vec![column_name],
+                            columns: vec![PrimaryKeyColumn::new(column_name)],
                             sequence,
                             constraint_name: Some(name.clone()),
                         });
@@ -627,11 +631,11 @@ impl<'a> SqlSchemaDescriber<'a> {
                 let entry: &mut (Vec<Index>, _) = indexes_map.entry(table_name).or_insert_with(|| (Vec::new(), None));
 
                 if let Some(existing_index) = entry.0.iter_mut().find(|idx| idx.name == name) {
-                    existing_index.columns.push(column_name);
+                    existing_index.columns.push(IndexColumn::new(column_name));
                 } else {
                     entry.0.push(Index {
                         name,
-                        columns: vec![column_name],
+                        columns: vec![IndexColumn::new(column_name)],
                         tpe: match is_unique {
                             true => IndexType::Unique,
                             false => IndexType::Normal,

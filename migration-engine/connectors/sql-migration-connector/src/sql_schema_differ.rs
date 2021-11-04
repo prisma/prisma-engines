@@ -362,7 +362,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                     index
                         .next()
                         .columns()
-                        .any(|col| dropped_and_recreated_column_ids_next.contains(&col.column_id()))
+                        .any(|col| dropped_and_recreated_column_ids_next.contains(&col.as_column().column_id()))
                 }) {
                     steps.push(SqlMigrationStep::CreateIndex {
                         table_id: (Some(tables.previous().table_id()), tables.next().table_id()),

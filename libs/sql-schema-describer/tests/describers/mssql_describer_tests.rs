@@ -495,6 +495,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
             auto_increment: false,
         },
     ];
+
     expected_columns.sort_unstable_by_key(|c| c.name.to_owned());
 
     assert_eq!("User", &table.name);
@@ -504,7 +505,9 @@ fn all_mssql_column_types_must_work(api: TestApi) {
 
     let pk = table.primary_key.as_ref().unwrap();
 
-    assert_eq!(vec!["primary_col".to_string()], pk.columns);
+    let pk_columns = pk.columns.iter().map(|c| c.name()).collect::<Vec<_>>();
+    assert_eq!(vec!["primary_col"], pk_columns);
+
     assert_eq!(None, pk.sequence);
     assert!(pk
         .constraint_name
@@ -611,7 +614,7 @@ fn mssql_foreign_key_on_delete_must_be_handled(api: TestApi) {
             ],
             indices: vec![],
             primary_key: Some(PrimaryKey {
-                columns: vec!["id".to_string()],
+                columns: vec![PrimaryKeyColumn::new("id")],
                 sequence: None,
                 constraint_name: Some("PK__User".into()),
             }),
@@ -656,7 +659,7 @@ fn mssql_multi_field_indexes_must_be_inferred(api: TestApi) {
         table.indices,
         &[Index {
             name: "age_and_name_index".into(),
-            columns: vec!["name".to_owned(), "age".to_owned()],
+            columns: vec![IndexColumn::new("name"), IndexColumn::new("age")],
             tpe: IndexType::Unique
         }]
     );
@@ -692,7 +695,7 @@ fn mssql_join_table_unique_indexes_must_be_inferred(api: TestApi) {
         table.indices,
         &[Index {
             name: "cat_and_human_index".into(),
-            columns: vec!["cat".to_owned(), "human".to_owned()],
+            columns: vec![IndexColumn::new("cat"), IndexColumn::new("human")],
             tpe: IndexType::Unique,
         }]
     );

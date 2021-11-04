@@ -138,7 +138,7 @@ impl SqlRenderer for MssqlFlavour {
         let index_name = self.quote(index.name());
         let table_reference = self.quote_with_schema(index.table().name()).to_string();
 
-        let columns = index.columns().map(|c| self.quote(c.name()));
+        let columns = index.columns().map(|c| self.quote(c.get().name()));
 
         format!(
             "CREATE {index_type}INDEX {index_name} ON {table_reference}({columns})",
@@ -156,7 +156,7 @@ impl SqlRenderer for MssqlFlavour {
             .join(",\n    ");
 
         let primary_key = if let Some(pk) = table.primary_key() {
-            let column_names = pk.columns.iter().map(|col| self.quote(col)).join(",");
+            let column_names = pk.columns.iter().map(|col| self.quote(col.name())).join(",");
 
             format!(
                 ",\n    CONSTRAINT {} PRIMARY KEY ({})",
@@ -176,7 +176,7 @@ impl SqlRenderer for MssqlFlavour {
             let constraints = constraints
                 .iter()
                 .map(|index| {
-                    let columns = index.columns().map(|col| self.quote(col.name()));
+                    let columns = index.columns().map(|col| self.quote(col.get().name()));
 
                     format!("CONSTRAINT {} UNIQUE ({})", self.quote(index.name()), columns.join(","))
                 })

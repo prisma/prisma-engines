@@ -4,7 +4,7 @@
 
 use crate::{
     Column, ColumnArity, ColumnId, ColumnType, ColumnTypeFamily, DefaultValue, Enum, ForeignKey, ForeignKeyAction,
-    Index, IndexType, PrimaryKey, SqlSchema, Table, TableId, UserDefinedType, View,
+    Index, IndexColumn, IndexType, PrimaryKey, PrimaryKeyColumn, SqlSchema, Table, TableId, UserDefinedType, View,
 };
 use serde::de::DeserializeOwned;
 use std::fmt;
@@ -137,7 +137,7 @@ impl<'a> ColumnWalker<'a> {
     pub fn is_single_primary_key(&self) -> bool {
         self.table()
             .primary_key()
-            .map(|pk| pk.columns == [self.name()])
+            .map(|pk| pk.columns.len() == 1 && pk.columns.first().map(|c| c.name() == self.name()).unwrap_or(false))
             .unwrap_or(false)
     }
 
@@ -349,8 +349,13 @@ impl<'a> TableWalker<'a> {
 
     /// The names of the columns that are part of the primary key. `None` means
     /// there is no primary key on the table.
-    pub fn primary_key_column_names(&self) -> Option<&[String]> {
-        self.table().primary_key.as_ref().map(|pk| pk.columns.as_slice())
+    pub fn primary_key_column_names(&'a self) -> impl ExactSizeIterator<Item = &'a str> + 'a {
+        let fetch_name = |c: &'a PrimaryKeyColumn| c.name();
+
+        match self.table().primary_key.as_ref() {
+            Some(pk) => pk.columns.iter().map(fetch_name),
+            None => [].iter().map(fetch_name),
+        }
     }
 
     /// Reference to the underlying `Table` struct.
@@ -467,6 +472,61 @@ impl<'schema> ForeignKeyWalker<'schema> {
     }
 }
 
+/// Traverse an index column.
+#[derive(Clone, Copy)]
+pub struct IndexColumnWalker<'a> {
+    schema: &'a SqlSchema,
+    index_column_id: usize,
+    table_id: TableId,
+    index_index: usize,
+}
+
+impl<'a> IndexColumnWalker<'a> {
+    /// Get the index column data.
+    pub fn get(&self) -> &'a IndexColumn {
+        &self.index().get().columns[self.index_column_id]
+    }
+
+    /// The table where the column is located.
+    pub fn table(&self) -> TableWalker<'a> {
+        TableWalker {
+            table_id: self.table_id,
+            schema: self.schema,
+        }
+    }
+
+    /// The index of the column.
+    pub fn index(&self) -> IndexWalker<'a> {
+        IndexWalker {
+            schema: self.schema,
+            table_id: self.table_id,
+            index_index: self.index_index,
+        }
+    }
+
+    /// Convert to a normal column walker, losing the possible index arguments.
+    pub fn as_column(&self) -> ColumnWalker<'a> {
+        let column_id = self
+            .table()
+            .columns()
+            .enumerate()
+            .find_map(|(i, c)| {
+                if c.column().name == self.get().name() {
+                    Some(i)
+                } else {
+                    None
+                }
+            })
+            .expect("STATE ERROR BOOP");
+
+        ColumnWalker {
+            schema: self.schema,
+            column_id: ColumnId(column_id as u32),
+            table_id: self.table_id,
+        }
+    }
+}
+
 /// Traverse an index.
 #[derive(Clone, Copy)]
 pub struct IndexWalker<'a> {
@@ -488,22 +548,27 @@ impl<'a> fmt::Debug for IndexWalker<'a> {
 
 impl<'a> IndexWalker<'a> {
     /// The names of the indexed columns.
-    pub fn column_names(&self) -> &'a [String] {
-        &self.get().columns
+    pub fn column_names(&'a self) -> impl ExactSizeIterator<Item = &'a str> + 'a {
+        self.get().columns.iter().map(|c| c.name())
     }
 
     /// Traverse the indexed columns.
-    pub fn columns<'b>(&'b self) -> impl Iterator<Item = ColumnWalker<'a>> + 'b {
-        self.get().columns.iter().map(move |column_name| {
-            self.table()
-                .column(column_name)
-                .expect("Failed to find column referenced in index")
-        })
+    pub fn columns<'b>(&'b self) -> impl ExactSizeIterator<Item = IndexColumnWalker<'a>> + 'b {
+        self.get()
+            .columns
+            .iter()
+            .enumerate()
+            .map(move |(index_column_id, _)| IndexColumnWalker {
+                schema: self.schema,
+                index_column_id,
+                table_id: self.table_id,
+                index_index: self.index_index,
+            })
     }
 
     /// True if index contains the given column.
     pub fn contains_column(&self, column_name: &str) -> bool {
-        self.get().columns.iter().any(|column| column == column_name)
+        self.get().columns.iter().any(|column| column.name() == column_name)
     }
 
     fn get(&self) -> &'a Index {

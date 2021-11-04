@@ -584,7 +584,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
             columns: expected_columns,
             indices: vec![],
             primary_key: Some(PrimaryKey {
-                columns: vec!["primary_col".to_string()],
+                columns: vec![PrimaryKeyColumn::new("primary_col")],
                 sequence: None,
                 constraint_name: None,
             }),
@@ -1114,7 +1114,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
             columns: expected_columns,
             indices: vec![],
             primary_key: Some(PrimaryKey {
-                columns: vec!["primary_col".to_string()],
+                columns: vec![PrimaryKeyColumn::new("primary_col")],
                 sequence: None,
                 constraint_name: None,
             }),
@@ -1188,7 +1188,7 @@ fn mysql_multi_field_indexes_must_be_inferred(api: TestApi) {
         table.indices,
         &[Index {
             name: "age_and_name_index".into(),
-            columns: vec!["name".to_owned(), "age".to_owned()],
+            columns: vec![IndexColumn::new("name"), IndexColumn::new("age")],
             tpe: IndexType::Unique,
         }]
     );

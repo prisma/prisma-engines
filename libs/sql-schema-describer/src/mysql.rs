@@ -462,9 +462,9 @@ impl<'a> SqlSchemaDescriber<'a> {
                         match primary_key {
                             Some(pk) => {
                                 if pk.columns.len() < (pos + 1) as usize {
-                                    pk.columns.resize((pos + 1) as usize, "".to_string());
+                                    pk.columns.resize((pos + 1) as usize, PrimaryKeyColumn::default());
                                 }
-                                pk.columns[pos as usize] = column_name;
+                                pk.columns[pos as usize] = PrimaryKeyColumn::new(column_name);
                                 trace!(
                                     "The primary key has already been created, added column to it: {:?}",
                                     pk.columns
@@ -474,7 +474,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                                 trace!("Instantiating primary key");
 
                                 primary_key.replace(PrimaryKey {
-                                    columns: vec![column_name],
+                                    columns: vec![PrimaryKeyColumn::new(column_name)],
                                     sequence: None,
                                     constraint_name: None,
                                 });
@@ -482,14 +482,14 @@ impl<'a> SqlSchemaDescriber<'a> {
                         };
                     } else if indexes_map.contains_key(&index_name) {
                         if let Some(index) = indexes_map.get_mut(&index_name) {
-                            index.columns.push(column_name);
+                            index.columns.push(IndexColumn::new(column_name));
                         }
                     } else {
                         indexes_map.insert(
                             index_name.clone(),
                             Index {
                                 name: index_name,
-                                columns: vec![column_name],
+                                columns: vec![IndexColumn::new(column_name)],
                                 tpe: match is_unique {
                                     true => IndexType::Unique,
                                     false => IndexType::Normal,

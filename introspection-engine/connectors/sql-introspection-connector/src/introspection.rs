@@ -65,7 +65,7 @@ pub fn introspect(
             model.primary_key = Some(PrimaryKeyDefinition {
                 name: None,
                 db_name: pk.constraint_name.clone(),
-                fields: pk.columns.clone(),
+                fields: pk.columns.iter().map(|c| c.name().to_string()).collect(),
                 defined_on_field: pk.columns.len() == 1,
             });
         }

@@ -170,7 +170,7 @@ impl<'a> AlterTableConstructor<'a> {
             .and_then(|pk| pk.constraint_name.as_ref())
             .expect("Missing constraint name in AddPrimaryKey on MSSQL");
 
-        let columns = self.tables.next().primary_key_column_names().unwrap();
+        let columns = self.tables.next().primary_key_column_names();
         let mut quoted_columns = Vec::with_capacity(columns.len());
 
         for colname in columns {

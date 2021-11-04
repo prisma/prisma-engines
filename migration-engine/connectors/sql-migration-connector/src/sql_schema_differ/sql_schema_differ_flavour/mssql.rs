@@ -76,7 +76,7 @@ impl SqlSchemaDifferFlavour for MssqlFlavour {
         for dropped_index in table.index_pairs().filter(|pair| {
             pair.previous()
                 .columns()
-                .any(|col| col.column_id() == *column_id.previous())
+                .any(|col| col.as_column().column_id() == *column_id.previous())
         }) {
             steps.push(SqlMigrationStep::DropIndex {
                 table_id: table.previous().table_id(),
@@ -84,10 +84,11 @@ impl SqlSchemaDifferFlavour for MssqlFlavour {
             })
         }
 
-        for created_index in table
-            .index_pairs()
-            .filter(|pair| pair.next().columns().any(|col| col.column_id() == *column_id.next()))
-        {
+        for created_index in table.index_pairs().filter(|pair| {
+            pair.next()
+                .columns()
+                .any(|col| col.as_column().column_id() == *column_id.next())
+        }) {
             steps.push(SqlMigrationStep::CreateIndex {
                 table_id: (None, table.next().table_id()),
                 index_index: created_index.next().index(),
