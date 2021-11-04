@@ -26,11 +26,7 @@ fn with_postgres_provider(dm: &str) -> String {
             provider = "postgres"
             url = "postgresql://..."
     }
-    
-    generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["NamedConstraints"]
-    }"#;
+    "#;
 
     format!("{}\n{}", header, dm)
 }

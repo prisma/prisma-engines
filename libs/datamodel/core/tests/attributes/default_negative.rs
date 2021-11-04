@@ -426,7 +426,6 @@ fn named_default_constraints_should_not_work_on_non_sql_server() {
 
         generator js {
           provider = "prisma-client-js"
-          previewFeatures = ["namedConstraints"]
         }
 
         model A {
@@ -439,10 +438,10 @@ fn named_default_constraints_should_not_work_on_non_sql_server() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": You defined a database name for the default value of a field on the model. This is not supported by the provider.[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
-        [1;94m12 | [0m  id Int @id @default(autoincrement())
-        [1;94m13 | [0m  data String @[1;91mdefault("beeb buub", map: "meow")[0m
+        [1;94m11 | [0m  id Int @id @default(autoincrement())
+        [1;94m12 | [0m  data String @[1;91mdefault("beeb buub", map: "meow")[0m
         [1;94m   | [0m
     "#]];
 
@@ -459,7 +458,6 @@ fn named_default_constraints_are_not_allowed_on_identity() {
 
         generator js {
           provider = "prisma-client-js"
-          previewFeatures = ["namedConstraints"]
         }
 
         model A {
@@ -471,10 +469,10 @@ fn named_default_constraints_are_not_allowed_on_identity() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": Naming an autoincrement default value is not allowed.[0m
-          [1;94m-->[0m  [4mschema.prisma:12[0m
+          [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
-        [1;94m11 | [0mmodel A {
-        [1;94m12 | [0m  id Int @id @[1;91mdefault(autoincrement(), map: "nope__nope__nope")[0m
+        [1;94m10 | [0mmodel A {
+        [1;94m11 | [0m  id Int @id @[1;91mdefault(autoincrement(), map: "nope__nope__nope")[0m
         [1;94m   | [0m
     "#]];
 
@@ -491,7 +489,6 @@ fn named_default_constraints_cannot_have_duplicate_names() {
 
         generator js {
           provider = "prisma-client-js"
-          previewFeatures = ["namedConstraints"]
         }
 
         model A {
@@ -509,16 +506,16 @@ fn named_default_constraints_cannot_have_duplicate_names() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": The given constraint name `reserved` has to be unique in the following namespace: global for primary keys, foreign keys and default constraints. Please provide a different name using the `map` argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
-        [1;94m12 | [0m  id Int @id @default(autoincrement())
-        [1;94m13 | [0m  a  String @default("asdf", [1;91mmap: "reserved"[0m)
+        [1;94m11 | [0m  id Int @id @default(autoincrement())
+        [1;94m12 | [0m  a  String @default("asdf", [1;91mmap: "reserved"[0m)
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@default": The given constraint name `reserved` has to be unique in the following namespace: global for primary keys, foreign keys and default constraints. Please provide a different name using the `map` argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:18[0m
+          [1;94m-->[0m  [4mschema.prisma:17[0m
         [1;94m   | [0m
-        [1;94m17 | [0m  id Int @id @default(autoincrement())
-        [1;94m18 | [0m  b  String @default("asdf", [1;91mmap: "reserved"[0m)
+        [1;94m16 | [0m  id Int @id @default(autoincrement())
+        [1;94m17 | [0m  b  String @default("asdf", [1;91mmap: "reserved"[0m)
         [1;94m   | [0m
     "#]];
 
@@ -535,7 +532,6 @@ fn named_default_constraints_cannot_clash_with_pk_names() {
 
         generator js {
           provider = "prisma-client-js"
-          previewFeatures = ["namedConstraints"]
         }
 
         model A {
@@ -552,16 +548,16 @@ fn named_default_constraints_cannot_clash_with_pk_names() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": The given constraint name `reserved` has to be unique in the following namespace: global for primary keys, foreign keys and default constraints. Please provide a different name using the `map` argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
-        [1;94m12 | [0m  id Int @id @default(autoincrement())
-        [1;94m13 | [0m  a  String @default("asdf", [1;91mmap: "reserved"[0m)
+        [1;94m11 | [0m  id Int @id @default(autoincrement())
+        [1;94m12 | [0m  a  String @default("asdf", [1;91mmap: "reserved"[0m)
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@id": The given constraint name `reserved` has to be unique in the following namespace: global for primary keys, foreign keys and default constraints. Please provide a different name using the `map` argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:17[0m
+          [1;94m-->[0m  [4mschema.prisma:16[0m
         [1;94m   | [0m
-        [1;94m16 | [0mmodel B {
-        [1;94m17 | [0m  id Int @id([1;91mmap: "reserved"[0m) @default(autoincrement())
+        [1;94m15 | [0mmodel B {
+        [1;94m16 | [0m  id Int @id([1;91mmap: "reserved"[0m) @default(autoincrement())
         [1;94m   | [0m
     "#]];
 

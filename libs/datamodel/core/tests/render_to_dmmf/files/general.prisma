@@ -6,7 +6,6 @@ datasource pg1 {
 
 generator foo {
   provider = "bar"
-  previewFeatures = ["namedConstraints"]
 }
 
 model User {

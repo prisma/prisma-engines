@@ -71,7 +71,6 @@ impl MySqlDatamodelConnector {
             ConnectorCapability::RelationsOverNonUniqueCriteria,
             ConnectorCapability::Enums,
             ConnectorCapability::Json,
-            ConnectorCapability::MultipleIndexesWithSameName, //TODO(matthias) get rid of this
             ConnectorCapability::AutoIncrementAllowedOnNonId,
             ConnectorCapability::RelationFieldsInArbitraryOrder,
             ConnectorCapability::CreateMany,
