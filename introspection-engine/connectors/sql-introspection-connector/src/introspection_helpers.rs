@@ -250,7 +250,10 @@ pub(crate) fn calculate_backrelation_field(
                     &relation_info.fields,
                 ) && i.is_unique()
             }) || columns_match(
-                &table.primary_key_columns().map(|c| c.name).collect::<Vec<_>>(),
+                &table
+                    .primary_key_columns()
+                    .map(|c| c.name().to_string())
+                    .collect::<Vec<_>>(),
                 &relation_info.fields,
             );
 

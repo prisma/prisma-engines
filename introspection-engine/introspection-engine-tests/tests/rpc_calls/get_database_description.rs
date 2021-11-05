@@ -113,7 +113,8 @@ async fn database_description_for_mysql_8_should_work(api: &TestApi) -> TestResu
                 "columns": [
                   {
                     "name": "id",
-                    "length": null
+                    "length": null,
+                    "sort_order": null
                   }
                 ],
                 "sequence": null,
@@ -177,7 +178,8 @@ async fn database_description_for_postgres_should_work(api: &TestApi) -> TestRes
                 "columns": [
                   {
                     "name": "id",
-                    "length": null
+                    "length": null,
+                    "sort_order": null
                   }
                 ],
                 "sequence": {
@@ -242,7 +244,8 @@ async fn database_description_for_sqlite_should_work(api: &TestApi) -> TestResul
                 "columns": [
                   {
                     "name": "id",
-                    "length": null
+                    "length": null,
+                    "sort_order": null
                   }
                 ],
                 "sequence": null,

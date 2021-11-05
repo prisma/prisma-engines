@@ -442,7 +442,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             // Exclude partial indices
             .filter(|row| !row.get("partial").and_then(|partial| partial.as_bool()).unwrap());
 
-        for row in filtered_rows {
+        'index_loop: for row in filtered_rows {
             let is_unique = row.get("unique").and_then(|x| x.as_bool()).expect("get unique");
             let name = row.get("name").and_then(|x| x.to_string()).expect("get name");
             let mut index = Index {
@@ -470,15 +470,18 @@ impl<'a> SqlSchemaDescriber<'a> {
 
             let sql = format!(r#"PRAGMA index_xinfo("{}");"#, name);
             let result_set = self.conn.query_raw(&sql, &[]).await.expect("querying for index info");
+
             trace!("Got extra index description results: {:?}", result_set);
+
             for row in result_set.into_iter() {
                 //if the index is on a rowid or expression, the name of the column will be null, we ignore these for now
 
                 match row.get("name") {
+                    _ if index.columns.len() == 0 => break 'index_loop,
                     Some(quaint::Value::Text(Some(s))) if !s.is_empty() => {
                         let pos = row.get("seqno").and_then(|x| x.as_i64()).expect("get seqno") as usize;
 
-                        let sort_order = dbg!(row.get("desc").and_then(|r| r.as_i64())).map(|v| match v {
+                        let sort_order = row.get("desc").and_then(|r| r.as_i64()).map(|v| match v {
                             0 => SQLSortOrder::Asc,
                             _ => SQLSortOrder::Desc,
                         });

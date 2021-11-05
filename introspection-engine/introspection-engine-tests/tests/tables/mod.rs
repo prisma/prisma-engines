@@ -824,15 +824,14 @@ async fn expression_indexes_should_be_ignored_on_sqlite(api: &TestApi) -> TestRe
         })
         .await?;
 
-    let dm = indoc! {r##"
+    let expected = expect![[r#"
         model Blog {
-          id                Int     @id @default(autoincrement())
-          author            String
+          id     Int    @id @default(autoincrement())
+          author String
         }
-    "##};
+    "#]];
 
-    let result = &api.introspect().await?;
-    api.assert_eq_datamodels(dm, result);
+    expected.assert_eq(&api.introspect_dml().await?);
 
     Ok(())
 }
