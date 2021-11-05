@@ -134,44 +134,6 @@ fn on_delete_actions_should_work_on_prisma_referential_integrity() {
 }
 
 #[test]
-fn on_update_actions_should_not_work_on_prisma_referential_integrity() {
-    let dml = indoc! { r#"
-        datasource db {
-          provider = "mysql"
-          url = "mysql://"
-          referentialIntegrity = "prisma"
-        }
-
-        generator client {
-          provider = "prisma-client-js"
-          previewFeatures = ["referentialIntegrity"]
-        }
-
-        model A {
-          id Int @id
-          bs B[]
-        }
-
-        model B {
-          id Int @id
-          aId Int
-          a A @relation(fields: [aId], references: [id], onUpdate: Restrict)
-        }
-    "#};
-
-    let expect = expect![[r#"
-        [1;91merror[0m: [1mError validating: Referential actions other than `NoAction` will not work for `onUpdate` without foreign keys. Please follow the issue: https://github.com/prisma/prisma/issues/9014[0m
-          [1;94m-->[0m  [4mschema.prisma:20[0m
-        [1;94m   | [0m
-        [1;94m19 | [0m  aId Int
-        [1;94m20 | [0m  a A @relation(fields: [aId], references: [id], [1;91monUpdate: Restrict[0m)
-        [1;94m   | [0m
-    "#]];
-
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
-}
-
-#[test]
 fn on_update_no_action_should_work_on_prisma_referential_integrity() {
     let dml = indoc! { r#"
         datasource db {
