@@ -239,11 +239,18 @@ pub enum SQLSortOrder {
     Desc,
 }
 
-#[derive(Default, Serialize, Deserialize, PartialEq, Debug, Clone)]
+#[derive(Default, Serialize, Deserialize, Debug, Clone)]
 pub struct IndexColumn {
     pub name: String,
     pub sort_order: Option<SQLSortOrder>,
     pub length: Option<u32>,
+}
+
+// TODO: remove when GA for index types
+impl PartialEq for IndexColumn {
+    fn eq(&self, other: &Self) -> bool {
+        self.name == other.name
+    }
 }
 
 impl IndexColumn {
@@ -298,11 +305,18 @@ pub struct UserDefinedType {
     pub definition: Option<String>,
 }
 
-#[derive(Default, Serialize, Deserialize, PartialEq, Debug, Clone)]
+#[derive(Default, Serialize, Deserialize, Debug, Clone)]
 pub struct PrimaryKeyColumn {
     pub name: String,
     pub length: Option<u32>,
     pub sort_order: Option<SQLSortOrder>,
+}
+
+// TODO: remove when GA for index types
+impl PartialEq for PrimaryKeyColumn {
+    fn eq(&self, other: &Self) -> bool {
+        self.name == other.name
+    }
 }
 
 impl PrimaryKeyColumn {

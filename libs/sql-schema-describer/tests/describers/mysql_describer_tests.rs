@@ -1170,7 +1170,7 @@ fn mysql_foreign_key_on_delete_must_be_handled(api: TestApi) {
     });
 }
 
-#[test_connector(tags(Mysql))]
+#[test_connector(tags(Mysql8))]
 fn mysql_multi_field_indexes_must_be_inferred(api: TestApi) {
     let mut migration = Migration::new().schema(api.db_name());
     migration.create_table("Employee", move |t| {
@@ -1194,6 +1194,44 @@ fn mysql_multi_field_indexes_must_be_inferred(api: TestApi) {
         IndexColumn {
             name: "age".into(),
             sort_order: Some(SQLSortOrder::Asc),
+            length: None,
+        },
+    ];
+
+    assert_eq!(
+        table.indices,
+        &[Index {
+            name: "age_and_name_index".into(),
+            columns,
+            tpe: IndexType::Unique,
+        }]
+    );
+}
+
+#[test_connector(tags(Mysql), exclude(Mysql8))]
+fn old_mysql_multi_field_indexes_must_be_inferred(api: TestApi) {
+    let mut migration = Migration::new().schema(api.db_name());
+    migration.create_table("Employee", move |t| {
+        t.add_column("id", types::primary());
+        t.add_column("age", types::integer());
+        t.add_column("name", types::varchar(200));
+        t.add_index("age_and_name_index", types::index(vec!["name", "age"]).unique(true));
+    });
+
+    let full_sql = migration.make::<barrel::backend::MySql>();
+    api.raw_cmd(&full_sql);
+    let result = api.describe();
+    let table = result.get_table("Employee").expect("couldn't get Employee table");
+
+    let columns = vec![
+        IndexColumn {
+            name: "name".into(),
+            sort_order: None,
+            length: None,
+        },
+        IndexColumn {
+            name: "age".into(),
+            sort_order: None,
             length: None,
         },
     ];
