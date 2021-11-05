@@ -477,7 +477,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 //if the index is on a rowid or expression, the name of the column will be null, we ignore these for now
 
                 match row.get("name") {
-                    _ if index.columns.len() == 0 => break 'index_loop,
+                    _ if index.columns.is_empty() => break 'index_loop,
                     Some(quaint::Value::Text(Some(s))) if !s.is_empty() => {
                         let pos = row.get("seqno").and_then(|x| x.as_i64()).expect("get seqno") as usize;
 

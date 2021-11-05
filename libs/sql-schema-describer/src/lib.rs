@@ -196,7 +196,7 @@ impl Table {
         }
     }
 
-    pub fn primary_key_columns<'a>(&'a self) -> impl Iterator<Item = &'a PrimaryKeyColumn> + 'a {
+    pub fn primary_key_columns(&self) -> impl Iterator<Item = &PrimaryKeyColumn> + '_ {
         match &self.primary_key {
             Some(pk) => pk.columns.iter(),
             None => [].iter(),
