@@ -197,16 +197,7 @@ impl SqlRenderer for MysqlFlavour {
             indexes: table
                 .indexes()
                 .map(move |index| ddl::IndexClause {
-<<<<<<< HEAD
-                    //TODO(matthias) The named constraint validations should have made this obsolete
-                    index_name: if index.name().len() > MYSQL_IDENTIFIER_SIZE_LIMIT {
-                        Some(Cow::Borrowed(&index.name()[0..MYSQL_IDENTIFIER_SIZE_LIMIT]))
-                    } else {
-                        Some(Cow::Borrowed(index.name()))
-                    },
-=======
                     index_name: Some(Cow::from(index.name())),
->>>>>>> master
                     unique: index.index_type().is_unique(),
                     columns: index
                         .column_definitions()
