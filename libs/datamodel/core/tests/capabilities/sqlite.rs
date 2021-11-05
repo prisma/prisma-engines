@@ -93,26 +93,16 @@ fn unique_index_names_support() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@index": The given constraint name `metaId` has to be unique in the following namespace: global for indexes and unique constraints. Please provide a different name using the `map` argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:6[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
-        [1;94m 5 | [0m
-        [1;94m 6 | [0m[1;91mmodel User {[0m
-        [1;94m 7 | [0m  id         Int @id
-        [1;94m 8 | [0m  neighborId Int
         [1;94m 9 | [0m
-        [1;94m10 | [0m  @@index([id], name: "metaId")
-        [1;94m11 | [0m}
+        [1;94m10 | [0m  @@index([id], [1;91mname: "metaId"[0m)
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@index": The given constraint name `metaId` has to be unique in the following namespace: global for indexes and unique constraints. Please provide a different name using the `map` argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
+          [1;94m-->[0m  [4mschema.prisma:17[0m
         [1;94m   | [0m
-        [1;94m12 | [0m
-        [1;94m13 | [0m[1;91mmodel Post {[0m
-        [1;94m14 | [0m  id Int @id
-        [1;94m15 | [0m  optionId Int
         [1;94m16 | [0m
-        [1;94m17 | [0m  @@index([id], name: "metaId")
-        [1;94m18 | [0m}
+        [1;94m17 | [0m  @@index([id], [1;91mname: "metaId"[0m)
         [1;94m   | [0m
     "#]];
 

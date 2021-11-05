@@ -12,7 +12,7 @@ use crate::SortOrder;
 pub(super) fn infer_implicit_indexes(ctx: &mut Context<'_>) {
     let mut indexes = Vec::new();
 
-    for relation in ctx.db.walk_explicit_relations() {
+    for relation in ctx.db.walk_complete_inline_relations() {
         if !relation.relation_type().is_one_to_one() {
             continue;
         }

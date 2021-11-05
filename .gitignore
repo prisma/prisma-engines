@@ -17,20 +17,6 @@ prisma-gpg-private.asc
 .idea
 .idea_modules
 
-# sbt specific
-.sbt
-dist/*
-target/
-lib_managed/
-src_managed/
-project/boot/
-project/plugins/project/
-
-# Scala-IDE specific
-.scala_dependencies
-.ensime
-.ensime_cache
-
 # test files
 /schema
 /request.json
@@ -45,3 +31,8 @@ buildkite-script-*
 
 # Nix specific
 .direnv/
+
+# Dev setup
+datamodel_v2.prisma
+dev_datamodel.prisma
+target/

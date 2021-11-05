@@ -7,7 +7,7 @@ mod visited_relation;
 use crate::{
     ast,
     diagnostics::{DatamodelError, Diagnostics},
-    transform::ast_to_dml::db::walkers::CompleteInlineRelationWalker,
+    transform::ast_to_dml::db::{walkers::CompleteInlineRelationWalker, ConstraintName, ParserDatabase},
 };
 use datamodel_connector::{Connector, ConnectorCapability};
 use itertools::Itertools;
@@ -21,6 +21,41 @@ const PRISMA_FORMAT_HINT: &str = "You can run `prisma format` to fix this automa
 const RELATION_ATTRIBUTE_NAME: &str = "relation";
 const RELATION_ATTRIBUTE_NAME_WITH_AT: &str = "@relation";
 const STATE_ERROR: &str = "Failed lookup of model, field or optional property during internal processing. This means that the internal representation was mutated incorrectly.";
+
+/// Depending on the database, a constraint name might need to be unique in a certain namespace.
+/// Validates per database that we do not use a name that is already in use.
+pub(crate) fn has_a_unique_constraint_name(
+    db: &ParserDatabase<'_>,
+    relation: CompleteInlineRelationWalker<'_, '_>,
+    diagnostics: &mut Diagnostics,
+) {
+    let name = match relation.foreign_key_name() {
+        Some(name) => name,
+        None => return,
+    };
+
+    let field = relation.referencing_field();
+    let model = relation.referencing_model();
+
+    for violation in db.scope_violations(model.model_id(), ConstraintName::Relation(name.as_ref())) {
+        let span = field
+            .ast_field()
+            .span_for_argument("relation", "map")
+            .unwrap_or_else(|| field.ast_field().span);
+
+        let message = format!(
+            "The given constraint name `{}` has to be unique in the following namespace: {}. Please provide a different name using the `map` argument.",
+            name,
+            violation.description(model.name())
+        );
+
+        diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+            &message,
+            RELATION_ATTRIBUTE_NAME,
+            span,
+        ));
+    }
+}
 
 /// Required relational fields should point to required scalar fields.
 pub(super) fn field_arity(relation: CompleteInlineRelationWalker<'_, '_>, diagnostics: &mut Diagnostics) {

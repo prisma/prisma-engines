@@ -19,17 +19,15 @@ mod unique_positive;
 mod updated_at_negative;
 mod updated_at_positive;
 
-//TODO(matthias) remove the previewFeature and adjust the tests
 fn with_postgres_provider(dm: &str) -> String {
     let header = r#"
     datasource test {
             provider = "postgres"
             url = "postgresql://..."
     }
-    
+         
     generator js {
             provider = "prisma-client-js"
-            previewFeatures = ["NamedConstraints"]
     }"#;
 
     format!("{}\n{}", header, dm)
