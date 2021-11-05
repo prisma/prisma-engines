@@ -150,7 +150,7 @@ dev-mssql2017: start-mssql_2017
 	echo 'mssql2017' > current_connector
 	cp $(CONFIG_PATH)/sqlserver2017 $(CONFIG_FILE)
 
-start-mongodb4:
+start-mongodb4-single:
 	docker-compose -f docker-compose.yml up -d --remove-orphans mongo4-single
 
 start-mongodb5-single:
