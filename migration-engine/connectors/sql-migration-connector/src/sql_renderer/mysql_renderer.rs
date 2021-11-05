@@ -118,6 +118,8 @@ impl SqlRenderer for MysqlFlavour {
                     tables
                         .next()
                         .primary_key_column_names()
+                        .iter()
+                        .flat_map(|c| c.iter())
                         .map(|colname| self.quote(colname))
                         .join(", ")
                 )),
@@ -204,7 +206,12 @@ impl SqlRenderer for MysqlFlavour {
                     columns: index.column_names().map(ToString::to_string).map(Cow::from).collect(),
                 })
                 .collect(),
-            primary_key: table.primary_key_column_names().map(|s| Cow::Borrowed(s)).collect(),
+            primary_key: table
+                .primary_key_column_names()
+                .unwrap_or_default()
+                .iter()
+                .map(|s| Cow::Borrowed(s.as_str()))
+                .collect(),
             default_character_set: Some("utf8mb4".into()),
             collate: Some("utf8mb4_unicode_ci".into()),
         }

@@ -285,6 +285,8 @@ impl SqlRenderer for PostgresFlavour {
                         tables
                             .next()
                             .primary_key_column_names()
+                            .unwrap()
+                            .iter()
                             .map(|colname| self.quote(colname))
                             .join(", ")
                     )

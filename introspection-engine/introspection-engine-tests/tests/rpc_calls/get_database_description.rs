@@ -54,7 +54,8 @@ async fn database_description_for_mysql_should_work(api: &TestApi) -> TestResult
                 "columns": [
                   {
                     "name": "id",
-                    "length": null
+                    "length": null,
+                    "sort_order": null
                   }
                 ],
                 "sequence": null,

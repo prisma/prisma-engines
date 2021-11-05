@@ -67,7 +67,6 @@ pub fn introspect(
         }
 
         match &table.primary_key {
-            // TODO: enable with preview flag, when dml index extensions are done.
             Some(pk) if pk.columns.iter().all(|c| c.length.is_none()) => {
                 model.primary_key = Some(PrimaryKeyDefinition {
                     name: None,

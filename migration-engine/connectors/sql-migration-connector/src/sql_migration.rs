@@ -289,17 +289,17 @@ impl SqlMigration {
                             }
                             TableChange::DropPrimaryKey => {
                                 out.push_str("  [-] Dropped the primary key on columns (");
-                                out.push_str(&tables.previous().primary_key_column_names().join(", "));
+                                out.push_str(&tables.previous().primary_key_column_names().unwrap().join(", "));
                                 out.push_str(")\n");
                             }
                             TableChange::RenamePrimaryKey => {
                                 out.push_str("  [*] Renamed the primary key on columns (");
-                                out.push_str(&tables.previous().primary_key_column_names().join(", "));
+                                out.push_str(&tables.previous().primary_key_column_names().unwrap().join(", "));
                                 out.push_str(")\n");
                             }
                             TableChange::AddPrimaryKey => {
                                 out.push_str("  [+] Added primary key on columns (");
-                                out.push_str(&tables.next().primary_key_column_names().join(", "));
+                                out.push_str(&tables.next().primary_key_column_names().unwrap().join(", "));
                                 out.push_str(")\n");
                             }
                         }

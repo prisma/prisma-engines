@@ -413,13 +413,11 @@ impl<'a> TableWalker<'a> {
     }
 
     /// The names of the columns that are part of the primary key.
-    pub fn primary_key_column_names(&'a self) -> impl ExactSizeIterator<Item = &'a str> + 'a {
-        let fetch_name = |c: &'a PrimaryKeyColumn| c.name();
-
-        match self.table().primary_key.as_ref() {
-            Some(pk) => pk.columns.iter().map(fetch_name),
-            None => [].iter().map(fetch_name),
-        }
+    pub fn primary_key_column_names(&self) -> Option<Vec<String>> {
+        self.table()
+            .primary_key
+            .as_ref()
+            .map(|pk| pk.columns.iter().map(|c| c.name().to_string()).collect())
     }
 
     /// Reference to the underlying `Table` struct.
