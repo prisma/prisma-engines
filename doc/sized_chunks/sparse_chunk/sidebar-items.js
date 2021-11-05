@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Drain",""],["Iter",""],["IterMut",""],["SparseChunk","A fixed capacity sparse array."]]});

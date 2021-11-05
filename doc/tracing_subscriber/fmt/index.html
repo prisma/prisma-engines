@@ -1,0 +1,250 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="A `Subscriber` for formatting and logging `tracing` data."><meta name="keywords" content="rust, rustlang, rust-lang, fmt"><title>tracing_subscriber::fmt - Rust</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../tracing_subscriber/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;tokio-rs&#x2F;tracing&#x2F;master&#x2F;assets&#x2F;logo-type.png' alt='logo'></div></a><h2 class="location">Module fmt</h2><div class="sidebar-elems"><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#traits">Traits</a></li><li><a href="#functions">Functions</a></li><li><a href="#types">Type Definitions</a></li></ul></div><div id="sidebar-vars" data-name="fmt" data-ty="mod" data-relpath="./"></div><script defer src="./sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Module <a href="../index.html">tracing_subscriber</a>::<wbr><a class="mod" href="#">fmt</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../../src/tracing_subscriber/fmt/mod.rs.html#1-1244" title="goto source code">[src]</a></span></h1><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>A <code>Subscriber</code> for formatting and logging <code>tracing</code> data.</p>
+<h2 id="overview" class="section-header"><a href="#overview">Overview</a></h2>
+<p><a href="https://crates.io/crates/tracing"><code>tracing</code></a> is a framework for instrumenting Rust programs with context-aware,
+structured, event-based diagnostic information. This crate provides an
+implementation of the <a href="https://docs.rs/tracing/latest/tracing/trait.Subscriber.html"><code>Subscriber</code></a> trait that records <code>tracing</code>’s <code>Event</code>s
+and <code>Span</code>s by formatting them as text and logging them to stdout.</p>
+<h2 id="usage" class="section-header"><a href="#usage">Usage</a></h2>
+<p>First, add this to your <code>Cargo.toml</code> file:</p>
+<div class="example-wrap"><pre class="language-toml"><code>[dependencies]
+tracing-subscriber = &quot;0.2&quot;</code></pre></div>
+<p><em>Compiler support: requires rustc 1.39+</em></p>
+<p>Add the following to your executable to initialize the default subscriber:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">tracing_subscriber</span>;
+
+<span class="ident">tracing_subscriber::fmt::init</span>();</code></pre></div>
+<h2 id="filtering-events-with-environment-variables" class="section-header"><a href="#filtering-events-with-environment-variables">Filtering Events with Environment Variables</a></h2>
+<p>The default subscriber installed by <code>init</code> enables you to filter events
+at runtime using environment variables (using the <a href="../filter/struct.EnvFilter.html"><code>EnvFilter</code></a>).</p>
+<p>The filter syntax is a superset of the <a href="https://docs.rs/env_logger/"><code>env_logger</code></a> syntax.</p>
+<p>For example:</p>
+<ul>
+<li>Setting <code>RUST_LOG=debug</code> enables all <code>Span</code>s and <code>Event</code>s
+set to the log level <code>DEBUG</code> or higher</li>
+<li>Setting <code>RUST_LOG=my_crate=trace</code> enables <code>Span</code>s and <code>Event</code>s
+in <code>my_crate</code> at all log levels</li>
+</ul>
+<p><strong>Note</strong>: This should <strong>not</strong> be called by libraries. Libraries should use
+<a href="https://crates.io/crates/tracing"><code>tracing</code></a> to publish <code>tracing</code> <code>Event</code>s.</p>
+<h2 id="configuration" class="section-header"><a href="#configuration">Configuration</a></h2>
+<p>You can configure a subscriber instead of using the defaults with
+the following functions:</p>
+<h3 id="subscriber" class="section-header"><a href="#subscriber">Subscriber</a></h3>
+<p>The <a href="./struct.Subscriber.html"><code>FmtSubscriber</code></a> formats and records <code>tracing</code> events as line-oriented logs.
+You can create one by calling:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident">tracing_subscriber::fmt</span>()
+    <span class="comment">// ... add configuration</span>
+    .<span class="ident">finish</span>();</code></pre></div>
+<p>You can find the configuration methods for <a href="./struct.Subscriber.html"><code>FmtSubscriber</code></a> in
+<a href="./struct.SubscriberBuilder.html"><code>SubscriberBuilder</code></a>.</p>
+<h3 id="formatters" class="section-header"><a href="#formatters">Formatters</a></h3>
+<p>The output format used by the layer and subscriber in this module is
+represented by implementing the <a href="trait.FormatEvent.html" title="FormatEvent"><code>FormatEvent</code></a> trait, and can be
+customized. This module provides a number of formatter implementations:</p>
+<ul>
+<li>
+<p><a href="format/struct.Full.html" title="format::Full"><code>format::Full</code></a>: The default formatter. This emits human-readable,
+single-line logs for each event that occurs, with the current span context
+displayed before the formatted representation of the event.</p>
+<p>For example:</p>
+<pre><font color="#4E9A06"><b>    Finished</b></font> dev [unoptimized + debuginfo] target(s) in 1.59s
+<font color="#4E9A06"><b>     Running</b></font> `target/debug/examples/fmt`
+<font color="#AAAAAA">Oct 24 12:55:47.814 </font><font color="#4E9A06"> INFO</font> fmt: preparing to shave yaks number_of_yaks=3
+<font color="#AAAAAA">Oct 24 12:55:47.814 </font><font color="#4E9A06"> INFO</font> <b>shaving_yaks{</b>yaks=3<b>}</b>: fmt::yak_shave: shaving yaks
+<font color="#AAAAAA">Oct 24 12:55:47.814 </font><font color="#75507B">TRACE</font> <b>shaving_yaks{</b>yaks=3<b>}</b>:<b>shave{</b>yak=1<b>}</b>: fmt::yak_shave: hello! I&apos;m gonna shave a yak excitement=&quot;yay!&quot;
+<font color="#AAAAAA">Oct 24 12:55:47.814 </font><font color="#75507B">TRACE</font> <b>shaving_yaks{</b>yaks=3<b>}</b>:<b>shave{</b>yak=1<b>}</b>: fmt::yak_shave: yak shaved successfully
+<font color="#AAAAAA">Oct 24 12:55:47.814 </font><font color="#3465A4">DEBUG</font> <b>shaving_yaks{</b>yaks=3<b>}</b>: yak_events: yak=1 shaved=true
+<font color="#AAAAAA">Oct 24 12:55:47.814 </font><font color="#75507B">TRACE</font> <b>shaving_yaks{</b>yaks=3<b>}</b>: fmt::yak_shave: yaks_shaved=1
+<font color="#AAAAAA">Oct 24 12:55:47.815 </font><font color="#75507B">TRACE</font> <b>shaving_yaks{</b>yaks=3<b>}</b>:<b>shave{</b>yak=2<b>}</b>: fmt::yak_shave: hello! I&apos;m gonna shave a yak excitement=&quot;yay!&quot;
+<font color="#AAAAAA">Oct 24 12:55:47.815 </font><font color="#75507B">TRACE</font> <b>shaving_yaks{</b>yaks=3<b>}</b>:<b>shave{</b>yak=2<b>}</b>: fmt::yak_shave: yak shaved successfully
+<font color="#AAAAAA">Oct 24 12:55:47.815 </font><font color="#3465A4">DEBUG</font> <b>shaving_yaks{</b>yaks=3<b>}</b>: yak_events: yak=2 shaved=true
+<font color="#AAAAAA">Oct 24 12:55:47.815 </font><font color="#75507B">TRACE</font> <b>shaving_yaks{</b>yaks=3<b>}</b>: fmt::yak_shave: yaks_shaved=2
+<font color="#AAAAAA">Oct 24 12:55:47.815 </font><font color="#75507B">TRACE</font> <b>shaving_yaks{</b>yaks=3<b>}</b>:<b>shave{</b>yak=3<b>}</b>: fmt::yak_shave: hello! I&apos;m gonna shave a yak excitement=&quot;yay!&quot;
+<font color="#AAAAAA">Oct 24 12:55:47.815 </font><font color="#C4A000"> WARN</font> <b>shaving_yaks{</b>yaks=3<b>}</b>:<b>shave{</b>yak=3<b>}</b>: fmt::yak_shave: could not locate yak
+<font color="#AAAAAA">Oct 24 12:55:47.815 </font><font color="#3465A4">DEBUG</font> <b>shaving_yaks{</b>yaks=3<b>}</b>: yak_events: yak=3 shaved=false
+<font color="#AAAAAA">Oct 24 12:55:47.815 </font><font color="#CC0000">ERROR</font> <b>shaving_yaks{</b>yaks=3<b>}</b>: fmt::yak_shave: failed to shave yak yak=3 error=missing yak
+<font color="#AAAAAA">Oct 24 12:55:47.815 </font><font color="#75507B">TRACE</font> <b>shaving_yaks{</b>yaks=3<b>}</b>: fmt::yak_shave: yaks_shaved=2
+<font color="#AAAAAA">Oct 24 12:55:47.815 </font><font color="#4E9A06"> INFO</font> fmt: yak shaving completed all_yaks_shaved=false
+</pre>
+</li>
+<li>
+<p><a href="format/struct.Pretty.html" title="format::Pretty"><code>format::Pretty</code></a>: Emits excessively pretty, multi-line logs, optimized
+for human readability. This is primarily intended to be used in local
+development and debugging, or for command-line applications, where
+automated analysis and compact storage of logs is less of a priority than
+readability and visual appeal.</p>
+<p>For example:</p>
+<pre><font color="#4E9A06"><b>    Finished</b></font> dev [unoptimized + debuginfo] target(s) in 1.61s
+<font color="#4E9A06"><b>     Running</b></font> `target/debug/examples/fmt-pretty`
+Oct 24 12:57:29.386 <font color="#4E9A06"><b>fmt_pretty</b></font><font color="#4E9A06">: preparing to shave yaks, </font><font color="#4E9A06"><b>number_of_yaks</b></font><font color="#4E9A06">: 3</font>
+  <font color="#AAAAAA"><i>at</i></font> examples/examples/fmt-pretty.rs:16<font color="#AAAAAA"><i> on</i></font> main
+
+Oct 24 12:57:29.386 <font color="#4E9A06"><b>fmt_pretty::yak_shave</b></font><font color="#4E9A06">: shaving yaks</font>
+  <font color="#AAAAAA"><i>at</i></font> examples/examples/fmt/yak_shave.rs:38<font color="#AAAAAA"><i> on</i></font> main
+  <font color="#AAAAAA"><i>in</i></font> fmt_pretty::yak_shave::<b>shaving_yaks</b> <font color="#AAAAAA"><i>with</i></font> <b>yaks</b>: 3
+
+Oct 24 12:57:29.387 <font color="#75507B"><b>fmt_pretty::yak_shave</b></font><font color="#75507B">: hello! I&apos;m gonna shave a yak, </font><font color="#75507B"><b>excitement</b></font><font color="#75507B">: &quot;yay!&quot;</font>
+  <font color="#AAAAAA"><i>at</i></font> examples/examples/fmt/yak_shave.rs:14<font color="#AAAAAA"><i> on</i></font> main
+  <font color="#AAAAAA"><i>in</i></font> fmt_pretty::yak_shave::<b>shave</b> <font color="#AAAAAA"><i>with</i></font> <b>yak</b>: 1
+  <font color="#AAAAAA"><i>in</i></font> fmt_pretty::yak_shave::<b>shaving_yaks</b> <font color="#AAAAAA"><i>with</i></font> <b>yaks</b>: 3
+
+Oct 24 12:57:29.387 <font color="#75507B"><b>fmt_pretty::yak_shave</b></font><font color="#75507B">: yak shaved successfully</font>
+  <font color="#AAAAAA"><i>at</i></font> examples/examples/fmt/yak_shave.rs:22<font color="#AAAAAA"><i> on</i></font> main
+  <font color="#AAAAAA"><i>in</i></font> fmt_pretty::yak_shave::<b>shave</b> <font color="#AAAAAA"><i>with</i></font> <b>yak</b>: 1
+  <font color="#AAAAAA"><i>in</i></font> fmt_pretty::yak_shave::<b>shaving_yaks</b> <font color="#AAAAAA"><i>with</i></font> <b>yaks</b>: 3
+
+Oct 24 12:57:29.387 <font color="#3465A4"><b>yak_events</b></font><font color="#3465A4">: </font><font color="#3465A4"><b>yak</b></font><font color="#3465A4">: 1, </font><font color="#3465A4"><b>shaved</b></font><font color="#3465A4">: true</font>
+  <font color="#AAAAAA"><i>at</i></font> examples/examples/fmt/yak_shave.rs:43<font color="#AAAAAA"><i> on</i></font> main
+  <font color="#AAAAAA"><i>in</i></font> fmt_pretty::yak_shave::<b>shaving_yaks</b> <font color="#AAAAAA"><i>with</i></font> <b>yaks</b>: 3
+
+Oct 24 12:57:29.387 <font color="#75507B"><b>fmt_pretty::yak_shave</b></font><font color="#75507B">: </font><font color="#75507B"><b>yaks_shaved</b></font><font color="#75507B">: 1</font>
+  <font color="#AAAAAA"><i>at</i></font> examples/examples/fmt/yak_shave.rs:52<font color="#AAAAAA"><i> on</i></font> main
+  <font color="#AAAAAA"><i>in</i></font> fmt_pretty::yak_shave::<b>shaving_yaks</b> <font color="#AAAAAA"><i>with</i></font> <b>yaks</b>: 3
+
+Oct 24 12:57:29.387 <font color="#75507B"><b>fmt_pretty::yak_shave</b></font><font color="#75507B">: hello! I&apos;m gonna shave a yak, </font><font color="#75507B"><b>excitement</b></font><font color="#75507B">: &quot;yay!&quot;</font>
+  <font color="#AAAAAA"><i>at</i></font> examples/examples/fmt/yak_shave.rs:14<font color="#AAAAAA"><i> on</i></font> main
+  <font color="#AAAAAA"><i>in</i></font> fmt_pretty::yak_shave::<b>shave</b> <font color="#AAAAAA"><i>with</i></font> <b>yak</b>: 2
+  <font color="#AAAAAA"><i>in</i></font> fmt_pretty::yak_shave::<b>shaving_yaks</b> <font color="#AAAAAA"><i>with</i></font> <b>yaks</b>: 3
+
+Oct 24 12:57:29.387 <font color="#75507B"><b>fmt_pretty::yak_shave</b></font><font color="#75507B">: yak shaved successfully</font>
+  <font color="#AAAAAA"><i>at</i></font> examples/examples/fmt/yak_shave.rs:22<font color="#AAAAAA"><i> on</i></font> main
+  <font color="#AAAAAA"><i>in</i></font> fmt_pretty::yak_shave::<b>shave</b> <font color="#AAAAAA"><i>with</i></font> <b>yak</b>: 2
+  <font color="#AAAAAA"><i>in</i></font> fmt_pretty::yak_shave::<b>shaving_yaks</b> <font color="#AAAAAA"><i>with</i></font> <b>yaks</b>: 3
+
+Oct 24 12:57:29.387 <font color="#3465A4"><b>yak_events</b></font><font color="#3465A4">: </font><font color="#3465A4"><b>yak</b></font><font color="#3465A4">: 2, </font><font color="#3465A4"><b>shaved</b></font><font color="#3465A4">: true</font>
+  <font color="#AAAAAA"><i>at</i></font> examples/examples/fmt/yak_shave.rs:43<font color="#AAAAAA"><i> on</i></font> main
+  <font color="#AAAAAA"><i>in</i></font> fmt_pretty::yak_shave::<b>shaving_yaks</b> <font color="#AAAAAA"><i>with</i></font> <b>yaks</b>: 3
+
+Oct 24 12:57:29.387 <font color="#75507B"><b>fmt_pretty::yak_shave</b></font><font color="#75507B">: </font><font color="#75507B"><b>yaks_shaved</b></font><font color="#75507B">: 2</font>
+  <font color="#AAAAAA"><i>at</i></font> examples/examples/fmt/yak_shave.rs:52<font color="#AAAAAA"><i> on</i></font> main
+  <font color="#AAAAAA"><i>in</i></font> fmt_pretty::yak_shave::<b>shaving_yaks</b> <font color="#AAAAAA"><i>with</i></font> <b>yaks</b>: 3
+
+Oct 24 12:57:29.387 <font color="#75507B"><b>fmt_pretty::yak_shave</b></font><font color="#75507B">: hello! I&apos;m gonna shave a yak, </font><font color="#75507B"><b>excitement</b></font><font color="#75507B">: &quot;yay!&quot;</font>
+  <font color="#AAAAAA"><i>at</i></font> examples/examples/fmt/yak_shave.rs:14<font color="#AAAAAA"><i> on</i></font> main
+  <font color="#AAAAAA"><i>in</i></font> fmt_pretty::yak_shave::<b>shave</b> <font color="#AAAAAA"><i>with</i></font> <b>yak</b>: 3
+  <font color="#AAAAAA"><i>in</i></font> fmt_pretty::yak_shave::<b>shaving_yaks</b> <font color="#AAAAAA"><i>with</i></font> <b>yaks</b>: 3
+
+Oct 24 12:57:29.387 <font color="#C4A000"><b>fmt_pretty::yak_shave</b></font><font color="#C4A000">: could not locate yak</font>
+  <font color="#AAAAAA"><i>at</i></font> examples/examples/fmt/yak_shave.rs:16<font color="#AAAAAA"><i> on</i></font> main
+  <font color="#AAAAAA"><i>in</i></font> fmt_pretty::yak_shave::<b>shave</b> <font color="#AAAAAA"><i>with</i></font> <b>yak</b>: 3
+  <font color="#AAAAAA"><i>in</i></font> fmt_pretty::yak_shave::<b>shaving_yaks</b> <font color="#AAAAAA"><i>with</i></font> <b>yaks</b>: 3
+
+Oct 24 12:57:29.387 <font color="#3465A4"><b>yak_events</b></font><font color="#3465A4">: </font><font color="#3465A4"><b>yak</b></font><font color="#3465A4">: 3, </font><font color="#3465A4"><b>shaved</b></font><font color="#3465A4">: false</font>
+  <font color="#AAAAAA"><i>at</i></font> examples/examples/fmt/yak_shave.rs:43<font color="#AAAAAA"><i> on</i></font> main
+  <font color="#AAAAAA"><i>in</i></font> fmt_pretty::yak_shave::<b>shaving_yaks</b> <font color="#AAAAAA"><i>with</i></font> <b>yaks</b>: 3
+
+Oct 24 12:57:29.387 <font color="#CC0000"><b>fmt_pretty::yak_shave</b></font><font color="#CC0000">: failed to shave yak, </font><font color="#CC0000"><b>yak</b></font><font color="#CC0000">: 3, </font><font color="#CC0000"><b>error</b></font><font color="#CC0000">: missing yak</font>
+  <font color="#AAAAAA"><i>at</i></font> examples/examples/fmt/yak_shave.rs:48<font color="#AAAAAA"><i> on</i></font> main
+  <font color="#AAAAAA"><i>in</i></font> fmt_pretty::yak_shave::<b>shaving_yaks</b> <font color="#AAAAAA"><i>with</i></font> <b>yaks</b>: 3
+
+Oct 24 12:57:29.387 <font color="#75507B"><b>fmt_pretty::yak_shave</b></font><font color="#75507B">: </font><font color="#75507B"><b>yaks_shaved</b></font><font color="#75507B">: 2</font>
+  <font color="#AAAAAA"><i>at</i></font> examples/examples/fmt/yak_shave.rs:52<font color="#AAAAAA"><i> on</i></font> main
+  <font color="#AAAAAA"><i>in</i></font> fmt_pretty::yak_shave::<b>shaving_yaks</b> <font color="#AAAAAA"><i>with</i></font> <b>yaks</b>: 3
+
+Oct 24 12:57:29.387 <font color="#4E9A06"><b>fmt_pretty</b></font><font color="#4E9A06">: yak shaving completed, </font><font color="#4E9A06"><b>all_yaks_shaved</b></font><font color="#4E9A06">: false</font>
+  <font color="#AAAAAA"><i>at</i></font> examples/examples/fmt-pretty.rs:19<font color="#AAAAAA"><i> on</i></font> main
+</pre>
+</li>
+<li>
+<p><a href="format/struct.Json.html" title="format::Json"><code>format::Json</code></a>: Outputs newline-delimited JSON logs. This is intended
+for production use with systems where structured logs are consumed as JSON
+by analysis and viewing tools. The JSON output, as seen below, is <em>not</em>
+optimized for human readability.</p>
+<p>For example:</p>
+<pre><font color="#4E9A06"><b>    Finished</b></font> dev [unoptimized + debuginfo] target(s) in 1.58s
+<font color="#4E9A06"><b>     Running</b></font> `target/debug/examples/fmt-json`
+{&quot;timestamp&quot;:&quot;Oct 24 13:00:00.873&quot;,&quot;level&quot;:&quot;INFO&quot;,&quot;fields&quot;:{&quot;message&quot;:&quot;preparing to shave yaks&quot;,&quot;number_of_yaks&quot;:3},&quot;target&quot;:&quot;fmt_json&quot;}
+{&quot;timestamp&quot;:&quot;Oct 24 13:00:00.874&quot;,&quot;level&quot;:&quot;INFO&quot;,&quot;fields&quot;:{&quot;message&quot;:&quot;shaving yaks&quot;},&quot;target&quot;:&quot;fmt_json::yak_shave&quot;,&quot;spans&quot;:[{&quot;yaks&quot;:3,&quot;name&quot;:&quot;shaving_yaks&quot;}]}
+{&quot;timestamp&quot;:&quot;Oct 24 13:00:00.874&quot;,&quot;level&quot;:&quot;TRACE&quot;,&quot;fields&quot;:{&quot;message&quot;:&quot;hello! I&apos;m gonna shave a yak&quot;,&quot;excitement&quot;:&quot;yay!&quot;},&quot;target&quot;:&quot;fmt_json::yak_shave&quot;,&quot;spans&quot;:[{&quot;yaks&quot;:3,&quot;name&quot;:&quot;shaving_yaks&quot;},{&quot;yak&quot;:&quot;1&quot;,&quot;name&quot;:&quot;shave&quot;}]}
+{&quot;timestamp&quot;:&quot;Oct 24 13:00:00.874&quot;,&quot;level&quot;:&quot;TRACE&quot;,&quot;fields&quot;:{&quot;message&quot;:&quot;yak shaved successfully&quot;},&quot;target&quot;:&quot;fmt_json::yak_shave&quot;,&quot;spans&quot;:[{&quot;yaks&quot;:3,&quot;name&quot;:&quot;shaving_yaks&quot;},{&quot;yak&quot;:&quot;1&quot;,&quot;name&quot;:&quot;shave&quot;}]}
+{&quot;timestamp&quot;:&quot;Oct 24 13:00:00.874&quot;,&quot;level&quot;:&quot;DEBUG&quot;,&quot;fields&quot;:{&quot;yak&quot;:1,&quot;shaved&quot;:true},&quot;target&quot;:&quot;yak_events&quot;,&quot;spans&quot;:[{&quot;yaks&quot;:3,&quot;name&quot;:&quot;shaving_yaks&quot;}]}
+{&quot;timestamp&quot;:&quot;Oct 24 13:00:00.874&quot;,&quot;level&quot;:&quot;TRACE&quot;,&quot;fields&quot;:{&quot;yaks_shaved&quot;:1},&quot;target&quot;:&quot;fmt_json::yak_shave&quot;,&quot;spans&quot;:[{&quot;yaks&quot;:3,&quot;name&quot;:&quot;shaving_yaks&quot;}]}
+{&quot;timestamp&quot;:&quot;Oct 24 13:00:00.874&quot;,&quot;level&quot;:&quot;TRACE&quot;,&quot;fields&quot;:{&quot;message&quot;:&quot;hello! I&apos;m gonna shave a yak&quot;,&quot;excitement&quot;:&quot;yay!&quot;},&quot;target&quot;:&quot;fmt_json::yak_shave&quot;,&quot;spans&quot;:[{&quot;yaks&quot;:3,&quot;name&quot;:&quot;shaving_yaks&quot;},{&quot;yak&quot;:&quot;2&quot;,&quot;name&quot;:&quot;shave&quot;}]}
+{&quot;timestamp&quot;:&quot;Oct 24 13:00:00.874&quot;,&quot;level&quot;:&quot;TRACE&quot;,&quot;fields&quot;:{&quot;message&quot;:&quot;yak shaved successfully&quot;},&quot;target&quot;:&quot;fmt_json::yak_shave&quot;,&quot;spans&quot;:[{&quot;yaks&quot;:3,&quot;name&quot;:&quot;shaving_yaks&quot;},{&quot;yak&quot;:&quot;2&quot;,&quot;name&quot;:&quot;shave&quot;}]}
+{&quot;timestamp&quot;:&quot;Oct 24 13:00:00.874&quot;,&quot;level&quot;:&quot;DEBUG&quot;,&quot;fields&quot;:{&quot;yak&quot;:2,&quot;shaved&quot;:true},&quot;target&quot;:&quot;yak_events&quot;,&quot;spans&quot;:[{&quot;yaks&quot;:3,&quot;name&quot;:&quot;shaving_yaks&quot;}]}
+{&quot;timestamp&quot;:&quot;Oct 24 13:00:00.874&quot;,&quot;level&quot;:&quot;TRACE&quot;,&quot;fields&quot;:{&quot;yaks_shaved&quot;:2},&quot;target&quot;:&quot;fmt_json::yak_shave&quot;,&quot;spans&quot;:[{&quot;yaks&quot;:3,&quot;name&quot;:&quot;shaving_yaks&quot;}]}
+{&quot;timestamp&quot;:&quot;Oct 24 13:00:00.874&quot;,&quot;level&quot;:&quot;TRACE&quot;,&quot;fields&quot;:{&quot;message&quot;:&quot;hello! I&apos;m gonna shave a yak&quot;,&quot;excitement&quot;:&quot;yay!&quot;},&quot;target&quot;:&quot;fmt_json::yak_shave&quot;,&quot;spans&quot;:[{&quot;yaks&quot;:3,&quot;name&quot;:&quot;shaving_yaks&quot;},{&quot;yak&quot;:&quot;3&quot;,&quot;name&quot;:&quot;shave&quot;}]}
+{&quot;timestamp&quot;:&quot;Oct 24 13:00:00.875&quot;,&quot;level&quot;:&quot;WARN&quot;,&quot;fields&quot;:{&quot;message&quot;:&quot;could not locate yak&quot;},&quot;target&quot;:&quot;fmt_json::yak_shave&quot;,&quot;spans&quot;:[{&quot;yaks&quot;:3,&quot;name&quot;:&quot;shaving_yaks&quot;},{&quot;yak&quot;:&quot;3&quot;,&quot;name&quot;:&quot;shave&quot;}]}
+{&quot;timestamp&quot;:&quot;Oct 24 13:00:00.875&quot;,&quot;level&quot;:&quot;DEBUG&quot;,&quot;fields&quot;:{&quot;yak&quot;:3,&quot;shaved&quot;:false},&quot;target&quot;:&quot;yak_events&quot;,&quot;spans&quot;:[{&quot;yaks&quot;:3,&quot;name&quot;:&quot;shaving_yaks&quot;}]}
+{&quot;timestamp&quot;:&quot;Oct 24 13:00:00.875&quot;,&quot;level&quot;:&quot;ERROR&quot;,&quot;fields&quot;:{&quot;message&quot;:&quot;failed to shave yak&quot;,&quot;yak&quot;:3,&quot;error&quot;:&quot;missing yak&quot;},&quot;target&quot;:&quot;fmt_json::yak_shave&quot;,&quot;spans&quot;:[{&quot;yaks&quot;:3,&quot;name&quot;:&quot;shaving_yaks&quot;}]}
+{&quot;timestamp&quot;:&quot;Oct 24 13:00:00.875&quot;,&quot;level&quot;:&quot;TRACE&quot;,&quot;fields&quot;:{&quot;yaks_shaved&quot;:2},&quot;target&quot;:&quot;fmt_json::yak_shave&quot;,&quot;spans&quot;:[{&quot;yaks&quot;:3,&quot;name&quot;:&quot;shaving_yaks&quot;}]}
+{&quot;timestamp&quot;:&quot;Oct 24 13:00:00.875&quot;,&quot;level&quot;:&quot;INFO&quot;,&quot;fields&quot;:{&quot;message&quot;:&quot;yak shaving completed&quot;,&quot;all_yaks_shaved&quot;:false},&quot;target&quot;:&quot;fmt_json&quot;}
+</pre>
+</li>
+</ul>
+<h3 id="filters" class="section-header"><a href="#filters">Filters</a></h3>
+<p>If you want to filter the <code>tracing</code> <code>Events</code> based on environment
+variables, you can use the <a href="../filter/struct.EnvFilter.html"><code>EnvFilter</code></a> as follows:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">tracing_subscriber::EnvFilter</span>;
+
+<span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">EnvFilter::from_default_env</span>();</code></pre></div>
+<p>As mentioned above, the <a href="../filter/struct.EnvFilter.html"><code>EnvFilter</code></a> allows <code>Span</code>s and <code>Event</code>s to
+be filtered at runtime by setting the <code>RUST_LOG</code> environment variable.</p>
+<p>You can find the other available <a href="../filter/index.html"><code>filter</code></a>s in the documentation.</p>
+<h3 id="using-your-subscriber" class="section-header"><a href="#using-your-subscriber">Using Your Subscriber</a></h3>
+<p>Finally, once you have configured your <code>Subscriber</code>, you need to
+configure your executable to use it.</p>
+<p>A subscriber can be installed globally using:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">tracing</span>;
+<span class="kw">use</span> <span class="ident">tracing_subscriber::FmtSubscriber</span>;
+
+<span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident">FmtSubscriber::new</span>();
+
+<span class="ident">tracing::subscriber::set_global_default</span>(<span class="ident">subscriber</span>)
+    .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">_err</span><span class="op">|</span> <span class="macro">eprintln!</span>(<span class="string">&quot;Unable to set global default subscriber&quot;</span>));
+<span class="comment">// Note this will only fail if you try to set the global default</span>
+<span class="comment">// subscriber multiple times</span></code></pre></div>
+<h3 id="composing-layers" class="section-header"><a href="#composing-layers">Composing Layers</a></h3>
+<p>Composing an <a href="../filter/struct.EnvFilter.html"><code>EnvFilter</code></a> <code>Layer</code> and a <a href="../fmt/struct.Layer.html">format <code>Layer</code></a>:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">tracing_subscriber</span>::{<span class="ident">fmt</span>, <span class="ident">EnvFilter</span>};
+<span class="kw">use</span> <span class="ident">tracing_subscriber::prelude</span>::<span class="kw-2">*</span>;
+
+<span class="kw">let</span> <span class="ident">fmt_layer</span> <span class="op">=</span> <span class="ident">fmt::layer</span>()
+    .<span class="ident">with_target</span>(<span class="bool-val">false</span>);
+<span class="kw">let</span> <span class="ident">filter_layer</span> <span class="op">=</span> <span class="ident">EnvFilter::try_from_default_env</span>()
+    .<span class="ident">or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">EnvFilter::try_new</span>(<span class="string">&quot;info&quot;</span>))
+    .<span class="ident">unwrap</span>();
+
+<span class="ident">tracing_subscriber::registry</span>()
+    .<span class="ident">with</span>(<span class="ident">filter_layer</span>)
+    .<span class="ident">with</span>(<span class="ident">fmt_layer</span>)
+    .<span class="ident">init</span>();</code></pre></div>
+</div></details><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
+<div class="item-table"><div class="item-left module-item"><a class="mod" href="format/index.html" title="tracing_subscriber::fmt::format mod">format</a></div><div class="item-right docblock-short"><p>Formatters for logging <code>tracing</code> events.</p>
+</div><div class="item-left module-item"><a class="mod" href="time/index.html" title="tracing_subscriber::fmt::time mod">time</a></div><div class="item-right docblock-short"><p>Formatters for event timestamps.</p>
+</div><div class="item-left module-item"><a class="mod" href="writer/index.html" title="tracing_subscriber::fmt::writer mod">writer</a></div><div class="item-right docblock-short"><p>Abstractions for creating <a href="https://doc.rust-lang.org/std/io/trait.Write.html"><code>io::Write</code></a> instances.</p>
+</div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.FmtContext.html" title="tracing_subscriber::fmt::FmtContext struct">FmtContext</a></div><div class="item-right docblock-short"><p>Provides the current span context to a formatter.</p>
+</div><div class="item-left module-item"><a class="struct" href="struct.FormattedFields.html" title="tracing_subscriber::fmt::FormattedFields struct">FormattedFields</a></div><div class="item-right docblock-short"><p>A formatted representation of a span’s fields stored in its <a href="../registry/struct.Extensions.html">extensions</a>.</p>
+</div><div class="item-left module-item"><a class="struct" href="struct.Layer.html" title="tracing_subscriber::fmt::Layer struct">Layer</a></div><div class="item-right docblock-short"><p>A <a href="../layer/trait.Layer.html"><code>Layer</code></a> that logs formatted representations of <code>tracing</code> events.</p>
+</div><div class="item-left module-item"><a class="struct" href="struct.Subscriber.html" title="tracing_subscriber::fmt::Subscriber struct">Subscriber</a></div><div class="item-right docblock-short"><p>A <code>Subscriber</code> that logs formatted representations of <code>tracing</code> events.</p>
+</div><div class="item-left module-item"><a class="struct" href="struct.SubscriberBuilder.html" title="tracing_subscriber::fmt::SubscriberBuilder struct">SubscriberBuilder</a></div><div class="item-right docblock-short"><p>Configures and constructs <code>Subscriber</code>s.</p>
+</div><div class="item-left module-item"><a class="struct" href="struct.TestWriter.html" title="tracing_subscriber::fmt::TestWriter struct">TestWriter</a></div><div class="item-right docblock-short"><p>A writer intended to support <a href="https://doc.rust-lang.org/book/ch11-02-running-tests.html#showing-function-output"><code>libtest</code>’s output capturing</a> for use in unit tests.</p>
+</div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
+<div class="item-table"><div class="item-left module-item"><a class="trait" href="trait.FormatEvent.html" title="tracing_subscriber::fmt::FormatEvent trait">FormatEvent</a></div><div class="item-right docblock-short"><p>A type that can format a tracing <code>Event</code> for a <code>fmt::Write</code>.</p>
+</div><div class="item-left module-item"><a class="trait" href="trait.FormatFields.html" title="tracing_subscriber::fmt::FormatFields trait">FormatFields</a></div><div class="item-right docblock-short"><p>A type that can format a <a href="../field/trait.RecordFields.html">set of fields</a> to a <code>fmt::Write</code>.</p>
+</div><div class="item-left module-item"><a class="trait" href="trait.MakeWriter.html" title="tracing_subscriber::fmt::MakeWriter trait">MakeWriter</a></div><div class="item-right docblock-short"><p>A type that can create <a href="https://doc.rust-lang.org/1.56.1/std/io/trait.Write.html"><code>io::Write</code></a> instances.</p>
+</div></div><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
+<div class="item-table"><div class="item-left module-item"><a class="fn" href="fn.fmt.html" title="tracing_subscriber::fmt::fmt fn">fmt</a></div><div class="item-right docblock-short"><p>Returns a new <a href="struct.SubscriberBuilder.html"><code>SubscriberBuilder</code></a> for configuring a <a href="struct.Subscriber.html">formatting subscriber</a>.</p>
+</div><div class="item-left module-item"><a class="fn" href="fn.format.html" title="tracing_subscriber::fmt::format fn">format</a></div><div class="item-right docblock-short"><p>Returns the default configuration for an [event formatter].</p>
+</div><div class="item-left module-item"><a class="fn" href="fn.init.html" title="tracing_subscriber::fmt::init fn">init</a></div><div class="item-right docblock-short"><p>Install a global tracing subscriber that listens for events and
+filters based on the value of the <a href="../filter/struct.EnvFilter.html#associatedconstant.DEFAULT_ENV"><code>RUST_LOG</code> environment variable</a>.</p>
+</div><div class="item-left module-item"><a class="fn" href="fn.layer.html" title="tracing_subscriber::fmt::layer fn">layer</a></div><div class="item-right docblock-short"><p>Returns a new <a href="struct.Layer.html">formatting layer</a> that can be <a href="../layer/index.html">composed</a> with other layers to
+construct a <a href="struct.Subscriber.html" title="Subscriber"><code>Subscriber</code></a>.</p>
+</div><div class="item-left module-item"><a class="fn" href="fn.time.html" title="tracing_subscriber::fmt::time fn">time</a></div><div class="item-right docblock-short"><p>Returns a new <code>SystemTime</code> timestamp provider.</p>
+</div><div class="item-left module-item"><a class="fn" href="fn.try_init.html" title="tracing_subscriber::fmt::try_init fn">try_init</a></div><div class="item-right docblock-short"><p>Install a global tracing subscriber that listens for events and
+filters based on the value of the <a href="../filter/struct.EnvFilter.html#associatedconstant.DEFAULT_ENV"><code>RUST_LOG</code> environment variable</a>,
+if one is not already set.</p>
+</div></div><h2 id="types" class="section-header"><a href="#types">Type Definitions</a></h2>
+<div class="item-table"><div class="item-left module-item"><a class="type" href="type.Formatter.html" title="tracing_subscriber::fmt::Formatter type">Formatter</a></div><div class="item-right docblock-short"><p>A <code>Subscriber</code> that logs formatted representations of <code>tracing</code> events.
+This type only logs formatted events; it does not perform any filtering.</p>
+</div><div class="item-left module-item"><a class="type" href="type.LayerBuilder.html" title="tracing_subscriber::fmt::LayerBuilder type">LayerBuilder</a><span class="stab deprecated" title="">Deprecated</span></div><div class="item-right docblock-short"><p>A builder for <a href="struct.Layer.html"><code>Layer</code></a> that logs formatted representations of <code>tracing</code>
+events and spans.</p>
+</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tracing_subscriber" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script>
+</body></html>

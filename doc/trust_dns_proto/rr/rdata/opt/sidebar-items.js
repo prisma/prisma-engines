@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["EdnsCode","The code of the EDNS data option"],["EdnsOption","options used to pass information about capabilities between client and server"]],"fn":[["emit","Write the RData from the given Decoder"],["read","Read the RData from the given Decoder"]],"struct":[["OPT","The OPT record type is used for ExtendedDNS records."]]});

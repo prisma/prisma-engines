@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["is_otf","Returns whether a buffer is OTF font data."],["is_ttf","Returns whether a buffer is TTF font data."],["is_woff","Returns whether a buffer is WOFF font data."],["is_woff2","Returns whether a buffer is WOFF2 font data."]]});

@@ -1,0 +1,4 @@
+(function() {var implementors = {};
+implementors["byte_pool"] = [{"text":"impl&lt;'a, T:&nbsp;<a class=\"trait\" href=\"stable_deref_trait/trait.StableDeref.html\" title=\"trait stable_deref_trait::StableDeref\">StableDeref</a> + <a class=\"trait\" href=\"byte_pool/trait.Poolable.html\" title=\"trait byte_pool::Poolable\">Poolable</a>&gt; <a class=\"trait\" href=\"stable_deref_trait/trait.StableDeref.html\" title=\"trait stable_deref_trait::StableDeref\">StableDeref</a> for <a class=\"struct\" href=\"byte_pool/struct.Block.html\" title=\"struct byte_pool::Block\">Block</a>&lt;'a, T&gt;","synthetic":false,"types":["byte_pool::pool::Block"]}];
+implementors["stable_deref_trait"] = [];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

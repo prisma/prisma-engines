@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Date","The date and time at which the message originated."],["Expect","HTTP `Expect` header"],["Referer","Contains the address of the page making the request."],["RetryAfter","Indicate how long the user agent should wait before making a follow-up request."],["SourceMap","Links to a file that maps transformed source to the original source."]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"macro":[["new","Create module with CPUID bool code."]]});

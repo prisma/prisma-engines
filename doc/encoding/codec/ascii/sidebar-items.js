@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["ASCIIDecoder","A decoder for ASCII."],["ASCIIEncoder","An encoder for ASCII."],["ASCIIEncoding","ASCII, also known as ISO/IEC 646:US."]]});

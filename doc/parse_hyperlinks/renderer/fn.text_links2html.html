@@ -1,0 +1,131 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source code viewer with link renderer"><meta name="keywords" content="rust, rustlang, rust-lang, text_links2html"><title>text_links2html in parse_hyperlinks::renderer - Rust</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc fn"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../parse_hyperlinks/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a><div class="sidebar-elems"><h2 class="location">Other items in<br><a href="../index.html">parse_hyperlinks</a>::<wbr><a href="index.html">renderer</a></h2><div id="sidebar-vars" data-name="text_links2html" data-ty="fn" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Function <a href="../index.html">parse_hyperlinks</a>::<wbr><a href="index.html">renderer</a>::<wbr><a class="fn" href="#">text_links2html</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../../src/parse_hyperlinks/renderer.rs.html#206-213" title="goto source code">[src]</a></span></h1><pre class="rust fn"><code>pub fn text_links2html(input: &amp;<a class="primitive" href="https://doc.rust-lang.org/1.56.1/std/primitive.str.html">str</a>) -&gt; <a class="struct" href="https://doc.rust-lang.org/1.56.1/alloc/string/struct.String.html" title="struct alloc::string::String">String</a></code></pre><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><h1 id="source-code-viewer-with-link-renderer" class="section-header"><a href="#source-code-viewer-with-link-renderer">Source code viewer with link renderer</a></h1>
+<p>Text to HTML renderer that prints the input text “as it is”, but
+renders links with markup. Links are clickable and only their
+<em>link text</em> is shown (the part enclosed with <code>&lt;a&gt;</code> and <code>&lt;/a&gt;</code>).</p>
+<h2 id="markdown" class="section-header"><a href="#markdown">Markdown</a></h2>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">parse_hyperlinks::renderer::text_links2html</span>;
+<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
+
+<span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="string">r#&quot;abc[text0](dest0 &quot;title0&quot;)abc
+abc[text1][label1]abc
+abc[text2](dest2 &quot;title2&quot;)abc
+[text3]: dest3 &quot;title3&quot;
+[label1]: dest1 &quot;title1&quot;
+abc[text3]abc
+&quot;#</span>;
+
+<span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="string">&quot;\
+&lt;pre&gt;abc&lt;a href=\&quot;dest0\&quot; title=\&quot;title0\&quot;&gt;text0&lt;/a&gt;abc
+abc&lt;a href=\&quot;dest1\&quot; title=\&quot;title1\&quot;&gt;text1&lt;/a&gt;abc
+abc&lt;a href=\&quot;dest2\&quot; title=\&quot;title2\&quot;&gt;text2&lt;/a&gt;abc
+&lt;a href=\&quot;dest3\&quot; title=\&quot;title3\&quot;&gt;[text3]: dest3 &amp;quot;title3&amp;quot;&lt;/a&gt;
+&lt;a href=\&quot;dest1\&quot; title=\&quot;title1\&quot;&gt;[label1]: dest1 &amp;quot;title1&amp;quot;&lt;/a&gt;
+abc&lt;a href=\&quot;dest3\&quot; title=\&quot;title3\&quot;&gt;text3&lt;/a&gt;abc
+&lt;/pre&gt;&quot;</span>;
+<span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">text_links2html</span>(<span class="ident">i</span>);
+<span class="macro">assert_eq!</span>(<span class="ident">res</span>, <span class="ident">expected</span>);</code></pre></div>
+<h3 id="rendered-text" class="section-header"><a href="#rendered-text">Rendered text</a></h3>
+<p>This is how the rendered text looks like in the browser:</p>
+<pre>abc<a href="dest0" title="title0">text0</a>abc
+abc<a href="dest1" title="title1">text1</a>abc
+abc<a href="dest2" title="title2">text2</a>abc
+<a href="dest3" title="title3">[text3]: dest3 &quot;title3&quot;</a>
+<a href="dest1" title="title1">[label1]: dest1 &quot;title1&quot;</a>
+abc<a href="dest3" title="title3">text3</a>abc
+</pre>
+<h2 id="restructuredtext" class="section-header"><a href="#restructuredtext">reStructuredText</a></h2>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">parse_hyperlinks::renderer::text_links2html</span>;
+<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
+
+<span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="string">r#&quot;abc `text1 &lt;label1_&gt;`_abc
+abc text2_ abc
+abc text3__ abc
+abc text_label4_ abc
+abc text5__ abc
+.. _label1: dest1
+.. _text2: dest2
+.. __: dest3
+__ dest5
+&quot;#</span>;
+
+<span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="string">&quot;\
+&lt;pre&gt;abc &lt;a href=\&quot;dest1\&quot; title=\&quot;\&quot;&gt;text1&lt;/a&gt;abc
+abc &lt;a href=\&quot;dest2\&quot; title=\&quot;\&quot;&gt;text2&lt;/a&gt; abc
+abc &lt;a href=\&quot;dest3\&quot; title=\&quot;\&quot;&gt;text3&lt;/a&gt; abc
+abc text_label4_ abc
+abc &lt;a href=\&quot;dest5\&quot; title=\&quot;\&quot;&gt;text5&lt;/a&gt; abc
+&lt;a href=\&quot;dest1\&quot; title=\&quot;\&quot;&gt;.. _label1: dest1&lt;/a&gt;
+&lt;a href=\&quot;dest2\&quot; title=\&quot;\&quot;&gt;.. _text2: dest2&lt;/a&gt;
+&lt;a href=\&quot;dest3\&quot; title=\&quot;\&quot;&gt;.. __: dest3&lt;/a&gt;
+&lt;a href=\&quot;dest5\&quot; title=\&quot;\&quot;&gt;__ dest5&lt;/a&gt;
+&lt;/pre&gt;\
+&quot;</span>;
+
+<span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">text_links2html</span>(<span class="ident">i</span>);
+<span class="macro">assert_eq!</span>(<span class="ident">res</span>, <span class="ident">expected</span>);</code></pre></div>
+<h3 id="rendered-text-1" class="section-header"><a href="#rendered-text-1">Rendered text</a></h3>
+<p>This is how the rendered text looks like in the browser:</p>
+<pre>abc <a href="dest1" title="">text1</a>abc
+abc <a href="dest2" title="">text2</a> abc
+abc <a href="dest3" title="">text3</a> abc
+abc text_label4_ abc
+abc <a href="dest5" title="">text5</a> abc
+<a href="dest1" title="">.. _label1: dest1</a>
+<a href="dest2" title="">.. _text2: dest2</a>
+<a href="dest3" title="">.. __: dest3</a>
+<a href="dest5" title="">__ dest5</a>
+</pre>
+<h2 id="asciidoc" class="section-header"><a href="#asciidoc">Asciidoc</a></h2>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">parse_hyperlinks::renderer::text_links2html</span>;
+<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
+
+<span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="string">r#&quot;abc https://dest0[text0]abc
+abc link:https://dest1[text1]abc
+abc{label2}[text2]abc
+abc{label3}abc
+:label2: https://dest2
+:label3: https://dest3
+&quot;#</span>;
+
+<span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="string">&quot;\
+&lt;pre&gt;abc &lt;a href=\&quot;https://dest0\&quot; title=\&quot;\&quot;&gt;text0&lt;/a&gt;abc
+abc &lt;a href=\&quot;https://dest1\&quot; title=\&quot;\&quot;&gt;text1&lt;/a&gt;abc
+abc&lt;a href=\&quot;https://dest2\&quot; title=\&quot;\&quot;&gt;text2&lt;/a&gt;abc
+abc&lt;a href=\&quot;https://dest3\&quot; title=\&quot;\&quot;&gt;https:&amp;#x2F;&amp;#x2F;dest3&lt;/a&gt;abc
+&lt;a href=\&quot;https://dest2\&quot; title=\&quot;\&quot;&gt;:label2: https:&amp;#x2F;&amp;#x2F;dest2&lt;/a&gt;
+&lt;a href=\&quot;https://dest3\&quot; title=\&quot;\&quot;&gt;:label3: https:&amp;#x2F;&amp;#x2F;dest3&lt;/a&gt;
+&lt;/pre&gt;&quot;</span>;
+
+<span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">text_links2html</span>(<span class="ident">i</span>);
+<span class="macro">assert_eq!</span>(<span class="ident">res</span>, <span class="ident">expected</span>);</code></pre></div>
+<h3 id="rendered-text-2" class="section-header"><a href="#rendered-text-2">Rendered text</a></h3>
+<p>This is how the rendered text looks like in the browser:</p>
+<pre>abc <a href="https://dest0" title="">text0</a>abc
+abc <a href="https://dest1" title="">text1</a>abc
+abc<a href="https://dest2" title="">text2</a>abc
+abc<a href="https://dest3" title="">https:&#x2F;&#x2F;dest3</a>abc
+<a href="https://dest2" title="">:label2: https:&#x2F;&#x2F;dest2</a>
+<a href="https://dest3" title="">:label3: https:&#x2F;&#x2F;dest3</a>
+</pre>
+<h2 id="html" class="section-header"><a href="#html">HTML</a></h2>
+<p>HTML <em>inline links</em> are sanitized and passed through.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">parse_hyperlinks::renderer::text_links2html</span>;
+<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
+
+<span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="string">r#&quot;abc&lt;a href=&quot;dest1&quot; title=&quot;title1&quot;&gt;text1&lt;/a&gt;abc&quot;#</span>;
+
+<span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="string">&quot;&lt;pre&gt;\
+abc&lt;a href=\&quot;dest1\&quot; title=\&quot;title1\&quot;&gt;text1&lt;/a&gt;abc\
+&lt;/pre&gt;&quot;</span>;
+
+<span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">text_links2html</span>(<span class="ident">i</span>);
+<span class="macro">assert_eq!</span>(<span class="ident">res</span>, <span class="ident">expected</span>);</code></pre></div>
+<h3 id="rendered-text-3" class="section-header"><a href="#rendered-text-3">Rendered text</a></h3>
+<p>This is how the rendered text looks like in the browser:</p>
+<pre>
+abc<a href="dest1" title="title1">text1</a>abc
+</pre>
+</div></details></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="parse_hyperlinks" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script>
+</body></html>

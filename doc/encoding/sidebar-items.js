@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["all","A list of all supported encodings. Useful for encodings fixed in the compile time."],["codec","Codec implementations."],["label","An interface for retrieving an encoding (or a set of encodings) from a string/numeric label."],["types","Interface to the character encoding."]]});

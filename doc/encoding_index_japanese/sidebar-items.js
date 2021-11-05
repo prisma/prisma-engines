@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["jis0208","JIS X 0208 with common extensions."],["jis0212","JIS X 0212."]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["BoxBody","A boxed [`Body`] trait object."],["MapData","Body returned by the `map_data` combinator."],["MapErr","Body returned by the `map_err` combinator."]]});

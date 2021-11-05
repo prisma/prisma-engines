@@ -1,0 +1,46 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Returns a new `SubscriberBuilder` for configuring a formatting subscriber."><meta name="keywords" content="rust, rustlang, rust-lang, fmt"><title>fmt in tracing_subscriber::fmt - Rust</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc fn"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../tracing_subscriber/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;tokio-rs&#x2F;tracing&#x2F;master&#x2F;assets&#x2F;logo-type.png' alt='logo'></div></a><div class="sidebar-elems"><h2 class="location">Other items in<br><a href="../index.html">tracing_subscriber</a>::<wbr><a href="index.html">fmt</a></h2><div id="sidebar-vars" data-name="fmt" data-ty="fn" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Function <a href="../index.html">tracing_subscriber</a>::<wbr><a href="index.html">fmt</a>::<wbr><a class="fn" href="#">fmt</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../../src/tracing_subscriber/fmt/mod.rs.html#382-384" title="goto source code">[src]</a></span></h1><pre class="rust fn"><code>pub fn fmt() -&gt; <a class="struct" href="struct.SubscriberBuilder.html" title="struct tracing_subscriber::fmt::SubscriberBuilder">SubscriberBuilder</a></code></pre><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Returns a new <a href="struct.SubscriberBuilder.html"><code>SubscriberBuilder</code></a> for configuring a <a href="struct.Subscriber.html">formatting subscriber</a>.</p>
+<p>This is essentially shorthand for [<code>SubscriberBuilder::default()]</code>.</p>
+<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
+<p>Using <a href="struct.SubscriberBuilder.html#method.init"><code>init</code></a> to set the default subscriber:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="ident">tracing_subscriber::fmt</span>().<span class="ident">init</span>();</code></pre></div>
+<p>Configuring the output format:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code>
+<span class="ident">tracing_subscriber::fmt</span>()
+    <span class="comment">// Configure formatting settings.</span>
+    .<span class="ident">with_target</span>(<span class="bool-val">false</span>)
+    .<span class="ident">with_timer</span>(<span class="ident">tracing_subscriber::fmt::time::uptime</span>())
+    .<span class="ident">with_level</span>(<span class="bool-val">true</span>)
+    <span class="comment">// Set the subscriber as the default.</span>
+    .<span class="ident">init</span>();</code></pre></div>
+<p><a href="struct.SubscriberBuilder.html#method.try_init"><code>try_init</code></a> returns an error if the default subscriber could not be set:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">std::error::Error</span>;
+
+<span class="kw">fn</span> <span class="ident">init_subscriber</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="ident">tracing_subscriber::fmt</span>()
+        <span class="comment">// Configure the subscriber to emit logs in JSON format.</span>
+        .<span class="ident">json</span>()
+        <span class="comment">// Configure the subscriber to flatten event fields in the output JSON objects.</span>
+        .<span class="ident">flatten_event</span>(<span class="bool-val">true</span>)
+        <span class="comment">// Set the subscriber as the default, returning an error if this fails.</span>
+        .<span class="ident">try_init</span>()<span class="question-mark">?</span>;
+
+    <span class="prelude-val">Ok</span>(())
+}</code></pre></div>
+<p>Rather than setting the subscriber as the default, <a href="struct.SubscriberBuilder.html#method.finish"><code>finish</code></a> <em>returns</em> the
+constructed subscriber, which may then be passed to other functions:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident">tracing_subscriber::fmt</span>()
+    .<span class="ident">with_max_level</span>(<span class="ident">tracing::Level::DEBUG</span>)
+    .<span class="ident">compact</span>()
+    .<span class="ident">finish</span>();
+
+<span class="ident">tracing::subscriber::with_default</span>(<span class="ident">subscriber</span>, <span class="op">|</span><span class="op">|</span> {
+    <span class="comment">// the subscriber will only be set as the default</span>
+    <span class="comment">// inside this closure...</span>
+})</code></pre></div>
+</div></details></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tracing_subscriber" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script>
+</body></html>

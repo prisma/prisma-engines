@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["new_row","Creates `Row` from values and columns."]],"mod":[["convert",""]],"struct":[["Row","Client side representation of a MySql row."]],"trait":[["ColumnIndex","Things that may be used as an index of a row column."]]});

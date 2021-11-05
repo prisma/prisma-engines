@@ -1,0 +1,1 @@
+initSidebarItems({"trait":[["BitStore","Common interface for memory regions."]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Error","Possible errors that can arise during encoding."]],"fn":[["to_bson","Encode a `T` Serializable into a BSON `Value`."],["to_document","Encode a `T` Serializable into a BSON `Document`."],["to_vec","Serialize the given `T` as a BSON byte vector."]],"struct":[["Serializer","Serde Serializer"]],"type":[["Result","Alias for `Result<T, Error>`."]]});

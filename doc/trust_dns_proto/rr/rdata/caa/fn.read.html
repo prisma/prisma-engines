@@ -1,0 +1,76 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Read the binary CAA format"><meta name="keywords" content="rust, rustlang, rust-lang, read"><title>read in trust_dns_proto::rr::rdata::caa - Rust</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc fn"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../trust_dns_proto/index.html'><div class='logo-container rust-logo'><img src='../../../../rust-logo.png' alt='logo'></div></a><div class="sidebar-elems"><h2 class="location">Other items in<br><a href="../../../index.html">trust_dns_proto</a>::<wbr><a href="../../index.html">rr</a>::<wbr><a href="../index.html">rdata</a>::<wbr><a href="index.html">caa</a></h2><div id="sidebar-vars" data-name="read" data-ty="fn" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Function <a href="../../../index.html">trust_dns_proto</a>::<wbr><a href="../../index.html">rr</a>::<wbr><a href="../index.html">rdata</a>::<wbr><a href="index.html">caa</a>::<wbr><a class="fn" href="#">read</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../../../../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../../../../src/trust_dns_proto/rr/rdata/caa.rs.html#730-750" title="goto source code">[src]</a></span></h1><pre class="rust fn"><code>pub fn read(<br>&nbsp;&nbsp;&nbsp;&nbsp;decoder: &amp;mut <a class="struct" href="../../../serialize/binary/struct.BinDecoder.html" title="struct trust_dns_proto::serialize::binary::BinDecoder">BinDecoder</a>&lt;'_&gt;, <br>&nbsp;&nbsp;&nbsp;&nbsp;rdata_length: <a class="struct" href="../../../serialize/binary/struct.Restrict.html" title="struct trust_dns_proto::serialize::binary::Restrict">Restrict</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/1.56.1/std/primitive.u16.html">u16</a>&gt;<br>) -&gt; <a class="type" href="../../../error/type.ProtoResult.html" title="type trust_dns_proto::error::ProtoResult">ProtoResult</a>&lt;<a class="struct" href="struct.CAA.html" title="struct trust_dns_proto::rr::rdata::caa::CAA">CAA</a>&gt;</code></pre><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Read the binary CAA format</p>
+<p><a href="https://tools.ietf.org/html/rfc6844#section-5.1">RFC 6844, DNS Certification Authority Authorization, January 2013</a></p>
+<div class="example-wrap"><pre class="language-text"><code>5.1.  Syntax
+
+  A CAA RR contains a single property entry consisting of a tag-value
+  pair.  Each tag represents a property of the CAA record.  The value
+  of a CAA property is that specified in the corresponding value field.
+
+  A domain name MAY have multiple CAA RRs associated with it and a
+  given property MAY be specified more than once.
+
+  The CAA data field contains one property entry.  A property entry
+  consists of the following data fields:
+
+  +0-1-2-3-4-5-6-7-|0-1-2-3-4-5-6-7-|
+  | Flags          | Tag Length = n |
+  +----------------+----------------+...+---------------+
+  | Tag char 0     | Tag char 1     |...| Tag char n-1  |
+  +----------------+----------------+...+---------------+
+  +----------------+----------------+.....+----------------+
+  | Value byte 0   | Value byte 1   |.....| Value byte m-1 |
+  +----------------+----------------+.....+----------------+
+
+  Where n is the length specified in the Tag length field and m is the
+  remaining octets in the Value field (m = d - n - 2) where d is the
+  length of the RDATA section.
+
+  The data fields are defined as follows:
+
+  Flags:  One octet containing the following fields:
+
+     Bit 0, Issuer Critical Flag:  If the value is set to &#39;1&#39;, the
+        critical flag is asserted and the property MUST be understood
+        if the CAA record is to be correctly processed by a certificate
+        issuer.
+
+        A Certification Authority MUST NOT issue certificates for any
+        Domain that contains a CAA critical property for an unknown or
+        unsupported property tag that for which the issuer critical
+        flag is set.
+
+     Note that according to the conventions set out in [RFC1035], bit 0
+     is the Most Significant Bit and bit 7 is the Least Significant
+     Bit. Thus, the Flags value 1 means that bit 7 is set while a value
+     of 128 means that bit 0 is set according to this convention.
+
+     All other bit positions are reserved for future use.
+
+     To ensure compatibility with future extensions to CAA, DNS records
+     compliant with this version of the CAA specification MUST clear
+     (set to &quot;0&quot;) all reserved flags bits.  Applications that interpret
+     CAA records MUST ignore the value of all reserved flag bits.
+
+  Tag Length:  A single octet containing an unsigned integer specifying
+     the tag length in octets.  The tag length MUST be at least 1 and
+     SHOULD be no more than 15.
+
+  Tag:  The property identifier, a sequence of US-ASCII characters.
+
+     Tag values MAY contain US-ASCII characters &#39;a&#39; through &#39;z&#39;, &#39;A&#39;
+     through &#39;Z&#39;, and the numbers 0 through 9.  Tag values SHOULD NOT
+     contain any other characters.  Matching of tag values is case
+     insensitive.
+
+     Tag values submitted for registration by IANA MUST NOT contain any
+     characters other than the (lowercase) US-ASCII characters &#39;a&#39;
+     through &#39;z&#39; and the numbers 0 through 9.
+
+  Value:  A sequence of octets representing the property value.
+     Property values are encoded as binary values and MAY employ sub-
+     formats.
+
+     The length of the value field is specified implicitly as the
+     remaining length of the enclosing Resource Record data field.</code></pre></div></div></details></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="trust_dns_proto" data-search-index-js="../../../../search-index.js" data-search-js="../../../../search.js"></div>
+    <script src="../../../../main.js"></script>
+</body></html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Extension trait adding combinators for working with types implementing [`MakeWriter`]."><meta name="keywords" content="rust, rustlang, rust-lang, MakeWriterExt"><title>MakeWriterExt in tracing_subscriber::fmt::writer - Rust</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc trait"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../tracing_subscriber/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;tokio-rs&#x2F;tracing&#x2F;master&#x2F;assets&#x2F;logo-type.png' alt='logo'></div></a><h2 class="location">Trait MakeWriterExt</h2><div class="sidebar-elems"><div class="block items"><h3 class="sidebar-title"><a href="#provided-methods">Provided Methods</a></h3><div class="sidebar-links"><a href="#method.and">and</a><a href="#method.or_else">or_else</a><a href="#method.with_filter">with_filter</a><a href="#method.with_max_level">with_max_level</a><a href="#method.with_min_level">with_min_level</a></div><h3 class="sidebar-title"><a href="#implementors">Implementors</a></h3></div><h2 class="location">Other items in<br><a href="../../index.html">tracing_subscriber</a>::<wbr><a href="../index.html">fmt</a>::<wbr><a href="index.html">writer</a></h2><div id="sidebar-vars" data-name="MakeWriterExt" data-ty="trait" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Trait <a href="../../index.html">tracing_subscriber</a>::<wbr><a href="../index.html">fmt</a>::<wbr><a href="index.html">writer</a>::<wbr><a class="trait" href="#">MakeWriterExt</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../../../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../../../src/tracing_subscriber/fmt/writer.rs.html#208-482" title="goto source code">[src]</a></span></h1><div class="docblock type-decl"><pre class="rust trait"><code>pub trait MakeWriterExt: <a class="trait" href="../trait.MakeWriter.html" title="trait tracing_subscriber::fmt::MakeWriter">MakeWriter</a> {
+    fn <a href="#method.with_max_level" class="fnname">with_max_level</a>(self, level: <a class="struct" href="../../../tracing_core/metadata/struct.Level.html" title="struct tracing_core::metadata::Level">Level</a>) -&gt; <a class="struct" href="struct.WithMaxLevel.html" title="struct tracing_subscriber::fmt::writer::WithMaxLevel">WithMaxLevel</a>&lt;Self&gt;<br>&nbsp;&nbsp;&nbsp; <span class="where">where<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Self: <a class="trait" href="https://doc.rust-lang.org/1.56.1/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a></span>,
+    { ... }
+<div class="item-spacer"></div>    fn <a href="#method.with_min_level" class="fnname">with_min_level</a>(self, level: <a class="struct" href="../../../tracing_core/metadata/struct.Level.html" title="struct tracing_core::metadata::Level">Level</a>) -&gt; <a class="struct" href="struct.WithMinLevel.html" title="struct tracing_subscriber::fmt::writer::WithMinLevel">WithMinLevel</a>&lt;Self&gt;<br>&nbsp;&nbsp;&nbsp; <span class="where">where<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Self: <a class="trait" href="https://doc.rust-lang.org/1.56.1/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a></span>,
+    { ... }
+<div class="item-spacer"></div>    fn <a href="#method.with_filter" class="fnname">with_filter</a>&lt;F&gt;(self, filter: F) -&gt; <a class="struct" href="struct.WithFilter.html" title="struct tracing_subscriber::fmt::writer::WithFilter">WithFilter</a>&lt;Self, F&gt;<br>&nbsp;&nbsp;&nbsp; <span class="where">where<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Self: <a class="trait" href="https://doc.rust-lang.org/1.56.1/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;F: <a class="trait" href="https://doc.rust-lang.org/1.56.1/core/ops/function/trait.Fn.html" title="trait core::ops::function::Fn">Fn</a>(&amp;<a class="struct" href="../../../tracing_core/metadata/struct.Metadata.html" title="struct tracing_core::metadata::Metadata">Metadata</a>&lt;'_&gt;) -&gt; <a class="primitive" href="https://doc.rust-lang.org/1.56.1/std/primitive.bool.html">bool</a></span>,
+    { ... }
+<div class="item-spacer"></div>    fn <a href="#method.and" class="fnname">and</a>&lt;B&gt;(self, other: B) -&gt; <a class="struct" href="struct.Tee.html" title="struct tracing_subscriber::fmt::writer::Tee">Tee</a>&lt;Self, B&gt;<span class="notable-traits"><span class="notable-traits-tooltip">ⓘ<div class="notable-traits-tooltiptext"><span class="docblock"><div class="notable">Notable traits for <a class="struct" href="struct.Tee.html" title="struct tracing_subscriber::fmt::writer::Tee">Tee</a>&lt;A, B&gt;</div><code class="content"><span class="where fmt-newline">impl&lt;A, B&gt; <a class="trait" href="https://doc.rust-lang.org/1.56.1/std/io/trait.Write.html" title="trait std::io::Write">Write</a> for <a class="struct" href="struct.Tee.html" title="struct tracing_subscriber::fmt::writer::Tee">Tee</a>&lt;A, B&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;A: <a class="trait" href="https://doc.rust-lang.org/1.56.1/std/io/trait.Write.html" title="trait std::io::Write">Write</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;B: <a class="trait" href="https://doc.rust-lang.org/1.56.1/std/io/trait.Write.html" title="trait std::io::Write">Write</a>,&nbsp;</span></span></code></span></div></span></span><br>&nbsp;&nbsp;&nbsp; <span class="where">where<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Self: <a class="trait" href="https://doc.rust-lang.org/1.56.1/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B: <a class="trait" href="../trait.MakeWriter.html" title="trait tracing_subscriber::fmt::MakeWriter">MakeWriter</a> + <a class="trait" href="https://doc.rust-lang.org/1.56.1/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a></span>,
+    { ... }
+<div class="item-spacer"></div>    fn <a href="#method.or_else" class="fnname">or_else</a>&lt;W, B&gt;(self, other: B) -&gt; <a class="struct" href="struct.OrElse.html" title="struct tracing_subscriber::fmt::writer::OrElse">OrElse</a>&lt;Self, B&gt;<br>&nbsp;&nbsp;&nbsp; <span class="where">where<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Self: <a class="trait" href="../trait.MakeWriter.html" title="trait tracing_subscriber::fmt::MakeWriter">MakeWriter</a>&lt;Writer = <a class="type" href="type.OptionalWriter.html" title="type tracing_subscriber::fmt::writer::OptionalWriter">OptionalWriter</a>&lt;W&gt;&gt; + <a class="trait" href="https://doc.rust-lang.org/1.56.1/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B: <a class="trait" href="../trait.MakeWriter.html" title="trait tracing_subscriber::fmt::MakeWriter">MakeWriter</a> + <a class="trait" href="https://doc.rust-lang.org/1.56.1/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;W: <a class="trait" href="https://doc.rust-lang.org/1.56.1/std/io/trait.Write.html" title="trait std::io::Write">Write</a></span>,
+    { ... }
+}</code></pre></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Extension trait adding combinators for working with types implementing
+<a href="../trait.MakeWriter.html" title="MakeWriter"><code>MakeWriter</code></a>.</p>
+<p>This is not intended to be implemented directly for user-defined
+<a href="../trait.MakeWriter.html" title="MakeWriter"><code>MakeWriter</code></a>s; instead, it should be imported when the desired methods are
+used.</p>
+</div></details><h2 id="provided-methods" class="small-section-header">Provided methods<a href="#provided-methods" class="anchor"></a></h2><div class="methods"><details class="rustdoc-toggle" open><summary><div id="method.with_max_level" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../../src/tracing_subscriber/fmt/writer.rs.html#267-272" title="goto source code">[src]</a></div><h4 class="code-header">fn <a href="#method.with_max_level" class="fnname">with_max_level</a>(self, level: <a class="struct" href="../../../tracing_core/metadata/struct.Level.html" title="struct tracing_core::metadata::Level">Level</a>) -&gt; <a class="struct" href="struct.WithMaxLevel.html" title="struct tracing_subscriber::fmt::writer::WithMaxLevel">WithMaxLevel</a>&lt;Self&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;Self: <a class="trait" href="https://doc.rust-lang.org/1.56.1/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>,&nbsp;</span></h4></div></summary><div class="docblock"><p>Wraps <code>self</code> and returns a <a href="../trait.MakeWriter.html" title="MakeWriter"><code>MakeWriter</code></a> that will only write output
+for events at or below the provided verbosity <a href="../../../tracing_core/metadata/struct.Level.html"><code>Level</code></a>. For instance,
+<code>Level::TRACE</code> is considered to be _more verbose<code>than</code>Level::INFO`.</p>
+<p>Events whose level is more verbose than <code>level</code> will be ignored, and no
+output will be written.</p>
+<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">tracing::Level</span>;
+<span class="kw">use</span> <span class="ident">tracing_subscriber::fmt::writer::MakeWriterExt</span>;
+
+<span class="comment">// Construct a writer that outputs events to `stderr` only if the span or</span>
+<span class="comment">// event&#39;s level is &gt;= WARN (WARN and ERROR).</span>
+<span class="kw">let</span> <span class="ident">mk_writer</span> <span class="op">=</span> <span class="ident">std::io::stderr</span>.<span class="ident">with_max_level</span>(<span class="ident">Level::WARN</span>);
+
+<span class="ident">tracing_subscriber::fmt</span>().<span class="ident">with_writer</span>(<span class="ident">mk_writer</span>).<span class="ident">init</span>();</code></pre></div>
+<p>Writing the <code>ERROR</code> and <code>WARN</code> levels to <code>stderr</code>, and everything else
+to <code>stdout</code>:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code>
+<span class="kw">let</span> <span class="ident">mk_writer</span> <span class="op">=</span> <span class="ident">std::io::stderr</span>
+    .<span class="ident">with_max_level</span>(<span class="ident">Level::WARN</span>)
+    .<span class="ident">or_else</span>(<span class="ident">std::io::stdout</span>);
+
+<span class="ident">tracing_subscriber::fmt</span>().<span class="ident">with_writer</span>(<span class="ident">mk_writer</span>).<span class="ident">init</span>();</code></pre></div>
+<p>Writing the <code>ERROR</code> level to <code>stderr</code>, the <code>INFO</code> and <code>WARN</code> levels to
+<code>stdout</code>, and the <code>INFO</code> and DEBUG` levels to a file:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">sync::Arc</span>, <span class="ident">fs::File</span>};
+<span class="kw">let</span> <span class="ident">debug_log</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">File::create</span>(<span class="string">&quot;debug.log&quot;</span>)<span class="question-mark">?</span>);
+
+<span class="kw">let</span> <span class="ident">mk_writer</span> <span class="op">=</span> <span class="ident">std::io::stderr</span>
+    .<span class="ident">with_max_level</span>(<span class="ident">Level::ERROR</span>)
+    .<span class="ident">or_else</span>(<span class="ident">std::io::stdout</span>
+        .<span class="ident">with_max_level</span>(<span class="ident">Level::INFO</span>)
+        .<span class="ident">and</span>(<span class="ident">debug_log</span>.<span class="ident">with_max_level</span>(<span class="ident">Level::DEBUG</span>))
+    );
+
+<span class="ident">tracing_subscriber::fmt</span>().<span class="ident">with_writer</span>(<span class="ident">mk_writer</span>).<span class="ident">init</span>();</code></pre></div>
+</div></details><details class="rustdoc-toggle" open><summary><div id="method.with_min_level" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../../src/tracing_subscriber/fmt/writer.rs.html#309-314" title="goto source code">[src]</a></div><h4 class="code-header">fn <a href="#method.with_min_level" class="fnname">with_min_level</a>(self, level: <a class="struct" href="../../../tracing_core/metadata/struct.Level.html" title="struct tracing_core::metadata::Level">Level</a>) -&gt; <a class="struct" href="struct.WithMinLevel.html" title="struct tracing_subscriber::fmt::writer::WithMinLevel">WithMinLevel</a>&lt;Self&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;Self: <a class="trait" href="https://doc.rust-lang.org/1.56.1/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>,&nbsp;</span></h4></div></summary><div class="docblock"><p>Wraps <code>self</code> and returns a <a href="../trait.MakeWriter.html" title="MakeWriter"><code>MakeWriter</code></a> that will only write output
+for events at or above the provided verbosity <a href="../../../tracing_core/metadata/struct.Level.html"><code>Level</code></a>.</p>
+<p>Events whose level is less verbose than <code>level</code> will be ignored, and no
+output will be written.</p>
+<h1 id="examples-1" class="section-header"><a href="#examples-1">Examples</a></h1>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">tracing::Level</span>;
+<span class="kw">use</span> <span class="ident">tracing_subscriber::fmt::writer::MakeWriterExt</span>;
+
+<span class="comment">// Construct a writer that outputs events to `stdout` only if the span or</span>
+<span class="comment">// event&#39;s level is &lt;= DEBUG (DEBUG and TRACE).</span>
+<span class="kw">let</span> <span class="ident">mk_writer</span> <span class="op">=</span> <span class="ident">std::io::stdout</span>.<span class="ident">with_min_level</span>(<span class="ident">Level::DEBUG</span>);
+
+<span class="ident">tracing_subscriber::fmt</span>().<span class="ident">with_writer</span>(<span class="ident">mk_writer</span>).<span class="ident">init</span>();</code></pre></div>
+<p>This can be combined with <a href="trait.MakeWriterExt.html#method.with_max_level" title="MakeWriterExt::with_max_level"><code>MakeWriterExt::with_max_level</code></a> to write
+only within a range of levels:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="comment">// Only write the `DEBUG` and `INFO` levels to stdout.</span>
+<span class="kw">let</span> <span class="ident">mk_writer</span> <span class="op">=</span> <span class="ident">std::io::stdout</span>
+    .<span class="ident">with_max_level</span>(<span class="ident">Level::DEBUG</span>)
+    .<span class="ident">with_min_level</span>(<span class="ident">Level::INFO</span>)
+    <span class="comment">// Write the `WARN` and `ERROR` levels to stderr.</span>
+    .<span class="ident">and</span>(<span class="ident">std::io::stderr</span>.<span class="ident">with_min_level</span>(<span class="ident">Level::WARN</span>));
+
+<span class="ident">tracing_subscriber::fmt</span>().<span class="ident">with_writer</span>(<span class="ident">mk_writer</span>).<span class="ident">init</span>();</code></pre></div>
+</div></details><details class="rustdoc-toggle" open><summary><div id="method.with_filter" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../../src/tracing_subscriber/fmt/writer.rs.html#388-394" title="goto source code">[src]</a></div><h4 class="code-header">fn <a href="#method.with_filter" class="fnname">with_filter</a>&lt;F&gt;(self, filter: F) -&gt; <a class="struct" href="struct.WithFilter.html" title="struct tracing_subscriber::fmt::writer::WithFilter">WithFilter</a>&lt;Self, F&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;Self: <a class="trait" href="https://doc.rust-lang.org/1.56.1/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;F: <a class="trait" href="https://doc.rust-lang.org/1.56.1/core/ops/function/trait.Fn.html" title="trait core::ops::function::Fn">Fn</a>(&amp;<a class="struct" href="../../../tracing_core/metadata/struct.Metadata.html" title="struct tracing_core::metadata::Metadata">Metadata</a>&lt;'_&gt;) -&gt; <a class="primitive" href="https://doc.rust-lang.org/1.56.1/std/primitive.bool.html">bool</a>,&nbsp;</span></h4></div></summary><div class="docblock"><p>Wraps <code>self</code> with a predicate that takes a span or event’s <a href="../../../tracing_core/metadata/struct.Metadata.html"><code>Metadata</code></a>
+and returns a <code>bool</code>. The returned <a href="../trait.MakeWriter.html" title="MakeWriter"><code>MakeWriter</code></a>’s
+<a href="../trait.MakeWriter.html#method.make_writer_for"><code>MakeWriter::make_writer_for</code></a> method will check the predicate to
+determine if  a writer should be produced for a given span or event.</p>
+<p>If the predicate returns <code>false</code>, the wrapped <a href="../trait.MakeWriter.html" title="MakeWriter"><code>MakeWriter</code></a>’s
+<a href="../trait.MakeWriter.html#method.make_writer_for"><code>make_writer_for</code></a> will return <a href="enum.EitherWriter.html#method.none"><code>OptionalWriter::none</code></a>.
+Otherwise, it calls the wrapped <a href="../trait.MakeWriter.html" title="MakeWriter"><code>MakeWriter</code></a>’s
+<a href="../trait.MakeWriter.html#method.make_writer_for"><code>make_writer_for</code></a> method, and returns the produced writer.</p>
+<p>This can be used to filter an output based on arbitrary <a href="../../../tracing_core/metadata/struct.Metadata.html"><code>Metadata</code></a>
+parameters.</p>
+<h1 id="examples-2" class="section-header"><a href="#examples-2">Examples</a></h1>
+<p>Writing events with a specific target to an HTTP access log, and other
+events to stdout:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">tracing_subscriber::fmt::writer::MakeWriterExt</span>;
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">sync::Arc</span>, <span class="ident">fs::File</span>};
+<span class="kw">let</span> <span class="ident">access_log</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">File::create</span>(<span class="string">&quot;access.log&quot;</span>)<span class="question-mark">?</span>);
+
+<span class="kw">let</span> <span class="ident">mk_writer</span> <span class="op">=</span> <span class="ident">access_log</span>
+    <span class="comment">// Only write events with the target &quot;http::access_log&quot; to the</span>
+    <span class="comment">// access log file.</span>
+    .<span class="ident">with_filter</span>(<span class="op">|</span><span class="ident">meta</span><span class="op">|</span> <span class="ident">meta</span>.<span class="ident">target</span>() <span class="op">=</span><span class="op">=</span> <span class="string">&quot;http::access_log&quot;</span>)
+    <span class="comment">// Write events with all other targets to stdout.</span>
+    .<span class="ident">or_else</span>(<span class="ident">std::io::stdout</span>);
+
+<span class="ident">tracing_subscriber::fmt</span>().<span class="ident">with_writer</span>(<span class="ident">mk_writer</span>).<span class="ident">init</span>();</code></pre></div>
+<p>Conditionally enabling or disabling a log file:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">tracing_subscriber::fmt::writer::MakeWriterExt</span>;
+<span class="kw">use</span> <span class="ident">std</span>::{
+    <span class="ident">sync</span>::{<span class="ident">Arc</span>, <span class="ident">atomic</span>::{<span class="ident">AtomicBool</span>, <span class="ident">Ordering</span>}},
+    <span class="ident">fs::File</span>,
+};
+
+<span class="kw">static</span> <span class="ident">DEBUG_LOG_ENABLED</span>: <span class="ident">AtomicBool</span> <span class="op">=</span> <span class="ident">AtomicBool::new</span>(<span class="bool-val">false</span>);
+
+<span class="comment">// Create the debug log file</span>
+<span class="kw">let</span> <span class="ident">debug_file</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">File::create</span>(<span class="string">&quot;debug.log&quot;</span>)<span class="question-mark">?</span>)
+    <span class="comment">// Enable the debug log only if the flag is enabled.</span>
+    .<span class="ident">with_filter</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">DEBUG_LOG_ENABLED</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>));
+
+<span class="comment">// Always write to stdout</span>
+<span class="kw">let</span> <span class="ident">mk_writer</span> <span class="op">=</span> <span class="ident">std::io::stdout</span>
+    <span class="comment">// Write to the debug file if it&#39;s enabled</span>
+    .<span class="ident">and</span>(<span class="ident">debug_file</span>);
+
+<span class="ident">tracing_subscriber::fmt</span>().<span class="ident">with_writer</span>(<span class="ident">mk_writer</span>).<span class="ident">init</span>();
+
+<span class="comment">// ...</span>
+
+<span class="comment">// Later, we can toggle on or off the debug log file.</span>
+<span class="ident">DEBUG_LOG_ENABLED</span>.<span class="ident">store</span>(<span class="bool-val">true</span>, <span class="ident">Ordering::Release</span>);</code></pre></div>
+</div></details><details class="rustdoc-toggle" open><summary><div id="method.and" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../../src/tracing_subscriber/fmt/writer.rs.html#443-449" title="goto source code">[src]</a></div><h4 class="code-header">fn <a href="#method.and" class="fnname">and</a>&lt;B&gt;(self, other: B) -&gt; <a class="struct" href="struct.Tee.html" title="struct tracing_subscriber::fmt::writer::Tee">Tee</a>&lt;Self, B&gt;<span class="notable-traits"><span class="notable-traits-tooltip">ⓘ<div class="notable-traits-tooltiptext"><span class="docblock"><div class="notable">Notable traits for <a class="struct" href="struct.Tee.html" title="struct tracing_subscriber::fmt::writer::Tee">Tee</a>&lt;A, B&gt;</div><code class="content"><span class="where fmt-newline">impl&lt;A, B&gt; <a class="trait" href="https://doc.rust-lang.org/1.56.1/std/io/trait.Write.html" title="trait std::io::Write">Write</a> for <a class="struct" href="struct.Tee.html" title="struct tracing_subscriber::fmt::writer::Tee">Tee</a>&lt;A, B&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;A: <a class="trait" href="https://doc.rust-lang.org/1.56.1/std/io/trait.Write.html" title="trait std::io::Write">Write</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;B: <a class="trait" href="https://doc.rust-lang.org/1.56.1/std/io/trait.Write.html" title="trait std::io::Write">Write</a>,&nbsp;</span></span></code></span></div></span></span> <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;Self: <a class="trait" href="https://doc.rust-lang.org/1.56.1/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;B: <a class="trait" href="../trait.MakeWriter.html" title="trait tracing_subscriber::fmt::MakeWriter">MakeWriter</a> + <a class="trait" href="https://doc.rust-lang.org/1.56.1/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>,&nbsp;</span></h4></div></summary><div class="docblock"><p>Combines <code>self</code> with another type implementing <a href="../trait.MakeWriter.html" title="MakeWriter"><code>MakeWriter</code></a>, returning
+a new <a href="../trait.MakeWriter.html" title="MakeWriter"><code>MakeWriter</code></a> that produces <a href="https://doc.rust-lang.org/1.56.1/std/io/trait.Write.html">writers</a> that write to <em>both</em>
+outputs.</p>
+<p>If writing to either writer returns an error, the returned writer will
+return that error. However, both writers will still be written to before
+the error is returned, so it is possible for one writer to fail while
+the other is written to successfully.</p>
+<h1 id="examples-3" class="section-header"><a href="#examples-3">Examples</a></h1>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">tracing_subscriber::fmt::writer::MakeWriterExt</span>;
+
+<span class="comment">// Construct a writer that outputs events to `stdout` *and* `stderr`.</span>
+<span class="kw">let</span> <span class="ident">mk_writer</span> <span class="op">=</span> <span class="ident">std::io::stdout</span>.<span class="ident">and</span>(<span class="ident">std::io::stderr</span>);
+
+<span class="ident">tracing_subscriber::fmt</span>().<span class="ident">with_writer</span>(<span class="ident">mk_writer</span>).<span class="ident">init</span>();</code></pre></div>
+<p><code>and</code> can be used in conjunction with filtering combinators. For
+example, if we want to write to a number of outputs depending on the
+level of an event, we could write:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">tracing::Level</span>;
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">sync::Arc</span>, <span class="ident">fs::File</span>};
+<span class="kw">let</span> <span class="ident">debug_log</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">File::create</span>(<span class="string">&quot;debug.log&quot;</span>)<span class="question-mark">?</span>);
+
+<span class="comment">// Write everything to the debug log.</span>
+<span class="kw">let</span> <span class="ident">mk_writer</span> <span class="op">=</span> <span class="ident">debug_log</span>
+    <span class="comment">// Write the `ERROR` and `WARN` levels to stderr.</span>
+    .<span class="ident">and</span>(<span class="ident">std::io::stderr</span>.<span class="ident">with_max_level</span>(<span class="ident">Level::WARN</span>))
+    <span class="comment">// Write `INFO` to `stdout`.</span>
+    .<span class="ident">and</span>(<span class="ident">std::io::stdout</span>
+        .<span class="ident">with_max_level</span>(<span class="ident">Level::INFO</span>)
+        .<span class="ident">with_min_level</span>(<span class="ident">Level::INFO</span>)
+    );
+
+<span class="ident">tracing_subscriber::fmt</span>().<span class="ident">with_writer</span>(<span class="ident">mk_writer</span>).<span class="ident">init</span>();</code></pre></div>
+</div></details><details class="rustdoc-toggle" open><summary><div id="method.or_else" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../../src/tracing_subscriber/fmt/writer.rs.html#474-481" title="goto source code">[src]</a></div><h4 class="code-header">fn <a href="#method.or_else" class="fnname">or_else</a>&lt;W, B&gt;(self, other: B) -&gt; <a class="struct" href="struct.OrElse.html" title="struct tracing_subscriber::fmt::writer::OrElse">OrElse</a>&lt;Self, B&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;Self: <a class="trait" href="../trait.MakeWriter.html" title="trait tracing_subscriber::fmt::MakeWriter">MakeWriter</a>&lt;Writer = <a class="type" href="type.OptionalWriter.html" title="type tracing_subscriber::fmt::writer::OptionalWriter">OptionalWriter</a>&lt;W&gt;&gt; + <a class="trait" href="https://doc.rust-lang.org/1.56.1/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;B: <a class="trait" href="../trait.MakeWriter.html" title="trait tracing_subscriber::fmt::MakeWriter">MakeWriter</a> + <a class="trait" href="https://doc.rust-lang.org/1.56.1/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;W: <a class="trait" href="https://doc.rust-lang.org/1.56.1/std/io/trait.Write.html" title="trait std::io::Write">Write</a>,&nbsp;</span></h4></div></summary><div class="docblock"><p>Combines <code>self</code> with another type implementing <a href="../trait.MakeWriter.html" title="MakeWriter"><code>MakeWriter</code></a>, returning
+a new <a href="../trait.MakeWriter.html" title="MakeWriter"><code>MakeWriter</code></a> that calls <code>other</code>’s <a href="../trait.MakeWriter.html#tymethod.make_writer"><code>make_writer</code></a> if <code>self</code>’s
+<code>make_writer</code> returns <a href="enum.EitherWriter.html#method.none"><code>OptionalWriter::none</code></a>.</p>
+<h1 id="examples-4" class="section-header"><a href="#examples-4">Examples</a></h1>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">tracing::Level</span>;
+<span class="kw">use</span> <span class="ident">tracing_subscriber::fmt::writer::MakeWriterExt</span>;
+
+<span class="comment">// Produces a writer that writes to `stderr` if the level is &gt;= WARN,</span>
+<span class="comment">// or returns `OptionalWriter::none()` otherwise.</span>
+<span class="kw">let</span> <span class="ident">stderr</span> <span class="op">=</span> <span class="ident">std::io::stderr</span>.<span class="ident">with_max_level</span>(<span class="ident">Level::WARN</span>);
+
+<span class="comment">// If the `stderr` `MakeWriter` is disabled by the max level filter,</span>
+<span class="comment">// write to stdout instead:</span>
+<span class="kw">let</span> <span class="ident">mk_writer</span> <span class="op">=</span> <span class="ident">stderr</span>.<span class="ident">or_else</span>(<span class="ident">std::io::stdout</span>);
+
+<span class="ident">tracing_subscriber::fmt</span>().<span class="ident">with_writer</span>(<span class="ident">mk_writer</span>).<span class="ident">init</span>();</code></pre></div>
+</div></details></div><h2 id="implementors" class="small-section-header">Implementors<a href="#implementors" class="anchor"></a></h2><div class="item-list" id="implementors-list"><div id="impl-MakeWriterExt" class="impl has-srclink"><div class="rightside"><a class="srclink" href="../../../src/tracing_subscriber/fmt/writer.rs.html#1084" title="goto source code">[src]</a></div><a href="#impl-MakeWriterExt" class="anchor"></a><h3 class="code-header in-band">impl&lt;M&gt; <a class="trait" href="trait.MakeWriterExt.html" title="trait tracing_subscriber::fmt::writer::MakeWriterExt">MakeWriterExt</a> for M <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;M: <a class="trait" href="../trait.MakeWriter.html" title="trait tracing_subscriber::fmt::MakeWriter">MakeWriter</a>,&nbsp;</span></h3></div></div><script type="text/javascript" src="../../../implementors/tracing_subscriber/fmt/writer/trait.MakeWriterExt.js" async></script></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tracing_subscriber" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
+    <script src="../../../main.js"></script>
+</body></html>
