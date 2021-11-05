@@ -23,9 +23,6 @@ pub struct ApplyMigrationsOutput {
     pub applied_migration_names: Vec<String>,
 }
 
-/// Read the contents of the migrations directory and the migrations table, and
-/// returns their relative statuses. At this stage, the migration engine only
-/// reads, it does not write to the dev database nor the migrations directory.
 pub(crate) async fn apply_migrations<C>(
     input: &ApplyMigrationsInput,
     connector: &C,
