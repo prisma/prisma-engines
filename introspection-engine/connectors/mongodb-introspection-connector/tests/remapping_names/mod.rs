@@ -1,4 +1,5 @@
 use crate::test_api::*;
+use mongodb::bson::doc;
 
 #[test]
 fn remapping_fields_with_invalid_characters() {

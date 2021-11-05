@@ -1,6 +1,6 @@
 use crate::schema::MongoSchema;
-use bson::{Bson, Document};
 use datamodel::Datamodel;
+use mongodb::bson::{Bson, Document};
 
 /// Datamodel -> MongoSchema
 pub(crate) fn calculate(datamodel: &Datamodel) -> MongoSchema {

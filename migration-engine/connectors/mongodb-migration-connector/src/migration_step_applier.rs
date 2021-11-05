@@ -6,6 +6,7 @@ use crate::{
 use migration_connector::{
     ConnectorResult, DatabaseMigrationStepApplier, DestructiveChangeDiagnostics, Migration, MigrationConnector,
 };
+use mongodb::bson;
 
 #[async_trait::async_trait]
 impl DatabaseMigrationStepApplier for MongoDbMigrationConnector {
