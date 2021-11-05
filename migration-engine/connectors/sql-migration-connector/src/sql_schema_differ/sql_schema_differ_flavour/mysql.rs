@@ -1,7 +1,5 @@
 use super::SqlSchemaDifferFlavour;
-use crate::{
-    flavour::MysqlFlavour, flavour::MYSQL_IDENTIFIER_SIZE_LIMIT, pair::Pair, sql_schema_differ::ColumnTypeChange,
-};
+use crate::{flavour::MysqlFlavour, pair::Pair, sql_schema_differ::ColumnTypeChange};
 use native_types::MySqlType;
 use sql_schema_describer::{
     walkers::{ColumnWalker, IndexWalker},
@@ -17,7 +15,7 @@ impl SqlSchemaDifferFlavour for MysqlFlavour {
         !self.is_mariadb() && !self.is_mysql_5_6()
     }
 
-    fn can_cope_with_foreign_key_column_becoming_nonnullable(&self) -> bool {
+    fn can_cope_with_foreign_key_column_becoming_non_nullable(&self) -> bool {
         false
     }
 
@@ -75,11 +73,7 @@ impl SqlSchemaDifferFlavour for MysqlFlavour {
         // Implements correct comparison for truncated index names.
         let (previous_name, next_name) = indexes.as_ref().map(|idx| idx.name()).into_tuple();
 
-        if previous_name.len() == MYSQL_IDENTIFIER_SIZE_LIMIT && next_name.len() > MYSQL_IDENTIFIER_SIZE_LIMIT {
-            previous_name[0..MYSQL_IDENTIFIER_SIZE_LIMIT] != next_name[0..MYSQL_IDENTIFIER_SIZE_LIMIT]
-        } else {
-            previous_name != next_name
-        }
+        previous_name != next_name
     }
 
     fn lower_cases_table_names(&self) -> bool {

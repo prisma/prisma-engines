@@ -62,7 +62,6 @@ impl MsSqlDatamodelConnector {
             ConnectorCapability::AutoIncrementNonIndexedAllowed,
             ConnectorCapability::CompoundIds,
             ConnectorCapability::CreateMany,
-            ConnectorCapability::MultipleIndexesWithSameName,
             ConnectorCapability::UpdateableId,
             ConnectorCapability::AnyId,
             ConnectorCapability::QueryRaw,

@@ -87,10 +87,10 @@ fn having_both_the_map_and_name_argument_must_be_rejected() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@index": The `@@index` attribute accepts the `name` argument as an alias for the `map` argument for legacy reasons. It does not accept both though. Please use the `map` argument to specify the database name of the index.[0m
-          [1;94m-->[0m  [4mschema.prisma:16[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
-        [1;94m15 | [0m
-        [1;94m16 | [0m  @@[1;91mindex([firstName,lastName], name: "BOTH MAP AND NAME IS NOT OK", map: "MyIndexName")[0m
+        [1;94m14 | [0m
+        [1;94m15 | [0m  @@[1;91mindex([firstName,lastName], name: "BOTH MAP AND NAME IS NOT OK", map: "MyIndexName")[0m
         [1;94m   | [0m
     "#]];
 

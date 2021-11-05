@@ -1,6 +1,6 @@
 use super::{common::Quoted, IteratorJoin, SqlRenderer};
 use crate::{
-    flavour::{MysqlFlavour, MYSQL_IDENTIFIER_SIZE_LIMIT},
+    flavour::MysqlFlavour,
     pair::Pair,
     sql_migration::{AlterColumn, AlterEnum, AlterTable, RedefineTable, TableChange},
     sql_schema_differ::ColumnChanges,
@@ -197,11 +197,7 @@ impl SqlRenderer for MysqlFlavour {
             indexes: table
                 .indexes()
                 .map(move |index| ddl::IndexClause {
-                    index_name: if index.name().len() > MYSQL_IDENTIFIER_SIZE_LIMIT {
-                        Some(Cow::Borrowed(&index.name()[0..MYSQL_IDENTIFIER_SIZE_LIMIT]))
-                    } else {
-                        Some(Cow::Borrowed(index.name()))
-                    },
+                    index_name: Some(Cow::from(index.name())),
                     unique: index.index_type().is_unique(),
                     columns: index.column_names().iter().map(Cow::from).collect(),
                 })
