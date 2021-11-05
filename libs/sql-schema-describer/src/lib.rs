@@ -196,10 +196,10 @@ impl Table {
         }
     }
 
-    pub fn primary_key_columns(&self) -> Vec<PrimaryKeyColumn> {
+    pub fn primary_key_columns<'a>(&'a self) -> impl Iterator<Item = &'a PrimaryKeyColumn> + 'a {
         match &self.primary_key {
-            Some(pk) => pk.columns.clone(),
-            None => Vec::new(),
+            Some(pk) => pk.columns.iter(),
+            None => [].iter(),
         }
     }
 
@@ -302,6 +302,7 @@ pub struct UserDefinedType {
 pub struct PrimaryKeyColumn {
     pub name: String,
     pub length: Option<u32>,
+    pub sort_order: Option<SQLSortOrder>,
 }
 
 impl PrimaryKeyColumn {

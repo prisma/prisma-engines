@@ -472,6 +472,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
                                 pk.columns[pos as usize] = PrimaryKeyColumn {
                                     name: column_name.to_string(),
+                                    sort_order: None,
                                     length,
                                 };
 
@@ -486,6 +487,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                                 let column = PrimaryKeyColumn {
                                     name: column_name,
                                     length,
+                                    sort_order: None,
                                 };
 
                                 primary_key.replace(PrimaryKey {

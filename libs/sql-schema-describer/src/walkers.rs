@@ -4,7 +4,8 @@
 
 use crate::{
     Column, ColumnArity, ColumnId, ColumnType, ColumnTypeFamily, DefaultValue, Enum, ForeignKey, ForeignKeyAction,
-    Index, IndexColumn, IndexType, PrimaryKey, PrimaryKeyColumn, SqlSchema, Table, TableId, UserDefinedType, View,
+    Index, IndexColumn, IndexType, PrimaryKey, PrimaryKeyColumn, SQLSortOrder, SqlSchema, Table, TableId,
+    UserDefinedType, View,
 };
 use serde::de::DeserializeOwned;
 use std::fmt;
@@ -237,6 +238,51 @@ impl<'a> fmt::Debug for TableWalker<'a> {
     }
 }
 
+/// A walker of a column in a primary key.
+#[derive(Clone, Copy)]
+pub struct PrimaryKeyColumnWalker<'a> {
+    schema: &'a SqlSchema,
+    primary_key_column_id: usize,
+    table_id: TableId,
+    column_id: ColumnId,
+}
+
+impl<'a> PrimaryKeyColumnWalker<'a> {
+    /// Conversion to a normal column walker.
+    pub fn as_column(self) -> ColumnWalker<'a> {
+        ColumnWalker {
+            schema: self.schema,
+            column_id: self.column_id,
+            table_id: self.table_id,
+        }
+    }
+
+    /// The length limit of the (text) column. Matters on MySQL only.
+    pub fn length(self) -> Option<u32> {
+        self.get().length
+    }
+
+    /// The BTree ordering. Matters on SQL Server only.
+    pub fn sort_order(self) -> Option<SQLSortOrder> {
+        self.get().sort_order
+    }
+
+    fn table(self) -> TableWalker<'a> {
+        TableWalker {
+            schema: self.schema,
+            table_id: self.table_id,
+        }
+    }
+
+    fn get(self) -> &'a PrimaryKeyColumn {
+        self.table()
+            .table()
+            .primary_key_columns()
+            .nth(self.primary_key_column_id)
+            .unwrap()
+    }
+}
+
 impl<'a> TableWalker<'a> {
     /// Create a TableWalker from a schema and a reference to one of its tables. This should stay private.
     pub(crate) fn new(schema: &'a SqlSchema, table_id: TableId) -> Self {
@@ -347,8 +393,26 @@ impl<'a> TableWalker<'a> {
         self.table().primary_key.as_ref()
     }
 
-    /// The names of the columns that are part of the primary key. `None` means
-    /// there is no primary key on the table.
+    /// The columns that are part of the primary keys.
+    pub fn primary_key_columns(&'a self) -> Box<dyn ExactSizeIterator<Item = PrimaryKeyColumnWalker<'a>> + 'a> {
+        let as_walker = move |primary_key_column_id: usize, c: &PrimaryKeyColumn| {
+            let column_id = self.column(c.name()).map(|c| c.column_id).unwrap();
+
+            PrimaryKeyColumnWalker {
+                schema: self.schema,
+                primary_key_column_id,
+                table_id: self.table_id,
+                column_id,
+            }
+        };
+
+        match self.table().primary_key.as_ref() {
+            Some(pk) => Box::new(pk.columns.iter().enumerate().map(move |(i, c)| as_walker(i, c))),
+            None => Box::new(std::iter::empty()),
+        }
+    }
+
+    /// The names of the columns that are part of the primary key.
     pub fn primary_key_column_names(&'a self) -> impl ExactSizeIterator<Item = &'a str> + 'a {
         let fetch_name = |c: &'a PrimaryKeyColumn| c.name();
 
@@ -485,6 +549,16 @@ impl<'a> IndexColumnWalker<'a> {
     /// Get the index column data.
     pub fn get(&self) -> &'a IndexColumn {
         &self.index().get().columns[self.index_column_id]
+    }
+
+    /// The length limit of the (text) column. Matters on MySQL only.
+    pub fn length(self) -> Option<u32> {
+        self.get().length
+    }
+
+    /// The BTree ordering.
+    pub fn sort_order(self) -> Option<SQLSortOrder> {
+        self.get().sort_order
     }
 
     /// The table where the column is located.

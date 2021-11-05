@@ -1,7 +1,7 @@
 use crate::{
     getters::Getter, parsers::Parser, Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue, DescriberError,
     DescriberErrorKind, DescriberResult, ForeignKey, ForeignKeyAction, Index, IndexColumn, IndexType, PrimaryKey,
-    PrimaryKeyColumn, Procedure, SqlMetadata, SqlSchema, Table, UserDefinedType, View,
+    PrimaryKeyColumn, Procedure, SQLSortOrder, SqlMetadata, SqlSchema, Table, UserDefinedType, View,
 };
 use indoc::indoc;
 use native_types::{MsSqlType, MsSqlTypeParameter, NativeType};
@@ -383,6 +383,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 ind.is_primary_key AS is_primary_key,
                 col.name AS column_name,
                 ic.key_ordinal AS seq_in_index,
+                ic.is_descending_key AS is_descending,
                 t.name AS table_name
             FROM
                 sys.indexes ind
@@ -413,6 +414,11 @@ impl<'a> SqlSchemaDescriber<'a> {
             let table_name = row.get_expect_string("table_name");
             let index_name = row.get_expect_string("index_name");
 
+            let sort_order = match row.get_expect_bool("is_descending") {
+                true => SQLSortOrder::Desc,
+                false => SQLSortOrder::Asc,
+            };
+
             match row.get("column_name").and_then(|x| x.to_string()) {
                 Some(column_name) => {
                     let seq_in_index = row.get_expect_i64("seq_in_index");
@@ -438,6 +444,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
                                 pk.columns[pos as usize] = PrimaryKeyColumn {
                                     name: column_name,
+                                    sort_order: Some(sort_order),
                                     length: None,
                                 };
 
@@ -450,7 +457,11 @@ impl<'a> SqlSchemaDescriber<'a> {
                                 debug!("Instantiating primary key");
 
                                 primary_key.replace(PrimaryKey {
-                                    columns: vec![PrimaryKeyColumn::new(column_name)],
+                                    columns: vec![PrimaryKeyColumn {
+                                        name: column_name.to_string(),
+                                        sort_order: Some(sort_order),
+                                        length: None,
+                                    }],
                                     sequence: None,
                                     constraint_name: Some(index_name),
                                 });
@@ -458,14 +469,24 @@ impl<'a> SqlSchemaDescriber<'a> {
                         };
                     } else if indexes_map.contains_key(&index_name) {
                         if let Some(index) = indexes_map.get_mut(&index_name) {
-                            index.columns.push(IndexColumn::new(column_name));
+                            index.columns.push(IndexColumn {
+                                name: column_name,
+                                sort_order: Some(sort_order),
+                                length: None,
+                            });
                         }
                     } else {
+                        let columns = vec![IndexColumn {
+                            name: column_name,
+                            sort_order: Some(sort_order),
+                            length: None,
+                        }];
+
                         indexes_map.insert(
                             index_name.clone(),
                             Index {
                                 name: index_name,
-                                columns: vec![IndexColumn::new(column_name)],
+                                columns,
                                 tpe: match is_unique {
                                     true => IndexType::Unique,
                                     false => IndexType::Normal,

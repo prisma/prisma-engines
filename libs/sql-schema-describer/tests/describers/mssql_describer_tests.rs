@@ -614,7 +614,11 @@ fn mssql_foreign_key_on_delete_must_be_handled(api: TestApi) {
             ],
             indices: vec![],
             primary_key: Some(PrimaryKey {
-                columns: vec![PrimaryKeyColumn::new("id")],
+                columns: vec![PrimaryKeyColumn {
+                    name: "id".to_string(),
+                    sort_order: Some(SQLSortOrder::Asc),
+                    length: None
+                }],
                 sequence: None,
                 constraint_name: Some("PK__User".into()),
             }),
@@ -655,11 +659,24 @@ fn mssql_multi_field_indexes_must_be_inferred(api: TestApi) {
     let result = api.describe();
     let table = result.get_table("Employee").expect("couldn't get Employee table");
 
+    let columns = vec![
+        IndexColumn {
+            name: "name".to_string(),
+            sort_order: Some(SQLSortOrder::Asc),
+            length: None,
+        },
+        IndexColumn {
+            name: "age".to_string(),
+            sort_order: Some(SQLSortOrder::Asc),
+            length: None,
+        },
+    ];
+
     assert_eq!(
         table.indices,
         &[Index {
             name: "age_and_name_index".into(),
-            columns: vec![IndexColumn::new("name"), IndexColumn::new("age")],
+            columns,
             tpe: IndexType::Unique
         }]
     );
@@ -691,11 +708,24 @@ fn mssql_join_table_unique_indexes_must_be_inferred(api: TestApi) {
     let result = api.describe();
     let table = result.get_table("CatToHuman").expect("couldn't get CatToHuman table");
 
+    let columns = vec![
+        IndexColumn {
+            name: "cat".to_string(),
+            sort_order: Some(SQLSortOrder::Asc),
+            length: None,
+        },
+        IndexColumn {
+            name: "human".to_string(),
+            sort_order: Some(SQLSortOrder::Asc),
+            length: None,
+        },
+    ];
+
     assert_eq!(
         table.indices,
         &[Index {
             name: "cat_and_human_index".into(),
-            columns: vec![IndexColumn::new("cat"), IndexColumn::new("human")],
+            columns,
             tpe: IndexType::Unique,
         }]
     );

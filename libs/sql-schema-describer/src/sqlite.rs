@@ -2,7 +2,8 @@
 use crate::{
     common::purge_dangling_foreign_keys, getters::Getter, parsers::Parser, Column, ColumnArity, ColumnType,
     ColumnTypeFamily, DefaultValue, DescriberResult, ForeignKey, ForeignKeyAction, Index, IndexColumn, IndexType, Lazy,
-    PrimaryKey, PrimaryKeyColumn, PrismaValue, Regex, SqlMetadata, SqlSchema, SqlSchemaDescriberBackend, Table, View,
+    PrimaryKey, PrimaryKeyColumn, PrismaValue, Regex, SQLSortOrder, SqlMetadata, SqlSchema, SqlSchemaDescriberBackend,
+    Table, View,
 };
 use quaint::{ast::Value, prelude::Queryable};
 use std::{any::type_name, borrow::Cow, collections::BTreeMap, convert::TryInto, fmt::Debug};
@@ -189,6 +190,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 } else {
                     ColumnArity::Nullable
                 };
+
                 let tpe = get_column_type(&row.get("type").and_then(|x| x.to_string()).expect("type"), arity);
 
                 let default = match row.get("dflt_value") {
@@ -275,6 +277,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             let mut columns: Vec<PrimaryKeyColumn> = vec![];
             let mut col_idxs: Vec<&i64> = pk_cols.keys().collect();
             col_idxs.sort_unstable();
+
             for i in col_idxs {
                 columns.push(PrimaryKeyColumn::new(pk_cols[i].clone()));
             }
@@ -439,7 +442,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             // Exclude partial indices
             .filter(|row| !row.get("partial").and_then(|partial| partial.as_bool()).unwrap());
 
-        'index_loop: for row in filtered_rows {
+        for row in filtered_rows {
             let is_unique = row.get("unique").and_then(|x| x.as_bool()).expect("get unique");
             let name = row.get("name").and_then(|x| x.to_string()).expect("get name");
             let mut index = Index {
@@ -456,15 +459,33 @@ impl<'a> SqlSchemaDescriber<'a> {
             trace!("Got index description results: {:?}", result_set);
             for row in result_set.into_iter() {
                 //if the index is on a rowid or expression, the name of the column will be null, we ignore these for now
-                match row.get("name").and_then(|x| x.to_string()) {
-                    Some(name) => {
-                        let pos = row.get("seqno").and_then(|x| x.as_i64()).expect("get seqno") as usize;
-                        if index.columns.len() <= pos {
-                            index.columns.resize(pos + 1, IndexColumn::default());
-                        }
-                        index.columns[pos] = IndexColumn::new(name);
+                if let Some(name) = row.get("name").and_then(|x| x.to_string()) {
+                    let pos = row.get("seqno").and_then(|x| x.as_i64()).expect("get seqno") as usize;
+                    if index.columns.len() <= pos {
+                        index.columns.resize(pos + 1, IndexColumn::default());
                     }
-                    None => break 'index_loop,
+                    index.columns[pos] = IndexColumn::new(name);
+                }
+            }
+
+            let sql = format!(r#"PRAGMA index_xinfo("{}");"#, name);
+            let result_set = self.conn.query_raw(&sql, &[]).await.expect("querying for index info");
+            trace!("Got extra index description results: {:?}", result_set);
+            for row in result_set.into_iter() {
+                //if the index is on a rowid or expression, the name of the column will be null, we ignore these for now
+
+                match row.get("name") {
+                    Some(quaint::Value::Text(Some(s))) if !s.is_empty() => {
+                        let pos = row.get("seqno").and_then(|x| x.as_i64()).expect("get seqno") as usize;
+
+                        let sort_order = dbg!(row.get("desc").and_then(|r| r.as_i64())).map(|v| match v {
+                            0 => SQLSortOrder::Asc,
+                            _ => SQLSortOrder::Desc,
+                        });
+
+                        index.columns[pos].sort_order = sort_order;
+                    }
+                    _ => (),
                 }
             }
 
