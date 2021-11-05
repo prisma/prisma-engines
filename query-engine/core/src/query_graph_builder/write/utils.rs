@@ -606,7 +606,7 @@ pub fn emulate_on_delete_set_null(
 
 /// Inserts set null emulations into the graph between `parent_node` and `child_node`.
 /// `relation_field` is the relation field pointing to the model to be deleted.
-/// Recurses into the deletion emulation to ensure that subsequent deletions are handled correctly as well.
+/// Recurses into the update emulation to ensure that subsequent updates are handled correctly as well.
 ///
 /// ```text
 ///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
@@ -903,7 +903,7 @@ fn extract_update_args(parent_node: &Node) -> &WriteArgs {
 
 /// Inserts cascade emulations into the graph between `parent_node` and `child_node`.
 /// `relation_field` is the relation field pointing to the model to be deleted.
-/// Recurses into the deletion emulation to ensure that subsequent deletions are handled correctly as well.
+/// Recurses into the update emulation to ensure that subsequent updates are handled correctly as well.
 ///
 /// ```text
 ///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─

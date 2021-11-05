@@ -169,7 +169,12 @@ pub fn nested_upsert(
             ),
         )?;
 
-        // TODO: Add comment to explain this
+        // In case the connector doesn't support referential integrity, we add a subtree to the graph that emulates the ON_UPDATE referential action.
+        // When that's the case, we create an intermediary node to which we connect all the nodes reponsible for emulating the referential action
+        // Then, we connect the if node to that intermediary emulation node. This enables performing the emulation only in case the graph traverses
+        // the update path (if the children already exists and goes to the THEN node).
+        // It's only after we've executed the emulation that it'll traverse the update node, hence the ExecutionOrder between
+        // the emulation node and the update node.
         let then_node = if let Some(emulation_node) = utils::insert_emulated_on_update_with_intermediary_node(
             graph,
             connector_ctx,
