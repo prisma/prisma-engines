@@ -310,3 +310,21 @@ If you dislike the interactive view, you can also run `cargo insta accept` to au
 ##### Without `cargo-insta`
 
 If you haven't installed `cargo-insta`, have a look at the error output and manually update the snapshot if the change is expected, just like when using `assert_eq!`.
+
+
+### Adding a new data store source for tests
+
+Let's say you already have connector tests for MongoDB but right now it runs only with version 4.4 and want to support version 5.0, the steps are easy but requires changes in different places to be sure we run the tests everywhere.
+
+1. Add the container image for your new data store source to the `docker-compose.yml` file, name it to something you will remember, for example `mongo5`
+2. Create a connector file in the `query-engine/connector-test-kit-rs/test-configs/` with the connector data (see other examples in that director), name it with something that makes sense, for example `mongo5`
+3. Add the credentials to access the _data store service_ from the docker compose file, this is done creating the required file in `.test_database_urls`, for example `.test_database_urls/mongo5`
+4. Make sure this image is available to build and prepare the environment in the `Makefile`, in the query engine we depend in two Make targets, `dev-` and `start-`
+   - The `start-` target (for example `start-mongo5`) will execute the _data store service_ in docker compose, for example `docker-compose -f docker-compose.yml up -d --remove-orphans mongo5`
+   - The `dev-` target (for example `dev-mongo5`) will depend on the `start-` target and copy the correct _connector file_, for example `cp $(CONFIG_PATH)/mongodb5 $(CONFIG_FILE)`
+5. Add the new test data store source to the `query-engine/connector-test-kit-rs/query-test-setup/src/connector_tag` file, if it is a completely new data store create the required file, in our case we need to modify `mongodb.rs`
+   - Add the new version to the version enum (ex. `MongoDbVersion`)
+   - Implement or amend the `try_from` function for the version enum
+   - Implement or amend the `to_string` function for the version enum
+   - Add the new source to the `connection_string` method. You need two implementations, one for the internal CI and another for the local test
+6. Add the new data source as a given capability, without this your test specific to that version won't run at all. For this you need to add the capability to the vector in the `all` function.
