@@ -664,23 +664,19 @@ pub fn emulate_on_update_set_null(
 
     // Unwraps are safe as in this stage, no node content can be replaced.
     let parent_update_args = extract_update_args(graph.node_content(child_node).unwrap());
-    let child_update_args: Vec<_> = parent_pks
+    let parent_updates_pk = parent_pks
         .into_iter()
-        .zip(child_fks)
-        .filter_map(|(parent_pk, child_fk)| {
-            if child_fk.is_required {
-                return None;
-            }
+        .any(|parent_pk| parent_update_args.get_field_value(parent_pk.db_name()).is_some());
 
-            parent_update_args
-                .get_field_value(parent_pk.db_name())
-                .map(|_| (DatasourceFieldName::from(&child_fk), PrismaValue::Null))
-        })
-        .collect();
-
-    if child_update_args.is_empty() {
+    if !parent_updates_pk {
         return Ok(());
     }
+
+    let child_update_args: Vec<_> = child_fks
+        .iter()
+        .filter(|child_fk| !child_fk.is_required)
+        .map(|child_fk| (DatasourceFieldName::from(child_fk), PrismaValue::Null))
+        .collect();
 
     // Records that need to be updated for the cascade.
     let dependent_records_node =
@@ -716,13 +712,51 @@ pub fn emulate_on_update_set_null(
         QueryGraphDependency::ExecutionOrder,
     )?;
 
-    insert_emulated_on_update(
-        graph,
-        connector_ctx,
-        &dependent_model,
-        &dependent_records_node,
-        &set_null_dependents_node,
-    )?;
+    // Collect other relation fields that share at least one common foreign key with the relation key we're dealing with
+    let dependent_relation_fields: Vec<_> = dependent_model
+        .fields()
+        .relation()
+        .into_iter()
+        .filter(|rf| rf != relation_field)
+        .filter(|rf| {
+            let fks = if rf.is_inlined_on_enclosing_model() {
+                rf.scalar_fields()
+            } else {
+                rf.related_field().referenced_fields()
+            };
+
+            fks.iter().any(|fk| child_fks.contains(fk))
+        })
+        .map(|rf| match rf.is_inlined_on_enclosing_model() {
+            true => rf,
+            false => rf.related_field(),
+        })
+        .collect();
+
+    // If there are any relation fields sharing one common foreign key, recurse
+    for rf in dependent_relation_fields {
+        match rf.relation().on_update() {
+            ReferentialAction::NoAction => continue,
+            ReferentialAction::Restrict => {
+                emulate_restrict(graph, &rf, &dependent_records_node, &set_null_dependents_node)?
+            }
+            ReferentialAction::SetNull => emulate_on_update_set_null(
+                graph,
+                &rf,
+                connector_ctx,
+                &dependent_records_node,
+                &set_null_dependents_node,
+            )?,
+            ReferentialAction::Cascade => emulate_on_update_cascade(
+                graph,
+                &rf,
+                connector_ctx,
+                &dependent_records_node,
+                &set_null_dependents_node,
+            )?,
+            x => panic!("Unsupported referential action emulation: {}", x),
+        }
+    }
 
     Ok(())
 }

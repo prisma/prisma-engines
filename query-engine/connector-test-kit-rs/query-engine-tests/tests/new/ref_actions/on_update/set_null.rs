@@ -157,6 +157,7 @@ mod one2one_opt {
         schema.to_owned()
     }
 
+    // SET_NULL should recurse if there are relations sharing a common fk
     #[connector_test(schema(one2one2one_opt_set_null))]
     async fn update_parent_recurse_set_null(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
@@ -225,6 +226,7 @@ mod one2one_opt {
         schema.to_owned()
     }
 
+    // SET_NULL should recurse if there are relations sharing a common fk
     #[connector_test(schema(one2one2one_opt_restrict))]
     async fn update_parent_recurse_restrict_failure(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
@@ -269,6 +271,82 @@ mod one2one_opt {
         insta::assert_snapshot!(
           run_query!(runner, r#"{ findManyA { id b_id b { id a_id c { id b_id } } } }"#),
           @r###"{"data":{"findManyA":[{"id":1,"b_id":1,"b":{"id":1,"a_id":1,"c":{"id":1,"b_id":1}}}]}}"###
+        );
+
+        Ok(())
+    }
+
+    fn one2one2one_no_shared_fk() -> String {
+        let schema = indoc! {
+            r#"model A {
+              #id(id, Int, @id)
+            
+              b_id Int? @unique
+              b    B?
+            }
+            
+            model B {
+              #id(id, Int, @id)
+            
+              a_id Int? @unique
+              c_id Int? @unique
+            
+              a A? @relation(fields: [a_id], references: [b_id], onUpdate: SetNull)
+              c C?
+            }
+            
+            model C {
+              #id(id, Int, @id)
+            
+              b_id Int? @unique
+              b    B?   @relation(fields: [b_id], references: [c_id], onUpdate: SetNull)
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // SET_NULL should not recurse if there is no relation sharing a common fk
+    #[connector_test(schema(one2one2one_no_shared_fk))]
+    async fn update_parent_no_recursion(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation {
+          createOneA(data: {
+            id: 1,
+            b_id: 1,
+            b: {
+              create: {
+                id: 1,
+                c_id: 1,
+                c: {
+                  create: {
+                    id: 1
+                  }
+                }
+              }
+            }
+          }) {
+            id
+          }
+        }"#),
+          @r###"{"data":{"createOneA":{"id":1}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation { updateOneA(where: { id: 1 }, data: { b_id: 2 }) { id } }"#),
+          @r###"{"data":{"updateOneA":{"id":1}}}"###
+        );
+
+        // B should be nulled
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{ findManyA { id b_id b { id } } }"#),
+          @r###"{"data":{"findManyA":[{"id":1,"b_id":2,"b":null}]}}"###
+        );
+
+        // But C should not because it doesn't share a fk with the A->B relation
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{ findManyC { id } }"#),
+          @r###"{"data":{"findManyC":[{"id":1}]}}"###
         );
 
         Ok(())
@@ -491,7 +569,328 @@ mod one2many_opt {
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"query { findManyChild { id parent_uniq_1 parent_uniq_2 }}"#),
-          @r###"{"data":{"findManyChild":[{"id":1,"parent_uniq_1":null,"parent_uniq_2":"u2"}]}}"###
+          @r###"{"data":{"findManyChild":[{"id":1,"parent_uniq_1":null,"parent_uniq_2":null}]}}"###
+        );
+
+        Ok(())
+    }
+
+    fn one2m2m_opt_set_null() -> String {
+        let schema = indoc! {
+            r#"model A {
+            #id(id, Int, @id)
+
+            b_id Int? @unique
+            bs B[]
+          }
+          
+          model B {
+            #id(id, Int, @id)
+
+            a_id Int? @unique
+            a A? @relation(fields: [a_id], references: [b_id], onUpdate: SetNull)
+
+            cs C[]
+          }
+          
+          model C {
+            #id(id, Int, @id)
+
+            b_id Int? @unique
+            b B? @relation(fields: [b_id], references: [a_id])
+          }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // SET_NULL should recurse if there are relations sharing a common fk
+    #[connector_test(schema(one2m2m_opt_set_null))]
+    async fn update_parent_recurse_set_null(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation {
+          createOneA(data: {
+            id: 1,
+            b_id: 1,
+            bs: { 
+              create: {
+                id: 1,
+                cs: {
+                  create: {
+                    id: 1
+                  }
+                }
+              }
+            }
+          }) {
+            id
+          }
+        }"#),
+          @r###"{"data":{"createOneA":{"id":1}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation { updateOneA(where: { id: 1 }, data: { b_id: 2 }) { id } }"#),
+          @r###"{"data":{"updateOneA":{"id":1}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{ findManyB { id a_id } }"#),
+          @r###"{"data":{"findManyB":[{"id":1,"a_id":null}]}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{ findManyC { id b_id } }"#),
+          @r###"{"data":{"findManyC":[{"id":1,"b_id":null}]}}"###
+        );
+
+        Ok(())
+    }
+
+    fn one2m2m_opt_restrict() -> String {
+        let schema = indoc! {
+            r#"model A {
+              #id(id, Int, @id)
+  
+              b_id Int? @unique
+              bs B[]
+            }
+            
+            model B {
+              #id(id, Int, @id)
+  
+              a_id Int? @unique
+              a A? @relation(fields: [a_id], references: [b_id], onUpdate: SetNull)
+  
+              cs C[]
+            }
+            
+            model C {
+              #id(id, Int, @id)
+  
+              b_id Int? @unique
+              b B? @relation(fields: [b_id], references: [a_id], onUpdate: Restrict)
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // SET_NULL should recurse if there are relations sharing a common fk
+    #[connector_test(schema(one2m2m_opt_restrict))]
+    async fn update_parent_recurse_restrict_failure(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation {
+        createOneA(data: {
+          id: 1,
+          b_id: 1,
+          bs: {
+            create: {
+              id: 1,
+              cs: {
+                create: {
+                  id: 1
+                }
+              }
+            }
+          }
+        }) {
+          id
+        }
+      }"#),
+          @r###"{"data":{"createOneA":{"id":1}}}"###
+        );
+
+        let query = r#"mutation { updateOneA(where: { id: 1 }, data: { b_id: 2 }) { id } }"#;
+
+        match runner.connector() {
+        ConnectorTag::MongoDb(_) => assert_error!(
+            runner,
+            query,
+            2014,
+            "The change you are trying to make would violate the required relation 'BToC' between the `B` and `C` models."
+        ),
+        _ => assert_error!(
+            runner,
+            query,
+            2003,
+            "Foreign key constraint failed on the field"
+        ),
+      };
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{ findManyA { id b_id bs { id a_id cs { id b_id } } } }"#),
+          @r###"{"data":{"findManyA":[{"id":1,"b_id":1,"bs":[{"id":1,"a_id":1,"cs":[{"id":1,"b_id":1}]}]}]}}"###
+        );
+
+        Ok(())
+    }
+    fn one2m2m_no_shared_fk() -> String {
+        let schema = indoc! {
+            r#"model A {
+              #id(id, Int, @id)
+            
+              b_id Int? @unique
+              bs   B[]
+            }
+            
+            model B {
+              #id(id, Int, @id)
+            
+              a_id Int? @unique
+              c_id Int? @unique
+            
+              a  A?  @relation(fields: [a_id], references: [b_id], onUpdate: SetNull)
+              cs C[]
+            }
+            
+            model C {
+              #id(id, Int, @id)
+            
+              b_id Int? @unique
+              b    B?   @relation(fields: [b_id], references: [c_id], onUpdate: SetNull)
+            }
+            "#
+        };
+
+        schema.to_owned()
+    }
+
+    // SET_NULL should not recurse if there is no relation sharing a common fk
+    #[connector_test(schema(one2m2m_no_shared_fk))]
+    async fn update_parent_no_recursion(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation {
+        createOneA(data: {
+          id: 1,
+          b_id: 1,
+          bs: {
+            create: {
+              id: 1,
+              c_id: 1,
+              cs: {
+                create: {
+                  id: 1
+                }
+              }
+            }
+          }
+        }) {
+          id
+        }
+      }"#),
+          @r###"{"data":{"createOneA":{"id":1}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation { updateOneA(where: { id: 1 }, data: { b_id: 2 }) { id } }"#),
+          @r###"{"data":{"updateOneA":{"id":1}}}"###
+        );
+
+        // B should be nulled
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{ findManyA { id b_id bs { id } } }"#),
+          @r###"{"data":{"findManyA":[{"id":1,"b_id":2,"bs":[]}]}}"###
+        );
+
+        // But C should not because it doesn't share a fk with the A->B relation
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{ findManyC { id } }"#),
+          @r###"{"data":{"findManyC":[{"id":1}]}}"###
+        );
+
+        Ok(())
+    }
+
+    fn one2m2m_compound_opt_set_null() -> String {
+        let schema = indoc! {
+            r#"model A {
+              #id(id, Int, @id)
+              name String?
+            
+              b_id_1 Int?
+              b_id_2 Int?
+            
+              bs B[]
+            
+              @@unique([b_id_1, b_id_2])
+            }
+            
+            model B {
+              #id(id, Int, @id)
+              name String?
+            
+              a_id_1 Int?
+              a_id_2 Int?
+              a      A?   @relation(fields: [a_id_1, a_id_2], references: [b_id_1, b_id_2], onUpdate: SetNull)
+            
+              cs C[]
+            
+              @@unique([a_id_1, a_id_2])
+            }
+            
+            model C {
+              #id(id, Int, @id)
+              name String?
+            
+              b_id_1 Int? @unique
+              b_id_2 Int? @unique
+              b      B?   @relation(fields: [b_id_1, b_id_2], references: [a_id_1, a_id_2])
+            }
+            "#
+        };
+
+        schema.to_owned()
+    }
+
+    // Relation fields with at least one shared compound should also be set to null
+    #[connector_test(schema(one2m2m_compound_opt_set_null))]
+    async fn update_parent_compound_recurse(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation {
+            createOneA(data: {
+              id: 1,
+              b_id_1: 1,
+              b_id_2: 1,
+              bs: {
+                create: {
+                  id: 1,
+                  cs: {
+                    create: {
+                      id: 1
+                    }
+                  }
+                }
+              }
+            }) {
+              id
+            }
+          }"#),
+          @r###"{"data":{"createOneA":{"id":1}}}"###
+        );
+
+        // Update one of the compound unique
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation { updateOneA(where: { id: 1 }, data: { b_id_1: 2 }) { id } } "#),
+          @r###"{"data":{"updateOneA":{"id":1}}}"###
+        );
+
+        // Check that no Bs are connected to A anymore
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{ findManyA { id b_id_1 b_id_2 bs { id } } }"#),
+          @r###"{"data":{"findManyA":[{"id":1,"b_id_1":2,"b_id_2":1,"bs":[]}]}}"###
+        );
+
+        // Check that both a_id_1 & a_id_2 compound were NULLed
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{ findManyB { id a_id_1 a_id_2 } }"#),
+          @r###"{"data":{"findManyB":[{"id":1,"a_id_1":null,"a_id_2":null}]}}"###
+        );
+
+        // Check that both b_id_1 & b_id_2 compound were NULLed
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{ findManyC { id b_id_1 b_id_2 } }"#),
+          @r###"{"data":{"findManyC":[{"id":1,"b_id_1":null,"b_id_2":null}]}}"###
         );
 
         Ok(())
