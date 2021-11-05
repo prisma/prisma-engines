@@ -2,7 +2,7 @@ mod walkers;
 
 pub(crate) use walkers::IndexWalker;
 
-use bson::Document;
+use mongodb::bson::Document;
 use std::collections::BTreeSet;
 
 //

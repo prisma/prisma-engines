@@ -1,6 +1,6 @@
 use crate::test_api::*;
-use bson::Bson;
 use introspection_connector::CompositeTypeDepth;
+use mongodb::bson::{doc, Bson};
 
 #[test]
 fn singular() {

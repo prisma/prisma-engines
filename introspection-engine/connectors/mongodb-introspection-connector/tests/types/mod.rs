@@ -1,7 +1,7 @@
 mod composite;
 
 use crate::test_api::*;
-use bson::{oid::ObjectId, Binary, Bson, DateTime, Decimal128, Timestamp};
+use mongodb::bson::{doc, oid::ObjectId, Binary, Bson, DateTime, Decimal128, Timestamp};
 
 #[test]
 fn string() {
@@ -196,7 +196,7 @@ fn binary() {
 
         let bin = Binary {
             bytes: b"deadbeef".to_vec(),
-            subtype: bson::spec::BinarySubtype::Generic,
+            subtype: mongodb::bson::spec::BinarySubtype::Generic,
         };
 
         let docs = vec![

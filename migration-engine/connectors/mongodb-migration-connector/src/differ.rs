@@ -2,6 +2,7 @@ use crate::{
     migration::{MongoDbMigration, MongoDbMigrationStep},
     schema::{CollectionId, IndexId, IndexWalker, MongoSchema},
 };
+use mongodb::bson;
 use std::collections::BTreeMap;
 
 pub(crate) fn diff(previous: MongoSchema, next: MongoSchema) -> MongoDbMigration {
