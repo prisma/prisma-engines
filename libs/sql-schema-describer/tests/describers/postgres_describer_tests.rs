@@ -2,6 +2,7 @@ mod cockroach_describer_tests;
 
 use crate::test_api::*;
 use barrel::{types, Migration};
+use indoc::indoc;
 use native_types::{NativeType, PostgresType};
 use pretty_assertions::assert_eq;
 use sql_schema_describer::*;
@@ -816,4 +817,28 @@ fn escaped_backslashes_in_string_literals_must_be_unescaped(api: TestApi) {
         .unwrap();
 
     assert_eq!(default, r#"xyz\Datasource\Model"#);
+}
+
+#[test_connector(tags(Postgres))]
+fn index_sort_order_is_handled(api: TestApi) {
+    let sql = indoc! {r#"
+        CREATE TABLE A (
+            id INT PRIMARY KEY,
+            a  INT NOT NULL
+        );
+
+        CREATE INDEX foo ON A (a DESC);
+    "#};
+
+    api.raw_cmd(sql);
+
+    let schema = api.describe();
+    let table = schema.table_walkers().next().unwrap();
+    let index = table.index_at(0);
+
+    let columns = index.columns().collect::<Vec<_>>();
+
+    assert_eq!(1, columns.len());
+    assert_eq!("a", columns[0].as_column().name());
+    assert_eq!(Some(SQLSortOrder::Desc), columns[0].sort_order());
 }

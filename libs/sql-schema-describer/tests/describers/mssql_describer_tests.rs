@@ -1,5 +1,6 @@
 use crate::test_api::*;
 use barrel::{types, Migration};
+use indoc::formatdoc;
 use native_types::{MsSqlType, MsSqlTypeParameter::*, NativeType};
 use pretty_assertions::assert_eq;
 use sql_schema_describer::{mssql::SqlSchemaDescriber, *};
@@ -546,6 +547,63 @@ fn mssql_cross_schema_references_are_not_allowed(api: TestApi) {
         "Illegal cross schema reference from `mssql_cross_schema_references_are_not_allowed.User` to `mssql_foreign_key_on_delete_must_be_handled_B.City` in constraint `FK__city`. Foreign keys between database schemas are not supported in Prisma. Please follow the GitHub ticket: https://github.com/prisma/prisma/issues/1175".to_string(),
         format!("{}", err),
     );
+}
+
+#[test_connector(tags(Mssql))]
+fn primary_key_sort_order_desc_is_handled(api: TestApi) {
+    let sql = formatdoc! {r#"
+        CREATE TABLE [{}].[A]
+        (
+            a INT NOT NULL,
+            b INT NOT NULL,
+            CONSTRAINT [PK__a_b] PRIMARY KEY (a ASC, b DESC)
+        );
+    "#, api.schema_name()};
+
+    api.raw_cmd(&sql);
+
+    let schema = api.describe();
+    let table = schema.table_walkers().next().unwrap();
+
+    assert_eq!(2, table.primary_key_columns().len());
+
+    let columns = table.primary_key_columns().collect::<Vec<_>>();
+
+    assert_eq!("a", columns[0].as_column().name());
+    assert_eq!("b", columns[1].as_column().name());
+
+    assert_eq!(Some(SQLSortOrder::Asc), columns[0].sort_order());
+    assert_eq!(Some(SQLSortOrder::Desc), columns[1].sort_order());
+}
+
+#[test_connector(tags(Mssql))]
+fn index_sort_order_desc_is_handled(api: TestApi) {
+    let sql = formatdoc! {r#"
+        CREATE TABLE [{schema}].[A]
+        (
+            id INT PRIMARY KEY,
+            a INT NOT NULL,
+            b INT NOT NULL
+        );
+
+        CREATE INDEX [A_idx] ON [{schema}].[A] (a DESC, b ASC);
+    "#, schema = api.schema_name()};
+
+    api.raw_cmd(&sql);
+
+    let schema = api.describe();
+    let table = schema.table_walkers().next().unwrap();
+    let index = table.index_at(0);
+
+    assert_eq!(2, index.columns().len());
+
+    let columns = index.columns().collect::<Vec<_>>();
+
+    assert_eq!("a", columns[0].as_column().name());
+    assert_eq!("b", columns[1].as_column().name());
+
+    assert_eq!(Some(SQLSortOrder::Desc), columns[0].sort_order());
+    assert_eq!(Some(SQLSortOrder::Asc), columns[1].sort_order());
 }
 
 #[test_connector(tags(Mssql))]

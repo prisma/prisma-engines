@@ -1,5 +1,6 @@
 use crate::test_api::*;
 use barrel::{types, Migration};
+use indoc::indoc;
 use pretty_assertions::assert_eq;
 use sql_schema_describer::*;
 
@@ -407,4 +408,33 @@ fn broken_relations_are_filtered_out(api: TestApi) {
         "{:#?}",
         table.foreign_keys
     );
+}
+
+#[test_connector(tags(Sqlite))]
+fn index_sort_order_is_handled(api: TestApi) {
+    let sql = indoc! {r#"
+        CREATE TABLE A (
+            id INT PRIMARY KEY,
+            a  INT NOT NULL,
+            b  INT NOT NULL
+        );
+
+        CREATE INDEX foo ON A (a DESC, b ASC);
+    "#};
+
+    api.raw_cmd(sql);
+
+    let schema = api.describe();
+    let table = schema.table_walkers().next().unwrap();
+    let index = table.index_at(0);
+
+    let columns = index.columns().collect::<Vec<_>>();
+
+    assert_eq!(2, columns.len());
+
+    assert_eq!("a", columns[0].as_column().name());
+    assert_eq!("b", columns[1].as_column().name());
+
+    assert_eq!(Some(SQLSortOrder::Desc), columns[0].sort_order());
+    assert_eq!(Some(SQLSortOrder::Asc), columns[1].sort_order());
 }

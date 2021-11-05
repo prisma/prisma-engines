@@ -1,5 +1,6 @@
 use crate::test_api::*;
 use barrel::{types, Migration};
+use indoc::indoc;
 use native_types::{MySqlType, NativeType};
 use pretty_assertions::assert_eq;
 use sql_schema_describer::*;
@@ -1491,4 +1492,60 @@ fn dangling_foreign_keys_are_filtered_out(api: TestApi) {
         "{:#?}",
         table.foreign_keys
     );
+}
+
+#[test_connector(tags(Mysql8))]
+fn primary_key_length_is_handled(api: TestApi) {
+    let sql = indoc! {r#"
+        CREATE TABLE `A` (
+            id TEXT NOT NULL,
+            CONSTRAINT PRIMARY KEY (id (255))
+        );
+    "#};
+
+    api.raw_cmd(sql);
+
+    let schema = api.describe();
+    let table = schema.table_walkers().next().unwrap();
+
+    assert_eq!(1, table.primary_key_columns().len());
+
+    let columns = table.primary_key_columns().collect::<Vec<_>>();
+
+    assert_eq!("id", columns[0].as_column().name());
+    assert_eq!(Some(255), columns[0].length());
+}
+
+#[test_connector(tags(Mysql8))]
+fn index_length_and_sorting_is_handled(api: TestApi) {
+    let sql = indoc! {r#"
+        CREATE TABLE `A` (
+            id INT PRIMARY KEY,
+            a  TEXT NOT NULL,
+            b  TEXT NOT NULL
+        );
+
+        CREATE INDEX foo ON `A` (a (10) ASC, b (20) DESC);
+    "#};
+
+    api.raw_cmd(sql);
+
+    let schema = api.describe();
+    let table = schema.table_walkers().next().unwrap();
+
+    assert_eq!(1, table.indexes_count());
+
+    let index = table.indexes().next().unwrap();
+    let columns = index.columns().collect::<Vec<_>>();
+
+    assert_eq!(2, columns.len());
+
+    assert_eq!("a", columns[0].as_column().name());
+    assert_eq!("b", columns[1].as_column().name());
+
+    assert_eq!(Some(SQLSortOrder::Asc), columns[0].sort_order());
+    assert_eq!(Some(SQLSortOrder::Desc), columns[1].sort_order());
+
+    assert_eq!(Some(10), columns[0].length());
+    assert_eq!(Some(20), columns[1].length());
 }
