@@ -798,16 +798,15 @@ async fn partial_indexes_should_be_ignored_on_mysql(api: &TestApi) -> TestResult
         })
         .await?;
 
-    let dm = indoc! {r##"
+    let expected = expect![[r#"
         model Blog {
-          id                Int     @id @default(autoincrement())
-          int_col           Int
-          blob_col          Bytes?  @db.MediumBlob
+          id       Int    @id @default(autoincrement())
+          int_col  Int
+          blob_col Bytes? @db.MediumBlob
         }
-    "##};
+    "#]];
 
-    let result = &api.introspect().await?;
-    api.assert_eq_datamodels(dm, result);
+    expected.assert_eq(&api.introspect_dml().await?);
 
     Ok(())
 }
