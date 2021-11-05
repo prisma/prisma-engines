@@ -283,7 +283,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             if pk_cols.len() == 1 {
                 let pk_col = &columns[0];
                 for col in cols.iter_mut() {
-                    if &col.name == pk_col.name() && &col.tpe.full_data_type.to_lowercase() == "integer" {
+                    if col.name == pk_col.name() && &col.tpe.full_data_type.to_lowercase() == "integer" {
                         trace!(
                             "Detected that the primary key column corresponds to rowid and \
                                  is auto incrementing"

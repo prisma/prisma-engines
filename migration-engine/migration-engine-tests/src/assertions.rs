@@ -600,7 +600,7 @@ impl<'a> PrimaryKeyAssertion<'a> {
             self.table
                 .columns
                 .iter()
-                .any(|column| self.pk.column_names().any(|name| name == &column.name) && column.auto_increment),
+                .any(|column| self.pk.column_names().any(|name| name == column.name) && column.auto_increment),
             "Assertion failed: expected a sequence on the primary key, found none."
         );
 
@@ -613,7 +613,7 @@ impl<'a> PrimaryKeyAssertion<'a> {
                 .table
                 .columns
                 .iter()
-                .any(|column| self.pk.column_names().any(|c| c == &column.name) && column.auto_increment),
+                .any(|column| self.pk.column_names().any(|c| c == column.name) && column.auto_increment),
             "Assertion failed: expected no sequence on the primary key, but found one."
         );
 
