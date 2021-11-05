@@ -27,7 +27,6 @@ impl MongoDbDatamodelConnector {
             ConnectorCapability::RelationsOverNonUniqueCriteria,
             ConnectorCapability::Json,
             ConnectorCapability::Enums,
-            ConnectorCapability::MultipleIndexesWithSameName,
             ConnectorCapability::RelationFieldsInArbitraryOrder,
             ConnectorCapability::CreateMany,
             ConnectorCapability::ScalarLists,

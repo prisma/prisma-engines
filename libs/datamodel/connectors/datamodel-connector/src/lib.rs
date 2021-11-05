@@ -140,10 +140,6 @@ pub trait Connector: Send + Sync {
         self.has_capability(ConnectorCapability::ScalarLists)
     }
 
-    fn supports_multiple_indexes_with_same_name(&self) -> bool {
-        self.has_capability(ConnectorCapability::MultipleIndexesWithSameName)
-    }
-
     fn supports_relations_over_non_unique_criteria(&self) -> bool {
         self.has_capability(ConnectorCapability::RelationsOverNonUniqueCriteria)
     }
@@ -259,7 +255,6 @@ capabilities!(
     AutoIncrementAllowedOnNonId,
     AutoIncrementMultipleAllowed,
     AutoIncrementNonIndexedAllowed,
-    MultipleIndexesWithSameName,
     NamedPrimaryKeys,
     NamedForeignKeys,
     ReferenceCycleDetection,
