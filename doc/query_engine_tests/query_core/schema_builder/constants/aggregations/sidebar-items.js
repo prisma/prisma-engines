@@ -1,1 +1,0 @@
-initSidebarItems({"constant":[["AVG",""],["COUNT",""],["MAX",""],["MIN",""],["SUM",""],["UNDERSCORE_AVG",""],["UNDERSCORE_COUNT",""],["UNDERSCORE_MAX",""],["UNDERSCORE_MIN",""],["UNDERSCORE_SUM",""]]});

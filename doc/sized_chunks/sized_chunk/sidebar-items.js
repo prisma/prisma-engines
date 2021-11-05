@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Chunk","A fixed capacity smart array."],["Drain",""],["Iter",""]]});

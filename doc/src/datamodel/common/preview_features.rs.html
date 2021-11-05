@@ -160,6 +160,8 @@
 <span id="160">160</span>
 <span id="161">161</span>
 <span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -223,6 +225,7 @@
     <span class="ident">NamedConstraints</span>,
     <span class="ident">FullTextSearch</span>,
     <span class="ident">DataProxy</span>,
+    <span class="ident">ExtendedIndexes</span>,
 );
 
 <span class="comment">// Mapping of which active, deprecated and hidden</span>
@@ -238,6 +241,7 @@
             <span class="ident">InteractiveTransactions</span>,
             <span class="ident">FullTextSearch</span>,
             <span class="ident">DataProxy</span>,
+            <span class="ident">ExtendedIndexes</span>,
         ])
         .<span class="ident">with_deprecated</span>(<span class="macro">vec!</span>[
             <span class="ident">AtomicNumberOperations</span>,

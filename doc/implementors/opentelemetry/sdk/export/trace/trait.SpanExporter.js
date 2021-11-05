@@ -1,4 +1,0 @@
-(function() {var implementors = {};
-implementors["opentelemetry"] = [];
-implementors["opentelemetry_otlp"] = [{"text":"impl <a class=\"trait\" href=\"opentelemetry/sdk/export/trace/trait.SpanExporter.html\" title=\"trait opentelemetry::sdk::export::trace::SpanExporter\">SpanExporter</a> for <a class=\"struct\" href=\"opentelemetry_otlp/struct.TraceExporter.html\" title=\"struct opentelemetry_otlp::TraceExporter\">TraceExporter</a>","synthetic":false,"types":["opentelemetry_otlp::span::TraceExporter"]}];
-if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

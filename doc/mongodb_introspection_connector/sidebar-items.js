@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Error",""],["MongoDbIntrospectionConnector",""]],"type":[["Result",""]]});

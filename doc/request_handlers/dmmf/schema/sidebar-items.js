@@ -1,1 +1,0 @@
-initSidebarItems({"enum":[["TypeLocation",""]],"struct":[["DmmfDeprecation",""],["DmmfEnum",""],["DmmfInputField",""],["DmmfInputType",""],["DmmfInputTypeConstraints",""],["DmmfOutputField",""],["DmmfOutputType",""],["DmmfQuerySchemaRenderer",""],["DmmfSchema",""],["DmmfTypeReference",""],["RenderContext",""]],"trait":[["Renderer",""]]});

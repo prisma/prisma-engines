@@ -1,1 +1,0 @@
-initSidebarItems({"mod":[["gen_server","The generated server module."]]});

@@ -67,6 +67,8 @@
 <span id="67">67</span>
 <span id="68">68</span>
 <span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">composite_type</span>;
 <span class="kw">mod</span> <span class="ident">field</span>;
 <span class="kw">mod</span> <span class="ident">index</span>;
@@ -120,7 +122,9 @@
     <span class="doccomment">/// Iterate all complete relations that are not many to many and are</span>
     <span class="doccomment">/// correctly defined from both sides.</span>
     <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">walk_explicit_relations</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">CompleteInlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">walk_complete_inline_relations</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">CompleteInlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
         <span class="self">self</span>.<span class="ident">relations</span>
             .<span class="ident">iter_relations</span>()
             .<span class="ident">filter</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">relation</span>)<span class="op">|</span> <span class="op">!</span><span class="ident">relation</span>.<span class="ident">is_many_to_many</span>())

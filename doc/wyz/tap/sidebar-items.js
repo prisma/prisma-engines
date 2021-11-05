@@ -1,1 +1,0 @@
-initSidebarItems({"trait":[["Tap","Value Tap"],["TapAsRef","Referential Tap"],["TapBorrow","Borrowing Tap"],["TapDeref","Dereferencing Tap"],["TapOption","Optional Tap"],["TapResult","Result Tap"]]});

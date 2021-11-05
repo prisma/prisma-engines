@@ -72,11 +72,6 @@
 <span id="72">72</span>
 <span id="73">73</span>
 <span id="74">74</span>
-<span id="75">75</span>
-<span id="76">76</span>
-<span id="77">77</span>
-<span id="78">78</span>
-<span id="79">79</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">validations</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">db::ParserDatabase</span>, <span class="ident">lift::LiftAstToDml</span>, <span class="ident">validate::Validator</span>};
@@ -143,11 +138,6 @@
 
         <span class="comment">// Phase 5: Validation (deprecated, move stuff out from here if you can)</span>
         <span class="self">self</span>.<span class="ident">validator</span>.<span class="ident">validate</span>(<span class="ident">db</span>.<span class="ident">ast</span>(), <span class="kw-2">&amp;</span><span class="ident">schema</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">diagnostics</span>);
-
-        <span class="comment">// Phase 6: Post Standardisation Validation (deprecated, move stuff out from here if you can)</span>
-        <span class="self">self</span>.<span class="ident">validator</span>
-            .<span class="ident">post_standardisation_validate</span>(<span class="ident">ast_schema</span>, <span class="kw-2">&amp;</span><span class="ident">schema</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">diagnostics</span>);
-
         <span class="ident">diagnostics</span>.<span class="ident">to_result</span>()<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">ValidatedDatamodel</span> {

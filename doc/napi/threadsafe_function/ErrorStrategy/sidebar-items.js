@@ -1,1 +1,0 @@
-initSidebarItems({"enum":[["CalleeHandled","Input errors (including conversion errors) are left for the callee to handle:"],["Fatal","Input errors (including conversion errors) are deemed fatal:"]],"trait":[["ErrorStrategy","See [`ErrorStrategy`][super::ErrorStrategy]"]]});

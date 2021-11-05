@@ -1,1 +1,0 @@
-initSidebarItems({"fn":[["run","Database setup for connector-test-kit."]]});

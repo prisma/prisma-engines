@@ -1,1 +1,0 @@
-initSidebarItems({"fn":[["backward","Returns the index pointer for code point `code` in this index."],["backward_remapped","Returns the index shift_jis pointer for code point `code`."],["forward","Returns the index code point for pointer `code` in this index."]]});

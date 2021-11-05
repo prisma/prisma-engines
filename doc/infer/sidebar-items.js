@@ -1,1 +1,0 @@
-initSidebarItems({"mod":[["app",""],["archive",""],["audio",""],["doc",""],["font",""],["image",""],["video",""]],"struct":[["Infer","Infer is the main struct of the module"],["Type","Generic information for a type"]],"type":[["Matcher","Matcher function"]]});

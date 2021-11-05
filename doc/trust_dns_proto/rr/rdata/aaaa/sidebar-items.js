@@ -1,1 +1,0 @@
-initSidebarItems({"fn":[["emit","Write the RData from the given Decoder"],["read","Read the RData from the given Decoder"]]});

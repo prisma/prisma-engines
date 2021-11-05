@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Migration","Represents a schema migration on a database"]]});

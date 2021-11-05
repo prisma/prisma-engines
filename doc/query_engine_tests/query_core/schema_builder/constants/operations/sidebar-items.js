@@ -1,1 +1,0 @@
-initSidebarItems({"constant":[["CONNECT",""],["CONNECT_OR_CREATE",""],["CREATE",""],["CREATE_MANY",""],["DECREMENT",""],["DELETE",""],["DELETE_MANY",""],["DISCONNECT",""],["DIVIDE",""],["INCREMENT",""],["MULTIPLY",""],["PUSH",""],["SET",""],["UPDATE",""],["UPDATE_MANY",""],["UPSERT",""]]});

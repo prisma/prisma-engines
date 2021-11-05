@@ -1,1 +1,0 @@
-initSidebarItems({"enum":[["AutogenFunction","Functions to generate default values"]],"fn":[["current_timestamp","Generates the current timestamp"]]});

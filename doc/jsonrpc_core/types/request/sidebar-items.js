@@ -1,1 +1,0 @@
-initSidebarItems({"enum":[["Call","Represents single jsonrpc call."],["Request","Represents jsonrpc request."]],"struct":[["MethodCall","Represents jsonrpc request which is a method call."],["Notification","Represents jsonrpc request which is a notification."]]});

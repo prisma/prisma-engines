@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["IntoIter","An owned iterator over the entries of a `Resource`."],["Iter","An iterator over the entries of a `Resource`."],["Resource","Describes an entity about which identifying information and metadata is exposed."]],"trait":[["ResourceDetector","ResourceDetector detects OpenTelemetry resource information"]]});

@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["MongoDb","The MongoDB connector struct."],["MongoDbConnection",""],["MongoDbTransaction",""]]});

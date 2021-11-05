@@ -1,3 +1,0 @@
-(function() {var implementors = {};
-implementors["opentelemetry_otlp"] = [{"text":"impl <a class=\"trait\" href=\"opentelemetry/sdk/export/trait.ExportError.html\" title=\"trait opentelemetry::sdk::export::ExportError\">ExportError</a> for <a class=\"enum\" href=\"opentelemetry_otlp/enum.Error.html\" title=\"enum opentelemetry_otlp::Error\">Error</a>","synthetic":false,"types":["opentelemetry_otlp::Error"]}];
-if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

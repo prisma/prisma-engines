@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Noop","No-op middleware implementation"]],"trait":[["Middleware","RPC middleware"]],"type":[["NoopCallFuture","Dummy future used as a noop call result of middleware."],["NoopFuture","Dummy future used as a noop result of middleware."]]});

@@ -63,6 +63,14 @@
 <span id="63">63</span>
 <span id="64">64</span>
 <span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -79,6 +87,14 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">PrimaryKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">ast_attribute</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::Attribute</span> {
+        <span class="self">self</span>.<span class="ident">ast_model</span>().<span class="ident">id_attribute</span>()
+    }
+
+    <span class="kw">fn</span> <span class="ident">ast_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::Model</span> {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="self">self</span>.<span class="ident">model_id</span>]
+    }
+
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">final_database_name</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">active_connector</span>().<span class="ident">supports_named_primary_keys</span>() {
             <span class="kw">return</span> <span class="prelude-val">None</span>;

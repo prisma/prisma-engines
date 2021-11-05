@@ -1,1 +1,0 @@
-initSidebarItems({"constant":[["napi_float32_array",""],["napi_float64_array",""],["napi_int16_array",""],["napi_int32_array",""],["napi_int8_array",""],["napi_uint16_array",""],["napi_uint32_array",""],["napi_uint8_array",""],["napi_uint8_clamped_array",""]]});

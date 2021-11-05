@@ -1,1 +1,0 @@
-initSidebarItems({"enum":[["DiffItem",""]],"macro":[["ordset","Construct a set from a sequence of values."]],"struct":[["ConsumingIter",""],["DiffIter",""],["Iter",""],["OrdSet","An ordered set."],["RangedIter",""]]});

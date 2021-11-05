@@ -514,17 +514,6 @@
 <span id="514">514</span>
 <span id="515">515</span>
 <span id="516">516</span>
-<span id="517">517</span>
-<span id="518">518</span>
-<span id="519">519</span>
-<span id="520">520</span>
-<span id="521">521</span>
-<span id="522">522</span>
-<span id="523">523</span>
-<span id="524">524</span>
-<span id="525">525</span>
-<span id="526">526</span>
-<span id="527">527</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast::Span</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::diagnostics::helper::pretty_print</span>;
 <span class="kw">use</span> <span class="ident">thiserror::Error</span>;
@@ -585,9 +574,6 @@
 
   <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Field \&quot;{}\&quot; in model \&quot;{}\&quot; can&#39;t be a list. The current connector does not support lists of primitive types.&quot;</span>, <span class="ident">field_name</span>, <span class="ident">model_name</span>)]</span>
   <span class="ident">ScalarListFieldsAreNotSupported</span> { <span class="ident">model_name</span>: <span class="ident">String</span>, <span class="ident">field_name</span>: <span class="ident">String</span>, <span class="ident">span</span>: <span class="ident">Span</span> },
-
-  <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The index name `{}` is declared multiple times. With the current connector index names have to be globally unique.&quot;</span>, <span class="ident">index_name</span>)]</span>
-  <span class="ident">MultipleIndexesWithSameNameAreNotSupported</span> { <span class="ident">index_name</span>: <span class="ident">String</span>, <span class="ident">span</span>: <span class="ident">Span</span> },
 
   <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Value \&quot;{}\&quot; is already defined on enum \&quot;{}\&quot;.&quot;</span>, <span class="ident">value_name</span>, <span class="ident">enum_name</span>)]</span>
   <span class="ident">DuplicateEnumValueError</span> { <span class="ident">enum_name</span>: <span class="ident">String</span>, <span class="ident">value_name</span>: <span class="ident">String</span>, <span class="ident">span</span>: <span class="ident">Span</span> },
@@ -824,13 +810,6 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_multiple_indexes_with_same_name_are_not_supported</span>(<span class="ident">index_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">span</span>: <span class="ident">Span</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DatamodelError</span> {
-        <span class="ident">DatamodelError::MultipleIndexesWithSameNameAreNotSupported</span> {
-            <span class="ident">index_name</span>: <span class="ident">String::from</span>(<span class="ident">index_name</span>),
-            <span class="ident">span</span>,
-        }
-    }
-
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_model_validation_error</span>(<span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">model_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">span</span>: <span class="ident">Span</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DatamodelError</span> {
         <span class="ident">DatamodelError::ModelValidationError</span> {
             <span class="ident">message</span>: <span class="ident">String::from</span>(<span class="ident">message</span>),
@@ -1034,7 +1013,6 @@
             <span class="ident">DatamodelError::DuplicateDefaultArgumentError</span> { <span class="ident">span</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">span</span>,
             <span class="ident">DatamodelError::UnusedArgumentError</span> { <span class="ident">span</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">span</span>,
             <span class="ident">DatamodelError::ScalarListFieldsAreNotSupported</span> { <span class="ident">span</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">span</span>,
-            <span class="ident">DatamodelError::MultipleIndexesWithSameNameAreNotSupported</span> { <span class="ident">span</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">span</span>,
             <span class="ident">DatamodelError::FieldValidationError</span> { <span class="ident">span</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">span</span>,
             <span class="ident">DatamodelError::SourceValidationError</span> { <span class="ident">span</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">span</span>,
             <span class="ident">DatamodelError::EnumValidationError</span> { <span class="ident">span</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">span</span>,

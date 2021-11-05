@@ -451,65 +451,9 @@
 <span id="451">451</span>
 <span id="452">452</span>
 <span id="453">453</span>
-<span id="454">454</span>
-<span id="455">455</span>
-<span id="456">456</span>
-<span id="457">457</span>
-<span id="458">458</span>
-<span id="459">459</span>
-<span id="460">460</span>
-<span id="461">461</span>
-<span id="462">462</span>
-<span id="463">463</span>
-<span id="464">464</span>
-<span id="465">465</span>
-<span id="466">466</span>
-<span id="467">467</span>
-<span id="468">468</span>
-<span id="469">469</span>
-<span id="470">470</span>
-<span id="471">471</span>
-<span id="472">472</span>
-<span id="473">473</span>
-<span id="474">474</span>
-<span id="475">475</span>
-<span id="476">476</span>
-<span id="477">477</span>
-<span id="478">478</span>
-<span id="479">479</span>
-<span id="480">480</span>
-<span id="481">481</span>
-<span id="482">482</span>
-<span id="483">483</span>
-<span id="484">484</span>
-<span id="485">485</span>
-<span id="486">486</span>
-<span id="487">487</span>
-<span id="488">488</span>
-<span id="489">489</span>
-<span id="490">490</span>
-<span id="491">491</span>
-<span id="492">492</span>
-<span id="493">493</span>
-<span id="494">494</span>
-<span id="495">495</span>
-<span id="496">496</span>
-<span id="497">497</span>
-<span id="498">498</span>
-<span id="499">499</span>
-<span id="500">500</span>
-<span id="501">501</span>
-<span id="502">502</span>
-<span id="503">503</span>
-<span id="504">504</span>
-<span id="505">505</span>
-<span id="506">506</span>
-<span id="507">507</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel_connector::connector_error</span>::{<span class="ident">ConnectorError</span>, <span class="ident">ErrorKind</span>};
 <span class="kw">use</span> <span class="ident">datamodel_connector::helper</span>::{<span class="ident">arg_vec_from_opt</span>, <span class="ident">args_vec_from_opt</span>, <span class="ident">parse_one_opt_u32</span>, <span class="ident">parse_two_opt_u32</span>};
-<span class="kw">use</span> <span class="ident">datamodel_connector</span>::{
-    <span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">ConstraintNameSpace</span>, <span class="ident">ConstraintType</span>, <span class="ident">ConstraintViolationScope</span>, <span class="ident">ReferentialIntegrity</span>,
-};
+<span class="kw">use</span> <span class="ident">datamodel_connector</span>::{<span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">ConstraintScope</span>, <span class="ident">ReferentialIntegrity</span>};
 <span class="kw">use</span> <span class="ident">dml</span>::{
     <span class="ident">field</span>::{<span class="ident">Field</span>, <span class="ident">FieldType</span>},
     <span class="ident">model::Model</span>,
@@ -523,8 +467,6 @@
 <span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
 <span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 
-<span class="kw">use</span> <span class="ident">dml::datamodel::Datamodel</span>;
-<span class="kw">use</span> <span class="ident">std::collections::BTreeMap</span>;
 <span class="kw">use</span> <span class="ident">MsSqlType</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">MsSqlTypeParameter</span>::<span class="kw-2">*</span>;
 
@@ -561,6 +503,7 @@
     <span class="ident">capabilities</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConnectorCapability</span><span class="op">&gt;</span>,
     <span class="ident">constructors</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NativeTypeConstructor</span><span class="op">&gt;</span>,
     <span class="ident">referential_integrity</span>: <span class="ident">ReferentialIntegrity</span>,
+    <span class="ident">constraint_violation_scopes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConstraintScope</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">MsSqlDatamodelConnector</span> {
@@ -572,7 +515,6 @@
             <span class="ident">ConnectorCapability::AutoIncrementNonIndexedAllowed</span>,
             <span class="ident">ConnectorCapability::CompoundIds</span>,
             <span class="ident">ConnectorCapability::CreateMany</span>,
-            <span class="ident">ConnectorCapability::MultipleIndexesWithSameName</span>,
             <span class="ident">ConnectorCapability::UpdateableId</span>,
             <span class="ident">ConnectorCapability::AnyId</span>,
             <span class="ident">ConnectorCapability::QueryRaw</span>,
@@ -621,6 +563,10 @@
             <span class="ident">capabilities</span>,
             <span class="ident">constructors</span>,
             <span class="ident">referential_integrity</span>,
+            <span class="ident">constraint_violation_scopes</span>: <span class="macro">vec!</span>[
+                <span class="ident">ConstraintScope::GlobalPrimaryKeyForeignKeyDefault</span>,
+                <span class="ident">ConstraintScope::ModelPrimaryKeyKeyIndex</span>,
+            ],
         }
     }
 
@@ -835,62 +781,8 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">get_constraint_namespace_violations</span><span class="op">&lt;</span><span class="lifetime">&#39;dml</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;dml</span> <span class="ident">Datamodel</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConstraintNameSpace</span><span class="op">&lt;</span><span class="lifetime">&#39;dml</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">potential_name_space_violations</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span>
-            (<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">ConstraintViolationScope</span>),
-            <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">ConstraintType</span>)<span class="op">&gt;</span>,
-        <span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
-
-        <span class="comment">//Primary Keys, Foreign Keys and Default Value names have to be globally unique</span>
-        <span class="comment">//Indexes have their own table namespace, but cannot have the same name as the Primary key in that table</span>
-
-        <span class="kw">for</span> <span class="ident">model</span> <span class="kw">in</span> <span class="ident">schema</span>.<span class="ident">models</span>() {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="ident">model</span>.<span class="ident">primary_key</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">pk</span>.<span class="ident">db_name</span>.<span class="ident">as_ref</span>()) {
-                <span class="kw">let</span> <span class="ident">entry</span> <span class="op">=</span> <span class="ident">potential_name_space_violations</span>
-                    .<span class="ident">entry</span>((<span class="ident">name</span>, <span class="ident">ConstraintViolationScope::GlobalPrimaryKeyForeignKeyDefault</span>))
-                    .<span class="ident">or_insert_with</span>(<span class="ident">Vec::new</span>);
-
-                <span class="ident">entry</span>.<span class="ident">push</span>((<span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">name</span>, <span class="ident">ConstraintType::PrimaryKey</span>));
-
-                <span class="kw">let</span> <span class="ident">entry</span> <span class="op">=</span> <span class="ident">potential_name_space_violations</span>
-                    .<span class="ident">entry</span>((<span class="ident">name</span>, <span class="ident">ConstraintViolationScope::ModelPrimaryKeyKeyIndex</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">name</span>)))
-                    .<span class="ident">or_insert_with</span>(<span class="ident">Vec::new</span>);
-
-                <span class="ident">entry</span>.<span class="ident">push</span>((<span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">name</span>, <span class="ident">ConstraintType::PrimaryKey</span>));
-            }
-
-            <span class="kw">for</span> <span class="ident">name</span> <span class="kw">in</span> <span class="ident">model</span>
-                .<span class="ident">relation_fields</span>()
-                .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">rf</span><span class="op">|</span> <span class="ident">rf</span>.<span class="ident">relation_info</span>.<span class="ident">fk_name</span>.<span class="ident">as_ref</span>())
-            {
-                <span class="kw">let</span> <span class="ident">entry</span> <span class="op">=</span> <span class="ident">potential_name_space_violations</span>
-                    .<span class="ident">entry</span>((<span class="ident">name</span>, <span class="ident">ConstraintViolationScope::GlobalPrimaryKeyForeignKeyDefault</span>))
-                    .<span class="ident">or_insert_with</span>(<span class="ident">Vec::new</span>);
-
-                <span class="ident">entry</span>.<span class="ident">push</span>((<span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">name</span>, <span class="ident">ConstraintType::ForeignKey</span>));
-            }
-
-            <span class="kw">for</span> <span class="ident">name</span> <span class="kw">in</span> <span class="ident">model</span>
-                .<span class="ident">scalar_fields</span>()
-                .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">sf</span><span class="op">|</span> <span class="ident">sf</span>.<span class="ident">default_value</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">db_name</span>()))
-            {
-                <span class="kw">let</span> <span class="ident">entry</span> <span class="op">=</span> <span class="ident">potential_name_space_violations</span>
-                    .<span class="ident">entry</span>((<span class="ident">name</span>, <span class="ident">ConstraintViolationScope::GlobalPrimaryKeyForeignKeyDefault</span>))
-                    .<span class="ident">or_insert_with</span>(<span class="ident">Vec::new</span>);
-
-                <span class="ident">entry</span>.<span class="ident">push</span>((<span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">name</span>, <span class="ident">ConstraintType::Default</span>));
-            }
-
-            <span class="kw">for</span> <span class="ident">name</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">indices</span>.<span class="ident">iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">db_name</span>.<span class="ident">as_ref</span>()) {
-                <span class="kw">let</span> <span class="ident">entry</span> <span class="op">=</span> <span class="ident">potential_name_space_violations</span>
-                    .<span class="ident">entry</span>((<span class="ident">name</span>, <span class="ident">ConstraintViolationScope::ModelPrimaryKeyKeyIndex</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">name</span>)))
-                    .<span class="ident">or_insert_with</span>(<span class="ident">Vec::new</span>);
-
-                <span class="ident">entry</span>.<span class="ident">push</span>((<span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">name</span>, <span class="ident">ConstraintType::KeyOrIdx</span>));
-            }
-        }
-
-        <span class="ident">ConstraintNameSpace::flatten</span>(<span class="ident">potential_name_space_violations</span>)
+    <span class="kw">fn</span> <span class="ident">constraint_violation_scopes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">ConstraintScope</span>] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">constraint_violation_scopes</span>
     }
 
     <span class="kw">fn</span> <span class="ident">available_native_type_constructors</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">NativeTypeConstructor</span>] {

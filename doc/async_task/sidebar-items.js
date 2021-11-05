@@ -1,1 +1,0 @@
-initSidebarItems({"fn":[["spawn","Creates a new task."],["spawn_local","Creates a new thread-local task."],["spawn_unchecked","Creates a new task without [`Send`], [`Sync`], and `'static` bounds."]],"struct":[["Runnable","A handle to a runnable task."],["Task","A spawned task."]]});

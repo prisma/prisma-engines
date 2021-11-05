@@ -362,7 +362,50 @@
 <span id="362">362</span>
 <span id="363">363</span>
 <span id="364">364</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">ModelWalker</span>, <span class="ident">RelationFieldWalker</span>, <span class="ident">RelationName</span>, <span class="ident">ScalarFieldWalker</span>};
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
+
+<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">ModelWalker</span>, <span class="ident">RelationFieldWalker</span>, <span class="ident">RelationName</span>, <span class="ident">ScalarFieldWalker</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>,
     <span class="ident">transform::ast_to_dml::db</span>::{<span class="ident">relations</span>::<span class="kw-2">*</span>, <span class="ident">ParserDatabase</span>, <span class="ident">ScalarFieldType</span>},
@@ -370,6 +413,8 @@
 <span class="kw">use</span> <span class="ident">datamodel_connector::ConnectorCapability</span>;
 <span class="kw">use</span> <span class="ident">dml::relation_info::ReferentialAction</span>;
 
+<span class="doccomment">/// A relation that has the minimal amount of information for us to create one. Useful for</span>
+<span class="doccomment">/// validation purposes. Holds all possible relation types.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">RelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">relation_id</span>: <span class="ident">usize</span>,
@@ -377,10 +422,10 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">RelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Converts the walker to either an implicit many to many, or a inline relation walker</span>
+    <span class="doccomment">/// gathering 1:1 and 1:n relations.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">refine</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RefinedRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">relation</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">relations</span>.<span class="ident">relations_storage</span>[<span class="self">self</span>.<span class="ident">relation_id</span>];
-
-        <span class="kw">if</span> <span class="ident">relation</span>.<span class="ident">is_many_to_many</span>() {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">is_many_to_many</span>() {
             <span class="ident">RefinedRelationWalker::ImplicitManyToMany</span>(<span class="ident">ImplicitManyToManyRelationWalker</span> {
                 <span class="ident">db</span>: <span class="self">self</span>.<span class="ident">db</span>,
                 <span class="ident">relation_id</span>: <span class="self">self</span>.<span class="ident">relation_id</span>,
@@ -392,10 +437,18 @@
             })
         }
     }
+
+    <span class="doccomment">/// The relation attributes parsed from the AST.</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">Relation</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">relations</span>.<span class="ident">relations_storage</span>[<span class="self">self</span>.<span class="ident">relation_id</span>]
+    }
 }
 
+<span class="doccomment">/// Splits the relation to different types.</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">RefinedRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// 1:1 and 1:n relations, where one side defines the relation arguments.</span>
     <span class="ident">Inline</span>(<span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span>),
+    <span class="doccomment">/// Implicit m:n relation. The arguments are inferred by Prisma.</span>
     <span class="ident">ImplicitManyToMany</span>(<span class="ident">ImplicitManyToManyRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span>),
 }
 
@@ -413,8 +466,8 @@
     <span class="ident">NA</span>,
 }
 
-<span class="doccomment">/// An explicitly defined 1:1 or 1:n relation. This walker doesn&#39;t expect the relation to be</span>
-<span class="doccomment">/// defined on both sides.</span>
+<span class="doccomment">/// An explicitly defined 1:1 or 1:n relation. The walker has the referencing side defined, but</span>
+<span class="doccomment">/// might miss the back relation in the AST.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
     <span class="ident">relation_id</span>: <span class="ident">usize</span>,
@@ -422,18 +475,22 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Get the relation attributes defined in the AST.</span>
     <span class="kw">fn</span> <span class="ident">get</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">Relation</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">relations</span>.<span class="ident">relations_storage</span>[<span class="self">self</span>.<span class="ident">relation_id</span>]
     }
 
+    <span class="doccomment">/// The relation is 1:1, having at most one record on both sides of the relation.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_one_to_one</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">get</span>().<span class="ident">attributes</span>, <span class="ident">RelationAttributes::OneToOne</span>(<span class="kw">_</span>))
     }
 
+    <span class="doccomment">/// The model which holds the relation arguments.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">referencing_model</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk_model</span>(<span class="self">self</span>.<span class="ident">get</span>().<span class="ident">model_a</span>)
     }
 
+    <span class="doccomment">/// The model referenced and which hold the back-relation field.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">referenced_model</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk_model</span>(<span class="self">self</span>.<span class="ident">get</span>().<span class="ident">model_b</span>)
     }
@@ -568,6 +625,8 @@
     }
 }
 
+<span class="doccomment">/// Describes an implicit m:n relation between two models. Neither side defines fields, attributes</span>
+<span class="doccomment">/// or referential actions, which are all inferred by Prisma.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">ImplicitManyToManyRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
     <span class="ident">relation_id</span>: <span class="ident">usize</span>,
@@ -575,18 +634,22 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">ImplicitManyToManyRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Gets the relation attributes from the AST.</span>
     <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">Relation</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">relations</span>.<span class="ident">relations_storage</span>[<span class="self">self</span>.<span class="ident">relation_id</span>]
     }
 
+    <span class="doccomment">/// The model which comes first in the alphabetical order.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">model_a</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk_model</span>(<span class="self">self</span>.<span class="ident">get</span>().<span class="ident">model_a</span>)
     }
 
+    <span class="doccomment">/// The model which comes after model a in the alphabetical order.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">model_b</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk_model</span>(<span class="self">self</span>.<span class="ident">get</span>().<span class="ident">model_b</span>)
     }
 
+    <span class="doccomment">/// The field that defines the relation in model a.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">field_a</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">attributes</span> {
             <span class="ident">RelationAttributes::ImplicitManyToMany</span> { <span class="ident">field_a</span>, <span class="ident">field_b</span>: <span class="kw">_</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">model_a</span>().<span class="ident">relation_field</span>(<span class="ident">field_a</span>),
@@ -594,6 +657,7 @@
         }
     }
 
+    <span class="doccomment">/// The field that defines the relation in model b.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">field_b</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">attributes</span> {
             <span class="ident">RelationAttributes::ImplicitManyToMany</span> { <span class="ident">field_a</span>: <span class="kw">_</span>, <span class="ident">field_b</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">model_b</span>().<span class="ident">relation_field</span>(<span class="ident">field_b</span>),
@@ -638,6 +702,24 @@
             <span class="ident">db</span>: <span class="self">self</span>.<span class="ident">db</span>,
             <span class="ident">relation_field</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">types</span>.<span class="ident">relation_fields</span>[<span class="kw-2">&amp;</span>(<span class="self">self</span>.<span class="ident">side_a</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="ident">side_a</span>.<span class="number">1</span>)],
         }
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">referenced_field</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+        <span class="ident">RelationFieldWalker</span> {
+            <span class="ident">model_id</span>: <span class="self">self</span>.<span class="ident">side_b</span>.<span class="number">0</span>,
+            <span class="ident">field_id</span>: <span class="self">self</span>.<span class="ident">side_b</span>.<span class="number">1</span>,
+            <span class="ident">db</span>: <span class="self">self</span>.<span class="ident">db</span>,
+            <span class="ident">relation_field</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">types</span>.<span class="ident">relation_fields</span>[<span class="kw-2">&amp;</span>(<span class="self">self</span>.<span class="ident">side_b</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="ident">side_b</span>.<span class="number">1</span>)],
+        }
+    }
+
+    <span class="doccomment">/// The name of the foreign key. Either taken from the `map` attribute, or generated following</span>
+    <span class="doccomment">/// the Prisma defaults.</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">foreign_key_name</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">from_forward</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">referencing_field</span>().<span class="ident">final_foreign_key_name</span>();
+        <span class="kw">let</span> <span class="ident">from_back</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">referenced_field</span>().<span class="ident">final_foreign_key_name</span>();
+
+        <span class="ident">from_forward</span>.<span class="ident">or</span>(<span class="ident">from_back</span>)
     }
 
     <span class="doccomment">/// The scalar fields defining the relation on the referenced model.</span>

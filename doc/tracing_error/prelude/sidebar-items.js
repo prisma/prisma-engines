@@ -1,1 +1,0 @@
-initSidebarItems({"trait":[["_","A trait for extracting SpanTraces created by `in_current_span()` from `dyn Error` trait objects"],["_","Extension trait for instrumenting errors in `Result`s with `SpanTrace`s"],["_","Extension trait for instrumenting errors with `SpanTrace`s"]]});

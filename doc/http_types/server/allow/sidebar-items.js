@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Allow","List the set of methods supported by a resource."],["IntoIter","A borrowing iterator over entries in `Allow`."],["Iter","A lending iterator over entries in `Allow`."]]});

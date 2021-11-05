@@ -1,1 +1,0 @@
-initSidebarItems({"trait":[["Bits","A type level number signifying the number of bits in a bitmap."],["ChunkLength","A trait used to decide the size of an array."]]});

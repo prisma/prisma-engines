@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["AcceptEncoding","Client header advertising available compression algorithms."],["IntoIter","A borrowing iterator over entries in `AcceptEncoding`."],["Iter","A lending iterator over entries in `AcceptEncoding`."],["IterMut","A mutable iterator over entries in `AcceptEncoding`."]]});

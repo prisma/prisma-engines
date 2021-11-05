@@ -1,1 +1,0 @@
-initSidebarItems({"attr":[["test_connector",""]],"enum":[["Capabilities","Test-relevant connector capabilities."],["Tags","Test-relevant connector tags."]],"macro":[["expect","Creates an instance of `Expect` from string literal:"]],"struct":[["BitFlags","Represents a set of flags of some type `T`. `T` must have the `#[bitflags]` attribute applied."],["TestApi",""]]});

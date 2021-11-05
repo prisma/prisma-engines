@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Drain",""],["InlineArray","A fixed capacity array sized to match some other type `T`."],["Iter",""]]});

@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["IntoIter","An owning iterator over the target-level pairs of a `Targets` filter."],["Iter","A borrowing iterator over the target-level pairs of a `Targets` filter."],["Targets","A filter that enables or disables spans and events based on their target and level."]]});

@@ -1,1 +1,0 @@
-initSidebarItems({"macro":[["params","This macro is a convenient way to pass named parameters to a statement."],["read_lenenc_str","Reads MySql’s length-encoded string"]],"mod":[["constants",""],["crypto",""],["io",""],["misc",""],["named_params",""],["packets",""],["params",""],["proto",""],["row",""],["scramble",""],["value",""]]});

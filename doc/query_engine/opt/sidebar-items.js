@@ -1,1 +1,0 @@
-initSidebarItems({"enum":[["CliOpt",""],["Subcommand",""]],"fn":[["load_datamodel_file",""],["parse_base64_string",""]],"struct":[["ExecuteRequestInput",""],["GetConfigInput",""],["PrismaOpt",""],["SourceOverride",""]]});

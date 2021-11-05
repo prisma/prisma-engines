@@ -225,6 +225,15 @@
 <span id="225">225</span>
 <span id="226">226</span>
 <span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">borrow::Cow</span>,
     <span class="ident">fmt</span>,
@@ -449,6 +458,15 @@
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">RelationName::Explicit</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
             <span class="ident">RelationName::Generated</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
+        }
+    }
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">RelationName</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">name</span>: <span class="ident">RelationName</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="kw">match</span> <span class="ident">name</span> {
+            <span class="ident">RelationName::Explicit</span>(<span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Cow::from</span>(<span class="ident">name</span>),
+            <span class="ident">RelationName::Generated</span>(<span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Cow::from</span>(<span class="ident">name</span>),
         }
     }
 }

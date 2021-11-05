@@ -1,1 +1,0 @@
-initSidebarItems({"enum":[["CharacterClass",""]],"struct":[["CharSet",""],["Match",""],["NFA",""],["State",""]]});

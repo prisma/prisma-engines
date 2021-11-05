@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Decimal128","Struct representing a BSON Decimal128 type."]]});

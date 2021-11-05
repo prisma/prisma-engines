@@ -1,1 +1,0 @@
-initSidebarItems({"enum":[["ForeignKeyAction","Foreign key action types (for ON DELETE|ON UPDATE)."]],"struct":[["Column",""],["CreateTable",""],["ForeignKey",""]]});

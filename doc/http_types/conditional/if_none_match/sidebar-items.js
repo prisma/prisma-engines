@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["IfNoneMatch","Apply the HTTP method if the ETags do not match."],["IntoIter","A borrowing iterator over entries in `IfNoneMatch`."],["Iter","A lending iterator over entries in `IfNoneMatch`."],["IterMut","A mutable iterator over entries in `IfNoneMatch`."]]});

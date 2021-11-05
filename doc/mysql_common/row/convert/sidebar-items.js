@@ -1,1 +1,0 @@
-initSidebarItems({"fn":[["from_row","Will panic if could not convert `row` to `T`."],["from_row_opt","Will return `Err(row)` if could not convert `row` to `T`"]],"struct":[["FromRowError","`FromRow` conversion error."]],"trait":[["FromRow","Trait to convert `Row` into a tuple of `FromValue` implementors up to arity 12."]]});

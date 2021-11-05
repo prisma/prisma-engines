@@ -1,1 +1,0 @@
-initSidebarItems({"enum":[["DNSClass","The DNS Record class"]]});

@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Context","A thread-safe, stateful context for the v1 generator to help ensure process-wide uniqueness."],["Timestamp","Stores the number of nanoseconds from an epoch and a counter for ensuring V1 ids generated on the same host are unique."]],"trait":[["ClockSequence","A trait that abstracts over generation of UUID v1 “Clock Sequence” values."]]});

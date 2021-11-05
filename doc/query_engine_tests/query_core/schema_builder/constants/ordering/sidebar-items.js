@@ -1,1 +1,0 @@
-initSidebarItems({"constant":[["ASC",""],["DESC",""],["FIELDS",""],["SEARCH",""],["SORT",""],["SORT_ORDER",""],["UNDERSCORE_RELEVANCE",""]]});

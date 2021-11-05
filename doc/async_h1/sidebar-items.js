@@ -1,1 +1,0 @@
-initSidebarItems({"macro":[["read_to_end","like ready! but early-returns the Poll<Result> early in all situations other than Ready(Ok(0))"]],"mod":[["client","Process HTTP connections on the client."],["server","Process HTTP connections on the server."]]});
