@@ -39,8 +39,8 @@ There are a lot of assumptions that need to hold for a down migration to "just w
   by the bad deployment.
 - The down migration actually works. Are your down migrations tested?
 
-In short, down migrations give you a sense of security, but it is a false sense
-of security.
+In short, down migrations give you a sense of security, but it is often a false
+sense of security.
 
 - In production, currently, we will diagnose the problem for you, but rollbacks
   are manual: you use `migrate resolve` to mark the migration as rolled back or
@@ -94,8 +94,9 @@ current state of a migrations history.
 
 Here is how we generate a new migration:
 
-- Create an empty shadow database, or try to make the one provided with the
-  `shadowDatabaseUrl` datasource param empty.
+- If the `shadowDatabaseUrl` datasource param is set in Prisma schema, connect
+  to that database and try to erase all schema. Otherwise create an empty
+  shadow database.
 - Apply all the migrations in the migrations directory to the shadow database.
   Introspect its schema: this is the schema we will assume as a _starting
   point_ for the next migration.
@@ -106,9 +107,9 @@ Here is how we generate a new migration:
 
 This logic is implemented in the migration connectors.
 
-### Can `migrate deploy` ask to reset the database? Does it use the shadow database?
+### Can `prisma migrate deploy` ask to reset the database? Does it use the shadow database?
 
-No. `migrate deploy` will never use a shadow database, and it will never reset
+No. `prisma migrate deploy` will never use a shadow database, and it will never reset
 your database.
 
 On a high level, migrate deploy _exclusively_:
@@ -116,6 +117,48 @@ On a high level, migrate deploy _exclusively_:
 - Figures out which migrations have been run and which migrations have not, by
   looking at the `_prisma_migrations` table in the target database.
 - Run the migrations that have not been applied yet, in chronological order.
+
+`prisma migrate deploy` is the command meant to be used for _unattended_
+migrations (as part of CI). As such, it should be as reliable, predictable and
+deterministic as possible.
+
+### Why does `prisma migrate deploy` not warn when a migration is in the migrations table but not in the migrations folder?
+
+We don't want to warn if an already applied migration is missing from the
+migration directory because it would prevent squashing migrations and
+deployment from not-properly-rebased branches.
+
+In general, by design, `deploy` errs on the side of not standing in the way of
+deploying your migrations.
+
+### Why does `prisma migrate deploy` not detect drift?
+
+We don't detect drift because we want to keep the deployment path light and
+simple, and because within the current Migrate architecture, we would need a
+shadow database for that. Many people would not be comfortable with
+creating/using temporary databases being on the deployment path.
+
+And as stated in the previous question, in general, by design,
+`deploy` errs on the side of not standing in the way of deploying your
+migrations.
+
+### What happens when a migration fails in `prisma migrate deploy`?
+
+If a migration fails during deployment, you will see the error. Then `prisma
+migrate status` and `prisma migrate deploy` commands (in subsequent runs) will
+show you the failed state with the error message when you run them again.
+
+It's then your responsibility to fix what failed, and mark the migration as
+applied or rolled back with `prisma migrate resolve`, so you can deploy
+migrations again.
+
+Prisma Migrate does not offer much help at that last stage, but this is
+something we are working on defining and prioritizing. See [this
+issue](https://github.com/prisma/prisma/issues/10127).
+
+Also see the [public
+documentation](https://www.prisma.io/docs/guides/database/production-troubleshooting)
+on this topic.
 
 ### Why does Migrate not do data migrations in TypeScript?
 
