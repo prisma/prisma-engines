@@ -301,7 +301,11 @@ fn indices_must_work(api: TestApi) {
     assert_eq!(
         vec![Index {
             name: "count".to_string(),
-            columns: vec![IndexColumn::new("count")],
+            columns: vec![IndexColumn {
+                name: "count".into(),
+                sort_order: Some(SQLSortOrder::Asc),
+                length: None,
+            }],
             tpe: IndexType::Normal,
         }],
         user_table.indices

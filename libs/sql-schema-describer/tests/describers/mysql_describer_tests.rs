@@ -1184,11 +1184,24 @@ fn mysql_multi_field_indexes_must_be_inferred(api: TestApi) {
     let result = api.describe();
     let table = result.get_table("Employee").expect("couldn't get Employee table");
 
+    let columns = vec![
+        IndexColumn {
+            name: "name".into(),
+            sort_order: Some(SQLSortOrder::Asc),
+            length: None,
+        },
+        IndexColumn {
+            name: "age".into(),
+            sort_order: Some(SQLSortOrder::Asc),
+            length: None,
+        },
+    ];
+
     assert_eq!(
         table.indices,
         &[Index {
             name: "age_and_name_index".into(),
-            columns: vec![IndexColumn::new("name"), IndexColumn::new("age")],
+            columns,
             tpe: IndexType::Unique,
         }]
     );

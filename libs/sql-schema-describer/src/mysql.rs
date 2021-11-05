@@ -418,7 +418,6 @@ impl<'a> SqlSchemaDescriber<'a> {
     ) -> DescriberResult<BTreeMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)>> {
         let mut map = BTreeMap::new();
         let mut indexes_with_expressions: HashSet<(String, String)> = HashSet::new();
-        let mut indexes_with_partially_covered_columns: HashSet<(String, String)> = HashSet::new();
 
         // We alias all the columns because MySQL column names are case-insensitive in queries, but the
         // information schema column names became upper-case in MySQL 8, causing the code fetching
@@ -430,7 +429,8 @@ impl<'a> SqlSchemaDescriber<'a> {
                 Binary column_name AS column_name,
                 seq_in_index AS seq_in_index,
                 Binary table_name AS table_name,
-                sub_part AS partial
+                sub_part AS partial,
+                Binary collation AS column_order
             FROM INFORMATION_SCHEMA.STATISTICS
             WHERE table_schema = ?
             ORDER BY index_name, seq_in_index
@@ -441,9 +441,14 @@ impl<'a> SqlSchemaDescriber<'a> {
             trace!("Got index row: {:#?}", row);
             let table_name = row.get_expect_string("table_name");
             let index_name = row.get_expect_string("index_name");
-            if row.get_u32("partial").is_some() {
-                indexes_with_partially_covered_columns.insert((table_name.clone(), index_name.clone()));
-            };
+            let length = row.get_u32("partial");
+
+            let sort_order = row.get_string("column_order").map(|v| match v.as_ref() {
+                "A" => SQLSortOrder::Asc,
+                "D" => SQLSortOrder::Desc,
+                misc => panic!("Unexpected sort order `{}`, collation should be A, D or Null", misc),
+            });
+
             match row.get_string("column_name") {
                 Some(column_name) => {
                     let seq_in_index = row.get_expect_i64("seq_in_index");
@@ -464,7 +469,12 @@ impl<'a> SqlSchemaDescriber<'a> {
                                 if pk.columns.len() < (pos + 1) as usize {
                                     pk.columns.resize((pos + 1) as usize, PrimaryKeyColumn::default());
                                 }
-                                pk.columns[pos as usize] = PrimaryKeyColumn::new(column_name);
+
+                                pk.columns[pos as usize] = PrimaryKeyColumn {
+                                    name: column_name.to_string(),
+                                    length,
+                                };
+
                                 trace!(
                                     "The primary key has already been created, added column to it: {:?}",
                                     pk.columns
@@ -473,8 +483,13 @@ impl<'a> SqlSchemaDescriber<'a> {
                             None => {
                                 trace!("Instantiating primary key");
 
+                                let column = PrimaryKeyColumn {
+                                    name: column_name,
+                                    length,
+                                };
+
                                 primary_key.replace(PrimaryKey {
-                                    columns: vec![PrimaryKeyColumn::new(column_name)],
+                                    columns: vec![column],
                                     sequence: None,
                                     constraint_name: None,
                                 });
@@ -482,14 +497,24 @@ impl<'a> SqlSchemaDescriber<'a> {
                         };
                     } else if indexes_map.contains_key(&index_name) {
                         if let Some(index) = indexes_map.get_mut(&index_name) {
-                            index.columns.push(IndexColumn::new(column_name));
+                            index.columns.push(IndexColumn {
+                                name: column_name.to_string(),
+                                length,
+                                sort_order,
+                            });
                         }
                     } else {
+                        let column = IndexColumn {
+                            name: column_name,
+                            sort_order,
+                            length,
+                        };
+
                         indexes_map.insert(
                             index_name.clone(),
                             Index {
                                 name: index_name,
-                                columns: vec![IndexColumn::new(column_name)],
+                                columns: vec![column],
                                 tpe: match is_unique {
                                     true => IndexType::Unique,
                                     false => IndexType::Normal,
@@ -506,11 +531,6 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         for (table, (index_map, _)) in &mut map {
             for (tble, index_name) in &indexes_with_expressions {
-                if tble == table {
-                    index_map.remove(index_name);
-                }
-            }
-            for (tble, index_name) in &indexes_with_partially_covered_columns {
                 if tble == table {
                     index_map.remove(index_name);
                 }
