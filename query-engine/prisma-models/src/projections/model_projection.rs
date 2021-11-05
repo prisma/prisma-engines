@@ -1,5 +1,8 @@
 use super::RecordProjection;
-use crate::{dml::FieldArity, DomainError, Field, PrismaValue, PrismaValueExtensions, ScalarFieldRef, TypeIdentifier};
+use crate::{
+    dml::FieldArity, DomainError, Field, FieldSelection, PrismaValue, PrismaValueExtensions, ScalarFieldRef,
+    SelectedField, TypeIdentifier,
+};
 use itertools::Itertools;
 
 /// Projection of a `Model`. A projection is a (sub)set of fields of a model.
@@ -12,6 +15,22 @@ pub struct ModelProjection {
 impl From<Field> for ModelProjection {
     fn from(f: Field) -> Self {
         Self { fields: vec![f] }
+    }
+}
+
+/// [Composites] todo: Temporary converter.
+impl From<&FieldSelection> for ModelProjection {
+    fn from(fs: &FieldSelection) -> Self {
+        Self {
+            fields: fs
+                .selection
+                .iter()
+                .filter_map(|selected| match selected {
+                    SelectedField::Scalar(sf) => Some(sf.clone().into()),
+                    SelectedField::Composite(_cf) => None,
+                })
+                .collect(),
+        }
     }
 }
 

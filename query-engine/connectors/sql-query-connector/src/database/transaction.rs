@@ -64,11 +64,11 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
         &mut self,
         model: &ModelRef,
         filter: &Filter,
-        selected_fields: &ModelProjection,
+        selected_fields: &FieldSelection,
         aggr_selections: &[RelAggregationSelection],
     ) -> connector::Result<Option<SingleRecord>> {
         catch(self.connection_info.clone(), async move {
-            read::get_single_record(&self.inner, model, filter, selected_fields, aggr_selections).await
+            read::get_single_record(&self.inner, model, filter, &selected_fields.into(), aggr_selections).await
         })
         .await
     }
@@ -77,7 +77,7 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
         &mut self,
         model: &ModelRef,
         query_arguments: QueryArguments,
-        selected_fields: &ModelProjection,
+        selected_fields: &FieldSelection,
         aggr_selections: &[RelAggregationSelection],
     ) -> connector::Result<ManyRecords> {
         catch(self.connection_info.clone(), async move {
@@ -85,7 +85,7 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
                 &self.inner,
                 model,
                 query_arguments,
-                selected_fields,
+                &selected_fields.into(),
                 aggr_selections,
                 SqlInfo::from(&self.connection_info),
             )

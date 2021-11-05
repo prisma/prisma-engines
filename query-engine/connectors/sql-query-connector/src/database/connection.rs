@@ -58,11 +58,12 @@ where
         &mut self,
         model: &ModelRef,
         filter: &Filter,
-        selected_fields: &ModelProjection,
+        selected_fields: &FieldSelection,
         aggr_selections: &[RelAggregationSelection],
     ) -> connector::Result<Option<SingleRecord>> {
+        // [Composites] todo: FieldSelection -> ModelProjection conversion
         catch(self.connection_info.clone(), async move {
-            read::get_single_record(&self.inner, model, filter, selected_fields, aggr_selections).await
+            read::get_single_record(&self.inner, model, filter, &selected_fields.into(), aggr_selections).await
         })
         .await
     }
@@ -71,7 +72,7 @@ where
         &mut self,
         model: &ModelRef,
         query_arguments: QueryArguments,
-        selected_fields: &ModelProjection,
+        selected_fields: &FieldSelection,
         aggr_selections: &[RelAggregationSelection],
     ) -> connector::Result<ManyRecords> {
         catch(self.connection_info.clone(), async move {
@@ -79,7 +80,7 @@ where
                 &self.inner,
                 model,
                 query_arguments,
-                selected_fields,
+                &selected_fields.into(),
                 aggr_selections,
                 SqlInfo::from(&self.connection_info),
             )

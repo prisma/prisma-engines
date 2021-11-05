@@ -187,7 +187,7 @@ impl<'conn> ReadOperations for MongoDbTransaction<'conn> {
         &mut self,
         model: &ModelRef,
         filter: &connector_interface::Filter,
-        selected_fields: &ModelProjection,
+        selected_fields: &FieldSelection,
         aggr_selections: &[RelAggregationSelection],
     ) -> connector_interface::Result<Option<SingleRecord>> {
         catch(async move {
@@ -196,7 +196,7 @@ impl<'conn> ReadOperations for MongoDbTransaction<'conn> {
                 &mut self.connection.session,
                 model,
                 filter,
-                selected_fields,
+                &selected_fields.into(),
                 aggr_selections,
             )
             .await
@@ -208,7 +208,7 @@ impl<'conn> ReadOperations for MongoDbTransaction<'conn> {
         &mut self,
         model: &ModelRef,
         query_arguments: connector_interface::QueryArguments,
-        selected_fields: &ModelProjection,
+        selected_fields: &FieldSelection,
         aggregation_selections: &[RelAggregationSelection],
     ) -> connector_interface::Result<ManyRecords> {
         catch(async move {
@@ -217,7 +217,7 @@ impl<'conn> ReadOperations for MongoDbTransaction<'conn> {
                 &mut self.connection.session,
                 model,
                 query_arguments,
-                selected_fields,
+                &selected_fields.into(),
                 aggregation_selections,
             )
             .await

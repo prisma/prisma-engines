@@ -215,12 +215,12 @@ pub trait ReadOperations {
     /// - The `ModelRef` represents the datamodel and its relations.
     /// - The `Filter` defines what item we want back and is guaranteed to be
     ///   defined to filter at most one item by the core.
-    /// - The `SelectedFields` defines the values to be returned.
+    /// - The `FieldSelection` defines the values to be returned.
     async fn get_single_record(
         &mut self,
         model: &ModelRef,
         filter: &Filter,
-        selected_fields: &ModelProjection,
+        selected_fields: &FieldSelection,
         aggregation_selections: &[RelAggregationSelection],
     ) -> crate::Result<Option<SingleRecord>>;
 
@@ -228,13 +228,13 @@ pub trait ReadOperations {
     ///
     /// - The `ModelRef` represents the datamodel and its relations.
     /// - The `QueryArguments` defines various constraints (see docs for detailed explanation).
-    /// - The `SelectedFields` defines the fields (e.g. columns or document fields)
+    /// - The `FieldSelection` defines the fields (e.g. columns or document fields)
     ///   to be returned as a projection of fields of the model it queries.
     async fn get_many_records(
         &mut self,
         model: &ModelRef,
         query_arguments: QueryArguments,
-        selected_fields: &ModelProjection,
+        selected_fields: &FieldSelection,
         aggregation_selections: &[RelAggregationSelection],
     ) -> crate::Result<ManyRecords>;
 

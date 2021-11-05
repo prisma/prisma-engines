@@ -1,5 +1,6 @@
 pub use crate::error::*;
 pub use crate::field::*;
+pub use crate::field_selection::*;
 pub use crate::fields::*;
 pub use crate::index::*;
 pub use crate::internal_data_model::*;
