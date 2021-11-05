@@ -564,7 +564,11 @@ fn all_postgres_column_types_must_work(api: TestApi) {
             columns: expected_columns,
             indices: vec![Index {
                 name: "User_uuid_col_key".into(),
-                columns: vec![IndexColumn::new("uuid_col")],
+                columns: vec![IndexColumn {
+                    name: "uuid_col".to_string(),
+                    sort_order: Some(SQLSortOrder::Asc),
+                    length: None,
+                }],
                 tpe: IndexType::Unique,
             },],
             primary_key: Some(PrimaryKey {
@@ -703,13 +707,41 @@ fn postgres_multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi
     let table = schema.table_bang("indexes_test");
     let index = &table.indices[0];
 
-    assert_eq!(&index.columns, &[IndexColumn::new("name"), IndexColumn::new("age")]);
+    assert_eq!(
+        &index.columns,
+        &[
+            IndexColumn {
+                name: "name".to_string(),
+                sort_order: Some(SQLSortOrder::Asc),
+                length: None
+            },
+            IndexColumn {
+                name: "age".to_string(),
+                sort_order: Some(SQLSortOrder::Asc),
+                length: None
+            },
+        ]
+    );
     assert!(index.tpe.is_unique());
 
     let index = &table.indices[1];
 
     assert!(!index.tpe.is_unique());
-    assert_eq!(&index.columns, &[IndexColumn::new("age"), IndexColumn::new("name")]);
+    assert_eq!(
+        &index.columns,
+        &[
+            IndexColumn {
+                name: "age".to_string(),
+                sort_order: Some(SQLSortOrder::Asc),
+                length: None
+            },
+            IndexColumn {
+                name: "name".to_string(),
+                sort_order: Some(SQLSortOrder::Asc),
+                length: None
+            },
+        ]
+    );
 }
 
 #[test_connector(tags(Postgres))]

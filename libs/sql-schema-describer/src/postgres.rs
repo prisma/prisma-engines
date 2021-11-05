@@ -543,52 +543,60 @@ impl<'a> SqlSchemaDescriber<'a> {
         let mut indexes_map = BTreeMap::new();
 
         let sql = r#"
-        SELECT
-            indexInfos.relname as name,
-            columnInfos.attname AS column_name,
-            rawIndex.indisunique AS is_unique,
-            rawIndex.indisprimary AS is_primary_key,
-            tableInfos.relname AS table_name,
-            rawIndex.indkeyidx,
-            pg_get_serial_sequence('"' || $1 || '"."' || tableInfos.relname || '"', columnInfos.attname) AS sequence_name
+        select indexinfos.relname                          as name,
+               columnInfos.attname                         AS column_name,
+               rawIndex.indisunique                        AS is_unique,
+               rawIndex.indisprimary                       AS is_primary_key,
+               tableInfos.relname                          AS table_name,
+               rawIndex.indkeyidx,
+               rawIndex.column_order,
+               pg_get_serial_sequence('"' || $1 || '"."' || tableInfos.relname || '"',
+                                      columnInfos.attname) AS sequence_name
         FROM
             -- pg_class stores infos about tables, indices etc: https://www.postgresql.org/docs/current/catalog-pg-class.html
             pg_class tableInfos,
             pg_class indexInfos,
             -- pg_index stores indices: https://www.postgresql.org/docs/current/catalog-pg-index.html
             (
-                SELECT
-                    indrelid,
-                    indexrelid,
-                    indisunique,
-                    indisprimary,
-                    pg_index.indkey AS indkey,
-                    generate_subscripts(pg_index.indkey, 1) AS indkeyidx
-                FROM pg_index
-                -- ignores partial indexes
-                WHERE indpred IS NULL
-                GROUP BY indrelid, indexrelid, indisunique, indisprimary, indkeyidx, indkey
-                ORDER BY indrelid, indexrelid, indkeyidx
+                SELECT i.indrelid,
+                       i.indexrelid,
+                       i.indisunique,
+                       i.indisprimary,
+                       i.indkey                         AS indkey,
+                       generate_subscripts(i.indkey, 1) AS indkeyidx,
+                       CASE o.OPTION
+                           & 1
+                           WHEN 1 THEN 'DESC'
+                           ELSE 'ASC'
+                           END                          AS column_order
+                FROM pg_index i
+                         CROSS JOIN LATERAL UNNEST(i.indkey) WITH ordinality AS c (colnum, ordinality)
+                         LEFT JOIN LATERAL UNNEST(i.indoption) WITH ordinality AS o (OPTION, ordinality)
+                                   ON c.ordinality = o.ordinality
+                WHERE i.indpred IS NULL
+                GROUP BY i.indrelid, i.indexrelid, i.indisunique, i.indisprimary, indkeyidx, i.indkey, column_order
+                ORDER BY i.indrelid, i.indexrelid
             ) rawIndex,
             -- pg_attribute stores infos about columns: https://www.postgresql.org/docs/current/catalog-pg-attribute.html
             pg_attribute columnInfos,
             -- pg_namespace stores info about the schema
             pg_namespace schemaInfo
         WHERE
-            -- find table info for index
+          -- find table info for index
             tableInfos.oid = rawIndex.indrelid
-            -- find index info
-            AND indexInfos.oid = rawIndex.indexrelid
-            -- find table columns
-            AND columnInfos.attrelid = tableInfos.oid
-            AND columnInfos.attnum = rawIndex.indkey[rawIndex.indkeyidx]
-            -- we only consider ordinary tables
-            AND tableInfos.relkind = 'r'
-            -- we only consider stuff out of one specific schema
-            AND tableInfos.relnamespace = schemaInfo.oid
-            AND schemaInfo.nspname = $1
-        GROUP BY tableInfos.relname, indexInfos.relname, rawIndex.indisunique, rawIndex.indisprimary, columnInfos.attname, rawIndex.indkeyidx
-        ORDER BY rawIndex.indkeyidx
+          -- find index info
+          AND indexInfos.oid = rawIndex.indexrelid
+          -- find table columns
+          AND columnInfos.attrelid = tableInfos.oid
+          AND columnInfos.attnum = rawIndex.indkey[rawIndex.indkeyidx]
+          -- we only consider ordinary tables
+          AND tableInfos.relkind = 'r'
+          -- we only consider stuff out of one specific schema
+          AND tableInfos.relnamespace = schemaInfo.oid
+          AND schemaInfo.nspname = $1
+        GROUP BY tableInfos.relname, indexInfos.relname, rawIndex.indisunique, rawIndex.indisprimary, columnInfos.attname,
+                 rawIndex.indkeyidx, rawIndex.column_order
+        ORDER BY rawIndex.indkeyidx;
         "#;
 
         let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
@@ -601,6 +609,15 @@ impl<'a> SqlSchemaDescriber<'a> {
             let is_primary_key = row.get_expect_bool("is_primary_key");
             let table_name = row.get_expect_string("table_name");
             let sequence_name = row.get_string("sequence_name");
+
+            let sort_order = row.get_string("column_order").map(|v| match v.as_ref() {
+                "ASC" => SQLSortOrder::Asc,
+                "DESC" => SQLSortOrder::Desc,
+                misc => panic!(
+                    "Unexpected sort order `{}`, collation should be ASC, DESC or Null",
+                    misc
+                ),
+            });
 
             if is_primary_key {
                 let entry: &mut (Vec<_>, Option<PrimaryKey>) =
@@ -630,12 +647,18 @@ impl<'a> SqlSchemaDescriber<'a> {
             } else {
                 let entry: &mut (Vec<Index>, _) = indexes_map.entry(table_name).or_insert_with(|| (Vec::new(), None));
 
+                let column = IndexColumn {
+                    name: column_name.to_string(),
+                    sort_order,
+                    length: None,
+                };
+
                 if let Some(existing_index) = entry.0.iter_mut().find(|idx| idx.name == name) {
-                    existing_index.columns.push(IndexColumn::new(column_name));
+                    existing_index.columns.push(column);
                 } else {
                     entry.0.push(Index {
                         name,
-                        columns: vec![IndexColumn::new(column_name)],
+                        columns: vec![column],
                         tpe: match is_unique {
                             true => IndexType::Unique,
                             false => IndexType::Normal,
