@@ -2,6 +2,7 @@
 
 use super::*;
 use crate::{getters::Getter, parsers::Parser};
+use datamodel::common::preview_features::PreviewFeature;
 use enumflags2::BitFlags;
 use indoc::indoc;
 use native_types::{NativeType, PostgresType};
@@ -21,6 +22,7 @@ pub enum Circumstances {
 pub struct SqlSchemaDescriber<'a> {
     conn: &'a dyn Queryable,
     circumstances: BitFlags<Circumstances>,
+    preview_features: BitFlags<PreviewFeature>,
 }
 
 impl Debug for SqlSchemaDescriber<'_> {
@@ -130,8 +132,16 @@ impl Parser for SqlSchemaDescriber<'_> {
 
 impl<'a> SqlSchemaDescriber<'a> {
     /// Constructor.
-    pub fn new(conn: &'a dyn Queryable, circumstances: BitFlags<Circumstances>) -> SqlSchemaDescriber<'a> {
-        SqlSchemaDescriber { conn, circumstances }
+    pub fn new(
+        conn: &'a dyn Queryable,
+        circumstances: BitFlags<Circumstances>,
+        preview_features: BitFlags<PreviewFeature>,
+    ) -> SqlSchemaDescriber<'a> {
+        SqlSchemaDescriber {
+            conn,
+            circumstances,
+            preview_features,
+        }
     }
 
     fn is_cockroach(&self) -> bool {
@@ -647,11 +657,11 @@ impl<'a> SqlSchemaDescriber<'a> {
             } else {
                 let entry: &mut (Vec<Index>, _) = indexes_map.entry(table_name).or_insert_with(|| (Vec::new(), None));
 
-                let column = IndexColumn {
-                    name: column_name.to_string(),
-                    sort_order,
-                    length: None,
-                };
+                let mut column = IndexColumn::new(column_name);
+
+                if self.preview_features.contains(PreviewFeature::ExtendedIndexes) {
+                    column.sort_order = sort_order;
+                }
 
                 if let Some(existing_index) = entry.0.iter_mut().find(|idx| idx.name == name) {
                     existing_index.columns.push(column);

@@ -2,6 +2,8 @@ use super::*;
 use crate::{getters::Getter, parsers::Parser};
 use bigdecimal::ToPrimitive;
 use common::purge_dangling_foreign_keys;
+use datamodel::common::preview_features::PreviewFeature;
+use enumflags2::BitFlags;
 use indoc::indoc;
 use native_types::{MySqlType, NativeType};
 use quaint::{prelude::Queryable, Value};
@@ -33,6 +35,7 @@ impl Flavour {
 
 pub struct SqlSchemaDescriber<'a> {
     conn: &'a dyn Queryable,
+    preview_features: BitFlags<PreviewFeature>,
 }
 
 #[async_trait::async_trait]
@@ -62,7 +65,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
         let table_names = self.get_table_names(schema).await?;
         let mut tables = Vec::with_capacity(table_names.len());
         let mut columns = Self::get_all_columns(self.conn, schema, &flavour).await?;
-        let mut indexes = Self::get_all_indexes(self.conn, schema).await?;
+        let mut indexes = self.get_all_indexes(schema).await?;
         let mut fks = Self::get_foreign_keys(self.conn, schema).await?;
 
         let mut enums = vec![];
@@ -97,8 +100,8 @@ impl Parser for SqlSchemaDescriber<'_> {}
 
 impl<'a> SqlSchemaDescriber<'a> {
     /// Constructor.
-    pub fn new(conn: &'a dyn Queryable) -> SqlSchemaDescriber<'a> {
-        SqlSchemaDescriber { conn }
+    pub fn new(conn: &'a dyn Queryable, preview_features: BitFlags<PreviewFeature>) -> SqlSchemaDescriber<'a> {
+        SqlSchemaDescriber { conn, preview_features }
     }
 
     #[tracing::instrument(skip(self))]
@@ -413,7 +416,7 @@ impl<'a> SqlSchemaDescriber<'a> {
     }
 
     async fn get_all_indexes(
-        conn: &dyn Queryable,
+        &self,
         schema_name: &str,
     ) -> DescriberResult<BTreeMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)>> {
         let mut map = BTreeMap::new();
@@ -435,7 +438,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             WHERE table_schema = ?
             ORDER BY index_name, seq_in_index
             ";
-        let rows = conn.query_raw(sql, &[schema_name.into()]).await?;
+        let rows = self.conn.query_raw(sql, &[schema_name.into()]).await?;
 
         for row in rows {
             trace!("Got index row: {:#?}", row);
@@ -470,11 +473,13 @@ impl<'a> SqlSchemaDescriber<'a> {
                                     pk.columns.resize((pos + 1) as usize, PrimaryKeyColumn::default());
                                 }
 
-                                pk.columns[pos as usize] = PrimaryKeyColumn {
-                                    name: column_name.to_string(),
-                                    sort_order: None,
-                                    length,
-                                };
+                                let mut column = PrimaryKeyColumn::new(column_name);
+
+                                if self.preview_features.contains(PreviewFeature::ExtendedIndexes) {
+                                    column.length = length;
+                                }
+
+                                pk.columns[pos as usize] = column;
 
                                 trace!(
                                     "The primary key has already been created, added column to it: {:?}",
@@ -484,11 +489,11 @@ impl<'a> SqlSchemaDescriber<'a> {
                             None => {
                                 trace!("Instantiating primary key");
 
-                                let column = PrimaryKeyColumn {
-                                    name: column_name,
-                                    length,
-                                    sort_order: None,
-                                };
+                                let mut column = PrimaryKeyColumn::new(column_name);
+
+                                if self.preview_features.contains(PreviewFeature::ExtendedIndexes) {
+                                    column.length = length;
+                                }
 
                                 primary_key.replace(PrimaryKey {
                                     columns: vec![column],
@@ -499,18 +504,22 @@ impl<'a> SqlSchemaDescriber<'a> {
                         };
                     } else if indexes_map.contains_key(&index_name) {
                         if let Some(index) = indexes_map.get_mut(&index_name) {
-                            index.columns.push(IndexColumn {
-                                name: column_name.to_string(),
-                                length,
-                                sort_order,
-                            });
+                            let mut column = IndexColumn::new(column_name);
+
+                            if self.preview_features.contains(PreviewFeature::ExtendedIndexes) {
+                                column.length = length;
+                                column.sort_order = sort_order;
+                            }
+
+                            index.columns.push(column);
                         }
                     } else {
-                        let column = IndexColumn {
-                            name: column_name,
-                            sort_order,
-                            length,
-                        };
+                        let mut column = IndexColumn::new(column_name);
+
+                        if self.preview_features.contains(PreviewFeature::ExtendedIndexes) {
+                            column.length = length;
+                            column.sort_order = sort_order;
+                        }
 
                         indexes_map.insert(
                             index_name.clone(),

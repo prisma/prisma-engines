@@ -7,6 +7,7 @@ version = "0.1.0"
 [dependencies]
 native-types = { path = "../native-types" }
 prisma-value = { path = "../prisma-value" }
+datamodel = { path = "../datamodel/core" }
 
 async-trait = "0.1.17"
 bigdecimal = "0.2"

@@ -1,3 +1,5 @@
+use datamodel::common::preview_features::PreviewFeature;
+use enumflags2::BitFlags;
 use quaint::prelude::{ConnectionInfo, Queryable, SqlFamily};
 use sql_schema_describer::{postgres::Circumstances, SqlSchemaDescriberBackend};
 
@@ -5,6 +7,7 @@ use sql_schema_describer::{postgres::Circumstances, SqlSchemaDescriberBackend};
 pub async fn load_describer<'a>(
     connection: &'a dyn Queryable,
     connection_info: &ConnectionInfo,
+    preview_features: BitFlags<PreviewFeature>,
 ) -> Result<Box<dyn SqlSchemaDescriberBackend + 'a>, crate::SqlError> {
     let version = connection.version().await?;
 
@@ -19,10 +22,20 @@ pub async fn load_describer<'a>(
             Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(
                 connection,
                 circumstances,
+                preview_features,
             )) as Box<dyn SqlSchemaDescriberBackend>
         }
-        SqlFamily::Mysql => Box::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(connection)),
-        SqlFamily::Sqlite => Box::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(connection)),
-        SqlFamily::Mssql => Box::new(sql_schema_describer::mssql::SqlSchemaDescriber::new(connection)),
+        SqlFamily::Mysql => Box::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(
+            connection,
+            preview_features,
+        )),
+        SqlFamily::Sqlite => Box::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(
+            connection,
+            preview_features,
+        )),
+        SqlFamily::Mssql => Box::new(sql_schema_describer::mssql::SqlSchemaDescriber::new(
+            connection,
+            preview_features,
+        )),
     })
 }

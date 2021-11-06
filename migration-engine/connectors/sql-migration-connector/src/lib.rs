@@ -34,6 +34,7 @@ pub struct SqlMigrationConnector {
     connection_info: ConnectionInfo,
     flavour: Box<dyn SqlFlavour + Send + Sync + 'static>,
     shadow_database_connection_string: Option<String>,
+    preview_features: BitFlags<PreviewFeature>,
 }
 
 impl SqlMigrationConnector {
@@ -56,6 +57,7 @@ impl SqlMigrationConnector {
             connection: tokio::sync::OnceCell::new(),
             flavour,
             shadow_database_connection_string,
+            preview_features,
         })
     }
 
@@ -88,7 +90,7 @@ impl SqlMigrationConnector {
 
     /// Made public for tests.
     pub async fn describe_schema(&self) -> ConnectorResult<SqlSchema> {
-        self.conn().await?.describe_schema().await
+        self.conn().await?.describe_schema(self.preview_features).await
     }
 
     /// Try to reset the database to an empty state. This should only be used
@@ -103,7 +105,7 @@ impl SqlMigrationConnector {
     async fn best_effort_reset_impl(&self, connection: &Connection) -> ConnectorResult<()> {
         tracing::info!("Attempting best_effort_reset");
 
-        let source_schema = connection.describe_schema().await?;
+        let source_schema = connection.describe_schema(self.preview_features).await?;
         let target_schema = SqlSchema::empty();
         let mut steps = Vec::new();
 

@@ -403,7 +403,7 @@ impl SqlFlavour for MssqlFlavour {
                         })?;
                 }
 
-                temp_database.describe_schema().await
+                temp_database.describe_schema(self.preview_features).await
             })()
             .await
         };
