@@ -48,7 +48,7 @@ impl ManyRecords {
         }
     }
 
-    pub fn empty(selected_fields: &ModelProjection) -> Self {
+    pub fn empty(selected_fields: &FieldSelection) -> Self {
         Self {
             records: Vec::new(),
             field_names: selected_fields.names().map(|n| n.to_string()).collect(),

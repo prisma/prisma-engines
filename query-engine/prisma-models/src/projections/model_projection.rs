@@ -23,7 +23,7 @@ impl From<&FieldSelection> for ModelProjection {
     fn from(fs: &FieldSelection) -> Self {
         Self {
             fields: fs
-                .selection
+                .selections
                 .iter()
                 .filter_map(|selected| match selected {
                     SelectedField::Scalar(sf) => Some(sf.clone().into()),

@@ -12,8 +12,8 @@ pub type CompositeFieldWeak = Weak<CompositeField>;
 #[derive(Clone)]
 pub struct CompositeField {
     pub name: String,
-    pub db_name: Option<String>,
     pub typ: CompositeTypeRef,
+    pub(crate) db_name: Option<String>,
     pub(crate) arity: FieldArity,
     pub(crate) container: ParentContainer,
 }
@@ -27,11 +27,9 @@ impl CompositeField {
         matches!(self.arity, FieldArity::Required)
     }
 
-    // pub fn model(&self) -> ModelRef {
-    //     self.model
-    //         .upgrade()
-    //         .expect("Model does not exist anymore. Parent model got deleted without deleting the child.")
-    // }
+    pub fn db_name(&self) -> &str {
+        self.db_name.as_deref().unwrap_or_else(|| self.name.as_str())
+    }
 
     pub fn scalar_fields(&self) -> Vec<ScalarFieldRef> {
         // let fields = self.fields.get_or_init(|| {
