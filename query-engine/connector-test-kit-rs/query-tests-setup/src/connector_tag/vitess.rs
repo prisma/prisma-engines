@@ -1,10 +1,7 @@
-use std::{fmt::Display, str::FromStr};
-
-use datamodel_connector::{Connector, ReferentialIntegrity};
-use sql_datamodel_connector::MySqlDatamodelConnector;
-
 use super::*;
 use crate::{SqlDatamodelRenderer, TestResult};
+use sql_datamodel_connector::SqlDatamodelConnectors;
+use std::{fmt::Display, str::FromStr};
 
 #[derive(Debug, Default, Clone)]
 pub struct VitessConnectorTag {
@@ -116,6 +113,5 @@ impl Display for VitessVersion {
 }
 
 fn vitess_capabilities() -> Vec<ConnectorCapability> {
-    let dm_connector = MySqlDatamodelConnector::new(ReferentialIntegrity::Prisma);
-    dm_connector.capabilities().to_owned()
+    SqlDatamodelConnectors::MYSQL.capabilities().to_owned()
 }

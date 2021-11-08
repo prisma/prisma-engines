@@ -1,9 +1,7 @@
-use datamodel_connector::{Connector, ReferentialIntegrity};
-use sql_datamodel_connector::PostgresDatamodelConnector;
-
-use crate::{datamodel_rendering::SqlDatamodelRenderer, TestError, TestResult};
+use sql_datamodel_connector::SqlDatamodelConnectors;
 
 use super::*;
+use crate::{datamodel_rendering::SqlDatamodelRenderer, TestError, TestResult};
 
 #[derive(Debug, Default, Clone)]
 pub struct PostgresConnectorTag {
@@ -196,6 +194,5 @@ impl ToString for PostgresVersion {
 }
 
 fn postgres_capabilities() -> Vec<ConnectorCapability> {
-    let dm_connector = PostgresDatamodelConnector::new(ReferentialIntegrity::default());
-    dm_connector.capabilities().to_owned()
+    SqlDatamodelConnectors::POSTGRES.capabilities().to_owned()
 }

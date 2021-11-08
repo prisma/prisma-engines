@@ -6,13 +6,12 @@ mod tests {
         IndexDefinition, Model, NativeTypeInstance, PrimaryKeyDefinition, ReferentialAction, RelationField,
         RelationInfo, ScalarField, ScalarType, StringFromEnvVar, ValueGenerator,
     };
-    use datamodel_connector::ReferentialIntegrity;
     use enumflags2::BitFlags;
     use expect_test::expect;
     use introspection_connector::IntrospectionContext;
     use native_types::{NativeType, PostgresType};
     use pretty_assertions::assert_eq;
-    use sql_datamodel_connector::PostgresDatamodelConnector;
+    use sql_datamodel_connector::SqlDatamodelConnectors;
     use sql_schema_describer::{
         Column, ColumnArity, ColumnType, ColumnTypeFamily, Enum, ForeignKey, ForeignKeyAction, Index, IndexType,
         PrimaryKey, Sequence, SqlSchema, Table,
@@ -25,11 +24,10 @@ mod tests {
             url: StringFromEnvVar::new_literal("test".to_string()),
             url_span: Span::empty(),
             documentation: None,
-            active_connector: Box::new(PostgresDatamodelConnector::new(Default::default())),
+            active_connector: SqlDatamodelConnectors::POSTGRES,
             shadow_database_url: None,
             provider: "postgresql".to_string(),
             referential_integrity: None,
-            default_referential_integrity: ReferentialIntegrity::ForeignKeys,
         };
 
         IntrospectionContext {

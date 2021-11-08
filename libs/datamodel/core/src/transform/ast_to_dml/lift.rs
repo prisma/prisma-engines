@@ -62,6 +62,7 @@ impl<'a> LiftAstToDml<'a> {
         field_ids_for_sorting: &mut HashMap<(&'a str, &'a str), ast::FieldId>,
     ) {
         let active_connector = self.db.active_connector();
+        let referential_integrity = self.db.active_referential_integrity();
         let common_dml_fields = |field: &mut dml::RelationField,
                                  attributes: &super::db::RelationField<'_>,
                                  relation_field: RelationFieldWalker<'_, '_>| {
@@ -73,9 +74,9 @@ impl<'a> LiftAstToDml<'a> {
             field.is_ignored = attributes.is_ignored;
             field.relation_info.fk_name = relation_field.final_foreign_key_name().map(|cow| cow.into_owned());
             field.supports_restrict_action(
-                active_connector.supports_referential_action(dml::ReferentialAction::Restrict),
+                active_connector.supports_referential_action(&referential_integrity, dml::ReferentialAction::Restrict),
             );
-            field.emulates_referential_actions(active_connector.emulates_referential_actions());
+            field.emulates_referential_actions(referential_integrity.is_prisma());
         };
 
         for relation in self.db.walk_relations() {
