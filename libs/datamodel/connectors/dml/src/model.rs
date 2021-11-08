@@ -42,7 +42,7 @@ impl IndexDefinition {
         matches!(self.tpe, IndexType::Unique)
     }
 
-    pub fn fields_names(&self) -> Vec<&String> {
+    pub fn field_names(&self) -> Vec<&String> {
         self.fields.iter().map(|(f, _, _)| f).collect()
     }
 }
@@ -57,8 +57,8 @@ pub struct PrimaryKeyDefinition {
 }
 
 impl PrimaryKeyDefinition {
-    pub fn field_names(&self) -> Vec<&String> {
-        self.fields.iter().map(|(field, _)| field).collect()
+    pub fn field_names(&self) -> impl ExactSizeIterator<Item = &String> {
+        self.fields.iter().map(|(field, _)| field)
     }
 }
 
@@ -73,6 +73,12 @@ pub enum SortOrder {
     Asc,
     Desc,
 }
+
+//FieldArrays
+// Name               -> Relations
+// Name, length       -> MySql PK
+// Name, sort         -> All indices
+// Name, length, sort -> MySql Indexes
 
 /// A unique criteria is a set of fields through which a record can be uniquely identified.
 #[derive(Debug)]
@@ -237,9 +243,8 @@ impl Model {
         {
             if let Some(pk) = &self.primary_key {
                 let id_fields: Vec<_> = pk
-                    .fields
-                    .iter()
-                    .map(|(f, _)| match self.find_scalar_field(f) {
+                    .field_names()
+                    .map(|f| match self.find_scalar_field(f) {
                         Some(field) => field,
                         None => {
                             let error = formatdoc!(
@@ -339,13 +344,13 @@ impl Model {
     }
 
     pub fn field_is_unique(&self, name: &str) -> bool {
-        self.indices.iter().any(|i| i.is_unique() && i.fields_names() == [name])
+        self.indices.iter().any(|i| i.is_unique() && i.field_names() == [name])
     }
 
     pub fn field_is_unique_and_defined_on_field(&self, name: &str) -> bool {
         self.indices
             .iter()
-            .any(|i| i.is_unique() && i.fields_names() == [name] && i.defined_on_field)
+            .any(|i| i.is_unique() && i.field_names() == [name] && i.defined_on_field)
     }
 
     pub fn field_is_primary(&self, field_name: &str) -> bool {

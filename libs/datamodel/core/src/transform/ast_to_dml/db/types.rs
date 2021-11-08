@@ -183,7 +183,7 @@ pub(crate) struct IndexAttribute<'ast> {
 #[derive(Debug, Default)]
 pub(super) struct IdAttribute<'ast> {
     pub(super) fields: Vec<ast::FieldId>,
-    pub(super) field_lengths: Vec<(ast::FieldId, Option<u32>)>,
+    pub(super) field_lengths: Vec<(ast::FieldId, Option<SortOrder>, Option<u32>)>,
     pub(super) source_field: Option<ast::FieldId>,
     pub(super) name: Option<&'ast str>,
     pub(super) db_name: Option<&'ast str>,

@@ -1,4 +1,4 @@
-use crate::attributes::with_postgres_provider;
+use crate::attributes::{with_mssql_provider, with_mysql_provider, with_postgres_provider};
 use crate::common::*;
 use datamodel::dml::*;
 use prisma_value::PrismaValue;
@@ -277,7 +277,7 @@ fn named_and_mapped_multi_field_ids_must_work() {
 
 #[test]
 fn id_accepts_length_arg_on_mysql() {
-    let dml = with_postgres_provider(
+    let dml = with_mysql_provider(
         r#"
     model User {
         firstName  String
@@ -289,6 +289,39 @@ fn id_accepts_length_arg_on_mysql() {
     
     model Blog {
         title  String @id(length:5)
+    }
+    "#,
+    );
+
+    let schema = parse(&dml);
+    let user_model = schema.assert_has_model("User");
+
+    user_model.assert_has_pk(PrimaryKeyDefinition {
+        name: None,
+        db_name: Some("User_pkey".to_string()),
+        fields: vec![
+            ("firstName".to_string(), None),
+            ("middleName".to_string(), Some(1)),
+            ("lastName".to_string(), None),
+        ],
+        defined_on_field: false,
+    });
+}
+
+#[test]
+fn id_accepts_sort_arg_on_mssql() {
+    let dml = with_mssql_provider(
+        r#"
+    model User {
+        firstName  String
+        middleName String
+        lastName   String
+        
+        @@id([firstName, middleName(sort: Desc), lastName])
+    }
+    
+    model Blog {
+        title  String @id(sort:Desc)
     }
     "#,
     );

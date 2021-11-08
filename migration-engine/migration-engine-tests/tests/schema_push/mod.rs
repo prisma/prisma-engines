@@ -435,3 +435,25 @@ fn partial_and_sorted_indices_work(api: TestApi) {
         .assert_green()
         .assert_has_executed_steps();
 }
+
+#[test_connector]
+fn sorted_indices_work(api: TestApi) {
+    let dm = r#"
+      model A {
+        id   Int  @unique(sort: Desc)
+      }
+      
+      model B {
+        id_1   Int
+        id_2   Int
+        
+        @@unique([id_1(sort: Asc), id_2(sort: Desc)])
+        @@index([id_1(sort: Desc)])
+      }
+    "#;
+
+    api.schema_push_w_datasource(dm)
+        .send()
+        .assert_green()
+        .assert_has_executed_steps();
+}

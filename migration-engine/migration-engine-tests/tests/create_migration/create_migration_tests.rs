@@ -1108,13 +1108,9 @@ fn alter_constraint_name(api: TestApi) {
 
 #[test_connector(tags(Mysql))]
 fn partial_and_sorted_mysql_indices(api: TestApi) {
-    let dm = r#"
-        datasource test {
-          provider = "mysql"
-          url = "mysql://unreachable:unreachable@example.com/unreachable"
-        }
-
-        model A {
+    let dm = api.datamodel_with_provider(
+        r#"
+      model A {
         id   String  @unique(length: 30, sort: Desc) @test.VarChar(3000)
       }
       
@@ -1125,14 +1121,15 @@ fn partial_and_sorted_mysql_indices(api: TestApi) {
         @@unique([id_1(length: 30), id_2(sort: Desc)])
         @@index([id_1(length: 30, sort: Desc), id_2])
       }
-    "#;
+    "#,
+    );
 
     let dir = api.create_migrations_directory();
 
-    api.create_migration("create-cats", dm, &dir)
+    api.create_migration("setup", &dm, &dir)
         .send_sync()
         .assert_migration_directories_count(1)
-        .assert_migration("create-cats", |migration| {
+        .assert_migration("setup", |migration| {
             let expected_script = indoc! {
                 r#"
                 -- CreateTable
@@ -1151,6 +1148,241 @@ fn partial_and_sorted_mysql_indices(api: TestApi) {
                     UNIQUE INDEX `B_id_1_id_2_key`(`id_1`(30) ASC, `id_2` DESC)
                 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
                 "#
+            };
+
+            migration.assert_contents(expected_script)
+        });
+}
+
+#[test_connector(tags(Mysql))]
+fn partial_primary_keys_on_mysql(api: TestApi) {
+    let dm = api.datamodel_with_provider(
+        r#"
+      model A {
+        id   String  @id(length: 30) @db.VarChar(3000)
+      }
+      
+      model B {
+        id_1   String  @db.VarChar(3000)
+        id_2   String  @db.VarChar(100)
+        
+        @@id([id_1(length: 30), id_2])
+      }
+    "#,
+    );
+
+    let dir = api.create_migrations_directory();
+
+    api.create_migration("setup", &dm, &dir)
+        .send_sync()
+        .assert_migration_directories_count(1)
+        .assert_migration("setup", |migration| {
+            let expected_script = indoc! {
+                r#"
+                -- CreateTable
+                CREATE TABLE `A` (
+                    `id` VARCHAR(3000) NOT NULL,
+        
+                    UNIQUE INDEX `A_id_key`(`id`(30) DESC)
+                ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+                
+                -- CreateTable
+                CREATE TABLE `B` (
+                    `id_1` VARCHAR(3000) NOT NULL,
+                    `id_2` VARCHAR(100) NOT NULL,
+                
+                    INDEX `B_id_1_id_2_idx`(`id_1`(30) DESC, `id_2` ASC),
+                    UNIQUE INDEX `B_id_1_id_2_key`(`id_1`(30) ASC, `id_2` DESC)
+                ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+                "#
+            };
+
+            migration.assert_contents(expected_script)
+        });
+}
+
+#[test_connector(tags(Mssql))]
+fn sorted_primary_keys_on_mssql(api: TestApi) {
+    let dm = api.datamodel_with_provider(
+        r#"
+      model A {
+        id   Int  @id(sort: Desc)
+      }
+      
+      model B {
+        id_1   Int
+        id_2   Int
+        
+        @@id([id_1(sort: Asc), id_2(sort: Desc)])
+      }
+    "#,
+    );
+
+    let dir = api.create_migrations_directory();
+
+    api.create_migration("setup", &dm, &dir)
+        .send_sync()
+        .assert_migration_directories_count(1)
+        .assert_migration("setup", |migration| {
+            let expected_script = indoc! {
+                r#"
+                -- CreateTable
+                CREATE TABLE `A` (
+                    `id` VARCHAR(3000) NOT NULL,
+        
+                    UNIQUE INDEX `A_id_key`(`id`(30) DESC)
+                ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+                
+                -- CreateTable
+                CREATE TABLE `B` (
+                    `id_1` VARCHAR(3000) NOT NULL,
+                    `id_2` VARCHAR(100) NOT NULL,
+                
+                    INDEX `B_id_1_id_2_idx`(`id_1`(30) DESC, `id_2` ASC),
+                    UNIQUE INDEX `B_id_1_id_2_key`(`id_1`(30) ASC, `id_2` DESC)
+                ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+                "#
+            };
+
+            migration.assert_contents(expected_script)
+        });
+}
+
+#[test_connector]
+fn sorted_indices_work_in_create_table(api: TestApi) {
+    let dm = api.datamodel_with_provider(
+        r#"
+        model A {
+        id   Int  @unique(sort: Desc)
+      }
+      
+      model B {
+        id_1   Int
+        id_2   Int
+        
+        @@unique([id_1(sort: Asc), id_2(sort: Desc)])
+        @@index([id_1(sort: Desc)])
+      }
+    "#,
+    );
+
+    let dir = api.create_migrations_directory();
+
+    api.create_migration("setup", &dm, &dir)
+        .send_sync()
+        .assert_migration_directories_count(1)
+        .assert_migration("setup", |migration| {
+            let expected_script = if api.is_mssql() {
+                indoc! {
+                r#"
+                BEGIN TRY
+                
+                BEGIN TRAN;
+                
+                -- CreateTable
+                CREATE TABLE [sorted_indices_work_in_create_table].[A] (
+                    [id] INT NOT NULL,
+                    CONSTRAINT [A_id_key] UNIQUE ([id] DESC)
+                );
+                
+                -- CreateTable
+                CREATE TABLE [sorted_indices_work_in_create_table].[B] (
+                    [id_1] INT NOT NULL,
+                    [id_2] INT NOT NULL,
+                    CONSTRAINT [B_id_1_id_2_key] UNIQUE ([id_1] ASC,[id_2] DESC)
+                );
+                
+                -- CreateIndex
+                CREATE INDEX [B_id_1_idx] ON [sorted_indices_work_in_create_table].[B]([id_1] DESC);
+                
+                COMMIT TRAN;
+                
+                END TRY
+                BEGIN CATCH
+                
+                IF @@TRANCOUNT > 0
+                BEGIN
+                    ROLLBACK TRAN;
+                END;
+                THROW
+                
+                END CATCH
+                "#
+                }
+            } else if api.is_postgres() {
+                indoc! {
+                r#"
+                -- CreateTable
+                CREATE TABLE "A" (
+                    "id" INTEGER NOT NULL
+                );
+                
+                -- CreateTable
+                CREATE TABLE "B" (
+                    "id_1" INTEGER NOT NULL,
+                    "id_2" INTEGER NOT NULL
+                );
+                
+                -- CreateIndex
+                CREATE UNIQUE INDEX "A_id_key" ON "A"("id" DESC);
+                
+                -- CreateIndex
+                CREATE INDEX "B_id_1_idx" ON "B"("id_1" DESC);
+                
+                -- CreateIndex
+                CREATE UNIQUE INDEX "B_id_1_id_2_key" ON "B"("id_1" ASC, "id_2" DESC);
+                "#
+                }
+            } else if api.is_mysql() {
+                indoc! {
+                r#"
+                -- CreateTable
+                CREATE TABLE `A` (
+                    `id` VARCHAR(3000) NOT NULL,
+        
+                    UNIQUE INDEX `A_id_key`(`id`(30) DESC)
+                ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+                
+                -- CreateTable
+                CREATE TABLE `B` (
+                    `id_1` VARCHAR(3000) NOT NULL,
+                    `id_2` VARCHAR(100) NOT NULL,
+                
+                    INDEX `B_id_1_id_2_idx`(`id_1`(30) DESC, `id_2` ASC),
+                    UNIQUE INDEX `B_id_1_id_2_key`(`id_1`(30) ASC, `id_2` DESC)
+                ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+                "#
+                }
+            } else if api.is_sqlite() {
+                indoc! {
+                r#"
+                -- CreateTable
+                CREATE TABLE "A" (
+                    "id" INTEGER NOT NULL
+                );
+                
+                -- CreateTable
+                CREATE TABLE "B" (
+                    "id_1" INTEGER NOT NULL,
+                    "id_2" INTEGER NOT NULL
+                );
+                
+                -- CreateIndex
+                CREATE UNIQUE INDEX "A_id_key" ON "A"("id" DESC);
+                
+                -- CreateIndex
+                CREATE INDEX "B_id_1_idx" ON "B"("id_1" DESC);
+                
+                -- CreateIndex
+                CREATE UNIQUE INDEX "B_id_1_id_2_key" ON "B"("id_1" ASC, "id_2" DESC);            
+                "#
+                }
+            } else {
+                indoc! {
+                r#"
+                other
+                "#
+                }
             };
 
             migration.assert_contents(expected_script)
