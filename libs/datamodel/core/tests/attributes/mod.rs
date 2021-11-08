@@ -38,6 +38,15 @@ fn with_header(dm: &str, provider: Provider, preview_features: &[&str]) -> Strin
         Provider::SqlServer => ("sqlserver", "sqlserver"),
     };
 
+    let preview_features = if preview_features.is_empty() {
+        "".to_string()
+    } else {
+        format!(
+            "previewFeatures = [{}]",
+            preview_features.into_iter().map(|f| format!("\"{}\"", f)).join(", ")
+        )
+    };
+
     let header = format!(
         r#"
     datasource test {{
@@ -47,12 +56,10 @@ fn with_header(dm: &str, provider: Provider, preview_features: &[&str]) -> Strin
     
     generator client {{
         provider = "prisma-client-js"
-        previewFeatures = [{}]
+        {}
     }}
     "#,
-        provider,
-        url,
-        preview_features.into_iter().map(|f| format!("\"{}\"", f)).join(", ")
+        provider, url, preview_features
     );
 
     format!("{}\n{}", header, dm)
