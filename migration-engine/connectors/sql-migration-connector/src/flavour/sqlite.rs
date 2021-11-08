@@ -154,7 +154,7 @@ impl SqlFlavour for SqliteFlavour {
                 })?;
         }
 
-        let sql_schema = conn.describe_schema().await?;
+        let sql_schema = conn.describe_schema(self.preview_features).await?;
 
         Ok(sql_schema)
     }

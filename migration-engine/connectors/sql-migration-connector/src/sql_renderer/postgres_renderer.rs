@@ -358,7 +358,7 @@ impl SqlRenderer for PostgresFlavour {
             index_name: index.name().into(),
             is_unique: index.index_type().is_unique(),
             table_reference: index.table().name().into(),
-            columns: index.columns().map(|c| c.name().into()).collect(),
+            columns: index.columns().map(|c| c.get().name().into()).collect(),
         }
         .to_string()
     }
@@ -376,11 +376,7 @@ impl SqlRenderer for PostgresFlavour {
                 ",\n\n{}{}PRIMARY KEY ({})",
                 SQL_INDENTATION,
                 named_constraint,
-                pk.columns
-                    .as_slice()
-                    .iter()
-                    .map(|col| self.quote(col.as_ref()))
-                    .join(",")
+                pk.columns.as_slice().iter().map(|col| self.quote(col.name())).join(",")
             )
         } else {
             String::new()

@@ -1,7 +1,7 @@
 use crate::{
     getters::Getter, parsers::Parser, Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue, DescriberError,
-    DescriberErrorKind, DescriberResult, ForeignKey, ForeignKeyAction, Index, IndexType, PrimaryKey, Procedure,
-    SqlMetadata, SqlSchema, Table, UserDefinedType, View,
+    DescriberErrorKind, DescriberResult, ForeignKey, ForeignKeyAction, Index, IndexColumn, IndexType, PrimaryKey,
+    PrimaryKeyColumn, Procedure, SQLSortOrder, SqlMetadata, SqlSchema, Table, UserDefinedType, View,
 };
 use indoc::indoc;
 use native_types::{MsSqlType, MsSqlTypeParameter, NativeType};
@@ -383,6 +383,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 ind.is_primary_key AS is_primary_key,
                 col.name AS column_name,
                 ic.key_ordinal AS seq_in_index,
+                ic.is_descending_key AS is_descending,
                 t.name AS table_name
             FROM
                 sys.indexes ind
@@ -413,6 +414,11 @@ impl<'a> SqlSchemaDescriber<'a> {
             let table_name = row.get_expect_string("table_name");
             let index_name = row.get_expect_string("index_name");
 
+            let sort_order = match row.get_expect_bool("is_descending") {
+                true => SQLSortOrder::Desc,
+                false => SQLSortOrder::Asc,
+            };
+
             match row.get("column_name").and_then(|x| x.to_string()) {
                 Some(column_name) => {
                     let seq_in_index = row.get_expect_i64("seq_in_index");
@@ -433,10 +439,11 @@ impl<'a> SqlSchemaDescriber<'a> {
                         match primary_key {
                             Some(pk) => {
                                 if pk.columns.len() < (pos + 1) as usize {
-                                    pk.columns.resize((pos + 1) as usize, "".to_string());
+                                    pk.columns.resize((pos + 1) as usize, PrimaryKeyColumn::default());
                                 }
 
-                                pk.columns[pos as usize] = column_name;
+                                pk.columns[pos as usize] = PrimaryKeyColumn::new(column_name);
+                                pk.columns[pos as usize].set_sort_order(sort_order);
 
                                 debug!(
                                     "The primary key has already been created, added column to it: {:?}",
@@ -446,8 +453,11 @@ impl<'a> SqlSchemaDescriber<'a> {
                             None => {
                                 debug!("Instantiating primary key");
 
+                                let mut column = PrimaryKeyColumn::new(column_name);
+                                column.set_sort_order(sort_order);
+
                                 primary_key.replace(PrimaryKey {
-                                    columns: vec![column_name],
+                                    columns: vec![column],
                                     sequence: None,
                                     constraint_name: Some(index_name),
                                 });
@@ -455,14 +465,20 @@ impl<'a> SqlSchemaDescriber<'a> {
                         };
                     } else if indexes_map.contains_key(&index_name) {
                         if let Some(index) = indexes_map.get_mut(&index_name) {
-                            index.columns.push(column_name);
+                            let mut column = IndexColumn::new(column_name);
+                            column.set_sort_order(sort_order);
+
+                            index.columns.push(column);
                         }
                     } else {
+                        let mut column = IndexColumn::new(column_name);
+                        column.set_sort_order(sort_order);
+
                         indexes_map.insert(
                             index_name.clone(),
                             Index {
                                 name: index_name,
-                                columns: vec![column_name],
+                                columns: vec![column],
                                 tpe: match is_unique {
                                     true => IndexType::Unique,
                                     false => IndexType::Normal,

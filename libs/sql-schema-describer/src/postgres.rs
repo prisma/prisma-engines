@@ -73,12 +73,16 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
                 let (indexes, table_pk_wrapped) = table_indexes;
 
                 let table_pk = table_pk_wrapped.as_mut().unwrap();
-                table_pk.columns.retain(|c| table_columns.contains(c));
+
+                table_pk
+                    .columns
+                    .retain(|c| table_columns.iter().any(|tc| tc == c.name()));
+
                 if table_pk.columns.is_empty() {
                     table_indexes.1 = None;
                 }
                 for index in indexes.iter_mut() {
-                    index.columns.retain(|c| table_columns.contains(c))
+                    index.columns.retain(|c| table_columns.iter().any(|tc| tc == c.name()))
                 }
                 indexes.retain(|i| !i.columns.is_empty());
             }
@@ -539,52 +543,61 @@ impl<'a> SqlSchemaDescriber<'a> {
         let mut indexes_map = BTreeMap::new();
 
         let sql = r#"
-        SELECT
-            indexInfos.relname as name,
-            columnInfos.attname AS column_name,
-            rawIndex.indisunique AS is_unique,
-            rawIndex.indisprimary AS is_primary_key,
-            tableInfos.relname AS table_name,
-            rawIndex.indkeyidx,
-            pg_get_serial_sequence('"' || $1 || '"."' || tableInfos.relname || '"', columnInfos.attname) AS sequence_name
+        SELECT indexinfos.relname                          AS name,
+               columnInfos.attname                         AS column_name,
+               rawIndex.indisunique                        AS is_unique,
+               rawIndex.indisprimary                       AS is_primary_key,
+               tableInfos.relname                          AS table_name,
+               rawIndex.indkeyidx,
+               CASE rawIndex.sort_order & 1
+                   WHEN 1 THEN 'DESC'
+                   ELSE 'ASC'
+                   END                                     AS column_order,
+               pg_get_serial_sequence('"' || $1 || '"."' || tableInfos.relname || '"',
+                                      columnInfos.attname) AS sequence_name
         FROM
             -- pg_class stores infos about tables, indices etc: https://www.postgresql.org/docs/current/catalog-pg-class.html
             pg_class tableInfos,
             pg_class indexInfos,
             -- pg_index stores indices: https://www.postgresql.org/docs/current/catalog-pg-index.html
             (
-                SELECT
-                    indrelid,
-                    indexrelid,
-                    indisunique,
-                    indisprimary,
-                    pg_index.indkey AS indkey,
-                    generate_subscripts(pg_index.indkey, 1) AS indkeyidx
-                FROM pg_index
-                -- ignores partial indexes
-                WHERE indpred IS NULL
-                GROUP BY indrelid, indexrelid, indisunique, indisprimary, indkeyidx, indkey
-                ORDER BY indrelid, indexrelid, indkeyidx
+                SELECT i.indrelid,
+                       i.indexrelid,
+                       i.indisunique,
+                       i.indisprimary,
+                       i.indkey,
+                       o.OPTION AS sort_order,
+                       c.colnum AS sort_order_colnum,
+                       generate_subscripts(i.indkey, 1) AS indkeyidx
+                FROM pg_index i
+                         CROSS JOIN LATERAL UNNEST(indkey) WITH ordinality AS c (colnum, ordinality)
+                         LEFT JOIN LATERAL UNNEST(indoption) WITH ordinality AS o (OPTION, ordinality)
+                                   ON c.ordinality = o.ordinality
+                WHERE i.indpred IS NULL
+                GROUP BY i.indrelid, i.indexrelid, i.indisunique, i.indisprimary, indkeyidx, i.indkey, i.indoption, sort_order, sort_order_colnum
+                ORDER BY i.indrelid, i.indexrelid
             ) rawIndex,
             -- pg_attribute stores infos about columns: https://www.postgresql.org/docs/current/catalog-pg-attribute.html
             pg_attribute columnInfos,
             -- pg_namespace stores info about the schema
             pg_namespace schemaInfo
         WHERE
-            -- find table info for index
+          -- find table info for index
             tableInfos.oid = rawIndex.indrelid
-            -- find index info
-            AND indexInfos.oid = rawIndex.indexrelid
-            -- find table columns
-            AND columnInfos.attrelid = tableInfos.oid
-            AND columnInfos.attnum = rawIndex.indkey[rawIndex.indkeyidx]
-            -- we only consider ordinary tables
-            AND tableInfos.relkind = 'r'
-            -- we only consider stuff out of one specific schema
-            AND tableInfos.relnamespace = schemaInfo.oid
-            AND schemaInfo.nspname = $1
-        GROUP BY tableInfos.relname, indexInfos.relname, rawIndex.indisunique, rawIndex.indisprimary, columnInfos.attname, rawIndex.indkeyidx
-        ORDER BY rawIndex.indkeyidx
+          -- find index info
+          AND indexInfos.oid = rawIndex.indexrelid
+          -- find table columns
+          AND columnInfos.attrelid = tableInfos.oid
+          AND columnInfos.attnum = rawIndex.indkey[rawIndex.indkeyidx]
+          -- we only consider ordinary tables
+          AND tableInfos.relkind = 'r'
+          -- we only consider stuff out of one specific schema
+          AND tableInfos.relnamespace = schemaInfo.oid
+          AND schemaInfo.nspname = $1
+          AND rawIndex.sort_order_colnum = columnInfos.attnum
+        GROUP BY tableInfos.relname, indexInfos.relname, rawIndex.indisunique, rawIndex.indisprimary, columnInfos.attname,
+                 rawIndex.indkeyidx, column_order
+        ORDER BY rawIndex.indkeyidx;
         "#;
 
         let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
@@ -598,13 +611,22 @@ impl<'a> SqlSchemaDescriber<'a> {
             let table_name = row.get_expect_string("table_name");
             let sequence_name = row.get_string("sequence_name");
 
+            let sort_order = row.get_string("column_order").map(|v| match v.as_ref() {
+                "ASC" => SQLSortOrder::Asc,
+                "DESC" => SQLSortOrder::Desc,
+                misc => panic!(
+                    "Unexpected sort order `{}`, collation should be ASC, DESC or Null",
+                    misc
+                ),
+            });
+
             if is_primary_key {
                 let entry: &mut (Vec<_>, Option<PrimaryKey>) =
                     indexes_map.entry(table_name).or_insert_with(|| (Vec::new(), None));
 
                 match entry.1.as_mut() {
                     Some(pk) => {
-                        pk.columns.push(column_name);
+                        pk.columns.push(PrimaryKeyColumn::new(column_name));
                     }
                     None => {
                         let sequence = sequence_name.and_then(|sequence_name| {
@@ -617,7 +639,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                         });
 
                         entry.1 = Some(PrimaryKey {
-                            columns: vec![column_name],
+                            columns: vec![PrimaryKeyColumn::new(column_name)],
                             sequence,
                             constraint_name: Some(name.clone()),
                         });
@@ -626,12 +648,15 @@ impl<'a> SqlSchemaDescriber<'a> {
             } else {
                 let entry: &mut (Vec<Index>, _) = indexes_map.entry(table_name).or_insert_with(|| (Vec::new(), None));
 
+                let mut column = IndexColumn::new(column_name);
+                column.sort_order = sort_order;
+
                 if let Some(existing_index) = entry.0.iter_mut().find(|idx| idx.name == name) {
-                    existing_index.columns.push(column_name);
+                    existing_index.columns.push(column);
                 } else {
                     entry.0.push(Index {
                         name,
-                        columns: vec![column_name],
+                        columns: vec![column],
                         tpe: match is_unique {
                             true => IndexType::Unique,
                             false => IndexType::Normal,

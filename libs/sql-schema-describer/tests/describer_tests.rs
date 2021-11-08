@@ -228,6 +228,23 @@ fn composite_primary_keys_must_work(api: TestApi) {
     ];
     expected_columns.sort_unstable_by_key(|c| c.name.to_owned());
 
+    let columns = if api.sql_family().is_mssql() {
+        vec![
+            PrimaryKeyColumn {
+                name: "id".to_string(),
+                sort_order: Some(SQLSortOrder::Asc),
+                length: None,
+            },
+            PrimaryKeyColumn {
+                name: "name".to_string(),
+                sort_order: Some(SQLSortOrder::Asc),
+                length: None,
+            },
+        ]
+    } else {
+        vec![PrimaryKeyColumn::new("id"), PrimaryKeyColumn::new("name")]
+    };
+
     assert_eq!(
         table,
         &Table {
@@ -235,7 +252,7 @@ fn composite_primary_keys_must_work(api: TestApi) {
             columns: expected_columns,
             indices: vec![],
             primary_key: Some(PrimaryKey {
-                columns: vec!["id".to_string(), "name".to_string()],
+                columns,
                 sequence: None,
                 constraint_name: match api.sql_family() {
                     SqlFamily::Postgres => Some("User_pkey".into()),
@@ -298,10 +315,20 @@ fn indices_must_work(api: TestApi) {
     assert_eq!("User", user_table.name);
     assert_eq!(expected_columns, user_table.columns);
 
+    let sort_order = if api.is_mysql() && !api.is_mysql_8() {
+        None
+    } else {
+        Some(SQLSortOrder::Asc)
+    };
+
     assert_eq!(
         vec![Index {
             name: "count".to_string(),
-            columns: vec!["count".to_string()],
+            columns: vec![IndexColumn {
+                name: "count".into(),
+                sort_order,
+                length: None,
+            }],
             tpe: IndexType::Normal,
         }],
         user_table.indices
@@ -312,7 +339,17 @@ fn indices_must_work(api: TestApi) {
 
     let pk = user_table.primary_key.as_ref().unwrap();
 
-    assert_eq!(pk.columns, &["id"]);
+    let pk_col = if api.sql_family().is_mssql() {
+        PrimaryKeyColumn {
+            name: "id".to_string(),
+            length: None,
+            sort_order: Some(SQLSortOrder::Asc),
+        }
+    } else {
+        PrimaryKeyColumn::new("id")
+    };
+
+    assert_eq!(pk.columns, &[pk_col]);
     assert_eq!(pk_sequence, pk.sequence);
 
     match api.sql_family() {

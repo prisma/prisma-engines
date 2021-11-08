@@ -184,7 +184,7 @@ impl SqlRenderer for MysqlFlavour {
             index_name: index.name().into(),
             on: (
                 index.table().name().into(),
-                index.columns().map(|c| c.name().into()).collect(),
+                index.columns().map(|c| c.get().name().into()).collect(),
             ),
         }
         .to_string()
@@ -199,7 +199,7 @@ impl SqlRenderer for MysqlFlavour {
                 .map(move |index| ddl::IndexClause {
                     index_name: Some(Cow::from(index.name())),
                     unique: index.index_type().is_unique(),
-                    columns: index.column_names().iter().map(Cow::from).collect(),
+                    columns: index.column_names().map(ToString::to_string).map(Cow::from).collect(),
                 })
                 .collect(),
             primary_key: table

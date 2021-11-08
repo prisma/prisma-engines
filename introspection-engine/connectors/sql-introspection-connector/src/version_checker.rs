@@ -125,7 +125,7 @@ impl VersionChecker {
         if !is_prisma_1_or_11_list_table(table) && !is_relay_table(table) {
             if let Some(PrimaryKey { columns, .. }) = &table.primary_key {
                 if columns.len() == 1 {
-                    let tpe = &table.column_bang(columns.first().unwrap()).tpe;
+                    let tpe = &table.column_bang(columns.first().unwrap().name()).tpe;
 
                     if self.sql_family == SqlFamily::Postgres {
                         if let Some(native_type) = &tpe.native_type {

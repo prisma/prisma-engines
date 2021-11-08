@@ -71,7 +71,12 @@ impl SqlIntrospectionConnector {
     }
 
     async fn describer(&self) -> SqlIntrospectionResult<Box<dyn SqlSchemaDescriberBackend + '_>> {
-        load_describer(&self.connection, self.connection.connection_info()).await
+        load_describer(
+            &self.connection,
+            self.connection.connection_info(),
+            self.preview_features,
+        )
+        .await
     }
 
     async fn list_databases_internal(&self) -> SqlIntrospectionResult<Vec<String>> {

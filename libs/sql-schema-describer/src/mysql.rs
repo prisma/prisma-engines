@@ -62,7 +62,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
         let table_names = self.get_table_names(schema).await?;
         let mut tables = Vec::with_capacity(table_names.len());
         let mut columns = Self::get_all_columns(self.conn, schema, &flavour).await?;
-        let mut indexes = Self::get_all_indexes(self.conn, schema).await?;
+        let mut indexes = self.get_all_indexes(schema).await?;
         let mut fks = Self::get_foreign_keys(self.conn, schema).await?;
 
         let mut enums = vec![];
@@ -413,12 +413,11 @@ impl<'a> SqlSchemaDescriber<'a> {
     }
 
     async fn get_all_indexes(
-        conn: &dyn Queryable,
+        &self,
         schema_name: &str,
     ) -> DescriberResult<BTreeMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)>> {
         let mut map = BTreeMap::new();
         let mut indexes_with_expressions: HashSet<(String, String)> = HashSet::new();
-        let mut indexes_with_partially_covered_columns: HashSet<(String, String)> = HashSet::new();
 
         // We alias all the columns because MySQL column names are case-insensitive in queries, but the
         // information schema column names became upper-case in MySQL 8, causing the code fetching
@@ -430,20 +429,26 @@ impl<'a> SqlSchemaDescriber<'a> {
                 Binary column_name AS column_name,
                 seq_in_index AS seq_in_index,
                 Binary table_name AS table_name,
-                sub_part AS partial
+                sub_part AS partial,
+                Binary collation AS column_order
             FROM INFORMATION_SCHEMA.STATISTICS
             WHERE table_schema = ?
             ORDER BY index_name, seq_in_index
             ";
-        let rows = conn.query_raw(sql, &[schema_name.into()]).await?;
+        let rows = self.conn.query_raw(sql, &[schema_name.into()]).await?;
 
         for row in rows {
             trace!("Got index row: {:#?}", row);
             let table_name = row.get_expect_string("table_name");
             let index_name = row.get_expect_string("index_name");
-            if row.get_u32("partial").is_some() {
-                indexes_with_partially_covered_columns.insert((table_name.clone(), index_name.clone()));
-            };
+            let length = row.get_u32("partial");
+
+            let sort_order = row.get_string("column_order").map(|v| match v.as_ref() {
+                "A" => SQLSortOrder::Asc,
+                "D" => SQLSortOrder::Desc,
+                misc => panic!("Unexpected sort order `{}`, collation should be A, D or Null", misc),
+            });
+
             match row.get_string("column_name") {
                 Some(column_name) => {
                     let seq_in_index = row.get_expect_i64("seq_in_index");
@@ -462,9 +467,14 @@ impl<'a> SqlSchemaDescriber<'a> {
                         match primary_key {
                             Some(pk) => {
                                 if pk.columns.len() < (pos + 1) as usize {
-                                    pk.columns.resize((pos + 1) as usize, "".to_string());
+                                    pk.columns.resize((pos + 1) as usize, PrimaryKeyColumn::default());
                                 }
-                                pk.columns[pos as usize] = column_name;
+
+                                let mut column = PrimaryKeyColumn::new(column_name);
+                                column.length = length;
+
+                                pk.columns[pos as usize] = column;
+
                                 trace!(
                                     "The primary key has already been created, added column to it: {:?}",
                                     pk.columns
@@ -473,8 +483,11 @@ impl<'a> SqlSchemaDescriber<'a> {
                             None => {
                                 trace!("Instantiating primary key");
 
+                                let mut column = PrimaryKeyColumn::new(column_name);
+                                column.length = length;
+
                                 primary_key.replace(PrimaryKey {
-                                    columns: vec![column_name],
+                                    columns: vec![column],
                                     sequence: None,
                                     constraint_name: None,
                                 });
@@ -482,14 +495,22 @@ impl<'a> SqlSchemaDescriber<'a> {
                         };
                     } else if indexes_map.contains_key(&index_name) {
                         if let Some(index) = indexes_map.get_mut(&index_name) {
-                            index.columns.push(column_name);
+                            let mut column = IndexColumn::new(column_name);
+                            column.length = length;
+                            column.sort_order = sort_order;
+
+                            index.columns.push(column);
                         }
                     } else {
+                        let mut column = IndexColumn::new(column_name);
+                        column.length = length;
+                        column.sort_order = sort_order;
+
                         indexes_map.insert(
                             index_name.clone(),
                             Index {
                                 name: index_name,
-                                columns: vec![column_name],
+                                columns: vec![column],
                                 tpe: match is_unique {
                                     true => IndexType::Unique,
                                     false => IndexType::Normal,
@@ -506,11 +527,6 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         for (table, (index_map, _)) in &mut map {
             for (tble, index_name) in &indexes_with_expressions {
-                if tble == table {
-                    index_map.remove(index_name);
-                }
-            }
-            for (tble, index_name) in &indexes_with_partially_covered_columns {
                 if tble == table {
                     index_map.remove(index_name);
                 }

@@ -1,8 +1,9 @@
 //! SQLite description.
 use crate::{
     common::purge_dangling_foreign_keys, getters::Getter, parsers::Parser, Column, ColumnArity, ColumnType,
-    ColumnTypeFamily, DefaultValue, DescriberResult, ForeignKey, ForeignKeyAction, Index, IndexType, Lazy, PrimaryKey,
-    PrismaValue, Regex, SqlMetadata, SqlSchema, SqlSchemaDescriberBackend, Table, View,
+    ColumnTypeFamily, DefaultValue, DescriberResult, ForeignKey, ForeignKeyAction, Index, IndexColumn, IndexType, Lazy,
+    PrimaryKey, PrimaryKeyColumn, PrismaValue, Regex, SQLSortOrder, SqlMetadata, SqlSchema, SqlSchemaDescriberBackend,
+    Table, View,
 };
 use quaint::{ast::Value, prelude::Queryable};
 use std::{any::type_name, borrow::Cow, collections::BTreeMap, convert::TryInto, fmt::Debug};
@@ -61,7 +62,8 @@ impl SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
         }
 
         for (table_index, fk_index, columns) in foreign_keys_without_referenced_columns {
-            tables[table_index].foreign_keys[fk_index].referenced_columns = columns
+            tables[table_index].foreign_keys[fk_index].referenced_columns =
+                columns.into_iter().map(|c| c.name).collect()
         }
 
         let views = self.get_views().await?;
@@ -188,6 +190,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 } else {
                     ColumnArity::Nullable
                 };
+
                 let tpe = get_column_type(&row.get("type").and_then(|x| x.to_string()).expect("type"), arity);
 
                 let default = match row.get("dflt_value") {
@@ -271,18 +274,19 @@ impl<'a> SqlSchemaDescriber<'a> {
             trace!("Determined that table has no primary key");
             None
         } else {
-            let mut columns: Vec<String> = vec![];
+            let mut columns: Vec<PrimaryKeyColumn> = vec![];
             let mut col_idxs: Vec<&i64> = pk_cols.keys().collect();
             col_idxs.sort_unstable();
+
             for i in col_idxs {
-                columns.push(pk_cols[i].clone());
+                columns.push(PrimaryKeyColumn::new(pk_cols[i].clone()));
             }
 
             //Integer Id columns are always implemented with either row id or autoincrement
             if pk_cols.len() == 1 {
                 let pk_col = &columns[0];
                 for col in cols.iter_mut() {
-                    if &col.name == pk_col && &col.tpe.full_data_type.to_lowercase() == "integer" {
+                    if col.name == pk_col.name() && &col.tpe.full_data_type.to_lowercase() == "integer" {
                         trace!(
                             "Detected that the primary key column corresponds to rowid and \
                                  is auto incrementing"
@@ -438,7 +442,9 @@ impl<'a> SqlSchemaDescriber<'a> {
             // Exclude partial indices
             .filter(|row| !row.get("partial").and_then(|partial| partial.as_bool()).unwrap());
 
-        'index_loop: for row in filtered_rows {
+        for row in filtered_rows {
+            let mut valid_index = true;
+
             let is_unique = row.get("unique").and_then(|x| x.as_bool()).expect("get unique");
             let name = row.get("name").and_then(|x| x.to_string()).expect("get name");
             let mut index = Index {
@@ -453,21 +459,42 @@ impl<'a> SqlSchemaDescriber<'a> {
             let sql = format!(r#"PRAGMA index_info("{}");"#, name);
             let result_set = self.conn.query_raw(&sql, &[]).await.expect("querying for index info");
             trace!("Got index description results: {:?}", result_set);
+
             for row in result_set.into_iter() {
                 //if the index is on a rowid or expression, the name of the column will be null, we ignore these for now
                 match row.get("name").and_then(|x| x.to_string()) {
                     Some(name) => {
                         let pos = row.get("seqno").and_then(|x| x.as_i64()).expect("get seqno") as usize;
                         if index.columns.len() <= pos {
-                            index.columns.resize(pos + 1, "".to_string());
+                            index.columns.resize(pos + 1, IndexColumn::default());
                         }
-                        index.columns[pos] = name;
+                        index.columns[pos] = IndexColumn::new(name);
                     }
-                    None => break 'index_loop,
+                    None => valid_index = false,
                 }
             }
 
-            indices.push(index)
+            let sql = format!(r#"PRAGMA index_xinfo("{}");"#, name);
+            let result_set = self.conn.query_raw(&sql, &[]).await.expect("querying for index info");
+            trace!("Got index description results: {:?}", result_set);
+
+            for row in result_set.into_iter() {
+                //if the index is on a rowid or expression, the name of the column will be null, we ignore these for now
+                if row.get("name").and_then(|x| x.to_string()).is_some() {
+                    let pos = row.get("seqno").and_then(|x| x.as_i64()).expect("get seqno") as usize;
+
+                    let sort_order = row.get("desc").and_then(|r| r.as_i64()).map(|v| match v {
+                        0 => SQLSortOrder::Asc,
+                        _ => SQLSortOrder::Desc,
+                    });
+
+                    index.columns[pos].sort_order = sort_order;
+                }
+            }
+
+            if valid_index {
+                indices.push(index)
+            }
         }
 
         Ok(indices)

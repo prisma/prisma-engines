@@ -2,6 +2,7 @@ mod cockroach_describer_tests;
 
 use crate::test_api::*;
 use barrel::{types, Migration};
+use indoc::indoc;
 use native_types::{NativeType, PostgresType};
 use pretty_assertions::assert_eq;
 use sql_schema_describer::*;
@@ -564,11 +565,15 @@ fn all_postgres_column_types_must_work(api: TestApi) {
             columns: expected_columns,
             indices: vec![Index {
                 name: "User_uuid_col_key".into(),
-                columns: vec!["uuid_col".into(),],
+                columns: vec![IndexColumn {
+                    name: "uuid_col".to_string(),
+                    sort_order: Some(SQLSortOrder::Asc),
+                    length: None,
+                }],
                 tpe: IndexType::Unique,
             },],
             primary_key: Some(PrimaryKey {
-                columns: vec!["primary_col".into()],
+                columns: vec![PrimaryKeyColumn::new("primary_col")],
                 sequence: Some(Sequence {
                     name: "User_primary_col_seq".into(),
                 },),
@@ -703,13 +708,41 @@ fn postgres_multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi
     let table = schema.table_bang("indexes_test");
     let index = &table.indices[0];
 
-    assert_eq!(&index.columns, &["name", "age"]);
+    assert_eq!(
+        &index.columns,
+        &[
+            IndexColumn {
+                name: "name".to_string(),
+                sort_order: Some(SQLSortOrder::Asc),
+                length: None
+            },
+            IndexColumn {
+                name: "age".to_string(),
+                sort_order: Some(SQLSortOrder::Asc),
+                length: None
+            },
+        ]
+    );
     assert!(index.tpe.is_unique());
 
     let index = &table.indices[1];
 
     assert!(!index.tpe.is_unique());
-    assert_eq!(&index.columns, &["age", "name"]);
+    assert_eq!(
+        &index.columns,
+        &[
+            IndexColumn {
+                name: "age".to_string(),
+                sort_order: Some(SQLSortOrder::Asc),
+                length: None
+            },
+            IndexColumn {
+                name: "name".to_string(),
+                sort_order: Some(SQLSortOrder::Asc),
+                length: None
+            },
+        ]
+    );
 }
 
 #[test_connector(tags(Postgres))]
@@ -784,4 +817,86 @@ fn escaped_backslashes_in_string_literals_must_be_unescaped(api: TestApi) {
         .unwrap();
 
     assert_eq!(default, r#"xyz\Datasource\Model"#);
+}
+
+#[test_connector(tags(Postgres))]
+fn index_sort_order_is_handled(api: TestApi) {
+    let sql = indoc! {r#"
+        CREATE TABLE A (
+            id INT PRIMARY KEY,
+            a  INT NOT NULL
+        );
+
+        CREATE INDEX foo ON A (a DESC);
+    "#};
+
+    api.raw_cmd(sql);
+
+    let schema = api.describe();
+    let table = schema.table_walkers().next().unwrap();
+    let index = table.index_at(0);
+
+    let columns = index.columns().collect::<Vec<_>>();
+
+    assert_eq!(1, columns.len());
+    assert_eq!("a", columns[0].as_column().name());
+    assert_eq!(Some(SQLSortOrder::Desc), columns[0].sort_order());
+}
+
+#[test_connector(tags(Postgres))]
+fn index_sort_order_composite_type_desc_desc_is_handled(api: TestApi) {
+    let sql = indoc! {r#"
+        CREATE TABLE A (
+            id INT PRIMARY KEY,
+            a  INT NOT NULL,
+            b  INT NOT NULL
+        );
+
+        CREATE INDEX foo ON A (a DESC, b DESC);
+    "#};
+
+    api.raw_cmd(sql);
+
+    let schema = api.describe();
+    let table = schema.table_walkers().next().unwrap();
+    let index = table.index_at(0);
+
+    let columns = index.columns().collect::<Vec<_>>();
+
+    assert_eq!(2, columns.len());
+
+    assert_eq!("a", columns[0].as_column().name());
+    assert_eq!("b", columns[1].as_column().name());
+
+    assert_eq!(Some(SQLSortOrder::Desc), columns[0].sort_order());
+    assert_eq!(Some(SQLSortOrder::Desc), columns[1].sort_order());
+}
+
+#[test_connector(tags(Postgres))]
+fn index_sort_order_composite_type_asc_desc_is_handled(api: TestApi) {
+    let sql = indoc! {r#"
+        CREATE TABLE A (
+            id INT PRIMARY KEY,
+            a  INT NOT NULL,
+            b  INT NOT NULL
+        );
+
+        CREATE INDEX foo ON A (a ASC, b DESC);
+    "#};
+
+    api.raw_cmd(sql);
+
+    let schema = api.describe();
+    let table = schema.table_walkers().next().unwrap();
+    let index = table.index_at(0);
+
+    let columns = index.columns().collect::<Vec<_>>();
+
+    assert_eq!(2, columns.len());
+
+    assert_eq!("a", columns[0].as_column().name());
+    assert_eq!("b", columns[1].as_column().name());
+
+    assert_eq!(Some(SQLSortOrder::Asc), columns[0].sort_order());
+    assert_eq!(Some(SQLSortOrder::Desc), columns[1].sort_order());
 }

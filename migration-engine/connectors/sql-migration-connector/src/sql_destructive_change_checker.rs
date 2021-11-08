@@ -250,7 +250,7 @@ impl SqlMigrationConnector {
                         plan.push_warning(
                             SqlMigrationWarningCheck::UniqueConstraintAddition {
                                 table: index.table().name().to_owned(),
-                                columns: index.columns().map(|col| col.name().to_owned()).collect(),
+                                columns: index.columns().map(|col| col.get().name().to_owned()).collect(),
                             },
                             step_index,
                         )

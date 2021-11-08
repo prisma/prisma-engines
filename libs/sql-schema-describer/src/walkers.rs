@@ -4,7 +4,8 @@
 
 use crate::{
     Column, ColumnArity, ColumnId, ColumnType, ColumnTypeFamily, DefaultValue, Enum, ForeignKey, ForeignKeyAction,
-    Index, IndexType, PrimaryKey, SqlSchema, Table, TableId, UserDefinedType, View,
+    Index, IndexColumn, IndexType, PrimaryKey, PrimaryKeyColumn, SQLSortOrder, SqlSchema, Table, TableId,
+    UserDefinedType, View,
 };
 use serde::de::DeserializeOwned;
 use std::fmt;
@@ -137,7 +138,7 @@ impl<'a> ColumnWalker<'a> {
     pub fn is_single_primary_key(&self) -> bool {
         self.table()
             .primary_key()
-            .map(|pk| pk.columns == [self.name()])
+            .map(|pk| pk.columns.len() == 1 && pk.columns.first().map(|c| c.name() == self.name()).unwrap_or(false))
             .unwrap_or(false)
     }
 
@@ -234,6 +235,51 @@ pub struct TableWalker<'a> {
 impl<'a> fmt::Debug for TableWalker<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("TableWalker").field("table_id", &self.table_id).finish()
+    }
+}
+
+/// A walker of a column in a primary key.
+#[derive(Clone, Copy)]
+pub struct PrimaryKeyColumnWalker<'a> {
+    schema: &'a SqlSchema,
+    primary_key_column_id: usize,
+    table_id: TableId,
+    column_id: ColumnId,
+}
+
+impl<'a> PrimaryKeyColumnWalker<'a> {
+    /// Conversion to a normal column walker.
+    pub fn as_column(self) -> ColumnWalker<'a> {
+        ColumnWalker {
+            schema: self.schema,
+            column_id: self.column_id,
+            table_id: self.table_id,
+        }
+    }
+
+    /// The length limit of the (text) column. Matters on MySQL only.
+    pub fn length(self) -> Option<u32> {
+        self.get().length
+    }
+
+    /// The BTree ordering. Matters on SQL Server only.
+    pub fn sort_order(self) -> Option<SQLSortOrder> {
+        self.get().sort_order
+    }
+
+    fn table(self) -> TableWalker<'a> {
+        TableWalker {
+            schema: self.schema,
+            table_id: self.table_id,
+        }
+    }
+
+    fn get(self) -> &'a PrimaryKeyColumn {
+        self.table()
+            .table()
+            .primary_key_columns()
+            .nth(self.primary_key_column_id)
+            .unwrap()
     }
 }
 
@@ -347,10 +393,31 @@ impl<'a> TableWalker<'a> {
         self.table().primary_key.as_ref()
     }
 
-    /// The names of the columns that are part of the primary key. `None` means
-    /// there is no primary key on the table.
-    pub fn primary_key_column_names(&self) -> Option<&[String]> {
-        self.table().primary_key.as_ref().map(|pk| pk.columns.as_slice())
+    /// The columns that are part of the primary keys.
+    pub fn primary_key_columns(&'a self) -> Box<dyn ExactSizeIterator<Item = PrimaryKeyColumnWalker<'a>> + 'a> {
+        let as_walker = move |primary_key_column_id: usize, c: &PrimaryKeyColumn| {
+            let column_id = self.column(c.name()).map(|c| c.column_id).unwrap();
+
+            PrimaryKeyColumnWalker {
+                schema: self.schema,
+                primary_key_column_id,
+                table_id: self.table_id,
+                column_id,
+            }
+        };
+
+        match self.table().primary_key.as_ref() {
+            Some(pk) => Box::new(pk.columns.iter().enumerate().map(move |(i, c)| as_walker(i, c))),
+            None => Box::new(std::iter::empty()),
+        }
+    }
+
+    /// The names of the columns that are part of the primary key.
+    pub fn primary_key_column_names(&self) -> Option<Vec<String>> {
+        self.table()
+            .primary_key
+            .as_ref()
+            .map(|pk| pk.columns.iter().map(|c| c.name().to_string()).collect())
     }
 
     /// Reference to the underlying `Table` struct.
@@ -467,6 +534,71 @@ impl<'schema> ForeignKeyWalker<'schema> {
     }
 }
 
+/// Traverse an index column.
+#[derive(Clone, Copy)]
+pub struct IndexColumnWalker<'a> {
+    schema: &'a SqlSchema,
+    index_column_id: usize,
+    table_id: TableId,
+    index_index: usize,
+}
+
+impl<'a> IndexColumnWalker<'a> {
+    /// Get the index column data.
+    pub fn get(&self) -> &'a IndexColumn {
+        &self.index().get().columns[self.index_column_id]
+    }
+
+    /// The length limit of the (text) column. Matters on MySQL only.
+    pub fn length(self) -> Option<u32> {
+        self.get().length
+    }
+
+    /// The BTree ordering.
+    pub fn sort_order(self) -> Option<SQLSortOrder> {
+        self.get().sort_order
+    }
+
+    /// The table where the column is located.
+    pub fn table(&self) -> TableWalker<'a> {
+        TableWalker {
+            table_id: self.table_id,
+            schema: self.schema,
+        }
+    }
+
+    /// The index of the column.
+    pub fn index(&self) -> IndexWalker<'a> {
+        IndexWalker {
+            schema: self.schema,
+            table_id: self.table_id,
+            index_index: self.index_index,
+        }
+    }
+
+    /// Convert to a normal column walker, losing the possible index arguments.
+    pub fn as_column(&self) -> ColumnWalker<'a> {
+        let column_id = self
+            .table()
+            .columns()
+            .enumerate()
+            .find_map(|(i, c)| {
+                if c.column().name == self.get().name() {
+                    Some(i)
+                } else {
+                    None
+                }
+            })
+            .expect("STATE ERROR BOOP");
+
+        ColumnWalker {
+            schema: self.schema,
+            column_id: ColumnId(column_id as u32),
+            table_id: self.table_id,
+        }
+    }
+}
+
 /// Traverse an index.
 #[derive(Clone, Copy)]
 pub struct IndexWalker<'a> {
@@ -488,22 +620,27 @@ impl<'a> fmt::Debug for IndexWalker<'a> {
 
 impl<'a> IndexWalker<'a> {
     /// The names of the indexed columns.
-    pub fn column_names(&self) -> &'a [String] {
-        &self.get().columns
+    pub fn column_names(&'a self) -> impl ExactSizeIterator<Item = &'a str> + 'a {
+        self.get().columns.iter().map(|c| c.name())
     }
 
     /// Traverse the indexed columns.
-    pub fn columns<'b>(&'b self) -> impl Iterator<Item = ColumnWalker<'a>> + 'b {
-        self.get().columns.iter().map(move |column_name| {
-            self.table()
-                .column(column_name)
-                .expect("Failed to find column referenced in index")
-        })
+    pub fn columns<'b>(&'b self) -> impl ExactSizeIterator<Item = IndexColumnWalker<'a>> + 'b {
+        self.get()
+            .columns
+            .iter()
+            .enumerate()
+            .map(move |(index_column_id, _)| IndexColumnWalker {
+                schema: self.schema,
+                index_column_id,
+                table_id: self.table_id,
+                index_index: self.index_index,
+            })
     }
 
     /// True if index contains the given column.
     pub fn contains_column(&self, column_name: &str) -> bool {
-        self.get().columns.iter().any(|column| column == column_name)
+        self.get().columns.iter().any(|column| column.name() == column_name)
     }
 
     fn get(&self) -> &'a Index {
