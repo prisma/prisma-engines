@@ -5,8 +5,8 @@ use datamodel_connector::{
     Connector, ConnectorCapability, ReferentialIntegrity,
 };
 use dml::{
-    default_value::DefaultKind, field::FieldType, native_type_constructor::NativeTypeConstructor,
-    native_type_instance::NativeTypeInstance, relation_info::ReferentialAction, traits::WithDatabaseName,
+    default_value::DefaultKind, field::FieldType, native_type_instance::NativeTypeInstance,
+    relation_info::ReferentialAction, traits::WithDatabaseName,
 };
 use enumflags2::BitFlags;
 use mongodb_types::*;
@@ -17,7 +17,6 @@ type Result<T> = std::result::Result<T, ConnectorError>;
 
 pub struct MongoDbDatamodelConnector {
     capabilities: Vec<ConnectorCapability>,
-    native_types: Vec<NativeTypeConstructor>,
     referential_integrity: ReferentialIntegrity,
 }
 
@@ -34,11 +33,8 @@ impl MongoDbDatamodelConnector {
             ConnectorCapability::CompositeTypes,
         ];
 
-        let native_types = mongodb_types::available_types();
-
         Self {
             capabilities,
-            native_types,
             referential_integrity: ReferentialIntegrity::Prisma,
         }
     }
@@ -133,8 +129,8 @@ impl Connector for MongoDbDatamodelConnector {
         }
     }
 
-    fn available_native_type_constructors(&self) -> &[dml::native_type_constructor::NativeTypeConstructor] {
-        &self.native_types
+    fn available_native_type_constructors(&self) -> &'static [dml::native_type_constructor::NativeTypeConstructor] {
+        NATIVE_TYPE_CONSTRUCTORS
     }
 
     fn default_native_type_for_scalar_type(&self, scalar_type: &dml::scalars::ScalarType) -> serde_json::Value {

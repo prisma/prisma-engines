@@ -42,21 +42,19 @@ pub(crate) fn default_for(scalar_type: &ScalarType) -> &MongoDbType {
         .unwrap_or_else(|| panic!("MongoDB native type mapping missing for '{:?}'", scalar_type))
 }
 
-pub(crate) fn available_types() -> Vec<NativeTypeConstructor> {
-    vec![
-        NativeTypeConstructor::without_args(STRING, vec![ScalarType::String]),
-        NativeTypeConstructor::without_args(DOUBLE, vec![ScalarType::Float]),
-        NativeTypeConstructor::without_args(LONG, vec![ScalarType::Int, ScalarType::BigInt]),
-        NativeTypeConstructor::without_args(INT, vec![ScalarType::Int]),
-        NativeTypeConstructor::without_args(BIN_DATA, vec![ScalarType::Bytes]),
-        NativeTypeConstructor::without_args(OBJECT_ID, vec![ScalarType::String, ScalarType::Bytes]),
-        NativeTypeConstructor::without_args(BOOL, vec![ScalarType::Boolean]),
-        NativeTypeConstructor::without_args(DATE, vec![ScalarType::DateTime]),
-        NativeTypeConstructor::without_args(TIMESTAMP, vec![ScalarType::DateTime]),
-        NativeTypeConstructor::without_args(DECIMAL, vec![ScalarType::Decimal]),
-        NativeTypeConstructor::with_args(ARRAY, 1, all_types()),
-    ]
-}
+pub(crate) const NATIVE_TYPE_CONSTRUCTORS: &[NativeTypeConstructor] = &[
+    NativeTypeConstructor::without_args(STRING, &[ScalarType::String]),
+    NativeTypeConstructor::without_args(DOUBLE, &[ScalarType::Float]),
+    NativeTypeConstructor::without_args(LONG, &[ScalarType::Int, ScalarType::BigInt]),
+    NativeTypeConstructor::without_args(INT, &[ScalarType::Int]),
+    NativeTypeConstructor::without_args(BIN_DATA, &[ScalarType::Bytes]),
+    NativeTypeConstructor::without_args(OBJECT_ID, &[ScalarType::String, ScalarType::Bytes]),
+    NativeTypeConstructor::without_args(BOOL, &[ScalarType::Boolean]),
+    NativeTypeConstructor::without_args(DATE, &[ScalarType::DateTime]),
+    NativeTypeConstructor::without_args(TIMESTAMP, &[ScalarType::DateTime]),
+    NativeTypeConstructor::without_args(DECIMAL, &[ScalarType::Decimal]),
+    NativeTypeConstructor::with_args(ARRAY, 1, all_types()),
+];
 
 pub(crate) fn mongo_type_from_input(name: &str, args: &[String]) -> crate::Result<MongoDbType> {
     let mongo_type = match name {
@@ -84,8 +82,8 @@ pub(crate) fn mongo_type_from_input(name: &str, args: &[String]) -> crate::Resul
     Ok(mongo_type)
 }
 
-fn all_types() -> Vec<ScalarType> {
-    vec![
+const fn all_types() -> &'static [ScalarType] {
+    &[
         ScalarType::Int,
         ScalarType::BigInt,
         ScalarType::Float,
