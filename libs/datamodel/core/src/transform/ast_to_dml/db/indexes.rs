@@ -3,6 +3,8 @@ use std::borrow::Cow;
 use crate::common::constraint_names::ConstraintNames;
 
 use super::{context::Context, types::IndexAttribute};
+use crate::transform::ast_to_dml::db::types::FieldWithArgs;
+use crate::SortOrder;
 
 /// Prisma forces a 1:1 relation to be unique from the defining side. If the
 /// field is not a primary key or already defined in a unique index, we add an
@@ -55,7 +57,14 @@ pub(super) fn infer_implicit_indexes(ctx: &mut Context<'_>) {
             model.model_id(),
             IndexAttribute {
                 is_unique: true,
-                fields: relation.referencing_fields().map(|f| f.field_id()).collect(),
+                fields: relation
+                    .referencing_fields()
+                    .map(|f| FieldWithArgs {
+                        field_id: f.field_id(),
+                        sort_order: Some(SortOrder::Asc),
+                        length: None,
+                    })
+                    .collect(),
                 source_field,
                 name: None,
                 db_name: Some(Cow::from(db_name)),

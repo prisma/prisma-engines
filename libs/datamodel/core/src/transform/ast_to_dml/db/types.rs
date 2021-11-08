@@ -161,7 +161,7 @@ impl ModelAttributes<'_> {
     pub(super) fn field_is_indexed_for_autoincrement(&self, field_id: ast::FieldId) -> bool {
         self.ast_indexes
             .iter()
-            .any(|(_, idx)| idx.fields.get(0) == Some(&field_id))
+            .any(|(_, idx)| idx.fields.get(0).map(|f| f.field_id) == Some(field_id))
             || self
                 .primary_key
                 .as_ref()
@@ -181,15 +181,15 @@ pub(crate) struct IndexAttribute<'ast> {
 
 #[derive(Debug, Default)]
 pub(super) struct IdAttribute<'ast> {
-    pub(super) fields: Vec<Fie>,
+    pub(super) fields: Vec<ast::FieldId>,
     pub(super) source_field: Option<ast::FieldId>,
     pub(super) name: Option<&'ast str>,
     pub(super) db_name: Option<&'ast str>,
 }
 
-#[derive(Debug, Default)]
-pub(super) struct FieldWithArgs {
-    pub(super) id: ast::FieldId,
+#[derive(Debug)]
+pub struct FieldWithArgs {
+    pub(crate) field_id: ast::FieldId,
     pub(super) sort_order: Option<SortOrder>,
     pub(super) length: Option<u32>,
 }

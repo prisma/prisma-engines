@@ -1,4 +1,4 @@
-use super::{resolve_field_array, FieldResolutionError};
+use super::{resolve_field_array_without_args, FieldResolutionError};
 use crate::{
     ast,
     common::constraint_names::ConstraintNames,
@@ -29,7 +29,7 @@ pub(super) fn model<'ast>(
         ));
     }
 
-    let resolved_fields = match resolve_field_array(&fields, args.span(), model_id, ctx) {
+    let resolved_fields = match resolve_field_array_without_args(&fields, args.span(), model_id, ctx) {
         Ok(fields) => fields,
         Err(FieldResolutionError::AlreadyDealtWith) => return,
         Err(FieldResolutionError::ProblematicFields {

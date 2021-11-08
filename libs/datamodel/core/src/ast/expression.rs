@@ -19,7 +19,9 @@ pub enum Expression {
     /// A function with a name and arguments, which is evaluated at client side.
     Function(String, Vec<Expression>, Span),
     /// An array of other values.
-    Array(Vec<Expression>, Span),
+    ExpressionArray(Vec<Expression>, Span),
+    /// A contained list of arguments.
+    FieldWithArgs(String, Vec<Argument>, Span),
 }
 
 impl fmt::Display for Expression {
@@ -32,7 +34,12 @@ impl fmt::Display for Expression {
             Expression::Function(fun, args, _) => {
                 write!(f, "{}({})", fun, args.iter().map(|arg| format!("{}", arg)).join(","))
             }
-            Expression::Array(vals, _) => write!(f, "[{}]", vals.iter().map(|arg| format!("{}", arg)).join(",")),
+            Expression::ExpressionArray(vals, _) => {
+                write!(f, "[{}]", vals.iter().map(|arg| format!("{}", arg)).join(","))
+            }
+            Expression::FieldWithArgs(ident, vals, _) => {
+                write!(f, "{}({})", ident, vals.iter().map(|arg| format!("{}", arg)).join(","))
+            }
         }
     }
 }
@@ -45,21 +52,10 @@ impl Expression {
         }
     }
 
-    pub fn with_lifted_span(&self, offset: usize) -> Expression {
+    pub fn extract_constant_value(&self) -> Option<(&str, Span)> {
         match self {
-            Expression::NumericValue(v, s) => Expression::NumericValue(v.clone(), s.lift_span(offset)),
-            Expression::BooleanValue(v, s) => Expression::BooleanValue(v.clone(), s.lift_span(offset)),
-            Expression::StringValue(v, s) => Expression::StringValue(v.clone(), s.lift_span(offset)),
-            Expression::ConstantValue(v, s) => Expression::ConstantValue(v.clone(), s.lift_span(offset)),
-            Expression::Function(v, a, s) => Expression::Function(
-                v.clone(),
-                a.iter().map(|elem| elem.with_lifted_span(offset)).collect(),
-                s.lift_span(offset),
-            ),
-            Expression::Array(v, s) => Expression::Array(
-                v.iter().map(|elem| elem.with_lifted_span(offset)).collect(),
-                s.lift_span(offset),
-            ),
+            Expression::ConstantValue(s, span) => Some((s, *span)),
+            _ => None,
         }
     }
 
@@ -74,7 +70,8 @@ impl Expression {
             Self::StringValue(_, span) => *span,
             Self::ConstantValue(_, span) => *span,
             Self::Function(_, _, span) => *span,
-            Self::Array(_, span) => *span,
+            Self::ExpressionArray(_, span) => *span,
+            Self::FieldWithArgs(_, _, span) => *span,
         }
     }
 
@@ -93,11 +90,12 @@ impl Expression {
             Expression::StringValue(_, _) => "string",
             Expression::ConstantValue(_, _) => "literal",
             Expression::Function(_, _, _) => "functional",
-            Expression::Array(_, _) => "array",
+            Expression::ExpressionArray(_, _) => "array",
+            Expression::FieldWithArgs(_, _, _) => "field with args",
         }
     }
 
     pub fn is_array(&self) -> bool {
-        matches!(self, Expression::Array(_, _))
+        matches!(self, Expression::ExpressionArray(_, _))
     }
 }

@@ -10,6 +10,7 @@ use super::{
     types::{EnumAttributes, IndexAttribute, ModelAttributes, RelationField, ScalarField, ScalarFieldType},
 };
 use crate::ast::{FieldId, Model};
+use crate::transform::ast_to_dml::db::types::FieldWithArgs;
 use crate::{
     ast::{self, WithName},
     common::constraint_names::ConstraintNames,
@@ -245,7 +246,7 @@ fn visit_field_unique<'ast>(
         None => None,
     };
 
-    let sort = match args.optional_arg("sort").map(|sort| sort.as_constant_literal()) {
+    let sort_order = match args.optional_arg("sort").map(|sort| sort.as_constant_literal()) {
         Some(Ok("Desc")) => Some(SortOrder::Desc),
         Some(Ok("Asc")) => Some(SortOrder::Asc),
         Some(Ok(other)) => {
@@ -266,7 +267,11 @@ fn visit_field_unique<'ast>(
         args.attribute(),
         IndexAttribute {
             is_unique: true,
-            fields: vec![(field_id, sort, length)],
+            fields: vec![FieldWithArgs {
+                field_id,
+                sort_order,
+                length,
+            }],
             source_field: Some(field_id),
             name: None,
             db_name: db_name.map(Cow::from),
@@ -643,7 +648,7 @@ fn common_index_validations<'ast>(
         }
     };
 
-    match resolve_field_array(&fields, args.span(), model_id, ctx) {
+    match resolve_field_array_with_args(&fields, args.span(), model_id, ctx) {
         Ok(fields) => {
             index_data.fields = fields;
         }
@@ -712,7 +717,7 @@ fn visit_relation<'ast>(
     ctx: &mut Context<'ast>,
 ) {
     if let Some(fields) = args.optional_arg("fields") {
-        let fields = match resolve_field_array(&fields, args.span(), model_id, ctx) {
+        let fields = match resolve_field_array_without_args(&fields, args.span(), model_id, ctx) {
             Ok(fields) => fields,
             Err(FieldResolutionError::AlreadyDealtWith) => Vec::new(),
             Err(FieldResolutionError::ProblematicFields {
@@ -735,7 +740,12 @@ fn visit_relation<'ast>(
     }
 
     if let Some(references) = args.optional_arg("references") {
-        let references = match resolve_field_array(&references, args.span(), relation_field.referenced_model, ctx) {
+        let references = match resolve_field_array_without_args(
+            &references,
+            args.span(),
+            relation_field.referenced_model,
+            ctx,
+        ) {
             Ok(references) => references,
             Err(FieldResolutionError::AlreadyDealtWith) => Vec::new(),
             Err(FieldResolutionError::ProblematicFields {
@@ -840,7 +850,7 @@ enum FieldResolutionError<'ast> {
 /// Takes an attribute argument, validates it as an array of constants, then
 /// resolves  the constant as field names on the model. The error variant
 /// contains the fields that are not in the model.
-fn resolve_field_array<'ast>(
+fn resolve_field_array_without_args<'ast>(
     values: &ValueValidator<'ast>,
     attribute_span: ast::Span,
     model_id: ast::ModelId,
@@ -897,6 +907,79 @@ fn resolve_field_array<'ast>(
         })
     } else {
         Ok(field_ids)
+    }
+}
+
+/// Takes an attribute argument, validates it as an array of fields with potentially args,
+/// then resolves  the constant literal as field names on the model. The error variant
+/// contains the fields that are not in the model.
+fn resolve_field_array_with_args<'ast>(
+    values: &ValueValidator<'ast>,
+    attribute_span: ast::Span,
+    model_id: ast::ModelId,
+    ctx: &mut Context<'ast>,
+) -> Result<Vec<FieldWithArgs>, FieldResolutionError<'ast>> {
+    let constant_array = match values.as_field_array_with_args() {
+        Ok(values) => values,
+        Err(err) => {
+            ctx.push_error(err);
+            return Err(FieldResolutionError::AlreadyDealtWith);
+        }
+    };
+
+    let mut field_ids = Vec::with_capacity(constant_array.len());
+    let mut unknown_fields = Vec::new();
+    let mut relation_fields = Vec::new();
+    let ast_model = &ctx.db.ast[model_id];
+
+    for (field_name, _, _) in &constant_array {
+        // Does the field exist?
+        let field_id = if let Some(field_id) = ctx.db.find_model_field(model_id, field_name) {
+            field_id
+        } else {
+            unknown_fields.push(*field_name);
+            continue;
+        };
+
+        // Is the field a scalar field?
+        if !ctx.db.types.scalar_fields.contains_key(&(model_id, field_id)) {
+            relation_fields.push((&ctx.db.ast[model_id][field_id], field_id));
+            continue;
+        }
+
+        // Is the field used twice?
+        if field_ids.contains(&field_id) {
+            ctx.push_error(DatamodelError::new_model_validation_error(
+                &format!(
+                    "The unique index definition refers to the field {} multiple times.",
+                    ast_model[field_id].name()
+                ),
+                ast_model.name(),
+                attribute_span,
+            ));
+            return Err(FieldResolutionError::AlreadyDealtWith);
+        }
+
+        field_ids.push(field_id);
+    }
+
+    if !unknown_fields.is_empty() || !relation_fields.is_empty() {
+        Err(FieldResolutionError::ProblematicFields {
+            unknown_fields,
+            relation_fields,
+        })
+    } else {
+        let fields_with_args = constant_array
+            .into_iter()
+            .zip(field_ids)
+            .map(|((_, sort_order, length), field_id)| FieldWithArgs {
+                field_id,
+                sort_order,
+                length,
+            })
+            .collect();
+
+        Ok(fields_with_args)
     }
 }
 
