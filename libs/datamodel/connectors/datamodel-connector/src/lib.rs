@@ -1,21 +1,21 @@
-use std::{borrow::Cow, collections::BTreeMap, str::FromStr};
-
-use enumflags2::BitFlags;
-
-use dml::{
-    field::Field, model::Model, native_type_constructor::NativeTypeConstructor,
-    native_type_instance::NativeTypeInstance, relation_info::ReferentialAction, scalars::ScalarType,
-};
-pub use empty_connector::EmptyDatamodelConnector;
-pub use referential_integrity::ReferentialIntegrity;
-
-use crate::connector_error::{ConnectorError, ConnectorErrorFactory, ErrorKind};
+#![deny(rust_2018_idioms, unsafe_code)]
 
 pub mod connector_error;
 pub mod helper;
 
 mod empty_connector;
 mod referential_integrity;
+
+pub use empty_connector::EmptyDatamodelConnector;
+pub use referential_integrity::ReferentialIntegrity;
+
+use crate::connector_error::{ConnectorError, ConnectorErrorFactory, ErrorKind};
+use dml::{
+    field::Field, model::Model, native_type_constructor::NativeTypeConstructor,
+    native_type_instance::NativeTypeInstance, relation_info::ReferentialAction, scalars::ScalarType,
+};
+use enumflags2::BitFlags;
+use std::{borrow::Cow, collections::BTreeMap, str::FromStr};
 
 pub trait Connector: Send + Sync {
     fn name(&self) -> &str;
