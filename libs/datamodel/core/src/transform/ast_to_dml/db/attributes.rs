@@ -9,12 +9,14 @@ use super::{
     context::{Arguments, Context},
     types::{EnumAttributes, IndexAttribute, ModelAttributes, RelationField, ScalarField, ScalarFieldType},
 };
+use crate::ast::{FieldId, Model};
 use crate::{
     ast::{self, WithName},
     common::constraint_names::ConstraintNames,
     diagnostics::DatamodelError,
     dml,
     transform::helpers::ValueValidator,
+    SortOrder,
 };
 use prisma_value::PrismaValue;
 
@@ -206,29 +208,70 @@ fn visit_scalar_field_attributes<'ast>(
 
         // @unique
         attributes.visit_optional_single("unique", ctx, |args, ctx| {
-            let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
-                Some(Ok("")) => {
-                    ctx.push_error(args.new_attribute_validation_error("The `map` argument cannot be an empty string."));
-                    None
-                },
-                Some(Ok(name)) => Some(name),
-                Some(Err(err)) => {
-                    ctx.push_error(err); None
-                },
-                None => None,
-            };
-            validate_db_name(ast_model, args, db_name, "@unique", ctx);
-
-
-            model_attributes.ast_indexes.push((args.attribute(), IndexAttribute {
-                is_unique: true,
-                fields: vec![field_id],
-                source_field: Some(field_id),
-                name: None,
-                db_name: db_name.map(Cow::from),
-            }))
+            visit_field_unique(field_id, ast_model, model_attributes, args, ctx)
         });
     });
+}
+
+fn visit_field_unique<'ast>(
+    field_id: FieldId,
+    ast_model: &'ast Model,
+    model_attributes: &mut ModelAttributes<'ast>,
+    args: &mut Arguments<'ast>,
+    ctx: &mut Context<'ast>,
+) {
+    let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
+        Some(Ok("")) => {
+            ctx.push_error(args.new_attribute_validation_error("The `map` argument cannot be an empty string."));
+            None
+        }
+        Some(Ok(name)) => Some(name),
+        Some(Err(err)) => {
+            ctx.push_error(err);
+            None
+        }
+        None => None,
+    };
+
+    validate_db_name(ast_model, args, db_name, "@unique", ctx);
+
+    //TODO(extendec indices) add db specific validations to sort and length
+    let length = match args.optional_arg("length").map(|length| length.as_int()) {
+        Some(Ok(length)) => Some(length as u32),
+        Some(Err(err)) => {
+            ctx.push_error(err);
+            None
+        }
+        None => None,
+    };
+
+    let sort = match args.optional_arg("sort").map(|sort| sort.as_constant_literal()) {
+        Some(Ok("Desc")) => Some(SortOrder::Desc),
+        Some(Ok("Asc")) => Some(SortOrder::Asc),
+        Some(Ok(other)) => {
+            ctx.push_error(args.new_attribute_validation_error(&format!(
+                "The `sort` argument can only be `Asc` or `Desc` you provided: {}.",
+                other
+            )));
+            None
+        }
+        Some(Err(err)) => {
+            ctx.push_error(err);
+            None
+        }
+        None => Some(SortOrder::Asc), //TODO(extended indices) once index types are introduced this needs to distinguish on them. Fulltext has no order for example
+    };
+
+    model_attributes.ast_indexes.push((
+        args.attribute(),
+        IndexAttribute {
+            is_unique: true,
+            fields: vec![(field_id, sort, length)],
+            source_field: Some(field_id),
+            name: None,
+            db_name: db_name.map(Cow::from),
+        },
+    ))
 }
 
 fn default_value_constraint_name<'ast>(

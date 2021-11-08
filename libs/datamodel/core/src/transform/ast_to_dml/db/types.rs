@@ -1,5 +1,5 @@
 use super::{context::Context, walkers::CompositeTypeFieldWalker};
-use crate::{ast, diagnostics::DatamodelError, transform::ast_to_dml::db::walkers::CompositeTypeWalker};
+use crate::{ast, diagnostics::DatamodelError, transform::ast_to_dml::db::walkers::CompositeTypeWalker, SortOrder};
 use itertools::Itertools;
 use once_cell::sync::Lazy;
 use regex::Regex;
@@ -173,7 +173,7 @@ impl ModelAttributes<'_> {
 #[derive(Debug, Default)]
 pub(crate) struct IndexAttribute<'ast> {
     pub(crate) is_unique: bool,
-    pub(crate) fields: Vec<ast::FieldId>,
+    pub(crate) fields: Vec<FieldWithArgs>,
     pub(crate) source_field: Option<ast::FieldId>,
     pub(crate) name: Option<&'ast str>,
     pub(crate) db_name: Option<Cow<'ast, str>>,
@@ -181,10 +181,17 @@ pub(crate) struct IndexAttribute<'ast> {
 
 #[derive(Debug, Default)]
 pub(super) struct IdAttribute<'ast> {
-    pub(super) fields: Vec<ast::FieldId>,
+    pub(super) fields: Vec<Fie>,
     pub(super) source_field: Option<ast::FieldId>,
     pub(super) name: Option<&'ast str>,
     pub(super) db_name: Option<&'ast str>,
+}
+
+#[derive(Debug, Default)]
+pub(super) struct FieldWithArgs {
+    pub(super) id: ast::FieldId,
+    pub(super) sort_order: Option<SortOrder>,
+    pub(super) length: Option<u32>,
 }
 
 #[derive(Debug, Default)]
