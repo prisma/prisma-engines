@@ -5,15 +5,12 @@ use crate::{
     PrimaryKey, PrimaryKeyColumn, PrismaValue, Regex, SQLSortOrder, SqlMetadata, SqlSchema, SqlSchemaDescriberBackend,
     Table, View,
 };
-use datamodel::common::preview_features::PreviewFeature;
-use enumflags2::BitFlags;
 use quaint::{ast::Value, prelude::Queryable};
 use std::{any::type_name, borrow::Cow, collections::BTreeMap, convert::TryInto, fmt::Debug};
 use tracing::trace;
 
 pub struct SqlSchemaDescriber<'a> {
     conn: &'a dyn Queryable,
-    preview_features: BitFlags<PreviewFeature>,
 }
 
 impl Debug for SqlSchemaDescriber<'_> {
@@ -94,8 +91,8 @@ impl Parser for SqlSchemaDescriber<'_> {}
 
 impl<'a> SqlSchemaDescriber<'a> {
     /// Constructor.
-    pub fn new(conn: &'a dyn Queryable, preview_features: BitFlags<PreviewFeature>) -> SqlSchemaDescriber<'a> {
-        SqlSchemaDescriber { conn, preview_features }
+    pub fn new(conn: &'a dyn Queryable) -> SqlSchemaDescriber<'a> {
+        SqlSchemaDescriber { conn }
     }
 
     #[tracing::instrument]
@@ -477,23 +474,21 @@ impl<'a> SqlSchemaDescriber<'a> {
                 }
             }
 
-            if self.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-                let sql = format!(r#"PRAGMA index_xinfo("{}");"#, name);
-                let result_set = self.conn.query_raw(&sql, &[]).await.expect("querying for index info");
-                trace!("Got index description results: {:?}", result_set);
+            let sql = format!(r#"PRAGMA index_xinfo("{}");"#, name);
+            let result_set = self.conn.query_raw(&sql, &[]).await.expect("querying for index info");
+            trace!("Got index description results: {:?}", result_set);
 
-                for row in result_set.into_iter() {
-                    //if the index is on a rowid or expression, the name of the column will be null, we ignore these for now
-                    if row.get("name").and_then(|x| x.to_string()).is_some() {
-                        let pos = row.get("seqno").and_then(|x| x.as_i64()).expect("get seqno") as usize;
+            for row in result_set.into_iter() {
+                //if the index is on a rowid or expression, the name of the column will be null, we ignore these for now
+                if row.get("name").and_then(|x| x.to_string()).is_some() {
+                    let pos = row.get("seqno").and_then(|x| x.as_i64()).expect("get seqno") as usize;
 
-                        let sort_order = row.get("desc").and_then(|r| r.as_i64()).map(|v| match v {
-                            0 => SQLSortOrder::Asc,
-                            _ => SQLSortOrder::Desc,
-                        });
+                    let sort_order = row.get("desc").and_then(|r| r.as_i64()).map(|v| match v {
+                        0 => SQLSortOrder::Asc,
+                        _ => SQLSortOrder::Desc,
+                    });
 
-                        index.columns[pos].sort_order = sort_order;
-                    }
+                    index.columns[pos].sort_order = sort_order;
                 }
             }
 

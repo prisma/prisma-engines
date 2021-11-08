@@ -3,8 +3,6 @@ use crate::{
     DescriberErrorKind, DescriberResult, ForeignKey, ForeignKeyAction, Index, IndexColumn, IndexType, PrimaryKey,
     PrimaryKeyColumn, Procedure, SQLSortOrder, SqlMetadata, SqlSchema, Table, UserDefinedType, View,
 };
-use datamodel::common::preview_features::PreviewFeature;
-use enumflags2::BitFlags;
 use indoc::indoc;
 use native_types::{MsSqlType, MsSqlTypeParameter, NativeType};
 use once_cell::sync::Lazy;
@@ -65,7 +63,6 @@ static DEFAULT_SHARED_CONSTRAINT: Lazy<Regex> = Lazy::new(|| Regex::new(r"^CREAT
 
 pub struct SqlSchemaDescriber<'a> {
     conn: &'a dyn Queryable,
-    preview_features: BitFlags<PreviewFeature>,
 }
 
 impl std::fmt::Debug for SqlSchemaDescriber<'_> {
@@ -127,8 +124,8 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
 impl Parser for SqlSchemaDescriber<'_> {}
 
 impl<'a> SqlSchemaDescriber<'a> {
-    pub fn new(conn: &'a dyn Queryable, preview_features: BitFlags<PreviewFeature>) -> Self {
-        Self { conn, preview_features }
+    pub fn new(conn: &'a dyn Queryable) -> Self {
+        Self { conn }
     }
 
     #[tracing::instrument]
@@ -446,9 +443,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                                 }
 
                                 pk.columns[pos as usize] = PrimaryKeyColumn::new(column_name);
-                                if self.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-                                    pk.columns[pos as usize].set_sort_order(sort_order);
-                                }
+                                pk.columns[pos as usize].set_sort_order(sort_order);
 
                                 debug!(
                                     "The primary key has already been created, added column to it: {:?}",
@@ -459,10 +454,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                                 debug!("Instantiating primary key");
 
                                 let mut column = PrimaryKeyColumn::new(column_name);
-
-                                if self.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-                                    column.set_sort_order(sort_order);
-                                }
+                                column.set_sort_order(sort_order);
 
                                 primary_key.replace(PrimaryKey {
                                     columns: vec![column],
@@ -474,19 +466,13 @@ impl<'a> SqlSchemaDescriber<'a> {
                     } else if indexes_map.contains_key(&index_name) {
                         if let Some(index) = indexes_map.get_mut(&index_name) {
                             let mut column = IndexColumn::new(column_name);
-
-                            if self.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-                                column.set_sort_order(sort_order);
-                            }
+                            column.set_sort_order(sort_order);
 
                             index.columns.push(column);
                         }
                     } else {
                         let mut column = IndexColumn::new(column_name);
-
-                        if self.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-                            column.set_sort_order(sort_order);
-                        }
+                        column.set_sort_order(sort_order);
 
                         indexes_map.insert(
                             index_name.clone(),

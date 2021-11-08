@@ -2,8 +2,6 @@ use super::*;
 use crate::{getters::Getter, parsers::Parser};
 use bigdecimal::ToPrimitive;
 use common::purge_dangling_foreign_keys;
-use datamodel::common::preview_features::PreviewFeature;
-use enumflags2::BitFlags;
 use indoc::indoc;
 use native_types::{MySqlType, NativeType};
 use quaint::{prelude::Queryable, Value};
@@ -35,7 +33,6 @@ impl Flavour {
 
 pub struct SqlSchemaDescriber<'a> {
     conn: &'a dyn Queryable,
-    preview_features: BitFlags<PreviewFeature>,
 }
 
 #[async_trait::async_trait]
@@ -100,8 +97,8 @@ impl Parser for SqlSchemaDescriber<'_> {}
 
 impl<'a> SqlSchemaDescriber<'a> {
     /// Constructor.
-    pub fn new(conn: &'a dyn Queryable, preview_features: BitFlags<PreviewFeature>) -> SqlSchemaDescriber<'a> {
-        SqlSchemaDescriber { conn, preview_features }
+    pub fn new(conn: &'a dyn Queryable) -> SqlSchemaDescriber<'a> {
+        SqlSchemaDescriber { conn }
     }
 
     #[tracing::instrument(skip(self))]
@@ -421,7 +418,6 @@ impl<'a> SqlSchemaDescriber<'a> {
     ) -> DescriberResult<BTreeMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)>> {
         let mut map = BTreeMap::new();
         let mut indexes_with_expressions: HashSet<(String, String)> = HashSet::new();
-        let mut indexes_with_partially_covered_columns: HashSet<(String, String)> = HashSet::new();
 
         // We alias all the columns because MySQL column names are case-insensitive in queries, but the
         // information schema column names became upper-case in MySQL 8, causing the code fetching
@@ -446,10 +442,6 @@ impl<'a> SqlSchemaDescriber<'a> {
             let table_name = row.get_expect_string("table_name");
             let index_name = row.get_expect_string("index_name");
             let length = row.get_u32("partial");
-
-            if length.is_some() {
-                indexes_with_partially_covered_columns.insert((table_name.clone(), index_name.clone()));
-            }
 
             let sort_order = row.get_string("column_order").map(|v| match v.as_ref() {
                 "A" => SQLSortOrder::Asc,
@@ -479,10 +471,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                                 }
 
                                 let mut column = PrimaryKeyColumn::new(column_name);
-
-                                if self.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-                                    column.length = length;
-                                }
+                                column.length = length;
 
                                 pk.columns[pos as usize] = column;
 
@@ -495,10 +484,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                                 trace!("Instantiating primary key");
 
                                 let mut column = PrimaryKeyColumn::new(column_name);
-
-                                if self.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-                                    column.length = length;
-                                }
+                                column.length = length;
 
                                 primary_key.replace(PrimaryKey {
                                     columns: vec![column],
@@ -510,21 +496,15 @@ impl<'a> SqlSchemaDescriber<'a> {
                     } else if indexes_map.contains_key(&index_name) {
                         if let Some(index) = indexes_map.get_mut(&index_name) {
                             let mut column = IndexColumn::new(column_name);
-
-                            if self.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-                                column.length = length;
-                                column.sort_order = sort_order;
-                            }
+                            column.length = length;
+                            column.sort_order = sort_order;
 
                             index.columns.push(column);
                         }
                     } else {
                         let mut column = IndexColumn::new(column_name);
-
-                        if self.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-                            column.length = length;
-                            column.sort_order = sort_order;
-                        }
+                        column.length = length;
+                        column.sort_order = sort_order;
 
                         indexes_map.insert(
                             index_name.clone(),
@@ -549,14 +529,6 @@ impl<'a> SqlSchemaDescriber<'a> {
             for (tble, index_name) in &indexes_with_expressions {
                 if tble == table {
                     index_map.remove(index_name);
-                }
-            }
-
-            if !self.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-                for (tble, index_name) in &indexes_with_partially_covered_columns {
-                    if tble == table {
-                        index_map.remove(index_name);
-                    }
                 }
             }
         }

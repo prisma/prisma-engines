@@ -11,10 +11,7 @@ async fn describe_sqlite(sql: &str) -> SqlSchema {
 
     conn.raw_cmd(sql).await.unwrap();
 
-    sqlite::SqlSchemaDescriber::new(&conn, BitFlags::all())
-        .describe(SCHEMA)
-        .await
-        .unwrap()
+    sqlite::SqlSchemaDescriber::new(&conn).describe(SCHEMA).await.unwrap()
 }
 
 #[tokio::test]

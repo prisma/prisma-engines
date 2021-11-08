@@ -110,6 +110,13 @@ impl SqlSchema {
             .map(|(table_index, table)| (TableId(table_index as u32), table))
     }
 
+    pub fn iter_tables_mut(&mut self) -> impl Iterator<Item = (TableId, &mut Table)> {
+        self.tables
+            .iter_mut()
+            .enumerate()
+            .map(|(table_index, table)| (TableId(table_index as u32), table))
+    }
+
     pub fn table(&self, name: &str) -> core::result::Result<&Table, String> {
         match self.tables.iter().find(|t| t.name == name) {
             Some(t) => Ok(t),

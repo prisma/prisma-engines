@@ -22,20 +22,10 @@ pub async fn load_describer<'a>(
             Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(
                 connection,
                 circumstances,
-                preview_features,
             )) as Box<dyn SqlSchemaDescriberBackend>
         }
-        SqlFamily::Mysql => Box::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(
-            connection,
-            preview_features,
-        )),
-        SqlFamily::Sqlite => Box::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(
-            connection,
-            preview_features,
-        )),
-        SqlFamily::Mssql => Box::new(sql_schema_describer::mssql::SqlSchemaDescriber::new(
-            connection,
-            preview_features,
-        )),
+        SqlFamily::Mysql => Box::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(connection)),
+        SqlFamily::Sqlite => Box::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(connection)),
+        SqlFamily::Mssql => Box::new(sql_schema_describer::mssql::SqlSchemaDescriber::new(connection)),
     })
 }

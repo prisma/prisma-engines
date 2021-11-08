@@ -80,20 +80,10 @@ impl TestApi {
                 } else {
                     Default::default()
                 },
-                BitFlags::all(),
             )),
-            SqlFamily::Sqlite => Box::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(
-                connection,
-                BitFlags::all(),
-            )),
-            SqlFamily::Mysql => Box::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(
-                connection,
-                BitFlags::all(),
-            )),
-            SqlFamily::Mssql => Box::new(sql_schema_describer::mssql::SqlSchemaDescriber::new(
-                connection,
-                BitFlags::all(),
-            )),
+            SqlFamily::Sqlite => Box::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(connection)),
+            SqlFamily::Mysql => Box::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(connection)),
+            SqlFamily::Mssql => Box::new(sql_schema_describer::mssql::SqlSchemaDescriber::new(connection)),
         }
     }
 
