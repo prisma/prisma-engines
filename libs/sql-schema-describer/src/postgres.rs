@@ -549,7 +549,10 @@ impl<'a> SqlSchemaDescriber<'a> {
                rawIndex.indisprimary                       AS is_primary_key,
                tableInfos.relname                          AS table_name,
                rawIndex.indkeyidx,
-               rawIndex.column_order,
+               CASE o.OPTION & 1
+                   WHEN 1 THEN 'DESC'
+                   ELSE 'ASC'
+                   END                                     AS column_order,
                pg_get_serial_sequence('"' || $1 || '"."' || tableInfos.relname || '"',
                                       columnInfos.attname) AS sequence_name
         FROM
@@ -563,24 +566,20 @@ impl<'a> SqlSchemaDescriber<'a> {
                        i.indisunique,
                        i.indisprimary,
                        i.indkey                         AS indkey,
-                       generate_subscripts(i.indkey, 1) AS indkeyidx,
-                       CASE o.OPTION
-                           & 1
-                           WHEN 1 THEN 'DESC'
-                           ELSE 'ASC'
-                           END                          AS column_order
+                       i.indoption                      AS indoption,
+                       generate_subscripts(i.indkey, 1) AS indkeyidx
                 FROM pg_index i
-                         CROSS JOIN LATERAL UNNEST(i.indkey) WITH ordinality AS c (colnum, ordinality)
-                         LEFT JOIN LATERAL UNNEST(i.indoption) WITH ordinality AS o (OPTION, ordinality)
-                                   ON c.ordinality = o.ordinality
                 WHERE i.indpred IS NULL
-                GROUP BY i.indrelid, i.indexrelid, i.indisunique, i.indisprimary, indkeyidx, i.indkey, column_order
+                GROUP BY i.indrelid, i.indexrelid, i.indisunique, i.indisprimary, indkeyidx, i.indkey, i.indoption
                 ORDER BY i.indrelid, i.indexrelid
             ) rawIndex,
             -- pg_attribute stores infos about columns: https://www.postgresql.org/docs/current/catalog-pg-attribute.html
             pg_attribute columnInfos,
             -- pg_namespace stores info about the schema
             pg_namespace schemaInfo
+        CROSS JOIN LATERAL UNNEST(rawIndex.indkey) WITH ordinality AS c (colnum, ordinality)
+        LEFT JOIN LATERAL UNNEST(rawIndex.indoption) WITH ordinality AS o (OPTION, ordinality)
+                   ON c.ordinality = o.ordinality
         WHERE
           -- find table info for index
             tableInfos.oid = rawIndex.indrelid
@@ -594,8 +593,9 @@ impl<'a> SqlSchemaDescriber<'a> {
           -- we only consider stuff out of one specific schema
           AND tableInfos.relnamespace = schemaInfo.oid
           AND schemaInfo.nspname = $1
+          AND c.colnum = columnInfos.attnum
         GROUP BY tableInfos.relname, indexInfos.relname, rawIndex.indisunique, rawIndex.indisprimary, columnInfos.attname,
-                 rawIndex.indkeyidx, rawIndex.column_order
+                 rawIndex.indkeyidx, column_order
         ORDER BY rawIndex.indkeyidx;
         "#;
 
