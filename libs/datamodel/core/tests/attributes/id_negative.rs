@@ -507,3 +507,37 @@ fn primary_key_and_foreign_key_names_cannot_clash() {
 
     expectation.assert_eq(&error)
 }
+
+#[test]
+fn id_does_not_allow_sort_or_index_unless_extended_indexes_are_on() {
+    let dml = with_header(
+        r#"
+     model User {
+         firstName  String
+         middleName String
+         lastName   String
+         
+         @@id([firstName, middleName(length: 1), lastName])
+     }
+     
+     model Blog {
+         title  String @id(length:5)
+     }
+     "#,
+        Provider::Mysql,
+        &[],
+    );
+
+    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@id": The length argument is not yet available.[0m
+          [1;94m-->[0m  [4mschema.prisma:22[0m
+        [1;94m   | [0m
+        [1;94m21 | [0m     model Blog {
+        [1;94m22 | [0m         title  String @[1;91mid(length:5)[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}

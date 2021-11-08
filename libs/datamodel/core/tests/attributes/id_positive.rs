@@ -316,7 +316,7 @@ fn id_accepts_length_arg_on_mysql() {
      }
      "#,
         Provider::Mysql,
-        &[],
+        &["extendedIndexes"],
     );
 
     let schema = parse(&dml);
@@ -351,7 +351,7 @@ fn id_accepts_sort_arg_on_mssql() {
      }
      "#,
         Provider::SqlServer,
-        &[],
+        &["extendedIndexes"],
     );
 
     let schema = parse(&dml);
