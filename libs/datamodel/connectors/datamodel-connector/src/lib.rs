@@ -67,8 +67,8 @@ pub trait Connector: Send + Sync {
     }
 
     /// Returns all available native type constructors available through this connector.
-    /// Powers the auto completion of the vs code plugin.
-    fn available_native_type_constructors(&self) -> &[NativeTypeConstructor];
+    /// Powers the auto completion of the VSCode plugin.
+    fn available_native_type_constructors(&self) -> &'static [NativeTypeConstructor];
 
     /// Returns the Scalar Type for the given native type
     fn scalar_type_for_native_type(&self, native_type: serde_json::Value) -> ScalarType;
@@ -83,7 +83,7 @@ pub trait Connector: Send + Sync {
     fn find_native_type_constructor(&self, name: &str) -> Option<&NativeTypeConstructor> {
         self.available_native_type_constructors()
             .iter()
-            .find(|constructor| constructor.name.as_str() == name)
+            .find(|constructor| constructor.name == name)
     }
 
     /// This function is used during Schema parsing to calculate the concrete native type.
