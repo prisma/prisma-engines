@@ -1,4 +1,4 @@
-use crate::attributes::with_postgres_provider;
+use crate::attributes::{with_mssql_provider, with_mysql_provider, with_postgres_provider};
 use crate::common::*;
 use datamodel::dml::*;
 use prisma_value::PrismaValue;
@@ -273,4 +273,70 @@ fn named_and_mapped_multi_field_ids_must_work() {
     let user_model = datamodel.assert_has_model("Model");
     user_model.assert_has_id_fields(&["a", "b"]);
     user_model.assert_has_named_pk("dbname");
+}
+
+#[test]
+fn id_accepts_length_arg_on_mysql() {
+    let dml = with_mysql_provider(
+        r#"
+     model User {
+         firstName  String
+         middleName String
+         lastName   String
+         
+         @@id([firstName, middleName(length: 1), lastName])
+     }
+     
+     model Blog {
+         title  String @id(length:5)
+     }
+     "#,
+    );
+
+    let schema = parse(&dml);
+    schema.assert_has_model("User");
+
+    // user_model.assert_has_pk(PrimaryKeyDefinition {
+    //     name: None,
+    //     db_name: Some("User_pkey".to_string()),
+    //     fields: vec![
+    //         ("firstName".to_string(), None),
+    //         ("middleName".to_string(), Some(1)),
+    //         ("lastName".to_string(), None),
+    //     ],
+    //     defined_on_field: false,
+    // });
+}
+
+#[test]
+fn id_accepts_sort_arg_on_mssql() {
+    let dml = with_mssql_provider(
+        r#"
+     model User {
+         firstName  String
+         middleName String
+         lastName   String
+         
+         @@id([firstName, middleName(sort: Desc), lastName])
+     }
+     
+     model Blog {
+         title  String @id(sort:Desc)
+     }
+     "#,
+    );
+
+    let schema = parse(&dml);
+    schema.assert_has_model("User");
+
+    // user_model.assert_has_pk(PrimaryKeyDefinition {
+    //     name: None,
+    //     db_name: Some("User_pkey".to_string()),
+    //     fields: vec![
+    //         ("firstName".to_string(), None),
+    //         ("middleName".to_string(), Some(1)),
+    //         ("lastName".to_string(), None),
+    //     ],
+    //     defined_on_field: false,
+    // });
 }

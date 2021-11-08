@@ -25,10 +25,29 @@ fn with_postgres_provider(dm: &str) -> String {
             provider = "postgres"
             url = "postgresql://..."
     }
-         
-    generator js {
-            provider = "prisma-client-js"
-    }"#;
+    "#;
+
+    format!("{}\n{}", header, dm)
+}
+
+fn with_mysql_provider(dm: &str) -> String {
+    let header = r#"
+     datasource test {
+             provider = "mysql"
+             url = "mysql://..."
+     }
+     "#;
+
+    format!("{}\n{}", header, dm)
+}
+
+fn with_mssql_provider(dm: &str) -> String {
+    let header = r#"
+     datasource test {
+             provider = "sqlserver"
+             url = "sqlserver://..."
+     }
+     "#;
 
     format!("{}\n{}", header, dm)
 }
