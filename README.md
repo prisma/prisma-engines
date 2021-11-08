@@ -28,9 +28,11 @@ published on the repo GitHub pages.
   choice.
 - Linux only: OpenSSL is required to be installed.
 - Installed [direnv](https://github.com/direnv/direnv), then `direnv allow` on
-  the repository root.
+  the repository root. 
+    - Make sure direnv is [hooked](https://direnv.net/docs/hook.html) into your shell
     - Alternatively: Load the defined environment in `./.envrc` manually in your
       shell.
+- **For m1 users**: Install [Protocol Buffers](https://grpc.io/docs/protoc-installation/)
 
 **How to build:**
 
@@ -175,6 +177,16 @@ Other variables may or may not be useful.
 **Run:**
 
 Run `cargo test` in the repository root.
+
+## Parallel rust-analyzer builds
+
+When rust-analzyer runs `cargo check` it will lock the build directory and stop any cargo commands from running until it has completed. This makes the build process feel a lot longer. It is possible to avoid this by setting a different build path for 
+rust-analyzer. To avoid this. Open VSCode settings and search for `Check on Save: Extra Args`. Look for the `Rust-analyzer › Check On Save: Extra Args` settings and add a new directory for rust-analyzer. Something like:
+
+```
+--target-dir:/tmp/rust-analyzer-check
+```
+
 
 ## Security
 
