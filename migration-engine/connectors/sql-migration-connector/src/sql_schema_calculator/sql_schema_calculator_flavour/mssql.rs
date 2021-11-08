@@ -23,10 +23,7 @@ impl SqlSchemaCalculatorFlavour for MssqlFlavour {
     }
 
     fn on_delete_action(&self, rf: &RelationFieldWalker<'_>) -> sql::ForeignKeyAction {
-        let action = rf
-            .on_delete_action()
-            .map(super::convert_referential_action)
-            .unwrap_or_else(|| super::convert_referential_action(rf.default_on_delete_action()));
+        let action = super::convert_referential_action(rf.on_delete_action());
 
         if action == ForeignKeyAction::Restrict {
             ForeignKeyAction::NoAction

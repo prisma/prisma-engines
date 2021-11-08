@@ -185,10 +185,6 @@ impl Relation {
 
     /// Retrieves the onDelete policy for this relation.
     pub fn on_delete(&self) -> ReferentialAction {
-        self.field_a()
-            .on_delete()
-            .cloned()
-            .or_else(|| self.field_b().on_delete().cloned())
-            .unwrap_or(self.field_a().on_delete_default)
+        self.field_a().on_delete()
     }
 }

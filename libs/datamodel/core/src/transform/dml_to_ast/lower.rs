@@ -1,5 +1,6 @@
 use crate::common::preview_features::PreviewFeature;
 use crate::{ast, dml, Datasource};
+use datamodel_connector::{Connector, EmptyDatamodelConnector};
 use enumflags2::BitFlags;
 
 pub struct LowerDmlToAst<'a> {
@@ -14,6 +15,12 @@ impl<'a> LowerDmlToAst<'a> {
             datasource,
             preview_features,
         }
+    }
+
+    fn _active_connector(&self) -> &dyn Connector {
+        self.datasource
+            .map(|datasource| datasource.active_connector.as_ref())
+            .unwrap_or(&EmptyDatamodelConnector)
     }
 
     pub fn lower(&self, datamodel: &dml::Datamodel) -> ast::SchemaAst {

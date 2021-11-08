@@ -100,8 +100,6 @@ impl<'a> DatamodelConverter<'a> {
                         relation_name: relation.name.clone(),
                         relation_side: relation.relation_side(rf),
                         relation_info: rf.relation_info.clone(),
-                        on_delete_default: rf.default_on_delete_action(),
-                        on_update_default: rf.default_on_update_action(),
                     }))
                 }
                 dml::Field::ScalarField(sf) => {

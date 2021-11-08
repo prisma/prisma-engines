@@ -204,12 +204,12 @@ impl RelationFieldAsserts for dml::RelationField {
     }
 
     fn assert_relation_delete_strategy(&self, t: dml::ReferentialAction) -> &Self {
-        assert_eq!(self.relation_info.on_delete, Some(t));
+        assert_eq!(self.relation_info.on_delete.take(), t);
         self
     }
 
     fn assert_relation_update_strategy(&self, t: dml::ReferentialAction) -> &Self {
-        assert_eq!(self.relation_info.on_update, Some(t));
+        assert_eq!(self.relation_info.on_update.take(), t);
         self
     }
 

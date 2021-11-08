@@ -61,21 +61,14 @@ impl<'a> LiftAstToDml<'a> {
         schema: &mut dml::Datamodel,
         field_ids_for_sorting: &mut HashMap<(&'a str, &'a str), ast::FieldId>,
     ) {
-        let active_connector = self.db.active_connector();
         let common_dml_fields = |field: &mut dml::RelationField,
                                  attributes: &super::db::RelationField<'_>,
                                  relation_field: RelationFieldWalker<'_, '_>| {
             let ast_field = relation_field.ast_field();
-            field.relation_info.on_delete = attributes.on_delete;
-            field.relation_info.on_update = attributes.on_update;
             field.relation_info.name = relation_field.relation_name().to_string();
             field.documentation = ast_field.documentation.clone().map(|comment| comment.text);
             field.is_ignored = attributes.is_ignored;
             field.relation_info.fk_name = relation_field.final_foreign_key_name().map(|cow| cow.into_owned());
-            field.supports_restrict_action(
-                active_connector.supports_referential_action(dml::ReferentialAction::Restrict),
-            );
-            field.emulates_referential_actions(active_connector.emulates_referential_actions());
         };
 
         for relation in self.db.walk_relations() {
@@ -91,11 +84,11 @@ impl<'a> LiftAstToDml<'a> {
                             // Construct a relation field in the DML for an existing relation field in the source.
                             let attributes = relation_field.attributes();
                             let arity = self.lift_field_arity(&relation_field.ast_field().arity);
-                            let referential_arity = self.lift_field_arity(&relation_field.referential_arity());
-                            let mut field =
-                                dml::RelationField::new(relation_field.name(), arity, referential_arity, relation_info);
+
+                            let mut field = dml::RelationField::new(relation_field.name(), arity, relation_info);
 
                             common_dml_fields(&mut field, attributes, relation_field);
+
                             field_ids_for_sorting.insert(
                                 (relation_field.model().name(), relation_field.name()),
                                 relation_field.field_id(),
@@ -107,13 +100,7 @@ impl<'a> LiftAstToDml<'a> {
                             //
                             // This is part of magic reformatting.
                             let arity = self.lift_field_arity(&relation.forward_relation_field_arity());
-                            let referential_arity = arity;
-                            dml::RelationField::new(
-                                relation.referenced_model().name(),
-                                arity,
-                                referential_arity,
-                                relation_info,
-                            )
+                            dml::RelationField::new(relation.referenced_model().name(), arity, relation_info)
                         };
 
                         relation_field.relation_info.name = relation.relation_name().to_string();
@@ -151,6 +138,12 @@ impl<'a> LiftAstToDml<'a> {
                             }
                             ReferencingFields::NA => Vec::new(),
                         };
+
+                        if let Some(relation) = relation.as_complete() {
+                            relation_field.relation_info.on_delete = relation.on_delete();
+                            relation_field.relation_info.on_update = relation.on_update();
+                        }
+
                         model.add_field(dml::Field::RelationField(relation_field));
 
                         for field in inferred_scalar_fields {
@@ -167,11 +160,15 @@ impl<'a> LiftAstToDml<'a> {
                             let ast_field = relation_field.ast_field();
                             let attributes = relation_field.attributes();
                             let arity = self.lift_field_arity(&ast_field.arity);
-                            let referential_arity = self.lift_field_arity(&relation_field.referential_arity());
-                            let mut field =
-                                dml::RelationField::new(relation_field.name(), arity, referential_arity, relation_info);
+
+                            let mut field = dml::RelationField::new(relation_field.name(), arity, relation_info);
 
                             common_dml_fields(&mut field, attributes, relation_field);
+
+                            if let Some(relation) = relation.as_complete() {
+                                field.relation_info.on_delete = relation.on_delete();
+                                field.relation_info.on_update = relation.on_update();
+                            }
 
                             field_ids_for_sorting.insert(
                                 (relation_field.model().name(), relation_field.name()),
@@ -182,14 +179,17 @@ impl<'a> LiftAstToDml<'a> {
                         } else {
                             // This is part of reformatting.
                             let arity = dml::FieldArity::List;
-                            let referential_arity = dml::FieldArity::List;
-                            let mut field = dml::RelationField::new(
-                                relation.referencing_model().name(),
-                                arity,
-                                referential_arity,
-                                relation_info,
-                            );
+
+                            let mut field =
+                                dml::RelationField::new(relation.referencing_model().name(), arity, relation_info);
+
                             field.is_ignored = relation.referencing_model().is_ignored();
+
+                            if let Some(relation) = relation.as_complete() {
+                                field.relation_info.on_delete = relation.on_delete();
+                                field.relation_info.on_update = relation.on_update();
+                            }
+
                             field
                         };
 
@@ -203,9 +203,8 @@ impl<'a> LiftAstToDml<'a> {
                         let attributes = relation_field.attributes();
                         let arity = self.lift_field_arity(&ast_field.arity);
                         let relation_info = dml::RelationInfo::new(relation_field.related_model().name());
-                        let referential_arity = self.lift_field_arity(&relation_field.referential_arity());
-                        let mut field =
-                            dml::RelationField::new(relation_field.name(), arity, referential_arity, relation_info);
+
+                        let mut field = dml::RelationField::new(relation_field.name(), arity, relation_info);
 
                         common_dml_fields(&mut field, attributes, relation_field);
 

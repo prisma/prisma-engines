@@ -333,24 +333,17 @@ impl<'a> RelationFieldWalker<'a> {
                 }),
         }
     }
+
     pub fn constraint_name(&self) -> Option<String> {
         self.get().relation_info.fk_name.clone()
     }
 
-    pub fn on_update_action(&self) -> Option<ReferentialAction> {
-        self.get().relation_info.on_update
+    pub fn on_update_action(&self) -> ReferentialAction {
+        self.get().relation_info.on_update.take()
     }
 
-    pub fn on_delete_action(&self) -> Option<ReferentialAction> {
-        self.get().relation_info.on_delete
-    }
-
-    pub fn default_on_update_action(&self) -> ReferentialAction {
-        self.get().default_on_update_action()
-    }
-
-    pub fn default_on_delete_action(&self) -> ReferentialAction {
-        self.get().default_on_delete_action()
+    pub fn on_delete_action(&self) -> ReferentialAction {
+        self.get().relation_info.on_delete.take()
     }
 }
 

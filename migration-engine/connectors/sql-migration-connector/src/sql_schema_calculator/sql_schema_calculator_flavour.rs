@@ -39,15 +39,11 @@ pub(crate) trait SqlSchemaCalculatorFlavour {
     }
 
     fn on_update_action(&self, rf: &RelationFieldWalker<'_>) -> sql::ForeignKeyAction {
-        rf.on_update_action()
-            .map(convert_referential_action)
-            .unwrap_or_else(|| convert_referential_action(rf.default_on_update_action()))
+        convert_referential_action(rf.on_update_action())
     }
 
     fn on_delete_action(&self, rf: &RelationFieldWalker<'_>) -> sql::ForeignKeyAction {
-        rf.on_delete_action()
-            .map(convert_referential_action)
-            .unwrap_or_else(|| convert_referential_action(rf.default_on_delete_action()))
+        convert_referential_action(rf.on_delete_action())
     }
 
     fn m2m_foreign_key_action(&self, _model_a: &ModelWalker<'_>, _model_b: &ModelWalker<'_>) -> sql::ForeignKeyAction {

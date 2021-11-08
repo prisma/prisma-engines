@@ -1,8 +1,10 @@
 use enumflags2::bitflags;
 use std::fmt;
 
+use crate::SchemaValue;
+
 /// Holds information about a relation field.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct RelationInfo {
     /// The target model of the relation.
     pub to: String,
@@ -16,10 +18,18 @@ pub struct RelationInfo {
     pub fk_name: Option<String>,
     /// A strategy indicating what happens when
     /// a related node is deleted.
-    pub on_delete: Option<ReferentialAction>,
+    pub on_delete: SchemaValue<ReferentialAction>,
     /// A strategy indicating what happens when
     /// a related node is updated.
-    pub on_update: Option<ReferentialAction>,
+    pub on_update: SchemaValue<ReferentialAction>,
+}
+
+impl std::ops::Deref for RelationInfo {
+    type Target = SchemaValue<ReferentialAction>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.on_update
+    }
 }
 
 impl PartialEq for RelationInfo {
@@ -35,12 +45,7 @@ impl RelationInfo {
     pub fn new(to: &str) -> RelationInfo {
         RelationInfo {
             to: String::from(to),
-            fields: Vec::new(),
-            references: Vec::new(),
-            name: String::new(),
-            fk_name: None,
-            on_delete: None,
-            on_update: None,
+            ..Default::default()
         }
     }
 }
@@ -73,6 +78,12 @@ pub enum ReferentialAction {
     /// of relation. Will always result in a runtime error if no defaults are
     /// provided for any relation scalar fields.
     SetDefault,
+}
+
+impl Default for ReferentialAction {
+    fn default() -> Self {
+        Self::NoAction
+    }
 }
 
 impl fmt::Display for ReferentialAction {

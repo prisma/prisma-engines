@@ -4,14 +4,16 @@ use crate::introspection_helpers::{
     is_prisma_1_point_1_or_2_join_table, is_relay_table,
 };
 use crate::version_checker::VersionChecker;
+use crate::Dedup;
 use crate::SqlError;
-use crate::{Dedup, SqlFamilyTrait};
 use datamodel::{dml, walkers::find_model_by_db_name, Datamodel, Field, Model, PrimaryKeyDefinition, RelationField};
 use introspection_connector::IntrospectionContext;
+use quaint::prelude::SqlFamily;
 use sql_schema_describer::{SqlSchema, Table};
 use tracing::debug;
 
 pub fn introspect(
+    sql_family: SqlFamily,
     schema: &SqlSchema,
     version_check: &mut VersionChecker,
     data_model: &mut Datamodel,
@@ -50,9 +52,7 @@ pub fn introspect(
             version_check.has_inline_relations(table);
             version_check.uses_on_delete(foreign_key, table);
 
-            let mut relation_field = calculate_relation_field(schema, table, foreign_key, &m2m_tables)?;
-
-            relation_field.supports_restrict_action(!ctx.sql_family().is_mssql());
+            let relation_field = calculate_relation_field(sql_family, schema, table, foreign_key, &m2m_tables)?;
 
             model.add_field(Field::RelationField(relation_field));
         }

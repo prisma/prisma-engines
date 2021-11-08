@@ -4,7 +4,9 @@ use datamodel::{
     common::RelationNames, Datamodel, DefaultValue as DMLDef, FieldArity, FieldType, IndexDefinition, Model,
     ReferentialAction, RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator as VG,
 };
+use dml::SchemaValue;
 use introspection_connector::IntrospectionContext;
+use quaint::prelude::SqlFamily;
 use sql_schema_describer::{Column, ColumnArity, ColumnTypeFamily, ForeignKey, Index, IndexType, SqlSchema, Table};
 use sql_schema_describer::{DefaultKind, ForeignKeyAction};
 use tracing::debug;
@@ -102,12 +104,9 @@ pub fn calculate_many_to_many_field(
 ) -> RelationField {
     let relation_info = RelationInfo {
         name: relation_name,
-        fk_name: None,
-        fields: vec![],
         to: opposite_foreign_key.referenced_table.clone(),
         references: opposite_foreign_key.referenced_columns.clone(),
-        on_delete: None,
-        on_update: None,
+        ..Default::default()
     };
 
     let basename = opposite_foreign_key.referenced_table.clone();
@@ -117,7 +116,7 @@ pub fn calculate_many_to_many_field(
         false => basename,
     };
 
-    RelationField::new(&name, FieldArity::List, FieldArity::List, relation_info)
+    RelationField::new(&name, FieldArity::List, relation_info)
 }
 
 pub(crate) fn calculate_index(index: &Index) -> IndexDefinition {
@@ -171,12 +170,19 @@ pub(crate) fn calculate_scalar_field(table: &Table, column: &Column, ctx: &Intro
 }
 
 pub(crate) fn calculate_relation_field(
+    sql_family: SqlFamily,
     schema: &SqlSchema,
     table: &Table,
     foreign_key: &ForeignKey,
     m2m_table_names: &[String],
 ) -> Result<RelationField, SqlError> {
     debug!("Handling foreign key  {:?}", foreign_key);
+
+    let references_required = foreign_key
+        .columns
+        .iter()
+        .map(|c| table.column_bang(c))
+        .any(|c| c.is_required());
 
     let map_action = |action: ForeignKeyAction| match action {
         ForeignKeyAction::NoAction => ReferentialAction::NoAction,
@@ -186,14 +192,29 @@ pub(crate) fn calculate_relation_field(
         ForeignKeyAction::SetDefault => ReferentialAction::SetDefault,
     };
 
+    let supports_restrict = !sql_family.is_mssql();
+
+    let on_delete = match map_action(foreign_key.on_delete_action) {
+        v @ ReferentialAction::Restrict if references_required && supports_restrict => SchemaValue::Implicit(v),
+        v @ ReferentialAction::NoAction if references_required && !supports_restrict => SchemaValue::Implicit(v),
+        v @ ReferentialAction::SetNull if !references_required => SchemaValue::Implicit(v),
+        v => SchemaValue::Explicit(v),
+    };
+
+    let on_update = match map_action(foreign_key.on_update_action) {
+        v @ ReferentialAction::Cascade => SchemaValue::Implicit(v),
+        v => SchemaValue::Explicit(v),
+    };
+
     let relation_info = RelationInfo {
         name: calculate_relation_name(schema, foreign_key, table, m2m_table_names)?,
         fk_name: foreign_key.constraint_name.clone(),
         fields: foreign_key.columns.clone(),
         to: foreign_key.referenced_table.clone(),
         references: foreign_key.referenced_columns.clone(),
-        on_delete: Some(map_action(foreign_key.on_delete_action)),
-        on_update: Some(map_action(foreign_key.on_update_action)),
+        on_delete,
+        on_update,
+        ..Default::default()
     };
 
     let columns: Vec<&Column> = foreign_key
@@ -207,17 +228,7 @@ pub(crate) fn calculate_relation_field(
         false => FieldArity::Required,
     };
 
-    let calculated_arity = match columns.iter().any(|c| c.is_required()) {
-        true => FieldArity::Required,
-        false => arity,
-    };
-
-    Ok(RelationField::new(
-        &foreign_key.referenced_table,
-        arity,
-        calculated_arity,
-        relation_info,
-    ))
+    Ok(RelationField::new(&foreign_key.referenced_table, arity, relation_info))
 }
 
 pub(crate) fn calculate_backrelation_field(
@@ -234,12 +245,8 @@ pub(crate) fn calculate_backrelation_field(
         Ok(table) => {
             let new_relation_info = RelationInfo {
                 name: relation_info.name.clone(),
-                fk_name: None,
                 to: model.name.clone(),
-                fields: vec![],
-                references: vec![],
-                on_delete: None,
-                on_update: None,
+                ..Default::default()
             };
 
             // unique or id
@@ -262,7 +269,7 @@ pub(crate) fn calculate_backrelation_field(
                 model.name.clone()
             };
 
-            Ok(RelationField::new(&name, arity, arity, new_relation_info))
+            Ok(RelationField::new(&name, arity, new_relation_info))
         }
     }
 }

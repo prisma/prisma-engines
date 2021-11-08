@@ -4128,6 +4128,7 @@ dependencies = [
  "bigdecimal",
  "datamodel",
  "datamodel-connector",
+ "dml",
  "enumflags2",
  "expect-test",
  "introspection-connector",

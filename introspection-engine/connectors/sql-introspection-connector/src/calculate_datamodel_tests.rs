@@ -1,6 +1,7 @@
 #[cfg(test)]
 mod tests {
     use crate::calculate_datamodel::calculate_datamodel;
+    use ::dml::SchemaValue;
     use datamodel::{
         ast::Span, dml, Datamodel, Datasource, DefaultValue as DMLDefault, Field, FieldArity, FieldType,
         IndexDefinition, Model, NativeTypeInstance, PrimaryKeyDefinition, ReferentialAction, RelationField,
@@ -12,6 +13,7 @@ mod tests {
     use introspection_connector::IntrospectionContext;
     use native_types::{NativeType, PostgresType};
     use pretty_assertions::assert_eq;
+    use quaint::prelude::SqlFamily;
     use sql_datamodel_connector::PostgresDatamodelConnector;
     use sql_schema_describer::{
         Column, ColumnArity, ColumnType, ColumnTypeFamily, Enum, ForeignKey, ForeignKeyAction, Index, IndexType,
@@ -158,8 +160,10 @@ mod tests {
             }),
             foreign_keys: vec![],
         }];
+
         let introspection_result =
-            calculate_datamodel(&schema, &Datamodel::new(), postgres_context()).expect("calculate data model");
+            calculate_datamodel(SqlFamily::Mysql, &schema, &Datamodel::new(), postgres_context())
+                .expect("calculate data model");
 
         ref_data_model.assert_debug_eq(&introspection_result.data_model);
     }
@@ -350,7 +354,8 @@ mod tests {
             },
         ];
         let introspection_result =
-            calculate_datamodel(&schema, &Datamodel::new(), postgres_context()).expect("calculate data model");
+            calculate_datamodel(SqlFamily::Mysql, &schema, &Datamodel::new(), postgres_context())
+                .expect("calculate data model");
 
         assert_eq!(introspection_result.data_model, ref_data_model);
     }
@@ -423,7 +428,8 @@ mod tests {
             foreign_keys: vec![],
         }];
         let introspection_result =
-            calculate_datamodel(&schema, &Datamodel::new(), postgres_context()).expect("calculate data model");
+            calculate_datamodel(SqlFamily::Mysql, &schema, &Datamodel::new(), postgres_context())
+                .expect("calculate data model");
 
         assert_eq!(introspection_result.data_model, ref_data_model);
     }
@@ -476,15 +482,10 @@ mod tests {
                         Field::RelationField(RelationField::new(
                             "User",
                             FieldArity::List,
-                            FieldArity::List,
                             RelationInfo {
                                 to: "User".to_string(),
-                                fields: vec![],
-                                references: vec![],
                                 name: "CityToUser".to_string(),
-                                fk_name: None,
-                                on_delete: None,
-                                on_update: None,
+                                ..Default::default()
                             },
                         )),
                     ],
@@ -567,21 +568,18 @@ mod tests {
                         Field::RelationField(RelationField {
                             name: "City".into(),
                             arity: FieldArity::Required,
-                            referential_arity: FieldArity::Required,
                             documentation: None,
                             is_generated: false,
                             is_commented_out: false,
                             is_ignored: false,
-                            supports_restrict_action: Some(true),
-                            emulates_referential_actions: None,
                             relation_info: RelationInfo {
                                 name: "CityToUser".to_string(),
                                 fk_name: None,
                                 to: "City".to_string(),
                                 fields: vec!["city_id".to_string(), "city_name".to_string()],
                                 references: vec!["id".to_string(), "name".to_string()],
-                                on_delete: Some(ReferentialAction::NoAction),
-                                on_update: Some(ReferentialAction::NoAction),
+                                on_delete: SchemaValue::Implicit(ReferentialAction::NoAction),
+                                on_update: SchemaValue::Implicit(ReferentialAction::NoAction),
                             },
                         }),
                     ],
@@ -689,7 +687,8 @@ mod tests {
             },
         ];
         let introspection_result =
-            calculate_datamodel(&schema, &Datamodel::new(), postgres_context()).expect("calculate data model");
+            calculate_datamodel(SqlFamily::Mysql, &schema, &Datamodel::new(), postgres_context())
+                .expect("calculate data model");
 
         assert_eq!(introspection_result.data_model, expected_data_model);
     }
@@ -821,7 +820,8 @@ mod tests {
             foreign_keys: vec![],
         }];
         let introspection_result =
-            calculate_datamodel(&schema, &Datamodel::new(), postgres_context()).expect("calculate data model");
+            calculate_datamodel(SqlFamily::Mysql, &schema, &Datamodel::new(), postgres_context())
+                .expect("calculate data model");
 
         assert_eq!(introspection_result.data_model, ref_data_model);
     }
@@ -874,15 +874,10 @@ mod tests {
                         Field::RelationField(RelationField::new(
                             "User",
                             FieldArity::List,
-                            FieldArity::List,
                             RelationInfo {
                                 to: "User".to_string(),
-                                fields: vec![],
-                                references: vec![],
                                 name: "CityToUser".to_string(),
-                                fk_name: None,
-                                on_delete: None,
-                                on_update: None,
+                                ..Default::default()
                             },
                         )),
                     ],
@@ -938,21 +933,18 @@ mod tests {
                         Field::RelationField(RelationField {
                             name: "City".into(),
                             arity: FieldArity::Required,
-                            referential_arity: FieldArity::Required,
                             documentation: None,
                             is_generated: false,
                             is_commented_out: false,
                             is_ignored: false,
-                            supports_restrict_action: Some(true),
-                            emulates_referential_actions: None,
                             relation_info: RelationInfo {
                                 name: "CityToUser".to_string(),
                                 fk_name: None,
                                 to: "City".to_string(),
                                 fields: vec!["city_id".to_string()],
                                 references: vec!["id".to_string()],
-                                on_delete: Some(ReferentialAction::NoAction),
-                                on_update: Some(ReferentialAction::NoAction),
+                                on_delete: SchemaValue::Implicit(ReferentialAction::NoAction),
+                                on_update: SchemaValue::Implicit(ReferentialAction::NoAction),
                             },
                         }),
                     ],
@@ -1048,7 +1040,8 @@ mod tests {
             },
         ];
         let introspection_result =
-            calculate_datamodel(&schema, &Datamodel::new(), postgres_context()).expect("calculate data model");
+            calculate_datamodel(SqlFamily::Mysql, &schema, &Datamodel::new(), postgres_context())
+                .expect("calculate data model");
 
         assert_eq!(introspection_result.data_model, ref_data_model);
     }
@@ -1087,7 +1080,8 @@ mod tests {
             values: enum_values,
         }];
         let introspection_result =
-            calculate_datamodel(&schema, &Datamodel::new(), postgres_context()).expect("calculate data model");
+            calculate_datamodel(SqlFamily::Mysql, &schema, &Datamodel::new(), postgres_context())
+                .expect("calculate data model");
 
         assert_eq!(introspection_result.data_model, ref_data_model);
     }

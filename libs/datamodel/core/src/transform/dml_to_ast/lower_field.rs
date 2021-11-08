@@ -194,18 +194,16 @@ impl<'a> LowerDmlToAst<'a> {
                 }
             }
 
-            if let Some(ref_action) = relation_info.on_delete {
-                if rf.default_on_delete_action() != ref_action {
-                    let expression = ast::Expression::ConstantValue(ref_action.to_string(), ast::Span::empty());
-                    args.push(ast::Argument::new("onDelete", expression));
-                }
+            if relation_info.on_delete.is_explicit() {
+                let expression =
+                    ast::Expression::ConstantValue(relation_info.on_delete.to_string(), ast::Span::empty());
+                args.push(ast::Argument::new("onDelete", expression));
             }
 
-            if let Some(ref_action) = relation_info.on_update {
-                if rf.default_on_update_action() != ref_action {
-                    let expression = ast::Expression::ConstantValue(ref_action.to_string(), ast::Span::empty());
-                    args.push(ast::Argument::new("onUpdate", expression));
-                }
+            if relation_info.on_update.is_explicit() {
+                let expression =
+                    ast::Expression::ConstantValue(relation_info.on_update.to_string(), ast::Span::empty());
+                args.push(ast::Argument::new("onUpdate", expression));
             }
 
             if let Some(fk_name) = &relation_info.fk_name {

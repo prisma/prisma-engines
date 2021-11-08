@@ -357,37 +357,49 @@ impl<'ast, 'db> CompleteInlineRelationWalker<'ast, 'db> {
 
     /// Gives the onUpdate referential action of the relation. If not defined
     /// explicitly, returns the default value.
-    pub(crate) fn on_update(self) -> ReferentialAction {
+    pub(crate) fn on_update(self) -> dml::SchemaValue<ReferentialAction> {
+        self.referencing_field()
+            .attributes()
+            .on_update
+            .map(dml::SchemaValue::Explicit)
+            .unwrap_or_else(|| dml::SchemaValue::Implicit(self.default_on_update()))
+    }
+
+    pub(crate) fn default_on_update(self) -> ReferentialAction {
         use ReferentialAction::*;
 
-        self.referencing_field().attributes().on_update.unwrap_or_else(|| {
-            let uses_foreign_keys = self
-                .db
-                .active_connector()
-                .has_capability(ConnectorCapability::ForeignKeys);
+        let uses_foreign_keys = self
+            .db
+            .active_connector()
+            .has_capability(ConnectorCapability::ForeignKeys);
 
-            match self.referential_arity() {
-                _ if uses_foreign_keys => Cascade,
-                ast::FieldArity::Required => NoAction,
-                _ => SetNull,
-            }
-        })
+        match self.referential_arity() {
+            _ if uses_foreign_keys => Cascade,
+            ast::FieldArity::Required => NoAction,
+            _ => SetNull,
+        }
     }
 
     /// Gives the onDelete referential action of the relation. If not defined
     /// explicitly, returns the default value.
-    pub(crate) fn on_delete(self) -> ReferentialAction {
+    pub(crate) fn on_delete(self) -> dml::SchemaValue<ReferentialAction> {
+        self.referencing_field()
+            .attributes()
+            .on_delete
+            .map(dml::SchemaValue::Explicit)
+            .unwrap_or_else(|| dml::SchemaValue::Implicit(self.default_on_delete()))
+    }
+
+    pub(crate) fn default_on_delete(self) -> ReferentialAction {
         use ReferentialAction::*;
 
-        self.referencing_field().attributes().on_delete.unwrap_or_else(|| {
-            let supports_restrict = self.db.active_connector().supports_referential_action(Restrict);
+        let supports_restrict = self.db.active_connector().supports_referential_action(Restrict);
 
-            match self.referential_arity() {
-                ast::FieldArity::Required if supports_restrict => Restrict,
-                ast::FieldArity::Required => NoAction,
-                _ => SetNull,
-            }
-        })
+        match self.referential_arity() {
+            ast::FieldArity::Required if supports_restrict => Restrict,
+            ast::FieldArity::Required => NoAction,
+            _ => SetNull,
+        }
     }
 
     /// Prisma allows setting the relation field as optional, even if one of the
