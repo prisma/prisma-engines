@@ -43,7 +43,7 @@ fn with_header(dm: &str, provider: Provider, preview_features: &[&str]) -> Strin
     } else {
         format!(
             "previewFeatures = [{}]",
-            preview_features.into_iter().map(|f| format!("\"{}\"", f)).join(", ")
+            preview_features.iter().map(|f| format!("\"{}\"", f)).join(", ")
         )
     };
 

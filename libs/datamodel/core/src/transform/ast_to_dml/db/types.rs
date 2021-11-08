@@ -184,8 +184,8 @@ pub(crate) struct IndexAttribute<'ast> {
 }
 
 #[derive(Debug, Default)]
-pub(super) struct IdAttribute<'ast> {
-    pub(super) fields: Vec<FieldWithArgs>,
+pub(crate) struct IdAttribute<'ast> {
+    pub(crate) fields: Vec<FieldWithArgs>,
     pub(super) source_field: Option<FieldId>,
     pub(super) name: Option<&'ast str>,
     pub(super) db_name: Option<&'ast str>,
@@ -194,8 +194,8 @@ pub(super) struct IdAttribute<'ast> {
 #[derive(Debug, Clone, Copy)]
 pub struct FieldWithArgs {
     pub(crate) field_id: ast::FieldId,
-    pub(super) sort_order: Option<SortOrder>,
-    pub(super) length: Option<u32>,
+    pub(crate) sort_order: Option<SortOrder>,
+    pub(crate) length: Option<u32>,
 }
 
 #[derive(Debug, Default)]

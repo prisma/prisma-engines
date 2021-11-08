@@ -4,7 +4,6 @@ use crate::transform::ast_to_dml::db::types::FieldWithArgs;
 use crate::{
     ast,
     common::constraint_names::ConstraintNames,
-    common::preview_features::PreviewFeature,
     diagnostics::DatamodelError,
     transform::ast_to_dml::db::{
         context::{Arguments, Context},
@@ -123,10 +122,6 @@ pub(super) fn field<'ast>(
             let db_name = primary_key_constraint_name(ast_model, args, "@id", ctx);
 
             let length = match args.optional_arg("length").map(|length| length.as_int()) {
-                Some(_) if !ctx.db._preview_features.contains(PreviewFeature::ExtendedIndexes) => {
-                    ctx.push_error(args.new_attribute_validation_error("The length argument is not yet available."));
-                    None
-                }
                 Some(Ok(length)) => Some(length as u32),
                 Some(Err(err)) => {
                     ctx.push_error(err);
@@ -136,10 +131,6 @@ pub(super) fn field<'ast>(
             };
 
             let sort_order = match args.optional_arg("sort").map(|sort| sort.as_constant_literal()) {
-                Some(_) if !ctx.db._preview_features.contains(PreviewFeature::ExtendedIndexes) => {
-                    ctx.push_error(args.new_attribute_validation_error("The sort argument is not yet available."));
-                    None
-                }
                 Some(Ok("Desc")) => Some(SortOrder::Desc),
                 Some(Ok("Asc")) => Some(SortOrder::Asc),
                 Some(Ok(other)) => {
@@ -153,7 +144,7 @@ pub(super) fn field<'ast>(
                     ctx.push_error(err);
                     None
                 }
-                None => Some(SortOrder::Asc), //TODO(extended indices) once index types are introduced this needs to distinguish on them. Fulltext has no order for example
+                None => None,
             };
 
             model_attributes.primary_key = Some(IdAttribute {

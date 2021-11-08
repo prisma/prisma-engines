@@ -104,29 +104,35 @@ fn index_does_not_accept_sort_or_length_without_extended_indexes() {
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@unique": The length argument is not yet available.[0m
+        [1;91merror[0m: [1mError parsing attribute "@unique": The sort and length arguments are not yet available.[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m         id         Int    @id
         [1;94m15 | [0m         firstName  String @[1;91munique(sort:Desc, length: 5)[0m
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@unique": The sort argument is not yet available.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
-        [1;94m   | [0m
-        [1;94m14 | [0m         id         Int    @id
-        [1;94m15 | [0m         firstName  String @[1;91munique(sort:Desc, length: 5)[0m
-        [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@unique": The sort argument is not yet available.[0m
+        [1;91merror[0m: [1mError parsing attribute "@unique": The sort and length arguments are not yet available.[0m
           [1;94m-->[0m  [4mschema.prisma:16[0m
         [1;94m   | [0m
         [1;94m15 | [0m         firstName  String @unique(sort:Desc, length: 5)
         [1;94m16 | [0m         middleName String @[1;91munique(sort:Desc)[0m
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@unique": The length argument is not yet available.[0m
+        [1;91merror[0m: [1mError parsing attribute "@unique": The sort and length arguments are not yet available.[0m
           [1;94m-->[0m  [4mschema.prisma:17[0m
         [1;94m   | [0m
         [1;94m16 | [0m         middleName String @unique(sort:Desc)
         [1;94m17 | [0m         lastName   String @[1;91munique(length: 5)[0m
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@index": The sort and length arguments are not yet available.[0m
+          [1;94m-->[0m  [4mschema.prisma:20[0m
+        [1;94m   | [0m
+        [1;94m19 | [0m         
+        [1;94m20 | [0m         @@[1;91mindex([firstName(sort: Desc), middleName(length: 5), lastName(sort: Desc, length: 5), generation])[0m
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@unique": The sort and length arguments are not yet available.[0m
+          [1;94m-->[0m  [4mschema.prisma:21[0m
+        [1;94m   | [0m
+        [1;94m20 | [0m         @@index([firstName(sort: Desc), middleName(length: 5), lastName(sort: Desc, length: 5), generation])
+        [1;94m21 | [0m         @@[1;91munique([firstName(sort: Desc), middleName(length: 6), lastName(sort: Desc, length: 6), generation])[0m
         [1;94m   | [0m
     "#]];
 

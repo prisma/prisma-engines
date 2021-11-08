@@ -196,10 +196,10 @@ impl<'a> ValueValidator<'a> {
 
     pub fn as_field_with_args(&self) -> Result<(&'a str, Option<SortOrder>, Option<u32>), DatamodelError> {
         match &self.value {
-            Expression::ConstantValue(field_name, _) => Ok((field_name, Some(SortOrder::Asc), None)), //TODO(matthias) this needs to be type aware
+            Expression::ConstantValue(field_name, _) => Ok((field_name, None, None)),
             Expression::FieldWithArgs(field_name, args, _) => {
                 let (sort, length) = value_validator::ValueValidator::<'a>::field_args(args)?;
-                Ok((field_name, sort.or(Some(SortOrder::Asc)), length)) //TODO(matthias) later this needs to be index type aware
+                Ok((field_name, sort, length))
             }
 
             _ => Err(self.construct_type_mismatch_error("constant literal")),

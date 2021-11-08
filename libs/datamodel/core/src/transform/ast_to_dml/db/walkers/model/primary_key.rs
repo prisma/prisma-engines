@@ -9,7 +9,7 @@ use crate::{
 #[derive(Copy, Clone)]
 pub(crate) struct PrimaryKeyWalker<'ast, 'db> {
     pub(crate) model_id: ast::ModelId,
-    pub(super) attribute: &'db IdAttribute<'ast>,
+    pub(crate) attribute: &'db IdAttribute<'ast>,
     pub(crate) db: &'db ParserDatabase<'ast>,
 }
 

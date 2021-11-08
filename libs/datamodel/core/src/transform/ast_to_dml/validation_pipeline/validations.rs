@@ -20,6 +20,7 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, r
     for model in db.walk_models() {
         models::has_a_strict_unique_criteria(model, diagnostics);
         models::has_a_unique_primary_key_name(db, model, diagnostics);
+        models::uses_sort_or_length_on_primary_without_preview_flag(db, model, diagnostics);
 
         for field in model.scalar_fields() {
             fields::validate_client_name(field.into(), &names, diagnostics);
@@ -43,6 +44,7 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, r
 
         for index in model.indexes() {
             indexes::has_a_unique_constraint_name(db, index, diagnostics);
+            indexes::uses_length_or_sort_without_preview_flag(db, index, diagnostics);
         }
     }
 

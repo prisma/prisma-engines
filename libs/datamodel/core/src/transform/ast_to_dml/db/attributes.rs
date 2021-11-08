@@ -14,7 +14,6 @@ use crate::transform::ast_to_dml::db::types::FieldWithArgs;
 use crate::{
     ast::{self, WithName},
     common::constraint_names::ConstraintNames,
-    common::preview_features::PreviewFeature,
     diagnostics::DatamodelError,
     dml,
     transform::helpers::ValueValidator,
@@ -237,12 +236,7 @@ fn visit_field_unique<'ast>(
 
     validate_db_name(ast_model, args, db_name, "@unique", ctx);
 
-    //TODO(extended indices) add db specific validations to sort and length
     let length = match args.optional_arg("length").map(|length| length.as_int()) {
-        Some(_) if !ctx.db._preview_features.contains(PreviewFeature::ExtendedIndexes) => {
-            ctx.push_error(args.new_attribute_validation_error("The length argument is not yet available."));
-            None
-        }
         Some(Ok(length)) => Some(length as u32),
         Some(Err(err)) => {
             ctx.push_error(err);
@@ -252,10 +246,6 @@ fn visit_field_unique<'ast>(
     };
 
     let sort_order = match args.optional_arg("sort").map(|sort| sort.as_constant_literal()) {
-        Some(_) if !ctx.db._preview_features.contains(PreviewFeature::ExtendedIndexes) => {
-            ctx.push_error(args.new_attribute_validation_error("The sort argument is not yet available."));
-            None
-        }
         Some(Ok("Desc")) => Some(SortOrder::Desc),
         Some(Ok("Asc")) => Some(SortOrder::Asc),
         Some(Ok(other)) => {
@@ -269,7 +259,7 @@ fn visit_field_unique<'ast>(
             ctx.push_error(err);
             None
         }
-        None => Some(SortOrder::Asc), //TODO(extended indices) once index types are introduced this needs to distinguish on them. Fulltext has no order for example
+        None => None,
     };
 
     model_attributes.ast_indexes.push((
