@@ -77,10 +77,14 @@ const NATIVE_TYPE_CONSTRUCTORS: &[NativeTypeConstructor] = &[
     NativeTypeConstructor::without_args(UNIQUE_IDENTIFIER_TYPE_NAME, &[ScalarType::String]),
 ];
 
+const CONSTRAINT_SCOPES: &[ConstraintScope] = &[
+    ConstraintScope::GlobalPrimaryKeyForeignKeyDefault,
+    ConstraintScope::ModelPrimaryKeyKeyIndex,
+];
+
 pub struct MsSqlDatamodelConnector {
     capabilities: Vec<ConnectorCapability>,
     referential_integrity: ReferentialIntegrity,
-    constraint_violation_scopes: Vec<ConstraintScope>,
 }
 
 impl MsSqlDatamodelConnector {
@@ -108,10 +112,6 @@ impl MsSqlDatamodelConnector {
         MsSqlDatamodelConnector {
             capabilities,
             referential_integrity,
-            constraint_violation_scopes: vec![
-                ConstraintScope::GlobalPrimaryKeyForeignKeyDefault,
-                ConstraintScope::ModelPrimaryKeyKeyIndex,
-            ],
         }
     }
 
@@ -326,8 +326,8 @@ impl Connector for MsSqlDatamodelConnector {
         }
     }
 
-    fn constraint_violation_scopes(&self) -> &[ConstraintScope] {
-        &self.constraint_violation_scopes
+    fn constraint_violation_scopes(&self) -> &'static [ConstraintScope] {
+        CONSTRAINT_SCOPES
     }
 
     fn available_native_type_constructors(&self) -> &'static [NativeTypeConstructor] {
