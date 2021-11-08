@@ -1,5 +1,5 @@
 use connector::{AggregationRow, QueryArguments, RelAggregationRow};
-use prisma_models::{ManyRecords, ModelProjection, RecordProjection};
+use prisma_models::{ManyRecords, ModelRef, RecordProjection};
 
 #[derive(Debug, Clone)]
 pub enum QueryResult {
@@ -30,8 +30,8 @@ pub struct RecordSelection {
     /// Required for result processing
     pub query_arguments: QueryArguments,
 
-    /// Model projection that can be used to retrieve the IDs of the contained records.
-    pub model_id: ModelProjection,
+    /// The model of the contained records.
+    pub model: ModelRef,
 
     /// Holds an ordered list of aggregation selections results for each contained record
     pub aggregation_rows: Option<Vec<RelAggregationRow>>,

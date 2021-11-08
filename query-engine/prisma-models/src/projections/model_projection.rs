@@ -1,7 +1,5 @@
 use super::RecordProjection;
-use crate::{
-    dml::FieldArity, DomainError, Field, ModelRef, PrismaValue, PrismaValueExtensions, ScalarFieldRef, TypeIdentifier,
-};
+use crate::{dml::FieldArity, DomainError, Field, PrismaValue, PrismaValueExtensions, ScalarFieldRef, TypeIdentifier};
 use itertools::Itertools;
 
 /// Projection of a `Model`. A projection is a (sub)set of fields of a model.
@@ -18,10 +16,6 @@ impl From<Field> for ModelProjection {
 }
 
 impl ModelProjection {
-    pub fn model(&self) -> ModelRef {
-        self.fields[0].model()
-    }
-
     pub fn new(fields: Vec<Field>) -> Self {
         Self {
             fields: fields.into_iter().unique_by(|f| f.name().to_owned()).collect(),

@@ -27,7 +27,6 @@ pub fn execute<'conn>(
 fn read_one(tx: &mut dyn ConnectionLike, query: RecordQuery) -> BoxFuture<'_, InterpretationResult<QueryResult>> {
     let fut = async move {
         let model = query.model;
-        let model_id = model.primary_identifier();
         let filter = query.filter.expect("Expected filter to be set for ReadOne query.");
         let scalars = tx
             .get_single_record(&model, &filter, &query.selected_fields, &query.aggregation_selections)
@@ -45,8 +44,8 @@ fn read_one(tx: &mut dyn ConnectionLike, query: RecordQuery) -> BoxFuture<'_, In
                     fields: query.selection_order,
                     scalars,
                     nested,
-                    model_id,
-                    query_arguments: QueryArguments::new(model),
+                    query_arguments: QueryArguments::new(model.clone()),
+                    model,
                     aggregation_rows,
                 }
                 .into())
@@ -55,10 +54,10 @@ fn read_one(tx: &mut dyn ConnectionLike, query: RecordQuery) -> BoxFuture<'_, In
             None => Ok(QueryResult::RecordSelection(Box::new(RecordSelection {
                 name: query.name,
                 fields: query.selection_order,
-                model_id,
                 scalars: ManyRecords::default(),
                 nested: vec![],
-                query_arguments: QueryArguments::new(model),
+                query_arguments: QueryArguments::new(model.clone()),
+                model,
                 aggregation_rows: None,
             }))),
         }
@@ -107,16 +106,15 @@ fn read_many(
             (scalars, aggregation_rows)
         };
 
-        let model_id = query.model.primary_identifier();
         let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
 
         Ok(RecordSelection {
             name: query.name,
             fields: query.selection_order,
-            query_arguments: query.args,
-            model_id,
             scalars,
             nested,
+            query_arguments: query.args,
+            model: query.model,
             aggregation_rows,
         }
         .into())
@@ -153,16 +151,15 @@ fn read_related<'conn>(
         };
 
         let model = query.parent_field.related_model();
-        let model_id = model.primary_identifier();
         let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
 
         Ok(RecordSelection {
             name: query.name,
             fields: query.selection_order,
-            query_arguments: query.args,
-            model_id,
             scalars,
             nested,
+            query_arguments: query.args,
+            model,
             aggregation_rows,
         }
         .into())
