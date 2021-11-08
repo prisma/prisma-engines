@@ -137,7 +137,7 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
             .iter()
             .map(move |pk| UniqueCriteriaWalker {
                 model_id,
-                fields: &[], //TODO(matthias)
+                fields: &pk.fields, //TODO(matthias)
                 db,
             });
 

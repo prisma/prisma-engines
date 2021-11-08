@@ -1,4 +1,5 @@
 use super::{context::Context, walkers::CompositeTypeFieldWalker};
+use crate::ast::FieldId;
 use crate::{ast, diagnostics::DatamodelError, transform::ast_to_dml::db::walkers::CompositeTypeWalker, SortOrder};
 use itertools::Itertools;
 use once_cell::sync::Lazy;
@@ -154,7 +155,10 @@ pub(crate) struct ModelAttributes<'ast> {
 impl ModelAttributes<'_> {
     /// Whether the field is the whole primary key. Will match `@id` and `@@id([fieldName])`.
     pub(super) fn field_is_single_pk(&self, field: ast::FieldId) -> bool {
-        self.primary_key.as_ref().filter(|pk| pk.fields == [field]).is_some()
+        self.primary_key
+            .as_ref()
+            .filter(|pk| pk.fields.iter().map(|f| f.field_id).collect::<Vec<_>>() == [field])
+            .is_some()
     }
 
     /// Whether MySQL would consider the field indexed for autoincrement purposes.
@@ -165,7 +169,7 @@ impl ModelAttributes<'_> {
             || self
                 .primary_key
                 .as_ref()
-                .filter(|pk| pk.fields.get(0) == Some(&field_id))
+                .filter(|pk| pk.fields.get(0).map(|f| f.field_id) == Some(field_id))
                 .is_some()
     }
 }
@@ -181,8 +185,8 @@ pub(crate) struct IndexAttribute<'ast> {
 
 #[derive(Debug, Default)]
 pub(super) struct IdAttribute<'ast> {
-    pub(super) fields: Vec<ast::FieldId>,
-    pub(super) source_field: Option<ast::FieldId>,
+    pub(super) fields: Vec<FieldWithArgs>,
+    pub(super) source_field: Option<FieldId>,
     pub(super) name: Option<&'ast str>,
     pub(super) db_name: Option<&'ast str>,
 }
