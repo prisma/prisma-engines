@@ -10,10 +10,10 @@ use std::borrow::Cow;
 pub struct SqliteDatamodelConnector {
     capabilities: Vec<ConnectorCapability>,
     referential_integrity: ReferentialIntegrity,
-    constraint_violation_scopes: Vec<ConstraintScope>,
 }
 
 const NATIVE_TYPE_CONSTRUCTORS: &[NativeTypeConstructor] = &[];
+const CONSTRAINT_SCOPES: &[ConstraintScope] = &[ConstraintScope::GlobalKeyIndex];
 
 impl SqliteDatamodelConnector {
     pub fn new(referential_integrity: ReferentialIntegrity) -> SqliteDatamodelConnector {
@@ -33,7 +33,6 @@ impl SqliteDatamodelConnector {
         SqliteDatamodelConnector {
             capabilities,
             referential_integrity,
-            constraint_violation_scopes: vec![ConstraintScope::GlobalKeyIndex],
         }
     }
 }
@@ -74,8 +73,8 @@ impl Connector for SqliteDatamodelConnector {
         false
     }
 
-    fn constraint_violation_scopes(&self) -> &[ConstraintScope] {
-        &self.constraint_violation_scopes
+    fn constraint_violation_scopes(&self) -> &'static [ConstraintScope] {
+        CONSTRAINT_SCOPES
     }
 
     fn available_native_type_constructors(&self) -> &'static [NativeTypeConstructor] {

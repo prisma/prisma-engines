@@ -93,10 +93,11 @@ const NATIVE_TYPE_CONSTRUCTORS: &[NativeTypeConstructor] = &[
     NativeTypeConstructor::without_args(JSON_TYPE_NAME, &[ScalarType::Json]),
 ];
 
+const CONSTRAINT_SCOPES: &[ConstraintScope] = &[ConstraintScope::GlobalForeignKey, ConstraintScope::ModelKeyIndex];
+
 pub struct MySqlDatamodelConnector {
     capabilities: Vec<ConnectorCapability>,
     referential_integrity: ReferentialIntegrity,
-    constraint_violation_scopes: Vec<ConstraintScope>,
 }
 
 impl MySqlDatamodelConnector {
@@ -128,7 +129,6 @@ impl MySqlDatamodelConnector {
         MySqlDatamodelConnector {
             capabilities,
             referential_integrity,
-            constraint_violation_scopes: vec![ConstraintScope::GlobalForeignKey, ConstraintScope::ModelKeyIndex],
         }
     }
 }
@@ -314,8 +314,8 @@ impl Connector for MySqlDatamodelConnector {
         }
     }
 
-    fn constraint_violation_scopes(&self) -> &[ConstraintScope] {
-        &self.constraint_violation_scopes
+    fn constraint_violation_scopes(&self) -> &'static [ConstraintScope] {
+        CONSTRAINT_SCOPES
     }
 
     fn available_native_type_constructors(&self) -> &'static [NativeTypeConstructor] {

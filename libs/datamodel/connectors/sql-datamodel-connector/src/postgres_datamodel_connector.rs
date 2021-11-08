@@ -70,10 +70,14 @@ const NATIVE_TYPE_CONSTRUCTORS: &[NativeTypeConstructor] = &[
     NativeTypeConstructor::without_args(JSON_B_TYPE_NAME, &[ScalarType::Json]),
 ];
 
+const CONSTRAINT_SCOPES: &[ConstraintScope] = &[
+    ConstraintScope::GlobalPrimaryKeyKeyIndex,
+    ConstraintScope::ModelPrimaryKeyKeyIndexForeignKey,
+];
+
 pub struct PostgresDatamodelConnector {
     capabilities: Vec<ConnectorCapability>,
     referential_integrity: ReferentialIntegrity,
-    constraint_violation_scopes: Vec<ConstraintScope>,
 }
 
 //todo should this also contain the pretty printed output for SQL rendering?
@@ -111,10 +115,6 @@ impl PostgresDatamodelConnector {
         PostgresDatamodelConnector {
             capabilities,
             referential_integrity,
-            constraint_violation_scopes: vec![
-                ConstraintScope::GlobalPrimaryKeyKeyIndex,
-                ConstraintScope::ModelPrimaryKeyKeyIndexForeignKey,
-            ],
         }
     }
 }
@@ -261,8 +261,8 @@ impl Connector for PostgresDatamodelConnector {
         }
     }
 
-    fn constraint_violation_scopes(&self) -> &[ConstraintScope] {
-        &self.constraint_violation_scopes
+    fn constraint_violation_scopes(&self) -> &'static [ConstraintScope] {
+        CONSTRAINT_SCOPES
     }
 
     fn available_native_type_constructors(&self) -> &'static [NativeTypeConstructor] {

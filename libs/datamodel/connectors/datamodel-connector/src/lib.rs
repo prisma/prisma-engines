@@ -62,7 +62,7 @@ pub trait Connector: Send + Sync {
 
     /// The scopes in which a constraint name should be validated. If empty, doesn't check for name
     /// clashes in the validation phase.
-    fn constraint_violation_scopes(&self) -> &[ConstraintScope] {
+    fn constraint_violation_scopes(&self) -> &'static [ConstraintScope] {
         &[]
     }
 
@@ -87,7 +87,6 @@ pub trait Connector: Send + Sync {
     }
 
     /// This function is used during Schema parsing to calculate the concrete native type.
-    /// This powers the use of native types for QE + ME.
     fn parse_native_type(&self, name: &str, args: Vec<String>) -> Result<NativeTypeInstance, ConnectorError>;
 
     /// This function is used in ME for error messages
@@ -97,7 +96,6 @@ pub trait Connector: Send + Sync {
     }
 
     /// This function is used during introspection to turn an introspected native type into an instance that can be put into the Prisma schema.
-    /// powers IE
     fn introspect_native_type(&self, native_type: serde_json::Value) -> Result<NativeTypeInstance, ConnectorError>;
 
     fn set_config_dir<'a>(&self, config_dir: &std::path::Path, url: &'a str) -> Cow<'a, str> {
