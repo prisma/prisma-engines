@@ -543,13 +543,13 @@ impl<'a> SqlSchemaDescriber<'a> {
         let mut indexes_map = BTreeMap::new();
 
         let sql = r#"
-        select indexinfos.relname                          as name,
+        SELECT indexinfos.relname                          AS name,
                columnInfos.attname                         AS column_name,
                rawIndex.indisunique                        AS is_unique,
                rawIndex.indisprimary                       AS is_primary_key,
                tableInfos.relname                          AS table_name,
                rawIndex.indkeyidx,
-               CASE o.OPTION & 1
+               CASE rawIndex.sort_order & 1
                    WHEN 1 THEN 'DESC'
                    ELSE 'ASC'
                    END                                     AS column_order,
@@ -565,21 +565,22 @@ impl<'a> SqlSchemaDescriber<'a> {
                        i.indexrelid,
                        i.indisunique,
                        i.indisprimary,
-                       i.indkey                         AS indkey,
-                       i.indoption                      AS indoption,
+                       i.indkey,
+                       o.OPTION AS sort_order,
+                       c.colnum AS sort_order_colnum,
                        generate_subscripts(i.indkey, 1) AS indkeyidx
                 FROM pg_index i
+                         CROSS JOIN LATERAL UNNEST(indkey) WITH ordinality AS c (colnum, ordinality)
+                         LEFT JOIN LATERAL UNNEST(indoption) WITH ordinality AS o (OPTION, ordinality)
+                                   ON c.ordinality = o.ordinality
                 WHERE i.indpred IS NULL
-                GROUP BY i.indrelid, i.indexrelid, i.indisunique, i.indisprimary, indkeyidx, i.indkey, i.indoption
+                GROUP BY i.indrelid, i.indexrelid, i.indisunique, i.indisprimary, indkeyidx, i.indkey, i.indoption, sort_order, sort_order_colnum
                 ORDER BY i.indrelid, i.indexrelid
             ) rawIndex,
             -- pg_attribute stores infos about columns: https://www.postgresql.org/docs/current/catalog-pg-attribute.html
             pg_attribute columnInfos,
             -- pg_namespace stores info about the schema
             pg_namespace schemaInfo
-        CROSS JOIN LATERAL UNNEST(rawIndex.indkey) WITH ordinality AS c (colnum, ordinality)
-        LEFT JOIN LATERAL UNNEST(rawIndex.indoption) WITH ordinality AS o (OPTION, ordinality)
-                   ON c.ordinality = o.ordinality
         WHERE
           -- find table info for index
             tableInfos.oid = rawIndex.indrelid
@@ -593,7 +594,7 @@ impl<'a> SqlSchemaDescriber<'a> {
           -- we only consider stuff out of one specific schema
           AND tableInfos.relnamespace = schemaInfo.oid
           AND schemaInfo.nspname = $1
-          AND c.colnum = columnInfos.attnum
+          AND rawIndex.sort_order_colnum = columnInfos.attnum
         GROUP BY tableInfos.relname, indexInfos.relname, rawIndex.indisunique, rawIndex.indisprimary, columnInfos.attname,
                  rawIndex.indkeyidx, column_order
         ORDER BY rawIndex.indkeyidx;
