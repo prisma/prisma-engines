@@ -405,7 +405,7 @@ impl<'a> Renderer<'a> {
 
     fn render_value(target: &mut dyn LineWriteable, val: &ast::Expression) {
         match val {
-            ast::Expression::ExpressionArray(vals, _) => Self::render_expression_array(target, vals),
+            ast::Expression::Array(vals, _) => Self::render_expression_array(target, vals),
             ast::Expression::FieldWithArgs(ident, vals, _) => Self::render_field_with_args(target, ident, vals),
             ast::Expression::BooleanValue(val, _) => target.write(val),
             ast::Expression::ConstantValue(val, _) => target.write(val),
@@ -415,7 +415,7 @@ impl<'a> Renderer<'a> {
         };
     }
 
-    fn render_field_with_args(target: &mut dyn LineWriteable, ident: &String, vals: &[ast::Argument]) {
+    fn render_field_with_args(target: &mut dyn LineWriteable, ident: &str, vals: &[ast::Argument]) {
         target.write(ident);
         if !vals.is_empty() {
             target.write("(");

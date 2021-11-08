@@ -52,7 +52,7 @@ impl Argument {
     pub fn new_array(name: &str, value: Vec<Expression>) -> Argument {
         Argument {
             name: Identifier::new(name),
-            value: Expression::ExpressionArray(value, Span::empty()),
+            value: Expression::Array(value, Span::empty()),
             span: Span::empty(),
         }
     }

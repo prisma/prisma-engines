@@ -47,7 +47,7 @@ fn parse_array(token: &Token<'_>) -> Expression {
         }
     }
 
-    Expression::ExpressionArray(elements, Span::from_pest(token.as_span()))
+    Expression::Array(elements, Span::from_pest(token.as_span()))
 }
 
 pub fn parse_arg_value(token: &Token<'_>) -> Expression {

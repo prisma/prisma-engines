@@ -160,7 +160,7 @@ impl<'a> ValueValidator<'a> {
 
     /// Unwraps the value as an array of constants.
     pub fn as_constant_array(&self) -> Result<Vec<&'a str>, DatamodelError> {
-        if let ast::Expression::ExpressionArray(values, _) = &self.value {
+        if let ast::Expression::Array(values, _) = &self.value {
             values
                 .iter()
                 .map(|val| ValueValidator::new(val).as_constant_literal())
@@ -180,9 +180,10 @@ impl<'a> ValueValidator<'a> {
         }
     }
 
+    #[allow(clippy::type_complexity)]
     /// Unwraps the value as an array of constants.
     pub fn as_field_array_with_args(&self) -> Result<Vec<(&'a str, Option<SortOrder>, Option<u32>)>, DatamodelError> {
-        if let ast::Expression::ExpressionArray(values, _) = &self.value {
+        if let ast::Expression::Array(values, _) = &self.value {
             values
                 .iter()
                 .map(|val| ValueValidator::new(val).as_field_with_args())
@@ -208,7 +209,7 @@ impl<'a> ValueValidator<'a> {
     /// Unwraps the wrapped value as a constant literal.
     pub fn field_args(args: &[ast::Argument]) -> Result<(Option<SortOrder>, Option<u32>), DatamodelError> {
         let sort = args
-            .into_iter()
+            .iter()
             .find(|arg| arg.name.name == "sort")
             .map(|arg| match arg.value.extract_constant_value() {
                 Some(("Asc", _)) => Ok(Some(SortOrder::Asc)),
@@ -224,7 +225,7 @@ impl<'a> ValueValidator<'a> {
             .flatten();
 
         let length = args
-            .into_iter()
+            .iter()
             .find(|arg| arg.name.name == "length")
             .map(|arg| match &arg.value {
                 Expression::NumericValue(s, _) => s.parse::<u32>().map_err(|_| DatamodelError::ParserError {
@@ -266,7 +267,7 @@ impl<'a> ValueValidator<'a> {
     /// Unwraps the wrapped value as a constant literal..
     pub fn as_array(&self) -> Vec<ValueValidator<'a>> {
         match &self.value {
-            ast::Expression::ExpressionArray(values, _) => {
+            ast::Expression::Array(values, _) => {
                 let mut validators: Vec<ValueValidator<'_>> = Vec::new();
 
                 for value in values {

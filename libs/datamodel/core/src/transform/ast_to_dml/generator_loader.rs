@@ -121,7 +121,7 @@ impl GeneratorLoader {
                 ast::Expression::StringValue(val, _) => val.clone(),
                 ast::Expression::ConstantValue(val, _) => val.clone(),
                 ast::Expression::Function(_, _, _) => String::from("(function)"),
-                ast::Expression::ExpressionArray(_, _) => String::from("(array)"),
+                ast::Expression::Array(_, _) => String::from("(array)"),
                 ast::Expression::FieldWithArgs(_, _, _) => String::from("(field with args)"),
             };
 
