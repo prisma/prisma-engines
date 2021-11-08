@@ -191,7 +191,7 @@ pub(super) struct IdAttribute<'ast> {
     pub(super) db_name: Option<&'ast str>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct FieldWithArgs {
     pub(crate) field_id: ast::FieldId,
     pub(super) sort_order: Option<SortOrder>,

@@ -1,3 +1,5 @@
+use itertools::Itertools;
+
 mod arg_parsing;
 mod builtin_attributes;
 mod constraint_names;
@@ -19,35 +21,39 @@ mod unique_positive;
 mod updated_at_negative;
 mod updated_at_positive;
 
-fn with_postgres_provider(dm: &str) -> String {
-    let header = r#"
-    datasource test {
-            provider = "postgres"
-            url = "postgresql://..."
-    }
-    "#;
-
-    format!("{}\n{}", header, dm)
+pub enum Provider {
+    Postgres,
+    Mysql,
+    Sqlite,
+    SqlServer,
+    Mongo,
 }
 
-fn with_mysql_provider(dm: &str) -> String {
-    let header = r#"
-     datasource test {
-             provider = "mysql"
-             url = "mysql://..."
-     }
-     "#;
+fn with_header(dm: &str, provider: Provider, preview_features: &[&str]) -> String {
+    let (provider, url) = match provider {
+        Provider::Mongo => ("mongo", "mongo"),
+        Provider::Postgres => ("postgres", "postgresql"),
+        Provider::Sqlite => ("sqlite", "file"),
+        Provider::Mysql => ("mysql", "mysql"),
+        Provider::SqlServer => ("sqlserver", "sqlserver"),
+    };
 
-    format!("{}\n{}", header, dm)
-}
-
-fn with_mssql_provider(dm: &str) -> String {
-    let header = r#"
-     datasource test {
-             provider = "sqlserver"
-             url = "sqlserver://..."
-     }
-     "#;
+    let header = format!(
+        r#"
+    datasource test {{
+            provider = "{}"
+            url = "{}://..."
+    }}
+    
+    generator client {{
+        provider = "prisma-client-js"
+        previewFeatures = [{}]
+    }}
+    "#,
+        provider,
+        url,
+        preview_features.into_iter().map(|f| format!("\"{}\"", f)).join(", ")
+    );
 
     format!("{}\n{}", header, dm)
 }

@@ -1,4 +1,4 @@
-use crate::attributes::with_postgres_provider;
+use crate::attributes::{with_header, Provider};
 use crate::common::*;
 use indoc::indoc;
 
@@ -213,14 +213,18 @@ fn relation_field_as_id_must_error() {
 
 #[test]
 fn invalid_name_for_compound_id_must_error() {
-    let dml = with_postgres_provider(indoc! {r#"
+    let dml = with_header(
+        indoc! {r#"
         model User {
           name           String
           identification Int
 
           @@id([name, identification], name: "Test.User")
         }
-    "#});
+    "#},
+        Provider::Postgres,
+        &[],
+    );
 
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
@@ -332,7 +336,8 @@ fn mapped_id_must_error_on_sqlite() {
 
 #[test]
 fn naming_id_to_a_field_name_should_error() {
-    let dml = with_postgres_provider(indoc! {r#"
+    let dml = with_header(
+        indoc! {r#"
         model User {
           used           Int
           name           String
@@ -340,7 +345,10 @@ fn naming_id_to_a_field_name_should_error() {
 
           @@id([name, identification], name: "used")
         }
-    "#});
+    "#},
+        Provider::Postgres,
+        &[],
+    );
 
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
@@ -364,7 +372,8 @@ fn naming_id_to_a_field_name_should_error() {
 
 #[test]
 fn mapping_id_with_a_name_that_is_too_long_should_error() {
-    let dml = with_postgres_provider(indoc! {r#"
+    let dml = with_header(
+        indoc! {r#"
         model User {
           name           String
           identification Int
@@ -376,7 +385,10 @@ fn mapping_id_with_a_name_that_is_too_long_should_error() {
           name           String @id(map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimitsHereAsWell")
           identification Int
         }
-    "#});
+    "#},
+        Provider::Postgres,
+        &[],
+    );
 
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
@@ -400,11 +412,15 @@ fn mapping_id_with_a_name_that_is_too_long_should_error() {
 
 #[test]
 fn name_on_field_level_id_should_error() {
-    let dml = with_postgres_provider(indoc! {r#"
+    let dml = with_header(
+        indoc! {r#"
         model User {
           invalid           Int @id(name: "THIS SHOULD BE MAP INSTEAD")
         }
-    "#});
+    "#},
+        Provider::Postgres,
+        &[],
+    );
 
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 

@@ -1,4 +1,4 @@
-use crate::attributes::with_postgres_provider;
+use crate::attributes::{with_header, Provider};
 use crate::common::*;
 
 const SQL_SERVER: &str = r#"datasource sqlserver {
@@ -73,7 +73,8 @@ fn empty_unique_index_names_are_rejected() {
 
 #[test]
 fn having_both_the_map_and_name_argument_must_be_rejected() {
-    let dml = with_postgres_provider(indoc! {r#"
+    let dml = with_header(
+        indoc! {r#"
         model User {
           id        Int    @id
           firstName String
@@ -81,7 +82,10 @@ fn having_both_the_map_and_name_argument_must_be_rejected() {
 
           @@index([firstName,lastName], name: "BOTH MAP AND NAME IS NOT OK", map: "MyIndexName")
         }
-    "#});
+    "#},
+        Provider::Postgres,
+        &[],
+    );
 
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 

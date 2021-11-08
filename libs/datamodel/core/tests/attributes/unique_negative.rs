@@ -1,4 +1,4 @@
-use crate::attributes::with_postgres_provider;
+use crate::attributes::{with_header, Provider};
 use crate::common::*;
 
 #[test]
@@ -352,7 +352,8 @@ fn mapping_unique_with_a_name_that_is_too_long_should_error() {
 
 #[test]
 fn naming_unique_to_a_field_name_should_error() {
-    let dml = with_postgres_provider(indoc! {r#"
+    let dml = with_header(
+        indoc! {r#"
         model User {
           used           Int
           name           String            
@@ -360,7 +361,10 @@ fn naming_unique_to_a_field_name_should_error() {
 
           @@unique([name, identification], name: "used")
         }
-    "#});
+    "#},
+        Provider::Postgres,
+        &[],
+    );
 
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
@@ -384,11 +388,15 @@ fn naming_unique_to_a_field_name_should_error() {
 
 #[test]
 fn naming_field_level_unique_should_error() {
-    let dml = with_postgres_provider(indoc! {r#"
+    let dml = with_header(
+        indoc! {r#"
         model User {
           used           Int @unique(name: "INVALID ON FIELD LEVEL")
         }
-    "#});
+    "#},
+        Provider::Postgres,
+        &[],
+    );
 
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
@@ -406,13 +414,17 @@ fn naming_field_level_unique_should_error() {
 
 #[test]
 fn duplicate_implicit_names_should_error() {
-    let dml = with_postgres_provider(indoc! {r#"
+    let dml = with_header(
+        indoc! {r#"
         model User {
           used           Int @unique
 
           @@unique([used])
         }
-    "#});
+    "#},
+        Provider::Postgres,
+        &[],
+    );
 
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 

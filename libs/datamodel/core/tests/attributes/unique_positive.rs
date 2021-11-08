@@ -1,4 +1,4 @@
-use crate::attributes::with_postgres_provider;
+use crate::attributes::{with_header, Provider};
 use crate::common::*;
 use datamodel::{render_datamodel_to_string, IndexDefinition, IndexType};
 
@@ -243,7 +243,7 @@ fn unique_attributes_must_serialize_to_valid_dml() {
 #[test]
 fn named_multi_field_unique_must_work() {
     //Compatibility case
-    let dml = with_postgres_provider(
+    let dml = with_header(
         r#"
      model User {
          a String
@@ -251,6 +251,8 @@ fn named_multi_field_unique_must_work() {
          @@unique([a,b], name:"ClientName")
      }
      "#,
+        Provider::Postgres,
+        &[],
     );
 
     let datamodel = parse(&dml);
@@ -266,7 +268,7 @@ fn named_multi_field_unique_must_work() {
 
 #[test]
 fn mapped_multi_field_unique_must_work() {
-    let dml = with_postgres_provider(
+    let dml = with_header(
         r#"
      model User {
          a String
@@ -274,6 +276,8 @@ fn mapped_multi_field_unique_must_work() {
          @@unique([a,b], map:"dbname")
      }
      "#,
+        Provider::Postgres,
+        &[],
     );
 
     let datamodel = parse(&dml);
@@ -289,7 +293,7 @@ fn mapped_multi_field_unique_must_work() {
 
 #[test]
 fn mapped_singular_unique_must_work() {
-    let dml = with_postgres_provider(
+    let dml = with_header(
         r#"
      model Model {
          a String @unique(map: "test")
@@ -299,6 +303,8 @@ fn mapped_singular_unique_must_work() {
          a String @unique(map: "test2")
      }
      "#,
+        Provider::Postgres,
+        &[],
     );
 
     let datamodel = parse(&dml);
@@ -323,7 +329,7 @@ fn mapped_singular_unique_must_work() {
 
 #[test]
 fn named_and_mapped_multi_field_unique_must_work() {
-    let dml = with_postgres_provider(
+    let dml = with_header(
         r#"
      model Model {
          a String
@@ -331,6 +337,8 @@ fn named_and_mapped_multi_field_unique_must_work() {
          @@unique([a,b], name: "compoundId", map:"dbname")
      }
      "#,
+        Provider::Postgres,
+        &[],
     );
 
     let datamodel = parse(&dml);
@@ -346,7 +354,7 @@ fn named_and_mapped_multi_field_unique_must_work() {
 
 #[test]
 fn implicit_names_must_work() {
-    let dml = with_postgres_provider(
+    let dml = with_header(
         r#"
      model Model {
          a String @unique
@@ -354,6 +362,8 @@ fn implicit_names_must_work() {
          @@unique([a,b])
      }
      "#,
+        Provider::Postgres,
+        &[],
     );
 
     let datamodel = parse(&dml);
@@ -377,7 +387,7 @@ fn implicit_names_must_work() {
 
 #[test]
 fn defined_on_field_must_work() {
-    let dml = with_postgres_provider(
+    let dml = with_header(
         r#"
      model Model {
          a String @unique
@@ -385,6 +395,8 @@ fn defined_on_field_must_work() {
          @@unique([b])
      }
      "#,
+        Provider::Postgres,
+        &[],
     );
 
     let datamodel = parse(&dml);

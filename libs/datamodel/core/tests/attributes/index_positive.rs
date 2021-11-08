@@ -1,6 +1,6 @@
 use datamodel::{render_datamodel_to_string, IndexDefinition, IndexType};
 
-use crate::attributes::with_postgres_provider;
+use crate::attributes::{with_header, Provider};
 use crate::common::*;
 
 #[test]
@@ -156,7 +156,7 @@ fn index_attributes_must_serialize_to_valid_dml() {
 
 #[test]
 fn index_accepts_three_different_notations() {
-    let dml = with_postgres_provider(
+    let dml = with_header(
         r#"
     model User {
         id        Int    @id
@@ -171,6 +171,8 @@ fn index_accepts_three_different_notations() {
         @@index([firstName,lastName])
     }
     "#,
+        Provider::Postgres,
+        &[],
     );
 
     let schema = parse(&dml);
@@ -203,7 +205,7 @@ fn index_accepts_three_different_notations() {
 
 #[test]
 fn index_accepts_sort_order() {
-    let dml = with_postgres_provider(
+    let dml = with_header(
         r#"
      model User {
          id         Int    @id
@@ -216,6 +218,8 @@ fn index_accepts_sort_order() {
          @@unique([firstName(sort: Desc), middleName(length: 6), lastName(sort: Desc, length: 6), generation])
      }
      "#,
+        Provider::Postgres,
+        &["extendedIndexes"],
     );
 
     let schema = parse(&dml);

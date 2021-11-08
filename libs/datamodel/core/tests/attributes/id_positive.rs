@@ -1,4 +1,4 @@
-use crate::attributes::{with_mssql_provider, with_mysql_provider, with_postgres_provider};
+use crate::attributes::{with_header, Provider};
 use crate::common::*;
 use datamodel::dml::*;
 use prisma_value::PrismaValue;
@@ -177,13 +177,17 @@ fn should_allow_unique_and_id_on_same_field() {
 
 #[test]
 fn unnamed_and_unmapped_multi_field_ids_must_work() {
-    let dml = with_postgres_provider(indoc! {r#"
+    let dml = with_header(
+        indoc! {r#"
         model Model {
           a String
           b Int
           @@id([a,b])
         }
-    "#});
+    "#},
+        Provider::Postgres,
+        &[],
+    );
 
     let datamodel = parse(&dml);
     let user_model = datamodel.assert_has_model("Model");
@@ -193,11 +197,15 @@ fn unnamed_and_unmapped_multi_field_ids_must_work() {
 
 #[test]
 fn unmapped_singular_id_must_work() {
-    let dml = with_postgres_provider(indoc! {r#"
+    let dml = with_header(
+        indoc! {r#"
         model Model {
           a String @id
         }
-    "#});
+    "#},
+        Provider::Postgres,
+        &[],
+    );
 
     let datamodel = parse(&dml);
     let model = datamodel.assert_has_model("Model");
@@ -207,13 +215,17 @@ fn unmapped_singular_id_must_work() {
 
 #[test]
 fn named_multi_field_ids_must_work() {
-    let dml = with_postgres_provider(indoc! {r#"
+    let dml = with_header(
+        indoc! {r#"
         model Model {
           a String
           b Int
           @@id([a,b], name: "compoundId")
         }
-    "#});
+    "#},
+        Provider::Postgres,
+        &[],
+    );
 
     let datamodel = parse(&dml);
     let user_model = datamodel.assert_has_model("Model");
@@ -223,13 +235,17 @@ fn named_multi_field_ids_must_work() {
 
 #[test]
 fn mapped_multi_field_ids_must_work() {
-    let dml = with_postgres_provider(indoc! {r#"
+    let dml = with_header(
+        indoc! {r#"
         model Model {
           a String
           b Int
           @@id([a,b], map:"dbname")
         }
-    "#});
+    "#},
+        Provider::Postgres,
+        &[],
+    );
 
     let datamodel = parse(&dml);
     let user_model = datamodel.assert_has_model("Model");
@@ -239,7 +255,8 @@ fn mapped_multi_field_ids_must_work() {
 
 #[test]
 fn mapped_singular_id_must_work() {
-    let dml = with_postgres_provider(indoc! {r#"
+    let dml = with_header(
+        indoc! {r#"
         model Model {
           a String @id(map: "test")
         }
@@ -247,7 +264,10 @@ fn mapped_singular_id_must_work() {
         model Model2 {
           a String @id(map: "test2")
         }
-    "#});
+    "#},
+        Provider::Postgres,
+        &[],
+    );
 
     let datamodel = parse(&dml);
     let model = datamodel.assert_has_model("Model");
@@ -261,13 +281,17 @@ fn mapped_singular_id_must_work() {
 
 #[test]
 fn named_and_mapped_multi_field_ids_must_work() {
-    let dml = with_postgres_provider(indoc! {r#"
+    let dml = with_header(
+        indoc! {r#"
         model Model {
           a String
           b Int
           @@id([a,b], name: "compoundId", map:"dbname")
         }
-    "#});
+    "#},
+        Provider::Postgres,
+        &[],
+    );
 
     let datamodel = parse(&dml);
     let user_model = datamodel.assert_has_model("Model");
@@ -277,7 +301,7 @@ fn named_and_mapped_multi_field_ids_must_work() {
 
 #[test]
 fn id_accepts_length_arg_on_mysql() {
-    let dml = with_mysql_provider(
+    let dml = with_header(
         r#"
      model User {
          firstName  String
@@ -291,6 +315,8 @@ fn id_accepts_length_arg_on_mysql() {
          title  String @id(length:5)
      }
      "#,
+        Provider::Mysql,
+        &[],
     );
 
     let schema = parse(&dml);
@@ -310,7 +336,7 @@ fn id_accepts_length_arg_on_mysql() {
 
 #[test]
 fn id_accepts_sort_arg_on_mssql() {
-    let dml = with_mssql_provider(
+    let dml = with_header(
         r#"
      model User {
          firstName  String
@@ -324,6 +350,8 @@ fn id_accepts_sort_arg_on_mssql() {
          title  String @id(sort:Desc)
      }
      "#,
+        Provider::SqlServer,
+        &[],
     );
 
     let schema = parse(&dml);
