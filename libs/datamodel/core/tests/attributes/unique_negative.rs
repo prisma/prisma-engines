@@ -1,4 +1,4 @@
-use crate::attributes::with_postgres_provider;
+use crate::attributes::{with_header, Provider};
 use crate::common::*;
 
 #[test]
@@ -352,7 +352,8 @@ fn mapping_unique_with_a_name_that_is_too_long_should_error() {
 
 #[test]
 fn naming_unique_to_a_field_name_should_error() {
-    let dml = with_postgres_provider(indoc! {r#"
+    let dml = with_header(
+        indoc! {r#"
         model User {
           used           Int
           name           String            
@@ -360,22 +361,25 @@ fn naming_unique_to_a_field_name_should_error() {
 
           @@unique([name, identification], name: "used")
         }
-    "#});
+    "#},
+        Provider::Postgres,
+        &[],
+    );
 
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating model "User": The custom name `used` specified for the `@@unique` attribute is already used as a name for a field. Please choose a different name.[0m
-          [1;94m-->[0m  [4mschema.prisma:10[0m
+          [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
-        [1;94m 9 | [0m    }
-        [1;94m10 | [0m[1;91mmodel User {[0m
-        [1;94m11 | [0m  used           Int
-        [1;94m12 | [0m  name           String            
-        [1;94m13 | [0m  identification Int
-        [1;94m14 | [0m
-        [1;94m15 | [0m  @@unique([name, identification], name: "used")
-        [1;94m16 | [0m}
+        [1;94m10 | [0m
+        [1;94m11 | [0m[1;91mmodel User {[0m
+        [1;94m12 | [0m  used           Int
+        [1;94m13 | [0m  name           String            
+        [1;94m14 | [0m  identification Int
+        [1;94m15 | [0m
+        [1;94m16 | [0m  @@unique([name, identification], name: "used")
+        [1;94m17 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -384,20 +388,24 @@ fn naming_unique_to_a_field_name_should_error() {
 
 #[test]
 fn naming_field_level_unique_should_error() {
-    let dml = with_postgres_provider(indoc! {r#"
+    let dml = with_header(
+        indoc! {r#"
         model User {
           used           Int @unique(name: "INVALID ON FIELD LEVEL")
         }
-    "#});
+    "#},
+        Provider::Postgres,
+        &[],
+    );
 
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mNo such argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:11[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
-        [1;94m10 | [0mmodel User {
-        [1;94m11 | [0m  used           Int @unique([1;91mname: "INVALID ON FIELD LEVEL"[0m)
+        [1;94m11 | [0mmodel User {
+        [1;94m12 | [0m  used           Int @unique([1;91mname: "INVALID ON FIELD LEVEL"[0m)
         [1;94m   | [0m
     "#]];
 
@@ -406,28 +414,32 @@ fn naming_field_level_unique_should_error() {
 
 #[test]
 fn duplicate_implicit_names_should_error() {
-    let dml = with_postgres_provider(indoc! {r#"
+    let dml = with_header(
+        indoc! {r#"
         model User {
           used           Int @unique
 
           @@unique([used])
         }
-    "#});
+    "#},
+        Provider::Postgres,
+        &[],
+    );
 
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@unique": The given constraint name `User_used_key` has to be unique in the following namespace: global for primary key, indexes and unique constraints. Please provide a different name using the `map` argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:11[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
-        [1;94m10 | [0mmodel User {
-        [1;94m11 | [0m  used           Int @[1;91munique[0m
+        [1;94m11 | [0mmodel User {
+        [1;94m12 | [0m  used           Int @[1;91munique[0m
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@unique": The given constraint name `User_used_key` has to be unique in the following namespace: global for primary key, indexes and unique constraints. Please provide a different name using the `map` argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m12 | [0m
-        [1;94m13 | [0m  @@[1;91munique([used])[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  @@[1;91munique([used])[0m
         [1;94m   | [0m
     "#]];
 

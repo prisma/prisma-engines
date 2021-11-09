@@ -1,4 +1,4 @@
-use crate::attributes::with_postgres_provider;
+use crate::attributes::{with_header, Provider};
 use crate::common::*;
 use datamodel::{dml, render_datamodel_to_string, IndexDefinition, IndexType, ScalarType};
 
@@ -225,7 +225,7 @@ fn allow_complicated_self_relations() {
 
 #[test]
 fn allow_explicit_fk_name_definition() {
-    let dml = with_postgres_provider(
+    let dml = with_header(
         r#"
      model User {
          user_id Int    @id
@@ -238,6 +238,8 @@ fn allow_explicit_fk_name_definition() {
          user    User    @relation(fields: user_id, references: user_id, map: "CustomFKName")
      }
      "#,
+        Provider::Postgres,
+        &[],
     );
 
     let schema = parse(&dml);
@@ -255,7 +257,7 @@ fn allow_explicit_fk_name_definition() {
 
 #[test]
 fn allow_implicit_fk_name_definition() {
-    let dml = with_postgres_provider(
+    let dml = with_header(
         r#"
      model User {
          user_id Int    @id
@@ -268,6 +270,8 @@ fn allow_implicit_fk_name_definition() {
          user    User    @relation(fields: user_id, references: user_id)
      }
      "#,
+        Provider::Postgres,
+        &[],
     );
 
     let schema = parse(&dml);
@@ -285,7 +289,7 @@ fn allow_implicit_fk_name_definition() {
 
 #[test]
 fn implicit_fk_name_definition_with_mapped_models_and_fields() {
-    let dml = with_postgres_provider(
+    let dml = with_header(
         r#"
      model User {
          user_id Int    @id  @map("user_id_map")
@@ -302,6 +306,8 @@ fn implicit_fk_name_definition_with_mapped_models_and_fields() {
          @@map("PostMap")
      }
      "#,
+        Provider::Postgres,
+        &[],
     );
 
     let schema = parse(&dml);
@@ -319,7 +325,7 @@ fn implicit_fk_name_definition_with_mapped_models_and_fields() {
 
 #[test]
 fn implicit_fk_name_definition_with_mapped_models_and_fields_other_order() {
-    let dml = with_postgres_provider(
+    let dml = with_header(
         r#"
      model User {
          user_id Int    @id  @map("user_id_map")
@@ -336,6 +342,8 @@ fn implicit_fk_name_definition_with_mapped_models_and_fields_other_order() {
          @@map("PostMap")
      }
      "#,
+        Provider::Postgres,
+        &[],
     );
 
     let schema = parse(&dml);
@@ -353,7 +361,8 @@ fn implicit_fk_name_definition_with_mapped_models_and_fields_other_order() {
 
 #[test]
 fn implicit_unique_constraint_on_one_to_one() {
-    let dml = with_postgres_provider(indoc! {r#"
+    let dml = with_header(
+        indoc! {r#"
         model User {
           user_id Int    @id  @map("user_id_map")
           post    Post?
@@ -368,7 +377,10 @@ fn implicit_unique_constraint_on_one_to_one() {
           
           @@map("PostMap")
         }
-    "#});
+    "#},
+        Provider::Postgres,
+        &[],
+    );
 
     let schema = parse(&dml);
 
@@ -394,7 +406,7 @@ fn implicit_unique_constraint_on_one_to_one() {
 
 #[test]
 fn implicit_unique_constraint_on_compound_one_to_one() {
-    let dml = with_postgres_provider(
+    let dml = with_header(
         r#"
      model User {
          user_id_1  Int    
@@ -411,6 +423,8 @@ fn implicit_unique_constraint_on_compound_one_to_one() {
          user       User   @relation(fields: [user_id_1, user_id_2], references: [user_id_1, user_id_2])
      }
      "#,
+        Provider::Postgres,
+        &[],
     );
 
     let schema = parse(&dml);
@@ -436,7 +450,8 @@ fn implicit_unique_constraint_on_compound_one_to_one() {
 
 #[test]
 fn no_unique_constraint_if_referring_the_pk() {
-    let dml = with_postgres_provider(indoc! {r#"
+    let dml = with_header(
+        indoc! {r#"
         model Cat {
           id      Int @id
           collar  Collar?
@@ -446,7 +461,10 @@ fn no_unique_constraint_if_referring_the_pk() {
           id      Int @id
           cat     Cat @relation(fields:[id], references: [id])
         }
-    "#});
+    "#},
+        Provider::Postgres,
+        &[],
+    );
 
     let expected = expect![[r#"
         model Cat {

@@ -1,5 +1,6 @@
 use super::{context::Context, walkers::CompositeTypeFieldWalker};
-use crate::{ast, diagnostics::DatamodelError, transform::ast_to_dml::db::walkers::CompositeTypeWalker};
+use crate::ast::FieldId;
+use crate::{ast, diagnostics::DatamodelError, transform::ast_to_dml::db::walkers::CompositeTypeWalker, SortOrder};
 use itertools::Itertools;
 use once_cell::sync::Lazy;
 use regex::Regex;
@@ -154,18 +155,21 @@ pub(crate) struct ModelAttributes<'ast> {
 impl ModelAttributes<'_> {
     /// Whether the field is the whole primary key. Will match `@id` and `@@id([fieldName])`.
     pub(super) fn field_is_single_pk(&self, field: ast::FieldId) -> bool {
-        self.primary_key.as_ref().filter(|pk| pk.fields == [field]).is_some()
+        self.primary_key
+            .as_ref()
+            .filter(|pk| pk.fields.iter().map(|f| f.field_id).collect::<Vec<_>>() == [field])
+            .is_some()
     }
 
     /// Whether MySQL would consider the field indexed for autoincrement purposes.
     pub(super) fn field_is_indexed_for_autoincrement(&self, field_id: ast::FieldId) -> bool {
         self.ast_indexes
             .iter()
-            .any(|(_, idx)| idx.fields.get(0) == Some(&field_id))
+            .any(|(_, idx)| idx.fields.get(0).map(|f| f.field_id) == Some(field_id))
             || self
                 .primary_key
                 .as_ref()
-                .filter(|pk| pk.fields.get(0) == Some(&field_id))
+                .filter(|pk| pk.fields.get(0).map(|f| f.field_id) == Some(field_id))
                 .is_some()
     }
 }
@@ -173,18 +177,25 @@ impl ModelAttributes<'_> {
 #[derive(Debug, Default)]
 pub(crate) struct IndexAttribute<'ast> {
     pub(crate) is_unique: bool,
-    pub(crate) fields: Vec<ast::FieldId>,
+    pub(crate) fields: Vec<FieldWithArgs>,
     pub(crate) source_field: Option<ast::FieldId>,
     pub(crate) name: Option<&'ast str>,
     pub(crate) db_name: Option<Cow<'ast, str>>,
 }
 
 #[derive(Debug, Default)]
-pub(super) struct IdAttribute<'ast> {
-    pub(super) fields: Vec<ast::FieldId>,
-    pub(super) source_field: Option<ast::FieldId>,
+pub(crate) struct IdAttribute<'ast> {
+    pub(crate) fields: Vec<FieldWithArgs>,
+    pub(super) source_field: Option<FieldId>,
     pub(super) name: Option<&'ast str>,
     pub(super) db_name: Option<&'ast str>,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct FieldWithArgs {
+    pub(crate) field_id: ast::FieldId,
+    pub(crate) sort_order: Option<SortOrder>,
+    pub(crate) length: Option<u32>,
 }
 
 #[derive(Debug, Default)]

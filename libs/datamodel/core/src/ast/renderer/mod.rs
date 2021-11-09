@@ -405,13 +405,23 @@ impl<'a> Renderer<'a> {
 
     fn render_value(target: &mut dyn LineWriteable, val: &ast::Expression) {
         match val {
-            ast::Expression::Array(vals, _) => Self::render_array(target, vals),
+            ast::Expression::Array(vals, _) => Self::render_expression_array(target, vals),
+            ast::Expression::FieldWithArgs(ident, vals, _) => Self::render_field_with_args(target, ident, vals),
             ast::Expression::BooleanValue(val, _) => target.write(val),
             ast::Expression::ConstantValue(val, _) => target.write(val),
             ast::Expression::NumericValue(val, _) => target.write(val),
             ast::Expression::StringValue(val, _) => Self::render_str(target, val),
             ast::Expression::Function(name, args, _) => Self::render_func(target, name, args),
         };
+    }
+
+    fn render_field_with_args(target: &mut dyn LineWriteable, ident: &str, vals: &[ast::Argument]) {
+        target.write(ident);
+        if !vals.is_empty() {
+            target.write("(");
+            Self::render_arguments(target, vals);
+            target.write(")");
+        }
     }
 
     fn render_func(target: &mut dyn LineWriteable, name: &str, vals: &[ast::Expression]) {
@@ -438,7 +448,7 @@ impl<'a> Renderer<'a> {
         self.indent -= 1
     }
 
-    fn render_array(target: &mut dyn LineWriteable, vals: &[ast::Expression]) {
+    fn render_expression_array(target: &mut dyn LineWriteable, vals: &[ast::Expression]) {
         target.write("[");
         for (idx, arg) in vals.iter().enumerate() {
             if idx > 0 {

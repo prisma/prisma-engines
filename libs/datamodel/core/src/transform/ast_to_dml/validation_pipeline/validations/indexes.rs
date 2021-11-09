@@ -1,4 +1,6 @@
+use crate::ast::Span;
 use crate::{
+    common::preview_features::PreviewFeature,
     diagnostics::{DatamodelError, Diagnostics},
     transform::ast_to_dml::db::{walkers::IndexWalker, ConstraintName, ParserDatabase},
 };
@@ -35,3 +37,28 @@ pub(crate) fn has_a_unique_constraint_name(
         ));
     }
 }
+
+/// sort and length are not yet allowed
+pub(crate) fn uses_length_or_sort_without_preview_flag(
+    db: &ParserDatabase<'_>,
+    index: IndexWalker<'_, '_>,
+    diagnostics: &mut Diagnostics,
+) {
+    if !db.preview_features.contains(PreviewFeature::ExtendedIndexes)
+        && index
+            .index_attribute
+            .fields
+            .iter()
+            .any(|f| f.sort_order.is_some() || f.length.is_some())
+    {
+        let message = "The sort and length arguments are not yet available.";
+
+        diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+            message,
+            index.attribute_name(),
+            index.ast_attribute().map(|i| i.span).unwrap_or_else(Span::empty),
+        ));
+    }
+}
+
+//TODO(extended indices) add db specific validations to sort and length

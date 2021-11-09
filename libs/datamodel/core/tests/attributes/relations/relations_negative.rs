@@ -1,4 +1,4 @@
-use crate::attributes::with_postgres_provider;
+use crate::attributes::{with_header, Provider};
 use crate::common::*;
 use indoc::indoc;
 
@@ -753,7 +753,8 @@ fn should_fail_on_missing_embed_ids_on_self_relations() {
 
 #[test]
 fn mapping_foreign_keys_with_a_name_that_is_too_long_should_error() {
-    let dml = with_postgres_provider(indoc! {r#"
+    let dml = with_header(
+        indoc! {r#"
         model User {
           id Int    @id
           posts   Post[]
@@ -764,14 +765,17 @@ fn mapping_foreign_keys_with_a_name_that_is_too_long_should_error() {
           user_id Int
           user    User   @relation(fields:[post_id], references: [id], map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits")
         }
-    "#});
+    "#},
+        Provider::Postgres,
+        &[],
+    );
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError validating model "Post": The constraint name 'IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits' specified in the `map` argument for the `@relation` constraint is too long for your chosen provider. The maximum allowed length is 63 bytes.[0m
-          [1;94m-->[0m  [4mschema.prisma:18[0m
+          [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
-        [1;94m17 | [0m  user_id Int
-        [1;94m18 | [0m  user    User   @[1;91mrelation(fields:[post_id], references: [id], map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits")[0m
+        [1;94m18 | [0m  user_id Int
+        [1;94m19 | [0m  user    User   @[1;91mrelation(fields:[post_id], references: [id], map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits")[0m
         [1;94m   | [0m
     "#]];
 

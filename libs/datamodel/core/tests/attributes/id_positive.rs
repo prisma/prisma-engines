@@ -1,4 +1,4 @@
-use crate::attributes::with_postgres_provider;
+use crate::attributes::{with_header, Provider};
 use crate::common::*;
 use datamodel::dml::*;
 use prisma_value::PrismaValue;
@@ -177,13 +177,17 @@ fn should_allow_unique_and_id_on_same_field() {
 
 #[test]
 fn unnamed_and_unmapped_multi_field_ids_must_work() {
-    let dml = with_postgres_provider(indoc! {r#"
+    let dml = with_header(
+        indoc! {r#"
         model Model {
           a String
           b Int
           @@id([a,b])
         }
-    "#});
+    "#},
+        Provider::Postgres,
+        &[],
+    );
 
     let datamodel = parse(&dml);
     let user_model = datamodel.assert_has_model("Model");
@@ -193,11 +197,15 @@ fn unnamed_and_unmapped_multi_field_ids_must_work() {
 
 #[test]
 fn unmapped_singular_id_must_work() {
-    let dml = with_postgres_provider(indoc! {r#"
+    let dml = with_header(
+        indoc! {r#"
         model Model {
           a String @id
         }
-    "#});
+    "#},
+        Provider::Postgres,
+        &[],
+    );
 
     let datamodel = parse(&dml);
     let model = datamodel.assert_has_model("Model");
@@ -207,13 +215,17 @@ fn unmapped_singular_id_must_work() {
 
 #[test]
 fn named_multi_field_ids_must_work() {
-    let dml = with_postgres_provider(indoc! {r#"
+    let dml = with_header(
+        indoc! {r#"
         model Model {
           a String
           b Int
           @@id([a,b], name: "compoundId")
         }
-    "#});
+    "#},
+        Provider::Postgres,
+        &[],
+    );
 
     let datamodel = parse(&dml);
     let user_model = datamodel.assert_has_model("Model");
@@ -223,13 +235,17 @@ fn named_multi_field_ids_must_work() {
 
 #[test]
 fn mapped_multi_field_ids_must_work() {
-    let dml = with_postgres_provider(indoc! {r#"
+    let dml = with_header(
+        indoc! {r#"
         model Model {
           a String
           b Int
           @@id([a,b], map:"dbname")
         }
-    "#});
+    "#},
+        Provider::Postgres,
+        &[],
+    );
 
     let datamodel = parse(&dml);
     let user_model = datamodel.assert_has_model("Model");
@@ -239,7 +255,8 @@ fn mapped_multi_field_ids_must_work() {
 
 #[test]
 fn mapped_singular_id_must_work() {
-    let dml = with_postgres_provider(indoc! {r#"
+    let dml = with_header(
+        indoc! {r#"
         model Model {
           a String @id(map: "test")
         }
@@ -247,7 +264,10 @@ fn mapped_singular_id_must_work() {
         model Model2 {
           a String @id(map: "test2")
         }
-    "#});
+    "#},
+        Provider::Postgres,
+        &[],
+    );
 
     let datamodel = parse(&dml);
     let model = datamodel.assert_has_model("Model");
@@ -261,16 +281,90 @@ fn mapped_singular_id_must_work() {
 
 #[test]
 fn named_and_mapped_multi_field_ids_must_work() {
-    let dml = with_postgres_provider(indoc! {r#"
+    let dml = with_header(
+        indoc! {r#"
         model Model {
           a String
           b Int
           @@id([a,b], name: "compoundId", map:"dbname")
         }
-    "#});
+    "#},
+        Provider::Postgres,
+        &[],
+    );
 
     let datamodel = parse(&dml);
     let user_model = datamodel.assert_has_model("Model");
     user_model.assert_has_id_fields(&["a", "b"]);
     user_model.assert_has_named_pk("dbname");
+}
+
+#[test]
+fn id_accepts_length_arg_on_mysql() {
+    let dml = with_header(
+        r#"
+     model User {
+         firstName  String
+         middleName String
+         lastName   String
+         
+         @@id([firstName, middleName(length: 1), lastName])
+     }
+     
+     model Blog {
+         title  String @id(length:5)
+     }
+     "#,
+        Provider::Mysql,
+        &["extendedIndexes"],
+    );
+
+    let schema = parse(&dml);
+    schema.assert_has_model("User");
+
+    // user_model.assert_has_pk(PrimaryKeyDefinition {
+    //     name: None,
+    //     db_name: Some("User_pkey".to_string()),
+    //     fields: vec![
+    //         ("firstName".to_string(), None),
+    //         ("middleName".to_string(), Some(1)),
+    //         ("lastName".to_string(), None),
+    //     ],
+    //     defined_on_field: false,
+    // });
+}
+
+#[test]
+fn id_accepts_sort_arg_on_mssql() {
+    let dml = with_header(
+        r#"
+     model User {
+         firstName  String
+         middleName String
+         lastName   String
+         
+         @@id([firstName, middleName(sort: Desc), lastName])
+     }
+     
+     model Blog {
+         title  String @id(sort:Desc)
+     }
+     "#,
+        Provider::SqlServer,
+        &["extendedIndexes"],
+    );
+
+    let schema = parse(&dml);
+    schema.assert_has_model("User");
+
+    // user_model.assert_has_pk(PrimaryKeyDefinition {
+    //     name: None,
+    //     db_name: Some("User_pkey".to_string()),
+    //     fields: vec![
+    //         ("firstName".to_string(), None),
+    //         ("middleName".to_string(), Some(1)),
+    //         ("lastName".to_string(), None),
+    //     ],
+    //     defined_on_field: false,
+    // });
 }

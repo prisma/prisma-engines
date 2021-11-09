@@ -1,4 +1,5 @@
 use super::helpers::{parsing_catch_all, Token, TokenExtensions};
+use super::parse_attribute::parse_attribute_arg;
 use super::Rule;
 use crate::ast::*;
 
@@ -10,11 +11,33 @@ pub fn parse_expression(token: &Token<'_>) -> Expression {
         Rule::string_literal => Expression::StringValue(parse_string_literal(&first_child), span),
         Rule::boolean_literal => Expression::BooleanValue(first_child.as_str().to_string(), span),
         Rule::constant_literal => Expression::ConstantValue(first_child.as_str().to_string(), span),
+        Rule::field_with_args => parse_field_with_args(&first_child),
         Rule::function => parse_function(&first_child),
         Rule::array_expression => parse_array(&first_child),
         _ => unreachable!(
             "Encountered impossible literal during parsing: {:?}",
             first_child.tokens()
+        ),
+    }
+}
+
+fn parse_field_with_args(token: &Token<'_>) -> Expression {
+    let mut name: Option<String> = None;
+    let mut arguments: Vec<Argument> = vec![];
+
+    for current in token.relevant_children() {
+        match current.as_rule() {
+            Rule::non_empty_identifier => name = Some(current.as_str().to_string()),
+            Rule::argument => arguments.push(parse_attribute_arg(&current)),
+            _ => parsing_catch_all(&current, "constant literal arg"),
+        }
+    }
+
+    match name {
+        Some(name) => Expression::FieldWithArgs(name, arguments, Span::from_pest(token.as_span())),
+        _ => unreachable!(
+            "Encountered impossible constant literal during parsing: {:?}",
+            token.as_str()
         ),
     }
 }

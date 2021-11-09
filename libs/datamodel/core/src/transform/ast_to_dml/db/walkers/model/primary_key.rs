@@ -9,7 +9,7 @@ use crate::{
 #[derive(Copy, Clone)]
 pub(crate) struct PrimaryKeyWalker<'ast, 'db> {
     pub(crate) model_id: ast::ModelId,
-    pub(super) attribute: &'db IdAttribute<'ast>,
+    pub(crate) attribute: &'db IdAttribute<'ast>,
     pub(crate) db: &'db ParserDatabase<'ast>,
 }
 
@@ -44,7 +44,7 @@ impl<'ast, 'db> PrimaryKeyWalker<'ast, 'db> {
         self.attribute
             .fields
             .iter()
-            .map(move |id| &self.db.ast[self.model_id][*id])
+            .map(move |field| &self.db.ast[self.model_id][field.field_id])
     }
 
     pub(crate) fn name(self) -> Option<&'ast str> {
@@ -52,16 +52,17 @@ impl<'ast, 'db> PrimaryKeyWalker<'ast, 'db> {
     }
 
     pub(crate) fn fields(self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db {
-        self.attribute.fields.iter().map(move |field_id| ScalarFieldWalker {
+        self.attribute.fields.iter().map(move |field| ScalarFieldWalker {
             model_id: self.model_id,
-            field_id: *field_id,
+            field_id: field.field_id,
             db: self.db,
-            scalar_field: &self.db.types.scalar_fields[&(self.model_id, *field_id)],
+            scalar_field: &self.db.types.scalar_fields[&(self.model_id, field.field_id)],
         })
     }
 
     pub(crate) fn contains_exactly_fields_by_id(self, fields: &[ast::FieldId]) -> bool {
-        self.attribute.fields == fields
+        self.attribute.fields.len() == fields.len()
+            && self.attribute.fields.iter().zip(fields).all(|(a, b)| a.field_id == *b)
     }
 
     pub(crate) fn contains_exactly_fields(

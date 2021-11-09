@@ -1,4 +1,6 @@
-use super::{resolve_field_array, FieldResolutionError};
+use super::FieldResolutionError;
+use crate::transform::ast_to_dml::db::attributes::resolve_field_array_with_args;
+use crate::transform::ast_to_dml::db::types::FieldWithArgs;
 use crate::{
     ast,
     common::constraint_names::ConstraintNames,
@@ -7,6 +9,7 @@ use crate::{
         context::{Arguments, Context},
         types::{IdAttribute, ModelAttributes},
     },
+    SortOrder,
 };
 
 /// @@id on models
@@ -29,7 +32,7 @@ pub(super) fn model<'ast>(
         ));
     }
 
-    let resolved_fields = match resolve_field_array(&fields, args.span(), model_id, ctx) {
+    let resolved_fields = match resolve_field_array_with_args(&fields, args.span(), model_id, ctx) {
         Ok(fields) => fields,
         Err(FieldResolutionError::AlreadyDealtWith) => return,
         Err(FieldResolutionError::ProblematicFields {
@@ -60,7 +63,7 @@ pub(super) fn model<'ast>(
     // ID attribute fields must reference only required fields.
     let fields_that_are_not_required: Vec<&str> = resolved_fields
         .iter()
-        .map(|field_id| &ctx.db.ast[model_id][*field_id])
+        .map(|field| &ctx.db.ast[model_id][field.field_id])
         .filter(|field| !field.arity.is_required())
         .map(|field| field.name())
         .collect();
@@ -118,10 +121,40 @@ pub(super) fn field<'ast>(
         None => {
             let db_name = primary_key_constraint_name(ast_model, args, "@id", ctx);
 
+            let length = match args.optional_arg("length").map(|length| length.as_int()) {
+                Some(Ok(length)) => Some(length as u32),
+                Some(Err(err)) => {
+                    ctx.push_error(err);
+                    None
+                }
+                None => None,
+            };
+
+            let sort_order = match args.optional_arg("sort").map(|sort| sort.as_constant_literal()) {
+                Some(Ok("Desc")) => Some(SortOrder::Desc),
+                Some(Ok("Asc")) => Some(SortOrder::Asc),
+                Some(Ok(other)) => {
+                    ctx.push_error(args.new_attribute_validation_error(&format!(
+                        "The `sort` argument can only be `Asc` or `Desc` you provided: {}.",
+                        other
+                    )));
+                    None
+                }
+                Some(Err(err)) => {
+                    ctx.push_error(err);
+                    None
+                }
+                None => None,
+            };
+
             model_attributes.primary_key = Some(IdAttribute {
                 name: None,
                 db_name,
-                fields: vec![field_id],
+                fields: vec![FieldWithArgs {
+                    field_id,
+                    sort_order,
+                    length,
+                }],
                 source_field: Some(field_id),
             })
         }

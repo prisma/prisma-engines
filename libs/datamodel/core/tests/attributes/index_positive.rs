@@ -1,6 +1,6 @@
 use datamodel::{render_datamodel_to_string, IndexDefinition, IndexType};
 
-use crate::attributes::with_postgres_provider;
+use crate::attributes::{with_header, Provider};
 use crate::common::*;
 
 #[test]
@@ -156,7 +156,7 @@ fn index_attributes_must_serialize_to_valid_dml() {
 
 #[test]
 fn index_accepts_three_different_notations() {
-    let dml = with_postgres_provider(
+    let dml = with_header(
         r#"
     model User {
         id        Int    @id
@@ -171,6 +171,8 @@ fn index_accepts_three_different_notations() {
         @@index([firstName,lastName])
     }
     "#,
+        Provider::Postgres,
+        &[],
     );
 
     let schema = parse(&dml);
@@ -199,4 +201,85 @@ fn index_accepts_three_different_notations() {
         tpe: IndexType::Normal,
         defined_on_field: false,
     });
+}
+
+#[test]
+fn index_accepts_sort_order() {
+    let dml = with_header(
+        r#"
+     model User {
+         id         Int    @id
+         firstName  String @unique(sort:Desc, length: 5)
+         middleName String @unique(sort:Desc)
+         lastName   String @unique(length: 5)
+         generation Int    @unique
+         
+         @@index([firstName(sort: Desc), middleName(length: 5), lastName(sort: Desc, length: 5), generation])
+         @@unique([firstName(sort: Desc), middleName(length: 6), lastName(sort: Desc, length: 6), generation])
+     }
+     "#,
+        Provider::Postgres,
+        &["extendedIndexes"],
+    );
+
+    let schema = parse(&dml);
+    schema.assert_has_model("User");
+
+    // user_model.assert_has_index(IndexDefinition {
+    //     name: None,
+    //     db_name: Some("User_firstName_key".to_string()),
+    //     fields: vec![("firstName".to_string(), Some(SortOrder::Desc), Some(5))],
+    //     tpe: IndexType::Unique,
+    //     defined_on_field: true,
+    // });
+    //
+    // user_model.assert_has_index(IndexDefinition {
+    //     name: None,
+    //     db_name: Some("User_middleName_key".to_string()),
+    //     fields: vec![("middleName".to_string(), Some(SortOrder::Desc), None)],
+    //     tpe: IndexType::Unique,
+    //     defined_on_field: true,
+    // });
+    //
+    // user_model.assert_has_index(IndexDefinition {
+    //     name: None,
+    //     db_name: Some("User_lastName_key".to_string()),
+    //     fields: vec![("lastName".to_string(), Some(SortOrder::Asc), Some(5))],
+    //     tpe: IndexType::Unique,
+    //     defined_on_field: true,
+    // });
+    //
+    // user_model.assert_has_index(IndexDefinition {
+    //     name: None,
+    //     db_name: Some("User_generation_key".to_string()),
+    //     fields: vec![("generation".to_string(), Some(SortOrder::Asc), None)],
+    //     tpe: IndexType::Unique,
+    //     defined_on_field: true,
+    // });
+    //
+    // user_model.assert_has_index(IndexDefinition {
+    //     name: None,
+    //     db_name: Some("User_firstName_middleName_lastName_generation_idx".to_string()),
+    //     fields: vec![
+    //         ("firstName".to_string(), Some(SortOrder::Desc), None),
+    //         ("middleName".to_string(), Some(SortOrder::Asc), Some(5)),
+    //         ("lastName".to_string(), Some(SortOrder::Desc), Some(5)),
+    //         ("generation".to_string(), Some(SortOrder::Asc), None),
+    //     ],
+    //     tpe: IndexType::Normal,
+    //     defined_on_field: false,
+    // });
+    //
+    // user_model.assert_has_index(IndexDefinition {
+    //     name: None,
+    //     db_name: Some("User_firstName_middleName_lastName_generation_key".to_string()),
+    //     fields: vec![
+    //         ("firstName".to_string(), Some(SortOrder::Desc), None),
+    //         ("middleName".to_string(), Some(SortOrder::Asc), Some(6)),
+    //         ("lastName".to_string(), Some(SortOrder::Desc), Some(6)),
+    //         ("generation".to_string(), Some(SortOrder::Asc), None),
+    //     ],
+    //     tpe: IndexType::Unique,
+    //     defined_on_field: false,
+    // });
 }

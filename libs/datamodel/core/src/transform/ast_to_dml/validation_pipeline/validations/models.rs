@@ -3,6 +3,7 @@ use std::borrow::Cow;
 use itertools::Itertools;
 
 use crate::{
+    common::preview_features::PreviewFeature,
     diagnostics::{DatamodelError, Diagnostics},
     transform::ast_to_dml::db::{walkers::ModelWalker, ConstraintName, ParserDatabase},
 };
@@ -79,5 +80,28 @@ pub(crate) fn has_a_unique_primary_key_name(
             .unwrap_or_else(|| pk.ast_attribute().span);
 
         diagnostics.push_error(DatamodelError::new_attribute_validation_error(&message, "id", span));
+    }
+}
+
+/// uses sort or length on id without preview flag
+pub(crate) fn uses_sort_or_length_on_primary_without_preview_flag(
+    db: &ParserDatabase<'_>,
+    model: ModelWalker<'_, '_>,
+    diagnostics: &mut Diagnostics,
+) {
+    if let Some(pk) = model.primary_key() {
+        if !db.preview_features.contains(PreviewFeature::ExtendedIndexes)
+            && pk
+                .attribute
+                .fields
+                .iter()
+                .any(|f| f.sort_order.is_some() || f.length.is_some())
+        {
+            let message = "The sort and length args are not yet available";
+
+            let span = pk.ast_attribute().span;
+
+            diagnostics.push_error(DatamodelError::new_attribute_validation_error(message, "id", span));
+        }
     }
 }

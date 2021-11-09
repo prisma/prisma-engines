@@ -1,4 +1,5 @@
 use super::*;
+use std::fmt::{Display, Formatter};
 
 /// An argument, either for attributes, or for keys in source blocks.
 #[derive(Debug, Clone, PartialEq)]
@@ -17,11 +18,25 @@ impl WithIdentifier for Argument {
     }
 }
 
+impl Display for Argument {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}: {}", self.name.name, self.value)
+    }
+}
+
 impl Argument {
     pub fn new_string(name: &str, value: String) -> Argument {
         Argument {
             name: Identifier::new(name),
             value: Expression::StringValue(value, Span::empty()),
+            span: Span::empty(),
+        }
+    }
+
+    pub fn new_numeric(name: &str, value: u32) -> Argument {
+        Argument {
+            name: Identifier::new(name),
+            value: Expression::NumericValue(value.to_string(), Span::empty()),
             span: Span::empty(),
         }
     }

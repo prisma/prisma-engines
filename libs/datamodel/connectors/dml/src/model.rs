@@ -58,6 +58,12 @@ pub enum IndexType {
     Normal,
 }
 
+#[derive(Debug, PartialEq, Clone, Copy)]
+pub enum SortOrder {
+    Asc,
+    Desc,
+}
+
 /// A unique criteria is a set of fields through which a record can be uniquely identified.
 #[derive(Debug)]
 pub struct UniqueCriteria<'a> {

@@ -1,8 +1,10 @@
 use super::env_function::EnvFunction;
 use crate::diagnostics::DatamodelError;
+use crate::transform::helpers::value_validator;
 use crate::{
     ast::{self, Expression, Span},
     configuration::StringFromEnvVar,
+    SortOrder,
 };
 use crate::{DefaultValue, ValueGenerator};
 use bigdecimal::BigDecimal;
@@ -176,6 +178,70 @@ impl<'a> ValueValidator<'a> {
             ast::Expression::BooleanValue(value, _) => Ok(value),
             _ => Err(self.construct_type_mismatch_error("constant literal")),
         }
+    }
+
+    #[allow(clippy::type_complexity)]
+    /// Unwraps the value as an array of constants.
+    pub fn as_field_array_with_args(&self) -> Result<Vec<(&'a str, Option<SortOrder>, Option<u32>)>, DatamodelError> {
+        if let ast::Expression::Array(values, _) = &self.value {
+            values
+                .iter()
+                .map(|val| ValueValidator::new(val).as_field_with_args())
+                .collect()
+        } else {
+            // Single values are accepted as array literals, for example in `@relation(fields: userId)`.
+            Ok(vec![self.as_field_with_args()?])
+        }
+    }
+
+    pub fn as_field_with_args(&self) -> Result<(&'a str, Option<SortOrder>, Option<u32>), DatamodelError> {
+        match &self.value {
+            Expression::ConstantValue(field_name, _) => Ok((field_name, None, None)),
+            Expression::FieldWithArgs(field_name, args, _) => {
+                let (sort, length) = value_validator::ValueValidator::<'a>::field_args(args)?;
+                Ok((field_name, sort, length))
+            }
+
+            _ => Err(self.construct_type_mismatch_error("constant literal")),
+        }
+    }
+
+    /// Unwraps the wrapped value as a constant literal.
+    pub fn field_args(args: &[ast::Argument]) -> Result<(Option<SortOrder>, Option<u32>), DatamodelError> {
+        let sort = args
+            .iter()
+            .find(|arg| arg.name.name == "sort")
+            .map(|arg| match arg.value.extract_constant_value() {
+                Some(("Asc", _)) => Ok(Some(SortOrder::Asc)),
+                Some(("Desc", _)) => Ok(Some(SortOrder::Desc)),
+                None => Ok(None),
+                _ => Err(DatamodelError::ParserError {
+                    expected: vec!["Asc", "Desc"],
+                    expected_str: "Asc, Desc".to_string(),
+                    span: arg.span,
+                }),
+            })
+            .transpose()?
+            .flatten();
+
+        let length = args
+            .iter()
+            .find(|arg| arg.name.name == "length")
+            .map(|arg| match &arg.value {
+                Expression::NumericValue(s, _) => s.parse::<u32>().map_err(|_| DatamodelError::ParserError {
+                    expected: vec![],
+                    expected_str: "valid integer".to_string(),
+                    span: arg.span,
+                }),
+                _ => Err(DatamodelError::ParserError {
+                    expected: vec![],
+                    expected_str: "valid integer".to_string(),
+                    span: arg.span,
+                }),
+            })
+            .transpose()?;
+
+        Ok((sort, length))
     }
 
     /// Unwraps the wrapped value as a referential action.

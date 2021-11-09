@@ -24,7 +24,16 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
 
         let model = self.db.walk_model(self.model_id);
         let model_db_name = model.final_database_name();
-        let field_db_names: Vec<&str> = model.get_field_db_names(&self.index_attribute.fields).collect();
+        let field_db_names: Vec<&str> = model
+            .get_field_db_names(
+                &self
+                    .index_attribute
+                    .fields
+                    .iter()
+                    .map(|f| f.field_id)
+                    .collect::<Vec<_>>(),
+            )
+            .collect();
 
         if self.index_attribute.is_unique {
             ConstraintNames::unique_index_name(model_db_name, &field_db_names, self.db.active_connector()).into()
@@ -55,9 +64,9 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
             .iter()
             .map(move |field_id| ScalarFieldWalker {
                 model_id: self.model_id,
-                field_id: *field_id,
+                field_id: field_id.field_id,
                 db: self.db,
-                scalar_field: &self.db.types.scalar_fields[&(self.model_id, *field_id)],
+                scalar_field: &self.db.types.scalar_fields[&(self.model_id, field_id.field_id)],
             })
     }
 

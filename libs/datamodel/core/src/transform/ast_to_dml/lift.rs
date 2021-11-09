@@ -284,7 +284,7 @@ impl<'a> LiftAstToDml<'a> {
                     .attribute()
                     .fields
                     .iter()
-                    .map(|id| self.db.ast()[model_id][*id].name.name.clone())
+                    .map(|field| self.db.ast()[model_id][field.field_id].name.name.clone())
                     .collect(),
                 tpe: match idx.attribute().is_unique {
                     true => dml::IndexType::Unique,

@@ -775,7 +775,8 @@ impl<'a> Reformatter<'a> {
     //duplicated from renderer -.-
     fn render_value(target: &mut StringBuilder, val: &ast::Expression) {
         match val {
-            ast::Expression::Array(vals, _) => Self::render_array(target, vals),
+            ast::Expression::Array(vals, _) => Self::render_expression_array(target, vals),
+            ast::Expression::FieldWithArgs(ident, vals, _) => Self::render_constant_value_w_args(target, ident, vals),
             ast::Expression::BooleanValue(val, _) => target.write(val),
             ast::Expression::ConstantValue(val, _) => target.write(val),
             ast::Expression::NumericValue(val, _) => target.write(val),
@@ -783,7 +784,29 @@ impl<'a> Reformatter<'a> {
             ast::Expression::Function(name, args, _) => Self::render_func(target, name, args),
         };
     }
-    fn render_array(target: &mut StringBuilder, vals: &[ast::Expression]) {
+
+    fn render_constant_value_w_args(target: &mut StringBuilder, ident: &str, vals: &[ast::Argument]) {
+        target.write(ident);
+        target.write("(");
+        for (idx, arg) in vals.iter().enumerate() {
+            if idx > 0 {
+                target.write(", ");
+            }
+            Self::render_argument(target, arg);
+        }
+        target.write(")");
+    }
+
+    fn render_argument(target: &mut StringBuilder, arg: &ast::Argument) {
+        if !arg.name.name.is_empty() {
+            target.write(&arg.name.name);
+            target.write(": ");
+        }
+
+        Self::render_value(target, &arg.value);
+    }
+
+    fn render_expression_array(target: &mut StringBuilder, vals: &[ast::Expression]) {
         target.write("[");
         for (idx, arg) in vals.iter().enumerate() {
             if idx > 0 {

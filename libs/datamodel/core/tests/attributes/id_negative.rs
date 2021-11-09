@@ -1,4 +1,4 @@
-use crate::attributes::with_postgres_provider;
+use crate::attributes::{with_header, Provider};
 use crate::common::*;
 use indoc::indoc;
 
@@ -213,23 +213,27 @@ fn relation_field_as_id_must_error() {
 
 #[test]
 fn invalid_name_for_compound_id_must_error() {
-    let dml = with_postgres_provider(indoc! {r#"
+    let dml = with_header(
+        indoc! {r#"
         model User {
           name           String
           identification Int
 
           @@id([name, identification], name: "Test.User")
         }
-    "#});
+    "#},
+        Provider::Postgres,
+        &[],
+    );
 
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating model "User": The `name` property within the `@@id` attribute only allows for the following characters: `_a-zA-Z0-9`.[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
-        [1;94m13 | [0m
-        [1;94m14 | [0m  @@[1;91mid([name, identification], name: "Test.User")[0m
+        [1;94m14 | [0m
+        [1;94m15 | [0m  @@[1;91mid([name, identification], name: "Test.User")[0m
         [1;94m   | [0m
     "#]];
 
@@ -332,7 +336,8 @@ fn mapped_id_must_error_on_sqlite() {
 
 #[test]
 fn naming_id_to_a_field_name_should_error() {
-    let dml = with_postgres_provider(indoc! {r#"
+    let dml = with_header(
+        indoc! {r#"
         model User {
           used           Int
           name           String
@@ -340,22 +345,25 @@ fn naming_id_to_a_field_name_should_error() {
 
           @@id([name, identification], name: "used")
         }
-    "#});
+    "#},
+        Provider::Postgres,
+        &[],
+    );
 
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating model "User": The custom name `used` specified for the `@@id` attribute is already used as a name for a field. Please choose a different name.[0m
-          [1;94m-->[0m  [4mschema.prisma:10[0m
+          [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
-        [1;94m 9 | [0m    }
-        [1;94m10 | [0m[1;91mmodel User {[0m
-        [1;94m11 | [0m  used           Int
-        [1;94m12 | [0m  name           String
-        [1;94m13 | [0m  identification Int
-        [1;94m14 | [0m
-        [1;94m15 | [0m  @@id([name, identification], name: "used")
-        [1;94m16 | [0m}
+        [1;94m10 | [0m
+        [1;94m11 | [0m[1;91mmodel User {[0m
+        [1;94m12 | [0m  used           Int
+        [1;94m13 | [0m  name           String
+        [1;94m14 | [0m  identification Int
+        [1;94m15 | [0m
+        [1;94m16 | [0m  @@id([name, identification], name: "used")
+        [1;94m17 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -364,7 +372,8 @@ fn naming_id_to_a_field_name_should_error() {
 
 #[test]
 fn mapping_id_with_a_name_that_is_too_long_should_error() {
-    let dml = with_postgres_provider(indoc! {r#"
+    let dml = with_header(
+        indoc! {r#"
         model User {
           name           String
           identification Int
@@ -376,22 +385,25 @@ fn mapping_id_with_a_name_that_is_too_long_should_error() {
           name           String @id(map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimitsHereAsWell")
           identification Int
         }
-    "#});
+    "#},
+        Provider::Postgres,
+        &[],
+    );
 
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating model "User": The constraint name 'IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits' specified in the `map` argument for the `@@id` constraint is too long for your chosen provider. The maximum allowed length is 63 bytes.[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
-        [1;94m13 | [0m
-        [1;94m14 | [0m  @@[1;91mid([name, identification], map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits")[0m
+        [1;94m14 | [0m
+        [1;94m15 | [0m  @@[1;91mid([name, identification], map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits")[0m
         [1;94m   | [0m
         [1;91merror[0m: [1mError validating model "User1": The constraint name 'IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimitsHereAsWell' specified in the `map` argument for the `@id` constraint is too long for your chosen provider. The maximum allowed length is 63 bytes.[0m
-          [1;94m-->[0m  [4mschema.prisma:18[0m
+          [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
-        [1;94m17 | [0mmodel User1 {
-        [1;94m18 | [0m  name           String @[1;91mid(map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimitsHereAsWell")[0m
+        [1;94m18 | [0mmodel User1 {
+        [1;94m19 | [0m  name           String @[1;91mid(map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimitsHereAsWell")[0m
         [1;94m   | [0m
     "#]];
 
@@ -400,20 +412,24 @@ fn mapping_id_with_a_name_that_is_too_long_should_error() {
 
 #[test]
 fn name_on_field_level_id_should_error() {
-    let dml = with_postgres_provider(indoc! {r#"
+    let dml = with_header(
+        indoc! {r#"
         model User {
           invalid           Int @id(name: "THIS SHOULD BE MAP INSTEAD")
         }
-    "#});
+    "#},
+        Provider::Postgres,
+        &[],
+    );
 
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mNo such argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:11[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
-        [1;94m10 | [0mmodel User {
-        [1;94m11 | [0m  invalid           Int @id([1;91mname: "THIS SHOULD BE MAP INSTEAD"[0m)
+        [1;94m11 | [0mmodel User {
+        [1;94m12 | [0m  invalid           Int @id([1;91mname: "THIS SHOULD BE MAP INSTEAD"[0m)
         [1;94m   | [0m
     "#]];
 
@@ -486,6 +502,46 @@ fn primary_key_and_foreign_key_names_cannot_clash() {
         [1;94m   | [0m
         [1;94m 8 | [0m    bId Int
         [1;94m 9 | [0m    b   B  @relation(fields: [bId], references: [id], [1;91mmap: "foo"[0m)
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn id_does_not_allow_sort_or_index_unless_extended_indexes_are_on() {
+    let dml = with_header(
+        r#"
+     model User {
+         firstName  String
+         middleName String
+         lastName   String
+         
+         @@id([firstName, middleName(length: 1), lastName])
+     }
+     
+     model Blog {
+         title  String @id(length:5)
+     }
+     "#,
+        Provider::Mysql,
+        &[],
+    );
+
+    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@id": The sort and length args are not yet available[0m
+          [1;94m-->[0m  [4mschema.prisma:17[0m
+        [1;94m   | [0m
+        [1;94m16 | [0m         
+        [1;94m17 | [0m         @@[1;91mid([firstName, middleName(length: 1), lastName])[0m
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@id": The sort and length args are not yet available[0m
+          [1;94m-->[0m  [4mschema.prisma:21[0m
+        [1;94m   | [0m
+        [1;94m20 | [0m     model Blog {
+        [1;94m21 | [0m         title  String @[1;91mid(length:5)[0m
         [1;94m   | [0m
     "#]];
 
