@@ -1,8 +1,6 @@
 use enumflags2::bitflags;
 use std::fmt;
 
-use crate::SchemaValue;
-
 /// Holds information about a relation field.
 #[derive(Debug, Clone, Default)]
 pub struct RelationInfo {
@@ -18,18 +16,10 @@ pub struct RelationInfo {
     pub fk_name: Option<String>,
     /// A strategy indicating what happens when
     /// a related node is deleted.
-    pub on_delete: SchemaValue<ReferentialAction>,
+    pub on_delete: ReferentialAction,
     /// A strategy indicating what happens when
     /// a related node is updated.
-    pub on_update: SchemaValue<ReferentialAction>,
-}
-
-impl std::ops::Deref for RelationInfo {
-    type Target = SchemaValue<ReferentialAction>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.on_update
-    }
+    pub on_update: ReferentialAction,
 }
 
 impl PartialEq for RelationInfo {

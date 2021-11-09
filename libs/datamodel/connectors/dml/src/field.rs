@@ -280,6 +280,9 @@ pub struct RelationField {
 
     /// Indicates if this field has to be ignored by the Client.
     pub is_ignored: bool,
+
+    /// is the implicit back-relation or m:n field
+    pub is_implicit: bool,
 }
 
 impl PartialEq for RelationField {
@@ -302,7 +305,7 @@ impl PartialEq for RelationField {
 
 impl RelationField {
     /// Creates a new field with the given name and type.
-    pub fn new(name: &str, arity: FieldArity, relation_info: RelationInfo) -> Self {
+    pub fn new(name: &str, arity: FieldArity, relation_info: RelationInfo, is_implicit: bool) -> Self {
         RelationField {
             name: String::from(name),
             arity,
@@ -311,18 +314,19 @@ impl RelationField {
             is_generated: false,
             is_commented_out: false,
             is_ignored: false,
+            is_implicit,
         }
     }
 
     /// Creates a new field with the given name and type, marked as generated and optional.
-    pub fn new_generated(name: &str, info: RelationInfo, required: bool) -> Self {
+    pub fn new_generated(name: &str, info: RelationInfo, required: bool, is_implicit: bool) -> Self {
         let arity = if required {
             FieldArity::Required
         } else {
             FieldArity::Optional
         };
 
-        let mut field = Self::new(name, arity, info);
+        let mut field = Self::new(name, arity, info, is_implicit);
         field.is_generated = true;
 
         field

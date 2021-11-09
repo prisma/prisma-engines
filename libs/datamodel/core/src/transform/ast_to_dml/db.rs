@@ -18,7 +18,7 @@ pub(crate) use types::{RelationField, ScalarField, ScalarFieldType};
 use self::{context::Context, relations::Relations, types::Types};
 use crate::PreviewFeature;
 use crate::{ast, diagnostics::Diagnostics, Datasource};
-use datamodel_connector::{Connector, ConstraintScope, EmptyDatamodelConnector};
+use datamodel_connector::{Connector, ConstraintScope, EmptyDatamodelConnector, ReferentialIntegrity};
 use enumflags2::BitFlags;
 use names::Names;
 
@@ -154,5 +154,11 @@ impl<'ast> ParserDatabase<'ast> {
         self.datasource
             .map(|datasource| datasource.active_connector.as_ref())
             .unwrap_or(&EmptyDatamodelConnector)
+    }
+
+    pub(super) fn referential_integrity(&self) -> ReferentialIntegrity {
+        self.datasource
+            .map(|ds| ds.referential_integrity())
+            .unwrap_or(ReferentialIntegrity::ForeignKeys)
     }
 }

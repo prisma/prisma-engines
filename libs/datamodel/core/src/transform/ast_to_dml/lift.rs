@@ -69,6 +69,14 @@ impl<'a> LiftAstToDml<'a> {
             field.documentation = ast_field.documentation.clone().map(|comment| comment.text);
             field.is_ignored = attributes.is_ignored;
             field.relation_info.fk_name = relation_field.final_foreign_key_name().map(|cow| cow.into_owned());
+
+            if let Some(on_update) = relation_field.on_update() {
+                field.relation_info.on_update = on_update;
+            }
+
+            if let Some(on_delete) = relation_field.on_delete() {
+                field.relation_info.on_delete = on_delete;
+            }
         };
 
         for relation in self.db.walk_relations() {
@@ -85,7 +93,7 @@ impl<'a> LiftAstToDml<'a> {
                             let attributes = relation_field.attributes();
                             let arity = self.lift_field_arity(&relation_field.ast_field().arity);
 
-                            let mut field = dml::RelationField::new(relation_field.name(), arity, relation_info);
+                            let mut field = dml::RelationField::new(relation_field.name(), arity, relation_info, false);
 
                             common_dml_fields(&mut field, attributes, relation_field);
 
@@ -100,7 +108,7 @@ impl<'a> LiftAstToDml<'a> {
                             //
                             // This is part of magic reformatting.
                             let arity = self.lift_field_arity(&relation.forward_relation_field_arity());
-                            dml::RelationField::new(relation.referenced_model().name(), arity, relation_info)
+                            dml::RelationField::new(relation.referenced_model().name(), arity, relation_info, false)
                         };
 
                         relation_field.relation_info.name = relation.relation_name().to_string();
@@ -139,11 +147,6 @@ impl<'a> LiftAstToDml<'a> {
                             ReferencingFields::NA => Vec::new(),
                         };
 
-                        if let Some(relation) = relation.as_complete() {
-                            relation_field.relation_info.on_delete = relation.on_delete();
-                            relation_field.relation_info.on_update = relation.on_update();
-                        }
-
                         model.add_field(dml::Field::RelationField(relation_field));
 
                         for field in inferred_scalar_fields {
@@ -161,14 +164,9 @@ impl<'a> LiftAstToDml<'a> {
                             let attributes = relation_field.attributes();
                             let arity = self.lift_field_arity(&ast_field.arity);
 
-                            let mut field = dml::RelationField::new(relation_field.name(), arity, relation_info);
+                            let mut field = dml::RelationField::new(relation_field.name(), arity, relation_info, true);
 
                             common_dml_fields(&mut field, attributes, relation_field);
-
-                            if let Some(relation) = relation.as_complete() {
-                                field.relation_info.on_delete = relation.on_delete();
-                                field.relation_info.on_update = relation.on_update();
-                            }
 
                             field_ids_for_sorting.insert(
                                 (relation_field.model().name(), relation_field.name()),
@@ -180,15 +178,14 @@ impl<'a> LiftAstToDml<'a> {
                             // This is part of reformatting.
                             let arity = dml::FieldArity::List;
 
-                            let mut field =
-                                dml::RelationField::new(relation.referencing_model().name(), arity, relation_info);
+                            let mut field = dml::RelationField::new(
+                                relation.referencing_model().name(),
+                                arity,
+                                relation_info,
+                                true,
+                            );
 
                             field.is_ignored = relation.referencing_model().is_ignored();
-
-                            if let Some(relation) = relation.as_complete() {
-                                field.relation_info.on_delete = relation.on_delete();
-                                field.relation_info.on_update = relation.on_update();
-                            }
 
                             field
                         };
@@ -204,7 +201,7 @@ impl<'a> LiftAstToDml<'a> {
                         let arity = self.lift_field_arity(&ast_field.arity);
                         let relation_info = dml::RelationInfo::new(relation_field.related_model().name());
 
-                        let mut field = dml::RelationField::new(relation_field.name(), arity, relation_info);
+                        let mut field = dml::RelationField::new(relation_field.name(), arity, relation_info, true);
 
                         common_dml_fields(&mut field, attributes, relation_field);
 

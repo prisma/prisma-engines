@@ -54,6 +54,8 @@ fn on_update_actions() {
             action
         );
 
+        println!("{}", dml);
+
         parse(&dml)
             .assert_has_model("B")
             .assert_has_relation_field("a")

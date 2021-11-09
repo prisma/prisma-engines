@@ -194,16 +194,53 @@ impl<'a> LowerDmlToAst<'a> {
                 }
             }
 
-            if relation_info.on_delete.is_explicit() {
-                let expression =
-                    ast::Expression::ConstantValue(relation_info.on_delete.to_string(), ast::Span::empty());
-                args.push(ast::Argument::new("onDelete", expression));
+            let references_required = rf
+                .relation_info
+                .fields
+                .iter()
+                .map(|f| model.find_scalar_field(f).unwrap())
+                .any(|f| f.is_required());
+
+            let supports_restrict = self
+                .active_connector()
+                .supports_referential_action(dml::ReferentialAction::Restrict);
+
+            let uses_foreign_keys = self
+                .datasource
+                .as_ref()
+                .map(|ds| ds.referential_integrity().uses_foreign_keys())
+                .unwrap_or(true);
+
+            match (references_required, supports_restrict, relation_info.on_delete) {
+                // Only render on one side, never on m:n
+                _ if rf.is_implicit => (),
+                // Default not rendered
+                (true, true, dml::ReferentialAction::Restrict) => (),
+                // Default not rendered
+                (true, false, dml::ReferentialAction::NoAction) => (),
+                // Default not rendered
+                (false, _, dml::ReferentialAction::SetNull) => (),
+                _ => {
+                    let expression =
+                        ast::Expression::ConstantValue(relation_info.on_delete.to_string(), ast::Span::empty());
+                    args.push(ast::Argument::new("onDelete", expression));
+                }
             }
 
-            if relation_info.on_update.is_explicit() {
-                let expression =
-                    ast::Expression::ConstantValue(relation_info.on_update.to_string(), ast::Span::empty());
-                args.push(ast::Argument::new("onUpdate", expression));
+            match (references_required, uses_foreign_keys, relation_info.on_update) {
+                // Only render on one side, never on m:n
+                _ if rf.is_implicit => (),
+                // Default not rendered
+                (_, true, dml::ReferentialAction::Cascade) => (),
+                // Default not rendered
+                (true, false, dml::ReferentialAction::NoAction) => (),
+                // Default not rendered
+                (false, false, dml::ReferentialAction::SetNull) => (),
+                _ => {
+                    let expression =
+                        ast::Expression::ConstantValue(relation_info.on_update.to_string(), ast::Span::empty());
+                    args.push(ast::Argument::new("onUpdate", expression));
+                }
             }
 
             if let Some(fk_name) = &relation_info.fk_name {

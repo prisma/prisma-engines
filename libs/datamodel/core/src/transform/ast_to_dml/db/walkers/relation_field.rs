@@ -79,6 +79,40 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
         }
     }
 
+    pub(crate) fn on_delete(self) -> Option<crate::ReferentialAction> {
+        self.attributes().on_delete.or_else(|| self.default_on_delete())
+    }
+
+    pub(crate) fn on_update(self) -> Option<crate::ReferentialAction> {
+        self.attributes().on_update.or_else(|| self.default_on_update())
+    }
+
+    pub(crate) fn default_on_update(self) -> Option<crate::ReferentialAction> {
+        use crate::ReferentialAction::*;
+
+        let uses_foreign_keys = self.db.referential_integrity().uses_foreign_keys();
+
+        match (self.ast_field().arity, self.referential_arity()) {
+            (ast::FieldArity::List, _) => None,
+            _ if uses_foreign_keys => Some(Cascade),
+            (_, ast::FieldArity::Required) => Some(NoAction),
+            _ => Some(SetNull),
+        }
+    }
+
+    pub(crate) fn default_on_delete(self) -> Option<crate::ReferentialAction> {
+        use crate::ReferentialAction::*;
+
+        let supports_restrict = self.db.active_connector().supports_referential_action(Restrict);
+
+        match (self.ast_field().arity, self.referential_arity()) {
+            (ast::FieldArity::List, _) => None,
+            (_, ast::FieldArity::Required) if supports_restrict => Some(Restrict),
+            (_, ast::FieldArity::Required) => Some(NoAction),
+            _ => Some(SetNull),
+        }
+    }
+
     pub(crate) fn referenced_fields(self) -> Option<impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db> {
         self.attributes().references.as_ref().map(|references| {
             references
@@ -110,6 +144,10 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
             .unwrap_or_else(|| RelationName::generated(self.model().name(), self.related_model().name()))
     }
 
+    /// Prisma allows setting the relation field as optional, even if one of the
+    /// underlying scalar fields is required. For the purpose of referential
+    /// actions, we count the relation field required if any of the underlying
+    /// fields is required.
     pub(crate) fn referential_arity(self) -> FieldArity {
         let some_required = self
             .fields()

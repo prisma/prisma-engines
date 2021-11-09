@@ -339,11 +339,11 @@ impl<'a> RelationFieldWalker<'a> {
     }
 
     pub fn on_update_action(&self) -> ReferentialAction {
-        self.get().relation_info.on_update.take()
+        self.get().relation_info.on_update
     }
 
     pub fn on_delete_action(&self) -> ReferentialAction {
-        self.get().relation_info.on_delete.take()
+        self.get().relation_info.on_delete
     }
 }
 

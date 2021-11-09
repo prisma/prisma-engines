@@ -7,13 +7,11 @@ use crate::SqlIntrospectionResult;
 use crate::{commenting_out_guardrails::commenting_out_guardrails, introspection::introspect};
 use datamodel::Datamodel;
 use introspection_connector::{IntrospectionContext, IntrospectionResult};
-use quaint::prelude::SqlFamily;
 use sql_schema_describer::*;
 use tracing::debug;
 
 /// Calculate a data model from a database schema.
 pub fn calculate_datamodel(
-    sql_family: SqlFamily,
     schema: &SqlSchema,
     previous_data_model: &Datamodel,
     ctx: IntrospectionContext,
@@ -24,7 +22,7 @@ pub fn calculate_datamodel(
     let mut data_model = Datamodel::new();
 
     // 1to1 translation of the sql schema
-    introspect(sql_family, schema, &mut version_check, &mut data_model, &ctx)?;
+    introspect(schema, &mut version_check, &mut data_model, &ctx)?;
 
     if !sanitization_leads_to_duplicate_names(&data_model) {
         // our opinionation about valid names

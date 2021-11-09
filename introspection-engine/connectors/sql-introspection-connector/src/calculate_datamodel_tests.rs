@@ -1,7 +1,6 @@
 #[cfg(test)]
 mod tests {
     use crate::calculate_datamodel::calculate_datamodel;
-    use ::dml::SchemaValue;
     use datamodel::{
         ast::Span, dml, Datamodel, Datasource, DefaultValue as DMLDefault, Field, FieldArity, FieldType,
         IndexDefinition, Model, NativeTypeInstance, PrimaryKeyDefinition, ReferentialAction, RelationField,
@@ -13,7 +12,6 @@ mod tests {
     use introspection_connector::IntrospectionContext;
     use native_types::{NativeType, PostgresType};
     use pretty_assertions::assert_eq;
-    use quaint::prelude::SqlFamily;
     use sql_datamodel_connector::PostgresDatamodelConnector;
     use sql_schema_describer::{
         Column, ColumnArity, ColumnType, ColumnTypeFamily, Enum, ForeignKey, ForeignKeyAction, Index, IndexType,
@@ -162,8 +160,7 @@ mod tests {
         }];
 
         let introspection_result =
-            calculate_datamodel(SqlFamily::Mysql, &schema, &Datamodel::new(), postgres_context())
-                .expect("calculate data model");
+            calculate_datamodel(&schema, &Datamodel::new(), postgres_context()).expect("calculate data model");
 
         ref_data_model.assert_debug_eq(&introspection_result.data_model);
     }
@@ -354,8 +351,7 @@ mod tests {
             },
         ];
         let introspection_result =
-            calculate_datamodel(SqlFamily::Mysql, &schema, &Datamodel::new(), postgres_context())
-                .expect("calculate data model");
+            calculate_datamodel(&schema, &Datamodel::new(), postgres_context()).expect("calculate data model");
 
         assert_eq!(introspection_result.data_model, ref_data_model);
     }
@@ -428,8 +424,7 @@ mod tests {
             foreign_keys: vec![],
         }];
         let introspection_result =
-            calculate_datamodel(SqlFamily::Mysql, &schema, &Datamodel::new(), postgres_context())
-                .expect("calculate data model");
+            calculate_datamodel(&schema, &Datamodel::new(), postgres_context()).expect("calculate data model");
 
         assert_eq!(introspection_result.data_model, ref_data_model);
     }
@@ -487,6 +482,7 @@ mod tests {
                                 name: "CityToUser".to_string(),
                                 ..Default::default()
                             },
+                            true,
                         )),
                     ],
                     is_generated: false,
@@ -572,14 +568,15 @@ mod tests {
                             is_generated: false,
                             is_commented_out: false,
                             is_ignored: false,
+                            is_implicit: false,
                             relation_info: RelationInfo {
                                 name: "CityToUser".to_string(),
                                 fk_name: None,
                                 to: "City".to_string(),
                                 fields: vec!["city_id".to_string(), "city_name".to_string()],
                                 references: vec!["id".to_string(), "name".to_string()],
-                                on_delete: SchemaValue::Implicit(ReferentialAction::NoAction),
-                                on_update: SchemaValue::Implicit(ReferentialAction::NoAction),
+                                on_delete: ReferentialAction::NoAction,
+                                on_update: ReferentialAction::NoAction,
                             },
                         }),
                     ],
@@ -687,8 +684,7 @@ mod tests {
             },
         ];
         let introspection_result =
-            calculate_datamodel(SqlFamily::Mysql, &schema, &Datamodel::new(), postgres_context())
-                .expect("calculate data model");
+            calculate_datamodel(&schema, &Datamodel::new(), postgres_context()).expect("calculate data model");
 
         assert_eq!(introspection_result.data_model, expected_data_model);
     }
@@ -820,8 +816,7 @@ mod tests {
             foreign_keys: vec![],
         }];
         let introspection_result =
-            calculate_datamodel(SqlFamily::Mysql, &schema, &Datamodel::new(), postgres_context())
-                .expect("calculate data model");
+            calculate_datamodel(&schema, &Datamodel::new(), postgres_context()).expect("calculate data model");
 
         assert_eq!(introspection_result.data_model, ref_data_model);
     }
@@ -879,6 +874,7 @@ mod tests {
                                 name: "CityToUser".to_string(),
                                 ..Default::default()
                             },
+                            true,
                         )),
                     ],
                     is_generated: false,
@@ -937,14 +933,15 @@ mod tests {
                             is_generated: false,
                             is_commented_out: false,
                             is_ignored: false,
+                            is_implicit: false,
                             relation_info: RelationInfo {
                                 name: "CityToUser".to_string(),
                                 fk_name: None,
                                 to: "City".to_string(),
                                 fields: vec!["city_id".to_string()],
                                 references: vec!["id".to_string()],
-                                on_delete: SchemaValue::Implicit(ReferentialAction::NoAction),
-                                on_update: SchemaValue::Implicit(ReferentialAction::NoAction),
+                                on_delete: ReferentialAction::NoAction,
+                                on_update: ReferentialAction::NoAction,
                             },
                         }),
                     ],
@@ -1040,8 +1037,7 @@ mod tests {
             },
         ];
         let introspection_result =
-            calculate_datamodel(SqlFamily::Mysql, &schema, &Datamodel::new(), postgres_context())
-                .expect("calculate data model");
+            calculate_datamodel(&schema, &Datamodel::new(), postgres_context()).expect("calculate data model");
 
         assert_eq!(introspection_result.data_model, ref_data_model);
     }
@@ -1080,8 +1076,7 @@ mod tests {
             values: enum_values,
         }];
         let introspection_result =
-            calculate_datamodel(SqlFamily::Mysql, &schema, &Datamodel::new(), postgres_context())
-                .expect("calculate data model");
+            calculate_datamodel(&schema, &Datamodel::new(), postgres_context()).expect("calculate data model");
 
         assert_eq!(introspection_result.data_model, ref_data_model);
     }

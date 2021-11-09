@@ -17,7 +17,7 @@ impl<'a> LowerDmlToAst<'a> {
         }
     }
 
-    fn _active_connector(&self) -> &dyn Connector {
+    pub(super) fn active_connector(&self) -> &dyn Connector {
         self.datasource
             .map(|datasource| datasource.active_connector.as_ref())
             .unwrap_or(&EmptyDatamodelConnector)
