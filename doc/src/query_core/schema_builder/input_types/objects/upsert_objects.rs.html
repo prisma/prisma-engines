@@ -104,7 +104,7 @@
     <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BuilderContext</span>,
     <span class="ident">parent_field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InputObjectTypeWeakRef</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">parent_field</span>.<span class="ident">is_list</span> {
+    <span class="kw">if</span> <span class="ident">parent_field</span>.<span class="ident">is_list</span>() {
         <span class="ident">nested_upsert_list_input_object</span>(<span class="ident">ctx</span>, <span class="ident">parent_field</span>)
     } <span class="kw">else</span> {
         <span class="ident">nested_upsert_nonlist_input_object</span>(<span class="ident">ctx</span>, <span class="ident">parent_field</span>)

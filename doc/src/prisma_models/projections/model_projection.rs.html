@@ -187,6 +187,7 @@
 <span id="187">187</span>
 <span id="188">188</span>
 <span id="189">189</span>
+<span id="190">190</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::RecordProjection</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">dml::FieldArity</span>, <span class="ident">DomainError</span>, <span class="ident">Field</span>, <span class="ident">PrismaValue</span>, <span class="ident">PrismaValueExtensions</span>, <span class="ident">ScalarFieldRef</span>, <span class="ident">TypeIdentifier</span>};
 <span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
@@ -249,6 +250,7 @@
             .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">field</span> {
                 <span class="ident">Field::Scalar</span>(<span class="ident">sf</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[<span class="ident">sf</span>.<span class="ident">clone</span>()],
                 <span class="ident">Field::Relation</span>(<span class="ident">rf</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">rf</span>.<span class="ident">scalar_fields</span>(),
+                <span class="ident">Field::Composite</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">todo!</span>(), <span class="comment">// [Composites] todo</span>
             })
             .<span class="ident">into_iter</span>()
             .<span class="ident">unique_by</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">name</span>.<span class="ident">clone</span>())

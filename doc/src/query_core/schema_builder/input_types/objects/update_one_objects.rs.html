@@ -397,6 +397,7 @@
 <span id="397">397</span>
 <span id="398">398</span>
 <span id="399">399</span>
+<span id="400">400</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">constants</span>::{<span class="ident">args</span>, <span class="ident">operations</span>};
 <span class="kw">use</span> <span class="ident">datamodel_connector::ConnectorCapability</span>;
@@ -567,7 +568,7 @@
     <span class="kw">let</span> <span class="ident">has_adv_json</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::AdvancedJsonNullability</span>);
     <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">type_identifier</span> {
         <span class="ident">TypeIdentifier::Json</span> <span class="kw">if</span> <span class="ident">has_adv_json</span> <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="ident">enum_type</span> <span class="op">=</span> <span class="ident">json_null_input_enum</span>(<span class="op">!</span><span class="ident">field</span>.<span class="ident">is_required</span>);
+            <span class="kw">let</span> <span class="ident">enum_type</span> <span class="op">=</span> <span class="ident">json_null_input_enum</span>(<span class="op">!</span><span class="ident">field</span>.<span class="ident">is_required</span>());
             <span class="kw">let</span> <span class="ident">input_field</span> <span class="op">=</span> <span class="ident">input_field</span>(
                 <span class="ident">field</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
                 <span class="macro">vec!</span>[<span class="ident">InputType::Enum</span>(<span class="ident">enum_type</span>), <span class="ident">base_update_type</span>],
@@ -581,7 +582,7 @@
             <span class="kw">let</span> <span class="ident">types</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">map_scalar_input_type_for_field</span>(<span class="ident">ctx</span>, <span class="ident">field</span>), <span class="ident">base_update_type</span>];
 
             <span class="kw">let</span> <span class="ident">input_field</span> <span class="op">=</span> <span class="ident">input_field</span>(<span class="ident">field</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">types</span>, <span class="ident">default</span>);
-            <span class="ident">input_field</span>.<span class="ident">optional</span>().<span class="ident">nullable_if</span>(<span class="op">!</span><span class="ident">field</span>.<span class="ident">is_required</span>)
+            <span class="ident">input_field</span>.<span class="ident">optional</span>().<span class="ident">nullable_if</span>(<span class="op">!</span><span class="ident">field</span>.<span class="ident">is_required</span>())
         }
     }
 }
@@ -595,7 +596,7 @@
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">InputObjectTypeWeakRef</span> {
     <span class="comment">// Nullability is important for the `set` operation, so we need to</span>
     <span class="comment">// construct and cache different objects to reflect that.</span>
-    <span class="kw">let</span> <span class="ident">nullable</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">is_required</span> { <span class="string">&quot;&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;Nullable&quot;</span> };
+    <span class="kw">let</span> <span class="ident">nullable</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">is_required</span>() { <span class="string">&quot;&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;Nullable&quot;</span> };
     <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">Identifier::new</span>(
         <span class="macro">format!</span>(<span class="string">&quot;{}{}FieldUpdateOperationsInput&quot;</span>, <span class="ident">nullable</span>, <span class="ident">prefix</span>),
         <span class="ident">PRISMA_NAMESPACE</span>,
@@ -611,7 +612,7 @@
     <span class="kw">let</span> <span class="ident">typ</span> <span class="op">=</span> <span class="ident">map_scalar_input_type_for_field</span>(<span class="ident">ctx</span>, <span class="ident">field</span>);
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fields</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">input_field</span>(<span class="ident">operations::SET</span>, <span class="ident">typ</span>.<span class="ident">clone</span>(), <span class="prelude-val">None</span>)
         .<span class="ident">optional</span>()
-        .<span class="ident">nullable_if</span>(<span class="op">!</span><span class="ident">field</span>.<span class="ident">is_required</span>)];
+        .<span class="ident">nullable_if</span>(<span class="op">!</span><span class="ident">field</span>.<span class="ident">is_required</span>())];
 
     <span class="kw">if</span> <span class="ident">with_number_operators</span> {
         <span class="ident">fields</span>.<span class="ident">push</span>(<span class="ident">input_field</span>(<span class="ident">operations::INCREMENT</span>, <span class="ident">typ</span>.<span class="ident">clone</span>(), <span class="prelude-val">None</span>).<span class="ident">optional</span>());
@@ -641,7 +642,7 @@
             <span class="kw">let</span> <span class="ident">related_field</span> <span class="op">=</span> <span class="ident">rf</span>.<span class="ident">related_field</span>();
 
             <span class="comment">// Compute input object name</span>
-            <span class="kw">let</span> <span class="ident">arity_part</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">rf</span>.<span class="ident">is_list</span>, <span class="ident">rf</span>.<span class="ident">is_required</span>) {
+            <span class="kw">let</span> <span class="ident">arity_part</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">rf</span>.<span class="ident">is_list</span>(), <span class="ident">rf</span>.<span class="ident">is_required</span>()) {
                 (<span class="bool-val">true</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Many&quot;</span>,
                 (<span class="bool-val">false</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;OneRequired&quot;</span>,
                 (<span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;One&quot;</span>,
@@ -698,7 +699,7 @@
             <span class="kw">let</span> <span class="ident">related_field</span> <span class="op">=</span> <span class="ident">rf</span>.<span class="ident">related_field</span>();
 
             <span class="comment">// Compute input object name</span>
-            <span class="kw">let</span> <span class="ident">arity_part</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">rf</span>.<span class="ident">is_list</span>, <span class="ident">rf</span>.<span class="ident">is_required</span>) {
+            <span class="kw">let</span> <span class="ident">arity_part</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">rf</span>.<span class="ident">is_list</span>(), <span class="ident">rf</span>.<span class="ident">is_required</span>()) {
                 (<span class="bool-val">true</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Many&quot;</span>,
                 (<span class="bool-val">false</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;OneRequired&quot;</span>,
                 (<span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;One&quot;</span>,
@@ -786,7 +787,8 @@
             (<span class="ident">TypeIdentifier::Int</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>)
         );
 
-    <span class="kw">let</span> <span class="ident">model_id</span>: <span class="ident">ModelProjection</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">primary_identifier</span>();
+    <span class="comment">// WIP assumption: All fields we&#39;re reaching here _must_ be enclosed by a model.</span>
+    <span class="kw">let</span> <span class="ident">model_id</span>: <span class="ident">ModelProjection</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">container</span>.<span class="ident">as_model</span>().<span class="ident">unwrap</span>().<span class="ident">primary_identifier</span>();
     <span class="kw">let</span> <span class="ident">is_not_disallowed_id</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">model_id</span>.<span class="ident">contains</span>(<span class="ident">field</span>.<span class="ident">clone</span>()) {
         <span class="comment">// Is part of the id, connector must allow updating ID fields.</span>
         <span class="ident">ctx</span>.<span class="ident">capabilities</span>.<span class="ident">contains</span>(<span class="ident">ConnectorCapability::UpdateableId</span>)

@@ -207,7 +207,6 @@
 <span id="207">207</span>
 <span id="208">208</span>
 <span id="209">209</span>
-<span id="210">210</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Datamodel</span>, <span class="ident">Enum</span>, <span class="ident">EnumValue</span>, <span class="ident">Field</span>, <span class="ident">Function</span>, <span class="ident">Model</span>, <span class="ident">UniqueIndex</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::dmmf::PrimaryKey</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">dml</span>, <span class="ident">FieldType</span>, <span class="ident">Ignorable</span>, <span class="ident">ScalarType</span>};
@@ -276,7 +275,6 @@
     <span class="ident">Model</span> {
         <span class="ident">name</span>: <span class="ident">model</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
         <span class="ident">db_name</span>: <span class="ident">model</span>.<span class="ident">database_name</span>.<span class="ident">clone</span>(),
-        <span class="ident">is_embedded</span>: <span class="bool-val">false</span>,
         <span class="ident">fields</span>: <span class="ident">model</span>
             .<span class="ident">fields</span>()
             .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="op">!</span><span class="ident">field</span>.<span class="ident">is_ignored</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="macro">matches!</span>(<span class="ident">field</span>.<span class="ident">field_type</span>(), <span class="ident">FieldType::Unsupported</span>(<span class="kw">_</span>)))

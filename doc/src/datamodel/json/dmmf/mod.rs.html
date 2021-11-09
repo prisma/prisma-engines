@@ -93,7 +93,6 @@
 <span id="93">93</span>
 <span id="94">94</span>
 <span id="95">95</span>
-<span id="96">96</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">to_dmmf</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">to_dmmf::render_to_dmmf</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">to_dmmf::render_to_dmmf_value</span>;
@@ -142,7 +141,6 @@
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Model</span> {
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">is_embedded</span>: <span class="ident">bool</span>,
     <span class="kw">pub</span> <span class="ident">db_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Field</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>

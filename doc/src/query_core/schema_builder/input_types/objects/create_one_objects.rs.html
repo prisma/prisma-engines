@@ -370,7 +370,7 @@
             <span class="kw">let</span> <span class="ident">related_field</span> <span class="op">=</span> <span class="ident">rf</span>.<span class="ident">related_field</span>();
 
             <span class="comment">// Compute input object name</span>
-            <span class="kw">let</span> <span class="ident">arity_part</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">rf</span>.<span class="ident">is_list</span> { <span class="string">&quot;NestedMany&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;NestedOne&quot;</span> };
+            <span class="kw">let</span> <span class="ident">arity_part</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">rf</span>.<span class="ident">is_list</span>() { <span class="string">&quot;NestedMany&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;NestedOne&quot;</span> };
             <span class="kw">let</span> <span class="ident">without_part</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;Without{}&quot;</span>, <span class="ident">capitalize</span>(<span class="kw-2">&amp;</span><span class="ident">related_field</span>.<span class="ident">name</span>));
             <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">Identifier::new</span>(
                 <span class="macro">format!</span>(<span class="string">&quot;{}Create{}{}Input&quot;</span>, <span class="ident">related_model</span>.<span class="ident">name</span>, <span class="ident">arity_part</span>, <span class="ident">without_part</span>),
@@ -407,7 +407,7 @@
 
                 <span class="kw">let</span> <span class="ident">input_field</span> <span class="op">=</span> <span class="ident">input_field</span>(<span class="ident">rf</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">InputType::object</span>(<span class="ident">input_object</span>), <span class="prelude-val">None</span>);
 
-                <span class="kw">if</span> <span class="ident">rf</span>.<span class="ident">is_required</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">all_required_scalar_fields_have_defaults</span> {
+                <span class="kw">if</span> <span class="ident">rf</span>.<span class="ident">is_required</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">all_required_scalar_fields_have_defaults</span> {
                     <span class="prelude-val">Some</span>(<span class="ident">input_field</span>)
                 } <span class="kw">else</span> {
                     <span class="prelude-val">Some</span>(<span class="ident">input_field</span>.<span class="ident">optional</span>())
@@ -500,7 +500,7 @@
             <span class="kw">let</span> <span class="ident">child_field</span> <span class="op">=</span> <span class="ident">rf</span>.<span class="ident">related_field</span>();
 
             <span class="comment">// Compute input object name</span>
-            <span class="kw">let</span> <span class="ident">arity_part</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">rf</span>.<span class="ident">is_list</span> { <span class="string">&quot;NestedMany&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;NestedOne&quot;</span> };
+            <span class="kw">let</span> <span class="ident">arity_part</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">rf</span>.<span class="ident">is_list</span>() { <span class="string">&quot;NestedMany&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;NestedOne&quot;</span> };
             <span class="kw">let</span> <span class="ident">without_part</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;Without{}&quot;</span>, <span class="ident">capitalize</span>(<span class="kw-2">&amp;</span><span class="ident">child_field</span>.<span class="ident">name</span>));
             <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">Identifier::new</span>(
                 <span class="macro">format!</span>(<span class="string">&quot;{}UncheckedCreate{}{}Input&quot;</span>, <span class="ident">child_model</span>.<span class="ident">name</span>, <span class="ident">arity_part</span>, <span class="ident">without_part</span>),
@@ -539,7 +539,7 @@
 
                 <span class="kw">let</span> <span class="ident">input_field</span> <span class="op">=</span> <span class="ident">input_field</span>(<span class="ident">rf</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">InputType::object</span>(<span class="ident">input_object</span>), <span class="prelude-val">None</span>);
 
-                <span class="kw">if</span> <span class="ident">rf</span>.<span class="ident">is_required</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">all_required_scalar_fields_have_defaults</span> {
+                <span class="kw">if</span> <span class="ident">rf</span>.<span class="ident">is_required</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">all_required_scalar_fields_have_defaults</span> {
                     <span class="prelude-val">Some</span>(<span class="ident">input_field</span>)
                 } <span class="kw">else</span> {
                     <span class="prelude-val">Some</span>(<span class="ident">input_field</span>.<span class="ident">optional</span>())
@@ -559,15 +559,15 @@
 
     <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">f</span>.<span class="ident">type_identifier</span> {
         <span class="ident">TypeIdentifier::Json</span> <span class="kw">if</span> <span class="ident">has_adv_json</span> <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="ident">enum_type</span> <span class="op">=</span> <span class="ident">json_null_input_enum</span>(<span class="op">!</span><span class="ident">f</span>.<span class="ident">is_required</span>);
+            <span class="kw">let</span> <span class="ident">enum_type</span> <span class="op">=</span> <span class="ident">json_null_input_enum</span>(<span class="op">!</span><span class="ident">f</span>.<span class="ident">is_required</span>());
 
             <span class="ident">input_field</span>(<span class="ident">f</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="macro">vec!</span>[<span class="ident">InputType::Enum</span>(<span class="ident">enum_type</span>), <span class="ident">typ</span>], <span class="ident">default</span>)
-                .<span class="ident">optional_if</span>(<span class="op">!</span><span class="ident">f</span>.<span class="ident">is_required</span> <span class="op">|</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">default_value</span>.<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">is_created_at</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">is_updated_at</span>())
+                .<span class="ident">optional_if</span>(<span class="op">!</span><span class="ident">f</span>.<span class="ident">is_required</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">default_value</span>.<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">is_updated_at</span>)
         }
 
         <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">input_field</span>(<span class="ident">f</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">typ</span>, <span class="ident">default</span>)
-            .<span class="ident">optional_if</span>(<span class="op">!</span><span class="ident">f</span>.<span class="ident">is_required</span> <span class="op">|</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">default_value</span>.<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">is_created_at</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">is_updated_at</span>())
-            .<span class="ident">nullable_if</span>(<span class="op">!</span><span class="ident">f</span>.<span class="ident">is_required</span>),
+            .<span class="ident">optional_if</span>(<span class="op">!</span><span class="ident">f</span>.<span class="ident">is_required</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">default_value</span>.<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">is_updated_at</span>)
+            .<span class="ident">nullable_if</span>(<span class="op">!</span><span class="ident">f</span>.<span class="ident">is_required</span>()),
     }
 }
 </code></pre></div>

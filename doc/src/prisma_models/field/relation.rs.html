@@ -282,35 +282,6 @@
 <span id="282">282</span>
 <span id="283">283</span>
 <span id="284">284</span>
-<span id="285">285</span>
-<span id="286">286</span>
-<span id="287">287</span>
-<span id="288">288</span>
-<span id="289">289</span>
-<span id="290">290</span>
-<span id="291">291</span>
-<span id="292">292</span>
-<span id="293">293</span>
-<span id="294">294</span>
-<span id="295">295</span>
-<span id="296">296</span>
-<span id="297">297</span>
-<span id="298">298</span>
-<span id="299">299</span>
-<span id="300">300</span>
-<span id="301">301</span>
-<span id="302">302</span>
-<span id="303">303</span>
-<span id="304">304</span>
-<span id="305">305</span>
-<span id="306">306</span>
-<span id="307">307</span>
-<span id="308">308</span>
-<span id="309">309</span>
-<span id="310">310</span>
-<span id="311">311</span>
-<span id="312">312</span>
-<span id="313">313</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">datamodel</span>::{<span class="ident">FieldArity</span>, <span class="ident">ReferentialAction</span>, <span class="ident">RelationInfo</span>};
 <span class="kw">use</span> <span class="ident">once_cell::sync::OnceCell</span>;
@@ -320,29 +291,13 @@
     <span class="ident">sync</span>::{<span class="ident">Arc</span>, <span class="ident">Weak</span>},
 };
 
-<span class="doccomment">/// A short-hand for `Arc&lt;RelationField&gt;`</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">RelationFieldRef</span> <span class="op">=</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RelationField</span><span class="op">&gt;</span>;
-
-<span class="doccomment">/// A short-hand for `Weak&lt;RelationField&gt;`</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">RelationFieldWeak</span> <span class="op">=</span> <span class="ident">Weak</span><span class="op">&lt;</span><span class="ident">RelationField</span><span class="op">&gt;</span>;
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RelationFieldTemplate</span> {
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">is_required</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span> <span class="ident">is_list</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span> <span class="ident">relation_name</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">relation_side</span>: <span class="ident">RelationSide</span>,
-    <span class="kw">pub</span> <span class="ident">relation_info</span>: <span class="ident">RelationInfo</span>,
-    <span class="kw">pub</span> <span class="ident">on_delete_default</span>: <span class="ident">ReferentialAction</span>,
-    <span class="kw">pub</span> <span class="ident">on_update_default</span>: <span class="ident">ReferentialAction</span>,
-}
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RelationField</span> {
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">is_required</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span> <span class="ident">is_list</span>: <span class="ident">bool</span>,
+    <span class="kw">pub</span> <span class="ident">arity</span>: <span class="ident">FieldArity</span>,
     <span class="kw">pub</span> <span class="ident">relation_name</span>: <span class="ident">String</span>,
     <span class="kw">pub</span> <span class="ident">relation_side</span>: <span class="ident">RelationSide</span>,
     <span class="kw">pub</span> <span class="ident">relation</span>: <span class="ident">OnceCell</span><span class="op">&lt;</span><span class="ident">RelationWeakRef</span><span class="op">&gt;</span>,
@@ -355,88 +310,15 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">fields</span>: <span class="ident">OnceCell</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldWeak</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">RelationField</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;RelationField&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;is_required&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">is_required</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;is_list&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">is_list</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;relation_name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">relation_name</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;relation_side&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">relation_side</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;relation&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">relation</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;relation_info&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">relation_info</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;model&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;#ModelWeakRef#&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;fields&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">fields</span>)
-            .<span class="ident">finish</span>()
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">RelationField</span> {}
-
-<span class="kw">impl</span> <span class="ident">Hash</span> <span class="kw">for</span> <span class="ident">RelationField</span> {
-    <span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">Hasher</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">H</span>) {
-        <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">hash</span>(<span class="ident">state</span>);
-        <span class="self">self</span>.<span class="ident">is_required</span>.<span class="ident">hash</span>(<span class="ident">state</span>);
-        <span class="self">self</span>.<span class="ident">is_list</span>.<span class="ident">hash</span>(<span class="ident">state</span>);
-        <span class="self">self</span>.<span class="ident">relation_name</span>.<span class="ident">hash</span>(<span class="ident">state</span>);
-        <span class="self">self</span>.<span class="ident">relation_side</span>.<span class="ident">hash</span>(<span class="ident">state</span>);
-        <span class="self">self</span>.<span class="ident">model</span>().<span class="ident">hash</span>(<span class="ident">state</span>);
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">RelationField</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">name</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">is_required</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">is_required</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">is_list</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">is_list</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">relation_name</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">relation_name</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">relation_side</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">relation_side</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">model</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">model</span>()
-    }
-}
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RelationSide</span> {
-    <span class="ident">A</span>,
-    <span class="ident">B</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">RelationSide</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">opposite</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RelationSide</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RelationSide::A</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RelationSide::B</span>,
-            <span class="ident">RelationSide::B</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RelationSide::A</span>,
-        }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_a</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span> <span class="op">=</span><span class="op">=</span> <span class="ident">RelationSide::A</span>
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_b</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span> <span class="op">=</span><span class="op">=</span> <span class="ident">RelationSide::B</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">RelationFieldTemplate</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>, <span class="ident">model</span>: <span class="ident">ModelWeakRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RelationFieldRef</span> {
-        <span class="ident">Arc::new</span>(<span class="ident">RelationField</span> {
-            <span class="ident">name</span>: <span class="self">self</span>.<span class="ident">name</span>,
-            <span class="ident">is_required</span>: <span class="self">self</span>.<span class="ident">is_required</span>,
-            <span class="ident">is_list</span>: <span class="self">self</span>.<span class="ident">is_list</span>,
-            <span class="ident">relation_name</span>: <span class="self">self</span>.<span class="ident">relation_name</span>,
-            <span class="ident">relation_side</span>: <span class="self">self</span>.<span class="ident">relation_side</span>,
-            <span class="ident">model</span>,
-            <span class="ident">relation</span>: <span class="ident">OnceCell::new</span>(),
-            <span class="ident">relation_info</span>: <span class="self">self</span>.<span class="ident">relation_info</span>,
-            <span class="ident">fields</span>: <span class="ident">OnceCell::new</span>(),
-            <span class="ident">on_delete_default</span>: <span class="self">self</span>.<span class="ident">on_delete_default</span>,
-            <span class="ident">on_update_default</span>: <span class="self">self</span>.<span class="ident">on_update_default</span>,
-        })
-    }
-}
-
 <span class="kw">impl</span> <span class="ident">RelationField</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_list</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">arity</span>, <span class="ident">FieldArity::List</span>)
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_required</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">arity</span>, <span class="ident">FieldArity::Required</span>)
+    }
+
     <span class="doccomment">/// Returns the `ModelProjection` used for this relation fields model.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ## What is the model projection of a relation field?</span>
@@ -477,7 +359,7 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_optional</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="op">!</span><span class="self">self</span>.<span class="ident">is_required</span>
+        <span class="op">!</span><span class="self">self</span>.<span class="ident">is_required</span>()
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ModelRef</span> {
@@ -622,6 +504,66 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">relation_info</span>.<span class="ident">on_delete</span>.<span class="ident">as_ref</span>()
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">RelationField</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;RelationField&quot;</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;arity&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">arity</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;relation_name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">relation_name</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;relation_side&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">relation_side</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;relation&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">relation</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;relation_info&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">relation_info</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;model&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;#ModelWeakRef#&quot;</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;fields&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">fields</span>)
+            .<span class="ident">finish</span>()
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">RelationField</span> {}
+
+<span class="kw">impl</span> <span class="ident">Hash</span> <span class="kw">for</span> <span class="ident">RelationField</span> {
+    <span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">Hasher</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">H</span>) {
+        <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">hash</span>(<span class="ident">state</span>);
+        <span class="self">self</span>.<span class="ident">arity</span>.<span class="ident">hash</span>(<span class="ident">state</span>);
+        <span class="self">self</span>.<span class="ident">relation_name</span>.<span class="ident">hash</span>(<span class="ident">state</span>);
+        <span class="self">self</span>.<span class="ident">relation_side</span>.<span class="ident">hash</span>(<span class="ident">state</span>);
+        <span class="self">self</span>.<span class="ident">model</span>().<span class="ident">hash</span>(<span class="ident">state</span>);
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">RelationField</span> {
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">name</span>
+            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">arity</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">arity</span>
+            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">relation_name</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">relation_name</span>
+            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">relation_side</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">relation_side</span>
+            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">model</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">model</span>()
+    }
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RelationSide</span> {
+    <span class="ident">A</span>,
+    <span class="ident">B</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">RelationSide</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">opposite</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RelationSide</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">RelationSide::A</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RelationSide::B</span>,
+            <span class="ident">RelationSide::B</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RelationSide::A</span>,
+        }
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_a</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span> <span class="op">=</span><span class="op">=</span> <span class="ident">RelationSide::A</span>
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_b</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span> <span class="op">=</span><span class="op">=</span> <span class="ident">RelationSide::B</span>
     }
 }
 </code></pre></div>

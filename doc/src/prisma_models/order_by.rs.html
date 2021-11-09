@@ -214,7 +214,7 @@
         <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span> <span class="number">2</span> {
             <span class="bool-val">false</span>
         } <span class="kw">else</span> {
-            <span class="ident">path</span>.<span class="ident">get</span>(<span class="ident">len</span> <span class="op">-</span> <span class="number">2</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">rf</span><span class="op">|</span> <span class="op">!</span><span class="ident">rf</span>.<span class="ident">is_list</span>).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
+            <span class="ident">path</span>.<span class="ident">get</span>(<span class="ident">len</span> <span class="op">-</span> <span class="number">2</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">rf</span><span class="op">|</span> <span class="op">!</span><span class="ident">rf</span>.<span class="ident">is_list</span>()).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
         }
     }
 }

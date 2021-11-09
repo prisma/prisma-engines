@@ -274,8 +274,9 @@
 <span class="doccomment">/// Builds the root `Mutation` type.</span>
 <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">ctx</span>))]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">build</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BuilderContext</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">OutputType</span>, <span class="ident">ObjectTypeStrongRef</span>) {
-    <span class="kw">let</span> <span class="ident">non_embedded_models</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">internal_data_model</span>.<span class="ident">non_embedded_models</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OutputField</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">non_embedded_models</span>
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OutputField</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">ctx</span>
+        .<span class="ident">internal_data_model</span>
+        .<span class="ident">models_cloned</span>()
         .<span class="ident">into_iter</span>()
         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">model</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">vec</span> <span class="op">=</span> <span class="macro">vec!</span>[];
@@ -329,8 +330,7 @@
                 <span class="ident">append_opt</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fields</span>, <span class="ident">input_fields::nested_create_many_input_field</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">rf</span>));
             }
 
-            <span class="ident">append_opt</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fields</span>, <span class="ident">input_fields::nested_connect_input_field</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">rf</span>));
-
+            <span class="ident">fields</span>.<span class="ident">push</span>(<span class="ident">input_fields::nested_connect_input_field</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">rf</span>));
             <span class="ident">input_object</span>.<span class="ident">set_fields</span>(<span class="ident">fields</span>);
         }
 
@@ -346,11 +346,11 @@
                 <span class="ident">append_opt</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fields</span>, <span class="ident">input_fields::nested_create_many_input_field</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">rf</span>));
             }
 
-            <span class="ident">append_opt</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fields</span>, <span class="ident">input_fields::nested_connect_input_field</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">rf</span>));
             <span class="ident">append_opt</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fields</span>, <span class="ident">input_fields::nested_set_input_field</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">rf</span>));
             <span class="ident">append_opt</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fields</span>, <span class="ident">input_fields::nested_disconnect_input_field</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">rf</span>));
             <span class="ident">append_opt</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fields</span>, <span class="ident">input_fields::nested_delete_input_field</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">rf</span>));
 
+            <span class="ident">fields</span>.<span class="ident">push</span>(<span class="ident">input_fields::nested_connect_input_field</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">rf</span>));
             <span class="ident">fields</span>.<span class="ident">push</span>(<span class="ident">input_fields::nested_update_input_field</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">rf</span>));
 
             <span class="ident">append_opt</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fields</span>, <span class="ident">input_fields::nested_update_many_field</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">rf</span>));

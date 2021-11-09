@@ -44,32 +44,35 @@
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">warnings</span>)]</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::from_over_into</span>)]</span>
 
-<span class="kw">mod</span> <span class="ident">datamodel_converter</span>;
+<span class="kw">mod</span> <span class="ident">builders</span>;
+<span class="kw">mod</span> <span class="ident">composite_type</span>;
 <span class="kw">mod</span> <span class="ident">error</span>;
+<span class="kw">mod</span> <span class="ident">extensions</span>;
 <span class="kw">mod</span> <span class="ident">field</span>;
 <span class="kw">mod</span> <span class="ident">fields</span>;
 <span class="kw">mod</span> <span class="ident">index</span>;
 <span class="kw">mod</span> <span class="ident">internal_data_model</span>;
+<span class="kw">mod</span> <span class="ident">internal_enum</span>;
 <span class="kw">mod</span> <span class="ident">model</span>;
 <span class="kw">mod</span> <span class="ident">order_by</span>;
+<span class="kw">mod</span> <span class="ident">parent_container</span>;
 <span class="kw">mod</span> <span class="ident">prisma_value_ext</span>;
 <span class="kw">mod</span> <span class="ident">projections</span>;
 <span class="kw">mod</span> <span class="ident">record</span>;
 <span class="kw">mod</span> <span class="ident">relation</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sql-ext&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">sql_ext</span>;
-
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">pk</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">prelude</span>;
 
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">builders::InternalDataModelBuilder</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">composite_type</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">datamodel::dml</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">datamodel_converter</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">error</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">field</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">fields</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">index</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">internal_data_model</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">internal_enum</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">model</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">order_by</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">prisma_value_ext</span>::<span class="kw-2">*</span>;
@@ -79,9 +82,6 @@
 
 <span class="comment">// reexport</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">prisma_value</span>::<span class="kw-2">*</span>;
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sql-ext&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">sql_ext</span>::<span class="kw-2">*</span>;
 
 <span class="kw">pub</span> <span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">DomainError</span><span class="op">&gt;</span>;
 </code></pre></div>

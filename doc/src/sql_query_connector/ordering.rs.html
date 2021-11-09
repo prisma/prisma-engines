@@ -190,7 +190,7 @@
 <span id="190">190</span>
 <span id="191">191</span>
 <span id="192">192</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">join_utils</span>::<span class="kw-2">*</span>, <span class="ident">query_arguments_ext::QueryArgumentsExt</span>};
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">join_utils</span>::<span class="kw-2">*</span>, <span class="ident">model_extensions</span>::<span class="kw-2">*</span>, <span class="ident">query_arguments_ext::QueryArgumentsExt</span>};
 <span class="kw">use</span> <span class="ident">connector_interface::QueryArguments</span>;
 <span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
 <span class="kw">use</span> <span class="ident">prisma_models</span>::<span class="kw-2">*</span>;
@@ -203,7 +203,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OrderByDefinition</span> {
     <span class="doccomment">/// Final column identifier to be used for the scalar field to order by</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">order_column</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Defines ordering for an `ORDER BY` statement.    </span>
+    <span class="doccomment">/// Defines ordering for an `ORDER BY` statement.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">order_definition</span>: <span class="ident">OrderDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Joins necessary to perform the order by</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">joins</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AliasedJoin</span><span class="op">&gt;</span>,
@@ -255,7 +255,7 @@
         .<span class="ident">fields</span>
         .<span class="ident">iter</span>()
         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">sf</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="ident">sf</span>.<span class="ident">is_required</span> {
+            <span class="kw">if</span> <span class="ident">sf</span>.<span class="ident">is_required</span>() {
                 <span class="ident">sf</span>.<span class="ident">as_column</span>().<span class="ident">into</span>()
             } <span class="kw">else</span> {
                 <span class="comment">// If the field is nullable, coalesce it with an empty string so that:</span>

@@ -702,7 +702,7 @@
     <span class="kw">let</span> <span class="ident">update_disconnect_node</span> <span class="op">=</span>
         <span class="ident">utils::update_records_node_placeholder</span>(<span class="ident">graph</span>, <span class="ident">Filter::empty</span>(), <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">child_model</span>));
 
-    <span class="kw">let</span> <span class="ident">child_side_required</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">related_field</span>().<span class="ident">is_required</span>;
+    <span class="kw">let</span> <span class="ident">child_side_required</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">related_field</span>().<span class="ident">is_required</span>();
     <span class="kw">let</span> <span class="ident">rf</span> <span class="op">=</span> <span class="ident">Arc::clone</span>(<span class="ident">parent_relation_field</span>);
 
     <span class="ident">graph</span>.<span class="ident">create_edge</span>(

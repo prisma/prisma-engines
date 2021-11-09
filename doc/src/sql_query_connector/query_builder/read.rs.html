@@ -257,7 +257,11 @@
 <span id="257">257</span>
 <span id="258">258</span>
 <span id="259">259</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">cursor_condition</span>, <span class="ident">filter_conversion::AliasedCondition</span>, <span class="ident">nested_aggregations</span>, <span class="ident">ordering</span>};
+<span id="260">260</span>
+<span id="261">261</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">cursor_condition</span>, <span class="ident">filter_conversion::AliasedCondition</span>, <span class="ident">model_extensions</span>::<span class="kw-2">*</span>, <span class="ident">nested_aggregations</span>, <span class="ident">ordering</span>,
+};
 <span class="kw">use</span> <span class="ident">connector_interface</span>::{<span class="ident">filter::Filter</span>, <span class="ident">AggregationSelection</span>, <span class="ident">QueryArguments</span>, <span class="ident">RelAggregationSelection</span>};
 <span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
 <span class="kw">use</span> <span class="ident">prisma_models</span>::<span class="kw-2">*</span>;

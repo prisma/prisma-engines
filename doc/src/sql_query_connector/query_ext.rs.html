@@ -145,7 +145,8 @@
 <span id="145">145</span>
 <span id="146">146</span>
 <span id="147">147</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">column_metadata</span>, <span class="ident">error</span>::<span class="kw-2">*</span>, <span class="ident">AliasedCondition</span>, <span class="ident">ColumnMetadata</span>, <span class="ident">SqlRow</span>, <span class="ident">ToSqlRow</span>};
+<span id="148">148</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">column_metadata</span>, <span class="ident">error</span>::<span class="kw-2">*</span>, <span class="ident">model_extensions</span>::<span class="kw-2">*</span>, <span class="ident">AliasedCondition</span>, <span class="ident">ColumnMetadata</span>, <span class="ident">SqlRow</span>, <span class="ident">ToSqlRow</span>};
 <span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
 <span class="kw">use</span> <span class="ident">connector_interface</span>::{<span class="ident">filter::Filter</span>, <span class="ident">RecordFilter</span>};
 <span class="kw">use</span> <span class="ident">futures::future::FutureExt</span>;
@@ -273,6 +274,7 @@
             .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">f</span> {
                 <span class="ident">Field::Scalar</span>(<span class="ident">sf</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[<span class="ident">sf</span>.<span class="ident">type_identifier_with_arity</span>()],
                 <span class="ident">Field::Relation</span>(<span class="ident">rf</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">rf</span>.<span class="ident">type_identifiers_with_arities</span>(),
+                <span class="ident">Field::Composite</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unimplemented!</span>(),
             })
             .<span class="ident">collect</span>();
 

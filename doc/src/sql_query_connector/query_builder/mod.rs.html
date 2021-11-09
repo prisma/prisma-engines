@@ -42,13 +42,15 @@
 <span id="42">42</span>
 <span id="43">43</span>
 <span id="44">44</span>
+<span id="45">45</span>
 </pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">read</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">write</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">read</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">write</span>::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">RecordProjection</span>, <span class="ident">RecordProjectionExt</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model_extensions::RecordProjectionExt</span>;
+<span class="kw">use</span> <span class="ident">prisma_models::RecordProjection</span>;
 <span class="kw">use</span> <span class="ident">quaint::ast</span>::{<span class="ident">Column</span>, <span class="ident">Comparable</span>, <span class="ident">ConditionTree</span>, <span class="ident">Query</span>, <span class="ident">Row</span>, <span class="ident">Values</span>};
 
 <span class="kw">const</span> <span class="ident">PARAMETER_LIMIT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">2000</span>;

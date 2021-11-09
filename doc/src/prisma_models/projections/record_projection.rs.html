@@ -149,7 +149,7 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ModelRef</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">fields</span>().<span class="ident">next</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">model</span>())
+        <span class="self">self</span>.<span class="ident">fields</span>().<span class="ident">next</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">container</span>.<span class="ident">as_model</span>())
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
