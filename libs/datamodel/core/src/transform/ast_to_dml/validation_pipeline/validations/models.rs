@@ -101,7 +101,7 @@ pub(crate) fn uses_sort_or_length_on_primary_without_preview_flag(
 
             let span = pk.ast_attribute().span;
 
-            diagnostics.push_error(DatamodelError::new_attribute_validation_error(&message, "id", span));
+            diagnostics.push_error(DatamodelError::new_attribute_validation_error(message, "id", span));
         }
     }
 }

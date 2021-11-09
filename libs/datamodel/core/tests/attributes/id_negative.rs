@@ -531,7 +531,13 @@ fn id_does_not_allow_sort_or_index_unless_extended_indexes_are_on() {
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@id": The length argument is not yet available.[0m
+        [1;91merror[0m: [1mError parsing attribute "@id": The sort and length args are not yet available[0m
+          [1;94m-->[0m  [4mschema.prisma:18[0m
+        [1;94m   | [0m
+        [1;94m17 | [0m         
+        [1;94m18 | [0m         @@[1;91mid([firstName, middleName(length: 1), lastName])[0m
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@id": The sort and length args are not yet available[0m
           [1;94m-->[0m  [4mschema.prisma:22[0m
         [1;94m   | [0m
         [1;94m21 | [0m     model Blog {
