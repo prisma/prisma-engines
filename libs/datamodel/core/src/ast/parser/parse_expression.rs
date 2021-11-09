@@ -1,6 +1,6 @@
 use super::helpers::{parsing_catch_all, Token, TokenExtensions};
+use super::parse_attribute::parse_attribute_arg;
 use super::Rule;
-use crate::ast::parser::parse_attribute::parse_attribute_arg;
 use crate::ast::*;
 
 pub fn parse_expression(token: &Token<'_>) -> Expression {

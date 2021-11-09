@@ -1,3 +1,4 @@
+use indoc::formatdoc;
 use itertools::Itertools;
 
 mod arg_parsing;
@@ -48,19 +49,21 @@ fn with_header(dm: &str, provider: Provider, preview_features: &[&str]) -> Strin
         )
     };
 
-    let header = format!(
+    let header = formatdoc!(
         r#"
-    datasource test {{
-            provider = "{}"
-            url = "{}://..."
-    }}
-    
-    generator client {{
-        provider = "prisma-client-js"
-        {}
-    }}
-    "#,
-        provider, url, preview_features
+        datasource test {{
+                provider = "{}"
+                url = "{}://..."
+        }}
+        
+        generator client {{
+            provider = "prisma-client-js"
+            {}
+        }}
+        "#,
+        provider,
+        url,
+        preview_features
     );
 
     format!("{}\n{}", header, dm)

@@ -230,10 +230,10 @@ fn invalid_name_for_compound_id_must_error() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating model "User": The `name` property within the `@@id` attribute only allows for the following characters: `_a-zA-Z0-9`.[0m
-          [1;94m-->[0m  [4mschema.prisma:16[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
-        [1;94m15 | [0m
-        [1;94m16 | [0m  @@[1;91mid([name, identification], name: "Test.User")[0m
+        [1;94m14 | [0m
+        [1;94m15 | [0m  @@[1;91mid([name, identification], name: "Test.User")[0m
         [1;94m   | [0m
     "#]];
 
@@ -354,16 +354,16 @@ fn naming_id_to_a_field_name_should_error() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating model "User": The custom name `used` specified for the `@@id` attribute is already used as a name for a field. Please choose a different name.[0m
-          [1;94m-->[0m  [4mschema.prisma:12[0m
+          [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
-        [1;94m11 | [0m    
-        [1;94m12 | [0m[1;91mmodel User {[0m
-        [1;94m13 | [0m  used           Int
-        [1;94m14 | [0m  name           String
-        [1;94m15 | [0m  identification Int
-        [1;94m16 | [0m
-        [1;94m17 | [0m  @@id([name, identification], name: "used")
-        [1;94m18 | [0m}
+        [1;94m10 | [0m
+        [1;94m11 | [0m[1;91mmodel User {[0m
+        [1;94m12 | [0m  used           Int
+        [1;94m13 | [0m  name           String
+        [1;94m14 | [0m  identification Int
+        [1;94m15 | [0m
+        [1;94m16 | [0m  @@id([name, identification], name: "used")
+        [1;94m17 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -394,16 +394,16 @@ fn mapping_id_with_a_name_that_is_too_long_should_error() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating model "User": The constraint name 'IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits' specified in the `map` argument for the `@@id` constraint is too long for your chosen provider. The maximum allowed length is 63 bytes.[0m
-          [1;94m-->[0m  [4mschema.prisma:16[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
-        [1;94m15 | [0m
-        [1;94m16 | [0m  @@[1;91mid([name, identification], map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits")[0m
+        [1;94m14 | [0m
+        [1;94m15 | [0m  @@[1;91mid([name, identification], map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits")[0m
         [1;94m   | [0m
         [1;91merror[0m: [1mError validating model "User1": The constraint name 'IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimitsHereAsWell' specified in the `map` argument for the `@id` constraint is too long for your chosen provider. The maximum allowed length is 63 bytes.[0m
-          [1;94m-->[0m  [4mschema.prisma:20[0m
+          [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
-        [1;94m19 | [0mmodel User1 {
-        [1;94m20 | [0m  name           String @[1;91mid(map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimitsHereAsWell")[0m
+        [1;94m18 | [0mmodel User1 {
+        [1;94m19 | [0m  name           String @[1;91mid(map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimitsHereAsWell")[0m
         [1;94m   | [0m
     "#]];
 
@@ -426,10 +426,10 @@ fn name_on_field_level_id_should_error() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mNo such argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
-        [1;94m12 | [0mmodel User {
-        [1;94m13 | [0m  invalid           Int @id([1;91mname: "THIS SHOULD BE MAP INSTEAD"[0m)
+        [1;94m11 | [0mmodel User {
+        [1;94m12 | [0m  invalid           Int @id([1;91mname: "THIS SHOULD BE MAP INSTEAD"[0m)
         [1;94m   | [0m
     "#]];
 
@@ -532,16 +532,16 @@ fn id_does_not_allow_sort_or_index_unless_extended_indexes_are_on() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@id": The sort and length args are not yet available[0m
-          [1;94m-->[0m  [4mschema.prisma:18[0m
+          [1;94m-->[0m  [4mschema.prisma:17[0m
         [1;94m   | [0m
-        [1;94m17 | [0m         
-        [1;94m18 | [0m         @@[1;91mid([firstName, middleName(length: 1), lastName])[0m
+        [1;94m16 | [0m         
+        [1;94m17 | [0m         @@[1;91mid([firstName, middleName(length: 1), lastName])[0m
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@id": The sort and length args are not yet available[0m
-          [1;94m-->[0m  [4mschema.prisma:22[0m
+          [1;94m-->[0m  [4mschema.prisma:21[0m
         [1;94m   | [0m
-        [1;94m21 | [0m     model Blog {
-        [1;94m22 | [0m         title  String @[1;91mid(length:5)[0m
+        [1;94m20 | [0m     model Blog {
+        [1;94m21 | [0m         title  String @[1;91mid(length:5)[0m
         [1;94m   | [0m
     "#]];
 

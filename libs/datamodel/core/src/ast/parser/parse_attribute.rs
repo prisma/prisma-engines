@@ -28,7 +28,7 @@ pub fn parse_attribute(token: &Token<'_>) -> Attribute {
     }
 }
 
-fn parse_attribute_args(token: &Token<'_>, arguments: &mut Vec<Argument>) {
+pub(crate) fn parse_attribute_args(token: &Token<'_>, arguments: &mut Vec<Argument>) {
     for current in token.relevant_children() {
         match current.as_rule() {
             // This is a named arg.
