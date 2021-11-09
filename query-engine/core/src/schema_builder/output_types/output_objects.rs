@@ -171,7 +171,7 @@ where
             object_mapper,
         ));
 
-        Some(field(name, vec![], object_type, None).nullable())
+        Some(field(name, vec![], object_type, None))
     }
 }
 
