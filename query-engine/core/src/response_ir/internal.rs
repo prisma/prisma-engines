@@ -300,8 +300,8 @@ fn serialize_objects(
     // Finally, serialize the objects based on the selected fields.
     let mut object_mapping = UncheckedItemsWithParents::with_capacity(result.scalars.records.len());
     let scalar_db_field_names = result.scalars.field_names;
+    let model = result.model;
 
-    let model = result.model_id.model();
     let field_names: Vec<_> = scalar_db_field_names
         .iter()
         .filter_map(|f| model.map_scalar_db_field_name(f).map(|x| x.name.clone()))
@@ -310,7 +310,7 @@ fn serialize_objects(
     // Write all fields, nested and list fields unordered into a map, afterwards order all into the final order.
     // If nothing is written to the object, write null instead.
     for (r_index, record) in result.scalars.records.into_iter().enumerate() {
-        let record_id = Some(record.projection(&scalar_db_field_names, &result.model_id)?);
+        let record_id = Some(record.projection(&scalar_db_field_names, &model.primary_identifier())?);
 
         if !object_mapping.contains_key(&record.parent_id) {
             object_mapping.insert(record.parent_id.clone(), Vec::new());
