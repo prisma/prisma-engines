@@ -1,6 +1,6 @@
 use crate::{
-    DomainError, ModelProjection, OrderBy, PrismaValue, PrismaValueExtensions, RecordProjection, ScalarFieldRef,
-    SortOrder,
+    DomainError, FieldSelection, ModelProjection, OrderBy, PrismaValue, PrismaValueExtensions, RecordProjection,
+    ScalarFieldRef, SortOrder,
 };
 use itertools::Itertools;
 use std::collections::HashMap;
@@ -51,11 +51,11 @@ impl ManyRecords {
     pub fn empty(selected_fields: &FieldSelection) -> Self {
         Self {
             records: Vec::new(),
-            field_names: selected_fields.names().map(|n| n.to_string()).collect(),
+            field_names: selected_fields.prisma_names().collect(),
         }
     }
 
-    pub fn from_projection(projection: Vec<Vec<PrismaValue>>, selected_fields: &ModelProjection) -> Self {
+    pub fn from_projection(projection: Vec<Vec<PrismaValue>>, selected_fields: &FieldSelection) -> Self {
         Self {
             records: projection
                 .into_iter()

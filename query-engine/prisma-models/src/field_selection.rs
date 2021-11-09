@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use itertools::Itertools;
 
-use crate::{CompositeFieldRef, ModelRef, ScalarFieldRef};
+use crate::{CompositeFieldRef, Field, ModelRef, ScalarFieldRef};
 
 /// A selection of fields from a model.
 #[derive(Debug, Clone)]
@@ -61,8 +61,14 @@ impl FieldSelection {
         })
     }
 
+    /// Returns all Prisma (e.g. schema model field) names of contained fields.
+    /// Does _not_ recurse into composite selections and only iterates top level fields.
+    pub fn prisma_names(&self) -> impl Iterator<Item = String> + '_ {
+        self.selections.iter().map(|f| f.prisma_name().to_owned())
+    }
+
     /// Returns all database (e.g. column or document field) names of contained fields.
-    /// Does _not_ recurse into composite selections and only checks top level fields.
+    /// Does _not_ recurse into composite selections and only iterates level fields.
     pub fn db_names(&self) -> impl Iterator<Item = String> + '_ {
         self.selections.iter().map(|f| f.db_name().to_owned())
     }
@@ -100,9 +106,19 @@ impl SelectedField {
     }
 }
 
-impl From<ScalarFieldRef> for SelectedField {
-    fn from(f: ScalarFieldRef) -> Self {
-        Self::Scalar(f)
+impl From<(ModelRef, Vec<Field>)> for FieldSelection {
+    fn from((model, fields): (ModelRef, Vec<Field>)) -> Self {
+        Self {
+            model,
+            selections: fields
+                .into_iter()
+                .flat_map(|field| match field {
+                    Field::Relation(rf) => rf.scalar_fields().into_iter().map(Into::into).collect(),
+                    Field::Scalar(sf) => vec![sf.into()],
+                    Field::Composite(cf) => todo!(),
+                })
+                .collect(),
+        }
     }
 }
 
@@ -112,6 +128,12 @@ impl From<(ModelRef, ScalarFieldRef)> for FieldSelection {
             model,
             selections: vec![field.into()],
         }
+    }
+}
+
+impl From<ScalarFieldRef> for SelectedField {
+    fn from(f: ScalarFieldRef) -> Self {
+        Self::Scalar(f)
     }
 }
 
