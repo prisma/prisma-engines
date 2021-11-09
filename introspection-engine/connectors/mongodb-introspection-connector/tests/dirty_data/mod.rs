@@ -1,5 +1,5 @@
 use crate::test_api::*;
-use bson::{Bson, DateTime, Timestamp};
+use mongodb::bson::{doc, Bson, DateTime, Timestamp};
 
 #[test]
 fn explicit_id_field() {

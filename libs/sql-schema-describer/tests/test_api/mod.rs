@@ -116,6 +116,14 @@ impl TestApi {
         self.tags.contains(Tags::Mssql)
     }
 
+    pub(crate) fn is_mysql(&self) -> bool {
+        self.tags.contains(Tags::Mysql)
+    }
+
+    pub(crate) fn is_mysql_8(&self) -> bool {
+        self.tags.contains(Tags::Mysql8)
+    }
+
     pub(crate) fn schema_name(&self) -> &str {
         match self.sql_family() {
             // It is not possible to connect to a specific schema in MSSQL. The
@@ -210,7 +218,16 @@ impl TableAssertion<'_> {
         columns: &[&str],
         assertions: impl for<'i> FnOnce(&'i IndexAssertion<'i>) -> &'i IndexAssertion<'i>,
     ) -> &Self {
-        let index = self.table.indexes().find(|idx| idx.column_names() == columns).unwrap();
+        let index = self
+            .table
+            .indexes()
+            .find(|i| {
+                let lengths_match = i.columns().len() == columns.len();
+                let columns_match = i.columns().zip(columns.iter()).all(|(a, b)| a.get().name() == *b);
+
+                lengths_match && columns_match
+            })
+            .unwrap();
 
         assertions(&IndexAssertion { index });
 
@@ -223,7 +240,17 @@ impl TableAssertion<'_> {
     }
 
     pub fn assert_pk_on_columns(&self, columns: &[&str]) -> &Self {
-        assert_eq!(self.table.primary_key().unwrap().columns, columns);
+        let pk_columns = self
+            .table
+            .primary_key()
+            .unwrap()
+            .columns
+            .iter()
+            .map(|c| c.name())
+            .collect::<Vec<_>>();
+
+        assert_eq!(pk_columns, columns);
+
         self
     }
 }

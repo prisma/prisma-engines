@@ -1,21 +1,21 @@
-use std::{borrow::Cow, collections::BTreeMap, str::FromStr};
-
-use enumflags2::BitFlags;
-
-use dml::{
-    field::Field, model::Model, native_type_constructor::NativeTypeConstructor,
-    native_type_instance::NativeTypeInstance, relation_info::ReferentialAction, scalars::ScalarType,
-};
-pub use empty_connector::EmptyDatamodelConnector;
-pub use referential_integrity::ReferentialIntegrity;
-
-use crate::connector_error::{ConnectorError, ConnectorErrorFactory, ErrorKind};
+#![deny(rust_2018_idioms, unsafe_code)]
 
 pub mod connector_error;
 pub mod helper;
 
 mod empty_connector;
 mod referential_integrity;
+
+pub use empty_connector::EmptyDatamodelConnector;
+pub use referential_integrity::ReferentialIntegrity;
+
+use crate::connector_error::{ConnectorError, ConnectorErrorFactory, ErrorKind};
+use dml::{
+    field::Field, model::Model, native_type_constructor::NativeTypeConstructor,
+    native_type_instance::NativeTypeInstance, relation_info::ReferentialAction, scalars::ScalarType,
+};
+use enumflags2::BitFlags;
+use std::{borrow::Cow, collections::BTreeMap, str::FromStr};
 
 pub trait Connector: Send + Sync {
     fn name(&self) -> &str;
@@ -62,13 +62,13 @@ pub trait Connector: Send + Sync {
 
     /// The scopes in which a constraint name should be validated. If empty, doesn't check for name
     /// clashes in the validation phase.
-    fn constraint_violation_scopes(&self) -> &[ConstraintScope] {
+    fn constraint_violation_scopes(&self) -> &'static [ConstraintScope] {
         &[]
     }
 
     /// Returns all available native type constructors available through this connector.
-    /// Powers the auto completion of the vs code plugin.
-    fn available_native_type_constructors(&self) -> &[NativeTypeConstructor];
+    /// Powers the auto completion of the VSCode plugin.
+    fn available_native_type_constructors(&self) -> &'static [NativeTypeConstructor];
 
     /// Returns the Scalar Type for the given native type
     fn scalar_type_for_native_type(&self, native_type: serde_json::Value) -> ScalarType;
@@ -83,11 +83,10 @@ pub trait Connector: Send + Sync {
     fn find_native_type_constructor(&self, name: &str) -> Option<&NativeTypeConstructor> {
         self.available_native_type_constructors()
             .iter()
-            .find(|constructor| constructor.name.as_str() == name)
+            .find(|constructor| constructor.name == name)
     }
 
     /// This function is used during Schema parsing to calculate the concrete native type.
-    /// This powers the use of native types for QE + ME.
     fn parse_native_type(&self, name: &str, args: Vec<String>) -> Result<NativeTypeInstance, ConnectorError>;
 
     /// This function is used in ME for error messages
@@ -97,7 +96,6 @@ pub trait Connector: Send + Sync {
     }
 
     /// This function is used during introspection to turn an introspected native type into an instance that can be put into the Prisma schema.
-    /// powers IE
     fn introspect_native_type(&self, native_type: serde_json::Value) -> Result<NativeTypeInstance, ConnectorError>;
 
     fn set_config_dir<'a>(&self, config_dir: &std::path::Path, url: &'a str) -> Cow<'a, str> {
@@ -138,10 +136,6 @@ pub trait Connector: Send + Sync {
 
     fn supports_scalar_lists(&self) -> bool {
         self.has_capability(ConnectorCapability::ScalarLists)
-    }
-
-    fn supports_multiple_indexes_with_same_name(&self) -> bool {
-        self.has_capability(ConnectorCapability::MultipleIndexesWithSameName)
     }
 
     fn supports_relations_over_non_unique_criteria(&self) -> bool {
@@ -259,7 +253,6 @@ capabilities!(
     AutoIncrementAllowedOnNonId,
     AutoIncrementMultipleAllowed,
     AutoIncrementNonIndexedAllowed,
-    MultipleIndexesWithSameName,
     NamedPrimaryKeys,
     NamedForeignKeys,
     ReferenceCycleDetection,

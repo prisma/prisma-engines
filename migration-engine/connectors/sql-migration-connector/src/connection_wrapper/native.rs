@@ -1,4 +1,6 @@
 use super::{SqlError, SqlResult};
+use datamodel::common::preview_features::PreviewFeature;
+use enumflags2::BitFlags;
 use migration_connector::{ConnectorError, ConnectorResult};
 use quaint::{
     connector::{Mysql, MysqlUrl, PostgreSql, PostgresUrl},
@@ -105,9 +107,12 @@ impl Connection {
         }
     }
 
-    pub(crate) async fn describe_schema(&self) -> ConnectorResult<SqlSchema> {
+    pub(crate) async fn describe_schema(
+        &self,
+        preview_features: BitFlags<PreviewFeature>,
+    ) -> ConnectorResult<SqlSchema> {
         let connection_info = self.connection_info();
-        match connection_info {
+        let mut schema = match connection_info {
             ConnectionInfo::Postgres(_) => {
                 sql_schema_describer::postgres::SqlSchemaDescriber::new(self.queryable(), Default::default())
                     .describe(connection_info.schema_name())
@@ -121,7 +126,7 @@ impl Connection {
 
                             ConnectorError::from(err)
                         }
-                    })
+                    })?
             }
             ConnectionInfo::Mysql(_) => sql_schema_describer::mysql::SqlSchemaDescriber::new(self.queryable())
                 .describe(connection_info.schema_name())
@@ -131,7 +136,7 @@ impl Connection {
                     DescriberErrorKind::CrossSchemaReference { .. } => {
                         unreachable!("No schemas on MySQL")
                     }
-                }),
+                })?,
             ConnectionInfo::Mssql(_) => sql_schema_describer::mssql::SqlSchemaDescriber::new(self.queryable())
                 .describe(connection_info.schema_name())
                 .await
@@ -144,7 +149,7 @@ impl Connection {
 
                         ConnectorError::from(err)
                     }
-                }),
+                })?,
             ConnectionInfo::Sqlite { .. } | ConnectionInfo::InMemorySqlite { .. } => {
                 sql_schema_describer::sqlite::SqlSchemaDescriber::new(self.queryable())
                     .describe(connection_info.schema_name())
@@ -154,11 +159,17 @@ impl Connection {
                         DescriberErrorKind::CrossSchemaReference { .. } => {
                             unreachable!("No schemas on SQLite")
                         }
-                    })
+                    })?
             }
-        }
-    }
+        };
 
+        // Remove this when the feature is GA
+        if !preview_features.contains(PreviewFeature::ExtendedIndexes) {
+            filter_extended_index_capabilities(&mut schema);
+        }
+
+        Ok(schema)
+    }
     pub(crate) async fn query(&self, query: impl Into<Query<'_>>) -> SqlResult<ResultSet> {
         self.queryable()
             .query(query.into())
@@ -199,5 +210,47 @@ impl Connection {
             ConnectionInner::Mysql(inner) => &**inner,
             other => panic!("{:?} in Connection::unwrap_mysql()", other),
         }
+    }
+}
+
+fn filter_extended_index_capabilities(schema: &mut SqlSchema) {
+    for (_, table) in schema.iter_tables_mut() {
+        let mut pk_removal = false;
+
+        if let Some(ref mut pk) = &mut table.primary_key {
+            for col in pk.columns.iter_mut() {
+                if col.length.is_some() {
+                    pk_removal = true;
+                }
+
+                col.length = None;
+                col.sort_order = None;
+            }
+        }
+
+        if pk_removal {
+            table.primary_key = None;
+        }
+
+        let mut kept_indexes = Vec::new();
+
+        while let Some(mut index) = table.indices.pop() {
+            let mut remove_index = false;
+
+            for col in index.columns.iter_mut() {
+                if col.length.is_some() {
+                    remove_index = true;
+                }
+
+                col.sort_order = None;
+            }
+
+            if !remove_index {
+                kept_indexes.push(index);
+            }
+        }
+
+        kept_indexes.reverse();
+        table.indices = kept_indexes;
     }
 }

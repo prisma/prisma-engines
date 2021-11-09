@@ -3,14 +3,16 @@ mod name;
 pub(crate) use name::Name;
 
 use super::{field_type::FieldType, CompositeTypeDepth};
-use bson::{Bson, Document};
 use convert_case::{Case, Casing};
 use datamodel::{
     CompositeType, CompositeTypeField, Datamodel, DefaultValue, Field, IndexDefinition, IndexType, Model,
     NativeTypeInstance, PrimaryKeyDefinition, ScalarField, ScalarType, ValueGenerator, WithDatabaseName,
 };
 use introspection_connector::Warning;
-use mongodb::IndexModel;
+use mongodb::{
+    bson::{Bson, Document},
+    IndexModel,
+};
 use native_types::MongoDbType;
 use once_cell::sync::Lazy;
 use regex::Regex;

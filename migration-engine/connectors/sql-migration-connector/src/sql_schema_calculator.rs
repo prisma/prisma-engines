@@ -49,7 +49,7 @@ fn calculate_model_tables<'a>(
             columns: pk
                 .fields
                 .iter()
-                .map(|field| model.find_scalar_field(field).unwrap().db_name().to_string())
+                .map(|field| sql::PrimaryKeyColumn::new(model.find_scalar_field(field).unwrap().db_name()))
                 .collect(),
             sequence: None,
             constraint_name: pk.db_name.clone(),
@@ -78,7 +78,7 @@ fn calculate_model_tables<'a>(
                     // The model index definition uses the model field names, but the SQL Index wants the column names.
                     columns: referenced_fields
                         .iter()
-                        .map(|field| field.db_name().to_owned())
+                        .map(|field| sql::IndexColumn::new(field.db_name()))
                         .collect(),
                     tpe: index_type,
                 }
@@ -159,12 +159,15 @@ fn calculate_relation_tables<'a>(
             let indexes = vec![
                 sql::Index {
                     name: format!("{}_AB_unique", &table_name),
-                    columns: vec![m2m.model_a_column().into(), m2m.model_b_column().into()],
+                    columns: vec![
+                        sql::IndexColumn::new(m2m.model_a_column()),
+                        sql::IndexColumn::new(m2m.model_b_column()),
+                    ],
                     tpe: sql::IndexType::Unique,
                 },
                 sql::Index {
                     name: format!("{}_B_index", &table_name),
-                    columns: vec![m2m.model_b_column().into()],
+                    columns: vec![sql::IndexColumn::new(m2m.model_b_column())],
                     tpe: sql::IndexType::Normal,
                 },
             ];

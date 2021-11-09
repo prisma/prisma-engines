@@ -482,3 +482,38 @@ fn one_to_one_optional() {
     schema.assert_has_model("A").assert_has_relation_field("b");
     schema.assert_has_model("B").assert_has_relation_field("a");
 }
+
+#[test]
+fn mongodb_inline_many_to_many_relations_are_allowed() {
+    let schema = indoc! {r#"
+    datasource db {
+      provider = "mongodb"
+      url = env("DB_URL")
+    }
+
+    generator js {
+      provider = "prisma-client-js"
+      previewFeatures = ["mongoDb"]
+    }
+
+    model A {
+        id  String  @id @map("_id") @db.ObjectId
+        gql String?
+
+        b_ids String[] @db.Array(ObjectId)
+        bs    B[]      @relation(fields: [b_ids])
+    }
+
+    model B {
+        id  String  @id @map("_id") @db.ObjectId
+        gql String?
+
+        a_ids String[] @db.Array(ObjectId)
+        as    A[]      @relation(fields: [a_ids])
+    }
+    "#};
+
+    let schema = parse(schema);
+    schema.assert_has_model("A").assert_has_relation_field("bs");
+    schema.assert_has_model("B").assert_has_relation_field("as");
+}

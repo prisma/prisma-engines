@@ -174,7 +174,7 @@ impl<'a> AlterTableConstructor<'a> {
         let mut quoted_columns = Vec::with_capacity(columns.len());
 
         for colname in columns {
-            quoted_columns.push(format!("{}", self.renderer.quote(colname)));
+            quoted_columns.push(format!("{}", self.renderer.quote(&colname)));
         }
 
         self.add_constraints.insert(format!(

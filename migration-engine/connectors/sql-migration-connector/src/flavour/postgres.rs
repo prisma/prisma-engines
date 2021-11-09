@@ -389,7 +389,7 @@ impl SqlFlavour for PostgresFlavour {
 
                 // The connection to the shadow database is dropped at the end of
                 // the block.
-                shadow_database.describe_schema().await
+                shadow_database.describe_schema(self.preview_features).await
             }
         })()
         .await;

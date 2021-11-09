@@ -110,6 +110,13 @@ impl SqlSchema {
             .map(|(table_index, table)| (TableId(table_index as u32), table))
     }
 
+    pub fn iter_tables_mut(&mut self) -> impl Iterator<Item = (TableId, &mut Table)> {
+        self.tables
+            .iter_mut()
+            .enumerate()
+            .map(|(table_index, table)| (TableId(table_index as u32), table))
+    }
+
     pub fn table(&self, name: &str) -> core::result::Result<&Table, String> {
         match self.tables.iter().find(|t| t.name == name) {
             Some(t) => Ok(t),
@@ -191,21 +198,21 @@ impl Table {
 
     pub fn is_part_of_primary_key(&self, column: &str) -> bool {
         match &self.primary_key {
-            Some(pk) => pk.columns.contains(&column.to_string()),
+            Some(pk) => pk.columns.iter().any(|c| c.name() == column),
             None => false,
         }
     }
 
-    pub fn primary_key_columns(&self) -> Vec<String> {
+    pub fn primary_key_columns(&self) -> impl Iterator<Item = &PrimaryKeyColumn> + '_ {
         match &self.primary_key {
-            Some(pk) => pk.columns.clone(),
-            None => Vec::new(),
+            Some(pk) => pk.columns.iter(),
+            None => [].iter(),
         }
     }
 
     pub fn is_column_unique(&self, column_name: &str) -> bool {
         self.indices.iter().any(|index| {
-            index.is_unique() && index.columns.len() == 1 && index.columns.contains(&column_name.to_owned())
+            index.is_unique() && index.columns.len() == 1 && index.columns.iter().any(|c| c.name() == column_name)
         })
     }
 
@@ -232,13 +239,44 @@ impl IndexType {
     }
 }
 
+/// The sort order of an index.
+#[derive(Serialize, Deserialize, PartialEq, Debug, Copy, Clone)]
+pub enum SQLSortOrder {
+    Asc,
+    Desc,
+}
+
+#[derive(Default, Serialize, Deserialize, PartialEq, Debug, Clone)]
+pub struct IndexColumn {
+    pub name: String,
+    pub sort_order: Option<SQLSortOrder>,
+    pub length: Option<u32>,
+}
+
+impl IndexColumn {
+    pub fn new(name: impl ToString) -> Self {
+        Self {
+            name: name.to_string(),
+            ..Default::default()
+        }
+    }
+
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    pub fn set_sort_order(&mut self, sort_order: SQLSortOrder) {
+        self.sort_order = Some(sort_order);
+    }
+}
+
 /// An index of a table.
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct Index {
     /// Index name.
     pub name: String,
     /// Index columns.
-    pub columns: Vec<String>,
+    pub columns: Vec<IndexColumn>,
     /// Type of index.
     pub tpe: IndexType,
 }
@@ -246,6 +284,10 @@ pub struct Index {
 impl Index {
     pub fn is_unique(&self) -> bool {
         self.tpe == IndexType::Unique
+    }
+
+    pub fn column_names(&self) -> impl ExactSizeIterator<Item = &str> + '_ {
+        self.columns.iter().map(|c| c.name())
     }
 }
 
@@ -267,11 +309,35 @@ pub struct UserDefinedType {
     pub definition: Option<String>,
 }
 
+#[derive(Default, Serialize, Deserialize, Debug, PartialEq, Clone)]
+pub struct PrimaryKeyColumn {
+    pub name: String,
+    pub length: Option<u32>,
+    pub sort_order: Option<SQLSortOrder>,
+}
+
+impl PrimaryKeyColumn {
+    pub fn new(name: impl ToString) -> Self {
+        Self {
+            name: name.to_string(),
+            ..Default::default()
+        }
+    }
+
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    pub fn set_sort_order(&mut self, sort_order: SQLSortOrder) {
+        self.sort_order = Some(sort_order);
+    }
+}
+
 /// The primary key of a table.
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct PrimaryKey {
     /// Columns.
-    pub columns: Vec<String>,
+    pub columns: Vec<PrimaryKeyColumn>,
     /// The sequence optionally seeding this primary key.
     pub sequence: Option<Sequence>,
     /// The name of the primary key constraint, when available.
@@ -280,7 +346,11 @@ pub struct PrimaryKey {
 
 impl PrimaryKey {
     pub fn is_single_primary_key(&self, column: &str) -> bool {
-        self.columns.len() == 1 && self.columns.iter().any(|col| col == column)
+        self.columns.len() == 1 && self.columns.iter().any(|col| col.name() == column)
+    }
+
+    pub fn column_names(&self) -> impl ExactSizeIterator<Item = &str> + '_ {
+        self.columns.iter().map(|c| c.name())
     }
 }
 

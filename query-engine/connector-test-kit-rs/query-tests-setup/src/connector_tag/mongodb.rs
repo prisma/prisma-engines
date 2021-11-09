@@ -21,11 +21,21 @@ impl ConnectorTagInterface for MongoDbConnectorTag {
 
     fn connection_string(&self, database: &str, is_ci: bool) -> String {
         match self.version {
-            Some(MongoDbVersion::V4) if is_ci => format!(
-                "mongodb://prisma:prisma@test-db-mongodb-4:27017/{}?authSource=admin&retryWrites=true",
+            Some(MongoDbVersion::V4_2) if is_ci => format!(
+                "mongodb://prisma:prisma@test-db-mongodb-4-2:27016/{}?authSource=admin&retryWrites=true",
                 database
             ),
-            Some(MongoDbVersion::V4) => {
+            Some(MongoDbVersion::V4_2) => {
+                format!(
+                    "mongodb://prisma:prisma@127.0.0.1:27016/{}?authSource=admin&retryWrites=true",
+                    database
+                )
+            }
+            Some(MongoDbVersion::V4_4) if is_ci => format!(
+                "mongodb://prisma:prisma@test-db-mongodb-4-4:27017/{}?authSource=admin&retryWrites=true",
+                database
+            ),
+            Some(MongoDbVersion::V4_4) => {
                 format!(
                     "mongodb://prisma:prisma@127.0.0.1:27017/{}?authSource=admin&retryWrites=true",
                     database
@@ -65,7 +75,8 @@ impl ConnectorTagInterface for MongoDbConnectorTag {
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum MongoDbVersion {
-    V4,
+    V4_2,
+    V4_4,
     V5,
 }
 
@@ -86,7 +97,11 @@ impl MongoDbConnectorTag {
     pub fn all() -> Vec<Self> {
         vec![
             Self {
-                version: Some(MongoDbVersion::V4),
+                version: Some(MongoDbVersion::V4_2),
+                capabilities: mongo_capabilities(),
+            },
+            Self {
+                version: Some(MongoDbVersion::V4_4),
                 capabilities: mongo_capabilities(),
             },
             Self {
@@ -111,7 +126,8 @@ impl TryFrom<&str> for MongoDbVersion {
 
     fn try_from(s: &str) -> Result<Self, Self::Error> {
         let version = match s {
-            "4" => Self::V4,
+            "4.4" => Self::V4_4,
+            "4.2" => Self::V4_2,
             "5" => Self::V5,
             _ => return Err(TestError::parse_error(format!("Unknown MongoDB version `{}`", s))),
         };
@@ -123,7 +139,8 @@ impl TryFrom<&str> for MongoDbVersion {
 impl ToString for MongoDbVersion {
     fn to_string(&self) -> String {
         match self {
-            MongoDbVersion::V4 => "4",
+            MongoDbVersion::V4_4 => "4.4",
+            &MongoDbVersion::V4_2 => "4.2",
             MongoDbVersion::V5 => "5",
         }
         .to_owned()

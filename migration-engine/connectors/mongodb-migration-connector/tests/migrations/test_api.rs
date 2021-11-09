@@ -1,6 +1,6 @@
-use bson::doc;
 use futures::TryStreamExt;
 use migration_connector::{DiffTarget, MigrationConnector};
+use mongodb::bson::{self, doc};
 use mongodb_migration_connector::MongoDbMigrationConnector;
 use once_cell::sync::Lazy;
 use std::{collections::BTreeMap, fmt::Write as _, io::Write as _, sync::atomic::AtomicUsize};

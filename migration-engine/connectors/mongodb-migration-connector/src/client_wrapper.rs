@@ -1,8 +1,8 @@
 use crate::schema::MongoSchema;
-use bson::Document;
 use futures::stream::TryStreamExt;
 use migration_connector::{ConnectorError, ConnectorResult};
 use mongodb::{
+    bson::Document,
     error::Error as MongoError,
     options::{ClientOptions, WriteConcern},
 };

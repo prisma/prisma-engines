@@ -1,3 +1,5 @@
+#![deny(rust_2018_idioms, unsafe_code)]
+
 mod mssql_datamodel_connector;
 mod mysql_datamodel_connector;
 mod postgres_datamodel_connector;

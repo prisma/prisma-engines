@@ -53,7 +53,7 @@ impl<'a> IndexWalker<'a> {
         &self.get().name
     }
 
-    pub(crate) fn keys(self) -> &'a bson::Document {
+    pub(crate) fn keys(self) -> &'a mongodb::bson::Document {
         &self.get().keys
     }
 }

@@ -362,7 +362,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                     index
                         .next()
                         .columns()
-                        .any(|col| dropped_and_recreated_column_ids_next.contains(&col.column_id()))
+                        .any(|col| dropped_and_recreated_column_ids_next.contains(&col.as_column().column_id()))
                 }) {
                     steps.push(SqlMigrationStep::CreateIndex {
                         table_id: (Some(tables.previous().table_id()), tables.next().table_id()),
@@ -504,7 +504,7 @@ fn foreign_keys_match(fks: Pair<&ForeignKeyWalker<'_>>, db: &DifferDatabase<'_>)
     let constrains_same_columns = fks.interleave(|fk| fk.constrained_columns()).all(|cols| {
         let type_changed = || db.column_changes_for_walkers(cols).type_changed();
 
-        let arities_ok = db.flavour.can_cope_with_foreign_key_column_becoming_nonnullable()
+        let arities_ok = db.flavour.can_cope_with_foreign_key_column_becoming_non_nullable()
             || (cols.previous().arity() == cols.next().arity()
                 || (cols.previous().arity().is_required() && cols.next().arity().is_nullable()));
 

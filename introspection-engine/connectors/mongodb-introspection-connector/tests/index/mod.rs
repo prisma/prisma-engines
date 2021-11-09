@@ -1,6 +1,9 @@
 use crate::test_api::*;
-use bson::Bson;
-use mongodb::{options::IndexOptions, IndexModel};
+use mongodb::{
+    bson::{doc, Bson},
+    options::IndexOptions,
+    IndexModel,
+};
 
 #[test]
 fn single_column_normal_index() {

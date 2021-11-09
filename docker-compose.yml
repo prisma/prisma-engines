@@ -227,7 +227,19 @@ services:
     networks:
       - databases
 
-  mongo4:
+  mongo42:
+    image: prismagraphql/mongo-single-replica:4.2.17-bionic
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: "prisma"
+      MONGO_INITDB_ROOT_PASSWORD: "prisma"
+      MONGO_PORT: 27016
+    networks:
+      - databases
+    ports:
+      - "27016:27016"
+
+  mongo44:
     image: prismagraphql/mongo-single-replica:4.4.3-bionic
     restart: always
     environment:

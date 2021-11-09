@@ -7,7 +7,6 @@ use once_cell::sync::Lazy;
 use std::{future::Future, io::Write};
 use tokio::runtime::Runtime;
 
-pub use bson::doc;
 pub use expect_test::expect;
 
 pub static CONN_STR: Lazy<String> = Lazy::new(|| match std::env::var("TEST_DATABASE_URL") {

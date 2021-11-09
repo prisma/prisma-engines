@@ -22,7 +22,7 @@ pub(crate) trait SqlSchemaDifferFlavour {
 
     /// Returns true only if the database can cope with an optional column
     /// constrained by a foreign key being made NOT NULL.
-    fn can_cope_with_foreign_key_column_becoming_nonnullable(&self) -> bool {
+    fn can_cope_with_foreign_key_column_becoming_non_nullable(&self) -> bool {
         true
     }
 

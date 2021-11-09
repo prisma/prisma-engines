@@ -27,7 +27,7 @@ impl Connector for EmptyDatamodelConnector {
         usize::MAX
     }
 
-    fn available_native_type_constructors(&self) -> &[dml::native_type_constructor::NativeTypeConstructor] {
+    fn available_native_type_constructors(&self) -> &'static [dml::native_type_constructor::NativeTypeConstructor] {
         &[]
     }
 

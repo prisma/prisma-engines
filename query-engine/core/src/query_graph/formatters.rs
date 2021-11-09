@@ -97,12 +97,9 @@ impl Display for QueryGraphDependency {
         match self {
             Self::ExecutionOrder => write!(f, "ExecutionOrder"),
             Self::ParentResult(_) => write!(f, "ParentResult"),
-            Self::ParentProjection(projection, _) => write!(
-                f,
-                "ParentProjection ({} | {:?})",
-                projection.model().name,
-                projection.names().collect::<Vec<_>>()
-            ),
+            Self::ParentProjection(projection, _) => {
+                write!(f, "ParentProjection ({:?})", projection.names().collect::<Vec<_>>())
+            }
             Self::Then => write!(f, "Then"),
             Self::Else => write!(f, "Else"),
         }

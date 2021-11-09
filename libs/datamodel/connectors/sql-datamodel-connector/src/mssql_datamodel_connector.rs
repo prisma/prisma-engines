@@ -46,11 +46,45 @@ const IMAGE_TYPE_NAME: &str = "Image";
 const XML_TYPE_NAME: &str = "Xml";
 const UNIQUE_IDENTIFIER_TYPE_NAME: &str = "UniqueIdentifier";
 
+const NATIVE_TYPE_CONSTRUCTORS: &[NativeTypeConstructor] = &[
+    NativeTypeConstructor::without_args(TINY_INT_TYPE_NAME, &[ScalarType::Int]),
+    NativeTypeConstructor::without_args(SMALL_INT_TYPE_NAME, &[ScalarType::Int]),
+    NativeTypeConstructor::without_args(INT_TYPE_NAME, &[ScalarType::Int]),
+    NativeTypeConstructor::without_args(BIG_INT_TYPE_NAME, &[ScalarType::BigInt]),
+    NativeTypeConstructor::with_optional_args(DECIMAL_TYPE_NAME, 2, &[ScalarType::Decimal]),
+    NativeTypeConstructor::with_optional_args(NUMERIC_TYPE_NAME, 2, &[ScalarType::Decimal]),
+    NativeTypeConstructor::without_args(MONEY_TYPE_NAME, &[ScalarType::Float]),
+    NativeTypeConstructor::without_args(SMALL_MONEY_TYPE_NAME, &[ScalarType::Float]),
+    NativeTypeConstructor::without_args(BIT_TYPE_NAME, &[ScalarType::Boolean, ScalarType::Int]),
+    NativeTypeConstructor::with_optional_args(FLOAT_TYPE_NAME, 1, &[ScalarType::Float]),
+    NativeTypeConstructor::without_args(REAL_TYPE_NAME, &[ScalarType::Float]),
+    NativeTypeConstructor::without_args(DATE_TYPE_NAME, &[ScalarType::DateTime]),
+    NativeTypeConstructor::without_args(TIME_TYPE_NAME, &[ScalarType::DateTime]),
+    NativeTypeConstructor::without_args(DATETIME_TYPE_NAME, &[ScalarType::DateTime]),
+    NativeTypeConstructor::without_args(DATETIME2_TYPE_NAME, &[ScalarType::DateTime]),
+    NativeTypeConstructor::without_args(DATETIME_OFFSET_TYPE_NAME, &[ScalarType::DateTime]),
+    NativeTypeConstructor::without_args(SMALL_DATETIME_TYPE_NAME, &[ScalarType::DateTime]),
+    NativeTypeConstructor::with_optional_args(CHAR_TYPE_NAME, 1, &[ScalarType::String]),
+    NativeTypeConstructor::with_optional_args(NCHAR_TYPE_NAME, 1, &[ScalarType::String]),
+    NativeTypeConstructor::with_optional_args(VARCHAR_TYPE_NAME, 1, &[ScalarType::String]),
+    NativeTypeConstructor::without_args(TEXT_TYPE_NAME, &[ScalarType::String]),
+    NativeTypeConstructor::with_optional_args(NVARCHAR_TYPE_NAME, 1, &[ScalarType::String]),
+    NativeTypeConstructor::without_args(NTEXT_TYPE_NAME, &[ScalarType::String]),
+    NativeTypeConstructor::with_optional_args(BINARY_TYPE_NAME, 1, &[ScalarType::Bytes]),
+    NativeTypeConstructor::with_optional_args(VAR_BINARY_TYPE_NAME, 1, &[ScalarType::Bytes]),
+    NativeTypeConstructor::without_args(IMAGE_TYPE_NAME, &[ScalarType::Bytes]),
+    NativeTypeConstructor::without_args(XML_TYPE_NAME, &[ScalarType::String]),
+    NativeTypeConstructor::without_args(UNIQUE_IDENTIFIER_TYPE_NAME, &[ScalarType::String]),
+];
+
+const CONSTRAINT_SCOPES: &[ConstraintScope] = &[
+    ConstraintScope::GlobalPrimaryKeyForeignKeyDefault,
+    ConstraintScope::ModelPrimaryKeyKeyIndex,
+];
+
 pub struct MsSqlDatamodelConnector {
     capabilities: Vec<ConnectorCapability>,
-    constructors: Vec<NativeTypeConstructor>,
     referential_integrity: ReferentialIntegrity,
-    constraint_violation_scopes: Vec<ConstraintScope>,
 }
 
 impl MsSqlDatamodelConnector {
@@ -62,7 +96,6 @@ impl MsSqlDatamodelConnector {
             ConnectorCapability::AutoIncrementNonIndexedAllowed,
             ConnectorCapability::CompoundIds,
             ConnectorCapability::CreateMany,
-            ConnectorCapability::MultipleIndexesWithSameName,
             ConnectorCapability::UpdateableId,
             ConnectorCapability::AnyId,
             ConnectorCapability::QueryRaw,
@@ -76,45 +109,9 @@ impl MsSqlDatamodelConnector {
             capabilities.push(ConnectorCapability::ForeignKeys);
         }
 
-        let constructors: Vec<NativeTypeConstructor> = vec![
-            NativeTypeConstructor::without_args(TINY_INT_TYPE_NAME, vec![ScalarType::Int]),
-            NativeTypeConstructor::without_args(SMALL_INT_TYPE_NAME, vec![ScalarType::Int]),
-            NativeTypeConstructor::without_args(INT_TYPE_NAME, vec![ScalarType::Int]),
-            NativeTypeConstructor::without_args(BIG_INT_TYPE_NAME, vec![ScalarType::BigInt]),
-            NativeTypeConstructor::with_optional_args(DECIMAL_TYPE_NAME, 2, vec![ScalarType::Decimal]),
-            NativeTypeConstructor::with_optional_args(NUMERIC_TYPE_NAME, 2, vec![ScalarType::Decimal]),
-            NativeTypeConstructor::without_args(MONEY_TYPE_NAME, vec![ScalarType::Float]),
-            NativeTypeConstructor::without_args(SMALL_MONEY_TYPE_NAME, vec![ScalarType::Float]),
-            NativeTypeConstructor::without_args(BIT_TYPE_NAME, vec![ScalarType::Boolean, ScalarType::Int]),
-            NativeTypeConstructor::with_optional_args(FLOAT_TYPE_NAME, 1, vec![ScalarType::Float]),
-            NativeTypeConstructor::without_args(REAL_TYPE_NAME, vec![ScalarType::Float]),
-            NativeTypeConstructor::without_args(DATE_TYPE_NAME, vec![ScalarType::DateTime]),
-            NativeTypeConstructor::without_args(TIME_TYPE_NAME, vec![ScalarType::DateTime]),
-            NativeTypeConstructor::without_args(DATETIME_TYPE_NAME, vec![ScalarType::DateTime]),
-            NativeTypeConstructor::without_args(DATETIME2_TYPE_NAME, vec![ScalarType::DateTime]),
-            NativeTypeConstructor::without_args(DATETIME_OFFSET_TYPE_NAME, vec![ScalarType::DateTime]),
-            NativeTypeConstructor::without_args(SMALL_DATETIME_TYPE_NAME, vec![ScalarType::DateTime]),
-            NativeTypeConstructor::with_optional_args(CHAR_TYPE_NAME, 1, vec![ScalarType::String]),
-            NativeTypeConstructor::with_optional_args(NCHAR_TYPE_NAME, 1, vec![ScalarType::String]),
-            NativeTypeConstructor::with_optional_args(VARCHAR_TYPE_NAME, 1, vec![ScalarType::String]),
-            NativeTypeConstructor::without_args(TEXT_TYPE_NAME, vec![ScalarType::String]),
-            NativeTypeConstructor::with_optional_args(NVARCHAR_TYPE_NAME, 1, vec![ScalarType::String]),
-            NativeTypeConstructor::without_args(NTEXT_TYPE_NAME, vec![ScalarType::String]),
-            NativeTypeConstructor::with_optional_args(BINARY_TYPE_NAME, 1, vec![ScalarType::Bytes]),
-            NativeTypeConstructor::with_optional_args(VAR_BINARY_TYPE_NAME, 1, vec![ScalarType::Bytes]),
-            NativeTypeConstructor::without_args(IMAGE_TYPE_NAME, vec![ScalarType::Bytes]),
-            NativeTypeConstructor::without_args(XML_TYPE_NAME, vec![ScalarType::String]),
-            NativeTypeConstructor::without_args(UNIQUE_IDENTIFIER_TYPE_NAME, vec![ScalarType::String]),
-        ];
-
         MsSqlDatamodelConnector {
             capabilities,
-            constructors,
             referential_integrity,
-            constraint_violation_scopes: vec![
-                ConstraintScope::GlobalPrimaryKeyForeignKeyDefault,
-                ConstraintScope::ModelPrimaryKeyKeyIndex,
-            ],
         }
     }
 
@@ -329,12 +326,12 @@ impl Connector for MsSqlDatamodelConnector {
         }
     }
 
-    fn constraint_violation_scopes(&self) -> &[ConstraintScope] {
-        &self.constraint_violation_scopes
+    fn constraint_violation_scopes(&self) -> &'static [ConstraintScope] {
+        CONSTRAINT_SCOPES
     }
 
-    fn available_native_type_constructors(&self) -> &[NativeTypeConstructor] {
-        &self.constructors
+    fn available_native_type_constructors(&self) -> &'static [NativeTypeConstructor] {
+        NATIVE_TYPE_CONSTRUCTORS
     }
 
     fn parse_native_type(&self, name: &str, args: Vec<String>) -> Result<NativeTypeInstance, ConnectorError> {
@@ -409,7 +406,7 @@ impl Connector for MsSqlDatamodelConnector {
         if let Some(constructor) = self.find_native_type_constructor(constructor_name) {
             let stringified_args = args.iter().map(|arg| arg.to_string()).collect();
             Ok(NativeTypeInstance::new(
-                constructor.name.as_str(),
+                constructor.name,
                 stringified_args,
                 &native_type,
             ))

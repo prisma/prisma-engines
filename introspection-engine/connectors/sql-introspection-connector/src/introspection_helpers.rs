@@ -74,15 +74,16 @@ fn common_prisma_m_to_n_relation_conditions(table: &Table) -> bool {
         //UNIQUE INDEX [A,B]
         && table.indices.iter().any(|i| {
             i.columns.len() == 2
-                && is_a(&i.columns[0])
-                && is_b(&i.columns[1])
+                && is_a(i.columns[0].name())
+                && is_b(i.columns[1].name())
                 && i.is_unique()
         })
         //INDEX [B]
         && table
             .indices
             .iter()
-            .any(|i| i.columns.len() == 1 && is_b(&i.columns[0]) && i.tpe == IndexType::Normal)
+            .any(|i| i.columns.len() == 1 && is_b(i.columns[0].name()) && i.tpe == IndexType::Normal)
+
         // 2 FKs
         && table.foreign_keys.len() == 2
         // Lexicographically lower model referenced by A
@@ -135,7 +136,7 @@ pub(crate) fn calculate_index(index: &Index) -> IndexDefinition {
     IndexDefinition {
         name: None,
         db_name: Some(index.name.clone()),
-        fields: index.columns.clone(),
+        fields: index.columns.iter().map(|c| c.name().to_string()).collect(),
         tpe,
         defined_on_field: index.columns.len() == 1,
     }
@@ -243,11 +244,18 @@ pub(crate) fn calculate_backrelation_field(
             };
 
             // unique or id
-            let other_is_unique = table
-                .indices
-                .iter()
-                .any(|i| columns_match(&i.columns, &relation_info.fields) && i.is_unique())
-                || columns_match(&table.primary_key_columns(), &relation_info.fields);
+            let other_is_unique = table.indices.iter().any(|i| {
+                columns_match(
+                    &i.columns.iter().map(|c| c.name().to_string()).collect::<Vec<_>>(),
+                    &relation_info.fields,
+                ) && i.is_unique()
+            }) || columns_match(
+                &table
+                    .primary_key_columns()
+                    .map(|c| c.name().to_string())
+                    .collect::<Vec<_>>(),
+                &relation_info.fields,
+            );
 
             let arity = match relation_field.arity {
                 FieldArity::Required | FieldArity::Optional if other_is_unique => FieldArity::Optional,

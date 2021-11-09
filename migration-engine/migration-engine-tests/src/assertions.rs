@@ -280,7 +280,12 @@ impl<'a> TableAssertion<'a> {
     where
         F: FnOnce(IndexAssertion<'a>) -> IndexAssertion<'a>,
     {
-        if let Some(idx) = self.table.indices.iter().find(|idx| idx.columns == columns) {
+        if let Some(idx) = self
+            .table
+            .indices
+            .iter()
+            .find(|idx| idx.column_names().collect::<Vec<_>>() == columns)
+        {
             index_assertions(IndexAssertion(idx));
         } else {
             panic!("Could not find index on {}.{:?}", self.table.name, columns);
@@ -585,7 +590,7 @@ pub struct PrimaryKeyAssertion<'a> {
 
 impl<'a> PrimaryKeyAssertion<'a> {
     pub fn assert_columns(self, column_names: &[&str]) -> Self {
-        assert_eq!(self.pk.columns, column_names);
+        assert_eq!(&self.pk.column_names().collect::<Vec<_>>(), column_names);
 
         self
     }
@@ -595,7 +600,7 @@ impl<'a> PrimaryKeyAssertion<'a> {
             self.table
                 .columns
                 .iter()
-                .any(|column| self.pk.columns.contains(&column.name) && column.auto_increment),
+                .any(|column| self.pk.column_names().any(|name| name == column.name) && column.auto_increment),
             "Assertion failed: expected a sequence on the primary key, found none."
         );
 
@@ -608,7 +613,7 @@ impl<'a> PrimaryKeyAssertion<'a> {
                 .table
                 .columns
                 .iter()
-                .any(|column| self.pk.columns.contains(&column.name) && column.auto_increment),
+                .any(|column| self.pk.column_names().any(|c| c == column.name) && column.auto_increment),
             "Assertion failed: expected no sequence on the primary key, but found one."
         );
 
