@@ -216,8 +216,8 @@ impl<'a> ValueValidator<'a> {
                 Some(("Desc", _)) => Ok(Some(SortOrder::Desc)),
                 None => Ok(None),
                 _ => Err(DatamodelError::ParserError {
-                    expected: vec![],
-                    expected_str: "".to_string(),
+                    expected: vec!["Asc", "Desc"],
+                    expected_str: "Asc, Desc".to_string(),
                     span: arg.span,
                 }),
             })
@@ -230,12 +230,12 @@ impl<'a> ValueValidator<'a> {
             .map(|arg| match &arg.value {
                 Expression::NumericValue(s, _) => s.parse::<u32>().map_err(|_| DatamodelError::ParserError {
                     expected: vec![],
-                    expected_str: "".to_string(),
+                    expected_str: "valid integer".to_string(),
                     span: arg.span,
                 }),
                 _ => Err(DatamodelError::ParserError {
                     expected: vec![],
-                    expected_str: "".to_string(),
+                    expected_str: "valid integer".to_string(),
                     span: arg.span,
                 }),
             })

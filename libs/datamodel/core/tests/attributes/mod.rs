@@ -21,6 +21,7 @@ mod unique_positive;
 mod updated_at_negative;
 mod updated_at_positive;
 
+#[allow(dead_code)]
 pub enum Provider {
     Postgres,
     Mysql,

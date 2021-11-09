@@ -56,7 +56,7 @@ pub(crate) fn uses_length_or_sort_without_preview_flag(
         diagnostics.push_error(DatamodelError::new_attribute_validation_error(
             message,
             index.attribute_name(),
-            index.ast_attribute().map(|i| i.span).unwrap_or_else(Span::empty()),
+            index.ast_attribute().map(|i| i.span).unwrap_or_else(Span::empty),
         ));
     }
 }

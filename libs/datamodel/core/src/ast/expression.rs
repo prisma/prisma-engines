@@ -20,7 +20,7 @@ pub enum Expression {
     Function(String, Vec<Expression>, Span),
     /// An array of other values.
     Array(Vec<Expression>, Span),
-    /// A contained list of arguments.
+    /// A field that can contain a list of arguments.
     FieldWithArgs(String, Vec<Argument>, Span),
 }
 
