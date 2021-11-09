@@ -1133,6 +1133,7 @@
 <span id="1133">1133</span>
 <span id="1134">1134</span>
 <span id="1135">1135</span>
+<span id="1136">1136</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::SqlSchemaDifferFlavour</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">flavour::MssqlFlavour</span>,
@@ -1211,7 +1212,7 @@
         <span class="kw">for</span> <span class="ident">dropped_index</span> <span class="kw">in</span> <span class="ident">table</span>.<span class="ident">index_pairs</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="ident">pair</span><span class="op">|</span> {
             <span class="ident">pair</span>.<span class="ident">previous</span>()
                 .<span class="ident">columns</span>()
-                .<span class="ident">any</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="ident">col</span>.<span class="ident">column_id</span>() <span class="op">=</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">column_id</span>.<span class="ident">previous</span>())
+                .<span class="ident">any</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="ident">col</span>.<span class="ident">as_column</span>().<span class="ident">column_id</span>() <span class="op">=</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">column_id</span>.<span class="ident">previous</span>())
         }) {
             <span class="ident">steps</span>.<span class="ident">push</span>(<span class="ident">SqlMigrationStep::DropIndex</span> {
                 <span class="ident">table_id</span>: <span class="ident">table</span>.<span class="ident">previous</span>().<span class="ident">table_id</span>(),
@@ -1219,10 +1220,11 @@
             })
         }
 
-        <span class="kw">for</span> <span class="ident">created_index</span> <span class="kw">in</span> <span class="ident">table</span>
-            .<span class="ident">index_pairs</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">pair</span><span class="op">|</span> <span class="ident">pair</span>.<span class="ident">next</span>().<span class="ident">columns</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="ident">col</span>.<span class="ident">column_id</span>() <span class="op">=</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">column_id</span>.<span class="ident">next</span>()))
-        {
+        <span class="kw">for</span> <span class="ident">created_index</span> <span class="kw">in</span> <span class="ident">table</span>.<span class="ident">index_pairs</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="ident">pair</span><span class="op">|</span> {
+            <span class="ident">pair</span>.<span class="ident">next</span>()
+                .<span class="ident">columns</span>()
+                .<span class="ident">any</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="ident">col</span>.<span class="ident">as_column</span>().<span class="ident">column_id</span>() <span class="op">=</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">column_id</span>.<span class="ident">next</span>())
+        }) {
             <span class="ident">steps</span>.<span class="ident">push</span>(<span class="ident">SqlMigrationStep::CreateIndex</span> {
                 <span class="ident">table_id</span>: (<span class="prelude-val">None</span>, <span class="ident">table</span>.<span class="ident">next</span>().<span class="ident">table_id</span>()),
                 <span class="ident">index_index</span>: <span class="ident">created_index</span>.<span class="ident">next</span>().<span class="ident">index</span>(),

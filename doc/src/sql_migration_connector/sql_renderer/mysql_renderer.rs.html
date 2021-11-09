@@ -654,7 +654,7 @@
             <span class="ident">index_name</span>: <span class="ident">index</span>.<span class="ident">name</span>().<span class="ident">into</span>(),
             <span class="ident">on</span>: (
                 <span class="ident">index</span>.<span class="ident">table</span>().<span class="ident">name</span>().<span class="ident">into</span>(),
-                <span class="ident">index</span>.<span class="ident">columns</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>().<span class="ident">into</span>()).<span class="ident">collect</span>(),
+                <span class="ident">index</span>.<span class="ident">columns</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">get</span>().<span class="ident">name</span>().<span class="ident">into</span>()).<span class="ident">collect</span>(),
             ),
         }
         .<span class="ident">to_string</span>()
@@ -669,7 +669,7 @@
                 .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">index</span><span class="op">|</span> <span class="ident">ddl::IndexClause</span> {
                     <span class="ident">index_name</span>: <span class="prelude-val">Some</span>(<span class="ident">Cow::from</span>(<span class="ident">index</span>.<span class="ident">name</span>())),
                     <span class="ident">unique</span>: <span class="ident">index</span>.<span class="ident">index_type</span>().<span class="ident">is_unique</span>(),
-                    <span class="ident">columns</span>: <span class="ident">index</span>.<span class="ident">column_names</span>().<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">Cow::from</span>).<span class="ident">collect</span>(),
+                    <span class="ident">columns</span>: <span class="ident">index</span>.<span class="ident">column_names</span>().<span class="ident">map</span>(<span class="ident">ToString::to_string</span>).<span class="ident">map</span>(<span class="ident">Cow::from</span>).<span class="ident">collect</span>(),
                 })
                 .<span class="ident">collect</span>(),
             <span class="ident">primary_key</span>: <span class="ident">table</span>

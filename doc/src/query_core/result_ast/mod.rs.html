@@ -52,7 +52,7 @@
 <span id="52">52</span>
 <span id="53">53</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">connector</span>::{<span class="ident">AggregationRow</span>, <span class="ident">QueryArguments</span>, <span class="ident">RelAggregationRow</span>};
-<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">ManyRecords</span>, <span class="ident">ModelProjection</span>, <span class="ident">RecordProjection</span>};
+<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">ManyRecords</span>, <span class="ident">ModelRef</span>, <span class="ident">RecordProjection</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">QueryResult</span> {
@@ -83,8 +83,8 @@
     <span class="doccomment">/// Required for result processing</span>
     <span class="kw">pub</span> <span class="ident">query_arguments</span>: <span class="ident">QueryArguments</span>,
 
-    <span class="doccomment">/// Model projection that can be used to retrieve the IDs of the contained records.</span>
-    <span class="kw">pub</span> <span class="ident">model_id</span>: <span class="ident">ModelProjection</span>,
+    <span class="doccomment">/// The model of the contained records.</span>
+    <span class="kw">pub</span> <span class="ident">model</span>: <span class="ident">ModelRef</span>,
 
     <span class="doccomment">/// Holds an ordered list of aggregation selections results for each contained record</span>
     <span class="kw">pub</span> <span class="ident">aggregation_rows</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelAggregationRow</span><span class="op">&gt;</span><span class="op">&gt;</span>,

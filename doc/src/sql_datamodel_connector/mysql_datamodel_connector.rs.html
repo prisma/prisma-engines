@@ -423,45 +423,6 @@
 <span id="423">423</span>
 <span id="424">424</span>
 <span id="425">425</span>
-<span id="426">426</span>
-<span id="427">427</span>
-<span id="428">428</span>
-<span id="429">429</span>
-<span id="430">430</span>
-<span id="431">431</span>
-<span id="432">432</span>
-<span id="433">433</span>
-<span id="434">434</span>
-<span id="435">435</span>
-<span id="436">436</span>
-<span id="437">437</span>
-<span id="438">438</span>
-<span id="439">439</span>
-<span id="440">440</span>
-<span id="441">441</span>
-<span id="442">442</span>
-<span id="443">443</span>
-<span id="444">444</span>
-<span id="445">445</span>
-<span id="446">446</span>
-<span id="447">447</span>
-<span id="448">448</span>
-<span id="449">449</span>
-<span id="450">450</span>
-<span id="451">451</span>
-<span id="452">452</span>
-<span id="453">453</span>
-<span id="454">454</span>
-<span id="455">455</span>
-<span id="456">456</span>
-<span id="457">457</span>
-<span id="458">458</span>
-<span id="459">459</span>
-<span id="460">460</span>
-<span id="461">461</span>
-<span id="462">462</span>
-<span id="463">463</span>
-<span id="464">464</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel_connector</span>::{
     <span class="ident">connector_error::ConnectorError</span>,
     <span class="ident">helper</span>::{<span class="ident">args_vec_from_opt</span>, <span class="ident">parse_one_opt_u32</span>, <span class="ident">parse_one_u32</span>, <span class="ident">parse_two_opt_u32</span>},
@@ -522,11 +483,46 @@
     <span class="ident">LONG_BLOB_TYPE_NAME</span>,
 ];
 
+<span class="kw">const</span> <span class="ident">NATIVE_TYPE_CONSTRUCTORS</span>: <span class="kw-2">&amp;</span>[<span class="ident">NativeTypeConstructor</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">INT_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Int</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">UNSIGNED_INT_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Int</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">SMALL_INT_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Int</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">UNSIGNED_SMALL_INT_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Int</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">TINY_INT_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Boolean</span>, <span class="ident">ScalarType::Int</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">UNSIGNED_TINY_INT_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Int</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">MEDIUM_INT_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Int</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">UNSIGNED_MEDIUM_INT_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Int</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">BIG_INT_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::BigInt</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">UNSIGNED_BIG_INT_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::BigInt</span>]),
+    <span class="ident">NativeTypeConstructor::with_optional_args</span>(<span class="ident">DECIMAL_TYPE_NAME</span>, <span class="number">2</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Decimal</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">FLOAT_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Float</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">DOUBLE_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Float</span>]),
+    <span class="ident">NativeTypeConstructor::with_args</span>(<span class="ident">BIT_TYPE_NAME</span>, <span class="number">1</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Boolean</span>, <span class="ident">ScalarType::Bytes</span>]),
+    <span class="ident">NativeTypeConstructor::with_args</span>(<span class="ident">CHAR_TYPE_NAME</span>, <span class="number">1</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::String</span>]),
+    <span class="ident">NativeTypeConstructor::with_args</span>(<span class="ident">VAR_CHAR_TYPE_NAME</span>, <span class="number">1</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::String</span>]),
+    <span class="ident">NativeTypeConstructor::with_args</span>(<span class="ident">BINARY_TYPE_NAME</span>, <span class="number">1</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Bytes</span>]),
+    <span class="ident">NativeTypeConstructor::with_args</span>(<span class="ident">VAR_BINARY_TYPE_NAME</span>, <span class="number">1</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Bytes</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">TINY_BLOB_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Bytes</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">BLOB_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Bytes</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">MEDIUM_BLOB_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Bytes</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">LONG_BLOB_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Bytes</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">TINY_TEXT_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::String</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">TEXT_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::String</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">MEDIUM_TEXT_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::String</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">LONG_TEXT_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::String</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">DATE_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::DateTime</span>]),
+    <span class="ident">NativeTypeConstructor::with_optional_args</span>(<span class="ident">TIME_TYPE_NAME</span>, <span class="number">1</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::DateTime</span>]),
+    <span class="ident">NativeTypeConstructor::with_optional_args</span>(<span class="ident">DATETIME_TYPE_NAME</span>, <span class="number">1</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::DateTime</span>]),
+    <span class="ident">NativeTypeConstructor::with_optional_args</span>(<span class="ident">TIMESTAMP_TYPE_NAME</span>, <span class="number">1</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::DateTime</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">YEAR_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Int</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">JSON_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Json</span>]),
+];
+
+<span class="kw">const</span> <span class="ident">CONSTRAINT_SCOPES</span>: <span class="kw-2">&amp;</span>[<span class="ident">ConstraintScope</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="ident">ConstraintScope::GlobalForeignKey</span>, <span class="ident">ConstraintScope::ModelKeyIndex</span>];
+
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MySqlDatamodelConnector</span> {
     <span class="ident">capabilities</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConnectorCapability</span><span class="op">&gt;</span>,
-    <span class="ident">constructors</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NativeTypeConstructor</span><span class="op">&gt;</span>,
     <span class="ident">referential_integrity</span>: <span class="ident">ReferentialIntegrity</span>,
-    <span class="ident">constraint_violation_scopes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConstraintScope</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">MySqlDatamodelConnector</span> {
@@ -555,83 +551,9 @@
             <span class="ident">capabilities</span>.<span class="ident">push</span>(<span class="ident">ConnectorCapability::ForeignKeys</span>);
         }
 
-        <span class="kw">let</span> <span class="ident">int</span> <span class="op">=</span> <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">INT_TYPE_NAME</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::Int</span>]);
-        <span class="kw">let</span> <span class="ident">unsigned_int</span> <span class="op">=</span> <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">UNSIGNED_INT_TYPE_NAME</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::Int</span>]);
-        <span class="kw">let</span> <span class="ident">small_int</span> <span class="op">=</span> <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">SMALL_INT_TYPE_NAME</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::Int</span>]);
-        <span class="kw">let</span> <span class="ident">unsigned_small_int</span> <span class="op">=</span>
-            <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">UNSIGNED_SMALL_INT_TYPE_NAME</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::Int</span>]);
-        <span class="kw">let</span> <span class="ident">tiny_int</span> <span class="op">=</span>
-            <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">TINY_INT_TYPE_NAME</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::Boolean</span>, <span class="ident">ScalarType::Int</span>]);
-        <span class="kw">let</span> <span class="ident">unsigned_tiny_int</span> <span class="op">=</span> <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">UNSIGNED_TINY_INT_TYPE_NAME</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::Int</span>]);
-        <span class="kw">let</span> <span class="ident">medium_int</span> <span class="op">=</span> <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">MEDIUM_INT_TYPE_NAME</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::Int</span>]);
-        <span class="kw">let</span> <span class="ident">unsigned_medium_int</span> <span class="op">=</span>
-            <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">UNSIGNED_MEDIUM_INT_TYPE_NAME</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::Int</span>]);
-        <span class="kw">let</span> <span class="ident">big_int</span> <span class="op">=</span> <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">BIG_INT_TYPE_NAME</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::BigInt</span>]);
-        <span class="kw">let</span> <span class="ident">unsigned_big_int</span> <span class="op">=</span>
-            <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">UNSIGNED_BIG_INT_TYPE_NAME</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::BigInt</span>]);
-        <span class="kw">let</span> <span class="ident">decimal</span> <span class="op">=</span> <span class="ident">NativeTypeConstructor::with_optional_args</span>(<span class="ident">DECIMAL_TYPE_NAME</span>, <span class="number">2</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::Decimal</span>]);
-        <span class="kw">let</span> <span class="ident">float</span> <span class="op">=</span> <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">FLOAT_TYPE_NAME</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::Float</span>]);
-        <span class="kw">let</span> <span class="ident">double</span> <span class="op">=</span> <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">DOUBLE_TYPE_NAME</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::Float</span>]);
-        <span class="kw">let</span> <span class="ident">bit</span> <span class="op">=</span> <span class="ident">NativeTypeConstructor::with_args</span>(<span class="ident">BIT_TYPE_NAME</span>, <span class="number">1</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::Boolean</span>, <span class="ident">ScalarType::Bytes</span>]);
-        <span class="kw">let</span> <span class="ident">char</span> <span class="op">=</span> <span class="ident">NativeTypeConstructor::with_args</span>(<span class="ident">CHAR_TYPE_NAME</span>, <span class="number">1</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::String</span>]);
-        <span class="kw">let</span> <span class="ident">var_char</span> <span class="op">=</span> <span class="ident">NativeTypeConstructor::with_args</span>(<span class="ident">VAR_CHAR_TYPE_NAME</span>, <span class="number">1</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::String</span>]);
-        <span class="kw">let</span> <span class="ident">binary</span> <span class="op">=</span> <span class="ident">NativeTypeConstructor::with_args</span>(<span class="ident">BINARY_TYPE_NAME</span>, <span class="number">1</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::Bytes</span>]);
-        <span class="kw">let</span> <span class="ident">var_binary</span> <span class="op">=</span> <span class="ident">NativeTypeConstructor::with_args</span>(<span class="ident">VAR_BINARY_TYPE_NAME</span>, <span class="number">1</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::Bytes</span>]);
-        <span class="kw">let</span> <span class="ident">tiny_blob</span> <span class="op">=</span> <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">TINY_BLOB_TYPE_NAME</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::Bytes</span>]);
-        <span class="kw">let</span> <span class="ident">blob</span> <span class="op">=</span> <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">BLOB_TYPE_NAME</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::Bytes</span>]);
-        <span class="kw">let</span> <span class="ident">medium_blob</span> <span class="op">=</span> <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">MEDIUM_BLOB_TYPE_NAME</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::Bytes</span>]);
-        <span class="kw">let</span> <span class="ident">long_blob</span> <span class="op">=</span> <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">LONG_BLOB_TYPE_NAME</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::Bytes</span>]);
-        <span class="kw">let</span> <span class="ident">tiny_text</span> <span class="op">=</span> <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">TINY_TEXT_TYPE_NAME</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::String</span>]);
-        <span class="kw">let</span> <span class="ident">text</span> <span class="op">=</span> <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">TEXT_TYPE_NAME</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::String</span>]);
-        <span class="kw">let</span> <span class="ident">medium_text</span> <span class="op">=</span> <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">MEDIUM_TEXT_TYPE_NAME</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::String</span>]);
-        <span class="kw">let</span> <span class="ident">long_text</span> <span class="op">=</span> <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">LONG_TEXT_TYPE_NAME</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::String</span>]);
-        <span class="kw">let</span> <span class="ident">date</span> <span class="op">=</span> <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">DATE_TYPE_NAME</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::DateTime</span>]);
-        <span class="kw">let</span> <span class="ident">time</span> <span class="op">=</span> <span class="ident">NativeTypeConstructor::with_optional_args</span>(<span class="ident">TIME_TYPE_NAME</span>, <span class="number">1</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::DateTime</span>]);
-        <span class="kw">let</span> <span class="ident">datetime</span> <span class="op">=</span> <span class="ident">NativeTypeConstructor::with_optional_args</span>(<span class="ident">DATETIME_TYPE_NAME</span>, <span class="number">1</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::DateTime</span>]);
-        <span class="kw">let</span> <span class="ident">timestamp</span> <span class="op">=</span> <span class="ident">NativeTypeConstructor::with_optional_args</span>(<span class="ident">TIMESTAMP_TYPE_NAME</span>, <span class="number">1</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::DateTime</span>]);
-        <span class="kw">let</span> <span class="ident">year</span> <span class="op">=</span> <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">YEAR_TYPE_NAME</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::Int</span>]);
-        <span class="kw">let</span> <span class="ident">json</span> <span class="op">=</span> <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">JSON_TYPE_NAME</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::Json</span>]);
-
-        <span class="kw">let</span> <span class="ident">constructors</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NativeTypeConstructor</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[
-            <span class="ident">int</span>,
-            <span class="ident">unsigned_int</span>,
-            <span class="ident">small_int</span>,
-            <span class="ident">unsigned_small_int</span>,
-            <span class="ident">tiny_int</span>,
-            <span class="ident">unsigned_tiny_int</span>,
-            <span class="ident">medium_int</span>,
-            <span class="ident">unsigned_medium_int</span>,
-            <span class="ident">big_int</span>,
-            <span class="ident">unsigned_big_int</span>,
-            <span class="ident">decimal</span>,
-            <span class="ident">float</span>,
-            <span class="ident">double</span>,
-            <span class="ident">bit</span>,
-            <span class="ident">char</span>,
-            <span class="ident">var_char</span>,
-            <span class="ident">binary</span>,
-            <span class="ident">var_binary</span>,
-            <span class="ident">tiny_blob</span>,
-            <span class="ident">blob</span>,
-            <span class="ident">medium_blob</span>,
-            <span class="ident">long_blob</span>,
-            <span class="ident">tiny_text</span>,
-            <span class="ident">text</span>,
-            <span class="ident">medium_text</span>,
-            <span class="ident">long_text</span>,
-            <span class="ident">date</span>,
-            <span class="ident">time</span>,
-            <span class="ident">datetime</span>,
-            <span class="ident">timestamp</span>,
-            <span class="ident">year</span>,
-            <span class="ident">json</span>,
-        ];
-
         <span class="ident">MySqlDatamodelConnector</span> {
             <span class="ident">capabilities</span>,
-            <span class="ident">constructors</span>,
             <span class="ident">referential_integrity</span>,
-            <span class="ident">constraint_violation_scopes</span>: <span class="macro">vec!</span>[<span class="ident">ConstraintScope::GlobalForeignKey</span>, <span class="ident">ConstraintScope::ModelKeyIndex</span>],
         }
     }
 }
@@ -817,12 +739,12 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">constraint_violation_scopes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">ConstraintScope</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">constraint_violation_scopes</span>
+    <span class="kw">fn</span> <span class="ident">constraint_violation_scopes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">ConstraintScope</span>] {
+        <span class="ident">CONSTRAINT_SCOPES</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">available_native_type_constructors</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">NativeTypeConstructor</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">constructors</span>
+    <span class="kw">fn</span> <span class="ident">available_native_type_constructors</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">NativeTypeConstructor</span>] {
+        <span class="ident">NATIVE_TYPE_CONSTRUCTORS</span>
     }
 
     <span class="kw">fn</span> <span class="ident">parse_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span>, <span class="ident">ConnectorError</span><span class="op">&gt;</span> {
@@ -912,7 +834,7 @@
         }
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">constructor</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">find_native_type_constructor</span>(<span class="ident">constructor_name</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">NativeTypeInstance::new</span>(<span class="ident">constructor</span>.<span class="ident">name</span>.<span class="ident">as_str</span>(), <span class="ident">args</span>, <span class="kw-2">&amp;</span><span class="ident">native_type</span>))
+            <span class="prelude-val">Ok</span>(<span class="ident">NativeTypeInstance::new</span>(<span class="ident">constructor</span>.<span class="ident">name</span>, <span class="ident">args</span>, <span class="kw-2">&amp;</span><span class="ident">native_type</span>))
         } <span class="kw">else</span> {
             <span class="prelude-val">Err</span>(<span class="self">self</span>.<span class="ident">native_str_error</span>(<span class="ident">constructor_name</span>).<span class="ident">native_type_name_unknown</span>())
         }

@@ -347,26 +347,24 @@
 <span id="347">347</span>
 <span id="348">348</span>
 <span id="349">349</span>
-<span id="350">350</span>
-<span id="351">351</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">collections::BTreeMap</span>, <span class="ident">str::FromStr</span>};
-
-<span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
-
-<span class="kw">use</span> <span class="ident">dml</span>::{
-    <span class="ident">field::Field</span>, <span class="ident">model::Model</span>, <span class="ident">native_type_constructor::NativeTypeConstructor</span>,
-    <span class="ident">native_type_instance::NativeTypeInstance</span>, <span class="ident">relation_info::ReferentialAction</span>, <span class="ident">scalars::ScalarType</span>,
-};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">empty_connector::EmptyDatamodelConnector</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">referential_integrity::ReferentialIntegrity</span>;
-
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::connector_error</span>::{<span class="ident">ConnectorError</span>, <span class="ident">ConnectorErrorFactory</span>, <span class="ident">ErrorKind</span>};
+</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>)]</span>
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">connector_error</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">helper</span>;
 
 <span class="kw">mod</span> <span class="ident">empty_connector</span>;
 <span class="kw">mod</span> <span class="ident">referential_integrity</span>;
+
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">empty_connector::EmptyDatamodelConnector</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">referential_integrity::ReferentialIntegrity</span>;
+
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::connector_error</span>::{<span class="ident">ConnectorError</span>, <span class="ident">ConnectorErrorFactory</span>, <span class="ident">ErrorKind</span>};
+<span class="kw">use</span> <span class="ident">dml</span>::{
+    <span class="ident">field::Field</span>, <span class="ident">model::Model</span>, <span class="ident">native_type_constructor::NativeTypeConstructor</span>,
+    <span class="ident">native_type_instance::NativeTypeInstance</span>, <span class="ident">relation_info::ReferentialAction</span>, <span class="ident">scalars::ScalarType</span>,
+};
+<span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">collections::BTreeMap</span>, <span class="ident">str::FromStr</span>};
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Connector</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> {
     <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span>;
@@ -413,13 +411,13 @@
 
     <span class="doccomment">/// The scopes in which a constraint name should be validated. If empty, doesn&#39;t check for name</span>
     <span class="doccomment">/// clashes in the validation phase.</span>
-    <span class="kw">fn</span> <span class="ident">constraint_violation_scopes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">ConstraintScope</span>] {
+    <span class="kw">fn</span> <span class="ident">constraint_violation_scopes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">ConstraintScope</span>] {
         <span class="kw-2">&amp;</span>[]
     }
 
     <span class="doccomment">/// Returns all available native type constructors available through this connector.</span>
-    <span class="doccomment">/// Powers the auto completion of the vs code plugin.</span>
-    <span class="kw">fn</span> <span class="ident">available_native_type_constructors</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">NativeTypeConstructor</span>];
+    <span class="doccomment">/// Powers the auto completion of the VSCode plugin.</span>
+    <span class="kw">fn</span> <span class="ident">available_native_type_constructors</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">NativeTypeConstructor</span>];
 
     <span class="doccomment">/// Returns the Scalar Type for the given native type</span>
     <span class="kw">fn</span> <span class="ident">scalar_type_for_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">native_type</span>: <span class="ident">serde_json::Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ScalarType</span>;
@@ -434,11 +432,10 @@
     <span class="kw">fn</span> <span class="ident">find_native_type_constructor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">NativeTypeConstructor</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">available_native_type_constructors</span>()
             .<span class="ident">iter</span>()
-            .<span class="ident">find</span>(<span class="op">|</span><span class="ident">constructor</span><span class="op">|</span> <span class="ident">constructor</span>.<span class="ident">name</span>.<span class="ident">as_str</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">name</span>)
+            .<span class="ident">find</span>(<span class="op">|</span><span class="ident">constructor</span><span class="op">|</span> <span class="ident">constructor</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="ident">name</span>)
     }
 
     <span class="doccomment">/// This function is used during Schema parsing to calculate the concrete native type.</span>
-    <span class="doccomment">/// This powers the use of native types for QE + ME.</span>
     <span class="kw">fn</span> <span class="ident">parse_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span>, <span class="ident">ConnectorError</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// This function is used in ME for error messages</span>
@@ -448,7 +445,6 @@
     }
 
     <span class="doccomment">/// This function is used during introspection to turn an introspected native type into an instance that can be put into the Prisma schema.</span>
-    <span class="doccomment">/// powers IE</span>
     <span class="kw">fn</span> <span class="ident">introspect_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">native_type</span>: <span class="ident">serde_json::Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span>, <span class="ident">ConnectorError</span><span class="op">&gt;</span>;
 
     <span class="kw">fn</span> <span class="ident">set_config_dir</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">config_dir</span>: <span class="kw-2">&amp;</span><span class="ident">std::path::Path</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span> {

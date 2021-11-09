@@ -1010,6 +1010,31 @@
 <span id="1010">1010</span>
 <span id="1011">1011</span>
 <span id="1012">1012</span>
+<span id="1013">1013</span>
+<span id="1014">1014</span>
+<span id="1015">1015</span>
+<span id="1016">1016</span>
+<span id="1017">1017</span>
+<span id="1018">1018</span>
+<span id="1019">1019</span>
+<span id="1020">1020</span>
+<span id="1021">1021</span>
+<span id="1022">1022</span>
+<span id="1023">1023</span>
+<span id="1024">1024</span>
+<span id="1025">1025</span>
+<span id="1026">1026</span>
+<span id="1027">1027</span>
+<span id="1028">1028</span>
+<span id="1029">1029</span>
+<span id="1030">1030</span>
+<span id="1031">1031</span>
+<span id="1032">1032</span>
+<span id="1033">1033</span>
+<span id="1034">1034</span>
+<span id="1035">1035</span>
+<span id="1036">1036</span>
+<span id="1037">1037</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Postgres schema description.</span>
 
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
@@ -1085,12 +1110,16 @@
                 <span class="kw">let</span> (<span class="ident">indexes</span>, <span class="ident">table_pk_wrapped</span>) <span class="op">=</span> <span class="ident">table_indexes</span>;
 
                 <span class="kw">let</span> <span class="ident">table_pk</span> <span class="op">=</span> <span class="ident">table_pk_wrapped</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>();
-                <span class="ident">table_pk</span>.<span class="ident">columns</span>.<span class="ident">retain</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">table_columns</span>.<span class="ident">contains</span>(<span class="ident">c</span>));
+
+                <span class="ident">table_pk</span>
+                    .<span class="ident">columns</span>
+                    .<span class="ident">retain</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">table_columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">tc</span><span class="op">|</span> <span class="ident">tc</span> <span class="op">=</span><span class="op">=</span> <span class="ident">c</span>.<span class="ident">name</span>()));
+
                 <span class="kw">if</span> <span class="ident">table_pk</span>.<span class="ident">columns</span>.<span class="ident">is_empty</span>() {
                     <span class="ident">table_indexes</span>.<span class="number">1</span> <span class="op">=</span> <span class="prelude-val">None</span>;
                 }
                 <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="ident">indexes</span>.<span class="ident">iter_mut</span>() {
-                    <span class="ident">index</span>.<span class="ident">columns</span>.<span class="ident">retain</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">table_columns</span>.<span class="ident">contains</span>(<span class="ident">c</span>))
+                    <span class="ident">index</span>.<span class="ident">columns</span>.<span class="ident">retain</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">table_columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">tc</span><span class="op">|</span> <span class="ident">tc</span> <span class="op">=</span><span class="op">=</span> <span class="ident">c</span>.<span class="ident">name</span>()))
                 }
                 <span class="ident">indexes</span>.<span class="ident">retain</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="op">!</span><span class="ident">i</span>.<span class="ident">columns</span>.<span class="ident">is_empty</span>());
             }
@@ -1551,52 +1580,61 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">indexes_map</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
 
         <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="string">r#&quot;
-        SELECT
-            indexInfos.relname as name,
-            columnInfos.attname AS column_name,
-            rawIndex.indisunique AS is_unique,
-            rawIndex.indisprimary AS is_primary_key,
-            tableInfos.relname AS table_name,
-            rawIndex.indkeyidx,
-            pg_get_serial_sequence(&#39;&quot;&#39; || $1 || &#39;&quot;.&quot;&#39; || tableInfos.relname || &#39;&quot;&#39;, columnInfos.attname) AS sequence_name
+        SELECT indexinfos.relname                          AS name,
+               columnInfos.attname                         AS column_name,
+               rawIndex.indisunique                        AS is_unique,
+               rawIndex.indisprimary                       AS is_primary_key,
+               tableInfos.relname                          AS table_name,
+               rawIndex.indkeyidx,
+               CASE rawIndex.sort_order &amp; 1
+                   WHEN 1 THEN &#39;DESC&#39;
+                   ELSE &#39;ASC&#39;
+                   END                                     AS column_order,
+               pg_get_serial_sequence(&#39;&quot;&#39; || $1 || &#39;&quot;.&quot;&#39; || tableInfos.relname || &#39;&quot;&#39;,
+                                      columnInfos.attname) AS sequence_name
         FROM
             -- pg_class stores infos about tables, indices etc: https://www.postgresql.org/docs/current/catalog-pg-class.html
             pg_class tableInfos,
             pg_class indexInfos,
             -- pg_index stores indices: https://www.postgresql.org/docs/current/catalog-pg-index.html
             (
-                SELECT
-                    indrelid,
-                    indexrelid,
-                    indisunique,
-                    indisprimary,
-                    pg_index.indkey AS indkey,
-                    generate_subscripts(pg_index.indkey, 1) AS indkeyidx
-                FROM pg_index
-                -- ignores partial indexes
-                WHERE indpred IS NULL
-                GROUP BY indrelid, indexrelid, indisunique, indisprimary, indkeyidx, indkey
-                ORDER BY indrelid, indexrelid, indkeyidx
+                SELECT i.indrelid,
+                       i.indexrelid,
+                       i.indisunique,
+                       i.indisprimary,
+                       i.indkey,
+                       o.OPTION AS sort_order,
+                       c.colnum AS sort_order_colnum,
+                       generate_subscripts(i.indkey, 1) AS indkeyidx
+                FROM pg_index i
+                         CROSS JOIN LATERAL UNNEST(indkey) WITH ordinality AS c (colnum, ordinality)
+                         LEFT JOIN LATERAL UNNEST(indoption) WITH ordinality AS o (OPTION, ordinality)
+                                   ON c.ordinality = o.ordinality
+                WHERE i.indpred IS NULL
+                GROUP BY i.indrelid, i.indexrelid, i.indisunique, i.indisprimary, indkeyidx, i.indkey, i.indoption, sort_order, sort_order_colnum
+                ORDER BY i.indrelid, i.indexrelid
             ) rawIndex,
             -- pg_attribute stores infos about columns: https://www.postgresql.org/docs/current/catalog-pg-attribute.html
             pg_attribute columnInfos,
             -- pg_namespace stores info about the schema
             pg_namespace schemaInfo
         WHERE
-            -- find table info for index
+          -- find table info for index
             tableInfos.oid = rawIndex.indrelid
-            -- find index info
-            AND indexInfos.oid = rawIndex.indexrelid
-            -- find table columns
-            AND columnInfos.attrelid = tableInfos.oid
-            AND columnInfos.attnum = rawIndex.indkey[rawIndex.indkeyidx]
-            -- we only consider ordinary tables
-            AND tableInfos.relkind = &#39;r&#39;
-            -- we only consider stuff out of one specific schema
-            AND tableInfos.relnamespace = schemaInfo.oid
-            AND schemaInfo.nspname = $1
-        GROUP BY tableInfos.relname, indexInfos.relname, rawIndex.indisunique, rawIndex.indisprimary, columnInfos.attname, rawIndex.indkeyidx
-        ORDER BY rawIndex.indkeyidx
+          -- find index info
+          AND indexInfos.oid = rawIndex.indexrelid
+          -- find table columns
+          AND columnInfos.attrelid = tableInfos.oid
+          AND columnInfos.attnum = rawIndex.indkey[rawIndex.indkeyidx]
+          -- we only consider ordinary tables
+          AND tableInfos.relkind = &#39;r&#39;
+          -- we only consider stuff out of one specific schema
+          AND tableInfos.relnamespace = schemaInfo.oid
+          AND schemaInfo.nspname = $1
+          AND rawIndex.sort_order_colnum = columnInfos.attnum
+        GROUP BY tableInfos.relname, indexInfos.relname, rawIndex.indisunique, rawIndex.indisprimary, columnInfos.attname,
+                 rawIndex.indkeyidx, column_order
+        ORDER BY rawIndex.indkeyidx;
         &quot;#</span>;
 
         <span class="kw">let</span> <span class="ident">rows</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">query_raw</span>(<span class="ident">sql</span>, <span class="kw-2">&amp;</span>[<span class="ident">schema</span>.<span class="ident">into</span>()]).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -1610,13 +1648,22 @@
             <span class="kw">let</span> <span class="ident">table_name</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;table_name&quot;</span>);
             <span class="kw">let</span> <span class="ident">sequence_name</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_string</span>(<span class="string">&quot;sequence_name&quot;</span>);
 
+            <span class="kw">let</span> <span class="ident">sort_order</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_string</span>(<span class="string">&quot;column_order&quot;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">v</span>.<span class="ident">as_ref</span>() {
+                <span class="string">&quot;ASC&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SQLSortOrder::Asc</span>,
+                <span class="string">&quot;DESC&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SQLSortOrder::Desc</span>,
+                <span class="ident">misc</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(
+                    <span class="string">&quot;Unexpected sort order `{}`, collation should be ASC, DESC or Null&quot;</span>,
+                    <span class="ident">misc</span>
+                ),
+            });
+
             <span class="kw">if</span> <span class="ident">is_primary_key</span> {
                 <span class="kw">let</span> <span class="ident">entry</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> (<span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrimaryKey</span><span class="op">&gt;</span>) <span class="op">=</span>
                     <span class="ident">indexes_map</span>.<span class="ident">entry</span>(<span class="ident">table_name</span>).<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> (<span class="ident">Vec::new</span>(), <span class="prelude-val">None</span>));
 
                 <span class="kw">match</span> <span class="ident">entry</span>.<span class="number">1</span>.<span class="ident">as_mut</span>() {
                     <span class="prelude-val">Some</span>(<span class="ident">pk</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                        <span class="ident">pk</span>.<span class="ident">columns</span>.<span class="ident">push</span>(<span class="ident">column_name</span>);
+                        <span class="ident">pk</span>.<span class="ident">columns</span>.<span class="ident">push</span>(<span class="ident">PrimaryKeyColumn::new</span>(<span class="ident">column_name</span>));
                     }
                     <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
                         <span class="kw">let</span> <span class="ident">sequence</span> <span class="op">=</span> <span class="ident">sequence_name</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">sequence_name</span><span class="op">|</span> {
@@ -1629,7 +1676,7 @@
                         });
 
                         <span class="ident">entry</span>.<span class="number">1</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">PrimaryKey</span> {
-                            <span class="ident">columns</span>: <span class="macro">vec!</span>[<span class="ident">column_name</span>],
+                            <span class="ident">columns</span>: <span class="macro">vec!</span>[<span class="ident">PrimaryKeyColumn::new</span>(<span class="ident">column_name</span>)],
                             <span class="ident">sequence</span>,
                             <span class="ident">constraint_name</span>: <span class="prelude-val">Some</span>(<span class="ident">name</span>.<span class="ident">clone</span>()),
                         });
@@ -1638,12 +1685,15 @@
             } <span class="kw">else</span> {
                 <span class="kw">let</span> <span class="ident">entry</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Index</span><span class="op">&gt;</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">indexes_map</span>.<span class="ident">entry</span>(<span class="ident">table_name</span>).<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> (<span class="ident">Vec::new</span>(), <span class="prelude-val">None</span>));
 
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">column</span> <span class="op">=</span> <span class="ident">IndexColumn::new</span>(<span class="ident">column_name</span>);
+                <span class="ident">column</span>.<span class="ident">sort_order</span> <span class="op">=</span> <span class="ident">sort_order</span>;
+
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">existing_index</span>) <span class="op">=</span> <span class="ident">entry</span>.<span class="number">0</span>.<span class="ident">iter_mut</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="ident">idx</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="ident">name</span>) {
-                    <span class="ident">existing_index</span>.<span class="ident">columns</span>.<span class="ident">push</span>(<span class="ident">column_name</span>);
+                    <span class="ident">existing_index</span>.<span class="ident">columns</span>.<span class="ident">push</span>(<span class="ident">column</span>);
                 } <span class="kw">else</span> {
                     <span class="ident">entry</span>.<span class="number">0</span>.<span class="ident">push</span>(<span class="ident">Index</span> {
                         <span class="ident">name</span>,
-                        <span class="ident">columns</span>: <span class="macro">vec!</span>[<span class="ident">column_name</span>],
+                        <span class="ident">columns</span>: <span class="macro">vec!</span>[<span class="ident">column</span>],
                         <span class="ident">tpe</span>: <span class="kw">match</span> <span class="ident">is_unique</span> {
                             <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">IndexType::Unique</span>,
                             <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">IndexType::Normal</span>,

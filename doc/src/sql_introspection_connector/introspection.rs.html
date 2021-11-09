@@ -134,6 +134,15 @@
 <span id="134">134</span>
 <span id="135">135</span>
 <span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::introspection_helpers</span>::{
     <span class="ident">calculate_backrelation_field</span>, <span class="ident">calculate_index</span>, <span class="ident">calculate_many_to_many_field</span>, <span class="ident">calculate_relation_field</span>,
     <span class="ident">calculate_scalar_field</span>, <span class="ident">is_new_migration_table</span>, <span class="ident">is_old_migration_table</span>, <span class="ident">is_prisma_1_point_0_join_table</span>,
@@ -194,16 +203,25 @@
         }
 
         <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">table</span>.<span class="ident">indices</span> {
+            <span class="comment">// TODO: enable with preview flag, when dml index extensions are done.</span>
+            <span class="kw">if</span> <span class="ident">index</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">length</span>.<span class="ident">is_some</span>()) {
+                <span class="kw">continue</span>;
+            }
+
             <span class="ident">model</span>.<span class="ident">add_index</span>(<span class="ident">calculate_index</span>(<span class="ident">index</span>));
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pk</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">table</span>.<span class="ident">primary_key</span> {
-            <span class="ident">model</span>.<span class="ident">primary_key</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">PrimaryKeyDefinition</span> {
-                <span class="ident">name</span>: <span class="prelude-val">None</span>,
-                <span class="ident">db_name</span>: <span class="ident">pk</span>.<span class="ident">constraint_name</span>.<span class="ident">clone</span>(),
-                <span class="ident">fields</span>: <span class="ident">pk</span>.<span class="ident">columns</span>.<span class="ident">clone</span>(),
-                <span class="ident">defined_on_field</span>: <span class="ident">pk</span>.<span class="ident">columns</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span>,
-            });
+        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">table</span>.<span class="ident">primary_key</span> {
+            <span class="comment">// TODO: enable with preview flag, when dml index extensions are done.</span>
+            <span class="prelude-val">Some</span>(<span class="ident">pk</span>) <span class="kw">if</span> <span class="ident">pk</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">length</span>.<span class="ident">is_none</span>()) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">model</span>.<span class="ident">primary_key</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">PrimaryKeyDefinition</span> {
+                    <span class="ident">name</span>: <span class="prelude-val">None</span>,
+                    <span class="ident">db_name</span>: <span class="ident">pk</span>.<span class="ident">constraint_name</span>.<span class="ident">clone</span>(),
+                    <span class="ident">fields</span>: <span class="ident">pk</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>().<span class="ident">to_string</span>()).<span class="ident">collect</span>(),
+                    <span class="ident">defined_on_field</span>: <span class="ident">pk</span>.<span class="ident">columns</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span>,
+                });
+            }
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> (),
         }
 
         <span class="ident">version_check</span>.<span class="ident">always_has_created_at_updated_at</span>(<span class="ident">table</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>);

@@ -187,16 +187,8 @@
 <span id="187">187</span>
 <span id="188">188</span>
 <span id="189">189</span>
-<span id="190">190</span>
-<span id="191">191</span>
-<span id="192">192</span>
-<span id="193">193</span>
-<span id="194">194</span>
-<span id="195">195</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::RecordProjection</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">dml::FieldArity</span>, <span class="ident">DomainError</span>, <span class="ident">Field</span>, <span class="ident">ModelRef</span>, <span class="ident">PrismaValue</span>, <span class="ident">PrismaValueExtensions</span>, <span class="ident">ScalarFieldRef</span>, <span class="ident">TypeIdentifier</span>,
-};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">dml::FieldArity</span>, <span class="ident">DomainError</span>, <span class="ident">Field</span>, <span class="ident">PrismaValue</span>, <span class="ident">PrismaValueExtensions</span>, <span class="ident">ScalarFieldRef</span>, <span class="ident">TypeIdentifier</span>};
 <span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
 
 <span class="doccomment">/// Projection of a `Model`. A projection is a (sub)set of fields of a model.</span>
@@ -213,10 +205,6 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ModelProjection</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ModelRef</span> {
-        <span class="self">self</span>.<span class="ident">fields</span>[<span class="number">0</span>].<span class="ident">model</span>()
-    }
-
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Field</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">fields</span>: <span class="ident">fields</span>.<span class="ident">into_iter</span>().<span class="ident">unique_by</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>()).<span class="ident">collect</span>(),

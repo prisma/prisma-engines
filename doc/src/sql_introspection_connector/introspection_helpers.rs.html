@@ -444,6 +444,14 @@
 <span id="444">444</span>
 <span id="445">445</span>
 <span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Dedup</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::SqlError</span>;
 <span class="kw">use</span> <span class="ident">datamodel</span>::{
@@ -520,15 +528,16 @@
         <span class="comment">//UNIQUE INDEX [A,B]</span>
         <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">indices</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> {
             <span class="ident">i</span>.<span class="ident">columns</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">2</span>
-                <span class="op">&amp;&amp;</span> <span class="ident">is_a</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>.<span class="ident">columns</span>[<span class="number">0</span>])
-                <span class="op">&amp;&amp;</span> <span class="ident">is_b</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>.<span class="ident">columns</span>[<span class="number">1</span>])
+                <span class="op">&amp;&amp;</span> <span class="ident">is_a</span>(<span class="ident">i</span>.<span class="ident">columns</span>[<span class="number">0</span>].<span class="ident">name</span>())
+                <span class="op">&amp;&amp;</span> <span class="ident">is_b</span>(<span class="ident">i</span>.<span class="ident">columns</span>[<span class="number">1</span>].<span class="ident">name</span>())
                 <span class="op">&amp;&amp;</span> <span class="ident">i</span>.<span class="ident">is_unique</span>()
         })
         <span class="comment">//INDEX [B]</span>
         <span class="op">&amp;&amp;</span> <span class="ident">table</span>
             .<span class="ident">indices</span>
             .<span class="ident">iter</span>()
-            .<span class="ident">any</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">columns</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="ident">is_b</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>.<span class="ident">columns</span>[<span class="number">0</span>]) <span class="op">&amp;&amp;</span> <span class="ident">i</span>.<span class="ident">tpe</span> <span class="op">=</span><span class="op">=</span> <span class="ident">IndexType::Normal</span>)
+            .<span class="ident">any</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">columns</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="ident">is_b</span>(<span class="ident">i</span>.<span class="ident">columns</span>[<span class="number">0</span>].<span class="ident">name</span>()) <span class="op">&amp;&amp;</span> <span class="ident">i</span>.<span class="ident">tpe</span> <span class="op">=</span><span class="op">=</span> <span class="ident">IndexType::Normal</span>)
+
         <span class="comment">// 2 FKs</span>
         <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">foreign_keys</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">2</span>
         <span class="comment">// Lexicographically lower model referenced by A</span>
@@ -581,7 +590,7 @@
     <span class="ident">IndexDefinition</span> {
         <span class="ident">name</span>: <span class="prelude-val">None</span>,
         <span class="ident">db_name</span>: <span class="prelude-val">Some</span>(<span class="ident">index</span>.<span class="ident">name</span>.<span class="ident">clone</span>()),
-        <span class="ident">fields</span>: <span class="ident">index</span>.<span class="ident">columns</span>.<span class="ident">clone</span>(),
+        <span class="ident">fields</span>: <span class="ident">index</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>().<span class="ident">to_string</span>()).<span class="ident">collect</span>(),
         <span class="ident">tpe</span>,
         <span class="ident">defined_on_field</span>: <span class="ident">index</span>.<span class="ident">columns</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span>,
     }
@@ -689,11 +698,18 @@
             };
 
             <span class="comment">// unique or id</span>
-            <span class="kw">let</span> <span class="ident">other_is_unique</span> <span class="op">=</span> <span class="ident">table</span>
-                .<span class="ident">indices</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">any</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">columns_match</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>.<span class="ident">columns</span>, <span class="kw-2">&amp;</span><span class="ident">relation_info</span>.<span class="ident">fields</span>) <span class="op">&amp;&amp;</span> <span class="ident">i</span>.<span class="ident">is_unique</span>())
-                <span class="op">|</span><span class="op">|</span> <span class="ident">columns_match</span>(<span class="kw-2">&amp;</span><span class="ident">table</span>.<span class="ident">primary_key_columns</span>(), <span class="kw-2">&amp;</span><span class="ident">relation_info</span>.<span class="ident">fields</span>);
+            <span class="kw">let</span> <span class="ident">other_is_unique</span> <span class="op">=</span> <span class="ident">table</span>.<span class="ident">indices</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> {
+                <span class="ident">columns_match</span>(
+                    <span class="kw-2">&amp;</span><span class="ident">i</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>().<span class="ident">to_string</span>()).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
+                    <span class="kw-2">&amp;</span><span class="ident">relation_info</span>.<span class="ident">fields</span>,
+                ) <span class="op">&amp;&amp;</span> <span class="ident">i</span>.<span class="ident">is_unique</span>()
+            }) <span class="op">|</span><span class="op">|</span> <span class="ident">columns_match</span>(
+                <span class="kw-2">&amp;</span><span class="ident">table</span>
+                    .<span class="ident">primary_key_columns</span>()
+                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>().<span class="ident">to_string</span>())
+                    .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
+                <span class="kw-2">&amp;</span><span class="ident">relation_info</span>.<span class="ident">fields</span>,
+            );
 
             <span class="kw">let</span> <span class="ident">arity</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">relation_field</span>.<span class="ident">arity</span> {
                 <span class="ident">FieldArity::Required</span> <span class="op">|</span> <span class="ident">FieldArity::Optional</span> <span class="kw">if</span> <span class="ident">other_is_unique</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">FieldArity::Optional</span>,

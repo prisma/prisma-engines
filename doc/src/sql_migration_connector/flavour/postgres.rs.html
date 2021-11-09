@@ -857,7 +857,7 @@
 
                 <span class="comment">// The connection to the shadow database is dropped at the end of</span>
                 <span class="comment">// the block.</span>
-                <span class="ident">shadow_database</span>.<span class="ident">describe_schema</span>().<span class="kw">await</span>
+                <span class="ident">shadow_database</span>.<span class="ident">describe_schema</span>(<span class="self">self</span>.<span class="ident">preview_features</span>).<span class="kw">await</span>
             }
         })()
         .<span class="kw">await</span>;

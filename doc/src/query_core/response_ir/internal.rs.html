@@ -837,8 +837,8 @@
     <span class="comment">// Finally, serialize the objects based on the selected fields.</span>
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">object_mapping</span> <span class="op">=</span> <span class="ident">UncheckedItemsWithParents::with_capacity</span>(<span class="ident">result</span>.<span class="ident">scalars</span>.<span class="ident">records</span>.<span class="ident">len</span>());
     <span class="kw">let</span> <span class="ident">scalar_db_field_names</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">scalars</span>.<span class="ident">field_names</span>;
+    <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">model</span>;
 
-    <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">model_id</span>.<span class="ident">model</span>();
     <span class="kw">let</span> <span class="ident">field_names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">scalar_db_field_names</span>
         .<span class="ident">iter</span>()
         .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">model</span>.<span class="ident">map_scalar_db_field_name</span>(<span class="ident">f</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">name</span>.<span class="ident">clone</span>()))
@@ -847,7 +847,7 @@
     <span class="comment">// Write all fields, nested and list fields unordered into a map, afterwards order all into the final order.</span>
     <span class="comment">// If nothing is written to the object, write null instead.</span>
     <span class="kw">for</span> (<span class="ident">r_index</span>, <span class="ident">record</span>) <span class="kw">in</span> <span class="ident">result</span>.<span class="ident">scalars</span>.<span class="ident">records</span>.<span class="ident">into_iter</span>().<span class="ident">enumerate</span>() {
-        <span class="kw">let</span> <span class="ident">record_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">record</span>.<span class="ident">projection</span>(<span class="kw-2">&amp;</span><span class="ident">scalar_db_field_names</span>, <span class="kw-2">&amp;</span><span class="ident">result</span>.<span class="ident">model_id</span>)<span class="question-mark">?</span>);
+        <span class="kw">let</span> <span class="ident">record_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">record</span>.<span class="ident">projection</span>(<span class="kw-2">&amp;</span><span class="ident">scalar_db_field_names</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">primary_identifier</span>())<span class="question-mark">?</span>);
 
         <span class="kw">if</span> <span class="op">!</span><span class="ident">object_mapping</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">record</span>.<span class="ident">parent_id</span>) {
             <span class="ident">object_mapping</span>.<span class="ident">insert</span>(<span class="ident">record</span>.<span class="ident">parent_id</span>.<span class="ident">clone</span>(), <span class="ident">Vec::new</span>());

@@ -181,10 +181,6 @@
 <span id="181">181</span>
 <span id="182">182</span>
 <span id="183">183</span>
-<span id="184">184</span>
-<span id="185">185</span>
-<span id="186">186</span>
-<span id="187">187</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">mongodb_types</span>;
 
 <span class="kw">use</span> <span class="ident">datamodel_connector</span>::{
@@ -192,8 +188,8 @@
     <span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">ReferentialIntegrity</span>,
 };
 <span class="kw">use</span> <span class="ident">dml</span>::{
-    <span class="ident">default_value::DefaultKind</span>, <span class="ident">field::FieldType</span>, <span class="ident">native_type_constructor::NativeTypeConstructor</span>,
-    <span class="ident">native_type_instance::NativeTypeInstance</span>, <span class="ident">relation_info::ReferentialAction</span>, <span class="ident">traits::WithDatabaseName</span>,
+    <span class="ident">default_value::DefaultKind</span>, <span class="ident">field::FieldType</span>, <span class="ident">native_type_instance::NativeTypeInstance</span>,
+    <span class="ident">relation_info::ReferentialAction</span>, <span class="ident">traits::WithDatabaseName</span>,
 };
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">mongodb_types</span>::<span class="kw-2">*</span>;
@@ -204,7 +200,6 @@
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MongoDbDatamodelConnector</span> {
     <span class="ident">capabilities</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConnectorCapability</span><span class="op">&gt;</span>,
-    <span class="ident">native_types</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NativeTypeConstructor</span><span class="op">&gt;</span>,
     <span class="ident">referential_integrity</span>: <span class="ident">ReferentialIntegrity</span>,
 }
 
@@ -221,11 +216,8 @@
             <span class="ident">ConnectorCapability::CompositeTypes</span>,
         ];
 
-        <span class="kw">let</span> <span class="ident">native_types</span> <span class="op">=</span> <span class="ident">mongodb_types::available_types</span>();
-
         <span class="self">Self</span> {
             <span class="ident">capabilities</span>,
-            <span class="ident">native_types</span>,
             <span class="ident">referential_integrity</span>: <span class="ident">ReferentialIntegrity::Prisma</span>,
         }
     }
@@ -320,8 +312,8 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">available_native_type_constructors</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">dml::native_type_constructor::NativeTypeConstructor</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">native_types</span>
+    <span class="kw">fn</span> <span class="ident">available_native_type_constructors</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">dml::native_type_constructor::NativeTypeConstructor</span>] {
+        <span class="ident">NATIVE_TYPE_CONSTRUCTORS</span>
     }
 
     <span class="kw">fn</span> <span class="ident">default_native_type_for_scalar_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">scalar_type</span>: <span class="kw-2">&amp;</span><span class="ident">dml::scalars::ScalarType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">serde_json::Value</span> {

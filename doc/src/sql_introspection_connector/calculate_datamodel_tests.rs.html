@@ -1108,8 +1108,8 @@
     <span class="kw">use</span> <span class="ident">pretty_assertions::assert_eq</span>;
     <span class="kw">use</span> <span class="ident">sql_datamodel_connector::PostgresDatamodelConnector</span>;
     <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{
-        <span class="ident">Column</span>, <span class="ident">ColumnArity</span>, <span class="ident">ColumnType</span>, <span class="ident">ColumnTypeFamily</span>, <span class="ident">Enum</span>, <span class="ident">ForeignKey</span>, <span class="ident">ForeignKeyAction</span>, <span class="ident">Index</span>, <span class="ident">IndexType</span>,
-        <span class="ident">PrimaryKey</span>, <span class="ident">Sequence</span>, <span class="ident">SqlSchema</span>, <span class="ident">Table</span>,
+        <span class="ident">Column</span>, <span class="ident">ColumnArity</span>, <span class="ident">ColumnType</span>, <span class="ident">ColumnTypeFamily</span>, <span class="ident">Enum</span>, <span class="ident">ForeignKey</span>, <span class="ident">ForeignKeyAction</span>, <span class="ident">Index</span>, <span class="ident">IndexColumn</span>,
+        <span class="ident">IndexType</span>, <span class="ident">PrimaryKey</span>, <span class="ident">PrimaryKeyColumn</span>, <span class="ident">Sequence</span>, <span class="ident">SqlSchema</span>, <span class="ident">Table</span>,
     };
 
     <span class="kw">fn</span> <span class="ident">postgres_context</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IntrospectionContext</span> {
@@ -1246,7 +1246,7 @@
             ],
             <span class="ident">indices</span>: <span class="macro">vec!</span>[],
             <span class="ident">primary_key</span>: <span class="prelude-val">Some</span>(<span class="ident">PrimaryKey</span> {
-                <span class="ident">columns</span>: <span class="macro">vec!</span>[<span class="string">&quot;required&quot;</span>.<span class="ident">to_string</span>()],
+                <span class="ident">columns</span>: <span class="macro">vec!</span>[<span class="ident">PrimaryKeyColumn::new</span>(<span class="string">&quot;required&quot;</span>)],
                 <span class="ident">sequence</span>: <span class="prelude-val">None</span>,
                 <span class="ident">constraint_name</span>: <span class="prelude-val">None</span>,
             }),
@@ -1392,7 +1392,7 @@
                 }],
                 <span class="ident">indices</span>: <span class="macro">vec!</span>[],
                 <span class="ident">primary_key</span>: <span class="prelude-val">Some</span>(<span class="ident">PrimaryKey</span> {
-                    <span class="ident">columns</span>: <span class="macro">vec!</span>[<span class="string">&quot;primary&quot;</span>.<span class="ident">to_string</span>()],
+                    <span class="ident">columns</span>: <span class="macro">vec!</span>[<span class="ident">PrimaryKeyColumn::new</span>(<span class="string">&quot;primary&quot;</span>)],
                     <span class="ident">sequence</span>: <span class="prelude-val">None</span>,
                     <span class="ident">constraint_name</span>: <span class="prelude-val">None</span>,
                 }),
@@ -1413,7 +1413,7 @@
                 }],
                 <span class="ident">indices</span>: <span class="macro">vec!</span>[],
                 <span class="ident">primary_key</span>: <span class="prelude-val">Some</span>(<span class="ident">PrimaryKey</span> {
-                    <span class="ident">columns</span>: <span class="macro">vec!</span>[<span class="string">&quot;primary&quot;</span>.<span class="ident">to_string</span>()],
+                    <span class="ident">columns</span>: <span class="macro">vec!</span>[<span class="ident">PrimaryKeyColumn::new</span>(<span class="string">&quot;primary&quot;</span>)],
                     <span class="ident">sequence</span>: <span class="prelude-val">None</span>,
                     <span class="ident">constraint_name</span>: <span class="prelude-val">None</span>,
                 }),
@@ -1434,7 +1434,7 @@
                 }],
                 <span class="ident">indices</span>: <span class="macro">vec!</span>[],
                 <span class="ident">primary_key</span>: <span class="prelude-val">Some</span>(<span class="ident">PrimaryKey</span> {
-                    <span class="ident">columns</span>: <span class="macro">vec!</span>[<span class="string">&quot;primary&quot;</span>.<span class="ident">to_string</span>()],
+                    <span class="ident">columns</span>: <span class="macro">vec!</span>[<span class="ident">PrimaryKeyColumn::new</span>(<span class="string">&quot;primary&quot;</span>)],
                     <span class="ident">sequence</span>: <span class="prelude-val">Some</span>(<span class="ident">Sequence</span> {
                         <span class="ident">name</span>: <span class="string">&quot;sequence&quot;</span>.<span class="ident">to_string</span>(),
                     }),
@@ -1510,7 +1510,7 @@
             ],
             <span class="ident">indices</span>: <span class="macro">vec!</span>[<span class="ident">Index</span> {
                 <span class="ident">name</span>: <span class="string">&quot;unique_unique&quot;</span>.<span class="ident">to_string</span>(),
-                <span class="ident">columns</span>: <span class="macro">vec!</span>[<span class="string">&quot;unique&quot;</span>.<span class="ident">to_string</span>()],
+                <span class="ident">columns</span>: <span class="macro">vec!</span>[<span class="ident">IndexColumn::new</span>(<span class="string">&quot;unique&quot;</span>)],
                 <span class="ident">tpe</span>: <span class="ident">IndexType::Unique</span>,
             }],
             <span class="ident">primary_key</span>: <span class="prelude-val">None</span>,
@@ -1722,7 +1722,7 @@
                 ],
                 <span class="ident">indices</span>: <span class="macro">vec!</span>[],
                 <span class="ident">primary_key</span>: <span class="prelude-val">Some</span>(<span class="ident">PrimaryKey</span> {
-                    <span class="ident">columns</span>: <span class="macro">vec!</span>[<span class="string">&quot;id&quot;</span>.<span class="ident">to_string</span>()],
+                    <span class="ident">columns</span>: <span class="macro">vec!</span>[<span class="ident">PrimaryKeyColumn::new</span>(<span class="string">&quot;id&quot;</span>)],
                     <span class="ident">sequence</span>: <span class="prelude-val">None</span>,
                     <span class="ident">constraint_name</span>: <span class="prelude-val">None</span>,
                 }),
@@ -1767,7 +1767,7 @@
                 ],
                 <span class="ident">indices</span>: <span class="macro">vec!</span>[],
                 <span class="ident">primary_key</span>: <span class="prelude-val">Some</span>(<span class="ident">PrimaryKey</span> {
-                    <span class="ident">columns</span>: <span class="macro">vec!</span>[<span class="string">&quot;id&quot;</span>.<span class="ident">to_string</span>()],
+                    <span class="ident">columns</span>: <span class="macro">vec!</span>[<span class="ident">PrimaryKeyColumn::new</span>(<span class="string">&quot;id&quot;</span>)],
                     <span class="ident">sequence</span>: <span class="prelude-val">None</span>,
                     <span class="ident">constraint_name</span>: <span class="prelude-val">None</span>,
                 }),
@@ -1904,11 +1904,11 @@
             ],
             <span class="ident">indices</span>: <span class="macro">vec!</span>[<span class="ident">Index</span> {
                 <span class="ident">name</span>: <span class="string">&quot;name_last_name_unique&quot;</span>.<span class="ident">to_string</span>(),
-                <span class="ident">columns</span>: <span class="macro">vec!</span>[<span class="string">&quot;name&quot;</span>.<span class="ident">to_string</span>(), <span class="string">&quot;lastname&quot;</span>.<span class="ident">to_string</span>()],
+                <span class="ident">columns</span>: <span class="macro">vec!</span>[<span class="ident">IndexColumn::new</span>(<span class="string">&quot;name&quot;</span>), <span class="ident">IndexColumn::new</span>(<span class="string">&quot;lastname&quot;</span>)],
                 <span class="ident">tpe</span>: <span class="ident">IndexType::Unique</span>,
             }],
             <span class="ident">primary_key</span>: <span class="prelude-val">Some</span>(<span class="ident">PrimaryKey</span> {
-                <span class="ident">columns</span>: <span class="macro">vec!</span>[<span class="string">&quot;id&quot;</span>.<span class="ident">to_string</span>()],
+                <span class="ident">columns</span>: <span class="macro">vec!</span>[<span class="ident">PrimaryKeyColumn::new</span>(<span class="string">&quot;id&quot;</span>)],
                 <span class="ident">sequence</span>: <span class="prelude-val">None</span>,
                 <span class="ident">constraint_name</span>: <span class="prelude-val">None</span>,
             }),
@@ -2093,7 +2093,7 @@
                 ],
                 <span class="ident">indices</span>: <span class="macro">vec!</span>[],
                 <span class="ident">primary_key</span>: <span class="prelude-val">Some</span>(<span class="ident">PrimaryKey</span> {
-                    <span class="ident">columns</span>: <span class="macro">vec!</span>[<span class="string">&quot;id&quot;</span>.<span class="ident">to_string</span>()],
+                    <span class="ident">columns</span>: <span class="macro">vec!</span>[<span class="ident">PrimaryKeyColumn::new</span>(<span class="string">&quot;id&quot;</span>)],
                     <span class="ident">sequence</span>: <span class="prelude-val">None</span>,
                     <span class="ident">constraint_name</span>: <span class="prelude-val">None</span>,
                 }),
@@ -2127,7 +2127,7 @@
                 ],
                 <span class="ident">indices</span>: <span class="macro">vec!</span>[],
                 <span class="ident">primary_key</span>: <span class="prelude-val">Some</span>(<span class="ident">PrimaryKey</span> {
-                    <span class="ident">columns</span>: <span class="macro">vec!</span>[<span class="string">&quot;id&quot;</span>.<span class="ident">to_string</span>()],
+                    <span class="ident">columns</span>: <span class="macro">vec!</span>[<span class="ident">PrimaryKeyColumn::new</span>(<span class="string">&quot;id&quot;</span>)],
                     <span class="ident">sequence</span>: <span class="prelude-val">None</span>,
                     <span class="ident">constraint_name</span>: <span class="prelude-val">None</span>,
                 }),

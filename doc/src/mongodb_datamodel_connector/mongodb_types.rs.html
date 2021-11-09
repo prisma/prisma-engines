@@ -106,8 +106,6 @@
 <span id="106">106</span>
 <span id="107">107</span>
 <span id="108">108</span>
-<span id="109">109</span>
-<span id="110">110</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel_connector::connector_error</span>::{<span class="ident">ConnectorError</span>, <span class="ident">ErrorKind</span>};
 <span class="kw">use</span> <span class="ident">dml</span>::{<span class="ident">native_type_constructor::NativeTypeConstructor</span>, <span class="ident">scalars::ScalarType</span>};
 <span class="kw">use</span> <span class="ident">native_types::MongoDbType</span>;
@@ -152,21 +150,19 @@
         .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">panic!</span>(<span class="string">&quot;MongoDB native type mapping missing for &#39;{:?}&#39;&quot;</span>, <span class="ident">scalar_type</span>))
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">available_types</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NativeTypeConstructor</span><span class="op">&gt;</span> {
-    <span class="macro">vec!</span>[
-        <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">STRING</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::String</span>]),
-        <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">DOUBLE</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::Float</span>]),
-        <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">LONG</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::Int</span>, <span class="ident">ScalarType::BigInt</span>]),
-        <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">INT</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::Int</span>]),
-        <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">BIN_DATA</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::Bytes</span>]),
-        <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">OBJECT_ID</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::String</span>, <span class="ident">ScalarType::Bytes</span>]),
-        <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">BOOL</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::Boolean</span>]),
-        <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">DATE</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::DateTime</span>]),
-        <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">TIMESTAMP</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::DateTime</span>]),
-        <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">DECIMAL</span>, <span class="macro">vec!</span>[<span class="ident">ScalarType::Decimal</span>]),
-        <span class="ident">NativeTypeConstructor::with_args</span>(<span class="ident">ARRAY</span>, <span class="number">1</span>, <span class="ident">all_types</span>()),
-    ]
-}
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">NATIVE_TYPE_CONSTRUCTORS</span>: <span class="kw-2">&amp;</span>[<span class="ident">NativeTypeConstructor</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">STRING</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::String</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">DOUBLE</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Float</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">LONG</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Int</span>, <span class="ident">ScalarType::BigInt</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">INT</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Int</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">BIN_DATA</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Bytes</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">OBJECT_ID</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::String</span>, <span class="ident">ScalarType::Bytes</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">BOOL</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Boolean</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">DATE</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::DateTime</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">TIMESTAMP</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::DateTime</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">DECIMAL</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Decimal</span>]),
+    <span class="ident">NativeTypeConstructor::with_args</span>(<span class="ident">ARRAY</span>, <span class="number">1</span>, <span class="ident">all_types</span>()),
+];
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">mongo_type_from_input</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">args</span>: <span class="kw-2">&amp;</span>[<span class="ident">String</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">MongoDbType</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">mongo_type</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">name</span> {
@@ -194,8 +190,8 @@
     <span class="prelude-val">Ok</span>(<span class="ident">mongo_type</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">all_types</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarType</span><span class="op">&gt;</span> {
-    <span class="macro">vec!</span>[
+<span class="kw">const</span> <span class="kw">fn</span> <span class="ident">all_types</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">ScalarType</span>] {
+    <span class="kw-2">&amp;</span>[
         <span class="ident">ScalarType::Int</span>,
         <span class="ident">ScalarType::BigInt</span>,
         <span class="ident">ScalarType::Float</span>,

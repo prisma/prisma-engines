@@ -379,6 +379,8 @@
 <span id="379">379</span>
 <span id="380">380</span>
 <span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The SQL migration connector.</span>
 
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>, <span class="ident">missing_docs</span>)]</span>
@@ -415,6 +417,7 @@
     <span class="ident">connection_info</span>: <span class="ident">ConnectionInfo</span>,
     <span class="ident">flavour</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">SqlFlavour</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>,
     <span class="ident">shadow_database_connection_string</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">SqlMigrationConnector</span> {
@@ -437,6 +440,7 @@
             <span class="ident">connection</span>: <span class="ident">tokio::sync::OnceCell::new</span>(),
             <span class="ident">flavour</span>,
             <span class="ident">shadow_database_connection_string</span>,
+            <span class="ident">preview_features</span>,
         })
     }
 
@@ -469,7 +473,7 @@
 
     <span class="doccomment">/// Made public for tests.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">describe_schema</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">conn</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">describe_schema</span>().<span class="kw">await</span>
+        <span class="self">self</span>.<span class="ident">conn</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">describe_schema</span>(<span class="self">self</span>.<span class="ident">preview_features</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Try to reset the database to an empty state. This should only be used</span>
@@ -484,7 +488,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">best_effort_reset_impl</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="macro">tracing::info!</span>(<span class="string">&quot;Attempting best_effort_reset&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">source_schema</span> <span class="op">=</span> <span class="ident">connection</span>.<span class="ident">describe_schema</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">source_schema</span> <span class="op">=</span> <span class="ident">connection</span>.<span class="ident">describe_schema</span>(<span class="self">self</span>.<span class="ident">preview_features</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">target_schema</span> <span class="op">=</span> <span class="ident">SqlSchema::empty</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">steps</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
