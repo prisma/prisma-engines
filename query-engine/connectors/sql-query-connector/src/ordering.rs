@@ -1,4 +1,4 @@
-use crate::{join_utils::*, query_arguments_ext::QueryArgumentsExt};
+use crate::{join_utils::*, model_extensions::*, query_arguments_ext::QueryArgumentsExt};
 use connector_interface::QueryArguments;
 use itertools::Itertools;
 use prisma_models::*;
@@ -11,7 +11,7 @@ static ORDER_AGGREGATOR_ALIAS: &str = "orderby_aggregator";
 pub struct OrderByDefinition {
     /// Final column identifier to be used for the scalar field to order by
     pub(crate) order_column: Expression<'static>,
-    /// Defines ordering for an `ORDER BY` statement.    
+    /// Defines ordering for an `ORDER BY` statement.
     pub(crate) order_definition: OrderDefinition<'static>,
     /// Joins necessary to perform the order by
     pub(crate) joins: Vec<AliasedJoin>,
@@ -63,7 +63,7 @@ fn build_order_relevance(order_by: &OrderByRelevance, needs_reversed_order: bool
         .fields
         .iter()
         .map(|sf| {
-            if sf.is_required {
+            if sf.is_required() {
                 sf.as_column().into()
             } else {
                 // If the field is nullable, coalesce it with an empty string so that:

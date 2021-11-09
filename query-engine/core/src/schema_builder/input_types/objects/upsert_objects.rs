@@ -7,7 +7,7 @@ pub(crate) fn nested_upsert_input_object(
     ctx: &mut BuilderContext,
     parent_field: &RelationFieldRef,
 ) -> Option<InputObjectTypeWeakRef> {
-    if parent_field.is_list {
+    if parent_field.is_list() {
         nested_upsert_list_input_object(ctx, parent_field)
     } else {
         nested_upsert_nonlist_input_object(ctx, parent_field)

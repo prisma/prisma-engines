@@ -18,13 +18,14 @@ pub(crate) fn get_field_filter_types(
             types.extend(mto1_relation_filter_shorthand_types(ctx, rf));
             types
         }
+        ModelField::Composite(_) => vec![], // [Composites] todo
         ModelField::Scalar(sf) if field.is_list() => vec![InputType::object(scalar_list_filter_type(ctx, sf))],
         ModelField::Scalar(sf) => {
             let mut types = vec![InputType::object(full_scalar_filter_type(
                 ctx,
                 &sf.type_identifier,
-                sf.is_list,
-                !sf.is_required,
+                sf.is_list(),
+                !sf.is_required(),
                 false,
                 include_aggregates,
             ))];
@@ -32,7 +33,7 @@ pub(crate) fn get_field_filter_types(
             if sf.type_identifier != TypeIdentifier::Json {
                 types.push(map_scalar_input_type_for_field(ctx, sf)); // Scalar equality shorthand
 
-                if !sf.is_required {
+                if !sf.is_required() {
                     types.push(InputType::null()); // Scalar null-equality shorthand
                 }
             }
@@ -48,12 +49,12 @@ pub(crate) fn get_field_filter_types(
 fn mto1_relation_filter_shorthand_types(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> Vec<InputType> {
     let mut types = vec![];
 
-    if !rf.is_list {
+    if !rf.is_list() {
         let related_model = rf.related_model();
         let related_input_type = filter_objects::where_object_type(ctx, &related_model);
         types.push(InputType::object(related_input_type));
 
-        if !rf.is_required {
+        if !rf.is_required() {
             types.push(InputType::null());
         }
     }
@@ -65,7 +66,7 @@ fn mto1_relation_filter_shorthand_types(ctx: &mut BuilderContext, rf: &RelationF
 fn full_relation_filter(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> InputObjectTypeWeakRef {
     let related_model = rf.related_model();
     let related_input_type = filter_objects::where_object_type(ctx, &related_model);
-    let list = if rf.is_list { "List" } else { "" };
+    let list = if rf.is_list() { "List" } else { "" };
     let ident = Identifier::new(
         format!("{}{}RelationFilter", capitalize(&related_model.name), list),
         PRISMA_NAMESPACE,
@@ -75,7 +76,7 @@ fn full_relation_filter(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> Inpu
     let object = Arc::new(init_input_object_type(ident.clone()));
     ctx.cache_input_type(ident, object.clone());
 
-    let fields = if rf.is_list {
+    let fields = if rf.is_list() {
         vec![
             input_field(filters::EVERY, InputType::object(related_input_type.clone()), None).optional(),
             input_field(filters::SOME, InputType::object(related_input_type.clone()), None).optional(),
@@ -85,10 +86,10 @@ fn full_relation_filter(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> Inpu
         vec![
             input_field(filters::IS, InputType::object(related_input_type.clone()), None)
                 .optional()
-                .nullable_if(!rf.is_required),
+                .nullable_if(!rf.is_required()),
             input_field(filters::IS_NOT, InputType::object(related_input_type), None)
                 .optional()
-                .nullable_if(!rf.is_required),
+                .nullable_if(!rf.is_required()),
         ]
     };
 
@@ -99,7 +100,7 @@ fn full_relation_filter(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> Inpu
 #[tracing::instrument(skip(ctx, sf))]
 fn scalar_list_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> InputObjectTypeWeakRef {
     let ident = Identifier::new(
-        scalar_filter_name(&sf.type_identifier, true, !sf.is_required, false, false),
+        scalar_filter_name(&sf.type_identifier, true, !sf.is_required(), false, false),
         PRISMA_NAMESPACE,
     );
     return_cached_input!(ctx, &ident);
@@ -112,12 +113,12 @@ fn scalar_list_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> Inp
 
     let mapped_nonlist_type = map_scalar_input_type(ctx, &sf.type_identifier, false);
     let mapped_list_type = InputType::list(mapped_nonlist_type.clone());
-    let mut fields: Vec<_> = equality_filters(mapped_list_type.clone(), !sf.is_required).collect();
+    let mut fields: Vec<_> = equality_filters(mapped_list_type.clone(), !sf.is_required()).collect();
 
     fields.push(
         input_field(filters::HAS, mapped_nonlist_type, None)
             .optional()
-            .nullable_if(!sf.is_required),
+            .nullable_if(!sf.is_required()),
     );
 
     fields.push(input_field(filters::HAS_EVERY, mapped_list_type.clone(), None).optional());

@@ -2,7 +2,7 @@ use crate::{error::ApiError, logger::ChannelLogger};
 use datamodel::{diagnostics::ValidatedConfiguration, Datamodel};
 use napi::threadsafe_function::ThreadsafeFunction;
 use opentelemetry::global;
-use prisma_models::DatamodelConverter;
+use prisma_models::InternalDataModelBuilder;
 use query_core::{executor, schema_builder, BuildMode, QueryExecutor, QuerySchema, QuerySchemaRenderer, TxId};
 use request_handlers::{GraphQLSchemaRenderer, GraphQlBody, GraphQlHandler, PrismaResponse, TxInput};
 use serde::{Deserialize, Serialize};
@@ -183,8 +183,6 @@ impl QueryEngine {
                     .logger
                     .clone()
                     .with_logging(|| async move {
-                        let template = DatamodelConverter::convert(&builder.datamodel.ast);
-
                         // We only support one data source & generator at the moment, so take the first one (default not exposed yet).
                         let data_source = builder
                             .config
@@ -205,7 +203,7 @@ impl QueryEngine {
                         connector.get_connection().await?;
 
                         // Build internal data model
-                        let internal_data_model = template.build(db_name);
+                        let internal_data_model = InternalDataModelBuilder::from(&builder.datamodel.ast).build(db_name);
 
                         let query_schema = schema_builder::build(
                             internal_data_model,

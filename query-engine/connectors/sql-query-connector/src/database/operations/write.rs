@@ -1,10 +1,10 @@
-use crate::{error::SqlError, query_builder::write, sql_info::SqlInfo, QueryExt};
+use crate::{error::SqlError, model_extensions::*, query_builder::write, sql_info::SqlInfo, QueryExt};
 use connector_interface::*;
 use itertools::Itertools;
 use prisma_models::*;
 use prisma_value::PrismaValue;
 use quaint::error::ErrorKind;
-use std::{collections::HashSet, convert::TryFrom, ops::Deref, usize};
+use std::{collections::HashSet, ops::Deref, usize};
 use tracing::log::trace;
 use user_facing_errors::query_engine::DatabaseConstraint;
 
@@ -62,7 +62,7 @@ pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArg
         (Some(identifier), _, _) if !identifier.misses_autogen_value() => Ok(identifier),
 
         // PostgreSQL with a working RETURNING statement
-        (_, n, _) if n > 0 => Ok(RecordProjection::try_from((&model.primary_identifier(), result_set))?),
+        (_, n, _) if n > 0 => Ok(try_convert(&model.primary_identifier(), result_set)?),
 
         // We have an auto-incremented id that we got from MySQL or SQLite
         (Some(mut identifier), _, Some(num)) if identifier.misses_autogen_value() => {

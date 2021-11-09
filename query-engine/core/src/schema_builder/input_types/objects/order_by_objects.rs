@@ -36,7 +36,7 @@ pub(crate) fn order_by_object_type(
         .all
         .iter()
         .filter_map(|field| match field {
-            ModelField::Relation(rf) if rf.is_list && include_relations => {
+            ModelField::Relation(rf) if rf.is_list() && include_relations => {
                 let related_model = rf.related_model();
                 let related_object_type = order_by_object_type_rel_aggregate(ctx, &related_model, &enum_type);
 

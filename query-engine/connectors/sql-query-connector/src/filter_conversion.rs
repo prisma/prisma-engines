@@ -1,3 +1,4 @@
+use crate::model_extensions::*;
 use connector_interface::filter::*;
 use prisma_models::prelude::*;
 use quaint::ast::*;

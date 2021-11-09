@@ -84,7 +84,7 @@ fn relation_input_fields_for_checked_create(
             let related_field = rf.related_field();
 
             // Compute input object name
-            let arity_part = if rf.is_list { "NestedMany" } else { "NestedOne" };
+            let arity_part = if rf.is_list() { "NestedMany" } else { "NestedOne" };
             let without_part = format!("Without{}", capitalize(&related_field.name));
             let ident = Identifier::new(
                 format!("{}Create{}{}Input", related_model.name, arity_part, without_part),
@@ -121,7 +121,7 @@ fn relation_input_fields_for_checked_create(
 
                 let input_field = input_field(rf.name.clone(), InputType::object(input_object), None);
 
-                if rf.is_required && !all_required_scalar_fields_have_defaults {
+                if rf.is_required() && !all_required_scalar_fields_have_defaults {
                     Some(input_field)
                 } else {
                     Some(input_field.optional())
@@ -214,7 +214,7 @@ fn relation_input_fields_for_unchecked_create(
             let child_field = rf.related_field();
 
             // Compute input object name
-            let arity_part = if rf.is_list { "NestedMany" } else { "NestedOne" };
+            let arity_part = if rf.is_list() { "NestedMany" } else { "NestedOne" };
             let without_part = format!("Without{}", capitalize(&child_field.name));
             let ident = Identifier::new(
                 format!("{}UncheckedCreate{}{}Input", child_model.name, arity_part, without_part),
@@ -253,7 +253,7 @@ fn relation_input_fields_for_unchecked_create(
 
                 let input_field = input_field(rf.name.clone(), InputType::object(input_object), None);
 
-                if rf.is_required && !all_required_scalar_fields_have_defaults {
+                if rf.is_required() && !all_required_scalar_fields_have_defaults {
                     Some(input_field)
                 } else {
                     Some(input_field.optional())
@@ -273,14 +273,14 @@ pub(crate) fn field_create_input(
 
     match &f.type_identifier {
         TypeIdentifier::Json if has_adv_json => {
-            let enum_type = json_null_input_enum(!f.is_required);
+            let enum_type = json_null_input_enum(!f.is_required());
 
             input_field(f.name.clone(), vec![InputType::Enum(enum_type), typ], default)
-                .optional_if(!f.is_required || f.default_value.is_some() || f.is_created_at() || f.is_updated_at())
+                .optional_if(!f.is_required() || f.default_value.is_some() || f.is_updated_at)
         }
 
         _ => input_field(f.name.clone(), typ, default)
-            .optional_if(!f.is_required || f.default_value.is_some() || f.is_created_at() || f.is_updated_at())
-            .nullable_if(!f.is_required),
+            .optional_if(!f.is_required() || f.default_value.is_some() || f.is_updated_at)
+            .nullable_if(!f.is_required()),
     }
 }

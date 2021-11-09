@@ -22,7 +22,6 @@
   "models": [
     {
       "name": "User",
-      "isEmbedded": false,
       "dbName": "user",
       "fields": [
         {
@@ -117,7 +116,6 @@
     },
     {
       "name": "Profile",
-      "isEmbedded": false,
       "dbName": "profile",
       "fields": [
         {
@@ -187,7 +185,6 @@
     },
     {
       "name": "Post",
-      "isEmbedded": false,
       "dbName": "post",
       "fields": [
         {
@@ -334,7 +331,6 @@
     },
     {
       "name": "Category",
-      "isEmbedded": false,
       "dbName": "category",
       "fields": [
         {
@@ -400,7 +396,6 @@
     },
     {
       "name": "PostToCategory",
-      "isEmbedded": false,
       "dbName": "post_to_category",
       "fields": [
         {
@@ -500,15 +495,24 @@
       ],
       "isGenerated": false,
       "primaryKey": null,
-      "uniqueFields": [["postTitle", "categoryId"]],
-      "uniqueIndexes": [{
-        "name": null,
-        "fields": ["postTitle", "categoryId"]
-      }]
+      "uniqueFields": [
+        [
+          "postTitle",
+          "categoryId"
+        ]
+      ],
+      "uniqueIndexes": [
+        {
+          "name": null,
+          "fields": [
+            "postTitle",
+            "categoryId"
+          ]
+        }
+      ]
     },
     {
       "name": "A",
-      "isEmbedded": false,
       "dbName": null,
       "fields": [
         {
@@ -565,7 +569,6 @@
     },
     {
       "name": "B",
-      "isEmbedded": false,
       "dbName": null,
       "fields": [
         {
@@ -605,7 +608,6 @@
     },
     {
       "name": "NamedCompounds",
-      "isEmbedded": false,
       "dbName": null,
       "fields": [
         {
@@ -664,14 +666,29 @@
       "isGenerated": false,
       "primaryKey": {
         "name": "MyPrimary",
-        "fields": ["a", "b"]
+        "fields": [
+          "a",
+          "b"
+        ]
       },
-      "uniqueFields": [["c", "d"]],
-      "uniqueIndexes": [{"name":  "MyUnique", "fields":  ["c", "d"]}]
+      "uniqueFields": [
+        [
+          "c",
+          "d"
+        ]
+      ],
+      "uniqueIndexes": [
+        {
+          "name": "MyUnique",
+          "fields": [
+            "c",
+            "d"
+          ]
+        }
+      ]
     },
     {
       "name": "MappedSingles",
-      "isEmbedded": false,
       "dbName": null,
       "fields": [
         {

@@ -4,7 +4,8 @@ pub mod write;
 pub use read::*;
 pub use write::*;
 
-use prisma_models::{RecordProjection, RecordProjectionExt};
+use crate::model_extensions::RecordProjectionExt;
+use prisma_models::RecordProjection;
 use quaint::ast::{Column, Comparable, ConditionTree, Query, Row, Values};
 
 const PARAMETER_LIMIT: usize = 2000;

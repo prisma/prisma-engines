@@ -168,7 +168,7 @@ fn non_list_scalar_update_field_mapper(
     let has_adv_json = ctx.has_capability(ConnectorCapability::AdvancedJsonNullability);
     match &field.type_identifier {
         TypeIdentifier::Json if has_adv_json => {
-            let enum_type = json_null_input_enum(!field.is_required);
+            let enum_type = json_null_input_enum(!field.is_required());
             let input_field = input_field(
                 field.name.clone(),
                 vec![InputType::Enum(enum_type), base_update_type],
@@ -182,7 +182,7 @@ fn non_list_scalar_update_field_mapper(
             let types = vec![map_scalar_input_type_for_field(ctx, field), base_update_type];
 
             let input_field = input_field(field.name.clone(), types, default);
-            input_field.optional().nullable_if(!field.is_required)
+            input_field.optional().nullable_if(!field.is_required())
         }
     }
 }
@@ -196,7 +196,7 @@ fn operations_object_type(
 ) -> InputObjectTypeWeakRef {
     // Nullability is important for the `set` operation, so we need to
     // construct and cache different objects to reflect that.
-    let nullable = if field.is_required { "" } else { "Nullable" };
+    let nullable = if field.is_required() { "" } else { "Nullable" };
     let ident = Identifier::new(
         format!("{}{}FieldUpdateOperationsInput", nullable, prefix),
         PRISMA_NAMESPACE,
@@ -212,7 +212,7 @@ fn operations_object_type(
     let typ = map_scalar_input_type_for_field(ctx, field);
     let mut fields = vec![input_field(operations::SET, typ.clone(), None)
         .optional()
-        .nullable_if(!field.is_required)];
+        .nullable_if(!field.is_required())];
 
     if with_number_operators {
         fields.push(input_field(operations::INCREMENT, typ.clone(), None).optional());
@@ -242,7 +242,7 @@ fn relation_input_fields_for_checked_update_one(
             let related_field = rf.related_field();
 
             // Compute input object name
-            let arity_part = match (rf.is_list, rf.is_required) {
+            let arity_part = match (rf.is_list(), rf.is_required()) {
                 (true, _) => "Many",
                 (false, true) => "OneRequired",
                 (false, false) => "One",
@@ -299,7 +299,7 @@ fn relation_input_fields_for_unchecked_update_one(
             let related_field = rf.related_field();
 
             // Compute input object name
-            let arity_part = match (rf.is_list, rf.is_required) {
+            let arity_part = match (rf.is_list(), rf.is_required()) {
                 (true, _) => "Many",
                 (false, true) => "OneRequired",
                 (false, false) => "One",
@@ -387,7 +387,8 @@ fn field_should_be_kept_for_checked_update_input_type(ctx: &BuilderContext, fiel
             (TypeIdentifier::Int, true, true)
         );
 
-    let model_id: ModelProjection = field.model().primary_identifier();
+    // WIP assumption: All fields we're reaching here _must_ be enclosed by a model.
+    let model_id: ModelProjection = field.container.as_model().unwrap().primary_identifier();
     let is_not_disallowed_id = if model_id.contains(field.clone()) {
         // Is part of the id, connector must allow updating ID fields.
         ctx.capabilities.contains(ConnectorCapability::UpdateableId)

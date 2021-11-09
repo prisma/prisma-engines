@@ -24,7 +24,7 @@ impl WriteArgsParser {
                 let field = model.fields().find_from_all(&k).unwrap();
 
                 match field {
-                    Field::Scalar(sf) if sf.is_list => match v {
+                    Field::Scalar(sf) if sf.is_list() => match v {
                         ParsedInputValue::List(_) => {
                             let set_value: PrismaValue = v.try_into()?;
 
@@ -75,6 +75,8 @@ impl WriteArgsParser {
                         ParsedInputValue::Single(PrismaValue::Null) => (),
                         _ => args.nested.push((Arc::clone(rf), v.try_into()?)),
                     },
+
+                    Field::Composite(_) => todo!(), // [Composites] todo
                 };
 
                 Ok(args)

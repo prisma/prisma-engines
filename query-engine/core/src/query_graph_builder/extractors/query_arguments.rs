@@ -114,7 +114,7 @@ fn process_order_object(
             let field = model.fields().find_from_all(&field_name)?;
 
             match field {
-                Field::Relation(rf) if rf.is_list => {
+                Field::Relation(rf) if rf.is_list() => {
                     let object: ParsedInputMap = field_value.try_into()?;
 
                     path.push(rf.clone());
@@ -146,6 +146,7 @@ fn process_order_object(
                         Ok(Some(OrderBy::scalar(sf.clone(), path, sort_order)))
                     }
                 }
+                Field::Composite(_) => Ok(None), // [Composites] todo
             }
         }
     }

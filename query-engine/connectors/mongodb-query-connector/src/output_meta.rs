@@ -47,7 +47,7 @@ pub fn from_field(field: &ScalarFieldRef) -> OutputMeta {
 
     // Only add a possible default return if the field is required.
     let default = field.default_value.clone().and_then(|dv| match dv.into_kind() {
-        datamodel::DefaultKind::Single(pv) if field.is_required => Some(pv),
+        datamodel::DefaultKind::Single(pv) if field.is_required() => Some(pv),
         _ => None,
     });
 

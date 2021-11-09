@@ -1,5 +1,6 @@
 use crate::{
     column_metadata,
+    model_extensions::*,
     query_arguments_ext::QueryArgumentsExt,
     query_builder::{self, read},
     sql_info::SqlInfo,

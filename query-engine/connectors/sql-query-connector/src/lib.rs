@@ -14,6 +14,7 @@ mod database;
 mod error;
 mod filter_conversion;
 mod join_utils;
+mod model_extensions;
 mod nested_aggregations;
 mod ordering;
 mod query_arguments_ext;

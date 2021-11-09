@@ -9,83 +9,22 @@ use std::{
 pub type RelationRef = Arc<Relation>;
 pub type RelationWeakRef = Weak<Relation>;
 
-#[derive(Debug)]
-pub struct RelationTemplate {
-    pub name: String,
-    pub manifestation: RelationLinkManifestation,
-    pub model_a_name: String,
-    pub model_b_name: String,
-}
-
 /// A relation between two models. Can be either using a `RelationTable` or
 /// model a direct link between two `RelationField`s.
 pub struct Relation {
     pub name: String,
 
-    model_a_name: String,
-    model_b_name: String,
+    pub(crate) model_a_name: String,
+    pub(crate) model_b_name: String,
 
-    model_a: OnceCell<ModelWeakRef>,
-    model_b: OnceCell<ModelWeakRef>,
+    pub(crate) model_a: OnceCell<ModelWeakRef>,
+    pub(crate) model_b: OnceCell<ModelWeakRef>,
 
-    field_a: OnceCell<Weak<RelationField>>,
-    field_b: OnceCell<Weak<RelationField>>,
+    pub(crate) field_a: OnceCell<Weak<RelationField>>,
+    pub(crate) field_b: OnceCell<Weak<RelationField>>,
 
     pub manifestation: RelationLinkManifestation,
-
     pub internal_data_model: InternalDataModelWeakRef,
-}
-
-impl Debug for Relation {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("Relation")
-            .field("name", &self.name)
-            .field("model_a_name", &self.model_a_name)
-            .field("model_b_name", &self.model_b_name)
-            .field("model_a", &self.model_a)
-            .field("model_b", &self.model_b)
-            .field("field_a", &self.field_a)
-            .field("field_b", &self.field_b)
-            .field("manifestation", &self.manifestation)
-            .field("internal_data_model", &"#InternalDataModelWeakRef#")
-            .finish()
-    }
-}
-
-#[derive(Debug, Clone, PartialEq)]
-pub enum RelationLinkManifestation {
-    Inline(InlineRelation),
-    RelationTable(RelationTable),
-}
-
-#[derive(Debug, Clone, PartialEq)]
-pub struct InlineRelation {
-    pub in_table_of_model_name: String,
-}
-
-#[derive(Debug, Clone, PartialEq)]
-pub struct RelationTable {
-    pub table: String,
-    pub model_a_column: String,
-    pub model_b_column: String,
-}
-
-impl RelationTemplate {
-    pub fn build(self, internal_data_model: InternalDataModelWeakRef) -> RelationRef {
-        let relation = Relation {
-            name: self.name,
-            manifestation: self.manifestation,
-            model_a_name: self.model_a_name,
-            model_b_name: self.model_b_name,
-            model_a: OnceCell::new(),
-            model_b: OnceCell::new(),
-            field_a: OnceCell::new(),
-            field_b: OnceCell::new(),
-            internal_data_model,
-        };
-
-        Arc::new(relation)
-    }
 }
 
 impl Relation {
@@ -166,11 +105,11 @@ impl Relation {
 
     /// Practically deprecated with Prisma 2.
     pub fn is_many_to_many(&self) -> bool {
-        self.field_a().is_list && self.field_b().is_list
+        self.field_a().is_list() && self.field_b().is_list()
     }
 
     pub fn is_one_to_one(&self) -> bool {
-        !self.field_a().is_list && !self.field_b().is_list
+        !self.field_a().is_list() && !self.field_b().is_list()
     }
 
     pub fn is_one_to_many(&self) -> bool {
@@ -191,4 +130,38 @@ impl Relation {
             .or_else(|| self.field_b().on_delete().cloned())
             .unwrap_or(self.field_a().on_delete_default)
     }
+}
+
+impl Debug for Relation {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Relation")
+            .field("name", &self.name)
+            .field("model_a_name", &self.model_a_name)
+            .field("model_b_name", &self.model_b_name)
+            .field("model_a", &self.model_a)
+            .field("model_b", &self.model_b)
+            .field("field_a", &self.field_a)
+            .field("field_b", &self.field_b)
+            .field("manifestation", &self.manifestation)
+            .field("internal_data_model", &"#InternalDataModelWeakRef#")
+            .finish()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum RelationLinkManifestation {
+    Inline(InlineRelation),
+    RelationTable(RelationTable),
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct InlineRelation {
+    pub in_table_of_model_name: String,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct RelationTable {
+    pub table: String,
+    pub model_a_column: String,
+    pub model_b_column: String,
 }

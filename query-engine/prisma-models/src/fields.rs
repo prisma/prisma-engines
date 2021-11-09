@@ -7,14 +7,15 @@ use std::{
     sync::{Arc, Weak},
 };
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Fields {
     pub all: Vec<Field>,
     primary_key: Option<PrimaryKey>,
     scalar: OnceCell<Vec<ScalarFieldWeak>>,
     relation: OnceCell<Vec<RelationFieldWeak>>,
+    composite: OnceCell<Vec<CompositeFieldWeak>>,
     model: ModelWeakRef,
-    created_at: OnceCell<Option<ScalarFieldRef>>,
+    // created_at: OnceCell<Option<ScalarFieldRef>>,
     updated_at: OnceCell<Option<ScalarFieldRef>>,
 }
 
@@ -25,7 +26,8 @@ impl Fields {
             primary_key,
             scalar: OnceCell::new(),
             relation: OnceCell::new(),
-            created_at: OnceCell::new(),
+            composite: OnceCell::new(),
+            // created_at: OnceCell::new(),
             updated_at: OnceCell::new(),
             model,
         }
@@ -79,21 +81,22 @@ impl Fields {
         }
     }
 
-    pub fn created_at(&self) -> &Option<ScalarFieldRef> {
-        self.created_at.get_or_init(|| {
-            self.scalar_weak()
-                .iter()
-                .map(|sf| sf.upgrade().unwrap())
-                .find(|sf| sf.is_created_at())
-        })
-    }
+    // Todo / WIP: Doesn't seem to exist anymore.
+    // pub fn created_at(&self) -> &Option<ScalarFieldRef> {
+    //     self.created_at.get_or_init(|| {
+    //         self.scalar_weak()
+    //             .iter()
+    //             .map(|sf| sf.upgrade().unwrap())
+    //             .find(|sf| sf.is_created_at())
+    //     })
+    // }
 
     pub fn updated_at(&self) -> &Option<ScalarFieldRef> {
         self.updated_at.get_or_init(|| {
             self.scalar_weak()
                 .iter()
                 .map(|sf| sf.upgrade().unwrap())
-                .find(|sf| sf.is_updated_at())
+                .find(|sf| sf.is_updated_at)
         })
     }
 
@@ -106,7 +109,7 @@ impl Fields {
     }
 
     pub fn scalar_list(&self) -> Vec<ScalarFieldRef> {
-        self.scalar().into_iter().filter(|sf| sf.is_list).collect()
+        self.scalar().into_iter().filter(|sf| sf.is_list()).collect()
     }
 
     fn scalar_weak(&self) -> &[ScalarFieldWeak] {

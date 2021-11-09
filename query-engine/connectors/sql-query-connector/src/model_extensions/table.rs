@@ -1,5 +1,5 @@
 use super::AsColumn;
-use crate::Model;
+use prisma_models::Model;
 use quaint::ast::{Column, Table};
 
 pub trait AsTable {
