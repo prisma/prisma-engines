@@ -2,6 +2,7 @@
 
 [![Query Engine](https://github.com/prisma/prisma-engines/actions/workflows/query-engine.yml/badge.svg)](https://github.com/prisma/prisma-engines/actions/workflows/query-engine.yml)
 [![Introspection Engine + Migration Engine + sql_schema_describer](https://github.com/prisma/prisma-engines/actions/workflows/migration-engine.yml/badge.svg)](https://github.com/prisma/prisma-engines/actions/workflows/migration-engine.yml)
+[![Cargo docs](https://github.com/prisma/prisma-engines/actions/workflows/cargo-doc.yml/badge.svg)](https://github.com/prisma/prisma-engines/actions/workflows/cargo-doc.yml)
 
 This repository contains a collection of engines that power the core stack for
 [Prisma](https://github.com/prisma/prisma), most prominently [Prisma
@@ -13,6 +14,11 @@ The engines and their respective binary crates are:
 - Migration engine: `migration-engine-cli`
 - Introspection engine: `introspection-engine`
 - Prisma Format: `prisma-fmt`
+
+## Documentation
+
+The [API docs (cargo doc)](https://prisma.github.io/prisma-engines/) are
+published on the repo GitHub pages.
 
 ## Building Prisma Engines
 
