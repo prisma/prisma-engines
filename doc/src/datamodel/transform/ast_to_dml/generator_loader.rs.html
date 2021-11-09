@@ -138,6 +138,7 @@
 <span id="138">138</span>
 <span id="139">139</span>
 <span id="140">140</span>
+<span id="141">141</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::helpers</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">Span</span>, <span class="ident">WithSpan</span>},
@@ -262,6 +263,7 @@
                 <span class="ident">ast::Expression::ConstantValue</span>(<span class="ident">val</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">val</span>.<span class="ident">clone</span>(),
                 <span class="ident">ast::Expression::Function</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">String::from</span>(<span class="string">&quot;(function)&quot;</span>),
                 <span class="ident">ast::Expression::Array</span>(<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">String::from</span>(<span class="string">&quot;(array)&quot;</span>),
+                <span class="ident">ast::Expression::FieldWithArgs</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">String::from</span>(<span class="string">&quot;(field with args)&quot;</span>),
             };
 
             <span class="ident">properties</span>.<span class="ident">insert</span>(<span class="ident">prop</span>.<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">value</span>);

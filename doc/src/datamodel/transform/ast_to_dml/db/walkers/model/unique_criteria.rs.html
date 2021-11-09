@@ -34,7 +34,9 @@
 <span id="34">34</span>
 <span id="35">35</span>
 <span id="36">36</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
+<span id="37">37</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::transform::ast_to_dml::db::types::FieldWithArgs</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>,
     <span class="ident">transform::ast_to_dml::db</span>::{<span class="ident">walkers::ScalarFieldWalker</span>, <span class="ident">ParserDatabase</span>},
 };
@@ -44,17 +46,17 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">UniqueCriteriaWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> [<span class="ident">ast::FieldId</span>],
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> [<span class="ident">FieldWithArgs</span>],
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ParserDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">UniqueCriteriaWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">fields</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;db</span> {
-        <span class="self">self</span>.<span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">field_id</span><span class="op">|</span> <span class="ident">ScalarFieldWalker</span> {
+        <span class="self">self</span>.<span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">ScalarFieldWalker</span> {
             <span class="ident">model_id</span>: <span class="self">self</span>.<span class="ident">model_id</span>,
-            <span class="ident">field_id</span>: <span class="kw-2">*</span><span class="ident">field_id</span>,
+            <span class="ident">field_id</span>: <span class="ident">field</span>.<span class="ident">field_id</span>,
             <span class="ident">db</span>: <span class="self">self</span>.<span class="ident">db</span>,
-            <span class="ident">scalar_field</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">types</span>.<span class="ident">scalar_fields</span>[<span class="kw-2">&amp;</span>(<span class="self">self</span>.<span class="ident">model_id</span>, <span class="kw-2">*</span><span class="ident">field_id</span>)],
+            <span class="ident">scalar_field</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">types</span>.<span class="ident">scalar_fields</span>[<span class="kw-2">&amp;</span>(<span class="self">self</span>.<span class="ident">model_id</span>, <span class="ident">field</span>.<span class="ident">field_id</span>)],
         })
     }
 

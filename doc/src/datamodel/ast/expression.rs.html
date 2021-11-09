@@ -99,8 +99,6 @@
 <span id="99"> 99</span>
 <span id="100">100</span>
 <span id="101">101</span>
-<span id="102">102</span>
-<span id="103">103</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
 
 <span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
@@ -123,6 +121,8 @@
     <span class="ident">Function</span>(<span class="ident">String</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&gt;</span>, <span class="ident">Span</span>),
     <span class="doccomment">/// An array of other values.</span>
     <span class="ident">Array</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&gt;</span>, <span class="ident">Span</span>),
+    <span class="doccomment">/// A field that can contain a list of arguments.</span>
+    <span class="ident">FieldWithArgs</span>(<span class="ident">String</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Argument</span><span class="op">&gt;</span>, <span class="ident">Span</span>),
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Expression</span> {
@@ -135,7 +135,12 @@
             <span class="ident">Expression::Function</span>(<span class="ident">fun</span>, <span class="ident">args</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}({})&quot;</span>, <span class="ident">fun</span>, <span class="ident">args</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">arg</span>)).<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>))
             }
-            <span class="ident">Expression::Array</span>(<span class="ident">vals</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;[{}]&quot;</span>, <span class="ident">vals</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">arg</span>)).<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>)),
+            <span class="ident">Expression::Array</span>(<span class="ident">vals</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;[{}]&quot;</span>, <span class="ident">vals</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">arg</span>)).<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>))
+            }
+            <span class="ident">Expression::FieldWithArgs</span>(<span class="ident">ident</span>, <span class="ident">vals</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}({})&quot;</span>, <span class="ident">ident</span>, <span class="ident">vals</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">arg</span>)).<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>))
+            }
         }
     }
 }
@@ -148,21 +153,10 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_lifted_span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">offset</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Expression</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extract_constant_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Span</span>)<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Expression::NumericValue</span>(<span class="ident">v</span>, <span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Expression::NumericValue</span>(<span class="ident">v</span>.<span class="ident">clone</span>(), <span class="ident">s</span>.<span class="ident">lift_span</span>(<span class="ident">offset</span>)),
-            <span class="ident">Expression::BooleanValue</span>(<span class="ident">v</span>, <span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Expression::BooleanValue</span>(<span class="ident">v</span>.<span class="ident">clone</span>(), <span class="ident">s</span>.<span class="ident">lift_span</span>(<span class="ident">offset</span>)),
-            <span class="ident">Expression::StringValue</span>(<span class="ident">v</span>, <span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Expression::StringValue</span>(<span class="ident">v</span>.<span class="ident">clone</span>(), <span class="ident">s</span>.<span class="ident">lift_span</span>(<span class="ident">offset</span>)),
-            <span class="ident">Expression::ConstantValue</span>(<span class="ident">v</span>, <span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Expression::ConstantValue</span>(<span class="ident">v</span>.<span class="ident">clone</span>(), <span class="ident">s</span>.<span class="ident">lift_span</span>(<span class="ident">offset</span>)),
-            <span class="ident">Expression::Function</span>(<span class="ident">v</span>, <span class="ident">a</span>, <span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Expression::Function</span>(
-                <span class="ident">v</span>.<span class="ident">clone</span>(),
-                <span class="ident">a</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">elem</span><span class="op">|</span> <span class="ident">elem</span>.<span class="ident">with_lifted_span</span>(<span class="ident">offset</span>)).<span class="ident">collect</span>(),
-                <span class="ident">s</span>.<span class="ident">lift_span</span>(<span class="ident">offset</span>),
-            ),
-            <span class="ident">Expression::Array</span>(<span class="ident">v</span>, <span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Expression::Array</span>(
-                <span class="ident">v</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">elem</span><span class="op">|</span> <span class="ident">elem</span>.<span class="ident">with_lifted_span</span>(<span class="ident">offset</span>)).<span class="ident">collect</span>(),
-                <span class="ident">s</span>.<span class="ident">lift_span</span>(<span class="ident">offset</span>),
-            ),
+            <span class="ident">Expression::ConstantValue</span>(<span class="ident">s</span>, <span class="ident">span</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>((<span class="ident">s</span>, <span class="kw-2">*</span><span class="ident">span</span>)),
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
         }
     }
 
@@ -178,6 +172,7 @@
             <span class="ident"><span class="self">Self</span>::ConstantValue</span>(<span class="kw">_</span>, <span class="ident">span</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">span</span>,
             <span class="ident"><span class="self">Self</span>::Function</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">span</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">span</span>,
             <span class="ident"><span class="self">Self</span>::Array</span>(<span class="kw">_</span>, <span class="ident">span</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">span</span>,
+            <span class="ident"><span class="self">Self</span>::FieldWithArgs</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">span</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">span</span>,
         }
     }
 
@@ -197,6 +192,7 @@
             <span class="ident">Expression::ConstantValue</span>(<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;literal&quot;</span>,
             <span class="ident">Expression::Function</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;functional&quot;</span>,
             <span class="ident">Expression::Array</span>(<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;array&quot;</span>,
+            <span class="ident">Expression::FieldWithArgs</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;field with args&quot;</span>,
         }
     }
 

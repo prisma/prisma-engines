@@ -213,7 +213,7 @@
     <span class="ident">names</span>: <span class="ident">Names</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
     <span class="ident">types</span>: <span class="ident">Types</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
     <span class="ident">relations</span>: <span class="ident">Relations</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
-    <span class="ident">_preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> <span class="ident">ParserDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
@@ -230,7 +230,7 @@
             <span class="ident">names</span>: <span class="ident">Names::default</span>(),
             <span class="ident">types</span>: <span class="ident">Types::default</span>(),
             <span class="ident">relations</span>: <span class="ident">Relations::default</span>(),
-            <span class="ident">_preview_features</span>: <span class="ident">preview_features</span>,
+            <span class="ident">preview_features</span>,
         };
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">Context::new</span>(<span class="ident">db</span>, <span class="ident">diagnostics</span>);

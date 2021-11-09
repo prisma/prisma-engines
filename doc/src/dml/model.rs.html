@@ -381,6 +381,12 @@
 <span id="381">381</span>
 <span id="382">382</span>
 <span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::default_value::DefaultKind</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::field</span>::{<span class="ident">Field</span>, <span class="ident">FieldType</span>, <span class="ident">RelationField</span>, <span class="ident">ScalarField</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::scalars::ScalarType</span>;
@@ -439,6 +445,12 @@
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">IndexType</span> {
     <span class="ident">Unique</span>,
     <span class="ident">Normal</span>,
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SortOrder</span> {
+    <span class="ident">Asc</span>,
+    <span class="ident">Desc</span>,
 }
 
 <span class="doccomment">/// A unique criteria is a set of fields through which a record can be uniquely identified.</span>

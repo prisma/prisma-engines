@@ -546,8 +546,20 @@
 <span id="546">546</span>
 <span id="547">547</span>
 <span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">context::Context</span>, <span class="ident">walkers::CompositeTypeFieldWalker</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ast</span>, <span class="ident">diagnostics::DatamodelError</span>, <span class="ident">transform::ast_to_dml::db::walkers::CompositeTypeWalker</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast::FieldId</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ast</span>, <span class="ident">diagnostics::DatamodelError</span>, <span class="ident">transform::ast_to_dml::db::walkers::CompositeTypeWalker</span>, <span class="ident">SortOrder</span>};
 <span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
 <span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
 <span class="kw">use</span> <span class="ident">regex::Regex</span>;
@@ -702,18 +714,21 @@
 <span class="kw">impl</span> <span class="ident">ModelAttributes</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Whether the field is the whole primary key. Will match `@id` and `@@id([fieldName])`.</span>
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">field_is_single_pk</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">field</span>: <span class="ident">ast::FieldId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">primary_key</span>.<span class="ident">as_ref</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">pk</span>.<span class="ident">fields</span> <span class="op">=</span><span class="op">=</span> [<span class="ident">field</span>]).<span class="ident">is_some</span>()
+        <span class="self">self</span>.<span class="ident">primary_key</span>
+            .<span class="ident">as_ref</span>()
+            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">pk</span>.<span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">field_id</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>() <span class="op">=</span><span class="op">=</span> [<span class="ident">field</span>])
+            .<span class="ident">is_some</span>()
     }
 
     <span class="doccomment">/// Whether MySQL would consider the field indexed for autoincrement purposes.</span>
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">field_is_indexed_for_autoincrement</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">field_id</span>: <span class="ident">ast::FieldId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ast_indexes</span>
             .<span class="ident">iter</span>()
-            .<span class="ident">any</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">idx</span>)<span class="op">|</span> <span class="ident">idx</span>.<span class="ident">fields</span>.<span class="ident">get</span>(<span class="number">0</span>) <span class="op">=</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">field_id</span>))
+            .<span class="ident">any</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">idx</span>)<span class="op">|</span> <span class="ident">idx</span>.<span class="ident">fields</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">field_id</span>) <span class="op">=</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field_id</span>))
             <span class="op">|</span><span class="op">|</span> <span class="self">self</span>
                 .<span class="ident">primary_key</span>
                 .<span class="ident">as_ref</span>()
-                .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">pk</span>.<span class="ident">fields</span>.<span class="ident">get</span>(<span class="number">0</span>) <span class="op">=</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">field_id</span>))
+                .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">pk</span>.<span class="ident">fields</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">field_id</span>) <span class="op">=</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field_id</span>))
                 .<span class="ident">is_some</span>()
     }
 }
@@ -721,18 +736,25 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">IndexAttribute</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">is_unique</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ast::FieldId</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FieldWithArgs</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">source_field</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ast::FieldId</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">db_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">IdAttribute</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ast::FieldId</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">source_field</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ast::FieldId</span><span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">IdAttribute</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FieldWithArgs</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">source_field</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FieldId</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">db_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span><span class="op">&gt;</span>,
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FieldWithArgs</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">field_id</span>: <span class="ident">ast::FieldId</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">sort_order</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SortOrder</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">length</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>

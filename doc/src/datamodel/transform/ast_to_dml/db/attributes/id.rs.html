@@ -194,7 +194,42 @@
 <span id="194">194</span>
 <span id="195">195</span>
 <span id="196">196</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">resolve_field_array</span>, <span class="ident">FieldResolutionError</span>};
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::FieldResolutionError</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::transform::ast_to_dml::db::attributes::resolve_field_array_with_args</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::transform::ast_to_dml::db::types::FieldWithArgs</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>,
     <span class="ident">common::constraint_names::ConstraintNames</span>,
@@ -203,6 +238,7 @@
         <span class="ident">context</span>::{<span class="ident">Arguments</span>, <span class="ident">Context</span>},
         <span class="ident">types</span>::{<span class="ident">IdAttribute</span>, <span class="ident">ModelAttributes</span>},
     },
+    <span class="ident">SortOrder</span>,
 };
 
 <span class="doccomment">/// @@id on models</span>
@@ -225,7 +261,7 @@
         ));
     }
 
-    <span class="kw">let</span> <span class="ident">resolved_fields</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">resolve_field_array</span>(<span class="kw-2">&amp;</span><span class="ident">fields</span>, <span class="ident">args</span>.<span class="ident">span</span>(), <span class="ident">model_id</span>, <span class="ident">ctx</span>) {
+    <span class="kw">let</span> <span class="ident">resolved_fields</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">resolve_field_array_with_args</span>(<span class="kw-2">&amp;</span><span class="ident">fields</span>, <span class="ident">args</span>.<span class="ident">span</span>(), <span class="ident">model_id</span>, <span class="ident">ctx</span>) {
         <span class="prelude-val">Ok</span>(<span class="ident">fields</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">fields</span>,
         <span class="prelude-val">Err</span>(<span class="ident">FieldResolutionError::AlreadyDealtWith</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span>,
         <span class="prelude-val">Err</span>(<span class="ident">FieldResolutionError::ProblematicFields</span> {
@@ -256,7 +292,7 @@
     <span class="comment">// ID attribute fields must reference only required fields.</span>
     <span class="kw">let</span> <span class="ident">fields_that_are_not_required</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">resolved_fields</span>
         .<span class="ident">iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field_id</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="ident">model_id</span>][<span class="kw-2">*</span><span class="ident">field_id</span>])
+        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="ident">model_id</span>][<span class="ident">field</span>.<span class="ident">field_id</span>])
         .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="op">!</span><span class="ident">field</span>.<span class="ident">arity</span>.<span class="ident">is_required</span>())
         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">name</span>())
         .<span class="ident">collect</span>();
@@ -314,10 +350,40 @@
         <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">db_name</span> <span class="op">=</span> <span class="ident">primary_key_constraint_name</span>(<span class="ident">ast_model</span>, <span class="ident">args</span>, <span class="string">&quot;@id&quot;</span>, <span class="ident">ctx</span>);
 
+            <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">args</span>.<span class="ident">optional_arg</span>(<span class="string">&quot;length&quot;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">length</span><span class="op">|</span> <span class="ident">length</span>.<span class="ident">as_int</span>()) {
+                <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">length</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">length</span> <span class="kw">as</span> <span class="ident">u32</span>),
+                <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">err</span>);
+                    <span class="prelude-val">None</span>
+                }
+                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            };
+
+            <span class="kw">let</span> <span class="ident">sort_order</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">args</span>.<span class="ident">optional_arg</span>(<span class="string">&quot;sort&quot;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">sort</span><span class="op">|</span> <span class="ident">sort</span>.<span class="ident">as_constant_literal</span>()) {
+                <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="string">&quot;Desc&quot;</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">SortOrder::Desc</span>),
+                <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="string">&quot;Asc&quot;</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">SortOrder::Asc</span>),
+                <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">other</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">args</span>.<span class="ident">new_attribute_validation_error</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
+                        <span class="string">&quot;The `sort` argument can only be `Asc` or `Desc` you provided: {}.&quot;</span>,
+                        <span class="ident">other</span>
+                    )));
+                    <span class="prelude-val">None</span>
+                }
+                <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">err</span>);
+                    <span class="prelude-val">None</span>
+                }
+                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            };
+
             <span class="ident">model_attributes</span>.<span class="ident">primary_key</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">IdAttribute</span> {
                 <span class="ident">name</span>: <span class="prelude-val">None</span>,
                 <span class="ident">db_name</span>,
-                <span class="ident">fields</span>: <span class="macro">vec!</span>[<span class="ident">field_id</span>],
+                <span class="ident">fields</span>: <span class="macro">vec!</span>[<span class="ident">FieldWithArgs</span> {
+                    <span class="ident">field_id</span>,
+                    <span class="ident">sort_order</span>,
+                    <span class="ident">length</span>,
+                }],
                 <span class="ident">source_field</span>: <span class="prelude-val">Some</span>(<span class="ident">field_id</span>),
             })
         }

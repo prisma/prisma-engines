@@ -164,6 +164,7 @@
 <span id="164">164</span>
 <span id="165">165</span>
 <span id="166">166</span>
+<span id="167">167</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">pest::Parser</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::{
@@ -272,6 +273,7 @@
         <span class="ident">Rule::expression</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;expression&quot;</span>,
         <span class="ident">Rule::argument_name</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;argument name&quot;</span>,
         <span class="ident">Rule::function</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;function expression&quot;</span>,
+        <span class="ident">Rule::field_with_args</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;field with arguments&quot;</span>,
         <span class="ident">Rule::argument_value</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;argument value&quot;</span>,
         <span class="ident">Rule::argument</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;argument&quot;</span>,
         <span class="ident">Rule::attribute_arguments</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;attribute arguments&quot;</span>,

@@ -88,6 +88,8 @@
 <span id="88">88</span>
 <span id="89">89</span>
 <span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">fields</span>;
 <span class="kw">mod</span> <span class="ident">indexes</span>;
 <span class="kw">mod</span> <span class="ident">models</span>;
@@ -110,6 +112,7 @@
     <span class="kw">for</span> <span class="ident">model</span> <span class="kw">in</span> <span class="ident">db</span>.<span class="ident">walk_models</span>() {
         <span class="ident">models::has_a_strict_unique_criteria</span>(<span class="ident">model</span>, <span class="ident">diagnostics</span>);
         <span class="ident">models::has_a_unique_primary_key_name</span>(<span class="ident">db</span>, <span class="ident">model</span>, <span class="ident">diagnostics</span>);
+        <span class="ident">models::uses_sort_or_length_on_primary_without_preview_flag</span>(<span class="ident">db</span>, <span class="ident">model</span>, <span class="ident">diagnostics</span>);
 
         <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">scalar_fields</span>() {
             <span class="ident">fields::validate_client_name</span>(<span class="ident">field</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="ident">names</span>, <span class="ident">diagnostics</span>);
@@ -133,6 +136,7 @@
 
         <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">indexes</span>() {
             <span class="ident">indexes::has_a_unique_constraint_name</span>(<span class="ident">db</span>, <span class="ident">index</span>, <span class="ident">diagnostics</span>);
+            <span class="ident">indexes::uses_length_or_sort_without_preview_flag</span>(<span class="ident">db</span>, <span class="ident">index</span>, <span class="ident">diagnostics</span>);
         }
     }
 

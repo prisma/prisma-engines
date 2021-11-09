@@ -69,11 +69,20 @@
 <span id="69">69</span>
 <span id="70">70</span>
 <span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common::constraint_names::ConstraintNames</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">context::Context</span>, <span class="ident">types::IndexAttribute</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::transform::ast_to_dml::db::types::FieldWithArgs</span>;
 
 <span class="doccomment">/// Prisma forces a 1:1 relation to be unique from the defining side. If the</span>
 <span class="doccomment">/// field is not a primary key or already defined in a unique index, we add an</span>
@@ -126,7 +135,14 @@
             <span class="ident">model</span>.<span class="ident">model_id</span>(),
             <span class="ident">IndexAttribute</span> {
                 <span class="ident">is_unique</span>: <span class="bool-val">true</span>,
-                <span class="ident">fields</span>: <span class="ident">relation</span>.<span class="ident">referencing_fields</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">field_id</span>()).<span class="ident">collect</span>(),
+                <span class="ident">fields</span>: <span class="ident">relation</span>
+                    .<span class="ident">referencing_fields</span>()
+                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">FieldWithArgs</span> {
+                        <span class="ident">field_id</span>: <span class="ident">f</span>.<span class="ident">field_id</span>(),
+                        <span class="ident">sort_order</span>: <span class="prelude-val">None</span>,
+                        <span class="ident">length</span>: <span class="prelude-val">None</span>,
+                    })
+                    .<span class="ident">collect</span>(),
                 <span class="ident">source_field</span>,
                 <span class="ident">name</span>: <span class="prelude-val">None</span>,
                 <span class="ident">db_name</span>: <span class="prelude-val">Some</span>(<span class="ident">Cow::from</span>(<span class="ident">db_name</span>)),
