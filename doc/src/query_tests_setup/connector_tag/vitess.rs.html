@@ -115,17 +115,10 @@
 <span id="115">115</span>
 <span id="116">116</span>
 <span id="117">117</span>
-<span id="118">118</span>
-<span id="119">119</span>
-<span id="120">120</span>
-<span id="121">121</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt::Display</span>, <span class="ident">str::FromStr</span>};
-
-<span class="kw">use</span> <span class="ident">datamodel_connector</span>::{<span class="ident">Connector</span>, <span class="ident">ReferentialIntegrity</span>};
-<span class="kw">use</span> <span class="ident">sql_datamodel_connector::MySqlDatamodelConnector</span>;
-
-<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">SqlDatamodelRenderer</span>, <span class="ident">TestResult</span>};
+<span class="kw">use</span> <span class="ident">sql_datamodel_connector::SqlDatamodelConnectors</span>;
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt::Display</span>, <span class="ident">str::FromStr</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">VitessConnectorTag</span> {
@@ -237,8 +230,7 @@
 }
 
 <span class="kw">fn</span> <span class="ident">vitess_capabilities</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConnectorCapability</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">dm_connector</span> <span class="op">=</span> <span class="ident">MySqlDatamodelConnector::new</span>(<span class="ident">ReferentialIntegrity::Prisma</span>);
-    <span class="ident">dm_connector</span>.<span class="ident">capabilities</span>().<span class="ident">to_owned</span>()
+    <span class="ident">SqlDatamodelConnectors::MYSQL</span>.<span class="ident">capabilities</span>().<span class="ident">to_owned</span>()
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_tests_setup" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>

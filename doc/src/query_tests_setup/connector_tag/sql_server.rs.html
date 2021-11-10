@@ -117,10 +117,7 @@
 <span id="117">117</span>
 <span id="118">118</span>
 <span id="119">119</span>
-<span id="120">120</span>
-<span id="121">121</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel_connector</span>::{<span class="ident">Connector</span>, <span class="ident">ReferentialIntegrity</span>};
-<span class="kw">use</span> <span class="ident">sql_datamodel_connector::MsSqlDatamodelConnector</span>;
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">sql_datamodel_connector::SqlDatamodelConnectors</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">datamodel_rendering::SqlDatamodelRenderer</span>, <span class="ident">TestError</span>, <span class="ident">TestResult</span>};
 
@@ -237,8 +234,7 @@
 }
 
 <span class="kw">fn</span> <span class="ident">sql_server_capabilities</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConnectorCapability</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">dm_connector</span> <span class="op">=</span> <span class="ident">MsSqlDatamodelConnector::new</span>(<span class="ident">ReferentialIntegrity::default</span>());
-    <span class="ident">dm_connector</span>.<span class="ident">capabilities</span>().<span class="ident">to_owned</span>()
+    <span class="ident">SqlDatamodelConnectors::MSSQL</span>.<span class="ident">capabilities</span>().<span class="ident">to_owned</span>()
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_tests_setup" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>

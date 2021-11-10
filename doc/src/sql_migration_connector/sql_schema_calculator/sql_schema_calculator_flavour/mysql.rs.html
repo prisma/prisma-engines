@@ -44,15 +44,12 @@
 <span id="44">44</span>
 <span id="45">45</span>
 <span id="46">46</span>
-<span id="47">47</span>
-<span id="48">48</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::SqlSchemaCalculatorFlavour</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::flavour::MysqlFlavour</span>;
 <span class="kw">use</span> <span class="ident">datamodel</span>::{
     <span class="ident">walkers</span>::{<span class="ident">walk_scalar_fields</span>, <span class="ident">ScalarFieldWalker</span>},
     <span class="ident">Datamodel</span>, <span class="ident">ScalarType</span>,
 };
-<span class="kw">use</span> <span class="ident">datamodel_connector::Connector</span>;
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span> <span class="kw">as</span> <span class="ident">sql</span>;
 
 <span class="kw">impl</span> <span class="ident">SqlSchemaCalculatorFlavour</span> <span class="kw">for</span> <span class="ident">MysqlFlavour</span> {
@@ -81,8 +78,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">default_native_type_for_scalar_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">scalar_type</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">serde_json::Value</span> {
-        <span class="ident">sql_datamodel_connector::SqlDatamodelConnectors::mysql</span>(<span class="ident">Default::default</span>())
-            .<span class="ident">default_native_type_for_scalar_type</span>(<span class="ident">scalar_type</span>)
+        <span class="ident">sql_datamodel_connector::SqlDatamodelConnectors::MYSQL</span>.<span class="ident">default_native_type_for_scalar_type</span>(<span class="ident">scalar_type</span>)
     }
 
     <span class="kw">fn</span> <span class="ident">enum_column_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">_db_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sql::ColumnType</span> {

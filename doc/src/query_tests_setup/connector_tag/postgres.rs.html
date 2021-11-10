@@ -196,15 +196,10 @@
 <span id="196">196</span>
 <span id="197">197</span>
 <span id="198">198</span>
-<span id="199">199</span>
-<span id="200">200</span>
-<span id="201">201</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel_connector</span>::{<span class="ident">Connector</span>, <span class="ident">ReferentialIntegrity</span>};
-<span class="kw">use</span> <span class="ident">sql_datamodel_connector::PostgresDatamodelConnector</span>;
-
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">datamodel_rendering::SqlDatamodelRenderer</span>, <span class="ident">TestError</span>, <span class="ident">TestResult</span>};
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">sql_datamodel_connector::SqlDatamodelConnectors</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">datamodel_rendering::SqlDatamodelRenderer</span>, <span class="ident">TestError</span>, <span class="ident">TestResult</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PostgresConnectorTag</span> {
@@ -397,8 +392,7 @@
 }
 
 <span class="kw">fn</span> <span class="ident">postgres_capabilities</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConnectorCapability</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">dm_connector</span> <span class="op">=</span> <span class="ident">PostgresDatamodelConnector::new</span>(<span class="ident">ReferentialIntegrity::default</span>());
-    <span class="ident">dm_connector</span>.<span class="ident">capabilities</span>().<span class="ident">to_owned</span>()
+    <span class="ident">SqlDatamodelConnectors::POSTGRES</span>.<span class="ident">capabilities</span>().<span class="ident">to_owned</span>()
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_tests_setup" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>

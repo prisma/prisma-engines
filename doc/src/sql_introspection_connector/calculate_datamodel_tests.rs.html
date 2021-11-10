@@ -1090,8 +1090,6 @@
 <span id="1090">1090</span>
 <span id="1091">1091</span>
 <span id="1092">1092</span>
-<span id="1093">1093</span>
-<span id="1094">1094</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::calculate_datamodel::calculate_datamodel</span>;
@@ -1100,13 +1098,12 @@
         <span class="ident">IndexDefinition</span>, <span class="ident">Model</span>, <span class="ident">NativeTypeInstance</span>, <span class="ident">PrimaryKeyDefinition</span>, <span class="ident">ReferentialAction</span>, <span class="ident">RelationField</span>,
         <span class="ident">RelationInfo</span>, <span class="ident">ScalarField</span>, <span class="ident">ScalarType</span>, <span class="ident">StringFromEnvVar</span>, <span class="ident">ValueGenerator</span>,
     };
-    <span class="kw">use</span> <span class="ident">datamodel_connector::ReferentialIntegrity</span>;
     <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
     <span class="kw">use</span> <span class="ident">expect_test::expect</span>;
     <span class="kw">use</span> <span class="ident">introspection_connector::IntrospectionContext</span>;
     <span class="kw">use</span> <span class="ident">native_types</span>::{<span class="ident">NativeType</span>, <span class="ident">PostgresType</span>};
     <span class="kw">use</span> <span class="ident">pretty_assertions::assert_eq</span>;
-    <span class="kw">use</span> <span class="ident">sql_datamodel_connector::PostgresDatamodelConnector</span>;
+    <span class="kw">use</span> <span class="ident">sql_datamodel_connector::SqlDatamodelConnectors</span>;
     <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{
         <span class="ident">Column</span>, <span class="ident">ColumnArity</span>, <span class="ident">ColumnType</span>, <span class="ident">ColumnTypeFamily</span>, <span class="ident">Enum</span>, <span class="ident">ForeignKey</span>, <span class="ident">ForeignKeyAction</span>, <span class="ident">Index</span>, <span class="ident">IndexColumn</span>,
         <span class="ident">IndexType</span>, <span class="ident">PrimaryKey</span>, <span class="ident">PrimaryKeyColumn</span>, <span class="ident">Sequence</span>, <span class="ident">SqlSchema</span>, <span class="ident">Table</span>,
@@ -1119,11 +1116,10 @@
             <span class="ident">url</span>: <span class="ident">StringFromEnvVar::new_literal</span>(<span class="string">&quot;test&quot;</span>.<span class="ident">to_string</span>()),
             <span class="ident">url_span</span>: <span class="ident">Span::empty</span>(),
             <span class="ident">documentation</span>: <span class="prelude-val">None</span>,
-            <span class="ident">active_connector</span>: <span class="ident">Box::new</span>(<span class="ident">PostgresDatamodelConnector::new</span>(<span class="ident">Default::default</span>())),
+            <span class="ident">active_connector</span>: <span class="ident">SqlDatamodelConnectors::POSTGRES</span>,
             <span class="ident">shadow_database_url</span>: <span class="prelude-val">None</span>,
             <span class="ident">provider</span>: <span class="string">&quot;postgresql&quot;</span>.<span class="ident">to_string</span>(),
             <span class="ident">referential_integrity</span>: <span class="prelude-val">None</span>,
-            <span class="ident">default_referential_integrity</span>: <span class="ident">ReferentialIntegrity::ForeignKeys</span>,
         };
 
         <span class="ident">IntrospectionContext</span> {

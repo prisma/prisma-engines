@@ -403,26 +403,6 @@
 <span id="403">403</span>
 <span id="404">404</span>
 <span id="405">405</span>
-<span id="406">406</span>
-<span id="407">407</span>
-<span id="408">408</span>
-<span id="409">409</span>
-<span id="410">410</span>
-<span id="411">411</span>
-<span id="412">412</span>
-<span id="413">413</span>
-<span id="414">414</span>
-<span id="415">415</span>
-<span id="416">416</span>
-<span id="417">417</span>
-<span id="418">418</span>
-<span id="419">419</span>
-<span id="420">420</span>
-<span id="421">421</span>
-<span id="422">422</span>
-<span id="423">423</span>
-<span id="424">424</span>
-<span id="425">425</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel_connector</span>::{
     <span class="ident">connector_error::ConnectorError</span>,
     <span class="ident">helper</span>::{<span class="ident">args_vec_from_opt</span>, <span class="ident">parse_one_opt_u32</span>, <span class="ident">parse_one_u32</span>, <span class="ident">parse_two_opt_u32</span>},
@@ -518,45 +498,30 @@
     <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">JSON_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Json</span>]),
 ];
 
+<span class="kw">const</span> <span class="ident">CAPABILITIES</span>: <span class="kw-2">&amp;</span>[<span class="ident">ConnectorCapability</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+    <span class="ident">ConnectorCapability::RelationsOverNonUniqueCriteria</span>,
+    <span class="ident">ConnectorCapability::Enums</span>,
+    <span class="ident">ConnectorCapability::Json</span>,
+    <span class="ident">ConnectorCapability::AutoIncrementAllowedOnNonId</span>,
+    <span class="ident">ConnectorCapability::RelationFieldsInArbitraryOrder</span>,
+    <span class="ident">ConnectorCapability::CreateMany</span>,
+    <span class="ident">ConnectorCapability::WritableAutoincField</span>,
+    <span class="ident">ConnectorCapability::CreateSkipDuplicates</span>,
+    <span class="ident">ConnectorCapability::UpdateableId</span>,
+    <span class="ident">ConnectorCapability::JsonFilteringJsonPath</span>,
+    <span class="ident">ConnectorCapability::CreateManyWriteableAutoIncId</span>,
+    <span class="ident">ConnectorCapability::AutoIncrement</span>,
+    <span class="ident">ConnectorCapability::CompoundIds</span>,
+    <span class="ident">ConnectorCapability::AnyId</span>,
+    <span class="ident">ConnectorCapability::QueryRaw</span>,
+    <span class="ident">ConnectorCapability::NamedForeignKeys</span>,
+    <span class="ident">ConnectorCapability::AdvancedJsonNullability</span>,
+    <span class="ident">ConnectorCapability::ForeignKeys</span>,
+];
+
 <span class="kw">const</span> <span class="ident">CONSTRAINT_SCOPES</span>: <span class="kw-2">&amp;</span>[<span class="ident">ConstraintScope</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="ident">ConstraintScope::GlobalForeignKey</span>, <span class="ident">ConstraintScope::ModelKeyIndex</span>];
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MySqlDatamodelConnector</span> {
-    <span class="ident">capabilities</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConnectorCapability</span><span class="op">&gt;</span>,
-    <span class="ident">referential_integrity</span>: <span class="ident">ReferentialIntegrity</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">MySqlDatamodelConnector</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">referential_integrity</span>: <span class="ident">ReferentialIntegrity</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MySqlDatamodelConnector</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">capabilities</span> <span class="op">=</span> <span class="macro">vec!</span>[
-            <span class="ident">ConnectorCapability::RelationsOverNonUniqueCriteria</span>,
-            <span class="ident">ConnectorCapability::Enums</span>,
-            <span class="ident">ConnectorCapability::Json</span>,
-            <span class="ident">ConnectorCapability::AutoIncrementAllowedOnNonId</span>,
-            <span class="ident">ConnectorCapability::RelationFieldsInArbitraryOrder</span>,
-            <span class="ident">ConnectorCapability::CreateMany</span>,
-            <span class="ident">ConnectorCapability::WritableAutoincField</span>,
-            <span class="ident">ConnectorCapability::CreateSkipDuplicates</span>,
-            <span class="ident">ConnectorCapability::UpdateableId</span>,
-            <span class="ident">ConnectorCapability::JsonFilteringJsonPath</span>,
-            <span class="ident">ConnectorCapability::CreateManyWriteableAutoIncId</span>,
-            <span class="ident">ConnectorCapability::AutoIncrement</span>,
-            <span class="ident">ConnectorCapability::CompoundIds</span>,
-            <span class="ident">ConnectorCapability::AnyId</span>,
-            <span class="ident">ConnectorCapability::QueryRaw</span>,
-            <span class="ident">ConnectorCapability::NamedForeignKeys</span>,
-            <span class="ident">ConnectorCapability::AdvancedJsonNullability</span>,
-        ];
-
-        <span class="kw">if</span> <span class="ident">referential_integrity</span>.<span class="ident">uses_foreign_keys</span>() {
-            <span class="ident">capabilities</span>.<span class="ident">push</span>(<span class="ident">ConnectorCapability::ForeignKeys</span>);
-        }
-
-        <span class="ident">MySqlDatamodelConnector</span> {
-            <span class="ident">capabilities</span>,
-            <span class="ident">referential_integrity</span>,
-        }
-    }
-}
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MySqlDatamodelConnector</span>;
 
 <span class="kw">const</span> <span class="ident">SCALAR_TYPE_DEFAULTS</span>: <span class="kw-2">&amp;</span>[(<span class="ident">ScalarType</span>, <span class="ident">MySqlType</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
     (<span class="ident">ScalarType::Int</span>, <span class="ident">MySqlType::Int</span>),
@@ -575,23 +540,18 @@
         <span class="string">&quot;MySQL&quot;</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">capabilities</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">ConnectorCapability</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">capabilities</span>
+    <span class="kw">fn</span> <span class="ident">capabilities</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">ConnectorCapability</span>] {
+        <span class="ident">CAPABILITIES</span>
     }
 
     <span class="kw">fn</span> <span class="ident">constraint_name_length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
         <span class="number">64</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">referential_actions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">referential_actions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">referential_integrity</span>: <span class="kw-2">&amp;</span><span class="ident">ReferentialIntegrity</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident">ReferentialAction</span>::<span class="kw-2">*</span>;
 
-        <span class="self">self</span>.<span class="ident">referential_integrity</span>
-            .<span class="ident">allowed_referential_actions</span>(<span class="ident">Restrict</span> <span class="op">|</span> <span class="ident">Cascade</span> <span class="op">|</span> <span class="ident">SetNull</span> <span class="op">|</span> <span class="ident">NoAction</span> <span class="op">|</span> <span class="ident">SetDefault</span>)
-    }
-
-    <span class="kw">fn</span> <span class="ident">emulates_referential_actions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">referential_integrity</span>, <span class="ident">ReferentialIntegrity::Prisma</span>)
+        <span class="ident">referential_integrity</span>.<span class="ident">allowed_referential_actions</span>(<span class="ident">Restrict</span> <span class="op">|</span> <span class="ident">Cascade</span> <span class="op">|</span> <span class="ident">SetNull</span> <span class="op">|</span> <span class="ident">NoAction</span> <span class="op">|</span> <span class="ident">SetDefault</span>)
     }
 
     <span class="kw">fn</span> <span class="ident">scalar_type_for_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">native_type</span>: <span class="ident">serde_json::Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ScalarType</span> {

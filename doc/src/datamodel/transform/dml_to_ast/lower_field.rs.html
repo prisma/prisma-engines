@@ -398,7 +398,7 @@
 
             <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span> <span class="self">self</span>
                 .<span class="ident">datasource</span>
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">source</span><span class="op">|</span> <span class="ident">source</span>.<span class="ident">active_connector</span>.<span class="ident">as_ref</span>())
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">source</span><span class="op">|</span> <span class="ident">source</span>.<span class="ident">active_connector</span>)
                 .<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span><span class="ident">EmptyDatamodelConnector</span> <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>);
 
             <span class="kw">let</span> <span class="ident">prisma_default</span> <span class="op">=</span> <span class="ident">ConstraintNames::default_name</span>(<span class="ident">model</span>.<span class="ident">name</span>(), <span class="ident">field</span>.<span class="ident">name</span>(), <span class="ident">connector</span>);

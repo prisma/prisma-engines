@@ -147,6 +147,8 @@
 <span id="147">147</span>
 <span id="148">148</span>
 <span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast::Span</span>,
     <span class="ident">configuration::StringFromEnvVar</span>,
@@ -166,12 +168,11 @@
     <span class="kw">pub</span> <span class="ident">url_span</span>: <span class="ident">Span</span>,
     <span class="kw">pub</span> <span class="ident">documentation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="doccomment">/// the connector of the active provider</span>
-    <span class="kw">pub</span> <span class="ident">active_connector</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Connector</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">active_connector</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">Connector</span>,
     <span class="doccomment">/// An optional user-defined shadow database URL.</span>
     <span class="kw">pub</span> <span class="ident">shadow_database_url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">StringFromEnvVar</span>, <span class="ident">Span</span>)<span class="op">&gt;</span>,
     <span class="doccomment">/// In which layer referential actions are handled.</span>
     <span class="kw">pub</span> <span class="ident">referential_integrity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReferentialIntegrity</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">default_referential_integrity</span>: <span class="ident">ReferentialIntegrity</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">Datasource</span> {
@@ -195,8 +196,11 @@
         <span class="ident">ConnectorCapabilities::new</span>(<span class="ident">capabilities</span>)
     }
 
+    <span class="doccomment">/// The applicable referential integrity mode for this datasource.</span>
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::or_fun_call</span>)]</span> <span class="comment">// not applicable in this case</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">referential_integrity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ReferentialIntegrity</span> {
-        <span class="self">self</span>.<span class="ident">referential_integrity</span>.<span class="ident">unwrap_or</span>(<span class="self">self</span>.<span class="ident">default_referential_integrity</span>)
+        <span class="self">self</span>.<span class="ident">referential_integrity</span>
+            .<span class="ident">unwrap_or</span>(<span class="self">self</span>.<span class="ident">active_connector</span>.<span class="ident">default_referential_integrity</span>())
     }
 
     <span class="doccomment">/// Load the database URL, validating it and resolving env vars in the</span>

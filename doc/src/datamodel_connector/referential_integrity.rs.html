@@ -52,6 +52,10 @@
 <span id="52">52</span>
 <span id="53">53</span>
 <span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
 
 <span class="kw">use</span> <span class="ident">dml::relation_info::ReferentialAction</span>;
@@ -84,6 +88,10 @@
             <span class="comment">// The emulated modes should be listed here.</span>
             <span class="ident"><span class="self">Self</span>::Prisma</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Restrict</span> <span class="op">|</span> <span class="ident">SetNull</span> <span class="op">|</span> <span class="ident">NoAction</span> <span class="op">|</span> <span class="ident">Cascade</span>,
         }
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_prisma</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">ReferentialIntegrity::Prisma</span>)
     }
 
     <span class="doccomment">/// True, if integrity is in database foreign keys</span>

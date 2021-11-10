@@ -55,10 +55,7 @@
 <span id="55">55</span>
 <span id="56">56</span>
 <span id="57">57</span>
-<span id="58">58</span>
-<span id="59">59</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel_connector</span>::{<span class="ident">Connector</span>, <span class="ident">ReferentialIntegrity</span>};
-<span class="kw">use</span> <span class="ident">sql_datamodel_connector::SqliteDatamodelConnector</span>;
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">sql_datamodel_connector::SqlDatamodelConnectors</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::SqlDatamodelRenderer</span>;
@@ -113,8 +110,7 @@
 }
 
 <span class="kw">fn</span> <span class="ident">sqlite_capabilities</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConnectorCapability</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">dm_connector</span> <span class="op">=</span> <span class="ident">SqliteDatamodelConnector::new</span>(<span class="ident">ReferentialIntegrity::default</span>());
-    <span class="ident">dm_connector</span>.<span class="ident">capabilities</span>().<span class="ident">to_owned</span>()
+    <span class="ident">SqlDatamodelConnectors::SQLITE</span>.<span class="ident">capabilities</span>().<span class="ident">to_owned</span>()
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_tests_setup" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
