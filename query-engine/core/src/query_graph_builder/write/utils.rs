@@ -551,7 +551,7 @@ pub fn emulate_on_delete_set_null(
     let child_update_args: Vec<_> = child_fks
         .into_iter()
         // Only the nullable fks should be updated to null
-        .filter(|sf| !sf.is_required)
+        .filter(|sf| !sf.is_required())
         .map(|child_fk| (DatasourceFieldName::from(&child_fk), PrismaValue::Null))
         .collect();
 
@@ -674,7 +674,7 @@ pub fn emulate_on_update_set_null(
 
     let child_update_args: Vec<_> = child_fks
         .iter()
-        .filter(|child_fk| !child_fk.is_required)
+        .filter(|child_fk| !child_fk.is_required())
         .map(|child_fk| (DatasourceFieldName::from(child_fk), PrismaValue::Null))
         .collect();
 
