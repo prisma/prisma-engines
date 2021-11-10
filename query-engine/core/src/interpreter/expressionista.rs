@@ -294,7 +294,6 @@ impl Expressionista {
         node: &NodeRef,
         parent_edges: Vec<EdgeRef>,
     ) -> InterpretationResult<Expression> {
-        // Child edges are ordered, evaluation order is low to high in the graph, unless other rules override.
         let direct_children = graph.direct_child_pairs(&node);
         let child_expressions = Self::process_children(graph, direct_children)?;
 

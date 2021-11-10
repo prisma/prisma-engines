@@ -12,19 +12,30 @@ use std::{convert::TryInto, sync::Arc};
 /// Handles nested update (single record) cases.
 ///
 /// ```text
-///    ┌ ─ ─ ─ ─ ─ ─
-/// ┌──    Parent   │─ ─ ─ ─ ─
-/// │  └ ─ ─ ─ ─ ─ ─          │
-/// │         │
-/// │         ▼               ▼
-/// │  ┌────────────┐   ┌ ─ ─ ─ ─ ─
-/// │  │   Check    │      Result  │
-/// │  └────────────┘   └ ─ ─ ─ ─ ─
-/// │         │
-/// │         ▼
-/// │  ┌────────────┐
-/// └─▶│   Update   │
-///    └────────────┘
+///       ┌ ─ ─ ─ ─ ─ ─                 
+/// ┌─────    Parent   │─ ─ ─ ─ ─ ┐     
+/// │     └ ─ ─ ─ ─ ─ ─                 
+/// │            │                │     
+/// │            ▼                ▼     
+/// │     ┌────────────┐    ┌ ─ ─ ─ ─ ─
+/// │     │   Check    │       Result  │
+/// │     └────────────┘    └ ─ ─ ─ ─ ─
+/// │            │                      
+/// │  ┌ ─ ─ ─ ─ ▼ ─ ─ ─ ─ ┐            
+/// │   ┌─────────────────┐             
+/// │  ││ Insert onUpdate ││            
+/// │   │emulation subtree│             
+/// │  ││for all relations││            
+/// │   │ pointing to the │             
+/// │  ││   Child model   ││            
+/// │   └─────────────────┘             
+/// │  └ ─ ─ ─ ─ ┬ ─ ─ ─ ─ ┘            
+/// │         ┌──┘                      
+/// │         │                         
+/// │         ▼                         
+/// │  ┌────────────┐                   
+/// └─▶│   Update   │                   
+///    └────────────┘                   
 /// ```
 #[tracing::instrument(skip(graph, parent, parent_relation_field, value, child_model))]
 pub fn nested_update(

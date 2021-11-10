@@ -408,36 +408,37 @@ pub fn emulate_restrict(
 /// Recurses into the deletion emulation to ensure that subsequent deletions are handled correctly as well.
 ///
 /// ```text
-///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
-///            Parent       │
+///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─    
+///            Parent       │   
 ///    │  (ids to delete)    ─ ┐
-///     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+///     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘   
 ///               │            │
-///               ▼
+///               ▼             
 ///    ┌────────────────────┐  │
-///    │Find Connected Model│
+///    │Find Connected Model│   
 /// ┌──│     (Cascade)      │  │
-/// │  └────────────────────┘
+/// │  └────────────────────┘   
 /// │             │            │
-/// │             ▼
+/// │             ▼             
 /// │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │
 /// │  ┌────────────────────┐ │
 /// ││ │  Insert onDelete   │  │
 /// │  │ emulation subtree  │ │
 /// ││ │ for all relations  │  │
-/// │  │   pointing to D.   │ │
-/// ││ └────────────────────┘  │
-/// │ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
-/// │             │            │
-/// │             ▼
-/// │  ┌────────────────────┐  │
-/// └─▶│  Delete children   │
-///    └────────────────────┘  │
-///               │
-///               ▼            │
-///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
-///            Delete       │◀ ┘
-///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+/// │  │  pointing to the   │ │
+/// ││ │  Connected Model.  │  │
+/// │  └────────────────────┘ │
+/// │└ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │
+/// │             │             
+/// │             ▼            │
+/// │  ┌────────────────────┐   
+/// └─▶│  Delete children   │  │
+///    └────────────────────┘   
+///               │            │
+///               ▼             
+///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+///            Delete       │◀─
+///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─    
 /// ```
 pub fn emulate_on_delete_cascade(
     graph: &mut QueryGraph,
@@ -652,6 +653,7 @@ pub fn emulate_on_update_set_null(
     let dependent_model = relation_field.model();
     let parent_relation_field = relation_field.related_field();
     let child_model_identifier = relation_field.related_model().primary_identifier().clone();
+
     // Only the nullable fks should be updated to null
     let (parent_pks, child_fks) = if relation_field.is_inlined_on_enclosing_model() {
         (relation_field.referenced_fields(), relation_field.scalar_fields())
@@ -771,36 +773,42 @@ pub fn emulate_on_update_set_null(
 ///
 /// Resulting graph (all emulations):
 /// ```text
-///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
-///            Parent       │
-/// ┌ ─│  (ids to update)    ─────────────────┬─────────────────────────────┬────────────────────────────────────────┐
-///     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘                 │                             │                                        │
-/// │             │                           │                             │                                        │
-///               ▼                           ▼                             ▼                                        ▼
-/// │  ┌────────────────────┐      ┌────────────────────┐        ┌────────────────────┐                   ┌────────────────────┐
-///    │Find Connected Model│      │Find Connected Model│        │Find Connected Model│                   │Find Connected Model│
-/// │  │    A (Restrict)    │      │    B (Restrict)    │     ┌──│    C (SetNull)     │                ┌──│    D (Cascade)     │
-///    └────────────────────┘      └────────────────────┘     │  └────────────────────┘                │  └────────────────────┘
-/// │             │                           │               │             │                          │             │
-///        Fail if│> 0                 Fail if│> 0            │             ▼                          │             │
-/// │             │                           │               │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─               │             ▼
-///               ▼                           ▼               │  ┌────────────────────┐ │              │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
-/// │  ┌────────────────────┐      ┌────────────────────┐     ││ │  Insert onUpdate   │                │  ┌────────────────────┐ │
-///    │       Empty        │      │       Empty        │     │  │ emulation subtree  │ │              ││ │  Insert onUpdate   │
-/// │  └────────────────────┘      └────────────────────┘     ││ │for relations using │                │  │ emulation subtree  │ │
-///               │                           │               │  │the foreign key that│ │              ││ │ for all relations  │
-/// │             │                           │               ││ │    was updated.    │                │  │   pointing to D.   │ │
-///               │                           │               │  └────────────────────┘ │              ││ └────────────────────┘
-/// │             │                           │               │└ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─               │ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
-///               │                           │               │             │                          │             │
-/// │             │                           │               │             │                          │             │
-///               ▼                           │               │             ▼                          │             ▼
-/// │  ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─                  │               │  ┌────────────────────┐                │  ┌────────────────────┐
-///  ─▶        Update       │◀────────────────┘               │  │ Update Cs (set FK  │                └─▶│     Update Cs      │
-///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─                                  └─▶│       null)        │                   └────────────────────┘
-///               ▲                                              └────────────────────┘                              │
-///               │                                                         │                                        │
-///               └─────────────────────────────────────────────────────────┴────────────────────────────────────────┘
+///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─                                                                                                      
+///            Parent       │                                                                                                     
+///    │  (ids to update)                                                                                                         
+///     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘                                                                                                     
+///               │                                                                                                               
+///               ▼                                                                                                               
+///    ┌────────────────────┐                                                                                                     
+/// ┌ ─│     Join node      │─────────────────┬─────────────────────────────┬────────────────────────────────────────┐            
+///    └────────────────────┘                 │                             │                                        │            
+/// │             │                           │                             │                                        │            
+///               │                           │                             │                                        │            
+/// │             ▼                           ▼                             ▼                                        ▼            
+///    ┌────────────────────┐      ┌────────────────────┐        ┌────────────────────┐                   ┌────────────────────┐  
+/// │  │Find Connected Model│      │Find Connected Model│        │Find Connected Model│                   │Find Connected Model│  
+///    │    A (Restrict)    │      │    B (Restrict)    │     ┌──│    C (SetNull)     │                ┌──│    D (Cascade)     │  
+/// │  └────────────────────┘      └────────────────────┘     │  └────────────────────┘                │  └────────────────────┘  
+///               │                           │               │             │                          │             │            
+/// │      Fail if│> 0                 Fail if│> 0            │             ▼                          │             │            
+///               │                           │               │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─               │             ▼            
+/// │             ▼                           ▼               │  ┌────────────────────┐ │              │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+///    ┌────────────────────┐      ┌────────────────────┐     ││ │  Insert onUpdate   │                │  ┌────────────────────┐ │
+/// │  │       Empty        │      │       Empty        │     │  │ emulation subtree  │ │              ││ │  Insert onUpdate   │  
+///    └────────────────────┘      └────────────────────┘     ││ │for relations using │                │  │ emulation subtree  │ │
+/// │             │                           │               │  │the foreign key that│ │              ││ │ for all relations  │  
+///               │                           │               ││ │    was updated.    │                │  │   pointing to D.   │ │
+/// │             │                           │               │  └────────────────────┘ │              ││ └────────────────────┘  
+///               │                           │               │└ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─               │ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+/// │             │                           │               │             │                          │             │            
+///               │                           │               │             │                          │             │            
+/// │             ▼                           │               │             ▼                          │             ▼            
+///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─                  │               │  ┌────────────────────┐                │  ┌────────────────────┐  
+/// └ ▶        Update       │◀────────────────┘               │  │ Update Cs (set FK  │                └─▶│     Update Cs      │  
+///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─                                  └─▶│       null)        │                   └────────────────────┘  
+///               ▲                                              └────────────────────┘                              │            
+///               │                                                         │                                        │            
+///               └─────────────────────────────────────────────────────────┴────────────────────────────────────────┘            
 /// ```
 #[tracing::instrument(skip(graph, model_to_update, parent_node, child_node))]
 pub fn insert_emulated_on_update_with_intermediary_node(
@@ -906,36 +914,38 @@ fn extract_update_args(parent_node: &Node) -> &WriteArgs {
 /// Recurses into the update emulation to ensure that subsequent updates are handled correctly as well.
 ///
 /// ```text
-///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
-///            Parent       │
+//    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+///            Parent       │   
 ///    │  (ids to update)    ─ ┐
-///     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+///     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘   
 ///               │            │
-///               ▼
+///               ▼             
 ///    ┌────────────────────┐  │
-///    │Find Connected Model│
+///    │Find Connected Model│   
 /// ┌──│     (Cascade)      │  │
-/// │  └────────────────────┘
+/// │  └────────────────────┘   
 /// │             │            │
-/// │             ▼
+/// │             ▼             
 /// │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │
 /// │  ┌────────────────────┐ │
 /// ││ │  Insert onUpdate   │  │
 /// │  │ emulation subtree  │ │
 /// ││ │ for all relations  │  │
-/// │  │   pointing to D.   │ │
-/// ││ └────────────────────┘  │
-/// │ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+/// │  │  pointing to the   │ │
+/// ││ │  Connected Model.  │  │
+/// │  └────────────────────┘ │
+/// │└ ─ ─ ─ ─ ─ ─│─ ─ ─ ─ ─ ─ │
+/// │             │             
 /// │             │            │
-/// │             ▼
+/// │             ▼             
 /// │  ┌────────────────────┐  │
-/// └─▶│  Update children   │
+/// └─▶│  Update children   │   
 ///    └────────────────────┘  │
-///               │
+///               │             
 ///               ▼            │
-///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─    
 ///            Update       │◀ ┘
-///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─    
 /// ```
 pub fn emulate_on_update_cascade(
     graph: &mut QueryGraph,
