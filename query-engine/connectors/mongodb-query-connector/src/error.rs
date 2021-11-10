@@ -1,6 +1,9 @@
 use connector_interface::error::{ConnectorError, ErrorKind, MultiError};
 use itertools::Itertools;
-use mongodb::error::{CommandError, Error as DriverError};
+use mongodb::{
+    bson::extjson,
+    error::{CommandError, Error as DriverError},
+};
 use regex::Regex;
 use thiserror::Error;
 use user_facing_errors::query_engine::DatabaseConstraint;
@@ -163,18 +166,16 @@ impl From<mongodb::bson::oid::Error> for MongoError {
     }
 }
 
-impl From<mongodb::bson::extjson::de::Error> for MongoError {
-    fn from(err: mongodb::bson::extjson::de::Error) -> Self {
+impl From<extjson::de::Error> for MongoError {
+    fn from(err: extjson::de::Error) -> Self {
         match err {
-            mongodb::bson::extjson::de::Error::InvalidObjectId(oid_err) => oid_err.into(),
-            mongodb::bson::extjson::de::Error::DeserializationError { message: _ } => MongoError::ConversionError {
+            extjson::de::Error::InvalidObjectId(oid_err) => oid_err.into(),
+            extjson::de::Error::DeserializationError { message: _ } => MongoError::ConversionError {
                 from: "JSON".to_string(),
                 to: "BSON".to_string(),
             },
             // Needed because `extjson::de::Error` is flagged as #[non_exhaustive]
-            _ => MongoError::UnhandledError(
-                "Something unexpected happened while deserializing JSON into BSON".to_string(),
-            ),
+            err => MongoError::UnhandledError(format!("{:?}", err)),
         }
     }
 }
