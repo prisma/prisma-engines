@@ -9,7 +9,7 @@ use std::{collections::HashSet, convert::TryInto};
 /// optional `RecordProjection` if available from the arguments or model.
 #[tracing::instrument(skip(model, args))]
 pub fn create_record(model: &ModelRef, mut args: WriteArgs) -> (Insert<'static>, Option<RecordProjection>) {
-    let return_id = args.as_record_projection(model.primary_identifier());
+    let return_id = args.as_record_projection(model.primary_identifier().into());
 
     let fields: Vec<_> = model
         .fields()
@@ -31,7 +31,7 @@ pub fn create_record(model: &ModelRef, mut args: WriteArgs) -> (Insert<'static>,
         });
 
     (
-        Insert::from(insert).returning(model.primary_identifier().as_columns()),
+        Insert::from(insert).returning(ModelProjection::from(model.primary_identifier()).as_columns()),
         return_id,
     )
 }
@@ -152,7 +152,7 @@ pub fn update_many(model: &ModelRef, ids: &[&RecordProjection], args: WriteArgs)
             acc.set(name, value)
         });
 
-    let columns: Vec<_> = model.primary_identifier().as_columns().collect();
+    let columns: Vec<_> = ModelProjection::from(model.primary_identifier()).as_columns().collect();
     let result: Vec<Query> = super::chunked_conditions(&columns, ids, |conditions| query.clone().so_that(conditions));
 
     Ok(result)
@@ -160,7 +160,7 @@ pub fn update_many(model: &ModelRef, ids: &[&RecordProjection], args: WriteArgs)
 
 #[tracing::instrument(skip(model, ids))]
 pub fn delete_many(model: &ModelRef, ids: &[&RecordProjection]) -> Vec<Query<'static>> {
-    let columns: Vec<_> = model.primary_identifier().as_columns().collect();
+    let columns: Vec<_> = ModelProjection::from(model.primary_identifier()).as_columns().collect();
 
     super::chunked_conditions(&columns, ids, |conditions| {
         Delete::from_table(model.as_table()).so_that(conditions)

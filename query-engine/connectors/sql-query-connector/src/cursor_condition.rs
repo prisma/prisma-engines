@@ -327,7 +327,9 @@ fn order_definitions(
     if query_arguments.order_by.is_empty() {
         return model
             .primary_identifier()
-            .scalar_fields()
+            .as_scalar_fields()
+            .expect("Primary identifier has non-scalar fields.")
+            .into_iter()
             .map(|f| CursorOrderDefinition {
                 sort_order: SortOrder::Ascending,
                 order_column: f.as_column().into(),

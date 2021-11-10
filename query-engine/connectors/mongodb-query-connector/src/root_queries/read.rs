@@ -97,7 +97,10 @@ pub async fn get_related_m2m_record_ids<'conn>(
     let model = from_field.model();
     let coll = database.collection(model.db_name());
 
-    let id_field = model.primary_identifier().scalar_fields().next().unwrap();
+    let id_field = ModelProjection::from(model.primary_identifier())
+        .scalar_fields()
+        .next()
+        .unwrap();
     let ids = from_record_ids
         .iter()
         .map(|p| (&id_field, p.values().next().unwrap()).into_bson())
@@ -120,9 +123,7 @@ pub async fn get_related_m2m_record_ids<'conn>(
     let id_holder_field = model.fields().find_from_scalar(relation_ids_field_name).unwrap();
     let related_ids_holder_meta = output_meta::from_field(&id_holder_field);
 
-    let child_id_field = from_field
-        .related_model()
-        .primary_identifier()
+    let child_id_field = ModelProjection::from(from_field.related_model().primary_identifier())
         .scalar_fields()
         .next()
         .unwrap();

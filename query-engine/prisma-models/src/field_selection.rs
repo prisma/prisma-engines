@@ -2,13 +2,12 @@ use std::fmt::Display;
 
 use itertools::Itertools;
 
-use crate::{CompositeFieldRef, Field, ModelRef, ScalarFieldRef};
+use crate::{CompositeFieldRef, Field, RelationField, ScalarFieldRef};
 
 /// A selection of fields from a model.
 #[derive(Debug, Clone)]
 pub struct FieldSelection {
-    pub model: ModelRef,
-    pub selections: Vec<SelectedField>,
+    selections: Vec<SelectedField>,
 }
 
 /// A selected field. Can be contained on a model or composite type.
@@ -61,6 +60,10 @@ impl FieldSelection {
         })
     }
 
+    pub fn selections(&self) -> impl Iterator<Item = &SelectedField> + '_ {
+        self.selections.iter()
+    }
+
     /// Returns all Prisma (e.g. schema model field) names of contained fields.
     /// Does _not_ recurse into composite selections and only iterates top level fields.
     pub fn prisma_names(&self) -> impl Iterator<Item = String> + '_ {
@@ -80,6 +83,24 @@ impl FieldSelection {
 
     pub fn get(&self, name: &str) -> Option<&SelectedField> {
         self.selections.iter().find(|selection| selection.prisma_name() == name)
+    }
+
+    /// Checks if `self` only contains scalar field selections and if so, returns them all in a list.
+    /// If any other selection is contained, returns `None`.
+    pub fn as_scalar_fields(&self) -> Option<Vec<ScalarFieldRef>> {
+        let scalar_fields = self
+            .selections()
+            .filter_map(|selection| match selection {
+                SelectedField::Scalar(sf) => Some(sf.clone()),
+                SelectedField::Composite(_) => None,
+            })
+            .collect_vec();
+
+        if scalar_fields.len() == self.selections.len() {
+            Some(scalar_fields)
+        } else {
+            None
+        }
     }
 }
 
@@ -106,27 +127,33 @@ impl SelectedField {
     }
 }
 
-impl From<(ModelRef, Vec<Field>)> for FieldSelection {
-    fn from((model, fields): (ModelRef, Vec<Field>)) -> Self {
+impl From<Vec<Field>> for FieldSelection {
+    fn from(fields: Vec<Field>) -> Self {
         Self {
-            model,
             selections: fields
                 .into_iter()
                 .flat_map(|field| match field {
                     Field::Relation(rf) => rf.scalar_fields().into_iter().map(Into::into).collect(),
                     Field::Scalar(sf) => vec![sf.into()],
-                    Field::Composite(cf) => todo!(),
+                    Field::Composite(_cf) => todo!(),
                 })
                 .collect(),
         }
     }
 }
 
-impl From<(ModelRef, ScalarFieldRef)> for FieldSelection {
-    fn from((model, field): (ModelRef, ScalarFieldRef)) -> Self {
+impl From<ScalarFieldRef> for FieldSelection {
+    fn from(field: ScalarFieldRef) -> Self {
         Self {
-            model,
             selections: vec![field.into()],
+        }
+    }
+}
+
+impl From<&RelationField> for FieldSelection {
+    fn from(rf: &RelationField) -> Self {
+        Self {
+            selections: rf.scalar_fields().into_iter().map(|sf| sf.into()).collect(),
         }
     }
 }
@@ -141,8 +168,7 @@ impl Display for FieldSelection {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "FieldSelection {{ model: '{}', fields: [{}] }}",
-            self.model.name,
+            "FieldSelection {{ fields: [{}] }}",
             self.selections
                 .iter()
                 .map(|selection| format!("{}", selection))

@@ -18,13 +18,18 @@ impl From<Field> for ModelProjection {
     }
 }
 
+impl From<FieldSelection> for ModelProjection {
+    fn from(fs: FieldSelection) -> Self {
+        (&fs).into()
+    }
+}
+
 /// [Composites] todo: Temporary converter.
 impl From<&FieldSelection> for ModelProjection {
     fn from(fs: &FieldSelection) -> Self {
         Self {
             fields: fs
-                .selections
-                .iter()
+                .selections()
                 .filter_map(|selected| match selected {
                     SelectedField::Scalar(sf) => Some(sf.clone().into()),
                     SelectedField::Composite(_cf) => None,

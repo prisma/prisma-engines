@@ -1,4 +1,4 @@
-use prisma_models::{Relation, RelationField, RelationLinkManifestation, RelationSide};
+use prisma_models::{ModelProjection, Relation, RelationField, RelationLinkManifestation, RelationSide};
 use quaint::{ast::Table, prelude::Column};
 use RelationLinkManifestation::*;
 
@@ -33,7 +33,7 @@ impl RelationFieldExt for RelationField {
         match (&self.relation().manifestation, &self.relation_side) {
             (RelationTable(ref m), RelationSide::A) => ColumnIterator::from(vec![m.model_b_column.clone().into()]),
             (RelationTable(ref m), RelationSide::B) => ColumnIterator::from(vec![m.model_a_column.clone().into()]),
-            _ => self.linking_fields().as_columns(),
+            _ => ModelProjection::from(self.linking_fields()).as_columns(),
         }
     }
 
@@ -41,7 +41,7 @@ impl RelationFieldExt for RelationField {
         match (&self.relation().manifestation, &self.relation_side) {
             (RelationTable(ref m), RelationSide::A) => ColumnIterator::from(vec![m.model_a_column.clone().into()]),
             (RelationTable(ref m), RelationSide::B) => ColumnIterator::from(vec![m.model_b_column.clone().into()]),
-            _ => self.model().primary_identifier().as_columns(),
+            _ => ModelProjection::from(self.model().primary_identifier()).as_columns(),
         }
     }
 

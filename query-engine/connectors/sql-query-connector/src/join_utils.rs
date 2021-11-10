@@ -99,9 +99,9 @@ fn compute_aggr_join_m2m(
 ) -> AliasedJoin {
     let relation_table = rf.as_table();
     let model_a = rf.model();
-    let a_ids = rf.model().primary_identifier();
+    let a_ids: ModelProjection = rf.model().primary_identifier().into();
     let a_columns: Vec<_> = a_ids.as_columns().collect();
-    let b_ids = rf.related_model().primary_identifier();
+    let b_ids: ModelProjection = rf.related_model().primary_identifier().into();
 
     // + SELECT A.id FROM A
     let query = Select::from_table(model_a.as_table()).columns(a_columns.clone());

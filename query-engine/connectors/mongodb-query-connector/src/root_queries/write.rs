@@ -26,7 +26,10 @@ pub async fn create_record<'conn>(
     let coll = database.collection::<Document>(model.db_name());
 
     // Mongo only allows a singular ID.
-    let mut id_fields = model.primary_identifier().scalar_fields().collect::<Vec<_>>();
+    let mut id_fields = ModelProjection::from(model.primary_identifier())
+        .scalar_fields()
+        .collect::<Vec<_>>();
+
     assert!(id_fields.len() == 1);
 
     let id_field = id_fields.pop().unwrap();
@@ -126,9 +129,12 @@ pub async fn update_records<'conn>(
     //
     // Mongo can only have singular IDs (always `_id`), hence the unwraps. Since IDs are immutable, we also don't
     // need to merge back id changes into the result set as with SQL.
-    let id_field = model.primary_identifier().scalar_fields().next().unwrap();
-    let id_meta = output_meta::from_field(&id_field);
+    let id_field = ModelProjection::from(model.primary_identifier())
+        .scalar_fields()
+        .next()
+        .unwrap();
 
+    let id_meta = output_meta::from_field(&id_field);
     let ids: Vec<Bson> = if let Some(selectors) = record_filter.selectors {
         selectors
             .into_iter()
@@ -233,7 +239,10 @@ pub async fn delete_records<'conn>(
     record_filter: RecordFilter,
 ) -> crate::Result<usize> {
     let coll = database.collection::<Document>(model.db_name());
-    let id_field = model.primary_identifier().scalar_fields().next().unwrap();
+    let id_field = ModelProjection::from(model.primary_identifier())
+        .scalar_fields()
+        .next()
+        .unwrap();
 
     let filter = if let Some(selectors) = record_filter.selectors {
         let ids = selectors
@@ -273,7 +282,7 @@ async fn find_ids(
         builder.query = Some(filter);
     };
 
-    let builder = builder.with_model_projection(id_field)?;
+    let builder = builder.with_model_projection(id_field.into())?;
     let query = builder.build()?;
     let docs = query.execute(collection, session).await?;
     let ids = docs.into_iter().map(|mut doc| doc.remove("_id").unwrap()).collect();
@@ -297,7 +306,11 @@ pub async fn m2m_connect<'conn>(
     let child_coll = database.collection::<Document>(child_model.db_name());
 
     let parent_id = parent_id.values().next().unwrap();
-    let parent_id_field = parent_model.primary_identifier().scalar_fields().next().unwrap();
+    let parent_id_field = ModelProjection::from(parent_model.primary_identifier())
+        .scalar_fields()
+        .next()
+        .unwrap();
+
     let parent_ids_scalar_field_name = field.relation_info.fields.get(0).unwrap();
     let parent_id = (&parent_id_field, parent_id).into_bson()?;
 
@@ -343,7 +356,11 @@ pub async fn m2m_disconnect<'conn>(
     let child_coll = database.collection::<Document>(child_model.db_name());
 
     let parent_id = parent_id.values().next().unwrap();
-    let parent_id_field = parent_model.primary_identifier().scalar_fields().next().unwrap();
+    let parent_id_field = ModelProjection::from(parent_model.primary_identifier())
+        .scalar_fields()
+        .next()
+        .unwrap();
+
     let parent_ids_scalar_field_name = field.relation_info.fields.get(0).unwrap();
     let parent_id = (&parent_id_field, parent_id).into_bson()?;
 

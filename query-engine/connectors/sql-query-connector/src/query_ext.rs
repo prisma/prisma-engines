@@ -109,7 +109,7 @@ pub trait QueryExt: Queryable + Send + Sync {
     /// Read the all columns as a (primary) identifier.
     #[tracing::instrument(skip(self, model, filter))]
     async fn filter_ids(&self, model: &ModelRef, filter: Filter) -> crate::Result<Vec<RecordProjection>> {
-        let model_id = model.primary_identifier();
+        let model_id: ModelProjection = model.primary_identifier().into();
         let id_cols: Vec<Column<'static>> = model_id.as_columns().collect();
 
         let select = Select::from_table(model.as_table())

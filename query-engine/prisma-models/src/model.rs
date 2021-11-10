@@ -41,7 +41,7 @@ impl Model {
                 })
                 .collect();
 
-            FieldSelection::from((self.clone(), fields))
+            FieldSelection::from(fields)
         }).clone()
     }
 

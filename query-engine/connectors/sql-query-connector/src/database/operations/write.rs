@@ -62,7 +62,7 @@ pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArg
         (Some(identifier), _, _) if !identifier.misses_autogen_value() => Ok(identifier),
 
         // PostgreSQL with a working RETURNING statement
-        (_, n, _) if n > 0 => Ok(try_convert(&model.primary_identifier(), result_set)?),
+        (_, n, _) if n > 0 => Ok(try_convert(&model.primary_identifier().into(), result_set)?),
 
         // We have an auto-incremented id that we got from MySQL or SQLite
         (Some(mut identifier), _, Some(num)) if identifier.misses_autogen_value() => {
@@ -226,7 +226,7 @@ pub async fn update_records(
     args: WriteArgs,
 ) -> crate::Result<Vec<RecordProjection>> {
     let ids = conn.filter_selectors(model, record_filter).await?;
-    let id_args = pick_args(&model.primary_identifier(), &args);
+    let id_args = pick_args(&model.primary_identifier().into(), &args);
 
     if ids.is_empty() {
         return Ok(vec![]);

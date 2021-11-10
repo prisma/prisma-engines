@@ -77,11 +77,10 @@ impl OrderByAggregation {
             .unwrap()
             .related_model()
             .primary_identifier()
-            .scalar_fields()
-            .collect();
-        let id = ids.first().unwrap();
+            .as_scalar_fields()
+            .expect("Primary identifier contains non-scalar fields.");
 
-        id.clone()
+        ids.into_iter().next().unwrap()
     }
 
     pub fn is_scalar_aggregation(&self) -> bool {
