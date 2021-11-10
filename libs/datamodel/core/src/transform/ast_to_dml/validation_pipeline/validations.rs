@@ -38,7 +38,7 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, r
             fields::validate_client_name(field.into(), &names, diagnostics);
 
             relation_fields::ignored_related_model(field, diagnostics);
-            relation_fields::referential_actions(field, connector, diagnostics);
+            relation_fields::referential_actions(field, db, diagnostics);
             relation_fields::on_update_without_foreign_keys(field, referential_integrity, diagnostics);
         }
 
@@ -55,8 +55,8 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, r
                 if let Some(relation) = relation.as_complete() {
                     relations::field_arity(relation, diagnostics);
                     relations::same_length_in_referencing_and_referenced(relation, diagnostics);
-                    relations::cycles(relation, connector, diagnostics);
-                    relations::multiple_cascading_paths(relation, connector, diagnostics);
+                    relations::cycles(relation, db, diagnostics);
+                    relations::multiple_cascading_paths(relation, db, diagnostics);
                     relations::has_a_unique_constraint_name(db, relation, diagnostics);
 
                     // These needs to run last to prevent error spam.

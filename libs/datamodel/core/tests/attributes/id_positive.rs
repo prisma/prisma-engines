@@ -30,22 +30,6 @@ fn int_id_with_default_autoincrement_should_have_strategy_auto() {
 }
 
 #[test]
-#[ignore] // bring back when we work on embeds
-fn id_should_also_work_on_embedded_types() {
-    let dml = indoc! {r#"
-        model Model {
-          id Int @id
-
-          @@embedded
-        }
-    "#};
-
-    let datamodel = parse(dml);
-    let user_model = datamodel.assert_has_model("Model");
-    user_model.assert_has_scalar_field("id").assert_is_id(user_model);
-}
-
-#[test]
 fn should_allow_string_ids_with_cuid() {
     let dml = indoc! {r#"
         model Model {

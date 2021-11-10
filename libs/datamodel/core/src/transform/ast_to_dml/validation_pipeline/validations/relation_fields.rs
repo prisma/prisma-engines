@@ -3,7 +3,7 @@ use crate::{
     diagnostics::{DatamodelError, Diagnostics},
     transform::ast_to_dml::db::walkers::{ModelWalker, RelationFieldWalker, RelationName},
 };
-use datamodel_connector::{Connector, ReferentialIntegrity};
+use datamodel_connector::ReferentialIntegrity;
 use dml::relation_info::ReferentialAction;
 use itertools::Itertools;
 use std::fmt;
@@ -173,12 +173,14 @@ pub(super) fn ignored_related_model(field: RelationFieldWalker<'_, '_>, diagnost
 /// Does the connector support the given referential actions.
 pub(super) fn referential_actions(
     field: RelationFieldWalker<'_, '_>,
-    connector: &dyn Connector,
+    db: &super::ParserDatabase<'_>,
     diagnostics: &mut Diagnostics,
 ) {
+    let referential_integrity = db.active_referential_integrity();
+    let connector = db.active_connector();
     let msg = |action| {
         let allowed_values = connector
-            .referential_actions()
+            .referential_actions(&referential_integrity)
             .iter()
             .map(|f| format!("`{}`", f))
             .join(", ");
@@ -190,7 +192,7 @@ pub(super) fn referential_actions(
     };
 
     if let Some(on_delete) = field.attributes().on_delete {
-        if !connector.supports_referential_action(on_delete) {
+        if !connector.supports_referential_action(&referential_integrity, on_delete) {
             let span = field
                 .ast_field()
                 .span_for_argument("relation", "onDelete")
@@ -201,7 +203,7 @@ pub(super) fn referential_actions(
     }
 
     if let Some(on_update) = field.attributes().on_update {
-        if !connector.supports_referential_action(on_update) {
+        if !connector.supports_referential_action(&referential_integrity, on_update) {
             let span = field
                 .ast_field()
                 .span_for_argument("relation", "onUpdate")

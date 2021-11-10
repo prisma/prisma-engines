@@ -380,7 +380,11 @@ impl<'ast, 'db> CompleteInlineRelationWalker<'ast, 'db> {
         use ReferentialAction::*;
 
         self.referencing_field().attributes().on_delete.unwrap_or_else(|| {
-            let supports_restrict = self.db.active_connector().supports_referential_action(Restrict);
+            let referential_integrity = self.db.active_referential_integrity();
+            let supports_restrict = self
+                .db
+                .active_connector()
+                .supports_referential_action(&referential_integrity, Restrict);
 
             match self.referential_arity() {
                 ast::FieldArity::Required if supports_restrict => Restrict,

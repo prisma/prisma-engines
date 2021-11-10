@@ -190,11 +190,16 @@ pub(super) fn referencing_fields_in_correct_order(
 /// relation links to NoAction for both referential actions.
 pub(super) fn cycles<'ast, 'db>(
     relation: CompleteInlineRelationWalker<'ast, 'db>,
-    connector: &dyn Connector,
+    db: &'db ParserDatabase<'ast>,
     diagnostics: &mut Diagnostics,
 ) {
-    if !connector.has_capability(ConnectorCapability::ReferenceCycleDetection)
-        || !connector.has_capability(ConnectorCapability::ForeignKeys)
+    if !db
+        .active_connector()
+        .has_capability(ConnectorCapability::ReferenceCycleDetection)
+        || db
+            .datasource()
+            .map(|ds| ds.referential_integrity().is_prisma())
+            .unwrap_or(false)
     {
         return;
     }
@@ -251,11 +256,15 @@ pub(super) fn cycles<'ast, 'db>(
 /// onDelete.
 pub(super) fn multiple_cascading_paths(
     relation: CompleteInlineRelationWalker<'_, '_>,
-    connector: &dyn Connector,
+    db: &ParserDatabase<'_>,
     diagnostics: &mut Diagnostics,
 ) {
+    let connector = db.active_connector();
     if !connector.has_capability(ConnectorCapability::ReferenceCycleDetection)
-        || !connector.has_capability(ConnectorCapability::ForeignKeys)
+        || db
+            .datasource()
+            .map(|ds| ds.referential_integrity().is_prisma())
+            .unwrap_or(false)
     {
         return;
     }

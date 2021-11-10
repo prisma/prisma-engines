@@ -75,49 +75,33 @@ const CONSTRAINT_SCOPES: &[ConstraintScope] = &[
     ConstraintScope::ModelPrimaryKeyKeyIndexForeignKey,
 ];
 
-pub struct PostgresDatamodelConnector {
-    capabilities: Vec<ConnectorCapability>,
-    referential_integrity: ReferentialIntegrity,
-}
+const CAPABILITIES: &[ConnectorCapability] = &[
+    ConnectorCapability::AdvancedJsonNullability,
+    ConnectorCapability::AnyId,
+    ConnectorCapability::AutoIncrement,
+    ConnectorCapability::AutoIncrementAllowedOnNonId,
+    ConnectorCapability::AutoIncrementMultipleAllowed,
+    ConnectorCapability::AutoIncrementNonIndexedAllowed,
+    ConnectorCapability::CompoundIds,
+    ConnectorCapability::CreateMany,
+    ConnectorCapability::CreateManyWriteableAutoIncId,
+    ConnectorCapability::CreateSkipDuplicates,
+    ConnectorCapability::Enums,
+    ConnectorCapability::ForeignKeys,
+    ConnectorCapability::FullTextSearchWithoutIndex,
+    ConnectorCapability::InsensitiveFilters,
+    ConnectorCapability::Json,
+    ConnectorCapability::JsonFilteringArrayPath,
+    ConnectorCapability::NamedForeignKeys,
+    ConnectorCapability::NamedPrimaryKeys,
+    ConnectorCapability::QueryRaw,
+    ConnectorCapability::RelationFieldsInArbitraryOrder,
+    ConnectorCapability::ScalarLists,
+    ConnectorCapability::UpdateableId,
+    ConnectorCapability::WritableAutoincField,
+];
 
-//todo should this also contain the pretty printed output for SQL rendering?
-impl PostgresDatamodelConnector {
-    pub fn new(referential_integrity: ReferentialIntegrity) -> PostgresDatamodelConnector {
-        let mut capabilities = vec![
-            ConnectorCapability::ScalarLists,
-            ConnectorCapability::Enums,
-            ConnectorCapability::Json,
-            ConnectorCapability::AutoIncrementMultipleAllowed,
-            ConnectorCapability::AutoIncrementAllowedOnNonId,
-            ConnectorCapability::AutoIncrementNonIndexedAllowed,
-            ConnectorCapability::InsensitiveFilters,
-            ConnectorCapability::RelationFieldsInArbitraryOrder,
-            ConnectorCapability::CreateMany,
-            ConnectorCapability::WritableAutoincField,
-            ConnectorCapability::CreateSkipDuplicates,
-            ConnectorCapability::UpdateableId,
-            ConnectorCapability::JsonFilteringArrayPath,
-            ConnectorCapability::CreateManyWriteableAutoIncId,
-            ConnectorCapability::AutoIncrement,
-            ConnectorCapability::CompoundIds,
-            ConnectorCapability::AnyId,
-            ConnectorCapability::QueryRaw,
-            ConnectorCapability::NamedPrimaryKeys,
-            ConnectorCapability::NamedForeignKeys,
-            ConnectorCapability::FullTextSearchWithoutIndex,
-            ConnectorCapability::AdvancedJsonNullability,
-        ];
-
-        if referential_integrity.uses_foreign_keys() {
-            capabilities.push(ConnectorCapability::ForeignKeys);
-        }
-
-        PostgresDatamodelConnector {
-            capabilities,
-            referential_integrity,
-        }
-    }
-}
+pub struct PostgresDatamodelConnector;
 
 const SCALAR_TYPE_DEFAULTS: &[(ScalarType, PostgresType)] = &[
     (ScalarType::Int, PostgresType::Integer),
@@ -136,8 +120,8 @@ impl Connector for PostgresDatamodelConnector {
         "Postgres"
     }
 
-    fn capabilities(&self) -> &[ConnectorCapability] {
-        &self.capabilities
+    fn capabilities(&self) -> &'static [ConnectorCapability] {
+        CAPABILITIES
     }
 
     /// The maximum length of postgres identifiers, in bytes.
@@ -147,11 +131,10 @@ impl Connector for PostgresDatamodelConnector {
         63
     }
 
-    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
+    fn referential_actions(&self, referential_integrity: &ReferentialIntegrity) -> BitFlags<ReferentialAction> {
         use ReferentialAction::*;
 
-        self.referential_integrity
-            .allowed_referential_actions(NoAction | Restrict | Cascade | SetNull | SetDefault)
+        referential_integrity.allowed_referential_actions(NoAction | Restrict | Cascade | SetNull | SetDefault)
     }
 
     fn scalar_type_for_native_type(&self, native_type: serde_json::Value) -> ScalarType {

@@ -9,7 +9,6 @@ use crate::{
     sql_migration::{AlterColumn, ColumnTypeChange},
     sql_schema_differ::ColumnChanges,
 };
-use datamodel_connector::Connector;
 use sql_datamodel_connector::SqlDatamodelConnectors;
 use sql_schema_describer::walkers::ColumnWalker;
 
@@ -48,7 +47,7 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
             )
         }
 
-        let datamodel_connector = SqlDatamodelConnectors::postgres(Default::default());
+        let datamodel_connector = SqlDatamodelConnectors::POSTGRES;
         let previous_type = match &columns.previous().column_type().native_type {
             Some(tpe) => datamodel_connector.render_native_type(tpe.clone()),
             _ => format!("{:?}", columns.previous().column_type_family()),

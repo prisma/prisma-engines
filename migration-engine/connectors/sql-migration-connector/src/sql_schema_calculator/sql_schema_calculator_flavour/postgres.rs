@@ -1,7 +1,6 @@
 use super::SqlSchemaCalculatorFlavour;
 use crate::flavour::PostgresFlavour;
 use datamodel::{walkers::ScalarFieldWalker, Datamodel, ScalarType, WithDatabaseName};
-use datamodel_connector::Connector;
 use sql_schema_describer::{self as sql};
 
 impl SqlSchemaCalculatorFlavour for PostgresFlavour {
@@ -16,8 +15,7 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
     }
 
     fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> serde_json::Value {
-        sql_datamodel_connector::PostgresDatamodelConnector::new(Default::default())
-            .default_native_type_for_scalar_type(scalar_type)
+        sql_datamodel_connector::SqlDatamodelConnectors::POSTGRES.default_native_type_for_scalar_type(scalar_type)
     }
 
     fn enum_column_type(&self, field: &ScalarFieldWalker<'_>, db_name: &str) -> sql::ColumnType {
