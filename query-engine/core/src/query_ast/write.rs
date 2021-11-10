@@ -20,7 +20,7 @@ pub enum WriteQuery {
 
 impl WriteQuery {
     #[tracing::instrument(skip(self, projection))]
-    pub fn inject_projection_into_args(&mut self, projection: RecordProjection) {
+    pub fn inject_projection_into_args(&mut self, projection: FieldValues) {
         let keys: Vec<_> = projection.fields().map(|sf| sf.db_name().to_owned()).collect();
         let values: Vec<_> = projection.values().collect();
 
@@ -136,7 +136,7 @@ pub struct CreateManyRecords {
 
 impl CreateManyRecords {
     #[tracing::instrument(skip(self, projection))]
-    pub fn inject_all(&mut self, projection: RecordProjection) {
+    pub fn inject_all(&mut self, projection: FieldValues) {
         let keys: Vec<_> = projection.fields().map(|sf| sf.db_name().to_owned()).collect();
         let values: Vec<_> = projection.values().collect();
 
@@ -178,15 +178,15 @@ pub struct DeleteManyRecords {
 
 #[derive(Debug, Clone)]
 pub struct ConnectRecords {
-    pub parent_id: Option<RecordProjection>,
-    pub child_ids: Vec<RecordProjection>,
+    pub parent_id: Option<FieldValues>,
+    pub child_ids: Vec<FieldValues>,
     pub relation_field: RelationFieldRef,
 }
 
 #[derive(Debug, Clone)]
 pub struct DisconnectRecords {
-    pub parent_id: Option<RecordProjection>,
-    pub child_ids: Vec<RecordProjection>,
+    pub parent_id: Option<FieldValues>,
+    pub child_ids: Vec<FieldValues>,
     pub relation_field: RelationFieldRef,
 }
 

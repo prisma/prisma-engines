@@ -3,7 +3,7 @@ use crate::{interpreter::InterpretationResult, query_ast::*};
 use connector::{
     self, filter::Filter, ConnectionLike, QueryArguments, RelAggregationRow, RelAggregationSelection, ScalarCompare,
 };
-use prisma_models::{ManyRecords, ModelProjection, Record, RecordProjection, RelationFieldRef};
+use prisma_models::{FieldValues, ManyRecords, ModelProjection, Record, RelationFieldRef};
 use prisma_value::PrismaValue;
 use std::collections::HashMap;
 
@@ -74,7 +74,7 @@ pub async fn m2m(
         };
 
     // Child id to parent ids
-    let mut id_map: HashMap<RecordProjection, Vec<RecordProjection>> = HashMap::new();
+    let mut id_map: HashMap<FieldValues, Vec<FieldValues>> = HashMap::new();
 
     for (parent_id, child_id) in ids {
         match id_map.get_mut(&child_id) {
@@ -142,7 +142,7 @@ pub async fn m2m(
 pub async fn one2m(
     tx: &mut dyn ConnectionLike,
     parent_field: &RelationFieldRef,
-    parent_projections: Option<Vec<RecordProjection>>,
+    parent_projections: Option<Vec<FieldValues>>,
     parent_result: Option<&ManyRecords>,
     query_args: QueryArguments,
     selected_fields: &ModelProjection,
@@ -166,7 +166,7 @@ pub async fn one2m(
 
     // Maps the identifying link values to all primary IDs they are tied to.
     // Only the values are hashed for easier comparison.
-    let mut link_mapping: HashMap<Vec<PrismaValue>, Vec<RecordProjection>> = HashMap::new();
+    let mut link_mapping: HashMap<Vec<PrismaValue>, Vec<FieldValues>> = HashMap::new();
     let idents = vec![parent_model_id, parent_link_id];
     let mut uniq_projections = Vec::new();
 
@@ -221,7 +221,7 @@ pub async fn one2m(
         let mut additional_records = vec![];
 
         for mut record in scalars.records.iter_mut() {
-            let child_link: RecordProjection = record.projection(&scalars.field_names, &child_link_id)?;
+            let child_link: FieldValues = record.projection(&scalars.field_names, &child_link_id)?;
             let child_link_values: Vec<PrismaValue> = child_link.pairs.into_iter().map(|(_, v)| v).collect();
 
             if let Some(parent_ids) = link_mapping.get_mut(&child_link_values) {
@@ -245,7 +245,7 @@ pub async fn one2m(
         let child_link_fields = parent_field.related_field().linking_fields();
 
         for record in scalars.records.iter_mut() {
-            let child_link: RecordProjection = record.projection(&scalars.field_names, &child_link_fields)?;
+            let child_link: FieldValues = record.projection(&scalars.field_names, &child_link_fields)?;
             let child_link_values: Vec<PrismaValue> = child_link.pairs.into_iter().map(|(_, v)| v).collect();
 
             if let Some(parent_ids) = link_mapping.get(&child_link_values) {

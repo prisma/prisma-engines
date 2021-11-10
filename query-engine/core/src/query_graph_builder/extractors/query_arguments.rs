@@ -6,7 +6,7 @@ use crate::{
 };
 use connector::QueryArguments;
 use prisma_models::{
-    Field, ModelProjection, ModelRef, OrderBy, PrismaValue, RecordProjection, RelationFieldRef, ScalarFieldRef,
+    Field, FieldValues, ModelProjection, ModelRef, OrderBy, PrismaValue, RelationFieldRef, ScalarFieldRef,
     SortAggregation, SortOrder,
 };
 use std::convert::TryInto;
@@ -229,7 +229,7 @@ fn extract_skip(value: ParsedInputValue) -> QueryGraphBuilderResult<Option<i64>>
     }
 }
 
-fn extract_cursor(value: ParsedInputValue, model: &ModelRef) -> QueryGraphBuilderResult<Option<RecordProjection>> {
+fn extract_cursor(value: ParsedInputValue, model: &ModelRef) -> QueryGraphBuilderResult<Option<FieldValues>> {
     let input_map: ParsedInputMap = value.try_into()?;
     let mut pairs = vec![];
 
@@ -250,7 +250,7 @@ fn extract_cursor(value: ParsedInputValue, model: &ModelRef) -> QueryGraphBuilde
         pairs.extend(additional_pairs);
     }
 
-    Ok(Some(RecordProjection::new(pairs)))
+    Ok(Some(FieldValues::new(pairs)))
 }
 
 fn extract_cursor_field(

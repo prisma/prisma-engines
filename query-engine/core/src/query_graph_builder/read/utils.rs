@@ -1,7 +1,7 @@
 use super::*;
 use crate::{constants::aggregations::*, FieldPair, ReadQuery};
 use connector::RelAggregationSelection;
-use prisma_models::{Field, ModelProjection, ModelRef, RecordProjection, RelationFieldRef};
+use prisma_models::{Field, FieldValues, ModelProjection, ModelRef, RelationFieldRef};
 use std::sync::Arc;
 
 pub fn collect_selection_order(from: &[FieldPair]) -> Vec<String> {
@@ -102,7 +102,7 @@ pub fn merge_relation_selections(
 
 /// Ensures that if a cursor is provided, its fields are also selected.
 /// Necessary for post-processing of unstable orderings with cursor operations.
-pub fn merge_cursor_fields(selected_fields: ModelProjection, cursor: &Option<RecordProjection>) -> ModelProjection {
+pub fn merge_cursor_fields(selected_fields: ModelProjection, cursor: &Option<FieldValues>) -> ModelProjection {
     match cursor {
         Some(cursor) => selected_fields.merge(cursor.into()),
         None => selected_fields,

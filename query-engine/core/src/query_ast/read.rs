@@ -123,7 +123,7 @@ pub struct RelatedRecordsQuery {
 
     /// Fields and values of the parent to satisfy the relation query without
     /// relying on the parent result passed by the interpreter.
-    pub parent_projections: Option<Vec<RecordProjection>>,
+    pub parent_projections: Option<Vec<FieldValues>>,
 }
 
 #[derive(Debug, Clone)]

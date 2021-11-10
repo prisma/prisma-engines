@@ -12,7 +12,7 @@ use mongodb::{
     options::InsertManyOptions,
     ClientSession, Collection, Database,
 };
-use prisma_models::{ModelRef, PrismaValue, RecordProjection};
+use prisma_models::{FieldValues, ModelRef, PrismaValue};
 use std::convert::TryInto;
 
 /// Create a single record to the database resulting in a
@@ -22,7 +22,7 @@ pub async fn create_record<'conn>(
     session: &mut ClientSession,
     model: &ModelRef,
     mut args: WriteArgs,
-) -> crate::Result<RecordProjection> {
+) -> crate::Result<FieldValues> {
     let coll = database.collection::<Document>(model.db_name());
 
     // Mongo only allows a singular ID.
@@ -61,7 +61,7 @@ pub async fn create_record<'conn>(
     let insert_result = coll.insert_one_with_session(doc, None, session).await?;
     let id_value = value_from_bson(insert_result.inserted_id, &id_meta)?;
 
-    Ok(RecordProjection::from((id_field, id_value)))
+    Ok(FieldValues::from((id_field, id_value)))
 }
 
 pub async fn create_records<'conn>(
@@ -120,7 +120,7 @@ pub async fn update_records<'conn>(
     model: &ModelRef,
     record_filter: RecordFilter,
     args: WriteArgs,
-) -> crate::Result<Vec<RecordProjection>> {
+) -> crate::Result<Vec<FieldValues>> {
     let coll = database.collection::<Document>(model.db_name());
 
     // We need to load ids of documents to be updated first because Mongo doesn't
@@ -222,7 +222,7 @@ pub async fn update_records<'conn>(
     let ids = ids
         .into_iter()
         .map(|bson_id| {
-            Ok(RecordProjection::from((
+            Ok(FieldValues::from((
                 id_field.clone(),
                 value_from_bson(bson_id, &id_meta)?,
             )))
@@ -296,8 +296,8 @@ pub async fn m2m_connect<'conn>(
     database: &Database,
     session: &mut ClientSession,
     field: &RelationFieldRef,
-    parent_id: &RecordProjection,
-    child_ids: &[RecordProjection],
+    parent_id: &FieldValues,
+    child_ids: &[FieldValues],
 ) -> crate::Result<()> {
     let parent_model = field.model();
     let child_model = field.related_model();
@@ -346,8 +346,8 @@ pub async fn m2m_disconnect<'conn>(
     database: &Database,
     session: &mut ClientSession,
     field: &RelationFieldRef,
-    parent_id: &RecordProjection,
-    child_ids: &[RecordProjection],
+    parent_id: &FieldValues,
+    child_ids: &[FieldValues],
 ) -> crate::Result<()> {
     let parent_model = field.model();
     let child_model = field.related_model();

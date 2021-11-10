@@ -13,7 +13,7 @@ use crate::{
 use connector::{IdFilter, QueryArguments};
 use guard::*;
 use petgraph::{graph::*, visit::EdgeRef as PEdgeRef, *};
-use prisma_models::{ModelProjection, ModelRef, RecordProjection};
+use prisma_models::{FieldValues, ModelProjection, ModelRef};
 use std::{borrow::Borrow, collections::HashSet, fmt};
 
 pub type QueryGraphResult<T> = std::result::Result<T, QueryGraphError>;
@@ -52,7 +52,7 @@ pub enum Flow {
     If(Box<dyn FnOnce() -> bool + Send + Sync + 'static>),
 
     /// Returns a fixed set of record projections.
-    Return(Option<Vec<RecordProjection>>),
+    Return(Option<Vec<FieldValues>>),
 }
 
 impl Flow {
@@ -76,8 +76,8 @@ impl Computation {
 }
 
 pub struct DiffNode {
-    pub left: HashSet<RecordProjection>,
-    pub right: HashSet<RecordProjection>,
+    pub left: HashSet<FieldValues>,
+    pub right: HashSet<FieldValues>,
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
@@ -105,7 +105,7 @@ impl EdgeRef {
 }
 
 pub type ParentProjectionFn =
-    Box<dyn FnOnce(Node, Vec<RecordProjection>) -> QueryGraphBuilderResult<Node> + Send + Sync + 'static>;
+    Box<dyn FnOnce(Node, Vec<FieldValues>) -> QueryGraphBuilderResult<Node> + Send + Sync + 'static>;
 
 pub type ParentResultFn =
     Box<dyn FnOnce(Node, &ExpressionResult) -> QueryGraphBuilderResult<Node> + Send + Sync + 'static>;

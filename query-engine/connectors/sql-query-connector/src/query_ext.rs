@@ -94,11 +94,7 @@ pub trait QueryExt: Queryable + Send + Sync {
     /// Process the record filter and either return directly with precomputed values,
     /// or fetch IDs from the database.
     #[tracing::instrument(skip(self, model, record_filter))]
-    async fn filter_selectors(
-        &self,
-        model: &ModelRef,
-        record_filter: RecordFilter,
-    ) -> crate::Result<Vec<RecordProjection>> {
+    async fn filter_selectors(&self, model: &ModelRef, record_filter: RecordFilter) -> crate::Result<Vec<FieldValues>> {
         if let Some(selectors) = record_filter.selectors {
             Ok(selectors)
         } else {
@@ -108,7 +104,7 @@ pub trait QueryExt: Queryable + Send + Sync {
 
     /// Read the all columns as a (primary) identifier.
     #[tracing::instrument(skip(self, model, filter))]
-    async fn filter_ids(&self, model: &ModelRef, filter: Filter) -> crate::Result<Vec<RecordProjection>> {
+    async fn filter_ids(&self, model: &ModelRef, filter: Filter) -> crate::Result<Vec<FieldValues>> {
         let model_id: ModelProjection = model.primary_identifier().into();
         let id_cols: Vec<Column<'static>> = model_id.as_columns().collect();
 
@@ -120,7 +116,7 @@ pub trait QueryExt: Queryable + Send + Sync {
     }
 
     #[tracing::instrument(skip(self, select, model_id))]
-    async fn select_ids(&self, select: Select<'_>, model_id: ModelProjection) -> crate::Result<Vec<RecordProjection>> {
+    async fn select_ids(&self, select: Select<'_>, model_id: ModelProjection) -> crate::Result<Vec<FieldValues>> {
         let idents: Vec<_> = model_id
             .fields()
             .flat_map(|f| match f {
@@ -138,7 +134,7 @@ pub trait QueryExt: Queryable + Send + Sync {
 
         for row in rows.drain(0..) {
             let tuples: Vec<_> = model_id.scalar_fields().zip(row.values.into_iter()).collect();
-            let record_id: RecordProjection = RecordProjection::new(tuples);
+            let record_id: FieldValues = FieldValues::new(tuples);
 
             result.push(record_id);
         }

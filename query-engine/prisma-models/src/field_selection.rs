@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use itertools::Itertools;
 
-use crate::{CompositeFieldRef, Field, RelationField, ScalarFieldRef};
+use crate::{CompositeFieldRef, DomainError, Field, FieldValues, RelationField, ScalarFieldRef};
 
 /// A selection of fields from a model.
 #[derive(Debug, Clone)]
@@ -85,6 +85,15 @@ impl FieldSelection {
         self.selections.iter().find(|selection| selection.prisma_name() == name)
     }
 
+    pub fn as_fields(&self) -> Vec<Field> {
+        self.selections()
+            .map(|selection| match selection {
+                SelectedField::Scalar(sf) => sf.clone().into(),
+                SelectedField::Composite(cf) => cf.field.clone().into(),
+            })
+            .collect()
+    }
+
     /// Checks if `self` only contains scalar field selections and if so, returns them all in a list.
     /// If any other selection is contained, returns `None`.
     pub fn as_scalar_fields(&self) -> Option<Vec<ScalarFieldRef>> {
@@ -100,6 +109,41 @@ impl FieldSelection {
             Some(scalar_fields)
         } else {
             None
+        }
+    }
+
+    /// Inserts this selections fields into the given field values.
+    /// Assumes caller knows that the exchange can be done, but still errors if lengths mismatch.
+    /// Additionally performs a type coercion based on the source and destination field types.
+    /// Resistance is futile.
+    pub fn assimilate(&self, values: FieldValues) -> crate::Result<FieldValues> {
+        if self.selections.len() != values.len() {
+            Err(DomainError::ConversionFailure(
+                "field values".to_owned(),
+                "assimilated field values".to_owned(),
+            ))
+        } else {
+            // let fields = self.as_fields();
+
+            // Ok(values
+            //     .pairs
+            //     .into_iter()
+            //     .zip(fields)
+            //     .map(|((og_field, value), other_field)| {
+            //         match og_field {
+
+            //         }
+            //         if og_field.type_identifier != other_field.type_identifier {
+            //             let value = value.coerce(&other_field.type_identifier)?;
+            //             Ok((other_field, value))
+            //         } else {
+            //             Ok((other_field, value))
+            //         }
+            //     })
+            //     .collect::<crate::Result<Vec<_>>>()?
+            //     .into())
+
+            todo!()
         }
     }
 }

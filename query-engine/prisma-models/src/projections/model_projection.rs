@@ -1,8 +1,5 @@
-use super::RecordProjection;
-use crate::{
-    dml::FieldArity, DomainError, Field, FieldSelection, PrismaValue, PrismaValueExtensions, ScalarFieldRef,
-    SelectedField, TypeIdentifier,
-};
+use super::FieldValues;
+use crate::{dml::FieldArity, Field, FieldSelection, PrismaValue, ScalarFieldRef, SelectedField, TypeIdentifier};
 use itertools::Itertools;
 
 /// Projection of a `Model`. A projection is a (sub)set of fields of a model.
@@ -103,42 +100,12 @@ impl ModelProjection {
     }
 
     /// Checks if a given `RecordProjection` belongs to this `ModelProjection`.
-    pub fn matches(&self, id: &RecordProjection) -> bool {
+    pub fn matches(&self, id: &FieldValues) -> bool {
         self.scalar_fields().eq(id.fields())
     }
 
-    /// Inserts this projections scalar fields into the given record projection.
-    /// Assumes caller knows that the exchange can be done. Errors if lengths mismatch.
-    /// Additionally performs a type coercion based on the source and destination field types.
-    /// (Resistance is futile.)
-    pub fn assimilate(&self, id: RecordProjection) -> crate::Result<RecordProjection> {
-        if self.scalar_length() != id.len() {
-            Err(DomainError::ConversionFailure(
-                "record identifier".to_owned(),
-                "assimilated record identifier".to_owned(),
-            ))
-        } else {
-            let fields = self.scalar_fields();
-
-            Ok(id
-                .pairs
-                .into_iter()
-                .zip(fields)
-                .map(|((og_field, value), other_field)| {
-                    if og_field.type_identifier != other_field.type_identifier {
-                        let value = value.coerce(&other_field.type_identifier)?;
-                        Ok((other_field, value))
-                    } else {
-                        Ok((other_field, value))
-                    }
-                })
-                .collect::<crate::Result<Vec<_>>>()?
-                .into())
-        }
-    }
-
     /// Creates a record projection of the model projection containing only null values.
-    pub fn empty_record_projection(&self) -> RecordProjection {
+    pub fn empty_record_projection(&self) -> FieldValues {
         self.scalar_fields()
             .map(|f| (f, PrismaValue::Null))
             .collect::<Vec<_>>()
@@ -157,8 +124,8 @@ impl ModelProjection {
 
     /// Creates a record identifier from raw values.
     /// No checks for length, type, or similar is performed, hence "unchecked".
-    pub fn from_unchecked(&self, values: Vec<PrismaValue>) -> RecordProjection {
-        RecordProjection::new(self.scalar_fields().zip(values).collect())
+    pub fn from_unchecked(&self, values: Vec<PrismaValue>) -> FieldValues {
+        FieldValues::new(self.scalar_fields().zip(values).collect())
     }
 
     /// Checks if this model projection contains given field.
@@ -201,8 +168,8 @@ impl IntoIterator for ModelProjection {
     }
 }
 
-impl From<&RecordProjection> for ModelProjection {
-    fn from(p: &RecordProjection) -> Self {
+impl From<&FieldValues> for ModelProjection {
+    fn from(p: &FieldValues) -> Self {
         let fields = p
             .pairs
             .iter()

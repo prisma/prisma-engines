@@ -1,5 +1,5 @@
 use crate::{
-    DomainError, FieldSelection, ModelProjection, OrderBy, PrismaValue, PrismaValueExtensions, RecordProjection,
+    DomainError, FieldSelection, FieldValues, ModelProjection, OrderBy, PrismaValue, PrismaValueExtensions,
     ScalarFieldRef, SortOrder,
 };
 use itertools::Itertools;
@@ -25,7 +25,7 @@ impl SingleRecord {
         Self { record, field_names }
     }
 
-    pub fn projection(&self, projection: &ModelProjection) -> crate::Result<RecordProjection> {
+    pub fn projection(&self, projection: &ModelProjection) -> crate::Result<FieldValues> {
         self.record.projection(&self.field_names, projection)
     }
 
@@ -101,7 +101,7 @@ impl ManyRecords {
         self.records.push(record);
     }
 
-    pub fn projections(&self, model_projection: &ModelProjection) -> crate::Result<Vec<RecordProjection>> {
+    pub fn projections(&self, model_projection: &ModelProjection) -> crate::Result<Vec<FieldValues>> {
         self.records
             .iter()
             .map(|record| record.projection(&self.field_names, model_projection))
@@ -138,7 +138,7 @@ impl ManyRecords {
 #[derive(Debug, Default, Clone, Eq, PartialEq, Hash)]
 pub struct Record {
     pub values: Vec<PrismaValue>,
-    pub parent_id: Option<RecordProjection>,
+    pub parent_id: Option<FieldValues>,
 }
 
 impl Record {
@@ -149,11 +149,7 @@ impl Record {
         }
     }
 
-    pub fn projection(
-        &self,
-        field_names: &[String],
-        model_projection: &ModelProjection,
-    ) -> crate::Result<RecordProjection> {
+    pub fn projection(&self, field_names: &[String], model_projection: &ModelProjection) -> crate::Result<FieldValues> {
         let pairs: Vec<(ScalarFieldRef, PrismaValue)> = model_projection
             .fields()
             .into_iter()
@@ -171,7 +167,7 @@ impl Record {
             })
             .collect::<crate::Result<Vec<_>>>()?;
 
-        Ok(RecordProjection { pairs })
+        Ok(FieldValues { pairs })
     }
 
     pub fn identifying_values(
@@ -207,7 +203,7 @@ impl Record {
         Ok(&self.values[index])
     }
 
-    pub fn set_parent_id(&mut self, parent_id: RecordProjection) {
+    pub fn set_parent_id(&mut self, parent_id: FieldValues) {
         self.parent_id = Some(parent_id);
     }
 }

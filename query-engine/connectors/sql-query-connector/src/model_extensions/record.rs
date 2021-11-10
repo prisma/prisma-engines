@@ -1,12 +1,12 @@
 use super::ScalarFieldExt;
 use crate::SqlError;
-use prisma_models::{DomainError, ModelProjection, RecordProjection};
+use prisma_models::{DomainError, FieldValues, ModelProjection};
 use quaint::{connector::ResultSet, Value};
 use std::convert::TryInto;
 
-pub fn try_convert(model_projection: &ModelProjection, result_set: ResultSet) -> crate::Result<RecordProjection> {
+pub fn try_convert(model_projection: &ModelProjection, result_set: ResultSet) -> crate::Result<FieldValues> {
     let columns: Vec<String> = result_set.columns().iter().map(|c| c.to_string()).collect();
-    let mut record_projection = RecordProjection::default();
+    let mut record_projection = FieldValues::default();
 
     if let Some(row) = result_set.into_iter().next() {
         for (i, val) in row.into_iter().enumerate() {
@@ -38,7 +38,7 @@ pub trait RecordProjectionExt {
     fn db_values<'a>(&self) -> Vec<Value<'a>>;
 }
 
-impl RecordProjectionExt for RecordProjection {
+impl RecordProjectionExt for FieldValues {
     fn db_values<'a>(&self) -> Vec<Value<'a>> {
         self.pairs.iter().map(|(f, v)| f.value(v.clone())).collect()
     }

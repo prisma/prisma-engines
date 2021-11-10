@@ -1,9 +1,9 @@
 use connector::{AggregationRow, QueryArguments, RelAggregationRow};
-use prisma_models::{ManyRecords, ModelRef, RecordProjection};
+use prisma_models::{FieldValues, ManyRecords, ModelRef};
 
 #[derive(Debug, Clone)]
 pub enum QueryResult {
-    Id(Option<RecordProjection>),
+    Id(Option<FieldValues>),
     Count(usize),
     RecordSelection(Box<RecordSelection>),
     Json(serde_json::Value),

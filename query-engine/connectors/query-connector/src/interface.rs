@@ -44,7 +44,7 @@ pub trait ConnectionLike: ReadOperations + WriteOperations + Send + Sync {}
 #[derive(Debug, Clone)]
 pub struct RecordFilter {
     pub filter: Filter,
-    pub selectors: Option<Vec<RecordProjection>>,
+    pub selectors: Option<Vec<FieldValues>>,
 }
 
 impl RecordFilter {
@@ -65,8 +65,8 @@ impl From<Filter> for RecordFilter {
     }
 }
 
-impl From<Vec<RecordProjection>> for RecordFilter {
-    fn from(selectors: Vec<RecordProjection>) -> Self {
+impl From<Vec<FieldValues>> for RecordFilter {
+    fn from(selectors: Vec<FieldValues>) -> Self {
         Self {
             filter: Filter::empty(),
             selectors: Some(selectors),
@@ -74,8 +74,8 @@ impl From<Vec<RecordProjection>> for RecordFilter {
     }
 }
 
-impl From<RecordProjection> for RecordFilter {
-    fn from(selector: RecordProjection) -> Self {
+impl From<FieldValues> for RecordFilter {
+    fn from(selector: FieldValues) -> Self {
         Self {
             filter: Filter::empty(),
             selectors: Some(vec![selector]),
@@ -248,8 +248,8 @@ pub trait ReadOperations {
     async fn get_related_m2m_record_ids(
         &mut self,
         from_field: &RelationFieldRef,
-        from_record_ids: &[RecordProjection],
-    ) -> crate::Result<Vec<(RecordProjection, RecordProjection)>>;
+        from_record_ids: &[FieldValues],
+    ) -> crate::Result<Vec<(FieldValues, FieldValues)>>;
 
     /// Aggregates records for a specific model based on the given selections.
     /// Whether or not the aggregations can be executed in a single query or
@@ -269,7 +269,7 @@ pub trait ReadOperations {
 #[async_trait]
 pub trait WriteOperations {
     /// Insert a single record to the database.
-    async fn create_record(&mut self, model: &ModelRef, args: WriteArgs) -> crate::Result<RecordProjection>;
+    async fn create_record(&mut self, model: &ModelRef, args: WriteArgs) -> crate::Result<FieldValues>;
 
     /// Inserts many records at once into the database.
     async fn create_records(
@@ -286,7 +286,7 @@ pub trait WriteOperations {
         model: &ModelRef,
         record_filter: RecordFilter,
         args: WriteArgs,
-    ) -> crate::Result<Vec<RecordProjection>>;
+    ) -> crate::Result<Vec<FieldValues>>;
 
     /// Delete records in the `Model` with the given `Filter`.
     async fn delete_records(&mut self, model: &ModelRef, record_filter: RecordFilter) -> crate::Result<usize>;
@@ -297,16 +297,16 @@ pub trait WriteOperations {
     async fn m2m_connect(
         &mut self,
         field: &RelationFieldRef,
-        parent_id: &RecordProjection,
-        child_ids: &[RecordProjection],
+        parent_id: &FieldValues,
+        child_ids: &[FieldValues],
     ) -> crate::Result<()>;
 
     /// Disconnect the children from the parent (m2m relation only).
     async fn m2m_disconnect(
         &mut self,
         field: &RelationFieldRef,
-        parent_id: &RecordProjection,
-        child_ids: &[RecordProjection],
+        parent_id: &FieldValues,
+        child_ids: &[FieldValues],
     ) -> crate::Result<()>;
 
     /// Execute the raw query in the database as-is. The `parameters` are

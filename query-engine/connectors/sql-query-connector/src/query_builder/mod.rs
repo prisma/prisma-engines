@@ -5,7 +5,7 @@ pub use read::*;
 pub use write::*;
 
 use crate::model_extensions::RecordProjectionExt;
-use prisma_models::RecordProjection;
+use prisma_models::FieldValues;
 use quaint::ast::{Column, Comparable, ConditionTree, Query, Row, Values};
 
 const PARAMETER_LIMIT: usize = 2000;
@@ -13,7 +13,7 @@ const PARAMETER_LIMIT: usize = 2000;
 #[tracing::instrument(skip(columns, records, f))]
 pub(super) fn chunked_conditions<F, Q>(
     columns: &[Column<'static>],
-    records: &[&RecordProjection],
+    records: &[&FieldValues],
     f: F,
 ) -> Vec<Query<'static>>
 where
@@ -32,7 +32,7 @@ where
 #[tracing::instrument(skip(columns, records))]
 pub(super) fn conditions<'a>(
     columns: &'a [Column<'static>],
-    records: impl IntoIterator<Item = &'a RecordProjection>,
+    records: impl IntoIterator<Item = &'a FieldValues>,
 ) -> ConditionTree<'static> {
     let mut values = Values::empty();
 

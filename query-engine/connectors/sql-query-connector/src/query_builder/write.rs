@@ -8,7 +8,7 @@ use std::{collections::HashSet, convert::TryInto};
 /// `INSERT` a new record to the database. Resulting an `INSERT` ast and an
 /// optional `RecordProjection` if available from the arguments or model.
 #[tracing::instrument(skip(model, args))]
-pub fn create_record(model: &ModelRef, mut args: WriteArgs) -> (Insert<'static>, Option<RecordProjection>) {
+pub fn create_record(model: &ModelRef, mut args: WriteArgs) -> (Insert<'static>, Option<FieldValues>) {
     let return_id = args.as_record_projection(model.primary_identifier().into());
 
     let fields: Vec<_> = model
@@ -98,7 +98,7 @@ pub fn create_records_empty(model: &ModelRef, skip_duplicates: bool) -> Insert<'
 }
 
 #[tracing::instrument(skip(model, ids, args))]
-pub fn update_many(model: &ModelRef, ids: &[&RecordProjection], args: WriteArgs) -> crate::Result<Vec<Query<'static>>> {
+pub fn update_many(model: &ModelRef, ids: &[&FieldValues], args: WriteArgs) -> crate::Result<Vec<Query<'static>>> {
     if args.args.is_empty() || ids.is_empty() {
         return Ok(Vec::new());
     }
@@ -159,7 +159,7 @@ pub fn update_many(model: &ModelRef, ids: &[&RecordProjection], args: WriteArgs)
 }
 
 #[tracing::instrument(skip(model, ids))]
-pub fn delete_many(model: &ModelRef, ids: &[&RecordProjection]) -> Vec<Query<'static>> {
+pub fn delete_many(model: &ModelRef, ids: &[&FieldValues]) -> Vec<Query<'static>> {
     let columns: Vec<_> = ModelProjection::from(model.primary_identifier()).as_columns().collect();
 
     super::chunked_conditions(&columns, ids, |conditions| {
@@ -170,8 +170,8 @@ pub fn delete_many(model: &ModelRef, ids: &[&RecordProjection]) -> Vec<Query<'st
 #[tracing::instrument(skip(field, parent_id, child_ids))]
 pub fn create_relation_table_records(
     field: &RelationFieldRef,
-    parent_id: &RecordProjection,
-    child_ids: &[RecordProjection],
+    parent_id: &FieldValues,
+    child_ids: &[FieldValues],
 ) -> Query<'static> {
     let relation = field.relation();
 
@@ -194,8 +194,8 @@ pub fn create_relation_table_records(
 #[tracing::instrument(skip(parent_field, parent_id, child_ids))]
 pub fn delete_relation_table_records(
     parent_field: &RelationFieldRef,
-    parent_id: &RecordProjection,
-    child_ids: &[RecordProjection],
+    parent_id: &FieldValues,
+    child_ids: &[FieldValues],
 ) -> Delete<'static> {
     let relation = parent_field.relation();
 

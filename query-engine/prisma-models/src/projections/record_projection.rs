@@ -4,11 +4,11 @@ use std::{collections::HashMap, convert::TryFrom};
 
 /// Represents a (sub)set of fields to value pairs from a single record.
 #[derive(Default, Debug, Clone, PartialEq, Eq, Hash)]
-pub struct RecordProjection {
+pub struct FieldValues {
     pub pairs: Vec<(ScalarFieldRef, PrismaValue)>,
 }
 
-impl RecordProjection {
+impl FieldValues {
     pub fn new(pairs: Vec<(ScalarFieldRef, PrismaValue)>) -> Self {
         Self { pairs }
     }
@@ -57,7 +57,7 @@ impl RecordProjection {
 
     /// Consumes this projection and splits it into a set of `RecordProjection`s based on the passed
     /// `ModelProjection`s. Assumes that the transformation can be done.
-    pub fn split_into(self, projections: &[ModelProjection]) -> Vec<RecordProjection> {
+    pub fn split_into(self, projections: &[ModelProjection]) -> Vec<FieldValues> {
         let mapped: HashMap<String, (ScalarFieldRef, PrismaValue)> =
             self.into_iter().map(|(sf, val)| (sf.name.clone(), (sf, val))).collect();
 
@@ -95,10 +95,10 @@ impl RecordProjection {
     }
 }
 
-impl TryFrom<RecordProjection> for PrismaValue {
+impl TryFrom<FieldValues> for PrismaValue {
     type Error = DomainError;
 
-    fn try_from(projection: RecordProjection) -> crate::Result<Self> {
+    fn try_from(projection: FieldValues) -> crate::Result<Self> {
         match projection.pairs.into_iter().next() {
             Some(value) => Ok(value.1),
             None => Err(DomainError::ConversionFailure(
@@ -109,7 +109,7 @@ impl TryFrom<RecordProjection> for PrismaValue {
     }
 }
 
-impl IntoIterator for RecordProjection {
+impl IntoIterator for FieldValues {
     type Item = (ScalarFieldRef, PrismaValue);
     type IntoIter = std::vec::IntoIter<Self::Item>;
 
@@ -118,13 +118,13 @@ impl IntoIterator for RecordProjection {
     }
 }
 
-impl From<(ScalarFieldRef, PrismaValue)> for RecordProjection {
+impl From<(ScalarFieldRef, PrismaValue)> for FieldValues {
     fn from(tup: (ScalarFieldRef, PrismaValue)) -> Self {
         Self::new(vec![tup])
     }
 }
 
-impl From<Vec<(ScalarFieldRef, PrismaValue)>> for RecordProjection {
+impl From<Vec<(ScalarFieldRef, PrismaValue)>> for FieldValues {
     fn from(tup: Vec<(ScalarFieldRef, PrismaValue)>) -> Self {
         Self::new(tup)
     }

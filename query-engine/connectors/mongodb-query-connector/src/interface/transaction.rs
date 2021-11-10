@@ -64,7 +64,7 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
         &mut self,
         model: &ModelRef,
         args: connector_interface::WriteArgs,
-    ) -> connector_interface::Result<RecordProjection> {
+    ) -> connector_interface::Result<FieldValues> {
         catch(async move {
             write::create_record(&self.connection.database, &mut self.connection.session, model, args).await
         })
@@ -95,7 +95,7 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
         model: &ModelRef,
         record_filter: connector_interface::RecordFilter,
         args: connector_interface::WriteArgs,
-    ) -> connector_interface::Result<Vec<RecordProjection>> {
+    ) -> connector_interface::Result<Vec<FieldValues>> {
         catch(async move {
             write::update_records(
                 &self.connection.database,
@@ -129,8 +129,8 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
     async fn m2m_connect(
         &mut self,
         field: &RelationFieldRef,
-        parent_id: &RecordProjection,
-        child_ids: &[RecordProjection],
+        parent_id: &FieldValues,
+        child_ids: &[FieldValues],
     ) -> connector_interface::Result<()> {
         catch(async move {
             write::m2m_connect(
@@ -148,8 +148,8 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
     async fn m2m_disconnect(
         &mut self,
         field: &RelationFieldRef,
-        parent_id: &RecordProjection,
-        child_ids: &[RecordProjection],
+        parent_id: &FieldValues,
+        child_ids: &[FieldValues],
     ) -> connector_interface::Result<()> {
         catch(async move {
             write::m2m_disconnect(
@@ -228,8 +228,8 @@ impl<'conn> ReadOperations for MongoDbTransaction<'conn> {
     async fn get_related_m2m_record_ids(
         &mut self,
         from_field: &RelationFieldRef,
-        from_record_ids: &[RecordProjection],
-    ) -> connector_interface::Result<Vec<(RecordProjection, RecordProjection)>> {
+        from_record_ids: &[FieldValues],
+    ) -> connector_interface::Result<Vec<(FieldValues, FieldValues)>> {
         catch(async move {
             read::get_related_m2m_record_ids(
                 &self.connection.database,

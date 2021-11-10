@@ -15,7 +15,7 @@ use prisma_models::prelude::*;
 #[derive(Debug, Clone)]
 pub enum ExpressionResult {
     Query(QueryResult),
-    RawProjections(Vec<RecordProjection>),
+    RawProjections(Vec<FieldValues>),
     Computation(ComputationResult),
     Empty,
 }
@@ -30,14 +30,14 @@ pub enum ComputationResult {
 /// `right` contains all elements that are in B but not in A.
 #[derive(Debug, Clone)]
 pub struct DiffResult {
-    pub left: Vec<RecordProjection>,
-    pub right: Vec<RecordProjection>,
+    pub left: Vec<FieldValues>,
+    pub right: Vec<FieldValues>,
 }
 
 impl ExpressionResult {
     /// Attempts to transform the result into a vector of record projections.
     #[tracing::instrument(skip(self, model_projection))]
-    pub fn as_projections(&self, model_projection: &ModelProjection) -> InterpretationResult<Vec<RecordProjection>> {
+    pub fn as_projections(&self, model_projection: &ModelProjection) -> InterpretationResult<Vec<FieldValues>> {
         let converted = match self {
             Self::Query(ref result) => match result {
                 QueryResult::Id(id) => match id {

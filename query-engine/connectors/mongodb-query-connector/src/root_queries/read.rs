@@ -88,8 +88,8 @@ pub async fn get_related_m2m_record_ids<'conn>(
     database: &Database,
     session: &mut ClientSession,
     from_field: &RelationFieldRef,
-    from_record_ids: &[RecordProjection],
-) -> crate::Result<Vec<(RecordProjection, RecordProjection)>> {
+    from_record_ids: &[FieldValues],
+) -> crate::Result<Vec<(FieldValues, FieldValues)>> {
     if from_record_ids.is_empty() {
         return Ok(vec![]);
     }
@@ -142,10 +142,10 @@ pub async fn get_related_m2m_record_ids<'conn>(
             val => vec![val],
         };
 
-        let parent_projection = RecordProjection::from((id_field.clone(), parent_id));
+        let parent_projection = FieldValues::from((id_field.clone(), parent_id));
 
         for child_id in child_ids {
-            let child_projection = RecordProjection::from((child_id_field.clone(), child_id));
+            let child_projection = FieldValues::from((child_id_field.clone(), child_id));
             id_pairs.push((parent_projection.clone(), child_projection));
         }
     }
