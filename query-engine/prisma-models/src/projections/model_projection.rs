@@ -1,5 +1,6 @@
-use super::FieldValues;
-use crate::{dml::FieldArity, Field, FieldSelection, PrismaValue, ScalarFieldRef, SelectedField, TypeIdentifier};
+use crate::{
+    dml::FieldArity, Field, FieldSelection, FieldValues, PrismaValue, ScalarFieldRef, SelectedField, TypeIdentifier,
+};
 use itertools::Itertools;
 
 /// Projection of a `Model`. A projection is a (sub)set of fields of a model.
@@ -99,9 +100,9 @@ impl ModelProjection {
         self.scalar_fields().map(|f| f.type_identifier_with_arity()).collect()
     }
 
-    /// Checks if a given `RecordProjection` belongs to this `ModelProjection`.
-    pub fn matches(&self, id: &FieldValues) -> bool {
-        self.scalar_fields().eq(id.fields())
+    /// Checks if a given `FieldValues` belongs to this `ModelProjection`.
+    pub fn matches(&self, field_values: &FieldValues) -> bool {
+        self.scalar_fields().eq(field_values.fields())
     }
 
     /// Creates a record projection of the model projection containing only null values.

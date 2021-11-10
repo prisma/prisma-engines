@@ -5,6 +5,7 @@ use crate::{
 };
 use connector_interface::{ConnectionLike, ReadOperations, RelAggregationSelection, Transaction, WriteOperations};
 use mongodb::options::{Acknowledgment, ReadConcern, TransactionOptions, WriteConcern};
+use prisma_models::FieldValues;
 
 pub struct MongoDbTransaction<'conn> {
     connection: &'conn mut MongoDbConnection,

@@ -6,7 +6,7 @@ use connector_interface::{
     self as connector, filter::Filter, AggregationRow, AggregationSelection, Connection, QueryArguments,
     ReadOperations, RecordFilter, Transaction, WriteArgs, WriteOperations,
 };
-use prisma_models::prelude::*;
+use prisma_models::{prelude::*, FieldValues};
 use prisma_value::PrismaValue;
 use quaint::{connector::TransactionCapable, prelude::ConnectionInfo};
 

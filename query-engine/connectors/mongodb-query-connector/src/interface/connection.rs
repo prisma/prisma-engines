@@ -9,7 +9,7 @@ use connector_interface::{
     Connection, ConnectionLike, ReadOperations, RelAggregationSelection, Transaction, WriteArgs, WriteOperations,
 };
 use mongodb::{ClientSession, Database};
-use prisma_models::prelude::*;
+use prisma_models::{prelude::*, FieldValues};
 
 pub struct MongoDbConnection {
     /// The session to use for operations.

@@ -2,7 +2,7 @@ use super::ModelProjection;
 use crate::{DomainError, ModelRef, PrismaValue, PrismaValueExtensions, ScalarFieldRef};
 use std::{collections::HashMap, convert::TryFrom};
 
-/// Represents a (sub)set of fields to value pairs from a single record.
+/// Represents a (sub)set of field-to-value pairs from a single record.
 #[derive(Default, Debug, Clone, PartialEq, Eq, Hash)]
 pub struct FieldValues {
     pub pairs: Vec<(ScalarFieldRef, PrismaValue)>,
@@ -55,7 +55,7 @@ impl FieldValues {
         false
     }
 
-    /// Consumes this projection and splits it into a set of `RecordProjection`s based on the passed
+    /// Consumes this `FieldValues` and splits it into a set of `FieldValues` based on the passed
     /// `ModelProjection`s. Assumes that the transformation can be done.
     pub fn split_into(self, projections: &[ModelProjection]) -> Vec<FieldValues> {
         let mapped: HashMap<String, (ScalarFieldRef, PrismaValue)> =
@@ -98,11 +98,11 @@ impl FieldValues {
 impl TryFrom<FieldValues> for PrismaValue {
     type Error = DomainError;
 
-    fn try_from(projection: FieldValues) -> crate::Result<Self> {
-        match projection.pairs.into_iter().next() {
+    fn try_from(field_values: FieldValues) -> crate::Result<Self> {
+        match field_values.pairs.into_iter().next() {
             Some(value) => Ok(value.1),
             None => Err(DomainError::ConversionFailure(
-                "RecordProjection".into(),
+                "FieldValues".into(),
                 "PrismaValue".into(),
             )),
         }
