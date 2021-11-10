@@ -176,50 +176,11 @@
 <span id="176">176</span>
 <span id="177">177</span>
 <span id="178">178</span>
-<span id="179">179</span>
-<span id="180">180</span>
-<span id="181">181</span>
-<span id="182">182</span>
-<span id="183">183</span>
-<span id="184">184</span>
-<span id="185">185</span>
-<span id="186">186</span>
-<span id="187">187</span>
-<span id="188">188</span>
-<span id="189">189</span>
-<span id="190">190</span>
-<span id="191">191</span>
-<span id="192">192</span>
-<span id="193">193</span>
-<span id="194">194</span>
-<span id="195">195</span>
-<span id="196">196</span>
-<span id="197">197</span>
-<span id="198">198</span>
-<span id="199">199</span>
-<span id="200">200</span>
-<span id="201">201</span>
-<span id="202">202</span>
-<span id="203">203</span>
-<span id="204">204</span>
-<span id="205">205</span>
-<span id="206">206</span>
-<span id="207">207</span>
-<span id="208">208</span>
-<span id="209">209</span>
-<span id="210">210</span>
-<span id="211">211</span>
-<span id="212">212</span>
-<span id="213">213</span>
-<span id="214">214</span>
-<span id="215">215</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>,
     <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>},
     <span class="ident">transform::ast_to_dml::db::walkers</span>::{<span class="ident">ModelWalker</span>, <span class="ident">RelationFieldWalker</span>, <span class="ident">RelationName</span>},
 };
-<span class="kw">use</span> <span class="ident">datamodel_connector::ReferentialIntegrity</span>;
-<span class="kw">use</span> <span class="ident">dml::relation_info::ReferentialAction</span>;
 <span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 
@@ -327,41 +288,6 @@
         }
         <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
     }
-}
-
-<span class="doccomment">/// Validates usage of `onUpdate` with the `referentialIntegrity` set to</span>
-<span class="doccomment">/// `prisma`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is temporary to the point until Query Engine supports `onUpdate`</span>
-<span class="doccomment">/// actions on emulations.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">on_update_without_foreign_keys</span>(
-    <span class="ident">field</span>: <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">referential_integrity</span>: <span class="ident">ReferentialIntegrity</span>,
-    <span class="ident">diagnostics</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Diagnostics</span>,
-) {
-    <span class="kw">if</span> <span class="ident">referential_integrity</span>.<span class="ident">uses_foreign_keys</span>() {
-        <span class="kw">return</span>;
-    }
-
-    <span class="kw">if</span> <span class="ident">field</span>
-        .<span class="ident">attributes</span>()
-        .<span class="ident">on_update</span>
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">act</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">act</span> <span class="op">!</span><span class="op">=</span> <span class="ident">ReferentialAction::NoAction</span>)
-        .<span class="ident">is_none</span>()
-    {
-        <span class="kw">return</span>;
-    }
-
-    <span class="kw">let</span> <span class="ident">ast_field</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">ast_field</span>();
-
-    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">ast_field</span>
-        .<span class="ident">span_for_argument</span>(<span class="string">&quot;relation&quot;</span>, <span class="string">&quot;onUpdate&quot;</span>)
-        .<span class="ident">unwrap_or</span>(<span class="ident">ast_field</span>.<span class="ident">span</span>);
-
-    <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(
-        <span class="string">&quot;Referential actions other than `NoAction` will not work for `onUpdate` without foreign keys. Please follow the issue: https://github.com/prisma/prisma/issues/9014&quot;</span>,
-        <span class="ident">span</span>
-    ));
 }
 
 <span class="doccomment">/// Validates if the related model for the relation is ignored.</span>

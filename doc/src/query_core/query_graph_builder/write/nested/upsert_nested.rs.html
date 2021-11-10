@@ -259,6 +259,34 @@
 <span id="259">259</span>
 <span id="260">260</span>
 <span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">constants::args</span>, <span class="ident">query_graph_builder::write::utils::coerce_vec</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -276,73 +304,81 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Many-to-many relation:</span>
 <span class="doccomment">/// ```text</span>
-<span class="doccomment">///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐</span>
-<span class="doccomment">///          Parent       ────────────────────────┐</span>
-<span class="doccomment">///    └ ─ ─ ─ ─ ─ ─ ─ ─ ┘         │              │</span>
-<span class="doccomment">///             │                                 │</span>
-<span class="doccomment">///             │                  │              │</span>
-<span class="doccomment">///             │                                 │</span>
-<span class="doccomment">///             ▼                  ▼              │</span>
-<span class="doccomment">///    ┌─────────────────┐  ┌ ─ ─ ─ ─ ─ ─         │</span>
-<span class="doccomment">/// ┌──│   Read Child    │      Result   │        │</span>
-<span class="doccomment">/// │  └─────────────────┘  └ ─ ─ ─ ─ ─ ─         │</span>
-<span class="doccomment">/// │           │                                 │</span>
-<span class="doccomment">/// │           │                                 │</span>
-<span class="doccomment">/// │           │                                 │</span>
-<span class="doccomment">/// │           ▼                                 │</span>
-<span class="doccomment">/// │  ┌─────────────────┐                        │</span>
-<span class="doccomment">/// │  │   If (exists)   │────────────┐           │</span>
-<span class="doccomment">/// │  └─────────────────┘            │           │</span>
-<span class="doccomment">/// │           │                     │           │</span>
-<span class="doccomment">/// │           │                     │           │</span>
-<span class="doccomment">/// │           │                     │           │</span>
-<span class="doccomment">/// │           ▼                     ▼           │</span>
-<span class="doccomment">/// │  ┌─────────────────┐   ┌─────────────────┐  │</span>
-<span class="doccomment">/// └─▶│  Update Child   │   │  Create Child   │  │</span>
-<span class="doccomment">///    └─────────────────┘   └─────────────────┘  │</span>
-<span class="doccomment">///                                   │           │</span>
-<span class="doccomment">///                                   │           │</span>
-<span class="doccomment">///                                   │           │</span>
-<span class="doccomment">///                                   ▼           │</span>
-<span class="doccomment">///                          ┌─────────────────┐  │</span>
-<span class="doccomment">///                          │     Connect     │◀─┘</span>
-<span class="doccomment">///                          └─────────────────┘</span>
+<span class="doccomment">///                           ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐                    </span>
+<span class="doccomment">///                                 Parent       ───────────────────┐</span>
+<span class="doccomment">///                           └ ─ ─ ─ ─ ─ ─ ─ ─ ┘         │         │</span>
+<span class="doccomment">///                                    │                            │</span>
+<span class="doccomment">///                                    │                  │         │</span>
+<span class="doccomment">///                                    ▼                            │</span>
+<span class="doccomment">///                           ┌─────────────────┐         │         │</span>
+<span class="doccomment">/// ┌───────────┬─────────────│   Read Child    │                   │</span>
+<span class="doccomment">/// │           │             └─────────────────┘         │         │</span>
+<span class="doccomment">/// │           │                      │                  ▼         │</span>
+<span class="doccomment">/// │           │                      │           ┌ ─ ─ ─ ─ ─ ─    │</span>
+<span class="doccomment">/// │           │                      │               Result   │   │</span>
+<span class="doccomment">/// │           │                      │           └ ─ ─ ─ ─ ─ ─    │</span>
+<span class="doccomment">/// │           │                      ▼                            │</span>
+<span class="doccomment">/// │           │             ┌─────────────────┐                   │</span>
+<span class="doccomment">/// │           │             │   If (exists)   │───────┐           │</span>
+<span class="doccomment">/// │ ┌ ─ ─ ─ ─ ▼ ─ ─ ─ ─ ┐   └─────────────────┘       │           │</span>
+<span class="doccomment">/// │  ┌─────────────────┐             │                │           │</span>
+<span class="doccomment">/// │ ││    Join Node    │◀────Then────┘                │           │</span>
+<span class="doccomment">/// │  └─────────────────┘                              │           │</span>
+<span class="doccomment">/// │ │         │         │                             │           │</span>
+<span class="doccomment">/// │           │                                       │           │</span>
+<span class="doccomment">/// │ │         ▼         │                             │           │</span>
+<span class="doccomment">/// │  ┌─────────────────┐                              ▼           │</span>
+<span class="doccomment">/// │ ││ Insert onUpdate ││                    ┌─────────────────┐  │</span>
+<span class="doccomment">/// │  │emulation subtree│                     │  Create Child   │  │</span>
+<span class="doccomment">/// │ ││for all relations││                    └─────────────────┘  │</span>
+<span class="doccomment">/// │  │ pointing to the │                              │           │</span>
+<span class="doccomment">/// │ ││   Child model   ││                             │           │</span>
+<span class="doccomment">/// │  └─────────────────┘                              │           │</span>
+<span class="doccomment">/// │ └ ─ ─ ─ ─ ┬ ─ ─ ─ ─ ┘                             ▼           │</span>
+<span class="doccomment">/// │           │                              ┌─────────────────┐  │</span>
+<span class="doccomment">/// │           │                              │     Connect     │◀─┘</span>
+<span class="doccomment">/// │           ▼                              └─────────────────┘   </span>
+<span class="doccomment">/// │  ┌─────────────────┐                                           </span>
+<span class="doccomment">/// └─▶│  Update Child   │                                           </span>
+<span class="doccomment">///    └─────────────────┘                                           </span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// One-to-x relation:</span>
 <span class="doccomment">/// ```text</span>
-<span class="doccomment">///    Inlined in parent:                                     Inlined in child:</span>
-<span class="doccomment">///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐                                    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐</span>
-<span class="doccomment">///          Parent       ────────────────────────┐                 Parent       ────────────────────────┐</span>
-<span class="doccomment">///    └ ─ ─ ─ ─ ─ ─ ─ ─ ┘         │              │           └ ─ ─ ─ ─ ─ ─ ─ ─ ┘         │              │</span>
-<span class="doccomment">///             │                                 │                    │                                 │</span>
-<span class="doccomment">///             │                  │              │                    │                  │              │</span>
-<span class="doccomment">///             │                                 │                    │                                 │</span>
-<span class="doccomment">///             ▼                  ▼              │                    ▼                  ▼              │</span>
-<span class="doccomment">///    ┌─────────────────┐  ┌ ─ ─ ─ ─ ─ ─         │           ┌─────────────────┐  ┌ ─ ─ ─ ─ ─ ─         │</span>
-<span class="doccomment">/// ┌──│   Read Child    │      Result   │        │        ┌──│   Read Child    │      Result   │        │</span>
-<span class="doccomment">/// │  └─────────────────┘  └ ─ ─ ─ ─ ─ ─         │        │  └─────────────────┘  └ ─ ─ ─ ─ ─ ─         │</span>
-<span class="doccomment">/// │           │                                 │        │           │                                 │</span>
-<span class="doccomment">/// │           │                                 │        │           │                                 │</span>
-<span class="doccomment">/// │           │                                 │        │           │                                 │</span>
-<span class="doccomment">/// │           ▼                                 │        │           ▼                                 │</span>
-<span class="doccomment">/// │  ┌─────────────────┐                        │        │  ┌─────────────────┐                        │</span>
-<span class="doccomment">/// │  │   If (exists)   │────────────┐           │        │  │   If (exists)   │────────────┐           │</span>
-<span class="doccomment">/// │  └─────────────────┘            │           │        │  └─────────────────┘            │           │</span>
-<span class="doccomment">/// │           │                     │           │        │           │                     │           │</span>
-<span class="doccomment">/// │           │                     │           │        │           │                     │           │</span>
-<span class="doccomment">/// │           │                     │           │        │           │                     │           │</span>
-<span class="doccomment">/// │           ▼                     ▼           │        │           ▼                     ▼           │</span>
-<span class="doccomment">/// │  ┌─────────────────┐   ┌─────────────────┐  │        │  ┌─────────────────┐   ┌─────────────────┐  │</span>
-<span class="doccomment">/// └─▶│  Update Child   │   │  Create Child   │  │        └─▶│  Update Child   │   │  Create Child   │◀─┘</span>
-<span class="doccomment">///    └─────────────────┘   └─────────────────┘  │           └─────────────────┘   └─────────────────┘</span>
-<span class="doccomment">///                                   │           │</span>
-<span class="doccomment">///                                   │           │</span>
-<span class="doccomment">///                                   │           │</span>
-<span class="doccomment">///                                   ▼           │</span>
-<span class="doccomment">///                          ┌─────────────────┐  │</span>
-<span class="doccomment">///                          │  Update Parent  │◀─┘</span>
-<span class="doccomment">///                          └─────────────────┘</span>
+<span class="doccomment">///    Inlined in parent:                                                                      Inlined in child:</span>
+<span class="doccomment">///                                                                                                                          ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐                     </span>
+<span class="doccomment">///                                     ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐                                                                        Parent       ────────────────────┐</span>
+<span class="doccomment">///                                           Parent       ────────┬──────────┐                                              └ ─ ─ ─ ─ ─ ─ ─ ─ ┘           │        │</span>
+<span class="doccomment">///                                     └ ─ ─ ─ ─ ─ ─ ─ ─ ┘                   │                                                       │                             │</span>
+<span class="doccomment">///                                              │                 │          │                                                       │                    │        │</span>
+<span class="doccomment">///                                              │                            │                                                       │                             │</span>
+<span class="doccomment">///                                              │                 │          │                                                       ▼                    ▼        │</span>
+<span class="doccomment">///                                              ▼                 ▼          │                                              ┌─────────────────┐    ┌ ─ ─ ─ ─ ─ ─   │</span>
+<span class="doccomment">///                                     ┌─────────────────┐ ┌ ─ ─ ─ ─ ─ ─     │                ┌─────────────────────────────│   Read Child    │        Result   │  │</span>
+<span class="doccomment">/// ┌───────────────────────────────────│   Read Child    │     Result   │    │                │                             └─────────────────┘    └ ─ ─ ─ ─ ─ ─   │</span>
+<span class="doccomment">/// │                                   └─────────────────┘ └ ─ ─ ─ ─ ─ ─     │                │                                      │                             │</span>
+<span class="doccomment">/// │                                            │                            │                │                                      │                             │</span>
+<span class="doccomment">/// │                                            │                            │                │ ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐                ▼                             │</span>
+<span class="doccomment">/// │                                            │                            │                │  ┌─────────────────┐        ┌─────────────────┐                    │</span>
+<span class="doccomment">/// │ ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐                      ▼                            │                │ ││    Join node    │◀───────│   If (exists)   │────────┐           │</span>
+<span class="doccomment">/// │  ┌─────────────────┐              ┌─────────────────┐                   │                │  └─────────────────┘        └─────────────────┘        │           │</span>
+<span class="doccomment">/// │ ││    Join node    │◀────Then─────│   If (exists)   │───────┐           │                │ │         │         │                                  │           │</span>
+<span class="doccomment">/// │  └─────────────────┘              └─────────────────┘       │           │                │           ▼                                            │           │</span>
+<span class="doccomment">/// │ │         │         │                                       │           │                │ │┌─────────────────┐│                                  │           │</span>
+<span class="doccomment">/// │           ▼                                                 │           │                │  │ Insert onUpdate │                                   │           │</span>
+<span class="doccomment">/// │ │┌─────────────────┐│                                       │           │                │ ││emulation subtree││                                  │           │</span>
+<span class="doccomment">/// │  │ Insert onUpdate │                                        ▼           │                │  │for all relations│                                   ▼           │</span>
+<span class="doccomment">/// │ ││emulation subtree││                              ┌─────────────────┐  │                │ ││ pointing to the ││                         ┌─────────────────┐  │</span>
+<span class="doccomment">/// │  │for all relations│                               │  Create Child   │  │                │  │   Child model   │                          │  Create Child   │◀─┘</span>
+<span class="doccomment">/// │ ││ pointing to the ││                              └─────────────────┘  │                │ │└─────────────────┘│                         └─────────────────┘   </span>
+<span class="doccomment">/// │  │   Child model   │                                        │           │                │  ─ ─ ─ ─ ─│─ ─ ─ ─ ─                                                </span>
+<span class="doccomment">/// │ │└─────────────────┘│                                       │           │                │           │                                                         </span>
+<span class="doccomment">/// │  ─ ─ ─ ─ ─│─ ─ ─ ─ ─                                        │           │                │           │                                                         </span>
+<span class="doccomment">/// │           │                                                 ▼           │                │           ▼                                                         </span>
+<span class="doccomment">/// │           ▼                                        ┌─────────────────┐  │                │  ┌─────────────────┐                                                </span>
+<span class="doccomment">/// │  ┌─────────────────┐                               │  Update Parent  │◀─┘                └─▶│  Update Child   │                                                </span>
+<span class="doccomment">/// └─▶│  Update Child   │                               └─────────────────┘                      └─────────────────┘                                                </span>
+<span class="doccomment">///    └─────────────────┘                                                                                                                                           </span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// Todo split this mess up and clean up the code.</span>
 <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">graph</span>, <span class="ident">parent_node</span>, <span class="ident">parent_relation_field</span>, <span class="ident">value</span>))]</span>
@@ -430,7 +466,27 @@
             ),
         )<span class="question-mark">?</span>;
 
-        <span class="ident">graph</span>.<span class="ident">create_edge</span>(<span class="kw-2">&amp;</span><span class="ident">if_node</span>, <span class="kw-2">&amp;</span><span class="ident">update_node</span>, <span class="ident">QueryGraphDependency::Then</span>)<span class="question-mark">?</span>;
+        <span class="comment">// In case the connector doesn&#39;t support referential integrity, we add a subtree to the graph that emulates the ON_UPDATE referential action.</span>
+        <span class="comment">// When that&#39;s the case, we create an intermediary node to which we connect all the nodes reponsible for emulating the referential action</span>
+        <span class="comment">// Then, we connect the if node to that intermediary emulation node. This enables performing the emulation only in case the graph traverses</span>
+        <span class="comment">// the update path (if the children already exists and goes to the THEN node).</span>
+        <span class="comment">// It&#39;s only after we&#39;ve executed the emulation that it&#39;ll traverse the update node, hence the ExecutionOrder between</span>
+        <span class="comment">// the emulation node and the update node.</span>
+        <span class="kw">let</span> <span class="ident">then_node</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">emulation_node</span>) <span class="op">=</span> <span class="ident">utils::insert_emulated_on_update_with_intermediary_node</span>(
+            <span class="ident">graph</span>,
+            <span class="ident">connector_ctx</span>,
+            <span class="kw-2">&amp;</span><span class="ident">child_model</span>,
+            <span class="kw-2">&amp;</span><span class="ident">read_children_node</span>,
+            <span class="kw-2">&amp;</span><span class="ident">update_node</span>,
+        )<span class="question-mark">?</span> {
+            <span class="ident">graph</span>.<span class="ident">create_edge</span>(<span class="kw-2">&amp;</span><span class="ident">emulation_node</span>, <span class="kw-2">&amp;</span><span class="ident">update_node</span>, <span class="ident">QueryGraphDependency::ExecutionOrder</span>)<span class="question-mark">?</span>;
+
+            <span class="ident">emulation_node</span>
+        } <span class="kw">else</span> {
+            <span class="ident">update_node</span>
+        };
+
+        <span class="ident">graph</span>.<span class="ident">create_edge</span>(<span class="kw-2">&amp;</span><span class="ident">if_node</span>, <span class="kw-2">&amp;</span><span class="ident">then_node</span>, <span class="ident">QueryGraphDependency::Then</span>)<span class="question-mark">?</span>;
         <span class="ident">graph</span>.<span class="ident">create_edge</span>(<span class="kw-2">&amp;</span><span class="ident">if_node</span>, <span class="kw-2">&amp;</span><span class="ident">create_node</span>, <span class="ident">QueryGraphDependency::Else</span>)<span class="question-mark">?</span>;
 
         <span class="comment">// Specific handling based on relation type and inlining side.</span>

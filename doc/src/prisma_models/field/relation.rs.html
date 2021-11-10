@@ -282,6 +282,10 @@
 <span id="282">282</span>
 <span id="283">283</span>
 <span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">datamodel</span>::{<span class="ident">FieldArity</span>, <span class="ident">ReferentialAction</span>, <span class="ident">RelationInfo</span>};
 <span class="kw">use</span> <span class="ident">once_cell::sync::OnceCell</span>;
@@ -504,6 +508,10 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">relation_info</span>.<span class="ident">on_delete</span>.<span class="ident">as_ref</span>()
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">relation_info</span>.<span class="ident">on_update</span>.<span class="ident">as_ref</span>()
     }
 }
 

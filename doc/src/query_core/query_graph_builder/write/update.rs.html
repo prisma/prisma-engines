@@ -150,6 +150,58 @@
 <span id="150">150</span>
 <span id="151">151</span>
 <span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">constants::args</span>, <span class="ident">query_graph_builder::write::write_args_parser</span>::<span class="kw-2">*</span>, <span class="ident">ConnectorContext</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -158,6 +210,7 @@
     <span class="ident">ArgumentListLookup</span>, <span class="ident">ParsedField</span>, <span class="ident">ParsedInputMap</span>,
 };
 <span class="kw">use</span> <span class="ident">connector</span>::{<span class="ident">Filter</span>, <span class="ident">IdFilter</span>};
+<span class="kw">use</span> <span class="ident">datamodel_connector::ConnectorCapability</span>;
 <span class="kw">use</span> <span class="ident">prisma_models::ModelRef</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert::TryInto</span>, <span class="ident">sync::Arc</span>};
 
@@ -177,10 +230,35 @@
     <span class="kw">let</span> <span class="ident">data_argument</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">arguments</span>.<span class="ident">lookup</span>(<span class="ident">args::DATA</span>).<span class="ident">unwrap</span>();
     <span class="kw">let</span> <span class="ident">data_map</span>: <span class="ident">ParsedInputMap</span> <span class="op">=</span> <span class="ident">data_argument</span>.<span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">update_node</span> <span class="op">=</span> <span class="ident">update_record_node</span>(<span class="ident">graph</span>, <span class="ident">connector_ctx</span>, <span class="ident">filter</span>, <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>), <span class="ident">data_map</span>)<span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">update_node</span> <span class="op">=</span> <span class="ident">update_record_node</span>(<span class="ident">graph</span>, <span class="ident">connector_ctx</span>, <span class="ident">filter</span>.<span class="ident">clone</span>(), <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>), <span class="ident">data_map</span>)<span class="question-mark">?</span>;
 
     <span class="kw">let</span> <span class="ident">read_query</span> <span class="op">=</span> <span class="ident">read::find_unique</span>(<span class="ident">field</span>, <span class="ident">model</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">read_node</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">create_node</span>(<span class="ident">Query::Read</span>(<span class="ident">read_query</span>));
+
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">connector_ctx</span>.<span class="ident">capabilities</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">ConnectorCapability::ForeignKeys</span>) {
+        <span class="kw">let</span> <span class="ident">read_parent_node</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">create_node</span>(<span class="ident">utils::read_ids_infallible</span>(
+            <span class="ident">model</span>.<span class="ident">clone</span>(),
+            <span class="ident">model</span>.<span class="ident">primary_identifier</span>(),
+            <span class="ident">filter</span>,
+        ));
+
+        <span class="ident">utils::insert_emulated_on_update</span>(<span class="ident">graph</span>, <span class="ident">connector_ctx</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>, <span class="kw-2">&amp;</span><span class="ident">read_parent_node</span>, <span class="kw-2">&amp;</span><span class="ident">update_node</span>)<span class="question-mark">?</span>;
+
+        <span class="ident">graph</span>.<span class="ident">create_edge</span>(
+            <span class="kw-2">&amp;</span><span class="ident">read_parent_node</span>,
+            <span class="kw-2">&amp;</span><span class="ident">update_node</span>,
+            <span class="ident">QueryGraphDependency::ParentProjection</span>(
+                <span class="ident">model</span>.<span class="ident">primary_identifier</span>(),
+                <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">update_node</span>, <span class="ident">parent_ids</span><span class="op">|</span> {
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">Query::Write</span>(<span class="ident">WriteQuery::UpdateRecord</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">ur</span>))) <span class="op">=</span> <span class="ident">update_node</span> {
+                        <span class="ident">ur</span>.<span class="ident">record_filter</span> <span class="op">=</span> <span class="ident">parent_ids</span>.<span class="ident">into</span>();
+                    }
+
+                    <span class="prelude-val">Ok</span>(<span class="ident">update_node</span>)
+                }),
+            ),
+        )<span class="question-mark">?</span>;
+    }
 
     <span class="ident">graph</span>.<span class="ident">add_result_node</span>(<span class="kw-2">&amp;</span><span class="ident">read_node</span>);
     <span class="ident">graph</span>.<span class="ident">create_edge</span>(
@@ -228,14 +306,40 @@
     <span class="kw">let</span> <span class="ident">data_argument</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">arguments</span>.<span class="ident">lookup</span>(<span class="ident">args::DATA</span>).<span class="ident">unwrap</span>();
     <span class="kw">let</span> <span class="ident">data_map</span>: <span class="ident">ParsedInputMap</span> <span class="op">=</span> <span class="ident">data_argument</span>.<span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
 
-    <span class="ident">update_many_record_node</span>(<span class="ident">graph</span>, <span class="ident">connector_ctx</span>, <span class="ident">filter</span>, <span class="ident">model</span>, <span class="ident">data_map</span>)<span class="question-mark">?</span>;
+    <span class="kw">if</span> <span class="ident">connector_ctx</span>.<span class="ident">capabilities</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">ConnectorCapability::ForeignKeys</span>) {
+        <span class="ident">update_many_record_node</span>(<span class="ident">graph</span>, <span class="ident">connector_ctx</span>, <span class="ident">filter</span>, <span class="ident">model</span>, <span class="ident">data_map</span>)<span class="question-mark">?</span>;
+    } <span class="kw">else</span> {
+        <span class="kw">let</span> <span class="ident">pre_read_node</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">create_node</span>(<span class="ident">utils::read_ids_infallible</span>(
+            <span class="ident">model</span>.<span class="ident">clone</span>(),
+            <span class="ident">model</span>.<span class="ident">primary_identifier</span>(),
+            <span class="ident">filter</span>,
+        ));
+        <span class="kw">let</span> <span class="ident">update_many_node</span> <span class="op">=</span> <span class="ident">update_many_record_node</span>(<span class="ident">graph</span>, <span class="ident">connector_ctx</span>, <span class="ident">Filter::empty</span>(), <span class="ident">model</span>.<span class="ident">clone</span>(), <span class="ident">data_map</span>)<span class="question-mark">?</span>;
+
+        <span class="ident">utils::insert_emulated_on_update</span>(<span class="ident">graph</span>, <span class="ident">connector_ctx</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>, <span class="kw-2">&amp;</span><span class="ident">pre_read_node</span>, <span class="kw-2">&amp;</span><span class="ident">update_many_node</span>)<span class="question-mark">?</span>;
+
+        <span class="ident">graph</span>.<span class="ident">create_edge</span>(
+            <span class="kw-2">&amp;</span><span class="ident">pre_read_node</span>,
+            <span class="kw-2">&amp;</span><span class="ident">update_many_node</span>,
+            <span class="ident">QueryGraphDependency::ParentProjection</span>(
+                <span class="ident">model</span>.<span class="ident">primary_identifier</span>(),
+                <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">update_node</span>, <span class="ident">parent_ids</span><span class="op">|</span> {
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">Query::Write</span>(<span class="ident">WriteQuery::UpdateManyRecords</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">ur</span>))) <span class="op">=</span> <span class="ident">update_node</span> {
+                        <span class="ident">ur</span>.<span class="ident">record_filter</span> <span class="op">=</span> <span class="ident">parent_ids</span>.<span class="ident">into</span>();
+                    }
+
+                    <span class="prelude-val">Ok</span>(<span class="ident">update_node</span>)
+                }),
+            ),
+        )<span class="question-mark">?</span>;
+    }
 
     <span class="prelude-val">Ok</span>(())
 }
 
 <span class="doccomment">/// Creates an update record query node and adds it to the query graph.</span>
 <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">graph</span>, <span class="ident">filter</span>, <span class="ident">model</span>, <span class="ident">data_map</span>))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update_record_node</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update_record_node</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Clone</span><span class="op">&gt;</span>(
     <span class="ident">graph</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">QueryGraph</span>,
     <span class="ident">connector_ctx</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectorContext</span>,
     <span class="ident">filter</span>: <span class="ident">T</span>,
@@ -252,20 +356,19 @@
 
     <span class="ident">args</span>.<span class="ident">update_datetimes</span>(<span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>));
 
-    <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">filter</span>.<span class="ident">into</span>();
-    <span class="kw">let</span> <span class="ident">record_filter</span> <span class="op">=</span> <span class="ident">filter</span>.<span class="ident">into</span>();
-    <span class="kw">let</span> <span class="ident">ur</span> <span class="op">=</span> <span class="ident">UpdateRecord</span> {
-        <span class="ident">model</span>,
-        <span class="ident">record_filter</span>,
+    <span class="kw">let</span> <span class="ident">filter</span>: <span class="ident">Filter</span> <span class="op">=</span> <span class="ident">filter</span>.<span class="ident">into</span>();
+    <span class="kw">let</span> <span class="ident">update_parent</span> <span class="op">=</span> <span class="ident">Query::Write</span>(<span class="ident">WriteQuery::UpdateRecord</span>(<span class="ident">UpdateRecord</span> {
+        <span class="ident">model</span>: <span class="ident">model</span>.<span class="ident">clone</span>(),
+        <span class="ident">record_filter</span>: <span class="ident">filter</span>.<span class="ident">into</span>(),
         <span class="ident">args</span>,
-    };
+    }));
+    <span class="kw">let</span> <span class="ident">update_node</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">create_node</span>(<span class="ident">update_parent</span>);
 
-    <span class="kw">let</span> <span class="ident">node</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">create_node</span>(<span class="ident">Query::Write</span>(<span class="ident">WriteQuery::UpdateRecord</span>(<span class="ident">ur</span>)));
     <span class="kw">for</span> (<span class="ident">relation_field</span>, <span class="ident">data_map</span>) <span class="kw">in</span> <span class="ident">update_args</span>.<span class="ident">nested</span> {
-        <span class="ident">nested::connect_nested_query</span>(<span class="ident">graph</span>, <span class="ident">connector_ctx</span>, <span class="ident">node</span>, <span class="ident">relation_field</span>, <span class="ident">data_map</span>)<span class="question-mark">?</span>;
+        <span class="ident">nested::connect_nested_query</span>(<span class="ident">graph</span>, <span class="ident">connector_ctx</span>, <span class="ident">update_node</span>, <span class="ident">relation_field</span>, <span class="ident">data_map</span>)<span class="question-mark">?</span>;
     }
 
-    <span class="prelude-val">Ok</span>(<span class="ident">node</span>)
+    <span class="prelude-val">Ok</span>(<span class="ident">update_node</span>)
 }
 
 <span class="doccomment">/// Creates an update many record query node and adds it to the query graph.</span>
@@ -295,12 +398,13 @@
         <span class="ident">args</span>,
     };
 
-    <span class="kw">let</span> <span class="ident">node</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">create_node</span>(<span class="ident">Query::Write</span>(<span class="ident">WriteQuery::UpdateManyRecords</span>(<span class="ident">update_many</span>)));
+    <span class="kw">let</span> <span class="ident">update_many_node</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">create_node</span>(<span class="ident">Query::Write</span>(<span class="ident">WriteQuery::UpdateManyRecords</span>(<span class="ident">update_many</span>)));
+
     <span class="kw">for</span> (<span class="ident">relation_field</span>, <span class="ident">data_map</span>) <span class="kw">in</span> <span class="ident">update_args</span>.<span class="ident">nested</span> {
-        <span class="ident">nested::connect_nested_query</span>(<span class="ident">graph</span>, <span class="ident">connector_ctx</span>, <span class="ident">node</span>, <span class="ident">relation_field</span>, <span class="ident">data_map</span>)<span class="question-mark">?</span>;
+        <span class="ident">nested::connect_nested_query</span>(<span class="ident">graph</span>, <span class="ident">connector_ctx</span>, <span class="ident">update_many_node</span>, <span class="ident">relation_field</span>, <span class="ident">data_map</span>)<span class="question-mark">?</span>;
     }
 
-    <span class="prelude-val">Ok</span>(<span class="ident">node</span>)
+    <span class="prelude-val">Ok</span>(<span class="ident">update_many_node</span>)
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="query_core" data-search-index-js="../../../../search-index.js" data-search-js="../../../../search.js"></div>

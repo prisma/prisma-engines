@@ -65,6 +65,8 @@
 <span id="65">65</span>
 <span id="66">66</span>
 <span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="macro">macro_rules!</span> <span class="ident">assert_query</span> {
     (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">runner</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">q</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">result</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
@@ -103,9 +105,11 @@
 
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="macro">macro_rules!</span> <span class="ident">run_query</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">runner</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">q</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">runner</span>.<span class="ident">query</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">q</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">to_string</span>()
-    };
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">runner</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">q</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {{
+        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">runner</span>.<span class="ident">query</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">q</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="ident">res</span>.<span class="ident">assert_success</span>();
+        <span class="ident">res</span>.<span class="ident">to_string</span>()
+    }};
 }
 
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
