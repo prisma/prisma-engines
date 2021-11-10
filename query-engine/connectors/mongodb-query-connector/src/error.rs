@@ -171,7 +171,7 @@ impl From<mongodb::bson::extjson::de::Error> for MongoError {
                 from: "JSON".to_string(),
                 to: "BSON".to_string(),
             },
-            // Needed because `extjson::de::Error` is flagged as #[non_ex]
+            // Needed because `extjson::de::Error` is flagged as #[non_exhaustive]
             _ => MongoError::UnhandledError(
                 "Something unexpected happened while deserializing JSON into BSON".to_string(),
             ),
