@@ -3,8 +3,6 @@ use crate::{
     diagnostics::{DatamodelError, Diagnostics},
     transform::ast_to_dml::db::walkers::{ModelWalker, RelationFieldWalker, RelationName},
 };
-use datamodel_connector::ReferentialIntegrity;
-use dml::relation_info::ReferentialAction;
 use itertools::Itertools;
 use std::fmt;
 
@@ -112,41 +110,6 @@ pub(super) fn ambiguity(field: RelationFieldWalker<'_, '_>, names: &Names<'_>) -
         }
         _ => Ok(()),
     }
-}
-
-/// Validates usage of `onUpdate` with the `referentialIntegrity` set to
-/// `prisma`.
-///
-/// This is temporary to the point until Query Engine supports `onUpdate`
-/// actions on emulations.
-pub(super) fn on_update_without_foreign_keys(
-    field: RelationFieldWalker<'_, '_>,
-    referential_integrity: ReferentialIntegrity,
-    diagnostics: &mut Diagnostics,
-) {
-    if referential_integrity.uses_foreign_keys() {
-        return;
-    }
-
-    if field
-        .attributes()
-        .on_update
-        .filter(|act| *act != ReferentialAction::NoAction)
-        .is_none()
-    {
-        return;
-    }
-
-    let ast_field = field.ast_field();
-
-    let span = ast_field
-        .span_for_argument("relation", "onUpdate")
-        .unwrap_or(ast_field.span);
-
-    diagnostics.push_error(DatamodelError::new_validation_error(
-        "Referential actions other than `NoAction` will not work for `onUpdate` without foreign keys. Please follow the issue: https://github.com/prisma/prisma/issues/9014",
-        span
-    ));
 }
 
 /// Validates if the related model for the relation is ignored.

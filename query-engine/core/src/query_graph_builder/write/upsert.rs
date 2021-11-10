@@ -9,6 +9,48 @@ use connector::IdFilter;
 use prisma_models::ModelRef;
 use std::{convert::TryInto, sync::Arc};
 
+/// Handles a top-level upsert
+///
+/// ```text
+///                         ┌─────────────────┐           ┌ ─ ─ ─ ─ ─ ─
+///                         │   Read Parent   │─ ─ ─ ─ ─ ▶    Result   │
+///                         └─────────────────┘           └ ─ ─ ─ ─ ─ ─
+///                                  │                                  
+///                                  │                                  
+///                                  │                                  
+///                                  │                                  
+///                                  ▼                                  
+///                         ┌─────────────────┐                         
+///           ┌───Then──────│   If (exists)   │──Else─────┐             
+///           │             └─────────────────┘           │             
+///           │                                           │             
+/// ┌ ─ ─ ─ ─ ▼ ─ ─ ─ ─ ┐                                 │             
+///  ┌─────────────────┐                                  │             
+/// ││    Join Node    ││                                 │             
+///  └─────────────────┘                                  ▼             
+/// │         │         │                        ┌─────────────────┐    
+///           │                                  │  Create Parent  │    
+/// │         ▼         │                        └─────────────────┘    
+///  ┌─────────────────┐                                  │             
+/// ││ Insert onUpdate ││                                 │             
+///  │emulation subtree│                                  │             
+/// ││for all relations││                                 │             
+///  │ pointing to the │                                  ▼             
+/// ││  Parent model   ││                        ┌─────────────────┐    
+///  └─────────────────┘                         │   Read Parent   │    
+/// └ ─ ─ ─ ─ ┬ ─ ─ ─ ─ ┘                        └─────────────────┘    
+///           │                                                         
+///           │                                                         
+///           ▼                                                         
+///  ┌─────────────────┐                                                
+///  │  Update Parent  │                                                
+///  └─────────────────┘                                                
+///           │                                                         
+///           ▼                                                         
+///  ┌─────────────────┐                                                
+///  │   Read Parent   │                                                
+///  └─────────────────┘
+/// ```                                             
 #[tracing::instrument(skip(graph, model, field))]
 pub fn upsert_record(
     graph: &mut QueryGraph,
@@ -69,7 +111,25 @@ pub fn upsert_record(
         ),
     )?;
 
-    graph.create_edge(&if_node, &update_node, QueryGraphDependency::Then)?;
+    // In case the connector doesn't support referential integrity, we add a subtree to the graph that emulates the ON_UPDATE referential action.
+    // When that's the case, we create an intermediary node to which we connect all the nodes reponsible for emulating the referential action
+    // Then, we connect the if node to that intermediary emulation node. This enables performing the emulation only in case the graph traverses
+    // the update path (if the children already exists and goes to the THEN node).
+    // It's only after we've executed the emulation that it'll traverse the update node, hence the ExecutionOrder between
+    // the emulation node and the update node.
+    if let Some(emulation_node) = utils::insert_emulated_on_update_with_intermediary_node(
+        graph,
+        connector_ctx,
+        &model,
+        &read_parent_records_node,
+        &update_node,
+    )? {
+        graph.create_edge(&if_node, &emulation_node, QueryGraphDependency::Then)?;
+        graph.create_edge(&emulation_node, &update_node, QueryGraphDependency::ExecutionOrder)?;
+    } else {
+        graph.create_edge(&if_node, &update_node, QueryGraphDependency::Then)?;
+    }
+
     graph.create_edge(&if_node, &create_node, QueryGraphDependency::Else)?;
     graph.create_edge(
         &update_node,
