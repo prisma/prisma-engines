@@ -102,16 +102,16 @@ mod raw_mongo {
           )
         ], false).await?.to_string();
         let res_json = serde_json::from_str::<serde_json::Value>(res_string.as_str()).unwrap();
-        let res_json = res_json.as_array().expect("Result should be an array");
+        let res_json = res_json["batchResult"].as_array().expect("Result should be an array");
 
         let first_query = &res_json[0]["data"]["queryRaw"];
         let second_query = &res_json[1]["data"]["queryRaw"];
 
-        assert_eq(&first_query["ok"], "1.0");
-        assert_eq(&first_query["n"], "1");
+        assert_eq!(&first_query["ok"].to_string(), "1.0");
+        assert_eq!(&first_query["n"].to_string(), "1");
 
-        assert_eq(&second_query["ok"], "1.0");
-        assert_eq(&second_query["n"], "2");
+        assert_eq!(&second_query["ok"].to_string(), "1.0");
+        assert_eq!(&second_query["n"].to_string(), "2");
 
         Ok(())
     }
