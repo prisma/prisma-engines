@@ -14,7 +14,7 @@ pub enum MongoError {
     #[error("Failed to convert '{}' to '{}'.", from, to)]
     ConversionError { from: String, to: String },
 
-    /// Unhanded behavior error.
+    /// Unhandled behavior error.
     #[error("Unhandled behavior: {0}.")]
     UnhandledError(String),
 
@@ -160,5 +160,21 @@ fn parse_unique_index_violation(message: &str) -> Option<String> {
 impl From<mongodb::bson::oid::Error> for MongoError {
     fn from(err: mongodb::bson::oid::Error) -> Self {
         MongoError::MalformedObjectId(format!("{}", err))
+    }
+}
+
+impl From<mongodb::bson::extjson::de::Error> for MongoError {
+    fn from(err: mongodb::bson::extjson::de::Error) -> Self {
+        match err {
+            mongodb::bson::extjson::de::Error::InvalidObjectId(oid_err) => oid_err.into(),
+            mongodb::bson::extjson::de::Error::DeserializationError { message: _ } => MongoError::ConversionError {
+                from: "JSON".to_string(),
+                to: "BSON".to_string(),
+            },
+            // Needed because `extjson::de::Error` is flagged as #[non_ex]
+            _ => MongoError::UnhandledError(
+                "Something unexpected happened while deserializing JSON into BSON".to_string(),
+            ),
+        }
     }
 }

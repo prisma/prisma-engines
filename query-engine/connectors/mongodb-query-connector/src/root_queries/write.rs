@@ -3,7 +3,7 @@ use crate::{
     filter::{convert_filter, MongoFilter},
     output_meta,
     query_builder::MongoReadQueryBuilder,
-    IntoBson,
+    BsonTransform, IntoBson,
 };
 use connector_interface::*;
 use mongodb::{
@@ -13,6 +13,7 @@ use mongodb::{
     ClientSession, Collection, Database,
 };
 use prisma_models::{ModelRef, PrismaValue, RecordProjection};
+use serde_json::Value;
 use std::convert::TryInto;
 
 /// Create a single record to the database resulting in a
@@ -373,4 +374,41 @@ pub async fn m2m_disconnect<'conn>(
         .await?;
 
     Ok(())
+}
+
+// TODO: We always return 0 for now. MongoDB doesn't have a baked-in API to get the numer of affected rows like SQL dbs
+// TODO: This is temporary until we decide what to do https://github.com/prisma/prisma-engines/issues/2391
+/// Execute a plain MongoDB query
+#[tracing::instrument(skip(database, session, _parameters))]
+pub async fn execute_raw<'conn>(
+    database: &Database,
+    session: &mut ClientSession,
+    query: String,
+    _parameters: Vec<PrismaValue>,
+) -> crate::Result<usize> {
+    let query_json: Value = serde_json::from_str(query.as_str())?;
+    let query_bson: Bson = query_json.try_into()?;
+    let cmd = query_bson.into_document()?;
+
+    database.run_command_with_session(cmd, None, session).await?;
+
+    Ok(0)
+}
+
+/// Execute a plain MongoDB query, returning the answer as a JSON `Value`.
+#[tracing::instrument(skip(database, session, _parameters))]
+pub async fn query_raw<'conn>(
+    database: &Database,
+    session: &mut ClientSession,
+    query: String,
+    _parameters: Vec<PrismaValue>,
+) -> crate::Result<serde_json::Value> {
+    let query_json: Value = serde_json::from_str(query.as_str())?;
+    let query_bson: Bson = query_json.try_into()?;
+    let cmd = query_bson.into_document()?;
+
+    let bson_result = Bson::Document(database.run_command_with_session(cmd, None, session).await?);
+    let json_result: Value = bson_result.into();
+
+    Ok(json_result)
 }

@@ -1,6 +1,5 @@
 use super::catch;
 use crate::{
-    error::MongoError,
     root_queries::{aggregate, read, write},
     MongoDbTransaction,
 };
@@ -100,18 +99,18 @@ impl WriteOperations for MongoDbConnection {
 
     async fn execute_raw(
         &mut self,
-        _query: String,
-        _parameters: Vec<prisma_value::PrismaValue>,
+        query: String,
+        parameters: Vec<prisma_value::PrismaValue>,
     ) -> connector_interface::Result<usize> {
-        Err(MongoError::Unsupported("Raw queries".to_owned()).into_connector_error())
+        catch(async move { write::execute_raw(&self.database, &mut self.session, query, parameters).await }).await
     }
 
     async fn query_raw(
         &mut self,
-        _query: String,
-        _parameters: Vec<prisma_value::PrismaValue>,
+        query: String,
+        parameters: Vec<prisma_value::PrismaValue>,
     ) -> connector_interface::Result<serde_json::Value> {
-        Err(MongoError::Unsupported("Raw queries".to_owned()).into_connector_error())
+        catch(async move { write::query_raw(&self.database, &mut self.session, query, parameters).await }).await
     }
 }
 
