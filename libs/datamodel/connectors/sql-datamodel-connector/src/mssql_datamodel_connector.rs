@@ -99,6 +99,7 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::QueryRaw,
     ConnectorCapability::ReferenceCycleDetection,
     ConnectorCapability::UpdateableId,
+    ConnectorCapability::PrimaryKeySortOrderDefinition,
 ];
 
 pub struct MsSqlDatamodelConnector;
@@ -412,8 +413,10 @@ impl Connector for MsSqlDatamodelConnector {
     }
 }
 
-static HEAP_ALLOCATED: Lazy<Vec<MsSqlType>> = Lazy::new(|| {
-    vec![
+/// A collection of types stored outside of the row to the heap, having
+/// certain properties such as not allowed in keys or normal indices.
+pub fn heap_allocated_types() -> &'static [MsSqlType] {
+    &[
         Text,
         NText,
         Image,
@@ -422,12 +425,6 @@ static HEAP_ALLOCATED: Lazy<Vec<MsSqlType>> = Lazy::new(|| {
         VarChar(Some(Max)),
         NVarChar(Some(Max)),
     ]
-});
-
-/// A collection of types stored outside of the row to the heap, having
-/// certain properties such as not allowed in keys or normal indices.
-pub fn heap_allocated_types() -> &'static [MsSqlType] {
-    &*HEAP_ALLOCATED
 }
 
 fn arg_vec_for_type_param(type_param: Option<MsSqlTypeParameter>) -> Vec<String> {

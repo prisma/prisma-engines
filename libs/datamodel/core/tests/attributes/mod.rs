@@ -33,7 +33,7 @@ pub enum Provider {
 
 fn with_header(dm: &str, provider: Provider, preview_features: &[&str]) -> String {
     let (provider, url) = match provider {
-        Provider::Mongo => ("mongo", "mongo"),
+        Provider::Mongo => ("mongodb", "mongo"),
         Provider::Postgres => ("postgres", "postgresql"),
         Provider::Sqlite => ("sqlite", "file"),
         Provider::Mysql => ("mysql", "mysql"),
@@ -52,13 +52,13 @@ fn with_header(dm: &str, provider: Provider, preview_features: &[&str]) -> Strin
     let header = formatdoc!(
         r#"
         datasource test {{
-                provider = "{}"
-                url = "{}://..."
+          provider = "{}"
+          url = "{}://..."
         }}
         
         generator client {{
-            provider = "prisma-client-js"
-            {}
+          provider = "prisma-client-js"
+          {}
         }}
         "#,
         provider,
