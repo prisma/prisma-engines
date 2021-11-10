@@ -54,13 +54,18 @@ impl Model {
     }
 
     pub(crate) fn id_attribute(&self) -> &Attribute {
+        self.try_id_attribute().unwrap()
+    }
+
+    #[track_caller]
+    pub(crate) fn try_id_attribute(&self) -> Option<&Attribute> {
         let from_model = self.attributes().iter().find(|attr| attr.is_id());
 
         let mut from_field = self
             .iter_fields()
             .flat_map(|(_, field)| field.attributes().iter().find(|attr| attr.is_id()));
 
-        from_model.or_else(|| from_field.next()).unwrap()
+        from_model.or_else(|| from_field.next())
     }
 
     pub(crate) fn name(&self) -> &str {

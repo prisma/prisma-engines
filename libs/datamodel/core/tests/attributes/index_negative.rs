@@ -436,3 +436,185 @@ fn mongodb_disallows_index_length_prefix() {
 
     expectation.assert_eq(&error)
 }
+
+#[test]
+fn length_argument_does_not_work_with_decimal() {
+    let dml = indoc! {r#"
+        model A {
+          id Int @id
+          a Decimal
+
+          @@index([a(length: 10)])
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@index": The length argument is only allowed with field types `String` or `Bytes`.[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m
+        [1;94m15 | [0m  @@[1;91mindex([a(length: 10)])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn length_argument_does_not_work_with_json() {
+    let dml = indoc! {r#"
+        model A {
+          id Int @id
+          a Json
+
+          @@index([a(length: 10)])
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@index": The length argument is only allowed with field types `String` or `Bytes`.[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m
+        [1;94m15 | [0m  @@[1;91mindex([a(length: 10)])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn length_argument_does_not_work_with_datetime() {
+    let dml = indoc! {r#"
+        model A {
+          id Int @id
+          a DateTime
+
+          @@index([a(length: 10)])
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@index": The length argument is only allowed with field types `String` or `Bytes`.[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m
+        [1;94m15 | [0m  @@[1;91mindex([a(length: 10)])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn length_argument_does_not_work_with_boolean() {
+    let dml = indoc! {r#"
+        model A {
+          id Int @id
+          a Boolean
+
+          @@index([a(length: 10)])
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@index": The length argument is only allowed with field types `String` or `Bytes`.[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m
+        [1;94m15 | [0m  @@[1;91mindex([a(length: 10)])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn length_argument_does_not_work_with_float() {
+    let dml = indoc! {r#"
+        model A {
+          id Int @id
+          a Float
+
+          @@index([a(length: 10)])
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@index": The length argument is only allowed with field types `String` or `Bytes`.[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m
+        [1;94m15 | [0m  @@[1;91mindex([a(length: 10)])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn length_argument_does_not_work_with_bigint() {
+    let dml = indoc! {r#"
+        model A {
+          id Int @id
+          a BigInt
+
+          @@index([a(length: 10)])
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@index": The length argument is only allowed with field types `String` or `Bytes`.[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m
+        [1;94m15 | [0m  @@[1;91mindex([a(length: 10)])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn length_argument_does_not_work_with_int() {
+    let dml = indoc! {r#"
+        model A {
+          id Int @id
+          a Int
+
+          @@index([a(length: 10)])
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@index": The length argument is only allowed with field types `String` or `Bytes`.[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m
+        [1;94m15 | [0m  @@[1;91mindex([a(length: 10)])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}

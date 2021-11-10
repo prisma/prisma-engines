@@ -123,7 +123,7 @@ pub(crate) fn primary_key_length_prefix_supported(
     }
 
     if let Some(pk) = model.primary_key() {
-        if pk.attribute.fields.iter().any(|f| f.length.is_some()) {
+        if pk.scalar_field_attributes().any(|f| f.length().is_some()) {
             let message = "The length argument is not supported with the current connector";
             let span = pk.ast_attribute().span;
 
@@ -145,7 +145,7 @@ pub(crate) fn primary_key_sort_order_supported(
     }
 
     if let Some(pk) = model.primary_key() {
-        if pk.attribute.fields.iter().any(|f| f.sort_order.is_some()) {
+        if pk.scalar_field_attributes().any(|f| f.sort_order().is_some()) {
             let message = "The sort argument is not supported with the current connector";
             let span = pk.ast_attribute().span;
 
