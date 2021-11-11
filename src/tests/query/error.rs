@@ -353,3 +353,18 @@ async fn should_execute_multi_statement_queries_with_raw_cmd(api: &mut dyn TestA
 
     Ok(())
 }
+
+#[cfg(feature = "uuid")]
+#[test_each_connector(tags("postgresql"))]
+async fn uuid_length_error(api: &mut dyn TestApi) -> crate::Result<()> {
+    let table = api.create_table("value uuid").await?;
+    let insert = Insert::single_into(&table).value("value", "fooo");
+
+    let result = api.conn().insert(insert.into()).await;
+    assert!(result.is_err());
+
+    let err = result.unwrap_err();
+    assert!(matches!(err.kind(), ErrorKind::UUIDError { .. }));
+
+    Ok(())
+}

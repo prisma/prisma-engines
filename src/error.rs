@@ -235,6 +235,9 @@ pub enum ErrorKind {
 
     #[error("Transaction was already closed: {}", _0)]
     TransactionAlreadyClosed(String),
+
+    #[error("Error creating UUID, {}", _0)]
+    UUIDError(String),
 }
 
 impl ErrorKind {

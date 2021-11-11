@@ -264,6 +264,11 @@ impl From<tokio_postgres::error::Error> for Error {
                     return io_error;
                 }
 
+                #[cfg(feature = "uuid")]
+                if let Some(uuid_error) = try_extracting_uuid_error(&e) {
+                    return uuid_error;
+                }
+
                 let reason = format!("{}", e);
 
                 match reason.as_str() {
@@ -305,6 +310,16 @@ impl From<tokio_postgres::error::Error> for Error {
             }
         }
     }
+}
+
+#[cfg(feature = "uuid")]
+fn try_extracting_uuid_error(err: &tokio_postgres::error::Error) -> Option<Error> {
+    use std::error::Error as _;
+
+    err.source()
+        .and_then(|err| err.downcast_ref::<uuid::Error>())
+        .map(|err| ErrorKind::UUIDError(format!("{}", err)))
+        .map(|kind| Error::builder(kind).build())
 }
 
 fn try_extracting_tls_error(err: &tokio_postgres::error::Error) -> Option<Error> {
