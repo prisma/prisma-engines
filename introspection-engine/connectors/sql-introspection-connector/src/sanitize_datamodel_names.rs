@@ -1,7 +1,7 @@
 use crate::SqlFamilyTrait;
 use datamodel::{
     reserved_model_names::is_reserved_type_name, Datamodel, DefaultKind, DefaultValue, Field, FieldType, Model,
-    ValueGenerator, WithDatabaseName, WithName,
+    PrimaryKeyField, ValueGenerator, WithDatabaseName, WithName,
 };
 use introspection_connector::IntrospectionContext;
 use once_cell::sync::Lazy;
@@ -52,7 +52,7 @@ fn sanitize_models(datamodel: &mut Datamodel, ctx: &IntrospectionContext) -> Has
         let model_db_name = model.database_name().map(|s| s.to_owned());
 
         if let Some(pk) = &mut model.primary_key {
-            pk.fields = sanitize_strings(pk.fields.as_slice());
+            sanitize_pk_field_names(&mut pk.fields);
         }
 
         for field in model.fields_mut() {
@@ -151,6 +151,13 @@ fn sanitize_enums(datamodel: &mut Datamodel, enum_renames: &HashMap<String, (Str
             }
         }
     }
+}
+
+fn sanitize_pk_field_names(fields: &mut [PrimaryKeyField]) {
+    fields
+        .iter_mut()
+        .map(|mut field| field.name = sanitize_string(&field.name))
+        .collect()
 }
 
 fn sanitize_strings(strings: &[String]) -> Vec<String> {

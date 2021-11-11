@@ -2,7 +2,7 @@ use crate::Dedup;
 use crate::SqlError;
 use datamodel::{
     common::RelationNames, Datamodel, DefaultValue as DMLDef, FieldArity, FieldType, IndexDefinition, Model,
-    ReferentialAction, RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator as VG,
+    PrimaryKeyField, ReferentialAction, RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator as VG,
 };
 use introspection_connector::IntrospectionContext;
 use sql_schema_describer::{Column, ColumnArity, ColumnTypeFamily, ForeignKey, Index, IndexType, SqlSchema, Table};
@@ -448,6 +448,17 @@ pub fn replace_field_names(target: &mut Vec<String>, old_name: &str, new_name: &
         .map(|v| {
             if v == old_name {
                 *v = new_name.to_string()
+            }
+        })
+        .for_each(drop);
+}
+
+pub fn replace_pk_field_names(target: &mut Vec<PrimaryKeyField>, old_name: &str, new_name: &str) {
+    target
+        .iter_mut()
+        .map(|field| {
+            if field.name == old_name {
+                field.name = new_name.to_string()
             }
         })
         .for_each(drop);

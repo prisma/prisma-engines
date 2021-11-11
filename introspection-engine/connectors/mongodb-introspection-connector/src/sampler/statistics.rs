@@ -6,7 +6,8 @@ use super::{field_type::FieldType, CompositeTypeDepth};
 use convert_case::{Case, Casing};
 use datamodel::{
     CompositeType, CompositeTypeField, Datamodel, DefaultValue, Field, IndexDefinition, IndexType, Model,
-    NativeTypeInstance, PrimaryKeyDefinition, ScalarField, ScalarType, ValueGenerator, WithDatabaseName,
+    NativeTypeInstance, PrimaryKeyDefinition, PrimaryKeyField, ScalarField, ScalarType, ValueGenerator,
+    WithDatabaseName,
 };
 use introspection_connector::Warning;
 use mongodb::{
@@ -356,7 +357,11 @@ fn new_model(model_name: &str) -> Model {
     let primary_key = PrimaryKeyDefinition {
         name: None,
         db_name: None,
-        fields: vec!["id".to_string()],
+        fields: vec![PrimaryKeyField {
+            name: "id".to_string(),
+            sort_order: None,
+            length: None,
+        }],
         defined_on_field: true,
     };
 

@@ -1,5 +1,6 @@
 use crate::ast::{Argument, Attribute};
 use crate::common::constraint_names::ConstraintNames;
+use crate::common::preview_features::PreviewFeature;
 use crate::transform::dml_to_ast::LowerDmlToAst;
 use crate::{
     ast::{self, Span},
@@ -15,7 +16,14 @@ impl<'a> LowerDmlToAst<'a> {
 
         if let Some(pk) = &model.primary_key {
             if !pk.defined_on_field {
-                let mut args = vec![ast::Argument::new_array("", LowerDmlToAst::field_array(&pk.fields))];
+                let mut args = if self.preview_features.contains(PreviewFeature::ExtendedIndexes) {
+                    vec![ast::Argument::new_array("", LowerDmlToAst::pk_field_array(&pk.fields))]
+                } else {
+                    vec![ast::Argument::new_array(
+                        "",
+                        LowerDmlToAst::field_array(&pk.fields.clone().into_iter().map(|f| f.name).collect::<Vec<_>>()),
+                    )]
+                };
 
                 if pk.name.is_some() {
                     args.push(ast::Argument::new(

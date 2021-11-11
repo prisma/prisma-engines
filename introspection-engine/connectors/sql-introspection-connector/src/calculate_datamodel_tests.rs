@@ -3,8 +3,8 @@ mod tests {
     use crate::calculate_datamodel::calculate_datamodel;
     use datamodel::{
         ast::Span, dml, Datamodel, Datasource, DefaultValue as DMLDefault, Field, FieldArity, FieldType,
-        IndexDefinition, Model, NativeTypeInstance, PrimaryKeyDefinition, ReferentialAction, RelationField,
-        RelationInfo, ScalarField, ScalarType, StringFromEnvVar, ValueGenerator,
+        IndexDefinition, Model, NativeTypeInstance, PrimaryKeyDefinition, PrimaryKeyField, ReferentialAction,
+        RelationField, RelationInfo, ScalarField, ScalarType, StringFromEnvVar, ValueGenerator,
     };
     use datamodel_connector::ReferentialIntegrity;
     use enumflags2::BitFlags;
@@ -201,7 +201,7 @@ mod tests {
                     primary_key: Some(PrimaryKeyDefinition {
                         name: None,
                         db_name: None,
-                        fields: vec!["primary".to_string()],
+                        fields: vec![PrimaryKeyField::new("primary")],
                         defined_on_field: true,
                     }),
                 },
@@ -237,7 +237,7 @@ mod tests {
                     primary_key: Some(PrimaryKeyDefinition {
                         name: None,
                         db_name: None,
-                        fields: vec!["primary".to_string()],
+                        fields: vec![PrimaryKeyField::new("primary")],
                         defined_on_field: true,
                     }),
                 },
@@ -273,7 +273,7 @@ mod tests {
                     primary_key: Some(PrimaryKeyDefinition {
                         name: None,
                         db_name: None,
-                        fields: vec!["primary".to_string()],
+                        fields: vec![PrimaryKeyField::new("primary")],
                         defined_on_field: true,
                     }),
                 },
@@ -493,7 +493,7 @@ mod tests {
                     primary_key: Some(PrimaryKeyDefinition {
                         name: None,
                         db_name: None,
-                        fields: vec!["id".to_string()],
+                        fields: vec![PrimaryKeyField::new("id")],
                         defined_on_field: true,
                     }),
                 },
@@ -590,7 +590,7 @@ mod tests {
                     primary_key: Some(PrimaryKeyDefinition {
                         name: None,
                         db_name: None,
-                        fields: vec!["id".to_string()],
+                        fields: vec![PrimaryKeyField::new("id")],
                         defined_on_field: true,
                     }),
                 },
@@ -763,7 +763,7 @@ mod tests {
                 primary_key: Some(PrimaryKeyDefinition {
                     name: None,
                     db_name: None,
-                    fields: vec!["id".to_string()],
+                    fields: vec![PrimaryKeyField::new("id")],
                     defined_on_field: true,
                 }),
             }],
@@ -891,7 +891,7 @@ mod tests {
                     primary_key: Some(PrimaryKeyDefinition {
                         name: None,
                         db_name: None,
-                        fields: vec!["id".to_string()],
+                        fields: vec![PrimaryKeyField::new("id")],
                         defined_on_field: true,
                     }),
                 },
@@ -961,7 +961,7 @@ mod tests {
                     primary_key: Some(PrimaryKeyDefinition {
                         name: None,
                         db_name: None,
-                        fields: vec!["id".to_string()],
+                        fields: vec![PrimaryKeyField::new("id")],
                         defined_on_field: true,
                     }),
                 },

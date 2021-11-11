@@ -4,11 +4,15 @@ use crate::introspection_helpers::{
     is_prisma_1_point_1_or_2_join_table, is_relay_table,
 };
 use crate::version_checker::VersionChecker;
+
 use crate::SqlError;
 use crate::{Dedup, SqlFamilyTrait};
-use datamodel::{dml, walkers::find_model_by_db_name, Datamodel, Field, Model, PrimaryKeyDefinition, RelationField};
+use datamodel::{
+    common::preview_features::PreviewFeature, dml, walkers::find_model_by_db_name, Datamodel, Field, Model,
+    PrimaryKeyDefinition, PrimaryKeyField, RelationField, SortOrder,
+};
 use introspection_connector::IntrospectionContext;
-use sql_schema_describer::{SqlSchema, Table};
+use sql_schema_describer::{SQLSortOrder, SqlSchema, Table};
 use tracing::debug;
 
 pub fn introspect(
@@ -67,12 +71,33 @@ pub fn introspect(
         }
 
         match &table.primary_key {
-            // TODO: enable with preview flag, when dml index extensions are done.
-            Some(pk) if pk.columns.iter().all(|c| c.length.is_none()) => {
+            Some(pk)
+                if pk.columns.iter().all(|c| {
+                    if !ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
+                        c.length.is_none()
+                    } else {
+                        true
+                    }
+                }) =>
+            {
                 model.primary_key = Some(PrimaryKeyDefinition {
                     name: None,
                     db_name: pk.constraint_name.clone(),
-                    fields: pk.columns.iter().map(|c| c.name().to_string()).collect(),
+                    fields: pk
+                        .columns
+                        .iter()
+                        .map(|c| {
+                            let sort_order = c.sort_order.map(|sort| match sort {
+                                SQLSortOrder::Asc => SortOrder::Asc,
+                                SQLSortOrder::Desc => SortOrder::Desc,
+                            });
+                            PrimaryKeyField {
+                                name: c.name().to_string(),
+                                sort_order,
+                                length: c.length,
+                            }
+                        })
+                        .collect(),
                     defined_on_field: pk.columns.len() == 1,
                 });
             }

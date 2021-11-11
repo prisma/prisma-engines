@@ -144,7 +144,7 @@ fn multi_field_ids_must_work() {
     user_model.assert_has_pk(PrimaryKeyDefinition {
         name: None,
         db_name: None,
-        fields: vec!["a".into(), "b".into()],
+        fields: vec![PrimaryKeyField::new("a"), PrimaryKeyField::new("b")],
         defined_on_field: false,
     });
 }
@@ -162,7 +162,7 @@ fn should_allow_unique_and_id_on_same_field() {
     user_model.assert_has_pk(PrimaryKeyDefinition {
         name: None,
         db_name: None,
-        fields: vec!["id".into()],
+        fields: vec![PrimaryKeyField::new("id")],
         defined_on_field: true,
     });
 
@@ -320,18 +320,42 @@ fn id_accepts_length_arg_on_mysql() {
     );
 
     let schema = parse(&dml);
-    schema.assert_has_model("User");
+    let user_model = schema.assert_has_model("User");
+    let blog_model = schema.assert_has_model("Blog");
 
-    // user_model.assert_has_pk(PrimaryKeyDefinition {
-    //     name: None,
-    //     db_name: Some("User_pkey".to_string()),
-    //     fields: vec![
-    //         ("firstName".to_string(), None),
-    //         ("middleName".to_string(), Some(1)),
-    //         ("lastName".to_string(), None),
-    //     ],
-    //     defined_on_field: false,
-    // });
+    user_model.assert_has_pk(PrimaryKeyDefinition {
+        name: None,
+        db_name: None,
+        fields: vec![
+            PrimaryKeyField {
+                name: "firstName".to_string(),
+                sort_order: None,
+                length: None,
+            },
+            PrimaryKeyField {
+                name: "middleName".to_string(),
+                sort_order: None,
+                length: Some(1),
+            },
+            PrimaryKeyField {
+                name: "lastName".to_string(),
+                sort_order: None,
+                length: None,
+            },
+        ],
+        defined_on_field: false,
+    });
+
+    blog_model.assert_has_pk(PrimaryKeyDefinition {
+        name: None,
+        db_name: None,
+        fields: vec![PrimaryKeyField {
+            name: "title".to_string(),
+            sort_order: None,
+            length: Some(5),
+        }],
+        defined_on_field: true,
+    });
 }
 
 #[test]
@@ -355,16 +379,40 @@ fn id_accepts_sort_arg_on_mssql() {
     );
 
     let schema = parse(&dml);
-    schema.assert_has_model("User");
+    let user_model = schema.assert_has_model("User");
+    let blog_model = schema.assert_has_model("Blog");
 
-    // user_model.assert_has_pk(PrimaryKeyDefinition {
-    //     name: None,
-    //     db_name: Some("User_pkey".to_string()),
-    //     fields: vec![
-    //         ("firstName".to_string(), None),
-    //         ("middleName".to_string(), Some(1)),
-    //         ("lastName".to_string(), None),
-    //     ],
-    //     defined_on_field: false,
-    // });
+    user_model.assert_has_pk(PrimaryKeyDefinition {
+        name: None,
+        db_name: Some("User_pkey".to_string()),
+        fields: vec![
+            PrimaryKeyField {
+                name: "firstName".to_string(),
+                sort_order: None,
+                length: None,
+            },
+            PrimaryKeyField {
+                name: "middleName".to_string(),
+                sort_order: Some(SortOrder::Desc),
+                length: None,
+            },
+            PrimaryKeyField {
+                name: "lastName".to_string(),
+                sort_order: None,
+                length: None,
+            },
+        ],
+        defined_on_field: false,
+    });
+
+    blog_model.assert_has_pk(PrimaryKeyDefinition {
+        name: None,
+        db_name: Some("Blog_pkey".to_string()),
+        fields: vec![PrimaryKeyField {
+            name: "title".to_string(),
+            sort_order: Some(SortOrder::Desc),
+            length: None,
+        }],
+        defined_on_field: true,
+    });
 }

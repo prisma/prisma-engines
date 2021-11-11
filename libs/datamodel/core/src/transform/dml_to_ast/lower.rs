@@ -1,5 +1,5 @@
 use crate::common::preview_features::PreviewFeature;
-use crate::{ast, dml, Datasource};
+use crate::{ast, dml, Datasource, PrimaryKeyField, SortOrder};
 use enumflags2::BitFlags;
 
 pub struct LowerDmlToAst<'a> {
@@ -134,6 +134,28 @@ impl<'a> LowerDmlToAst<'a> {
         fields
             .iter()
             .map(|f| ast::Expression::ConstantValue(f.to_string(), ast::Span::empty()))
+            .collect()
+    }
+
+    pub fn pk_field_array(fields: &[PrimaryKeyField]) -> Vec<ast::Expression> {
+        fields
+            .iter()
+            .map(|f| {
+                let length = f
+                    .length
+                    .into_iter()
+                    .map(|length| ast::Argument::new_numeric("length", length));
+
+                let sort = match f.sort_order {
+                    None => vec![],
+                    Some(SortOrder::Asc) => vec![],
+                    Some(SortOrder::Desc) => vec![ast::Argument::new_constant("sort", "Desc")],
+                };
+
+                let args = length.chain(sort).collect();
+
+                ast::Expression::FieldWithArgs(f.to_string(), args, ast::Span::empty())
+            })
             .collect()
     }
 }

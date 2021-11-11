@@ -161,7 +161,7 @@ impl<'a> DatamodelConverter<'a> {
 
     fn convert_pk(&self, model: &dml::Model) -> Option<PrimaryKeyTemplate> {
         model.primary_key.as_ref().map(|pk| PrimaryKeyTemplate {
-            fields: pk.fields.to_owned(),
+            fields: pk.fields.clone().into_iter().map(|f| f.name).collect(),
             alias: pk.name.to_owned(),
         })
     }

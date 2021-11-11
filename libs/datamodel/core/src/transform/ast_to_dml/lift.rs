@@ -1,6 +1,7 @@
 use crate::{
     ast, dml,
     transform::ast_to_dml::db::{self, walkers::*},
+    PrimaryKeyField,
 };
 use ::dml::composite_type::{CompositeType, CompositeTypeField, CompositeTypeFieldType};
 use std::collections::HashMap;
@@ -271,7 +272,14 @@ impl<'a> LiftAstToDml<'a> {
         model.primary_key = walker.primary_key().map(|pk| dml::PrimaryKeyDefinition {
             name: pk.name().map(String::from),
             db_name: pk.final_database_name().map(|c| c.into_owned()),
-            fields: pk.iter_ast_fields().map(|field| field.name.name.to_owned()).collect(),
+            fields: pk
+                .iter_ast_fields()
+                .map(|(field, sort_order, length)| PrimaryKeyField {
+                    name: field.name.name.to_owned(),
+                    sort_order,
+                    length,
+                })
+                .collect(),
             defined_on_field: pk.is_defined_on_field(),
         });
 

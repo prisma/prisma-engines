@@ -57,7 +57,8 @@ fn model_to_dmmf(model: &dml::Model) -> Model {
     let primary_key = if let Some(pk) = &model.primary_key {
         (!pk.defined_on_field).then(|| PrimaryKey {
             name: pk.name.clone(),
-            fields: pk.fields.clone(),
+            //TODO(extended indices) add field options here
+            fields: pk.fields.clone().into_iter().map(|f| f.name).collect(),
         })
     } else {
         None

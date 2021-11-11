@@ -1,4 +1,4 @@
-use crate::introspection_helpers::replace_field_names;
+use crate::introspection_helpers::{replace_field_names, replace_pk_field_names};
 use crate::{warnings::*, SqlFamilyTrait};
 use datamodel::{Datamodel, DefaultValue, Field, FieldType, Ignorable, ValueGenerator, WithName};
 use introspection_connector::{IntrospectionContext, Warning};
@@ -235,7 +235,9 @@ fn merge_changed_primary_key_names(
         if let Some(old_model) = &old_data_model.find_model(&model.name) {
             if let Some(primary_key) = &model.primary_key {
                 if let Some(old_primary_key) = &old_model.primary_key {
-                    if old_primary_key.fields == primary_key.fields
+                    //TODO(extended indices)
+                    if old_primary_key.fields.iter().map(|f| &f.name).collect::<Vec<_>>()
+                        == primary_key.fields.iter().map(|f| &f.name).collect::<Vec<_>>()
                         && (old_primary_key.db_name == primary_key.db_name || primary_key.db_name.is_none())
                         && old_primary_key.name.is_some()
                     {
@@ -302,7 +304,7 @@ fn merge_changed_scalar_key_names(
         let model = new_data_model.find_model_mut(&changed_field_name.0.model);
 
         if let Some(pk) = &mut model.primary_key {
-            replace_field_names(&mut pk.fields, &changed_field_name.0.field, &changed_field_name.1);
+            replace_pk_field_names(&mut pk.fields, &changed_field_name.0.field, &changed_field_name.1);
         }
 
         for index in &mut model.indices {

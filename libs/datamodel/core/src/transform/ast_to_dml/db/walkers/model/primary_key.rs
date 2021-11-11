@@ -4,6 +4,7 @@ use crate::{
     ast,
     common::constraint_names::ConstraintNames,
     transform::ast_to_dml::db::{types::IdAttribute, walkers::ScalarFieldWalker, ParserDatabase},
+    SortOrder,
 };
 
 #[derive(Copy, Clone)]
@@ -40,11 +41,16 @@ impl<'ast, 'db> PrimaryKeyWalker<'ast, 'db> {
         self.attribute.source_field.is_some()
     }
 
-    pub(crate) fn iter_ast_fields(self) -> impl Iterator<Item = &'ast ast::Field> + 'db {
-        self.attribute
-            .fields
-            .iter()
-            .map(move |field| &self.db.ast[self.model_id][field.field_id])
+    pub(crate) fn iter_ast_fields(
+        self,
+    ) -> impl Iterator<Item = (&'ast ast::Field, Option<SortOrder>, Option<u32>)> + 'db {
+        self.attribute.fields.iter().map(move |field| {
+            (
+                &self.db.ast[self.model_id][field.field_id],
+                field.sort_order,
+                field.length,
+            )
+        })
     }
 
     pub(crate) fn name(self) -> Option<&'ast str> {

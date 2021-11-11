@@ -122,7 +122,7 @@ impl<'a> ModelWalker<'a> {
         let x = if let Some(pk) = &walker.get().primary_key {
             pk.fields
                 .iter()
-                .map(|field_name| walker.find_scalar_field(field_name).unwrap())
+                .map(|field| walker.find_scalar_field(&field.name).unwrap())
                 .map(move |field| ScalarFieldWalker {
                     datamodel,
                     model_idx,
