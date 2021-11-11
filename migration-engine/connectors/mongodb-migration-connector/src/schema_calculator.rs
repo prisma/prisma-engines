@@ -15,7 +15,7 @@ pub(crate) fn calculate(datamodel: &Datamodel) -> MongoSchema {
             let fields = index
                 .fields
                 .iter()
-                .map(|field_name| model.find_scalar_field(field_name).unwrap().db_name())
+                .map(|field| model.find_scalar_field(&field.name).unwrap().db_name())
                 .map(|field_final_name: &str| (field_final_name.to_owned(), Bson::Int32(1)));
 
             path.extend(fields);

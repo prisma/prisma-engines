@@ -9,7 +9,7 @@ impl<'a> LowerDmlToAst<'a> {
     pub(crate) fn lower_enum_attributes(&self, enm: &dml::Enum) -> Vec<ast::Attribute> {
         let mut attributes = vec![];
 
-        <LowerDmlToAst<'a>>::push_map_attribute(enm, &mut attributes);
+        <LowerDmlToAst<'a>>::push_model_index_map_arg(enm, &mut attributes);
 
         attributes
     }

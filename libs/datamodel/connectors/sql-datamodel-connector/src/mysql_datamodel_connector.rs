@@ -252,7 +252,10 @@ impl Connector for MySqlDatamodelConnector {
 
     fn validate_model(&self, model: &Model, errors: &mut Vec<ConnectorError>) {
         for index_definition in model.indices.iter() {
-            let fields = index_definition.fields.iter().map(|f| model.find_field(f).unwrap());
+            let fields = index_definition
+                .fields
+                .iter()
+                .map(|f| model.find_field(&f.name).unwrap());
             for f in fields {
                 if let FieldType::Scalar(_, _, Some(native_type)) = f.field_type() {
                     let native_type_name = native_type.name.as_str();

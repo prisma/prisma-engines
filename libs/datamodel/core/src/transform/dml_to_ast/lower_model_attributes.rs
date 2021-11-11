@@ -4,7 +4,7 @@ use crate::common::preview_features::PreviewFeature;
 use crate::transform::dml_to_ast::LowerDmlToAst;
 use crate::{
     ast::{self, Span},
-    dml, Ignorable, IndexDefinition, IndexType, Model, WithDatabaseName,
+    dml, Ignorable, IndexDefinition, IndexType, Model, SortOrder, WithDatabaseName,
 };
 
 impl<'a> LowerDmlToAst<'a> {
@@ -53,10 +53,19 @@ impl<'a> LowerDmlToAst<'a> {
             .iter()
             .filter(|index| index.is_unique() && !index.defined_on_field)
             .for_each(|index_def| {
-                let mut args = vec![ast::Argument::new_array(
-                    "",
-                    LowerDmlToAst::field_array(&index_def.fields),
-                )];
+                let mut args = if self.preview_features.contains(PreviewFeature::ExtendedIndexes) {
+                    vec![ast::Argument::new_array(
+                        "",
+                        LowerDmlToAst::index_field_array(&index_def.fields),
+                    )]
+                } else {
+                    vec![ast::Argument::new_array(
+                        "",
+                        LowerDmlToAst::field_array(
+                            &index_def.fields.clone().into_iter().map(|f| f.name).collect::<Vec<_>>(),
+                        ),
+                    )]
+                };
 
                 if let Some(name) = &index_def.name {
                     args.push(ast::Argument::new_string("name", name.to_string()));
@@ -73,10 +82,19 @@ impl<'a> LowerDmlToAst<'a> {
             .iter()
             .filter(|index| index.tpe == IndexType::Normal)
             .for_each(|index_def| {
-                let mut args = vec![ast::Argument::new_array(
-                    "",
-                    LowerDmlToAst::field_array(&index_def.fields),
-                )];
+                let mut args = if self.preview_features.contains(PreviewFeature::ExtendedIndexes) {
+                    vec![ast::Argument::new_array(
+                        "",
+                        LowerDmlToAst::index_field_array(&index_def.fields),
+                    )]
+                } else {
+                    vec![ast::Argument::new_array(
+                        "",
+                        LowerDmlToAst::field_array(
+                            &index_def.fields.clone().into_iter().map(|f| f.name).collect::<Vec<_>>(),
+                        ),
+                    )]
+                };
 
                 self.push_index_map_argument(model, index_def, &mut args);
 
@@ -84,7 +102,7 @@ impl<'a> LowerDmlToAst<'a> {
             });
 
         // @@map
-        <LowerDmlToAst<'a>>::push_map_attribute(model, &mut attributes);
+        <LowerDmlToAst<'a>>::push_model_index_map_arg(model, &mut attributes);
 
         // @@ignore
         if model.is_ignored() {
@@ -92,6 +110,38 @@ impl<'a> LowerDmlToAst<'a> {
         }
 
         attributes
+    }
+
+    pub(crate) fn push_field_index_arguments(
+        &self,
+        model: &Model,
+        index_def: &IndexDefinition,
+        args: &mut Vec<Argument>,
+    ) {
+        let field = index_def.fields.first().unwrap();
+
+        if let Some(src) = self.datasource {
+            if !ConstraintNames::index_name_matches(index_def, model, &*src.active_connector) {
+                args.push(ast::Argument::new(
+                    "map",
+                    ast::Expression::StringValue(String::from(index_def.db_name.as_ref().unwrap()), Span::empty()),
+                ));
+            }
+        }
+
+        if let Some(length) = field.length {
+            args.push(ast::Argument::new(
+                "length",
+                ast::Expression::NumericValue(length.to_string(), Span::empty()),
+            ));
+        }
+
+        if field.sort_order == Some(SortOrder::Desc) {
+            args.push(ast::Argument::new(
+                "sort",
+                ast::Expression::ConstantValue("Desc".to_string(), Span::empty()),
+            ));
+        }
     }
 
     pub(crate) fn push_index_map_argument(&self, model: &Model, index_def: &IndexDefinition, args: &mut Vec<Argument>) {
@@ -105,7 +155,7 @@ impl<'a> LowerDmlToAst<'a> {
         }
     }
 
-    pub(crate) fn push_map_attribute<T: WithDatabaseName>(obj: &T, attributes: &mut Vec<Attribute>) {
+    pub(crate) fn push_model_index_map_arg<T: WithDatabaseName>(obj: &T, attributes: &mut Vec<Attribute>) {
         if let Some(db_name) = obj.database_name() {
             attributes.push(ast::Attribute::new(
                 "map",

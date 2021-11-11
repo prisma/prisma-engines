@@ -1,7 +1,7 @@
 use crate::{
     ast, dml,
     transform::ast_to_dml::db::{self, walkers::*},
-    PrimaryKeyField,
+    IndexField, PrimaryKeyField,
 };
 use ::dml::composite_type::{CompositeType, CompositeTypeField, CompositeTypeFieldType};
 use std::collections::HashMap;
@@ -293,7 +293,11 @@ impl<'a> LiftAstToDml<'a> {
                     .attribute()
                     .fields
                     .iter()
-                    .map(|field| self.db.ast()[model_id][field.field_id].name.name.clone())
+                    .map(|field| IndexField {
+                        name: self.db.ast()[model_id][field.field_id].name.name.clone(),
+                        sort_order: field.sort_order,
+                        length: field.length,
+                    })
                     .collect(),
                 tpe: match idx.attribute().is_unique {
                     true => dml::IndexType::Unique,

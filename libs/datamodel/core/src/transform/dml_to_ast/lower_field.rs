@@ -105,11 +105,12 @@ impl<'a> LowerDmlToAst<'a> {
         if let dml::Field::ScalarField(sf) = field {
             if model.field_is_unique_and_defined_on_field(&sf.name) {
                 let mut arguments = Vec::new();
-                if let Some(idx) = model
-                    .indices
-                    .iter()
-                    .find(|id| id.is_unique() && id.defined_on_field && id.fields == [field.name()])
-                {
+                if let Some(idx) = model.indices.iter().find(|i| {
+                    i.is_unique()
+                        && i.defined_on_field
+                        && i.fields.len() == 1
+                        && i.fields.first().unwrap().name == field.name()
+                }) {
                     self.push_index_map_argument(model, idx, &mut arguments)
                 }
 
@@ -146,7 +147,7 @@ impl<'a> LowerDmlToAst<'a> {
         }
 
         // @map
-        <LowerDmlToAst<'a>>::push_map_attribute(field, &mut attributes);
+        <LowerDmlToAst<'a>>::push_model_index_map_arg(field, &mut attributes);
 
         // @relation
         if let dml::Field::RelationField(rf) = field {
