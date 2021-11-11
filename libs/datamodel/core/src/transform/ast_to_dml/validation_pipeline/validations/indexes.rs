@@ -78,7 +78,7 @@ pub(crate) fn field_length_prefix_supported(
     }
 
     if index.scalar_field_attributes().any(|f| f.length().is_some()) {
-        let message = "The length argument is not supported with the current connector";
+        let message = "The length argument is not supported in an index definition with the current connector";
         let span = index.ast_attribute().map(|i| i.span).unwrap_or_else(Span::empty);
 
         diagnostics.push_error(DatamodelError::new_attribute_validation_error(
