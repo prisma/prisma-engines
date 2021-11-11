@@ -63,7 +63,9 @@ pub fn introspect(
 
         for index in &table.indices {
             // TODO: enable with preview flag, when dml index extensions are done.
-            if index.columns.iter().any(|c| c.length.is_some()) {
+            if !ctx.preview_features.contains(PreviewFeature::ExtendedIndexes)
+                && index.columns.iter().any(|c| c.length.is_some())
+            {
                 continue;
             }
 
@@ -71,15 +73,7 @@ pub fn introspect(
         }
 
         match &table.primary_key {
-            Some(pk)
-                if pk.columns.iter().all(|c| {
-                    if !ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-                        c.length.is_none()
-                    } else {
-                        true
-                    }
-                }) =>
-            {
+            Some(pk) => {
                 model.primary_key = Some(PrimaryKeyDefinition {
                     name: None,
                     db_name: pk.constraint_name.clone(),

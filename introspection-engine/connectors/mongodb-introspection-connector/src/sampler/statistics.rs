@@ -5,8 +5,8 @@ pub(crate) use name::Name;
 use super::{field_type::FieldType, CompositeTypeDepth};
 use convert_case::{Case, Casing};
 use datamodel::{
-    CompositeType, CompositeTypeField, Datamodel, DefaultValue, Field, IndexDefinition, IndexType, Model,
-    NativeTypeInstance, PrimaryKeyDefinition, PrimaryKeyField, ScalarField, ScalarType, ValueGenerator,
+    CompositeType, CompositeTypeField, Datamodel, DefaultValue, Field, IndexDefinition, IndexField, IndexType, Model,
+    NativeTypeInstance, PrimaryKeyDefinition, PrimaryKeyField, ScalarField, ScalarType, SortOrder, ValueGenerator,
     WithDatabaseName,
 };
 use introspection_connector::Warning;
@@ -448,9 +448,17 @@ fn add_indices_to_models(models: &mut BTreeMap<String, Model>, indices: &mut BTr
             let fields = index
                 .keys
                 .into_iter()
-                .map(|(k, _)| match sanitize_string(&k) {
-                    Some(sanitized) => sanitized,
-                    None => k,
+                //TODO(extended indices) is the value here always the sort order? the driver docs are unclear
+                .map(|(k, _)| {
+                    let field_name = match sanitize_string(&k) {
+                        Some(sanitized) => sanitized,
+                        None => k,
+                    };
+                    IndexField {
+                        name: field_name,
+                        sort_order: Some(SortOrder::Asc),
+                        length: None,
+                    }
                 })
                 .collect();
 

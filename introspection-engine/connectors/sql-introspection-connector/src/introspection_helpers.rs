@@ -1,11 +1,14 @@
 use crate::Dedup;
 use crate::SqlError;
 use datamodel::{
-    common::RelationNames, Datamodel, DefaultValue as DMLDef, FieldArity, FieldType, IndexDefinition, Model,
-    PrimaryKeyField, ReferentialAction, RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator as VG,
+    common::RelationNames, Datamodel, DefaultValue as DMLDef, FieldArity, FieldType, IndexDefinition, IndexField,
+    Model, PrimaryKeyField, ReferentialAction, RelationField, RelationInfo, ScalarField, ScalarType, SortOrder,
+    ValueGenerator as VG,
 };
 use introspection_connector::IntrospectionContext;
-use sql_schema_describer::{Column, ColumnArity, ColumnTypeFamily, ForeignKey, Index, IndexType, SqlSchema, Table};
+use sql_schema_describer::{
+    Column, ColumnArity, ColumnTypeFamily, ForeignKey, Index, IndexType, SQLSortOrder, SqlSchema, Table,
+};
 use sql_schema_describer::{DefaultKind, ForeignKeyAction};
 use tracing::debug;
 
@@ -136,7 +139,21 @@ pub(crate) fn calculate_index(index: &Index) -> IndexDefinition {
     IndexDefinition {
         name: None,
         db_name: Some(index.name.clone()),
-        fields: index.columns.iter().map(|c| c.name().to_string()).collect(),
+        fields: index
+            .columns
+            .iter()
+            .map(|c| {
+                let sort_order = c.sort_order.map(|sort| match sort {
+                    SQLSortOrder::Asc => SortOrder::Asc,
+                    SQLSortOrder::Desc => SortOrder::Desc,
+                });
+                IndexField {
+                    name: c.name().to_string(),
+                    sort_order,
+                    length: c.length,
+                }
+            })
+            .collect(),
         tpe,
         defined_on_field: index.columns.len() == 1,
     }
@@ -454,6 +471,17 @@ pub fn replace_field_names(target: &mut Vec<String>, old_name: &str, new_name: &
 }
 
 pub fn replace_pk_field_names(target: &mut Vec<PrimaryKeyField>, old_name: &str, new_name: &str) {
+    target
+        .iter_mut()
+        .map(|field| {
+            if field.name == old_name {
+                field.name = new_name.to_string()
+            }
+        })
+        .for_each(drop);
+}
+
+pub fn replace_index_field_names(target: &mut Vec<IndexField>, old_name: &str, new_name: &str) {
     target
         .iter_mut()
         .map(|field| {

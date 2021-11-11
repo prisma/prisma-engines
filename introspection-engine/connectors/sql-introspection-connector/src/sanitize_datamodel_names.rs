@@ -1,7 +1,7 @@
 use crate::SqlFamilyTrait;
 use datamodel::{
-    reserved_model_names::is_reserved_type_name, Datamodel, DefaultKind, DefaultValue, Field, FieldType, Model,
-    PrimaryKeyField, ValueGenerator, WithDatabaseName, WithName,
+    reserved_model_names::is_reserved_type_name, Datamodel, DefaultKind, DefaultValue, Field, FieldType, IndexField,
+    Model, PrimaryKeyField, ValueGenerator, WithDatabaseName, WithName,
 };
 use introspection_connector::IntrospectionContext;
 use once_cell::sync::Lazy;
@@ -123,7 +123,7 @@ fn sanitize_models(datamodel: &mut Datamodel, ctx: &IntrospectionContext) -> Has
         }
 
         for index in &mut model.indices {
-            index.fields = sanitize_strings(&index.fields);
+            sanitize_index_field_names(&mut index.fields);
         }
     }
 
@@ -160,15 +160,19 @@ fn sanitize_pk_field_names(fields: &mut [PrimaryKeyField]) {
         .collect()
 }
 
+fn sanitize_index_field_names(fields: &mut [IndexField]) {
+    fields
+        .iter_mut()
+        .map(|mut field| field.name = sanitize_string(&field.name))
+        .collect()
+}
+
 fn sanitize_strings(strings: &[String]) -> Vec<String> {
     strings.iter().map(|f| sanitize_string(f)).collect()
 }
 
-// Todo: This is now widely used, we can make this smarter at some point.
-// Ideas:
-// - Numbers only -> spell out first digit? 100 -> one00
-// - Only invalid characters?
-// - Underscore at start
+/// We agreed on a simple sanitization logic. Any remaining conflicts will produce a datamodel with
+/// name conflicts. Our validation will catch that and ask the user to disambiguate manually.
 fn sanitize_name<T>(renameable: &mut T)
 where
     T: WithDatabaseName + WithName,

@@ -127,8 +127,16 @@ fn multiple_unique_must_work() {
                     "User_firstName_lastName_key",
                 ),
                 fields: [
-                    "firstName",
-                    "lastName",
+                    IndexField {
+                        name: "firstName",
+                        sort_order: None,
+                        length: None,
+                    },
+                    IndexField {
+                        name: "lastName",
+                        sort_order: None,
+                        length: None,
+                    },
                 ],
                 tpe: Unique,
                 defined_on_field: false,
@@ -141,8 +149,16 @@ fn multiple_unique_must_work() {
                     "MyIndexName",
                 ),
                 fields: [
-                    "firstName",
-                    "lastName",
+                    IndexField {
+                        name: "firstName",
+                        sort_order: None,
+                        length: None,
+                    },
+                    IndexField {
+                        name: "lastName",
+                        sort_order: None,
+                        length: None,
+                    },
                 ],
                 tpe: Unique,
                 defined_on_field: false,

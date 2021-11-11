@@ -61,9 +61,9 @@ fn calculate_model_tables<'a>(
                 let referenced_fields: Vec<ScalarFieldWalker<'_>> = index_definition
                     .fields
                     .iter()
-                    .map(|field_name| {
+                    .map(|field| {
                         model
-                            .find_scalar_field(field_name)
+                            .find_scalar_field(&field.name)
                             .expect("Unknown field in index directive.")
                     })
                     .collect();

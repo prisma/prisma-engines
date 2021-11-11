@@ -3,8 +3,8 @@ mod tests {
     use crate::calculate_datamodel::calculate_datamodel;
     use datamodel::{
         ast::Span, dml, Datamodel, Datasource, DefaultValue as DMLDefault, Field, FieldArity, FieldType,
-        IndexDefinition, Model, NativeTypeInstance, PrimaryKeyDefinition, PrimaryKeyField, ReferentialAction,
-        RelationField, RelationInfo, ScalarField, ScalarType, StringFromEnvVar, ValueGenerator,
+        IndexDefinition, IndexField, Model, NativeTypeInstance, PrimaryKeyDefinition, PrimaryKeyField,
+        ReferentialAction, RelationField, RelationInfo, ScalarField, ScalarType, StringFromEnvVar, ValueGenerator,
     };
     use enumflags2::BitFlags;
     use expect_test::expect;
@@ -390,7 +390,7 @@ mod tests {
                 indices: vec![IndexDefinition {
                     name: None,
                     db_name: Some("unique_unique".to_string()),
-                    fields: vec!["unique".to_string()],
+                    fields: vec![IndexField::new("unique")],
                     tpe: dml::IndexType::Unique,
                     defined_on_field: true,
                 }],
@@ -758,7 +758,7 @@ mod tests {
                 indices: vec![datamodel::dml::IndexDefinition {
                     name: None,
                     db_name: Some("name_last_name_unique".to_string()),
-                    fields: vec!["name".to_string(), "lastname".to_string()],
+                    fields: vec![IndexField::new("name"), IndexField::new("lastname")],
                     tpe: datamodel::dml::IndexType::Unique,
                     defined_on_field: false,
                 }],
