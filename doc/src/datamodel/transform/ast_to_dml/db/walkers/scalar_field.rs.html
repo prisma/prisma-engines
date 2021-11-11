@@ -105,14 +105,45 @@
 <span id="105">105</span>
 <span id="106">106</span>
 <span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 
-<span class="kw">use</span> <span class="ident">dml::default_value::DefaultValue</span>;
+<span class="kw">use</span> <span class="ident">dml</span>::{<span class="ident">default_value::DefaultValue</span>, <span class="ident">model::SortOrder</span>};
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>,
     <span class="ident">common::constraint_names::ConstraintNames</span>,
-    <span class="ident">transform::ast_to_dml::db</span>::{<span class="ident">ParserDatabase</span>, <span class="ident">ScalarField</span>},
+    <span class="ident">transform::ast_to_dml::db</span>::{<span class="ident">types::FieldWithArgs</span>, <span class="ident">ParserDatabase</span>, <span class="ident">ScalarField</span>},
 };
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ModelWalker</span>;
@@ -210,6 +241,37 @@
             <span class="ident">db</span>: <span class="self">self</span>.<span class="ident">db</span>,
             <span class="ident">scalar_field</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">types</span>.<span class="ident">scalar_fields</span>[<span class="kw-2">&amp;</span>(<span class="self">self</span>.<span class="ident">model_id</span>, <span class="self">self</span>.<span class="ident">field_id</span>)],
         }
+    }
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">ScalarFieldAttributeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> [<span class="ident">FieldWithArgs</span>],
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ParserDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">field_arg_id</span>: <span class="ident">usize</span>,
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">ScalarFieldAttributeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">args</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">FieldWithArgs</span> {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">fields</span>[<span class="self">self</span>.<span class="ident">field_arg_id</span>]
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">length</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">args</span>().<span class="ident">length</span>
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">as_scalar_field</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+        <span class="ident">ScalarFieldWalker</span> {
+            <span class="ident">model_id</span>: <span class="self">self</span>.<span class="ident">model_id</span>,
+            <span class="ident">field_id</span>: <span class="self">self</span>.<span class="ident">args</span>().<span class="ident">field_id</span>,
+            <span class="ident">db</span>: <span class="self">self</span>.<span class="ident">db</span>,
+            <span class="ident">scalar_field</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">types</span>.<span class="ident">scalar_fields</span>[<span class="kw-2">&amp;</span>(<span class="self">self</span>.<span class="ident">model_id</span>, <span class="self">self</span>.<span class="ident">args</span>().<span class="ident">field_id</span>)],
+        }
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">sort_order</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SortOrder</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">args</span>().<span class="ident">sort_order</span>
     }
 }
 </code></pre></div>

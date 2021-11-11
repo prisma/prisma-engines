@@ -557,6 +557,15 @@
 <span id="557">557</span>
 <span id="558">558</span>
 <span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
+<span id="566">566</span>
+<span id="567">567</span>
+<span id="568">568</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">context::Context</span>, <span class="ident">walkers::CompositeTypeFieldWalker</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast::FieldId</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ast</span>, <span class="ident">diagnostics::DatamodelError</span>, <span class="ident">transform::ast_to_dml::db::walkers::CompositeTypeWalker</span>, <span class="ident">SortOrder</span>};
@@ -645,6 +654,15 @@
     <span class="ident">BuiltInScalar</span>(<span class="ident">dml::scalars::ScalarType</span>),
     <span class="ident">Alias</span>(<span class="ident">ast::AliasId</span>),
     <span class="ident">Unsupported</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">ScalarFieldType</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">as_builtin_scalar</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">dml::scalars::ScalarType</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">ScalarFieldType::BuiltInScalar</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">s</span>),
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        }
+    }
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
