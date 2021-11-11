@@ -319,36 +319,55 @@ fn id_accepts_length_arg_on_mysql() {
 }
 
 #[test]
-fn id_accepts_sort_arg_on_mssql() {
-    let dml = with_header(
-        r#"
-     model User {
-         firstName  String
-         middleName String
-         lastName   String
-         
-         @@id([firstName, middleName(sort: Desc), lastName])
-     }
-     
-     model Blog {
-         title  String @id(sort:Desc)
-     }
-     "#,
-        Provider::SqlServer,
-        &["extendedIndexes"],
-    );
+fn mysql_allows_id_length_prefix() {
+    let dml = indoc! {r#"
+        model A {
+          id String @id(length: 30) @test.VarChar(255)
+        }
+    "#};
 
-    let schema = parse(&dml);
-    schema.assert_has_model("User");
+    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    assert!(datamodel::parse_schema(&schema).is_ok());
+}
 
-    // user_model.assert_has_pk(PrimaryKeyDefinition {
-    //     name: None,
-    //     db_name: Some("User_pkey".to_string()),
-    //     fields: vec![
-    //         ("firstName".to_string(), None),
-    //         ("middleName".to_string(), Some(1)),
-    //         ("lastName".to_string(), None),
-    //     ],
-    //     defined_on_field: false,
-    // });
+#[test]
+fn mysql_allows_compound_id_length_prefix() {
+    let dml = indoc! {r#"
+        model A {
+          a String @test.VarChar(255)
+          b String @test.VarChar(255)
+
+          @@id([a(length: 10), b(length: 20)])
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    assert!(datamodel::parse_schema(&schema).is_ok());
+}
+
+#[test]
+fn mssql_allows_id_sort_argument() {
+    let dml = indoc! {r#"
+        model A {
+          id Int @id(sort: Desc)
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::SqlServer, &["extendedIndexes"]);
+    assert!(datamodel::parse_schema(&schema).is_ok());
+}
+
+#[test]
+fn mssql_allows_compound_id_sort_argument() {
+    let dml = indoc! {r#"
+        model A {
+          a String @test.VarChar(255)
+          b String @test.VarChar(255)
+
+          @@id([a(sort: Asc), b(sort: Desc)])
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::SqlServer, &["extendedIndexes"]);
+    assert!(datamodel::parse_schema(&schema).is_ok());
 }

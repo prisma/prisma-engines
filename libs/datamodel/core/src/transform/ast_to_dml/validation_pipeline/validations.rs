@@ -7,6 +7,7 @@ mod relations;
 
 use self::names::Names;
 use crate::{
+    ast,
     diagnostics::Diagnostics,
     transform::ast_to_dml::db::{walkers::RefinedRelationWalker, ParserDatabase},
 };
@@ -19,6 +20,22 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, r
         models::has_a_strict_unique_criteria(model, diagnostics);
         models::has_a_unique_primary_key_name(db, model, diagnostics);
         models::uses_sort_or_length_on_primary_without_preview_flag(db, model, diagnostics);
+        models::primary_key_length_prefix_supported(db, model, diagnostics);
+        models::primary_key_sort_order_supported(db, model, diagnostics);
+
+        if let Some(pk) = model.primary_key() {
+            for field_attribute in pk.scalar_field_attributes() {
+                // Type aliases will panic here... :(
+                let span = if pk.has_ast_attribute() {
+                    pk.ast_attribute().span
+                } else {
+                    ast::Span::empty()
+                };
+
+                let attribute = ("id", span);
+                fields::validate_length_used_with_correct_types(db, field_attribute, attribute, diagnostics);
+            }
+        }
 
         for field in model.scalar_fields() {
             fields::validate_client_name(field.into(), &names, diagnostics);
@@ -42,6 +59,17 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, r
         for index in model.indexes() {
             indexes::has_a_unique_constraint_name(db, index, diagnostics);
             indexes::uses_length_or_sort_without_preview_flag(db, index, diagnostics);
+            indexes::field_length_prefix_supported(db, index, diagnostics);
+
+            for field_attribute in index.scalar_field_attributes() {
+                let span = index
+                    .ast_attribute()
+                    .map(|attr| attr.span)
+                    .unwrap_or_else(ast::Span::empty);
+
+                let attribute = (index.attribute_name(), span);
+                fields::validate_length_used_with_correct_types(db, field_attribute, attribute, diagnostics);
+            }
         }
     }
 

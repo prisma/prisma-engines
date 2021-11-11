@@ -3,7 +3,11 @@ use std::borrow::Cow;
 use crate::{
     ast,
     common::constraint_names::ConstraintNames,
-    transform::ast_to_dml::db::{types::IdAttribute, walkers::ScalarFieldWalker, ParserDatabase},
+    transform::ast_to_dml::db::{
+        types::IdAttribute,
+        walkers::{ScalarFieldAttributeWalker, ScalarFieldWalker},
+        ParserDatabase,
+    },
 };
 
 #[derive(Copy, Clone)]
@@ -14,8 +18,13 @@ pub(crate) struct PrimaryKeyWalker<'ast, 'db> {
 }
 
 impl<'ast, 'db> PrimaryKeyWalker<'ast, 'db> {
+    #[track_caller]
     pub(crate) fn ast_attribute(self) -> &'ast ast::Attribute {
         self.ast_model().id_attribute()
+    }
+
+    pub(crate) fn has_ast_attribute(self) -> bool {
+        self.ast_model().try_id_attribute().is_some()
     }
 
     fn ast_model(&self) -> &'ast ast::Model {
@@ -58,6 +67,21 @@ impl<'ast, 'db> PrimaryKeyWalker<'ast, 'db> {
             db: self.db,
             scalar_field: &self.db.types.scalar_fields[&(self.model_id, field.field_id)],
         })
+    }
+
+    pub(crate) fn scalar_field_attributes(
+        self,
+    ) -> impl ExactSizeIterator<Item = ScalarFieldAttributeWalker<'ast, 'db>> + 'db {
+        self.attribute
+            .fields
+            .iter()
+            .enumerate()
+            .map(move |(field_arg_id, _)| ScalarFieldAttributeWalker {
+                model_id: self.model_id,
+                fields: &self.attribute.fields,
+                db: self.db,
+                field_arg_id,
+            })
     }
 
     pub(crate) fn contains_exactly_fields_by_id(self, fields: &[ast::FieldId]) -> bool {
