@@ -111,7 +111,11 @@ mod tests {
                                 name: None,
                                 db_name: None,
                                 fields: [
-                                    "required",
+                                    PrimaryKeyField {
+                                        name: "required",
+                                        sort_order: None,
+                                        length: None,
+                                    },
                                 ],
                                 defined_on_field: true,
                             },

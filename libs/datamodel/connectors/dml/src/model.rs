@@ -53,7 +53,7 @@ pub struct PrimaryKeyDefinition {
     pub defined_on_field: bool,
 }
 
-///A field in a Primary Key that optionally defines a sortorder and length limit.
+///A field in a Primary Key that optionally defines a sort order and length limit.
 #[derive(Debug, PartialEq, Clone)]
 pub struct PrimaryKeyField {
     pub name: String,
