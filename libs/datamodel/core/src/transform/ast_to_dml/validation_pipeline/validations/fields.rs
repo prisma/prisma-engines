@@ -77,6 +77,7 @@ pub(crate) fn has_a_unique_default_constraint_name(
     }
 }
 
+/// The length prefix can be used with strings and byte columns.
 pub(crate) fn validate_length_used_with_correct_types(
     db: &ParserDatabase<'_>,
     attr: ScalarFieldAttributeWalker<'_, '_>,

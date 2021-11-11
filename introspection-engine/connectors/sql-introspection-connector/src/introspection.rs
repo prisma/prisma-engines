@@ -66,17 +66,13 @@ pub fn introspect(
             model.add_index(calculate_index(index));
         }
 
-        match &table.primary_key {
-            // TODO: enable with preview flag, when dml index extensions are done.
-            Some(pk) if pk.columns.iter().all(|c| c.length.is_none()) => {
-                model.primary_key = Some(PrimaryKeyDefinition {
-                    name: None,
-                    db_name: pk.constraint_name.clone(),
-                    fields: pk.columns.iter().map(|c| c.name().to_string()).collect(),
-                    defined_on_field: pk.columns.len() == 1,
-                });
-            }
-            _ => (),
+        if let Some(pk) = &table.primary_key {
+            model.primary_key = Some(PrimaryKeyDefinition {
+                name: None,
+                db_name: pk.constraint_name.clone(),
+                fields: pk.columns.iter().map(|c| c.name().to_string()).collect(),
+                defined_on_field: pk.columns.len() == 1,
+            });
         }
 
         version_check.always_has_created_at_updated_at(table, &model);
