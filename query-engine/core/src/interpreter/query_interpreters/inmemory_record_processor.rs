@@ -1,6 +1,6 @@
 use connector::QueryArguments;
 use itertools::Itertools;
-use prisma_models::{FieldValues, ManyRecords, ModelProjection, Record};
+use prisma_models::{ManyRecords, ModelProjection, Record, SelectionResult};
 use std::ops::Deref;
 
 #[derive(Debug)]
@@ -154,7 +154,7 @@ impl InMemoryRecordProcessor {
 
         // The records are sorted by their parent id. Hence we just need to remember the count for the last parent id to apply pagination.
         let mut current_count: i64 = 0;
-        let mut last_parent_id: Option<FieldValues> = None;
+        let mut last_parent_id: Option<SelectionResult> = None;
 
         many_records.records.retain(|record| {
             if last_parent_id == record.parent_id {

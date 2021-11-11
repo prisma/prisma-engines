@@ -6,7 +6,7 @@ use connector_interface::{
     self as connector, filter::Filter, AggregationRow, AggregationSelection, QueryArguments, ReadOperations,
     RecordFilter, Transaction, WriteArgs, WriteOperations,
 };
-use prisma_models::{prelude::*, FieldValues};
+use prisma_models::{prelude::*, SelectionResult};
 use prisma_value::PrismaValue;
 use quaint::prelude::ConnectionInfo;
 
@@ -97,8 +97,8 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
     async fn get_related_m2m_record_ids(
         &mut self,
         from_field: &RelationFieldRef,
-        from_record_ids: &[FieldValues],
-    ) -> connector::Result<Vec<(FieldValues, FieldValues)>> {
+        from_record_ids: &[SelectionResult],
+    ) -> connector::Result<Vec<(SelectionResult, SelectionResult)>> {
         catch(self.connection_info.clone(), async move {
             read::get_related_m2m_record_ids(&self.inner, from_field, from_record_ids).await
         })
@@ -122,7 +122,7 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
 
 #[async_trait]
 impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
-    async fn create_record(&mut self, model: &ModelRef, args: WriteArgs) -> connector::Result<FieldValues> {
+    async fn create_record(&mut self, model: &ModelRef, args: WriteArgs) -> connector::Result<SelectionResult> {
         catch(self.connection_info.clone(), async move {
             write::create_record(&self.inner, model, args).await
         })
@@ -153,7 +153,7 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
         model: &ModelRef,
         record_filter: RecordFilter,
         args: WriteArgs,
-    ) -> connector::Result<Vec<FieldValues>> {
+    ) -> connector::Result<Vec<SelectionResult>> {
         catch(self.connection_info.clone(), async move {
             write::update_records(&self.inner, model, record_filter, args).await
         })
@@ -170,8 +170,8 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
     async fn m2m_connect(
         &mut self,
         field: &RelationFieldRef,
-        parent_id: &FieldValues,
-        child_ids: &[FieldValues],
+        parent_id: &SelectionResult,
+        child_ids: &[SelectionResult],
     ) -> connector::Result<()> {
         catch(self.connection_info.clone(), async move {
             write::m2m_connect(&self.inner, field, parent_id, child_ids).await
@@ -182,8 +182,8 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
     async fn m2m_disconnect(
         &mut self,
         field: &RelationFieldRef,
-        parent_id: &FieldValues,
-        child_ids: &[FieldValues],
+        parent_id: &SelectionResult,
+        child_ids: &[SelectionResult],
     ) -> connector::Result<()> {
         catch(self.connection_info.clone(), async move {
             write::m2m_disconnect(&self.inner, field, parent_id, child_ids).await

@@ -11,7 +11,7 @@ use user_facing_errors::query_engine::DatabaseConstraint;
 /// Create a single record to the database defined in `conn`, resulting into a
 /// `RecordProjection` as an identifier pointing to the just-created record.
 #[tracing::instrument(skip(conn, model, args))]
-pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArgs) -> crate::Result<FieldValues> {
+pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArgs) -> crate::Result<SelectionResult> {
     let (insert, returned_id) = write::create_record(model, args);
 
     let result_set = match conn.insert(insert).await {
@@ -224,7 +224,7 @@ pub async fn update_records(
     model: &ModelRef,
     record_filter: RecordFilter,
     args: WriteArgs,
-) -> crate::Result<Vec<FieldValues>> {
+) -> crate::Result<Vec<SelectionResult>> {
     let ids = conn.filter_selectors(model, record_filter).await?;
     let id_args = pick_args(&model.primary_identifier().into(), &args);
 
@@ -233,7 +233,7 @@ pub async fn update_records(
     }
 
     let updates = {
-        let ids: Vec<&FieldValues> = ids.iter().map(|id| &*id).collect();
+        let ids: Vec<&SelectionResult> = ids.iter().map(|id| &*id).collect();
         write::update_many(model, ids.as_slice(), args)?
     };
 
@@ -252,7 +252,7 @@ pub async fn delete_records(
     record_filter: RecordFilter,
 ) -> crate::Result<usize> {
     let ids = conn.filter_selectors(model, record_filter).await?;
-    let ids: Vec<&FieldValues> = ids.iter().map(|id| &*id).collect();
+    let ids: Vec<&SelectionResult> = ids.iter().map(|id| &*id).collect();
     let count = ids.len();
 
     if count == 0 {
@@ -272,8 +272,8 @@ pub async fn delete_records(
 pub async fn m2m_connect(
     conn: &dyn QueryExt,
     field: &RelationFieldRef,
-    parent_id: &FieldValues,
-    child_ids: &[FieldValues],
+    parent_id: &SelectionResult,
+    child_ids: &[SelectionResult],
 ) -> crate::Result<()> {
     let query = write::create_relation_table_records(field, parent_id, child_ids);
     conn.query(query).await?;
@@ -287,8 +287,8 @@ pub async fn m2m_connect(
 pub async fn m2m_disconnect(
     conn: &dyn QueryExt,
     field: &RelationFieldRef,
-    parent_id: &FieldValues,
-    child_ids: &[FieldValues],
+    parent_id: &SelectionResult,
+    child_ids: &[SelectionResult],
 ) -> crate::Result<()> {
     let query = write::delete_relation_table_records(field, parent_id, child_ids);
     conn.delete(query).await?;

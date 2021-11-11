@@ -22,7 +22,7 @@ pub struct SkipAndLimit {
 #[derive(Debug, Clone)]
 pub struct QueryArguments {
     pub model: ModelRef,
-    pub cursor: Option<FieldValues>,
+    pub cursor: Option<SelectionResult>,
     pub take: Option<i64>,
     pub skip: Option<i64>,
     pub filter: Option<Filter>,

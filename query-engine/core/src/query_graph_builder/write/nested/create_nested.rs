@@ -6,7 +6,7 @@ use crate::{
     write::write_args_parser::WriteArgsParser,
     ParsedInputList, ParsedInputValue,
 };
-use connector::{Filter, IdFilter};
+use connector::{Filter, IntoFilter};
 use prisma_models::{ModelRef, RelationFieldRef};
 use std::{convert::TryInto, sync::Arc};
 

@@ -4,21 +4,32 @@ use chrono::{TimeZone, Utc};
 use itertools::Itertools;
 use mongodb::bson::{oid::ObjectId, spec::BinarySubtype, Binary, Bson, Timestamp};
 use native_types::MongoDbType;
-use prisma_models::{PrismaValue, ScalarFieldRef, TypeIdentifier};
+use prisma_models::{PrismaValue, ScalarFieldRef, SelectedField, TypeIdentifier};
 use serde_json::Value;
 use std::{convert::TryFrom, fmt::Display};
 
 /// Transforms a `PrismaValue` of a specific field into the BSON mapping as prescribed by the native types
 /// or as defined by the default `TypeIdentifier` to BSON mapping.
+impl IntoBson for (&SelectedField, PrismaValue) {
+    fn into_bson(self) -> crate::Result<Bson> {
+        let (selection, value) = self;
+
+        match selection {
+            SelectedField::Scalar(sf) => (sf, value).into_bson(),
+            SelectedField::Composite(_) => todo!(), // [Composites] todo
+        }
+    }
+}
+
 impl IntoBson for (&ScalarFieldRef, PrismaValue) {
     fn into_bson(self) -> crate::Result<Bson> {
-        let (field, value) = self;
+        let (sf, value) = self;
 
         // This is _insanely_ inefficient, but we have no real choice with the current interface.
-        let mongo_type: Option<MongoDbType> = field.native_type.as_ref().map(|nt| nt.deserialize_native_type());
+        let mongo_type: Option<MongoDbType> = sf.native_type.as_ref().map(|nt| nt.deserialize_native_type());
 
         // If we have a native type, use that one as source of truth for mapping, else use the type ident for defaults.
-        match (mongo_type, &field.type_identifier, value) {
+        match (mongo_type, &sf.type_identifier, value) {
             // We assume this is always valid if it arrives here.
             (_, _, PrismaValue::Null) => Ok(Bson::Null),
             (Some(mt), _, value) => (mt, value).into_bson(),

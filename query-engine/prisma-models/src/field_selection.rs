@@ -2,23 +2,23 @@ use std::fmt::Display;
 
 use itertools::Itertools;
 
-use crate::{CompositeFieldRef, DomainError, Field, FieldValues, RelationField, ScalarFieldRef};
+use crate::{CompositeFieldRef, DomainError, Field, RelationField, ScalarFieldRef, SelectionResult};
 
 /// A selection of fields from a model.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct FieldSelection {
     selections: Vec<SelectedField>,
 }
 
 /// A selected field. Can be contained on a model or composite type.
 // Todo: Think about virtual selections like aggregations.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SelectedField {
     Scalar(ScalarFieldRef),
     Composite(CompositeSelection),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct CompositeSelection {
     pub field: CompositeFieldRef,
     pub selections: Vec<SelectedField>,
@@ -116,7 +116,7 @@ impl FieldSelection {
     /// Assumes caller knows that the exchange can be done, but still errors if lengths mismatch.
     /// Additionally performs a type coercion based on the source and destination field types.
     /// Resistance is futile.
-    pub fn assimilate(&self, values: FieldValues) -> crate::Result<FieldValues> {
+    pub fn assimilate(&self, values: SelectionResult) -> crate::Result<SelectionResult> {
         if self.selections.len() != values.len() {
             Err(DomainError::ConversionFailure(
                 "field values".to_owned(),

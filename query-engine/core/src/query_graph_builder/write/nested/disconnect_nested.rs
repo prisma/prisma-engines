@@ -3,7 +3,7 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     FilteredQuery, ParsedInputMap, ParsedInputValue, Query, WriteQuery,
 };
-use connector::{Filter, IdFilter};
+use connector::{Filter, IntoFilter};
 use itertools::Itertools;
 use prisma_models::{ModelRef, PrismaValue, RelationFieldRef};
 use std::convert::TryInto;

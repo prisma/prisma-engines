@@ -18,7 +18,7 @@ mod prisma_value_ext;
 mod projections;
 mod record;
 mod relation;
-mod field_values;
+mod selection_result;
 
 pub mod pk;
 pub mod prelude;
@@ -39,7 +39,7 @@ pub use prisma_value_ext::*;
 pub use projections::*;
 pub use record::*;
 pub use relation::*;
-pub use field_values::*;
+pub use selection_result::*;
 
 // reexport
 pub use prisma_value::*;

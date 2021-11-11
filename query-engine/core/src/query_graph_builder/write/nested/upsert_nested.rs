@@ -5,7 +5,7 @@ use crate::{
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputMap, ParsedInputValue,
 };
-use connector::{Filter, IdFilter};
+use connector::{Filter, IntoFilter};
 use prisma_models::RelationFieldRef;
 use std::{convert::TryInto, sync::Arc};
 

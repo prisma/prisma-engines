@@ -1,6 +1,6 @@
 use crate::{
-    DomainError, FieldSelection, FieldValues, ModelProjection, OrderBy, PrismaValue, PrismaValueExtensions,
-    ScalarFieldRef, SortOrder,
+    DomainError, FieldSelection, ModelProjection, OrderBy, PrismaValue, PrismaValueExtensions, ScalarFieldRef,
+    SelectionResult, SortOrder,
 };
 use itertools::Itertools;
 use std::collections::HashMap;
@@ -25,7 +25,7 @@ impl SingleRecord {
         Self { record, field_names }
     }
 
-    pub fn projection(&self, projection: &ModelProjection) -> crate::Result<FieldValues> {
+    pub fn projection(&self, projection: &ModelProjection) -> crate::Result<SelectionResult> {
         self.record.projection(&self.field_names, projection)
     }
 
@@ -101,7 +101,7 @@ impl ManyRecords {
         self.records.push(record);
     }
 
-    pub fn projections(&self, model_projection: &ModelProjection) -> crate::Result<Vec<FieldValues>> {
+    pub fn projections(&self, model_projection: &ModelProjection) -> crate::Result<Vec<SelectionResult>> {
         self.records
             .iter()
             .map(|record| record.projection(&self.field_names, model_projection))
@@ -138,7 +138,7 @@ impl ManyRecords {
 #[derive(Debug, Default, Clone, Eq, PartialEq, Hash)]
 pub struct Record {
     pub values: Vec<PrismaValue>,
-    pub parent_id: Option<FieldValues>,
+    pub parent_id: Option<SelectionResult>,
 }
 
 impl Record {
@@ -149,7 +149,11 @@ impl Record {
         }
     }
 
-    pub fn projection(&self, field_names: &[String], model_projection: &ModelProjection) -> crate::Result<FieldValues> {
+    pub fn projection(
+        &self,
+        field_names: &[String],
+        model_projection: &ModelProjection,
+    ) -> crate::Result<SelectionResult> {
         let pairs: Vec<(ScalarFieldRef, PrismaValue)> = model_projection
             .fields()
             .into_iter()
@@ -167,7 +171,7 @@ impl Record {
             })
             .collect::<crate::Result<Vec<_>>>()?;
 
-        Ok(FieldValues { pairs })
+        Ok(SelectionResult::new(pairs))
     }
 
     pub fn identifying_values(
@@ -203,7 +207,7 @@ impl Record {
         Ok(&self.values[index])
     }
 
-    pub fn set_parent_id(&mut self, parent_id: FieldValues) {
+    pub fn set_parent_id(&mut self, parent_id: SelectionResult) {
         self.parent_id = Some(parent_id);
     }
 }

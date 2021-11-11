@@ -5,7 +5,7 @@ use crate::{
 };
 use connector_interface::{ConnectionLike, ReadOperations, RelAggregationSelection, Transaction, WriteOperations};
 use mongodb::options::{Acknowledgment, ReadConcern, TransactionOptions, WriteConcern};
-use prisma_models::FieldValues;
+use prisma_models::SelectionResult;
 
 pub struct MongoDbTransaction<'conn> {
     connection: &'conn mut MongoDbConnection,
@@ -65,7 +65,7 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
         &mut self,
         model: &ModelRef,
         args: connector_interface::WriteArgs,
-    ) -> connector_interface::Result<FieldValues> {
+    ) -> connector_interface::Result<SelectionResult> {
         catch(async move {
             write::create_record(&self.connection.database, &mut self.connection.session, model, args).await
         })
@@ -96,7 +96,7 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
         model: &ModelRef,
         record_filter: connector_interface::RecordFilter,
         args: connector_interface::WriteArgs,
-    ) -> connector_interface::Result<Vec<FieldValues>> {
+    ) -> connector_interface::Result<Vec<SelectionResult>> {
         catch(async move {
             write::update_records(
                 &self.connection.database,
@@ -130,8 +130,8 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
     async fn m2m_connect(
         &mut self,
         field: &RelationFieldRef,
-        parent_id: &FieldValues,
-        child_ids: &[FieldValues],
+        parent_id: &SelectionResult,
+        child_ids: &[SelectionResult],
     ) -> connector_interface::Result<()> {
         catch(async move {
             write::m2m_connect(
@@ -149,8 +149,8 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
     async fn m2m_disconnect(
         &mut self,
         field: &RelationFieldRef,
-        parent_id: &FieldValues,
-        child_ids: &[FieldValues],
+        parent_id: &SelectionResult,
+        child_ids: &[SelectionResult],
     ) -> connector_interface::Result<()> {
         catch(async move {
             write::m2m_disconnect(
@@ -229,8 +229,8 @@ impl<'conn> ReadOperations for MongoDbTransaction<'conn> {
     async fn get_related_m2m_record_ids(
         &mut self,
         from_field: &RelationFieldRef,
-        from_record_ids: &[FieldValues],
-    ) -> connector_interface::Result<Vec<(FieldValues, FieldValues)>> {
+        from_record_ids: &[SelectionResult],
+    ) -> connector_interface::Result<Vec<(SelectionResult, SelectionResult)>> {
         catch(async move {
             read::get_related_m2m_record_ids(
                 &self.connection.database,

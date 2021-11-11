@@ -1,5 +1,5 @@
 use crate::{
-    dml::FieldArity, Field, FieldSelection, FieldValues, PrismaValue, ScalarFieldRef, SelectedField, TypeIdentifier,
+    dml::FieldArity, Field, FieldSelection, PrismaValue, ScalarFieldRef, SelectedField, SelectionResult, TypeIdentifier,
 };
 use itertools::Itertools;
 
@@ -100,13 +100,16 @@ impl ModelProjection {
         self.scalar_fields().map(|f| f.type_identifier_with_arity()).collect()
     }
 
-    /// Checks if a given `FieldValues` belongs to this `ModelProjection`.
-    pub fn matches(&self, field_values: &FieldValues) -> bool {
-        self.scalar_fields().eq(field_values.fields())
+    /// Checks if a given `ReturnValues` belongs to this `ModelProjection`.
+    pub fn matches(&self, return_values: &SelectionResult) -> bool {
+        return_values.pairs.iter().all(|(rt, _)| match rt {
+            SelectedField::Scalar(sf) => self.find(&sf.name).is_some(),
+            SelectedField::Composite(cf) => self.find(&cf.field.name).is_some(),
+        })
     }
 
     /// Creates a record projection of the model projection containing only null values.
-    pub fn empty_record_projection(&self) -> FieldValues {
+    pub fn empty_record_projection(&self) -> SelectionResult {
         self.scalar_fields()
             .map(|f| (f, PrismaValue::Null))
             .collect::<Vec<_>>()
@@ -125,8 +128,8 @@ impl ModelProjection {
 
     /// Creates a record identifier from raw values.
     /// No checks for length, type, or similar is performed, hence "unchecked".
-    pub fn from_unchecked(&self, values: Vec<PrismaValue>) -> FieldValues {
-        FieldValues::new(self.scalar_fields().zip(values).collect())
+    pub fn from_unchecked(&self, values: Vec<PrismaValue>) -> SelectionResult {
+        SelectionResult::new(self.scalar_fields().zip(values).collect())
     }
 
     /// Checks if this model projection contains given field.
@@ -169,12 +172,15 @@ impl IntoIterator for ModelProjection {
     }
 }
 
-impl From<&FieldValues> for ModelProjection {
-    fn from(p: &FieldValues) -> Self {
+impl From<&SelectionResult> for ModelProjection {
+    fn from(p: &SelectionResult) -> Self {
         let fields = p
             .pairs
             .iter()
-            .map(|(field, _)| field.clone().into())
+            .map(|(field_selection, _)| match field_selection {
+                SelectedField::Scalar(sf) => sf.clone().into(),
+                SelectedField::Composite(cf) => cf.field.clone().into(),
+            })
             .collect::<Vec<_>>();
 
         Self::new(fields)

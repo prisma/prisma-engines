@@ -4,13 +4,13 @@
 //! [ScalarCompare](/query-connector/trait.ScalarCompare.html) and
 //! [RelationCompare](/query-connector/trait.RelationCompare.html).
 
-mod id_filter;
+mod into_filter;
 mod json;
 mod list;
 mod relation;
 mod scalar;
 
-pub use id_filter::*;
+pub use into_filter::*;
 pub use json::*;
 pub use list::*;
 pub use relation::*;

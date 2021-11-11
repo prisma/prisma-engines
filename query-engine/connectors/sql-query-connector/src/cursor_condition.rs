@@ -1,6 +1,6 @@
 use crate::{
     join_utils::AliasedJoin,
-    model_extensions::{AsColumn, AsColumns, AsTable, ScalarFieldExt},
+    model_extensions::{AsColumn, AsColumns, AsTable, SelectionResultExt},
     ordering::OrderByDefinition,
     query_arguments_ext::QueryArgumentsExt,
 };
@@ -127,8 +127,8 @@ pub fn build(
     match query_arguments.cursor {
         None => (None, ConditionTree::NoCondition),
         Some(ref cursor) => {
-            let cursor_fields: Vec<_> = cursor.fields().collect();
-            let cursor_values: Vec<_> = cursor.pairs.iter().map(|(f, v)| f.value(v.clone())).collect();
+            let cursor_fields: Vec<_> = cursor.as_scalar_fields().expect("Cursor fields contain non-scalars.");
+            let cursor_values: Vec<_> = cursor.db_values();
             let cursor_columns: Vec<_> = cursor_fields.as_slice().as_columns().collect();
             let cursor_row = Row::from(cursor_columns);
 
