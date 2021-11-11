@@ -17,12 +17,11 @@ pub struct Datasource {
     pub url_span: Span,
     pub documentation: Option<String>,
     /// the connector of the active provider
-    pub active_connector: Box<dyn Connector>,
+    pub active_connector: &'static dyn Connector,
     /// An optional user-defined shadow database URL.
     pub shadow_database_url: Option<(StringFromEnvVar, Span)>,
     /// In which layer referential actions are handled.
     pub referential_integrity: Option<ReferentialIntegrity>,
-    pub default_referential_integrity: ReferentialIntegrity,
 }
 
 impl std::fmt::Debug for Datasource {
@@ -46,8 +45,11 @@ impl Datasource {
         ConnectorCapabilities::new(capabilities)
     }
 
+    /// The applicable referential integrity mode for this datasource.
+    #[allow(clippy::or_fun_call)] // not applicable in this case
     pub fn referential_integrity(&self) -> ReferentialIntegrity {
-        self.referential_integrity.unwrap_or(self.default_referential_integrity)
+        self.referential_integrity
+            .unwrap_or(self.active_connector.default_referential_integrity())
     }
 
     /// Load the database URL, validating it and resolving env vars in the

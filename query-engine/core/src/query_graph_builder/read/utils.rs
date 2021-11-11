@@ -57,6 +57,7 @@ pub fn collect_nested_queries(from: Vec<FieldPair>, model: &ModelRef) -> QueryGr
 
             match model_field {
                 Field::Scalar(_) => None,
+                Field::Composite(_) => None,
                 Field::Relation(ref rf) => {
                     let model = rf.related_model();
                     let parent = Arc::clone(&rf);

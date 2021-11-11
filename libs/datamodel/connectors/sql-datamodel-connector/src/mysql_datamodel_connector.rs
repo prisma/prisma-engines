@@ -93,45 +93,30 @@ const NATIVE_TYPE_CONSTRUCTORS: &[NativeTypeConstructor] = &[
     NativeTypeConstructor::without_args(JSON_TYPE_NAME, &[ScalarType::Json]),
 ];
 
+const CAPABILITIES: &[ConnectorCapability] = &[
+    ConnectorCapability::RelationsOverNonUniqueCriteria,
+    ConnectorCapability::Enums,
+    ConnectorCapability::Json,
+    ConnectorCapability::AutoIncrementAllowedOnNonId,
+    ConnectorCapability::RelationFieldsInArbitraryOrder,
+    ConnectorCapability::CreateMany,
+    ConnectorCapability::WritableAutoincField,
+    ConnectorCapability::CreateSkipDuplicates,
+    ConnectorCapability::UpdateableId,
+    ConnectorCapability::JsonFilteringJsonPath,
+    ConnectorCapability::CreateManyWriteableAutoIncId,
+    ConnectorCapability::AutoIncrement,
+    ConnectorCapability::CompoundIds,
+    ConnectorCapability::AnyId,
+    ConnectorCapability::QueryRaw,
+    ConnectorCapability::NamedForeignKeys,
+    ConnectorCapability::AdvancedJsonNullability,
+    ConnectorCapability::ForeignKeys,
+];
+
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[ConstraintScope::GlobalForeignKey, ConstraintScope::ModelKeyIndex];
 
-pub struct MySqlDatamodelConnector {
-    capabilities: Vec<ConnectorCapability>,
-    referential_integrity: ReferentialIntegrity,
-}
-
-impl MySqlDatamodelConnector {
-    pub fn new(referential_integrity: ReferentialIntegrity) -> MySqlDatamodelConnector {
-        let mut capabilities = vec![
-            ConnectorCapability::RelationsOverNonUniqueCriteria,
-            ConnectorCapability::Enums,
-            ConnectorCapability::Json,
-            ConnectorCapability::AutoIncrementAllowedOnNonId,
-            ConnectorCapability::RelationFieldsInArbitraryOrder,
-            ConnectorCapability::CreateMany,
-            ConnectorCapability::WritableAutoincField,
-            ConnectorCapability::CreateSkipDuplicates,
-            ConnectorCapability::UpdateableId,
-            ConnectorCapability::JsonFilteringJsonPath,
-            ConnectorCapability::CreateManyWriteableAutoIncId,
-            ConnectorCapability::AutoIncrement,
-            ConnectorCapability::CompoundIds,
-            ConnectorCapability::AnyId,
-            ConnectorCapability::QueryRaw,
-            ConnectorCapability::NamedForeignKeys,
-            ConnectorCapability::AdvancedJsonNullability,
-        ];
-
-        if referential_integrity.uses_foreign_keys() {
-            capabilities.push(ConnectorCapability::ForeignKeys);
-        }
-
-        MySqlDatamodelConnector {
-            capabilities,
-            referential_integrity,
-        }
-    }
-}
+pub struct MySqlDatamodelConnector;
 
 const SCALAR_TYPE_DEFAULTS: &[(ScalarType, MySqlType)] = &[
     (ScalarType::Int, MySqlType::Int),
@@ -150,23 +135,18 @@ impl Connector for MySqlDatamodelConnector {
         "MySQL"
     }
 
-    fn capabilities(&self) -> &[ConnectorCapability] {
-        &self.capabilities
+    fn capabilities(&self) -> &'static [ConnectorCapability] {
+        CAPABILITIES
     }
 
     fn constraint_name_length(&self) -> usize {
         64
     }
 
-    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
+    fn referential_actions(&self, referential_integrity: &ReferentialIntegrity) -> BitFlags<ReferentialAction> {
         use ReferentialAction::*;
 
-        self.referential_integrity
-            .allowed_referential_actions(Restrict | Cascade | SetNull | NoAction | SetDefault)
-    }
-
-    fn emulates_referential_actions(&self) -> bool {
-        matches!(self.referential_integrity, ReferentialIntegrity::Prisma)
+        referential_integrity.allowed_referential_actions(Restrict | Cascade | SetNull | NoAction | SetDefault)
     }
 
     fn scalar_type_for_native_type(&self, native_type: serde_json::Value) -> ScalarType {

@@ -10,7 +10,7 @@ use objects::*;
 use prisma_models::{RelationFieldRef, ScalarFieldRef};
 
 fn map_scalar_input_type_for_field(ctx: &mut BuilderContext, field: &ScalarFieldRef) -> InputType {
-    map_scalar_input_type(ctx, &field.type_identifier, field.is_list)
+    map_scalar_input_type(ctx, &field.type_identifier, field.is_list())
 }
 
 fn map_scalar_input_type(ctx: &mut BuilderContext, typ: &TypeIdentifier, list: bool) -> InputType {

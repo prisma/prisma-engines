@@ -50,7 +50,7 @@ pub fn nested_disconnect(
         } else {
             // One-to-many specify a number of finders if the parent side is the to-one.
             // todo check if this if else is really still required.
-            if parent_relation_field.is_list {
+            if parent_relation_field.is_list() {
                 let filters = utils::coerce_vec(value)
                     .into_iter()
                     .map(|value: ParsedInputValue| {
@@ -160,7 +160,7 @@ fn handle_one_to_x(
 
     // If we're in a 1:m scenario and either relation side is required, a disconnect is impossible, as some
     // relation requirement would be violated with the disconnect.
-    if parent_relation_field.is_required || child_relation_field.is_required {
+    if parent_relation_field.is_required() || child_relation_field.is_required() {
         return Err(QueryGraphBuilderError::RelationViolation(parent_relation_field.into()));
     }
 

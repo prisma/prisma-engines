@@ -73,7 +73,7 @@ impl QueryArguments {
     pub fn contains_null_cursor(&self) -> bool {
         self.cursor.is_some()
             && self.order_by.iter().any(|o| match o {
-                OrderBy::Scalar(o) => !o.field.is_required,
+                OrderBy::Scalar(o) => !o.field.is_required(),
                 OrderBy::Aggregation(_) => false,
                 OrderBy::Relevance(_) => false,
             })

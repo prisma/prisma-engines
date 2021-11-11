@@ -1,6 +1,8 @@
-use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
 use datamodel_connector::helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32};
-use datamodel_connector::{Connector, ConnectorCapability, ConstraintScope, ReferentialIntegrity};
+use datamodel_connector::{
+    connector_error::{ConnectorError, ErrorKind},
+    Connector, ConnectorCapability, ConstraintScope, ReferentialIntegrity,
+};
 use dml::{
     field::{Field, FieldType},
     model::Model,
@@ -82,39 +84,26 @@ const CONSTRAINT_SCOPES: &[ConstraintScope] = &[
     ConstraintScope::ModelPrimaryKeyKeyIndex,
 ];
 
-pub struct MsSqlDatamodelConnector {
-    capabilities: Vec<ConnectorCapability>,
-    referential_integrity: ReferentialIntegrity,
-}
+const CAPABILITIES: &[ConnectorCapability] = &[
+    ConnectorCapability::AnyId,
+    ConnectorCapability::AutoIncrement,
+    ConnectorCapability::AutoIncrementAllowedOnNonId,
+    ConnectorCapability::AutoIncrementMultipleAllowed,
+    ConnectorCapability::AutoIncrementNonIndexedAllowed,
+    ConnectorCapability::CompoundIds,
+    ConnectorCapability::CreateMany,
+    ConnectorCapability::ForeignKeys,
+    ConnectorCapability::NamedDefaultValues,
+    ConnectorCapability::NamedForeignKeys,
+    ConnectorCapability::NamedPrimaryKeys,
+    ConnectorCapability::QueryRaw,
+    ConnectorCapability::ReferenceCycleDetection,
+    ConnectorCapability::UpdateableId,
+];
+
+pub struct MsSqlDatamodelConnector;
 
 impl MsSqlDatamodelConnector {
-    pub fn new(referential_integrity: ReferentialIntegrity) -> MsSqlDatamodelConnector {
-        let mut capabilities = vec![
-            ConnectorCapability::AutoIncrement,
-            ConnectorCapability::AutoIncrementAllowedOnNonId,
-            ConnectorCapability::AutoIncrementMultipleAllowed,
-            ConnectorCapability::AutoIncrementNonIndexedAllowed,
-            ConnectorCapability::CompoundIds,
-            ConnectorCapability::CreateMany,
-            ConnectorCapability::UpdateableId,
-            ConnectorCapability::AnyId,
-            ConnectorCapability::QueryRaw,
-            ConnectorCapability::NamedPrimaryKeys,
-            ConnectorCapability::NamedForeignKeys,
-            ConnectorCapability::NamedDefaultValues,
-            ConnectorCapability::ReferenceCycleDetection,
-        ];
-
-        if referential_integrity.uses_foreign_keys() {
-            capabilities.push(ConnectorCapability::ForeignKeys);
-        }
-
-        MsSqlDatamodelConnector {
-            capabilities,
-            referential_integrity,
-        }
-    }
-
     fn parse_mssql_type_parameter(
         &self,
         r#type: &str,
@@ -157,19 +146,18 @@ impl Connector for MsSqlDatamodelConnector {
         "SQL Server"
     }
 
-    fn capabilities(&self) -> &[ConnectorCapability] {
-        &self.capabilities
+    fn capabilities(&self) -> &'static [ConnectorCapability] {
+        CAPABILITIES
     }
 
     fn constraint_name_length(&self) -> usize {
         128
     }
 
-    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
+    fn referential_actions(&self, referential_integrity: &ReferentialIntegrity) -> BitFlags<ReferentialAction> {
         use ReferentialAction::*;
 
-        self.referential_integrity
-            .allowed_referential_actions(NoAction | Cascade | SetNull | SetDefault)
+        referential_integrity.allowed_referential_actions(NoAction | Cascade | SetNull | SetDefault)
     }
 
     fn scalar_type_for_native_type(&self, native_type: serde_json::Value) -> ScalarType {

@@ -18,7 +18,7 @@ impl RecordProjection {
     }
 
     pub fn model(&self) -> Option<ModelRef> {
-        self.fields().next().map(|field| field.model())
+        self.fields().next().and_then(|field| field.container.as_model())
     }
 
     pub fn fields(&self) -> impl Iterator<Item = ScalarFieldRef> + '_ {

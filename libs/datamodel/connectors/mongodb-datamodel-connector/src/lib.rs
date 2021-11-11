@@ -13,59 +13,36 @@ use mongodb_types::*;
 use native_types::MongoDbType;
 use std::result::Result as StdResult;
 
+const CAPABILITIES: &[ConnectorCapability] = &[
+    ConnectorCapability::RelationsOverNonUniqueCriteria,
+    ConnectorCapability::Json,
+    ConnectorCapability::Enums,
+    ConnectorCapability::RelationFieldsInArbitraryOrder,
+    ConnectorCapability::CreateMany,
+    ConnectorCapability::ScalarLists,
+    ConnectorCapability::InsensitiveFilters,
+    ConnectorCapability::CompositeTypes,
+];
+
 type Result<T> = std::result::Result<T, ConnectorError>;
 
-pub struct MongoDbDatamodelConnector {
-    capabilities: Vec<ConnectorCapability>,
-    referential_integrity: ReferentialIntegrity,
-}
-
-impl MongoDbDatamodelConnector {
-    pub fn new() -> Self {
-        let capabilities = vec![
-            ConnectorCapability::RelationsOverNonUniqueCriteria,
-            ConnectorCapability::Json,
-            ConnectorCapability::Enums,
-            ConnectorCapability::RelationFieldsInArbitraryOrder,
-            ConnectorCapability::CreateMany,
-            ConnectorCapability::ScalarLists,
-            ConnectorCapability::InsensitiveFilters,
-            ConnectorCapability::CompositeTypes,
-        ];
-
-        Self {
-            capabilities,
-            referential_integrity: ReferentialIntegrity::Prisma,
-        }
-    }
-}
-
-impl Default for MongoDbDatamodelConnector {
-    fn default() -> Self {
-        Self::new()
-    }
-}
+pub struct MongoDbDatamodelConnector;
 
 impl Connector for MongoDbDatamodelConnector {
     fn name(&self) -> &str {
         "MongoDB"
     }
 
-    fn capabilities(&self) -> &[ConnectorCapability] {
-        &self.capabilities
+    fn capabilities(&self) -> &'static [ConnectorCapability] {
+        CAPABILITIES
     }
 
     fn constraint_name_length(&self) -> usize {
         127
     }
 
-    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
-        self.referential_integrity
-            .allowed_referential_actions(BitFlags::empty())
-    }
-
-    fn emulates_referential_actions(&self) -> bool {
-        true
+    fn referential_actions(&self, referential_integrity: &ReferentialIntegrity) -> BitFlags<ReferentialAction> {
+        referential_integrity.allowed_referential_actions(BitFlags::empty())
     }
 
     fn validate_field(&self, field: &dml::field::Field, errors: &mut Vec<ConnectorError>) {
@@ -179,5 +156,13 @@ impl Connector for MongoDbDatamodelConnector {
         }
 
         Ok(())
+    }
+
+    fn default_referential_integrity(&self) -> ReferentialIntegrity {
+        ReferentialIntegrity::Prisma
+    }
+
+    fn allowed_referential_integrity_settings(&self) -> enumflags2::BitFlags<ReferentialIntegrity> {
+        ReferentialIntegrity::Prisma.into()
     }
 }

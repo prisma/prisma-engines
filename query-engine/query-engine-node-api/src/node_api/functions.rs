@@ -1,16 +1,14 @@
+use crate::error::ApiError;
+use datamodel_connector::ConnectorCapabilities;
+use napi::{CallContext, JsString, JsUndefined, JsUnknown};
+use napi_derive::js_function;
+use prisma_models::InternalDataModelBuilder;
+use query_core::{schema_builder, BuildMode, QuerySchemaRef};
+use request_handlers::dmmf;
 use std::{
     collections::{BTreeMap, HashMap},
     sync::Arc,
 };
-
-use datamodel_connector::ConnectorCapabilities;
-use napi::{CallContext, JsString, JsUndefined, JsUnknown};
-use napi_derive::js_function;
-use prisma_models::DatamodelConverter;
-use query_core::{schema_builder, BuildMode, QuerySchemaRef};
-use request_handlers::dmmf;
-
-use crate::error::ApiError;
 
 #[js_function(0)]
 pub fn version(ctx: CallContext) -> napi::Result<JsUnknown> {
@@ -35,8 +33,6 @@ pub fn dmmf(ctx: CallContext) -> napi::Result<JsString> {
     let datamodel = datamodel::parse_datamodel(&datamodel_string)
         .map_err(|errors| ApiError::conversion(errors, &datamodel_string))?;
 
-    let template = DatamodelConverter::convert(&datamodel.subject);
-
     let config = datamodel::parse_configuration(&datamodel_string)
         .map_err(|errors| ApiError::conversion(errors, &datamodel_string))?;
 
@@ -45,7 +41,7 @@ pub fn dmmf(ctx: CallContext) -> napi::Result<JsString> {
         None => ConnectorCapabilities::empty(),
     };
 
-    let internal_data_model = template.build("".into());
+    let internal_data_model = InternalDataModelBuilder::from(&datamodel.subject).build("".into());
 
     let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(
         internal_data_model,

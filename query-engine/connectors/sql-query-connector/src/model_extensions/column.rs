@@ -1,30 +1,11 @@
-use crate::{
-    Field, ModelProjection, RelationField, RelationLinkManifestation, ScalarField, ScalarFieldExt, TypeIdentifier,
-};
+use crate::model_extensions::ScalarFieldExt;
 use itertools::Itertools;
+use prisma_models::{Field, ModelProjection, RelationField, RelationLinkManifestation, ScalarField, TypeIdentifier};
 use quaint::ast::{Column, Row, TypeDataLength, TypeFamily};
 use std::convert::AsRef;
 
 pub struct ColumnIterator {
-    count: usize,
     inner: Box<dyn Iterator<Item = Column<'static>> + 'static>,
-}
-
-impl ColumnIterator {
-    pub fn new(inner: impl Iterator<Item = Column<'static>> + 'static, count: usize) -> Self {
-        Self {
-            inner: Box::new(inner),
-            count,
-        }
-    }
-
-    pub fn len(&self) -> usize {
-        self.count
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.count == 0
-    }
 }
 
 impl Iterator for ColumnIterator {
@@ -37,11 +18,8 @@ impl Iterator for ColumnIterator {
 
 impl From<Vec<Column<'static>>> for ColumnIterator {
     fn from(v: Vec<Column<'static>>) -> Self {
-        let count = v.len();
-
         Self {
             inner: Box::new(v.into_iter()),
-            count,
         }
     }
 }
@@ -54,13 +32,6 @@ pub trait AsColumns {
     fn as_columns(&self) -> ColumnIterator;
 }
 
-impl AsColumns for &[Field] {
-    fn as_columns(&self) -> ColumnIterator {
-        let cols: Vec<Column<'static>> = self.iter().flat_map(AsColumns::as_columns).collect();
-        ColumnIterator::from(cols)
-    }
-}
-
 impl AsColumns for ModelProjection {
     fn as_columns(&self) -> ColumnIterator {
         let cols: Vec<Column<'static>> = self
@@ -68,6 +39,7 @@ impl AsColumns for ModelProjection {
             .flat_map(|f| f.as_columns())
             .unique_by(|c| c.name.clone())
             .collect();
+
         ColumnIterator::from(cols)
     }
 }
@@ -88,6 +60,7 @@ impl AsColumns for Field {
         match self {
             Field::Scalar(ref sf) => ColumnIterator::from(vec![sf.as_column()]),
             Field::Relation(ref rf) => rf.as_columns(),
+            Field::Composite(_) => unimplemented!(),
         }
     }
 }
@@ -152,7 +125,9 @@ where
     fn as_column(&self) -> Column<'static> {
         let sf = self.as_ref();
         let db = sf.internal_data_model().db_name.clone();
-        let table = sf.model().db_name().to_string();
+
+        // Unwrap is safe: SQL connectors do not anything other than models as field containers.
+        let table = sf.container.as_model().unwrap().db_name().to_string();
         let col = sf.db_name().to_string();
 
         let parse_len = |sf: &ScalarField| {

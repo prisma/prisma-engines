@@ -37,6 +37,7 @@ pub(crate) fn scalar_filter_object_type(
     input_fields.extend(model.fields().all.iter().filter_map(|f| match f {
         ModelField::Scalar(_) => Some(input_fields::filter_input_field(ctx, f, include_aggregates)),
         ModelField::Relation(_) => None,
+        ModelField::Composite(_) => None, // [Composites] todo
     }));
 
     input_object.set_fields(input_fields);

@@ -772,7 +772,7 @@ fn prisma_type(native_type: &str) -> &str {
 
 #[test_connector(tags(Postgres))]
 fn safe_casts_with_existing_data_should_work(api: TestApi) {
-    let connector = SqlDatamodelConnectors::postgres(Default::default());
+    let connector = SqlDatamodelConnectors::POSTGRES;
 
     for (from, seed, casts) in SAFE_CASTS.iter() {
         let span = tracing::info_span!("SafeCasts", from = %from, to = ?casts, seed = ?seed);
@@ -831,7 +831,7 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
             previous_assertions.iter().fold(
                 table.assert_column_count(previous_assertions.len() + 1),
                 |table, (column_name, expected)| {
-                    table.assert_column(column_name, |c| c.assert_native_type(expected, &connector))
+                    table.assert_column(column_name, |c| c.assert_native_type(expected, connector))
                 },
             )
         });
@@ -852,7 +852,7 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
         api.assert_schema().assert_table("A", |table| {
             next_assertions.iter().fold(
                 table.assert_column_count(next_assertions.len() + 1),
-                |table, (name, expected)| table.assert_column(name, |c| c.assert_native_type(expected, &connector)),
+                |table, (name, expected)| table.assert_column(name, |c| c.assert_native_type(expected, connector)),
             )
         });
 
@@ -862,7 +862,7 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
 
 #[test_connector(tags(Postgres))]
 fn risky_casts_with_existing_data_should_warn(api: TestApi) {
-    let connector = SqlDatamodelConnectors::postgres(Default::default());
+    let connector = SqlDatamodelConnectors::POSTGRES;
 
     for (from, seed, casts) in RISKY_CASTS.iter() {
         let mut previous_columns = "".to_string();
@@ -925,7 +925,7 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
             previous_assertions.iter().fold(
                 table.assert_column_count(previous_assertions.len() + 1),
                 |table, (column_name, expected)| {
-                    table.assert_column(column_name, |c| c.assert_native_type(expected, &connector))
+                    table.assert_column(column_name, |c| c.assert_native_type(expected, connector))
                 },
             )
         });
@@ -950,7 +950,7 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
             next_assertions.iter().fold(
                 table.assert_column_count(next_assertions.len() + 1),
                 |table, (column_name, expected)| {
-                    table.assert_column(column_name, |c| c.assert_native_type(expected, &connector))
+                    table.assert_column(column_name, |c| c.assert_native_type(expected, connector))
                 },
             )
         });
@@ -961,7 +961,7 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
 
 #[test_connector(tags(Postgres))]
 fn not_castable_with_existing_data_should_warn(api: TestApi) {
-    let connector = SqlDatamodelConnectors::postgres(Default::default());
+    let connector = SqlDatamodelConnectors::POSTGRES;
     let mut warnings = Vec::new();
 
     for (from, seed, casts) in NOT_CASTABLE.iter() {
@@ -1026,7 +1026,7 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
             previous_assertions.iter().fold(
                 table.assert_column_count(previous_assertions.len() + 1),
                 |table, (column_name, expected)| {
-                    table.assert_column(column_name, |c| c.assert_native_type(expected, &connector))
+                    table.assert_column(column_name, |c| c.assert_native_type(expected, connector))
                 },
             )
         });
@@ -1050,7 +1050,7 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
             previous_assertions.iter().fold(
                 table.assert_column_count(previous_assertions.len() + 1),
                 |table, (column_name, expected)| {
-                    table.assert_column(column_name, |c| c.assert_native_type(expected, &connector))
+                    table.assert_column(column_name, |c| c.assert_native_type(expected, connector))
                 },
             )
         });
@@ -1147,7 +1147,7 @@ static SAFE_CASTS_NON_LIST_TO_STRING: CastList = Lazy::new(|| {
 
 #[test_connector(tags(Postgres))]
 fn safe_casts_from_array_with_existing_data_should_work(api: TestApi) {
-    let connector = SqlDatamodelConnectors::postgres(Default::default());
+    let connector = SqlDatamodelConnectors::POSTGRES;
 
     for (to, from) in SAFE_CASTS_NON_LIST_TO_STRING.iter() {
         let mut previous_columns = "".to_string();
@@ -1201,7 +1201,7 @@ fn safe_casts_from_array_with_existing_data_should_work(api: TestApi) {
             previous_assertions.iter().fold(
                 table.assert_column_count(previous_assertions.len() + 1),
                 |table, (column_name, expected)| {
-                    table.assert_column(column_name, |c| c.assert_native_type(expected, &connector))
+                    table.assert_column(column_name, |c| c.assert_native_type(expected, connector))
                 },
             )
         });
@@ -1222,7 +1222,7 @@ fn safe_casts_from_array_with_existing_data_should_work(api: TestApi) {
         api.assert_schema().assert_table("A", |table| {
             next_assertions.iter().fold(
                 table.assert_column_count(next_assertions.len() + 1),
-                |table, (name, expected)| table.assert_column(name, |c| c.assert_native_type(expected, &connector)),
+                |table, (name, expected)| table.assert_column(name, |c| c.assert_native_type(expected, connector)),
             )
         });
 

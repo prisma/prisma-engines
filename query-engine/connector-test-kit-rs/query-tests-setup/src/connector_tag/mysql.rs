@@ -1,5 +1,4 @@
-use datamodel_connector::Connector;
-use sql_datamodel_connector::MySqlDatamodelConnector;
+use sql_datamodel_connector::SqlDatamodelConnectors;
 
 use super::*;
 use crate::{datamodel_rendering::SqlDatamodelRenderer, TestError, TestResult};
@@ -141,6 +140,5 @@ impl ToString for MySqlVersion {
 }
 
 fn mysql_capabilities() -> Vec<ConnectorCapability> {
-    let dm_connector = MySqlDatamodelConnector::new(Default::default());
-    dm_connector.capabilities().to_owned()
+    SqlDatamodelConnectors::MYSQL.capabilities().to_owned()
 }

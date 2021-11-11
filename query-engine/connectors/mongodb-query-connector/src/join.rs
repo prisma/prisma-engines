@@ -91,7 +91,7 @@ impl JoinStage {
                 let left_var = format!("$$left_{}", idx);
 
                 match relation.is_many_to_many() {
-                    true if right_field.is_list => doc! { "$in": [left_var, right_ref] },
+                    true if right_field.is_list() => doc! { "$in": [left_var, right_ref] },
                     true => doc! { "$in": [right_ref, left_var] },
                     _ => doc! { "$eq": [right_ref, left_var] },
                 }
@@ -133,7 +133,7 @@ impl JoinStage {
         pipeline.extend(nested_stages);
 
         // If the field is a to-one, add an unwind stage.
-        let unwind_stage = if !from_field.is_list {
+        let unwind_stage = if !from_field.is_list() {
             Some(doc! {
                 "$unwind": { "path": format!("${}", as_name), "preserveNullAndEmptyArrays": true }
             })

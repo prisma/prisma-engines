@@ -8,8 +8,9 @@ use prisma_models::{dml, PrismaValue};
 /// Builds the root `Mutation` type.
 #[tracing::instrument(skip(ctx))]
 pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRef) {
-    let non_embedded_models = ctx.internal_data_model.non_embedded_models();
-    let mut fields: Vec<OutputField> = non_embedded_models
+    let mut fields: Vec<OutputField> = ctx
+        .internal_data_model
+        .models_cloned()
         .into_iter()
         .map(|model| {
             let mut vec = vec![];
@@ -63,8 +64,7 @@ fn create_nested_inputs(ctx: &mut BuilderContext) {
                 append_opt(&mut fields, input_fields::nested_create_many_input_field(ctx, &rf));
             }
 
-            append_opt(&mut fields, input_fields::nested_connect_input_field(ctx, &rf));
-
+            fields.push(input_fields::nested_connect_input_field(ctx, &rf));
             input_object.set_fields(fields);
         }
 
@@ -80,11 +80,11 @@ fn create_nested_inputs(ctx: &mut BuilderContext) {
                 append_opt(&mut fields, input_fields::nested_create_many_input_field(ctx, &rf));
             }
 
-            append_opt(&mut fields, input_fields::nested_connect_input_field(ctx, &rf));
             append_opt(&mut fields, input_fields::nested_set_input_field(ctx, &rf));
             append_opt(&mut fields, input_fields::nested_disconnect_input_field(ctx, &rf));
             append_opt(&mut fields, input_fields::nested_delete_input_field(ctx, &rf));
 
+            fields.push(input_fields::nested_connect_input_field(ctx, &rf));
             fields.push(input_fields::nested_update_input_field(ctx, &rf));
 
             append_opt(&mut fields, input_fields::nested_update_many_field(ctx, &rf));

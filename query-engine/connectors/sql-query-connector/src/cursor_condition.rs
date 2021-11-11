@@ -1,4 +1,9 @@
-use crate::{join_utils::AliasedJoin, ordering::OrderByDefinition, query_arguments_ext::QueryArgumentsExt};
+use crate::{
+    join_utils::AliasedJoin,
+    model_extensions::{AsColumn, AsColumns, AsTable, ScalarFieldExt},
+    ordering::OrderByDefinition,
+    query_arguments_ext::QueryArgumentsExt,
+};
 use connector_interface::QueryArguments;
 use itertools::Itertools;
 use prisma_models::*;
@@ -274,7 +279,7 @@ fn map_orderby_condition(
     // Add OR statements for the foreign key fields too if they are nullable
     let order_expr = if let Some(fks) = &order_definition.order_fks {
         fks.iter()
-            .filter(|fk| !fk.field.is_required)
+            .filter(|fk| !fk.field.is_required())
             .fold(order_expr, |acc, fk| {
                 let col = if let Some(alias) = &fk.alias {
                     Column::from((alias.to_owned(), fk.field.db_name().to_owned()))
@@ -329,7 +334,7 @@ fn order_definitions(
                 order_fks: None,
                 cmp_column: f.as_column().into(),
                 cmp_column_alias: f.db_name().to_string(),
-                on_nullable_fields: !f.is_required,
+                on_nullable_fields: !f.is_required(),
             })
             .collect();
     }
@@ -364,7 +369,13 @@ fn cursor_order_def_scalar(
     // Selected fields needs to be aliased in case there are two order bys on two different tables, pointing to a field of the same name.
     // eg: orderBy: [{ id: asc }, { b: { id: asc } }]
     // Without these aliases, selecting from the <ORDER_TABLE_ALIAS> tmp table would result in ambiguous field name
-    let cmp_column_alias = format!("{}_{}_{}", &order_by.field.model().name, &order_by.field.name, index);
+    // Unwrap is safe: SQL connectors do not anything other than models as field containers.
+    let cmp_column_alias = format!(
+        "{}_{}_{}",
+        &order_by.field.container.as_model().unwrap().name,
+        &order_by.field.name,
+        index
+    );
 
     CursorOrderDefinition {
         sort_order: order_by.sort_order,
@@ -372,7 +383,7 @@ fn cursor_order_def_scalar(
         order_fks: fks,
         cmp_column: order_by_def.order_column.clone().alias(cmp_column_alias.clone()),
         cmp_column_alias,
-        on_nullable_fields: !order_by.field.is_required,
+        on_nullable_fields: !order_by.field.is_required(),
     }
 }
 
@@ -386,7 +397,13 @@ fn cursor_order_def_aggregation_scalar(
     // Selected fields needs to be aliased in case there are two order bys on two different tables, pointing to a field of the same name.
     // eg: orderBy: [{ id: asc }, { b: { id: asc } }]
     // Without these aliases, selecting from the <ORDER_TABLE_ALIAS> cmp table would result in ambiguous field name
-    let cmp_column_alias = format!("aggr_{}_{}_{}", &field.model().name, &field.name, index);
+    // Unwrap is safe: SQL connectors do not anything other than models as field containers.
+    let cmp_column_alias = format!(
+        "aggr_{}_{}_{}",
+        &field.container.as_model().unwrap().name,
+        &field.name,
+        index
+    );
 
     let coalesce_exprs: Vec<Expression> = vec![order_by_def.order_column.clone(), Value::integer(0).into()];
     // We coalesce the order column to 0 when it's compared to the cmp table since the aggregations joins

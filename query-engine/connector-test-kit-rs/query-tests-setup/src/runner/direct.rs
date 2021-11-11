@@ -1,9 +1,8 @@
-use std::{env, sync::Arc};
-
 use crate::{ConnectorTag, RunnerInterface, TestResult};
-use prisma_models::DatamodelConverter;
+use prisma_models::InternalDataModelBuilder;
 use query_core::{executor, schema_builder, BuildMode, QueryExecutor, QuerySchemaRef, TxId};
 use request_handlers::{GraphQlBody, GraphQlHandler, MultiQuery};
+use std::{env, sync::Arc};
 
 pub(crate) type Executor = Box<dyn QueryExecutor + Send + Sync>;
 
@@ -19,14 +18,11 @@ pub struct DirectRunner {
 impl RunnerInterface for DirectRunner {
     async fn load(datamodel: String, connector_tag: ConnectorTag) -> TestResult<Self> {
         let config = datamodel::parse_configuration(&datamodel).unwrap().subject;
-
-        let parsed_datamodel = datamodel::parse_datamodel(&datamodel).unwrap().subject;
-        let internal_datamodel = DatamodelConverter::convert(&parsed_datamodel);
         let data_source = config.datasources.first().expect("No valid data source found");
         let preview_features: Vec<_> = config.preview_features().iter().collect();
         let url = data_source.load_url(|key| env::var(key).ok()).unwrap();
         let (db_name, executor) = executor::load(data_source, &preview_features, &url).await?;
-        let internal_data_model = internal_datamodel.build(db_name);
+        let internal_data_model = InternalDataModelBuilder::new(&datamodel).build(db_name);
 
         let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(
             internal_data_model,

@@ -31,7 +31,7 @@ pub fn nested_delete(
 ) -> QueryGraphBuilderResult<()> {
     let child_model_identifier = parent_relation_field.related_model().primary_identifier();
 
-    if parent_relation_field.is_list {
+    if parent_relation_field.is_list() {
         let filters: Vec<Filter> = utils::coerce_vec(value)
             .into_iter()
             .map(|value: ParsedInputValue| {

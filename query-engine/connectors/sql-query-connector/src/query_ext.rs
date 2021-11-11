@@ -1,4 +1,4 @@
-use crate::{column_metadata, error::*, AliasedCondition, ColumnMetadata, SqlRow, ToSqlRow};
+use crate::{column_metadata, error::*, model_extensions::*, AliasedCondition, ColumnMetadata, SqlRow, ToSqlRow};
 use async_trait::async_trait;
 use connector_interface::{filter::Filter, RecordFilter};
 use futures::future::FutureExt;
@@ -126,6 +126,7 @@ pub trait QueryExt: Queryable + Send + Sync {
             .flat_map(|f| match f {
                 Field::Scalar(sf) => vec![sf.type_identifier_with_arity()],
                 Field::Relation(rf) => rf.type_identifiers_with_arities(),
+                Field::Composite(_) => unimplemented!(),
             })
             .collect();
 

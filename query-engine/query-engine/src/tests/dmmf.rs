@@ -4,7 +4,7 @@ use crate::{
     PrismaResult,
 };
 use datamodel_connector::ConnectorCapabilities;
-use prisma_models::DatamodelConverter;
+use prisma_models::InternalDataModelBuilder;
 use query_core::{schema_builder, BuildMode, QuerySchema};
 use serial_test::serial;
 use std::sync::Arc;
@@ -18,9 +18,7 @@ pub fn get_query_schema(datamodel_string: &str) -> (QuerySchema, datamodel::dml:
         None => ConnectorCapabilities::empty(),
     };
 
-    let internal_dm_template = DatamodelConverter::convert(&dm);
-    let internal_ref = internal_dm_template.build("db".to_owned());
-
+    let internal_ref = InternalDataModelBuilder::from(&dm).build("db".to_owned());
     let schema = schema_builder::build(
         internal_ref,
         BuildMode::Modern,

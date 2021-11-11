@@ -1,4 +1,3 @@
-pub use crate::datamodel_converter::*;
 pub use crate::error::*;
 pub use crate::field::*;
 pub use crate::fields::*;
@@ -11,6 +10,3 @@ pub use crate::record::*;
 pub use crate::relation::*;
 pub use datamodel::dml;
 pub use prisma_value::*;
-
-#[cfg(feature = "sql-ext")]
-pub use crate::sql_ext::*;

@@ -121,6 +121,7 @@ pub fn extract_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraph
                         let filters = match model.fields().find_from_all(&key)? {
                             Field::Relation(rf) => extract_relation_filters(rf, value),
                             Field::Scalar(sf) => extract_scalar_filters(sf, value),
+                            Field::Composite(_) => Ok(vec![]), // [Composites] todo
                         }?;
 
                         // strip empty filters

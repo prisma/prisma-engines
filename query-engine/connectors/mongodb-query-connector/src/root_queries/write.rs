@@ -156,7 +156,7 @@ pub async fn update_records<'conn>(
         let dollar_field_name = format!("${}", field.db_name());
 
         let doc = match write_expr {
-            WriteExpression::Add(rhs) if field.is_list => match rhs {
+            WriteExpression::Add(rhs) if field.is_list() => match rhs {
                 PrismaValue::List(vals) => {
                     let vals = vals
                         .into_iter()

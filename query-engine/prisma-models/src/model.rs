@@ -1,4 +1,3 @@
-use crate::pk::PrimaryKeyTemplate;
 use crate::prelude::*;
 use once_cell::sync::OnceCell;
 use std::{
@@ -10,91 +9,16 @@ use std::{
 pub type ModelRef = Arc<Model>;
 pub type ModelWeakRef = Weak<Model>;
 
-#[derive(Debug)]
-pub struct ModelTemplate {
-    pub name: String,
-    pub is_embedded: bool,
-    pub fields: Vec<FieldTemplate>,
-    pub manifestation: Option<String>,
-    pub primary_key: Option<PrimaryKeyTemplate>,
-    pub indexes: Vec<IndexTemplate>,
-    pub supports_create_operation: bool,
-    pub dml_model: datamodel::Model,
-}
-
 pub struct Model {
     pub name: String,
-    pub is_embedded: bool,
-    manifestation: Option<String>,
-    fields: OnceCell<Fields>,
-    indexes: OnceCell<Vec<Index>>,
-    primary_identifier: OnceCell<ModelProjection>,
-    dml_model: datamodel::Model,
+    pub(crate) manifestation: Option<String>,
+    pub(crate) fields: OnceCell<Fields>,
+    pub(crate) indexes: OnceCell<Vec<Index>>,
+    pub(crate) primary_identifier: OnceCell<ModelProjection>,
+    pub(crate) dml_model: datamodel::Model,
 
     pub internal_data_model: InternalDataModelWeakRef,
     pub supports_create_operation: bool,
-}
-
-impl Debug for Model {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("Model")
-            .field("name", &self.name)
-            .field("is_embedded", &self.is_embedded)
-            .field("manifestation", &self.manifestation)
-            .field("fields", &self.fields)
-            .field("indexes", &self.indexes)
-            .field("primary_identifier", &self.primary_identifier)
-            .field("dml_model", &self.dml_model)
-            .field("internal_data_model", &"#InternalDataModelWeakRef#")
-            .finish()
-    }
-}
-
-impl ModelTemplate {
-    pub fn build(self, internal_data_model: InternalDataModelWeakRef) -> ModelRef {
-        let model = Arc::new(Model {
-            name: self.name,
-            is_embedded: self.is_embedded,
-            manifestation: self.manifestation,
-            fields: OnceCell::new(),
-            indexes: OnceCell::new(),
-            primary_identifier: OnceCell::new(),
-            dml_model: self.dml_model,
-            internal_data_model,
-            supports_create_operation: self.supports_create_operation,
-        });
-
-        let all_fields: Vec<_> = self
-            .fields
-            .into_iter()
-            .map(|ft| ft.build(Arc::downgrade(&model)))
-            .collect();
-
-        let pk = self.primary_key.map(|pk| pk.build(&all_fields));
-        let fields = Fields::new(all_fields, Arc::downgrade(&model), pk);
-
-        let indexes = self.indexes.into_iter().map(|i| i.build(&fields.scalar())).collect();
-
-        // The model is created here and fields WILL BE UNSET before now!
-        model.fields.set(fields).unwrap();
-        model.indexes.set(indexes).unwrap();
-        model
-    }
-}
-
-impl Hash for Model {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        // Names are unique in the data model.
-        self.name.hash(state);
-    }
-}
-
-impl Eq for Model {}
-
-impl PartialEq for Model {
-    fn eq(&self, other: &Model) -> bool {
-        self.name == other.name
-    }
 }
 
 impl Model {
@@ -142,10 +66,6 @@ impl Model {
             .collect()
     }
 
-    pub fn is_legacy(&self) -> bool {
-        self.internal_data_model().is_legacy()
-    }
-
     pub fn db_name(&self) -> &str {
         self.db_name_opt().unwrap_or_else(|| self.name.as_ref())
     }
@@ -165,5 +85,34 @@ impl Model {
             .scalar()
             .into_iter()
             .find_map(|field| (field.db_name() == name).then(|| field))
+    }
+}
+
+impl Debug for Model {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Model")
+            .field("name", &self.name)
+            .field("manifestation", &self.manifestation)
+            .field("fields", &self.fields)
+            .field("indexes", &self.indexes)
+            .field("primary_identifier", &self.primary_identifier)
+            .field("dml_model", &self.dml_model)
+            .field("internal_data_model", &"#InternalDataModelWeakRef#")
+            .finish()
+    }
+}
+
+impl Hash for Model {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        // Names are unique in the data model.
+        self.name.hash(state);
+    }
+}
+
+impl Eq for Model {}
+
+impl PartialEq for Model {
+    fn eq(&self, other: &Model) -> bool {
+        self.name == other.name
     }
 }

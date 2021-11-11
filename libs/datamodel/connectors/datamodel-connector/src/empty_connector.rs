@@ -11,11 +11,11 @@ impl Connector for EmptyDatamodelConnector {
         std::any::type_name::<EmptyDatamodelConnector>()
     }
 
-    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
+    fn referential_actions(&self, _referential_integrity: &crate::ReferentialIntegrity) -> BitFlags<ReferentialAction> {
         BitFlags::all()
     }
 
-    fn capabilities(&self) -> &[ConnectorCapability] {
+    fn capabilities(&self) -> &'static [ConnectorCapability] {
         &[
             ConnectorCapability::CompoundIds,
             ConnectorCapability::Enums,

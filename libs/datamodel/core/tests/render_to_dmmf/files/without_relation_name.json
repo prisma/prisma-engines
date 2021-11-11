@@ -3,7 +3,6 @@
   "models": [
     {
       "name": "User",
-      "isEmbedded": false,
       "dbName": null,
       "fields": [
         {
@@ -43,7 +42,6 @@
     },
     {
       "name": "Post",
-      "isEmbedded": false,
       "dbName": null,
       "fields": [
         {

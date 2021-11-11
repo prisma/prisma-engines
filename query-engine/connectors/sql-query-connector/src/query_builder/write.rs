@@ -1,3 +1,4 @@
+use crate::model_extensions::*;
 use connector_interface::{DatasourceFieldName, WriteArgs, WriteExpression};
 use itertools::Itertools;
 use prisma_models::*;
@@ -117,7 +118,7 @@ pub fn update_many(model: &ModelRef, ids: &[&RecordProjection], args: WriteArgs)
             let value: Expression = match val {
                 WriteExpression::Field(_) => unimplemented!(),
                 WriteExpression::Value(rhs) => field.value(rhs).into(),
-                WriteExpression::Add(rhs) if field.is_list => {
+                WriteExpression::Add(rhs) if field.is_list() => {
                     let e: Expression = Column::from(name.clone()).into();
                     let vals: Vec<_> = match rhs {
                         PrismaValue::List(vals) => vals.into_iter().map(|val| field.value(val)).collect(),

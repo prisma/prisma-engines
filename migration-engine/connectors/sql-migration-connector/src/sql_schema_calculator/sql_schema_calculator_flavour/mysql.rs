@@ -4,7 +4,6 @@ use datamodel::{
     walkers::{walk_scalar_fields, ScalarFieldWalker},
     Datamodel, ScalarType,
 };
-use datamodel_connector::Connector;
 use sql_schema_describer as sql;
 
 impl SqlSchemaCalculatorFlavour for MysqlFlavour {
@@ -33,8 +32,7 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
     }
 
     fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> serde_json::Value {
-        sql_datamodel_connector::SqlDatamodelConnectors::mysql(Default::default())
-            .default_native_type_for_scalar_type(scalar_type)
+        sql_datamodel_connector::SqlDatamodelConnectors::MYSQL.default_native_type_for_scalar_type(scalar_type)
     }
 
     fn enum_column_type(&self, field: &ScalarFieldWalker<'_>, _db_name: &str) -> sql::ColumnType {

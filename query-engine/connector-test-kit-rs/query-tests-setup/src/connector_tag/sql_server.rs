@@ -1,5 +1,4 @@
-use datamodel_connector::{Connector, ReferentialIntegrity};
-use sql_datamodel_connector::MsSqlDatamodelConnector;
+use sql_datamodel_connector::SqlDatamodelConnectors;
 
 use crate::{datamodel_rendering::SqlDatamodelRenderer, TestError, TestResult};
 
@@ -116,6 +115,5 @@ impl ToString for SqlServerVersion {
 }
 
 fn sql_server_capabilities() -> Vec<ConnectorCapability> {
-    let dm_connector = MsSqlDatamodelConnector::new(ReferentialIntegrity::default());
-    dm_connector.capabilities().to_owned()
+    SqlDatamodelConnectors::MSSQL.capabilities().to_owned()
 }

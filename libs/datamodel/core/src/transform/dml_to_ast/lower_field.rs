@@ -126,7 +126,7 @@ impl<'a> LowerDmlToAst<'a> {
 
             let connector = self
                 .datasource
-                .map(|source| source.active_connector.as_ref())
+                .map(|source| source.active_connector)
                 .unwrap_or(&EmptyDatamodelConnector as &dyn Connector);
 
             let prisma_default = ConstraintNames::default_name(model.name(), field.name(), connector);

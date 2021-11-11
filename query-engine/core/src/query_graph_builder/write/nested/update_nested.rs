@@ -12,19 +12,30 @@ use std::{convert::TryInto, sync::Arc};
 /// Handles nested update (single record) cases.
 ///
 /// ```text
-///    ┌ ─ ─ ─ ─ ─ ─
-/// ┌──    Parent   │─ ─ ─ ─ ─
-/// │  └ ─ ─ ─ ─ ─ ─          │
-/// │         │
-/// │         ▼               ▼
-/// │  ┌────────────┐   ┌ ─ ─ ─ ─ ─
-/// │  │   Check    │      Result  │
-/// │  └────────────┘   └ ─ ─ ─ ─ ─
-/// │         │
-/// │         ▼
-/// │  ┌────────────┐
-/// └─▶│   Update   │
-///    └────────────┘
+///       ┌ ─ ─ ─ ─ ─ ─                 
+/// ┌─────    Parent   │─ ─ ─ ─ ─ ┐     
+/// │     └ ─ ─ ─ ─ ─ ─                 
+/// │            │                │     
+/// │            ▼                ▼     
+/// │     ┌────────────┐    ┌ ─ ─ ─ ─ ─
+/// │     │   Check    │       Result  │
+/// │     └────────────┘    └ ─ ─ ─ ─ ─
+/// │            │                      
+/// │  ┌ ─ ─ ─ ─ ▼ ─ ─ ─ ─ ┐            
+/// │   ┌─────────────────┐             
+/// │  ││ Insert onUpdate ││            
+/// │   │emulation subtree│             
+/// │  ││for all relations││            
+/// │   │ pointing to the │             
+/// │  ││   Child model   ││            
+/// │   └─────────────────┘             
+/// │  └ ─ ─ ─ ─ ┬ ─ ─ ─ ─ ┘            
+/// │         ┌──┘                      
+/// │         │                         
+/// │         ▼                         
+/// │  ┌────────────┐                   
+/// └─▶│   Update   │                   
+///    └────────────┘                   
 /// ```
 #[tracing::instrument(skip(graph, parent, parent_relation_field, value, child_model))]
 pub fn nested_update(
@@ -36,7 +47,7 @@ pub fn nested_update(
     child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
     for value in utils::coerce_vec(value) {
-        let (data, filter) = if parent_relation_field.is_list {
+        let (data, filter) = if parent_relation_field.is_list() {
             // We have to have a single record filter in "where".
             // This is used to read the children first, to make sure they're actually connected.
             // The update itself operates on the record found by the read check.
@@ -84,6 +95,14 @@ pub fn nested_update(
                     Ok(update_node)
                 }),
             ),
+        )?;
+
+        utils::insert_emulated_on_update(
+            graph,
+            connector_ctx,
+            &child_model,
+            &find_child_records_node,
+            &update_node,
         )?;
     }
 

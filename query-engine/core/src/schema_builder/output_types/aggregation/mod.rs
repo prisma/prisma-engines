@@ -18,7 +18,7 @@ pub fn collect_non_list_nor_json_fields(model: &ModelRef) -> Vec<ScalarFieldRef>
         .fields()
         .scalar()
         .into_iter()
-        .filter(|f| !f.is_list && f.type_identifier != TypeIdentifier::Json)
+        .filter(|f| !f.is_list() && f.type_identifier != TypeIdentifier::Json)
         .collect()
 }
 

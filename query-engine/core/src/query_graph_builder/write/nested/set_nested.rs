@@ -328,7 +328,7 @@ fn handle_one_to_many(
     let update_disconnect_node =
         utils::update_records_node_placeholder(graph, Filter::empty(), Arc::clone(&child_model));
 
-    let child_side_required = parent_relation_field.related_field().is_required;
+    let child_side_required = parent_relation_field.related_field().is_required();
     let rf = Arc::clone(parent_relation_field);
 
     graph.create_edge(

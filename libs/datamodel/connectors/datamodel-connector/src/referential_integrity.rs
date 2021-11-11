@@ -32,6 +32,10 @@ impl ReferentialIntegrity {
         }
     }
 
+    pub fn is_prisma(&self) -> bool {
+        matches!(self, ReferentialIntegrity::Prisma)
+    }
+
     /// True, if integrity is in database foreign keys
     pub fn uses_foreign_keys(&self) -> bool {
         matches!(self, Self::ForeignKeys)
