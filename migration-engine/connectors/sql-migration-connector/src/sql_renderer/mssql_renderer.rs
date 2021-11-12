@@ -16,7 +16,7 @@ use sql_schema_describer::{
     walkers::{
         ColumnWalker, EnumWalker, ForeignKeyWalker, IndexWalker, TableWalker, UserDefinedTypeWalker, ViewWalker,
     },
-    ColumnTypeFamily, DefaultKind, DefaultValue, IndexType, SqlSchema,
+    ColumnTypeFamily, DefaultKind, DefaultValue, IndexType, SQLSortOrder, SqlSchema,
 };
 use std::{
     borrow::Cow,
@@ -138,7 +138,17 @@ impl SqlRenderer for MssqlFlavour {
         let index_name = self.quote(index.name());
         let table_reference = self.quote_with_schema(index.table().name()).to_string();
 
-        let columns = index.columns().map(|c| self.quote(c.get().name()));
+        let columns = index.columns().map(|c| {
+            let mut rendered = format!("{}", self.quote(c.get().name()));
+
+            match c.sort_order() {
+                Some(SQLSortOrder::Asc) => rendered.push_str(" ASC"),
+                Some(SQLSortOrder::Desc) => rendered.push_str(" DESC"),
+                None => (),
+            }
+
+            rendered
+        });
 
         format!(
             "CREATE {index_type}INDEX {index_name} ON {table_reference}({columns})",
@@ -156,7 +166,24 @@ impl SqlRenderer for MssqlFlavour {
             .join(",\n    ");
 
         let primary_key = if let Some(pk) = table.primary_key() {
-            let column_names = pk.columns.iter().map(|col| self.quote(col.name())).join(",");
+            let column_names = pk
+                .columns
+                .iter()
+                .map(|col| {
+                    let mut rendered = format!("{}", self.quote(col.name()));
+
+                    if let Some(sort_order) = col.sort_order {
+                        rendered.push(' ');
+
+                        match sort_order {
+                            SQLSortOrder::Asc => rendered.push_str("ASC"),
+                            SQLSortOrder::Desc => rendered.push_str("DESC"),
+                        }
+                    }
+
+                    rendered
+                })
+                .join(",");
 
             format!(
                 ",\n    CONSTRAINT {} PRIMARY KEY ({})",
@@ -176,7 +203,17 @@ impl SqlRenderer for MssqlFlavour {
             let constraints = constraints
                 .iter()
                 .map(|index| {
-                    let columns = index.columns().map(|col| self.quote(col.get().name()));
+                    let columns = index.columns().map(|col| {
+                        let mut rendered = format!("{}", self.quote(col.get().name()));
+
+                        match col.sort_order() {
+                            Some(SQLSortOrder::Asc) => rendered.push_str(" ASC"),
+                            Some(SQLSortOrder::Desc) => rendered.push_str(" DESC"),
+                            None => (),
+                        }
+
+                        rendered
+                    });
 
                     format!("CONSTRAINT {} UNIQUE ({})", self.quote(index.name()), columns.join(","))
                 })

@@ -8,6 +8,7 @@ use crate::{
     sql_renderer::{common::IteratorJoin, SqlRenderer},
     sql_schema_differ::ColumnChanges,
 };
+use sql_schema_describer::SQLSortOrder;
 use sql_schema_describer::{
     walkers::{ColumnWalker, TableWalker},
     ColumnId, DefaultValue,
@@ -170,11 +171,19 @@ impl<'a> AlterTableConstructor<'a> {
             .and_then(|pk| pk.constraint_name.as_ref())
             .expect("Missing constraint name in AddPrimaryKey on MSSQL");
 
-        let columns = self.tables.next().primary_key_column_names().unwrap();
+        let columns = self.tables.next().primary_key_columns();
         let mut quoted_columns = Vec::with_capacity(columns.len());
 
-        for colname in columns {
-            quoted_columns.push(format!("{}", self.renderer.quote(&colname)));
+        for column in columns {
+            let mut rendered = format!("{}", self.renderer.quote(column.as_column().name()));
+
+            match column.sort_order() {
+                Some(SQLSortOrder::Asc) => rendered.push_str(" ASC"),
+                Some(SQLSortOrder::Desc) => rendered.push_str(" DESC"),
+                None => (),
+            }
+
+            quoted_columns.push(rendered);
         }
 
         self.add_constraints.insert(format!(

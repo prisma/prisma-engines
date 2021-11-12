@@ -157,10 +157,16 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
 
 /// Compare two SQL indexes and return whether they only differ by name.
 fn indexes_match(first: &IndexWalker<'_>, second: &IndexWalker<'_>) -> bool {
-    let left_cols = first.column_names();
-    let right_cols = second.column_names();
+    let left_cols = first.columns();
+    let right_cols = second.columns();
 
     left_cols.len() == right_cols.len()
-        && left_cols.zip(right_cols).all(|(a, b)| a == b)
+        && left_cols.zip(right_cols).all(|(a, b)| {
+            let names_match = a.as_column().name() == b.as_column().name();
+            let lengths_match = a.length() == b.length();
+            let orders_match = a.sort_order() == b.sort_order();
+
+            names_match && lengths_match && orders_match
+        })
         && first.index_type() == second.index_type()
 }
