@@ -315,6 +315,7 @@
 <span id="315">315</span>
 <span id="316">316</span>
 <span id="317">317</span>
+<span id="318">318</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">connector_interface</span>::{<span class="ident">error</span>::<span class="kw-2">*</span>, <span class="ident">Filter</span>};
 <span class="kw">use</span> <span class="ident">prisma_models::prelude::DomainError</span>;
 <span class="kw">use</span> <span class="ident">quaint::error::ErrorKind</span> <span class="kw">as</span> <span class="ident">QuaintKind</span>;
@@ -595,6 +596,7 @@
             <span class="ident">e</span> @ <span class="ident">QuaintKind::ResultTypeMismatch</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SqlError::QueryError</span>(<span class="ident">e</span>.<span class="ident">into</span>()),
             <span class="ident">e</span> @ <span class="ident">QuaintKind::LengthMismatch</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SqlError::QueryError</span>(<span class="ident">e</span>.<span class="ident">into</span>()),
             <span class="ident">e</span> @ <span class="ident">QuaintKind::ValueOutOfRange</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SqlError::QueryError</span>(<span class="ident">e</span>.<span class="ident">into</span>()),
+            <span class="ident">e</span> @ <span class="ident">QuaintKind::UUIDError</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SqlError::ConversionError</span>(<span class="ident">e</span>.<span class="ident">into</span>()),
             <span class="ident">e</span> @ <span class="ident">QuaintKind::DatabaseUrlIsInvalid</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SqlError::ConnectionError</span>(<span class="ident">e</span>),
             <span class="ident">e</span> @ <span class="ident">QuaintKind::DatabaseDoesNotExist</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SqlError::ConnectionError</span>(<span class="ident">e</span>),
             <span class="ident">e</span> @ <span class="ident">QuaintKind::AuthenticationFailed</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SqlError::ConnectionError</span>(<span class="ident">e</span>),
