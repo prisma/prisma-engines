@@ -9,6 +9,11 @@ fn enum_support() {
           url = "postgres://"
         }
 
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["cockroachdb"]
+        }
+
         model Todo {
           id     Int    @id
           status Status
@@ -31,6 +36,11 @@ fn scalar_list_support() {
           url = "postgres://"
         }
 
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["cockroachdb"]
+        }
+
         model Todo {
           id     Int    @id
           val    String[]
@@ -46,6 +56,11 @@ fn unique_index_names_support() {
         datasource db {
           provider = "cockroachdb"
           url = "postgres://"
+        }
+
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["cockroachdb"]
         }
 
         model User {
@@ -67,16 +82,16 @@ fn unique_index_names_support() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@index": The given constraint name `metaId` has to be unique in the following namespace: global for primary key, indexes and unique constraints. Please provide a different name using the `map` argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:10[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
-        [1;94m 9 | [0m
-        [1;94m10 | [0m  @@index([id], [1;91mname: "metaId"[0m)
+        [1;94m14 | [0m
+        [1;94m15 | [0m  @@index([id], [1;91mname: "metaId"[0m)
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@index": The given constraint name `metaId` has to be unique in the following namespace: global for primary key, indexes and unique constraints. Please provide a different name using the `map` argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:17[0m
+          [1;94m-->[0m  [4mschema.prisma:22[0m
         [1;94m   | [0m
-        [1;94m16 | [0m
-        [1;94m17 | [0m  @@index([id], [1;91mname: "metaId"[0m)
+        [1;94m21 | [0m
+        [1;94m22 | [0m  @@index([id], [1;91mname: "metaId"[0m)
         [1;94m   | [0m
     "#]];
 
@@ -89,6 +104,11 @@ fn json_support() {
         datasource db {
           provider = "cockroachdb"
           url = "postgres://"
+        }
+
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["cockroachdb"]
         }
 
         model User {
@@ -108,6 +128,11 @@ fn non_unique_relation_criteria_support() {
           url = "file:test.db"
         }
 
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["cockroachdb"]
+        }
+
         model Todo {
           id           Int    @id
           assigneeName String
@@ -125,11 +150,11 @@ fn non_unique_relation_criteria_support() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating: The argument `references` must refer to a unique criteria in the related model `User`. But it is referencing the following fields that are not a unique criteria: name[0m
-          [1;94m-->[0m  [4mschema.prisma:9[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m 8 | [0m  assigneeName String
-        [1;94m 9 | [0m  [1;91massignee     User   @relation(fields: [assigneeName], references: [name])[0m
-        [1;94m10 | [0m}
+        [1;94m13 | [0m  assigneeName String
+        [1;94m14 | [0m  [1;91massignee     User   @relation(fields: [assigneeName], references: [name])[0m
+        [1;94m15 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -142,6 +167,11 @@ fn auto_increment_on_non_primary_column_support() {
         datasource db {
           provider = "cockroachdb"
           url = "postgres://"
+        }
+
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["cockroachdb"]
         }
 
         model Todo {
@@ -159,6 +189,11 @@ fn key_order_enforcement_support() {
         datasource db {
           provider = "cockroachdb"
           url = "postgres://"
+        }
+
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["cockroachdb"]
         }
 
         model  Todo {
@@ -189,6 +224,11 @@ fn does_not_support_composite_types() {
             url = "postgres://"
         }
 
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["cockroachdb"]
+        }
+
         type Address {
             street String
         }
@@ -198,12 +238,12 @@ fn does_not_support_composite_types() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating: Composite types are not supported on Postgres.[0m
-          [1;94m-->[0m  [4mschema.prisma:7[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
-        [1;94m 6 | [0m
-        [1;94m 7 | [0m        [1;91mtype Address {[0m
-        [1;94m 8 | [0m            street String
-        [1;94m 9 | [0m        }
+        [1;94m11 | [0m
+        [1;94m12 | [0m        [1;91mtype Address {[0m
+        [1;94m13 | [0m            street String
+        [1;94m14 | [0m        }
         [1;94m   | [0m
     "#]];
 

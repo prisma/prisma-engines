@@ -163,7 +163,9 @@ impl DatasourceLoader {
             p if p == SQLITE_SOURCE_NAME => &SqliteDatasourceProvider,
             p if p == MSSQL_SOURCE_NAME => &MsSqlDatasourceProvider,
             p if p == MONGODB_SOURCE_NAME => &MongoDbDatasourceProvider,
-            p if p == COCKROACHDB_SOURCE_NAME => &CockroachDbDatasourceProvider,
+            p if p == COCKROACHDB_SOURCE_NAME && preview_features.contains(PreviewFeature::Cockroachdb) => {
+                &CockroachDbDatasourceProvider
+            }
             _ => {
                 diagnostics.push_error(DatamodelError::new_datasource_provider_not_known_error(
                     provider,
