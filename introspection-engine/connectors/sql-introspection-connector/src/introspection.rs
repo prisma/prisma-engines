@@ -80,14 +80,20 @@ pub fn introspect(
                     .columns
                     .iter()
                     .map(|c| {
-                        let sort_order = c.sort_order.map(|sort| match sort {
-                            SQLSortOrder::Asc => SortOrder::Asc,
-                            SQLSortOrder::Desc => SortOrder::Desc,
-                        });
+                        let (sort_order, length) = if !ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
+                            (None, None)
+                        } else {
+                            let sort_order = c.sort_order.map(|sort| match sort {
+                                SQLSortOrder::Asc => SortOrder::Asc,
+                                SQLSortOrder::Desc => SortOrder::Desc,
+                            });
+                            (sort_order, c.length)
+                        };
+
                         PrimaryKeyField {
                             name: c.name().to_string(),
                             sort_order,
-                            length: c.length,
+                            length,
                         }
                     })
                     .collect(),

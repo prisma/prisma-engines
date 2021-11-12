@@ -275,7 +275,11 @@ impl<'a> LiftAstToDml<'a> {
             db_name: pk.final_database_name().map(|c| c.into_owned()),
             fields: pk
                 .iter_ast_fields()
-                .map(|(field, sort_order, length)| PrimaryKeyField {
+                .map(|(field, sort_order, length)|
+                    //(extended indexes) here it is ok to pass sort and length with out a preview flag
+                    //check since this is coming from the ast and the parsing would reject the args without
+                    //the flag set
+                    PrimaryKeyField {
                     name: field.name.name.to_owned(),
                     sort_order,
                     length,

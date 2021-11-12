@@ -357,6 +357,7 @@ fn new_model(model_name: &str) -> Model {
     let primary_key = PrimaryKeyDefinition {
         name: None,
         db_name: None,
+        //TODO(extended indexes) If the flag is enabled this should return the sort, otherwise not
         fields: vec![PrimaryKeyField {
             name: "id".to_string(),
             sort_order: None,
