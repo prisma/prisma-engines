@@ -34,7 +34,6 @@ fn expanded_index_capability_rendering_works() {
     "#]];
 
     let dml = datamodel::parse_datamodel(&dm).unwrap().subject;
-    println!("{:#?}", dml);
     let configuration = datamodel::parse_configuration(&dm).unwrap().subject;
     let rendered = datamodel::render_datamodel_to_string(&dml, Some(&configuration));
     expected.assert_eq(&rendered)
