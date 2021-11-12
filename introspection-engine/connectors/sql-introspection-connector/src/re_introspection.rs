@@ -237,9 +237,6 @@ fn merge_changed_primary_key_names(
         if let Some(old_model) = &old_data_model.find_model(&model.name) {
             if let Some(primary_key) = &model.primary_key {
                 if let Some(old_primary_key) = &old_model.primary_key {
-                    println!("OLD {:#?}", old_primary_key);
-                    println!("NEW {:#?}", primary_key);
-
                     //TODO(extended indices) this should compare more than names at some point
                     if old_primary_key.fields.iter().map(|f| &f.name).collect::<Vec<_>>()
                         == primary_key.fields.iter().map(|f| &f.name).collect::<Vec<_>>()
