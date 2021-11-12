@@ -220,7 +220,7 @@ fn index_builders(model: &dml::Model) -> Vec<IndexBuilder> {
         .filter(|i| i.fields.len() > 1 && model.is_compound_index_supported(i)) // @@unique for 1 field are transformed to is_unique instead
         .map(|i| IndexBuilder {
             name: i.name.clone(),
-            fields: i.fields.clone(),
+            fields: i.fields.clone().into_iter().map(|f| f.name).collect(),
             typ: match i.tpe {
                 dml::IndexType::Unique => IndexType::Unique,
                 dml::IndexType::Normal => IndexType::Normal,
@@ -231,7 +231,7 @@ fn index_builders(model: &dml::Model) -> Vec<IndexBuilder> {
 
 fn pk_builder(model: &dml::Model) -> Option<PrimaryKeyBuilder> {
     model.primary_key.as_ref().map(|pk| PrimaryKeyBuilder {
-        fields: pk.fields.to_owned(),
+        fields: pk.fields.clone().into_iter().map(|f| f.name).collect(),
         alias: pk.name.to_owned(),
     })
 }

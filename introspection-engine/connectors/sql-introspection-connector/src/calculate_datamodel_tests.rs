@@ -3,16 +3,15 @@ mod tests {
     use crate::calculate_datamodel::calculate_datamodel;
     use datamodel::{
         ast::Span, dml, Datamodel, Datasource, DefaultValue as DMLDefault, Field, FieldArity, FieldType,
-        IndexDefinition, Model, NativeTypeInstance, PrimaryKeyDefinition, ReferentialAction, RelationField,
-        RelationInfo, ScalarField, ScalarType, StringFromEnvVar, ValueGenerator,
+        IndexDefinition, IndexField, Model, NativeTypeInstance, PrimaryKeyDefinition, PrimaryKeyField,
+        ReferentialAction, RelationField, RelationInfo, ScalarField, ScalarType, StringFromEnvVar, ValueGenerator,
     };
-    use datamodel_connector::ReferentialIntegrity;
     use enumflags2::BitFlags;
     use expect_test::expect;
     use introspection_connector::IntrospectionContext;
     use native_types::{NativeType, PostgresType};
     use pretty_assertions::assert_eq;
-    use sql_datamodel_connector::PostgresDatamodelConnector;
+    use sql_datamodel_connector::SqlDatamodelConnectors;
     use sql_schema_describer::{
         Column, ColumnArity, ColumnType, ColumnTypeFamily, Enum, ForeignKey, ForeignKeyAction, Index, IndexColumn,
         IndexType, PrimaryKey, PrimaryKeyColumn, Sequence, SqlSchema, Table,
@@ -25,11 +24,10 @@ mod tests {
             url: StringFromEnvVar::new_literal("test".to_string()),
             url_span: Span::empty(),
             documentation: None,
-            active_connector: Box::new(PostgresDatamodelConnector::new(Default::default())),
+            active_connector: SqlDatamodelConnectors::POSTGRES,
             shadow_database_url: None,
             provider: "postgresql".to_string(),
             referential_integrity: None,
-            default_referential_integrity: ReferentialIntegrity::ForeignKeys,
         };
 
         IntrospectionContext {
@@ -113,7 +111,11 @@ mod tests {
                                 name: None,
                                 db_name: None,
                                 fields: [
-                                    "required",
+                                    PrimaryKeyField {
+                                        name: "required",
+                                        sort_order: None,
+                                        length: None,
+                                    },
                                 ],
                                 defined_on_field: true,
                             },
@@ -201,7 +203,7 @@ mod tests {
                     primary_key: Some(PrimaryKeyDefinition {
                         name: None,
                         db_name: None,
-                        fields: vec!["primary".to_string()],
+                        fields: vec![PrimaryKeyField::new("primary")],
                         defined_on_field: true,
                     }),
                 },
@@ -237,7 +239,7 @@ mod tests {
                     primary_key: Some(PrimaryKeyDefinition {
                         name: None,
                         db_name: None,
-                        fields: vec!["primary".to_string()],
+                        fields: vec![PrimaryKeyField::new("primary")],
                         defined_on_field: true,
                     }),
                 },
@@ -273,7 +275,7 @@ mod tests {
                     primary_key: Some(PrimaryKeyDefinition {
                         name: None,
                         db_name: None,
-                        fields: vec!["primary".to_string()],
+                        fields: vec![PrimaryKeyField::new("primary")],
                         defined_on_field: true,
                     }),
                 },
@@ -388,7 +390,7 @@ mod tests {
                 indices: vec![IndexDefinition {
                     name: None,
                     db_name: Some("unique_unique".to_string()),
-                    fields: vec!["unique".to_string()],
+                    fields: vec![IndexField::new("unique")],
                     tpe: dml::IndexType::Unique,
                     defined_on_field: true,
                 }],
@@ -493,7 +495,7 @@ mod tests {
                     primary_key: Some(PrimaryKeyDefinition {
                         name: None,
                         db_name: None,
-                        fields: vec!["id".to_string()],
+                        fields: vec![PrimaryKeyField::new("id")],
                         defined_on_field: true,
                     }),
                 },
@@ -590,7 +592,7 @@ mod tests {
                     primary_key: Some(PrimaryKeyDefinition {
                         name: None,
                         db_name: None,
-                        fields: vec!["id".to_string()],
+                        fields: vec![PrimaryKeyField::new("id")],
                         defined_on_field: true,
                     }),
                 },
@@ -756,14 +758,14 @@ mod tests {
                 indices: vec![datamodel::dml::IndexDefinition {
                     name: None,
                     db_name: Some("name_last_name_unique".to_string()),
-                    fields: vec!["name".to_string(), "lastname".to_string()],
+                    fields: vec![IndexField::new("name"), IndexField::new("lastname")],
                     tpe: datamodel::dml::IndexType::Unique,
                     defined_on_field: false,
                 }],
                 primary_key: Some(PrimaryKeyDefinition {
                     name: None,
                     db_name: None,
-                    fields: vec!["id".to_string()],
+                    fields: vec![PrimaryKeyField::new("id")],
                     defined_on_field: true,
                 }),
             }],
@@ -891,7 +893,7 @@ mod tests {
                     primary_key: Some(PrimaryKeyDefinition {
                         name: None,
                         db_name: None,
-                        fields: vec!["id".to_string()],
+                        fields: vec![PrimaryKeyField::new("id")],
                         defined_on_field: true,
                     }),
                 },
@@ -961,7 +963,7 @@ mod tests {
                     primary_key: Some(PrimaryKeyDefinition {
                         name: None,
                         db_name: None,
-                        fields: vec!["id".to_string()],
+                        fields: vec![PrimaryKeyField::new("id")],
                         defined_on_field: true,
                     }),
                 },

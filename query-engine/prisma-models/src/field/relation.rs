@@ -221,6 +221,10 @@ impl RelationField {
     pub fn on_delete(&self) -> Option<&ReferentialAction> {
         self.relation_info.on_delete.as_ref()
     }
+
+    pub fn on_update(&self) -> Option<&ReferentialAction> {
+        self.relation_info.on_update.as_ref()
+    }
 }
 
 impl Debug for RelationField {

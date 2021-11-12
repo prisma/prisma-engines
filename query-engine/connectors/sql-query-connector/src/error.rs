@@ -278,6 +278,7 @@ impl From<quaint::error::Error> for SqlError {
             e @ QuaintKind::ResultTypeMismatch { .. } => SqlError::QueryError(e.into()),
             e @ QuaintKind::LengthMismatch { .. } => SqlError::QueryError(e.into()),
             e @ QuaintKind::ValueOutOfRange { .. } => SqlError::QueryError(e.into()),
+            e @ QuaintKind::UUIDError(_) => SqlError::ConversionError(e.into()),
             e @ QuaintKind::DatabaseUrlIsInvalid { .. } => SqlError::ConnectionError(e),
             e @ QuaintKind::DatabaseDoesNotExist { .. } => SqlError::ConnectionError(e),
             e @ QuaintKind::AuthenticationFailed { .. } => SqlError::ConnectionError(e),

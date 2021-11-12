@@ -20,17 +20,32 @@ use std::{borrow::Cow, collections::BTreeMap, str::FromStr};
 pub trait Connector: Send + Sync {
     fn name(&self) -> &str;
 
-    fn capabilities(&self) -> &[ConnectorCapability];
+    fn capabilities(&self) -> &'static [ConnectorCapability];
 
     /// The maximum length of constraint names in bytes. Connectors without a
     /// limit should return usize::MAX.
     fn constraint_name_length(&self) -> usize;
 
+    // Referential integrity
+
+    /// The referential integrity modes that can be set through the referentialIntegrity datasource
+    /// argument.
+    fn allowed_referential_integrity_settings(&self) -> BitFlags<ReferentialIntegrity> {
+        use ReferentialIntegrity::*;
+
+        ForeignKeys | Prisma
+    }
+
+    /// The default referential integrity mode to assume for this connector.
+    fn default_referential_integrity(&self) -> ReferentialIntegrity {
+        ReferentialIntegrity::ForeignKeys
+    }
+
     fn has_capability(&self, capability: ConnectorCapability) -> bool {
         self.capabilities().contains(&capability)
     }
 
-    fn referential_actions(&self) -> BitFlags<ReferentialAction>;
+    fn referential_actions(&self, referential_integrity: &ReferentialIntegrity) -> BitFlags<ReferentialAction>;
 
     fn supports_composite_types(&self) -> bool {
         self.has_capability(ConnectorCapability::CompositeTypes)
@@ -48,12 +63,8 @@ pub trait Connector: Send + Sync {
         self.has_capability(ConnectorCapability::NamedDefaultValues)
     }
 
-    fn supports_referential_action(&self, action: ReferentialAction) -> bool {
-        self.referential_actions().contains(action)
-    }
-
-    fn emulates_referential_actions(&self) -> bool {
-        false
+    fn supports_referential_action(&self, integrity: &ReferentialIntegrity, action: ReferentialAction) -> bool {
+        self.referential_actions(integrity).contains(action)
     }
 
     fn validate_field(&self, _: &Field, _: &mut Vec<ConnectorError>) {}
@@ -257,6 +268,8 @@ capabilities!(
     NamedForeignKeys,
     ReferenceCycleDetection,
     NamedDefaultValues,
+    IndexColumnLengthPrefixing,
+    PrimaryKeySortOrderDefinition,
     // Start of query-engine-only Capabilities
     InsensitiveFilters,
     CreateMany,

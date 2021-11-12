@@ -62,7 +62,7 @@ impl ConstraintNames {
         let column_names: Vec<&str> = idx
             .fields
             .iter()
-            .map(|field_name| model.find_scalar_field(field_name).unwrap().final_database_name())
+            .map(|field| model.find_scalar_field(&field.name).unwrap().final_database_name())
             .collect();
 
         let expected = if idx.is_unique() {

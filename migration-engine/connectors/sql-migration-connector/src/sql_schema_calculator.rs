@@ -49,7 +49,7 @@ fn calculate_model_tables<'a>(
             columns: pk
                 .fields
                 .iter()
-                .map(|field| sql::PrimaryKeyColumn::new(model.find_scalar_field(field).unwrap().db_name()))
+                .map(|field| sql::PrimaryKeyColumn::new(model.find_scalar_field(&field.name).unwrap().db_name()))
                 .collect(),
             sequence: None,
             constraint_name: pk.db_name.clone(),
@@ -61,9 +61,9 @@ fn calculate_model_tables<'a>(
                 let referenced_fields: Vec<ScalarFieldWalker<'_>> = index_definition
                     .fields
                     .iter()
-                    .map(|field_name| {
+                    .map(|field| {
                         model
-                            .find_scalar_field(field_name)
+                            .find_scalar_field(&field.name)
                             .expect("Unknown field in index directive.")
                     })
                     .collect();

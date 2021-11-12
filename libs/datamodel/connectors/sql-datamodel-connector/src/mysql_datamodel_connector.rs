@@ -93,45 +93,31 @@ const NATIVE_TYPE_CONSTRUCTORS: &[NativeTypeConstructor] = &[
     NativeTypeConstructor::without_args(JSON_TYPE_NAME, &[ScalarType::Json]),
 ];
 
+const CAPABILITIES: &[ConnectorCapability] = &[
+    ConnectorCapability::RelationsOverNonUniqueCriteria,
+    ConnectorCapability::Enums,
+    ConnectorCapability::Json,
+    ConnectorCapability::AutoIncrementAllowedOnNonId,
+    ConnectorCapability::RelationFieldsInArbitraryOrder,
+    ConnectorCapability::CreateMany,
+    ConnectorCapability::WritableAutoincField,
+    ConnectorCapability::CreateSkipDuplicates,
+    ConnectorCapability::UpdateableId,
+    ConnectorCapability::JsonFilteringJsonPath,
+    ConnectorCapability::CreateManyWriteableAutoIncId,
+    ConnectorCapability::AutoIncrement,
+    ConnectorCapability::CompoundIds,
+    ConnectorCapability::AnyId,
+    ConnectorCapability::QueryRaw,
+    ConnectorCapability::NamedForeignKeys,
+    ConnectorCapability::AdvancedJsonNullability,
+    ConnectorCapability::ForeignKeys,
+    ConnectorCapability::IndexColumnLengthPrefixing,
+];
+
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[ConstraintScope::GlobalForeignKey, ConstraintScope::ModelKeyIndex];
 
-pub struct MySqlDatamodelConnector {
-    capabilities: Vec<ConnectorCapability>,
-    referential_integrity: ReferentialIntegrity,
-}
-
-impl MySqlDatamodelConnector {
-    pub fn new(referential_integrity: ReferentialIntegrity) -> MySqlDatamodelConnector {
-        let mut capabilities = vec![
-            ConnectorCapability::RelationsOverNonUniqueCriteria,
-            ConnectorCapability::Enums,
-            ConnectorCapability::Json,
-            ConnectorCapability::AutoIncrementAllowedOnNonId,
-            ConnectorCapability::RelationFieldsInArbitraryOrder,
-            ConnectorCapability::CreateMany,
-            ConnectorCapability::WritableAutoincField,
-            ConnectorCapability::CreateSkipDuplicates,
-            ConnectorCapability::UpdateableId,
-            ConnectorCapability::JsonFilteringJsonPath,
-            ConnectorCapability::CreateManyWriteableAutoIncId,
-            ConnectorCapability::AutoIncrement,
-            ConnectorCapability::CompoundIds,
-            ConnectorCapability::AnyId,
-            ConnectorCapability::QueryRaw,
-            ConnectorCapability::NamedForeignKeys,
-            ConnectorCapability::AdvancedJsonNullability,
-        ];
-
-        if referential_integrity.uses_foreign_keys() {
-            capabilities.push(ConnectorCapability::ForeignKeys);
-        }
-
-        MySqlDatamodelConnector {
-            capabilities,
-            referential_integrity,
-        }
-    }
-}
+pub struct MySqlDatamodelConnector;
 
 const SCALAR_TYPE_DEFAULTS: &[(ScalarType, MySqlType)] = &[
     (ScalarType::Int, MySqlType::Int),
@@ -150,23 +136,18 @@ impl Connector for MySqlDatamodelConnector {
         "MySQL"
     }
 
-    fn capabilities(&self) -> &[ConnectorCapability] {
-        &self.capabilities
+    fn capabilities(&self) -> &'static [ConnectorCapability] {
+        CAPABILITIES
     }
 
     fn constraint_name_length(&self) -> usize {
         64
     }
 
-    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
+    fn referential_actions(&self, referential_integrity: &ReferentialIntegrity) -> BitFlags<ReferentialAction> {
         use ReferentialAction::*;
 
-        self.referential_integrity
-            .allowed_referential_actions(Restrict | Cascade | SetNull | NoAction | SetDefault)
-    }
-
-    fn emulates_referential_actions(&self) -> bool {
-        matches!(self.referential_integrity, ReferentialIntegrity::Prisma)
+        referential_integrity.allowed_referential_actions(Restrict | Cascade | SetNull | NoAction | SetDefault)
     }
 
     fn scalar_type_for_native_type(&self, native_type: serde_json::Value) -> ScalarType {
@@ -272,7 +253,10 @@ impl Connector for MySqlDatamodelConnector {
 
     fn validate_model(&self, model: &Model, errors: &mut Vec<ConnectorError>) {
         for index_definition in model.indices.iter() {
-            let fields = index_definition.fields.iter().map(|f| model.find_field(f).unwrap());
+            let fields = index_definition
+                .fields
+                .iter()
+                .map(|f| model.find_field(&f.name).unwrap());
             for f in fields {
                 if let FieldType::Scalar(_, _, Some(native_type)) = f.field_type() {
                     let native_type_name = native_type.name.as_str();
@@ -298,7 +282,7 @@ impl Connector for MySqlDatamodelConnector {
 
         if let Some(pk) = &model.primary_key {
             for id_field in pk.fields.iter() {
-                let field = model.find_field(id_field).unwrap();
+                let field = model.find_field(&id_field.name).unwrap();
                 if let FieldType::Scalar(_, _, Some(native_type)) = field.field_type() {
                     let native_type_name = native_type.name.as_str();
                     if NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name) {

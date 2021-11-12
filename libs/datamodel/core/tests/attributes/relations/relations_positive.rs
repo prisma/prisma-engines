@@ -1,6 +1,6 @@
-use crate::attributes::{with_header, Provider};
 use crate::common::*;
-use datamodel::{dml, render_datamodel_to_string, IndexDefinition, IndexType, ScalarType};
+use crate::{with_header, Provider};
+use datamodel::{dml, render_datamodel_to_string, IndexDefinition, IndexField, IndexType, ScalarType};
 
 #[test]
 fn must_add_referenced_fields_on_both_sides_for_many_to_many_relations() {
@@ -398,7 +398,7 @@ fn implicit_unique_constraint_on_one_to_one() {
     schema.assert_has_model("Post").assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("PostMap_user_id_map_on_post_key".to_string()),
-        fields: vec!["user_id".to_string()],
+        fields: vec![IndexField::new("user_id")],
         tpe: IndexType::Unique,
         defined_on_field: true,
     });
@@ -442,7 +442,7 @@ fn implicit_unique_constraint_on_compound_one_to_one() {
     schema.assert_has_model("Post").assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("Post_user_id_1_user_id_2_key".to_string()),
-        fields: vec!["user_id_1".to_string(), "user_id_2".to_string()],
+        fields: vec![IndexField::new("user_id_1"), IndexField::new("user_id_2")],
         tpe: IndexType::Unique,
         defined_on_field: false,
     });

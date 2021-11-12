@@ -1,8 +1,12 @@
+use datamodel_connector::ConnectorCapability;
+use dml::scalars::ScalarType;
+
 use super::names::{NameTaken, Names};
 use crate::{
+    ast,
     diagnostics::{DatamodelError, Diagnostics},
     transform::ast_to_dml::db::{
-        walkers::{FieldWalker, ScalarFieldWalker},
+        walkers::{FieldWalker, ScalarFieldAttributeWalker, ScalarFieldWalker},
         ConstraintName, ParserDatabase,
     },
 };
@@ -71,4 +75,37 @@ pub(crate) fn has_a_unique_default_constraint_name(
             &message, "default", span,
         ));
     }
+}
+
+/// The length prefix can be used with strings and byte columns.
+pub(crate) fn validate_length_used_with_correct_types(
+    db: &ParserDatabase<'_>,
+    attr: ScalarFieldAttributeWalker<'_, '_>,
+    attribute: (&str, ast::Span),
+    diagnostics: &mut Diagnostics,
+) {
+    if !db
+        .active_connector()
+        .has_capability(ConnectorCapability::IndexColumnLengthPrefixing)
+    {
+        return;
+    }
+
+    if attr.length().is_none() {
+        return;
+    }
+
+    if let Some(r#type) = attr.as_scalar_field().attributes().r#type.as_builtin_scalar() {
+        if [ScalarType::String, ScalarType::Bytes].iter().any(|t| t == &r#type) {
+            return;
+        }
+    };
+
+    let message = "The length argument is only allowed with field types `String` or `Bytes`.";
+
+    diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+        message,
+        attribute.0,
+        attribute.1,
+    ));
 }

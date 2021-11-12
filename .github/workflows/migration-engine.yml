@@ -220,8 +220,14 @@ jobs:
             target
           key: ${{ runner.os }}-cargo-${{ matrix.rust }}-${{ hashFiles('**/Cargo.lock') }}
 
+      - uses: MinoruSekine/setup-scoop@main
+
       - name: Install ${{ matrix.db.name }}
-        run: choco install ${{ matrix.db.name }}
+        run: |
+          scoop install sudo
+          scoop install ${{ matrix.db.name }}
+          sudo mysqld --install
+          sudo sc start MySQL
 
       - name: Run tests
         run: cargo test -p migration-engine-tests

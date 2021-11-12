@@ -215,21 +215,11 @@ impl Connection {
 
 fn filter_extended_index_capabilities(schema: &mut SqlSchema) {
     for (_, table) in schema.iter_tables_mut() {
-        let mut pk_removal = false;
-
         if let Some(ref mut pk) = &mut table.primary_key {
             for col in pk.columns.iter_mut() {
-                if col.length.is_some() {
-                    pk_removal = true;
-                }
-
                 col.length = None;
                 col.sort_order = None;
             }
-        }
-
-        if pk_removal {
-            table.primary_key = None;
         }
 
         let mut kept_indexes = Vec::new();

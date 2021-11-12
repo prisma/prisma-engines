@@ -1,3 +1,5 @@
+use datamodel_connector::ConnectorCapability;
+
 use crate::ast::Span;
 use crate::{
     common::preview_features::PreviewFeature,
@@ -44,12 +46,13 @@ pub(crate) fn uses_length_or_sort_without_preview_flag(
     index: IndexWalker<'_, '_>,
     diagnostics: &mut Diagnostics,
 ) {
-    if !db.preview_features.contains(PreviewFeature::ExtendedIndexes)
-        && index
-            .index_attribute
-            .fields
-            .iter()
-            .any(|f| f.sort_order.is_some() || f.length.is_some())
+    if db.preview_features.contains(PreviewFeature::ExtendedIndexes) {
+        return;
+    }
+
+    if index
+        .scalar_field_attributes()
+        .any(|f| f.sort_order().is_some() || f.length().is_some())
     {
         let message = "The sort and length arguments are not yet available.";
 
@@ -57,6 +60,31 @@ pub(crate) fn uses_length_or_sort_without_preview_flag(
             message,
             index.attribute_name(),
             index.ast_attribute().map(|i| i.span).unwrap_or_else(Span::empty),
+        ));
+    }
+}
+
+/// The database must support the index length prefix for it to be allowed in the data model.
+pub(crate) fn field_length_prefix_supported(
+    db: &ParserDatabase<'_>,
+    index: IndexWalker<'_, '_>,
+    diagnostics: &mut Diagnostics,
+) {
+    if db
+        .active_connector()
+        .has_capability(ConnectorCapability::IndexColumnLengthPrefixing)
+    {
+        return;
+    }
+
+    if index.scalar_field_attributes().any(|f| f.length().is_some()) {
+        let message = "The length argument is not supported in an index definition with the current connector";
+        let span = index.ast_attribute().map(|i| i.span).unwrap_or_else(Span::empty);
+
+        diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+            message,
+            index.attribute_name(),
+            span,
         ));
     }
 }

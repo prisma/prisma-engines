@@ -1,6 +1,8 @@
-use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
 use datamodel_connector::helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32};
-use datamodel_connector::{Connector, ConnectorCapability, ConstraintScope, ReferentialIntegrity};
+use datamodel_connector::{
+    connector_error::{ConnectorError, ErrorKind},
+    Connector, ConnectorCapability, ConstraintScope, ReferentialIntegrity,
+};
 use dml::{
     field::{Field, FieldType},
     model::Model,
@@ -82,39 +84,27 @@ const CONSTRAINT_SCOPES: &[ConstraintScope] = &[
     ConstraintScope::ModelPrimaryKeyKeyIndex,
 ];
 
-pub struct MsSqlDatamodelConnector {
-    capabilities: Vec<ConnectorCapability>,
-    referential_integrity: ReferentialIntegrity,
-}
+const CAPABILITIES: &[ConnectorCapability] = &[
+    ConnectorCapability::AnyId,
+    ConnectorCapability::AutoIncrement,
+    ConnectorCapability::AutoIncrementAllowedOnNonId,
+    ConnectorCapability::AutoIncrementMultipleAllowed,
+    ConnectorCapability::AutoIncrementNonIndexedAllowed,
+    ConnectorCapability::CompoundIds,
+    ConnectorCapability::CreateMany,
+    ConnectorCapability::ForeignKeys,
+    ConnectorCapability::NamedDefaultValues,
+    ConnectorCapability::NamedForeignKeys,
+    ConnectorCapability::NamedPrimaryKeys,
+    ConnectorCapability::QueryRaw,
+    ConnectorCapability::ReferenceCycleDetection,
+    ConnectorCapability::UpdateableId,
+    ConnectorCapability::PrimaryKeySortOrderDefinition,
+];
+
+pub struct MsSqlDatamodelConnector;
 
 impl MsSqlDatamodelConnector {
-    pub fn new(referential_integrity: ReferentialIntegrity) -> MsSqlDatamodelConnector {
-        let mut capabilities = vec![
-            ConnectorCapability::AutoIncrement,
-            ConnectorCapability::AutoIncrementAllowedOnNonId,
-            ConnectorCapability::AutoIncrementMultipleAllowed,
-            ConnectorCapability::AutoIncrementNonIndexedAllowed,
-            ConnectorCapability::CompoundIds,
-            ConnectorCapability::CreateMany,
-            ConnectorCapability::UpdateableId,
-            ConnectorCapability::AnyId,
-            ConnectorCapability::QueryRaw,
-            ConnectorCapability::NamedPrimaryKeys,
-            ConnectorCapability::NamedForeignKeys,
-            ConnectorCapability::NamedDefaultValues,
-            ConnectorCapability::ReferenceCycleDetection,
-        ];
-
-        if referential_integrity.uses_foreign_keys() {
-            capabilities.push(ConnectorCapability::ForeignKeys);
-        }
-
-        MsSqlDatamodelConnector {
-            capabilities,
-            referential_integrity,
-        }
-    }
-
     fn parse_mssql_type_parameter(
         &self,
         r#type: &str,
@@ -157,19 +147,18 @@ impl Connector for MsSqlDatamodelConnector {
         "SQL Server"
     }
 
-    fn capabilities(&self) -> &[ConnectorCapability] {
-        &self.capabilities
+    fn capabilities(&self) -> &'static [ConnectorCapability] {
+        CAPABILITIES
     }
 
     fn constraint_name_length(&self) -> usize {
         128
     }
 
-    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
+    fn referential_actions(&self, referential_integrity: &ReferentialIntegrity) -> BitFlags<ReferentialAction> {
         use ReferentialAction::*;
 
-        self.referential_integrity
-            .allowed_referential_actions(NoAction | Cascade | SetNull | SetDefault)
+        referential_integrity.allowed_referential_actions(NoAction | Cascade | SetNull | SetDefault)
     }
 
     fn scalar_type_for_native_type(&self, native_type: serde_json::Value) -> ScalarType {
@@ -277,7 +266,10 @@ impl Connector for MsSqlDatamodelConnector {
 
     fn validate_model(&self, model: &Model, errors: &mut Vec<ConnectorError>) {
         for index_definition in model.indices.iter() {
-            let fields = index_definition.fields.iter().map(|f| model.find_field(f).unwrap());
+            let fields = index_definition
+                .fields
+                .iter()
+                .map(|f| model.find_field(&f.name).unwrap());
 
             for field in fields {
                 if let FieldType::Scalar(_, _, Some(native_type)) = field.field_type() {
@@ -298,7 +290,7 @@ impl Connector for MsSqlDatamodelConnector {
 
         if let Some(pk) = &model.primary_key {
             for id_field in pk.fields.iter() {
-                let field = model.find_field(id_field).unwrap();
+                let field = model.find_field(&id_field.name).unwrap();
 
                 if let FieldType::Scalar(scalar_type, _, native_type) = field.field_type() {
                     if let Some(native_type) = native_type {
@@ -424,8 +416,10 @@ impl Connector for MsSqlDatamodelConnector {
     }
 }
 
-static HEAP_ALLOCATED: Lazy<Vec<MsSqlType>> = Lazy::new(|| {
-    vec![
+/// A collection of types stored outside of the row to the heap, having
+/// certain properties such as not allowed in keys or normal indices.
+pub fn heap_allocated_types() -> &'static [MsSqlType] {
+    &[
         Text,
         NText,
         Image,
@@ -434,12 +428,6 @@ static HEAP_ALLOCATED: Lazy<Vec<MsSqlType>> = Lazy::new(|| {
         VarChar(Some(Max)),
         NVarChar(Some(Max)),
     ]
-});
-
-/// A collection of types stored outside of the row to the heap, having
-/// certain properties such as not allowed in keys or normal indices.
-pub fn heap_allocated_types() -> &'static [MsSqlType] {
-    &*HEAP_ALLOCATED
 }
 
 fn arg_vec_for_type_param(type_param: Option<MsSqlTypeParameter>) -> Vec<String> {

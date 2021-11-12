@@ -5,7 +5,7 @@ use crate::{
 };
 use std::borrow::Cow;
 
-use super::{ModelWalker, ScalarFieldWalker};
+use super::{ModelWalker, ScalarFieldAttributeWalker, ScalarFieldWalker};
 
 #[allow(dead_code)]
 #[derive(Copy, Clone)]
@@ -67,6 +67,21 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
                 field_id: field_id.field_id,
                 db: self.db,
                 scalar_field: &self.db.types.scalar_fields[&(self.model_id, field_id.field_id)],
+            })
+    }
+
+    pub(crate) fn scalar_field_attributes(
+        self,
+    ) -> impl ExactSizeIterator<Item = ScalarFieldAttributeWalker<'ast, 'db>> + 'db {
+        self.attribute()
+            .fields
+            .iter()
+            .enumerate()
+            .map(move |(field_arg_id, _)| ScalarFieldAttributeWalker {
+                model_id: self.model_id,
+                fields: &self.attribute().fields,
+                db: self.db,
+                field_arg_id,
             })
     }
 

@@ -148,6 +148,5 @@ impl ToString for MongoDbVersion {
 }
 
 fn mongo_capabilities() -> Vec<ConnectorCapability> {
-    let dm_connector = MongoDbDatamodelConnector::default();
-    dm_connector.capabilities().to_owned()
+    MongoDbDatamodelConnector.capabilities().to_owned()
 }

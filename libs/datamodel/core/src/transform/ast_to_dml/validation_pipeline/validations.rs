@@ -7,6 +7,7 @@ mod relations;
 
 use self::names::Names;
 use crate::{
+    ast,
     diagnostics::Diagnostics,
     transform::ast_to_dml::db::{walkers::RefinedRelationWalker, ParserDatabase},
 };
@@ -15,12 +16,26 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, r
     let names = Names::new(db);
     let connector = db.active_connector();
 
-    let referential_integrity = db.datasource().map(|ds| ds.referential_integrity()).unwrap_or_default();
-
     for model in db.walk_models() {
         models::has_a_strict_unique_criteria(model, diagnostics);
         models::has_a_unique_primary_key_name(db, model, diagnostics);
         models::uses_sort_or_length_on_primary_without_preview_flag(db, model, diagnostics);
+        models::primary_key_length_prefix_supported(db, model, diagnostics);
+        models::primary_key_sort_order_supported(db, model, diagnostics);
+
+        if let Some(pk) = model.primary_key() {
+            for field_attribute in pk.scalar_field_attributes() {
+                // Type aliases will panic here... :(
+                let span = if pk.has_ast_attribute() {
+                    pk.ast_attribute().span
+                } else {
+                    ast::Span::empty()
+                };
+
+                let attribute = ("id", span);
+                fields::validate_length_used_with_correct_types(db, field_attribute, attribute, diagnostics);
+            }
+        }
 
         for field in model.scalar_fields() {
             fields::validate_client_name(field.into(), &names, diagnostics);
@@ -38,13 +53,23 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, r
             fields::validate_client_name(field.into(), &names, diagnostics);
 
             relation_fields::ignored_related_model(field, diagnostics);
-            relation_fields::referential_actions(field, connector, diagnostics);
-            relation_fields::on_update_without_foreign_keys(field, referential_integrity, diagnostics);
+            relation_fields::referential_actions(field, db, diagnostics);
         }
 
         for index in model.indexes() {
             indexes::has_a_unique_constraint_name(db, index, diagnostics);
             indexes::uses_length_or_sort_without_preview_flag(db, index, diagnostics);
+            indexes::field_length_prefix_supported(db, index, diagnostics);
+
+            for field_attribute in index.scalar_field_attributes() {
+                let span = index
+                    .ast_attribute()
+                    .map(|attr| attr.span)
+                    .unwrap_or_else(ast::Span::empty);
+
+                let attribute = (index.attribute_name(), span);
+                fields::validate_length_used_with_correct_types(db, field_attribute, attribute, diagnostics);
+            }
         }
     }
 
@@ -55,8 +80,8 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, r
                 if let Some(relation) = relation.as_complete() {
                     relations::field_arity(relation, diagnostics);
                     relations::same_length_in_referencing_and_referenced(relation, diagnostics);
-                    relations::cycles(relation, connector, diagnostics);
-                    relations::multiple_cascading_paths(relation, connector, diagnostics);
+                    relations::cycles(relation, db, diagnostics);
+                    relations::multiple_cascading_paths(relation, db, diagnostics);
                     relations::has_a_unique_constraint_name(db, relation, diagnostics);
 
                     // These needs to run last to prevent error spam.

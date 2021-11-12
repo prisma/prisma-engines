@@ -198,6 +198,9 @@ dev-vitess_8_0: start-vitess_8_0
 qe:
 	cargo run --bin query-engine -- --enable-playground --enable-raw-queries
 
+qe-dmmf:
+	cargo run --bin query-engine -- cli dmmf > dmmf.json
+
 push-schema:
 	cargo run --bin test-cli -- schema-push $(DEV_SCHEMA_FILE) --force
 
