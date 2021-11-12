@@ -1,0 +1,34 @@
+
+------
+
+{
+  "collections": {
+    "User": {
+      "indexes": [
+        {
+          "name": "_id_",
+          "is_unique": false,
+          "keys": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "UserExistingIndex",
+          "is_unique": false,
+          "keys": {
+            "firstName": 1,
+            "lastName": -1,
+            "age": 1
+          }
+        }
+      ],
+      "documents": [
+        {
+          "_id": 1,
+          "age": 52,
+          "firstName": "George"
+        }
+      ]
+    }
+  }
+}

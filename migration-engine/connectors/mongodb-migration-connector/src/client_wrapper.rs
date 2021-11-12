@@ -1,8 +1,10 @@
 use crate::schema::MongoSchema;
+use datamodel::common::preview_features::PreviewFeature;
+use enumflags2::BitFlags;
 use futures::stream::TryStreamExt;
 use migration_connector::{ConnectorError, ConnectorResult};
 use mongodb::{
-    bson::Document,
+    bson::{Bson, Document},
     error::Error as MongoError,
     options::{ClientOptions, WriteConcern},
 };
@@ -35,7 +37,7 @@ impl Client {
         self.inner.database(&self.db_name)
     }
 
-    pub(crate) async fn describe(&self) -> ConnectorResult<MongoSchema> {
+    pub(crate) async fn describe(&self, preview_features: BitFlags<PreviewFeature>) -> ConnectorResult<MongoSchema> {
         let mut schema = MongoSchema::default();
         let database = self.database();
 
@@ -67,8 +69,16 @@ impl Client {
                     continue; // do not introspect or diff these
                 }
 
-                let path = index.keys;
-                schema.push_index(collection_id, name, is_unique, path);
+                let path = if preview_features.contains(PreviewFeature::ExtendedIndexes) {
+                    index.keys
+                } else {
+                    index.keys.iter().fold(Document::new(), |mut acc, (k, _)| {
+                        acc.insert(k, Bson::Int32(1));
+                        acc
+                    })
+                };
+
+                schema.push_index(collection_id, name, is_unique, dbg!(path));
             }
         }
 
