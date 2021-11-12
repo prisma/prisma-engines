@@ -1,8 +1,8 @@
 use super::{
     super::helpers::{ValueListValidator, ValueValidator},
     builtin_datasource_providers::{
-        MongoDbDatasourceProvider, MsSqlDatasourceProvider, MySqlDatasourceProvider, PostgresDatasourceProvider,
-        SqliteDatasourceProvider,
+        CockroachDbDatasourceProvider, MongoDbDatasourceProvider, MsSqlDatasourceProvider, MySqlDatasourceProvider,
+        PostgresDatasourceProvider, SqliteDatasourceProvider,
     },
     datasource_provider::DatasourceProvider,
 };
@@ -157,12 +157,13 @@ impl DatasourceLoader {
         let documentation = ast_source.documentation.as_ref().map(|comment| comment.text.clone());
         let referential_integrity = get_referential_integrity(&args, preview_features, ast_source, diagnostics);
 
-        let datasource_provider: Box<dyn DatasourceProvider> = match provider {
-            p if p == MYSQL_SOURCE_NAME => Box::new(MySqlDatasourceProvider),
-            p if p == POSTGRES_SOURCE_NAME || p == POSTGRES_SOURCE_NAME_HEROKU => Box::new(PostgresDatasourceProvider),
-            p if p == SQLITE_SOURCE_NAME => Box::new(SqliteDatasourceProvider),
-            p if p == MSSQL_SOURCE_NAME => Box::new(MsSqlDatasourceProvider),
-            p if p == MONGODB_SOURCE_NAME => Box::new(MongoDbDatasourceProvider),
+        let datasource_provider: &'static dyn DatasourceProvider = match provider {
+            p if p == MYSQL_SOURCE_NAME => &MySqlDatasourceProvider,
+            p if p == POSTGRES_SOURCE_NAME || p == POSTGRES_SOURCE_NAME_HEROKU => &PostgresDatasourceProvider,
+            p if p == SQLITE_SOURCE_NAME => &SqliteDatasourceProvider,
+            p if p == MSSQL_SOURCE_NAME => &MsSqlDatasourceProvider,
+            p if p == MONGODB_SOURCE_NAME => &MongoDbDatasourceProvider,
+            p if p == COCKROACHDB_SOURCE_NAME => &CockroachDbDatasourceProvider,
             _ => {
                 diagnostics.push_error(DatamodelError::new_datasource_provider_not_known_error(
                     provider,

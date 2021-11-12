@@ -457,3 +457,10 @@ pub(crate) const MSSQL_SOURCE: &str = r#"
         url      = "sqlserver://localhost:1433"
     }
 "#;
+
+pub(crate) const COCKROACHDB_SOURCE: &str = r#"
+    datasource db {
+        provider = "cockroachdb"
+        url      = "postgresql://localhost:5432"
+    }
+"#;
