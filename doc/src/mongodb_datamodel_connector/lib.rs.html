@@ -236,7 +236,7 @@
 
             <span class="comment">// singular id</span>
             <span class="kw">let</span> <span class="ident">field_name</span> <span class="op">=</span> <span class="ident">pk</span>.<span class="ident">fields</span>.<span class="ident">first</span>().<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">find_scalar_field</span>(<span class="ident">field_name</span>.<span class="ident">as_str</span>()).<span class="ident">unwrap</span>();
+            <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">find_scalar_field</span>(<span class="ident">field_name</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()).<span class="ident">unwrap</span>();
 
             <span class="comment">// The _id name check is superfluous because it&#39;s not a valid schema field at the moment.</span>
             <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">name</span> <span class="op">!</span><span class="op">=</span> <span class="string">&quot;_id&quot;</span> {

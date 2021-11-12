@@ -475,6 +475,21 @@
 <span id="475">475</span>
 <span id="476">476</span>
 <span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">name</span>;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">name::Name</span>;
@@ -482,8 +497,9 @@
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">field_type::FieldType</span>, <span class="ident">CompositeTypeDepth</span>};
 <span class="kw">use</span> <span class="ident">convert_case</span>::{<span class="ident">Case</span>, <span class="ident">Casing</span>};
 <span class="kw">use</span> <span class="ident">datamodel</span>::{
-    <span class="ident">CompositeType</span>, <span class="ident">CompositeTypeField</span>, <span class="ident">Datamodel</span>, <span class="ident">DefaultValue</span>, <span class="ident">Field</span>, <span class="ident">IndexDefinition</span>, <span class="ident">IndexType</span>, <span class="ident">Model</span>,
-    <span class="ident">NativeTypeInstance</span>, <span class="ident">PrimaryKeyDefinition</span>, <span class="ident">ScalarField</span>, <span class="ident">ScalarType</span>, <span class="ident">ValueGenerator</span>, <span class="ident">WithDatabaseName</span>,
+    <span class="ident">CompositeType</span>, <span class="ident">CompositeTypeField</span>, <span class="ident">Datamodel</span>, <span class="ident">DefaultValue</span>, <span class="ident">Field</span>, <span class="ident">IndexDefinition</span>, <span class="ident">IndexField</span>, <span class="ident">IndexType</span>, <span class="ident">Model</span>,
+    <span class="ident">NativeTypeInstance</span>, <span class="ident">PrimaryKeyDefinition</span>, <span class="ident">PrimaryKeyField</span>, <span class="ident">ScalarField</span>, <span class="ident">ScalarType</span>, <span class="ident">SortOrder</span>, <span class="ident">ValueGenerator</span>,
+    <span class="ident">WithDatabaseName</span>,
 };
 <span class="kw">use</span> <span class="ident">introspection_connector::Warning</span>;
 <span class="kw">use</span> <span class="ident">mongodb</span>::{
@@ -833,7 +849,12 @@
     <span class="kw">let</span> <span class="ident">primary_key</span> <span class="op">=</span> <span class="ident">PrimaryKeyDefinition</span> {
         <span class="ident">name</span>: <span class="prelude-val">None</span>,
         <span class="ident">db_name</span>: <span class="prelude-val">None</span>,
-        <span class="ident">fields</span>: <span class="macro">vec!</span>[<span class="string">&quot;id&quot;</span>.<span class="ident">to_string</span>()],
+        <span class="comment">//TODO(extended indexes) If the flag is enabled this should return the sort, otherwise not</span>
+        <span class="ident">fields</span>: <span class="macro">vec!</span>[<span class="ident">PrimaryKeyField</span> {
+            <span class="ident">name</span>: <span class="string">&quot;id&quot;</span>.<span class="ident">to_string</span>(),
+            <span class="ident">sort_order</span>: <span class="prelude-val">None</span>,
+            <span class="ident">length</span>: <span class="prelude-val">None</span>,
+        }],
         <span class="ident">defined_on_field</span>: <span class="bool-val">true</span>,
     };
 
@@ -920,9 +941,18 @@
             <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="ident">index</span>
                 .<span class="ident">keys</span>
                 .<span class="ident">into_iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="kw">match</span> <span class="ident">sanitize_string</span>(<span class="kw-2">&amp;</span><span class="ident">k</span>) {
-                    <span class="prelude-val">Some</span>(<span class="ident">sanitized</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sanitized</span>,
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">k</span>,
+                <span class="comment">//TODO(extended indices) is the value here always the sort order? the driver docs are unclear</span>
+                <span class="comment">// If the flag is enabled this should return the sort, otherwise not</span>
+                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="kw">_</span>)<span class="op">|</span> {
+                    <span class="kw">let</span> <span class="ident">field_name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">sanitize_string</span>(<span class="kw-2">&amp;</span><span class="ident">k</span>) {
+                        <span class="prelude-val">Some</span>(<span class="ident">sanitized</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sanitized</span>,
+                        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">k</span>,
+                    };
+                    <span class="ident">IndexField</span> {
+                        <span class="ident">name</span>: <span class="ident">field_name</span>,
+                        <span class="ident">sort_order</span>: <span class="prelude-val">Some</span>(<span class="ident">SortOrder::Asc</span>),
+                        <span class="ident">length</span>: <span class="prelude-val">None</span>,
+                    }
                 })
                 .<span class="ident">collect</span>();
 

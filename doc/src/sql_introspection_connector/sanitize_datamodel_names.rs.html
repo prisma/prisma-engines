@@ -224,10 +224,21 @@
 <span id="224">224</span>
 <span id="225">225</span>
 <span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::SqlFamilyTrait</span>;
 <span class="kw">use</span> <span class="ident">datamodel</span>::{
-    <span class="ident">reserved_model_names::is_reserved_type_name</span>, <span class="ident">Datamodel</span>, <span class="ident">DefaultKind</span>, <span class="ident">DefaultValue</span>, <span class="ident">Field</span>, <span class="ident">FieldType</span>, <span class="ident">Model</span>,
-    <span class="ident">ValueGenerator</span>, <span class="ident">WithDatabaseName</span>, <span class="ident">WithName</span>,
+    <span class="ident">reserved_model_names::is_reserved_type_name</span>, <span class="ident">Datamodel</span>, <span class="ident">DefaultKind</span>, <span class="ident">DefaultValue</span>, <span class="ident">Field</span>, <span class="ident">FieldType</span>, <span class="ident">IndexField</span>,
+    <span class="ident">Model</span>, <span class="ident">PrimaryKeyField</span>, <span class="ident">ValueGenerator</span>, <span class="ident">WithDatabaseName</span>, <span class="ident">WithName</span>,
 };
 <span class="kw">use</span> <span class="ident">introspection_connector::IntrospectionContext</span>;
 <span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
@@ -278,7 +289,7 @@
         <span class="kw">let</span> <span class="ident">model_db_name</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">database_name</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">to_owned</span>());
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pk</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">model</span>.<span class="ident">primary_key</span> {
-            <span class="ident">pk</span>.<span class="ident">fields</span> <span class="op">=</span> <span class="ident">sanitize_strings</span>(<span class="ident">pk</span>.<span class="ident">fields</span>.<span class="ident">as_slice</span>());
+            <span class="ident">sanitize_pk_field_names</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">pk</span>.<span class="ident">fields</span>);
         }
 
         <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">fields_mut</span>() {
@@ -349,7 +360,7 @@
         }
 
         <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">model</span>.<span class="ident">indices</span> {
-            <span class="ident">index</span>.<span class="ident">fields</span> <span class="op">=</span> <span class="ident">sanitize_strings</span>(<span class="kw-2">&amp;</span><span class="ident">index</span>.<span class="ident">fields</span>);
+            <span class="ident">sanitize_index_field_names</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">index</span>.<span class="ident">fields</span>);
         }
     }
 
@@ -379,15 +390,26 @@
     }
 }
 
+<span class="kw">fn</span> <span class="ident">sanitize_pk_field_names</span>(<span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">PrimaryKeyField</span>]) {
+    <span class="ident">fields</span>
+        .<span class="ident">iter_mut</span>()
+        .<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">field</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">sanitize_string</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">name</span>))
+        .<span class="ident">collect</span>()
+}
+
+<span class="kw">fn</span> <span class="ident">sanitize_index_field_names</span>(<span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">IndexField</span>]) {
+    <span class="ident">fields</span>
+        .<span class="ident">iter_mut</span>()
+        .<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">field</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">sanitize_string</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">name</span>))
+        .<span class="ident">collect</span>()
+}
+
 <span class="kw">fn</span> <span class="ident">sanitize_strings</span>(<span class="ident">strings</span>: <span class="kw-2">&amp;</span>[<span class="ident">String</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
     <span class="ident">strings</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">sanitize_string</span>(<span class="ident">f</span>)).<span class="ident">collect</span>()
 }
 
-<span class="comment">// Todo: This is now widely used, we can make this smarter at some point.</span>
-<span class="comment">// Ideas:</span>
-<span class="comment">// - Numbers only -&gt; spell out first digit? 100 -&gt; one00</span>
-<span class="comment">// - Only invalid characters?</span>
-<span class="comment">// - Underscore at start</span>
+<span class="doccomment">/// We agreed on a simple sanitization logic. Any remaining conflicts will produce a datamodel with</span>
+<span class="doccomment">/// name conflicts. Our validation will catch that and ask the user to disambiguate manually.</span>
 <span class="kw">fn</span> <span class="ident">sanitize_name</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">renameable</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>)
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">WithDatabaseName</span> <span class="op">+</span> <span class="ident">WithName</span>,

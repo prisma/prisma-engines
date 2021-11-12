@@ -270,12 +270,30 @@
 <span id="270">270</span>
 <span id="271">271</span>
 <span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common::constraint_names::ConstraintNames</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common::preview_features::PreviewFeature</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common::RelationNames</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::transform::dml_to_ast::LowerDmlToAst</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">Attribute</span>, <span class="ident">Span</span>},
-    <span class="ident">dml</span>, <span class="ident">Datasource</span>, <span class="ident">Field</span>, <span class="ident">Ignorable</span>,
+    <span class="ident">dml</span>, <span class="ident">Datasource</span>, <span class="ident">Field</span>, <span class="ident">Ignorable</span>, <span class="ident">SortOrder</span>,
 };
 <span class="kw">use</span> <span class="ident">::dml::traits::WithName</span>;
 <span class="kw">use</span> <span class="ident">datamodel_connector</span>::{<span class="ident">Connector</span>, <span class="ident">EmptyDatamodelConnector</span>};
@@ -358,16 +376,31 @@
             <span class="kw">if</span> <span class="ident">model</span>.<span class="ident">field_is_primary_and_defined_on_field</span>(<span class="kw-2">&amp;</span><span class="ident">sf</span>.<span class="ident">name</span>) {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
                 <span class="kw">let</span> <span class="ident">pk</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">primary_key</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>();
-                <span class="kw">if</span> <span class="ident">pk</span>.<span class="ident">db_name</span>.<span class="ident">is_some</span>() {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">src</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">datasource</span> {
-                        <span class="kw">if</span> <span class="op">!</span><span class="ident">ConstraintNames::primary_key_name_matches</span>(<span class="ident">pk</span>, <span class="ident">model</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">src</span>.<span class="ident">active_connector</span>) {
-                            <span class="ident">args</span>.<span class="ident">push</span>(<span class="ident">ast::Argument::new</span>(
-                                <span class="string">&quot;map&quot;</span>,
-                                <span class="ident">ast::Expression::StringValue</span>(<span class="ident">String::from</span>(<span class="ident">pk</span>.<span class="ident">db_name</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()), <span class="ident">Span::empty</span>()),
-                            ));
-                        }
-                    };
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">src</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">datasource</span> {
+                    <span class="kw">if</span> <span class="ident">pk</span>.<span class="ident">db_name</span>.<span class="ident">is_some</span>()
+                        <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">ConstraintNames::primary_key_name_matches</span>(<span class="ident">pk</span>, <span class="ident">model</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">src</span>.<span class="ident">active_connector</span>)
+                    {
+                        <span class="ident">args</span>.<span class="ident">push</span>(<span class="ident">ast::Argument::new</span>(
+                            <span class="string">&quot;map&quot;</span>,
+                            <span class="ident">ast::Expression::StringValue</span>(<span class="ident">String::from</span>(<span class="ident">pk</span>.<span class="ident">db_name</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()), <span class="ident">Span::empty</span>()),
+                        ));
+                    }
                 }
+                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::ExtendedIndexes</span>) {
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">length</span>) <span class="op">=</span> <span class="ident">pk</span>.<span class="ident">fields</span>.<span class="ident">first</span>().<span class="ident">unwrap</span>().<span class="ident">length</span> {
+                        <span class="ident">args</span>.<span class="ident">push</span>(<span class="ident">ast::Argument::new</span>(
+                            <span class="string">&quot;length&quot;</span>,
+                            <span class="ident">ast::Expression::NumericValue</span>(<span class="ident">length</span>.<span class="ident">to_string</span>(), <span class="ident">Span::empty</span>()),
+                        ));
+                    }
+
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">SortOrder::Desc</span>) <span class="op">=</span> <span class="ident">pk</span>.<span class="ident">fields</span>.<span class="ident">first</span>().<span class="ident">unwrap</span>().<span class="ident">sort_order</span> {
+                        <span class="ident">args</span>.<span class="ident">push</span>(<span class="ident">ast::Argument::new</span>(
+                            <span class="string">&quot;sort&quot;</span>,
+                            <span class="ident">ast::Expression::NumericValue</span>(<span class="string">&quot;Desc&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">Span::empty</span>()),
+                        ));
+                    }
+                };
 
                 <span class="ident">attributes</span>.<span class="ident">push</span>(<span class="ident">ast::Attribute::new</span>(<span class="string">&quot;id&quot;</span>, <span class="ident">args</span>));
             }
@@ -377,12 +410,13 @@
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">dml::Field::ScalarField</span>(<span class="ident">sf</span>) <span class="op">=</span> <span class="ident">field</span> {
             <span class="kw">if</span> <span class="ident">model</span>.<span class="ident">field_is_unique_and_defined_on_field</span>(<span class="kw-2">&amp;</span><span class="ident">sf</span>.<span class="ident">name</span>) {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">arguments</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">idx</span>) <span class="op">=</span> <span class="ident">model</span>
-                    .<span class="ident">indices</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">find</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="ident">id</span>.<span class="ident">is_unique</span>() <span class="op">&amp;&amp;</span> <span class="ident">id</span>.<span class="ident">defined_on_field</span> <span class="op">&amp;&amp;</span> <span class="ident">id</span>.<span class="ident">fields</span> <span class="op">=</span><span class="op">=</span> [<span class="ident">field</span>.<span class="ident">name</span>()])
-                {
-                    <span class="self">self</span>.<span class="ident">push_index_map_argument</span>(<span class="ident">model</span>, <span class="ident">idx</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">arguments</span>)
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">idx</span>) <span class="op">=</span> <span class="ident">model</span>.<span class="ident">indices</span>.<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> {
+                    <span class="ident">i</span>.<span class="ident">is_unique</span>()
+                        <span class="op">&amp;&amp;</span> <span class="ident">i</span>.<span class="ident">defined_on_field</span>
+                        <span class="op">&amp;&amp;</span> <span class="ident">i</span>.<span class="ident">fields</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span>
+                        <span class="op">&amp;&amp;</span> <span class="ident">i</span>.<span class="ident">fields</span>.<span class="ident">first</span>().<span class="ident">unwrap</span>().<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="ident">field</span>.<span class="ident">name</span>()
+                }) {
+                    <span class="self">self</span>.<span class="ident">push_field_index_arguments</span>(<span class="ident">model</span>, <span class="ident">idx</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">arguments</span>)
                 }
 
                 <span class="ident">attributes</span>.<span class="ident">push</span>(<span class="ident">ast::Attribute::new</span>(<span class="string">&quot;unique&quot;</span>, <span class="ident">arguments</span>));
@@ -418,7 +452,7 @@
         }
 
         <span class="comment">// @map</span>
-        <span class="op">&lt;</span><span class="ident">LowerDmlToAst</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::push_map_attribute</span>(<span class="ident">field</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">attributes</span>);
+        <span class="op">&lt;</span><span class="ident">LowerDmlToAst</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::push_model_index_map_arg</span>(<span class="ident">field</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">attributes</span>);
 
         <span class="comment">// @relation</span>
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">dml::Field::RelationField</span>(<span class="ident">rf</span>) <span class="op">=</span> <span class="ident">field</span> {

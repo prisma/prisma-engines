@@ -411,9 +411,32 @@
 <span id="411">411</span>
 <span id="412">412</span>
 <span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>, <span class="ident">dml</span>,
     <span class="ident">transform::ast_to_dml::db</span>::{<span class="self">self</span>, <span class="ident">walkers</span>::<span class="kw-2">*</span>},
+    <span class="ident">IndexField</span>, <span class="ident">PrimaryKeyField</span>,
 };
 <span class="kw">use</span> <span class="ident">::dml::composite_type</span>::{<span class="ident">CompositeType</span>, <span class="ident">CompositeTypeField</span>, <span class="ident">CompositeTypeFieldType</span>};
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
@@ -685,7 +708,19 @@
         <span class="ident">model</span>.<span class="ident">primary_key</span> <span class="op">=</span> <span class="ident">walker</span>.<span class="ident">primary_key</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">dml::PrimaryKeyDefinition</span> {
             <span class="ident">name</span>: <span class="ident">pk</span>.<span class="ident">name</span>().<span class="ident">map</span>(<span class="ident">String::from</span>),
             <span class="ident">db_name</span>: <span class="ident">pk</span>.<span class="ident">final_database_name</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">into_owned</span>()),
-            <span class="ident">fields</span>: <span class="ident">pk</span>.<span class="ident">iter_ast_fields</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">to_owned</span>()).<span class="ident">collect</span>(),
+            <span class="ident">fields</span>: <span class="ident">pk</span>
+                .<span class="ident">iter_ast_fields</span>()
+                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">field</span>, <span class="ident">sort_order</span>, <span class="ident">length</span>)<span class="op">|</span>
+                    <span class="comment">//TODO (extended indexes) here it is ok to pass sort and length with out a preview flag</span>
+                    <span class="comment">// check since this is coming from the ast and the parsing would reject the args without</span>
+                    <span class="comment">// the flag set</span>
+                    <span class="comment">// When we start using the extra args here could be a place to fill in the defaults. </span>
+                    <span class="ident">PrimaryKeyField</span> {
+                    <span class="ident">name</span>: <span class="ident">field</span>.<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">to_owned</span>(),
+                    <span class="ident">sort_order</span>,
+                    <span class="ident">length</span>,
+                })
+                .<span class="ident">collect</span>(),
             <span class="ident">defined_on_field</span>: <span class="ident">pk</span>.<span class="ident">is_defined_on_field</span>(),
         });
 
@@ -698,7 +733,16 @@
                     .<span class="ident">attribute</span>()
                     .<span class="ident">fields</span>
                     .<span class="ident">iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>()[<span class="ident">model_id</span>][<span class="ident">field</span>.<span class="ident">field_id</span>].<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">clone</span>())
+                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span>
+                        <span class="comment">//TODO(extended indexes) here it is ok to pass sort and length with out a preview flag</span>
+                        <span class="comment">// check since this is coming from the ast and the parsing would reject the args without</span>
+                        <span class="comment">// the flag set.</span>
+                        <span class="comment">// When we start using the extra args here could be a place to fill in the defaults. </span>
+                        <span class="ident">IndexField</span> {
+                        <span class="ident">name</span>: <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>()[<span class="ident">model_id</span>][<span class="ident">field</span>.<span class="ident">field_id</span>].<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
+                        <span class="ident">sort_order</span>: <span class="ident">field</span>.<span class="ident">sort_order</span>,
+                        <span class="ident">length</span>: <span class="ident">field</span>.<span class="ident">length</span>,
+                    })
                     .<span class="ident">collect</span>(),
                 <span class="ident">tpe</span>: <span class="kw">match</span> <span class="ident">idx</span>.<span class="ident">attribute</span>().<span class="ident">is_unique</span> {
                     <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">dml::IndexType::Unique</span>,
