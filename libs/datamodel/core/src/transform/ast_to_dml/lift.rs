@@ -291,7 +291,10 @@ impl<'a> LiftAstToDml<'a> {
 
         model.indices = walker
             .indexes()
-            .map(|idx| dml::IndexDefinition {
+            .map(|idx| {
+                assert!(idx.fields().len() != 0);
+
+                dml::IndexDefinition {
                 name: idx.attribute().name.map(String::from),
                 db_name: Some(idx.final_database_name().into_owned()),
                 fields: idx
@@ -314,7 +317,7 @@ impl<'a> LiftAstToDml<'a> {
                     false => dml::IndexType::Normal,
                 },
                 defined_on_field: idx.attribute().source_field.is_some(),
-            })
+            }})
             .collect();
 
         for scalar_field in walker.scalar_fields() {
