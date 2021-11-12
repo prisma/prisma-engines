@@ -1,11 +1,11 @@
 use std::borrow::Cow;
 
-use dml::default_value::DefaultValue;
+use dml::{default_value::DefaultValue, model::SortOrder};
 
 use crate::{
     ast,
     common::constraint_names::ConstraintNames,
-    transform::ast_to_dml::db::{ParserDatabase, ScalarField},
+    transform::ast_to_dml::db::{types::FieldWithArgs, ParserDatabase, ScalarField},
 };
 
 use super::ModelWalker;
@@ -103,5 +103,36 @@ impl<'ast, 'db> DefaultValueWalker<'ast, 'db> {
             db: self.db,
             scalar_field: &self.db.types.scalar_fields[&(self.model_id, self.field_id)],
         }
+    }
+}
+
+#[derive(Copy, Clone)]
+pub(crate) struct ScalarFieldAttributeWalker<'ast, 'db> {
+    pub(crate) model_id: ast::ModelId,
+    pub(crate) fields: &'db [FieldWithArgs],
+    pub(crate) db: &'db ParserDatabase<'ast>,
+    pub(crate) field_arg_id: usize,
+}
+
+impl<'ast, 'db> ScalarFieldAttributeWalker<'ast, 'db> {
+    fn args(self) -> &'db FieldWithArgs {
+        &self.fields[self.field_arg_id]
+    }
+
+    pub(crate) fn length(self) -> Option<u32> {
+        self.args().length
+    }
+
+    pub(crate) fn as_scalar_field(self) -> ScalarFieldWalker<'ast, 'db> {
+        ScalarFieldWalker {
+            model_id: self.model_id,
+            field_id: self.args().field_id,
+            db: self.db,
+            scalar_field: &self.db.types.scalar_fields[&(self.model_id, self.args().field_id)],
+        }
+    }
+
+    pub(crate) fn sort_order(&self) -> Option<SortOrder> {
+        self.args().sort_order
     }
 }

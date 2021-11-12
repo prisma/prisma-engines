@@ -268,6 +268,8 @@ capabilities!(
     NamedForeignKeys,
     ReferenceCycleDetection,
     NamedDefaultValues,
+    IndexColumnLengthPrefixing,
+    PrimaryKeySortOrderDefinition,
     // Start of query-engine-only Capabilities
     InsensitiveFilters,
     CreateMany,

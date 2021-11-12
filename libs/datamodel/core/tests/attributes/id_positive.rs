@@ -343,7 +343,7 @@ fn id_accepts_length_arg_on_mysql() {
 }
 
 #[test]
-fn id_accepts_sort_arg_on_mssql() {
+fn id_accepts_sort_arg_on_sqlserver() {
     let dml = with_header(
         r#"
      model User {
@@ -355,7 +355,7 @@ fn id_accepts_sort_arg_on_mssql() {
      }
      
      model Blog {
-         title  String @id(sort:Desc)
+         title  String @id(sort: Desc)
      }
      "#,
         Provider::SqlServer,
@@ -399,4 +399,57 @@ fn id_accepts_sort_arg_on_mssql() {
         }],
         defined_on_field: true,
     });
+}
+
+#[test]
+fn mysql_allows_id_length_prefix() {
+    let dml = indoc! {r#"
+        model A {
+          id String @id(length: 30) @test.VarChar(255)
+        }
+    "#};
+    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    assert!(datamodel::parse_schema(&schema).is_ok());
+}
+
+#[test]
+fn mysql_allows_compound_id_length_prefix() {
+    let dml = indoc! {r#"
+        model A {
+          a String @test.VarChar(255)
+          b String @test.VarChar(255)
+
+          @@id([a(length: 10), b(length: 20)])
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    assert!(datamodel::parse_schema(&schema).is_ok());
+}
+
+#[test]
+fn mssql_allows_id_sort_argument() {
+    let dml = indoc! {r#"
+        model A {
+          id Int @id(sort: Desc)
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::SqlServer, &["extendedIndexes"]);
+    assert!(datamodel::parse_schema(&schema).is_ok());
+}
+
+#[test]
+fn mssql_allows_compound_id_sort_argument() {
+    let dml = indoc! {r#"
+        model A {
+          a String @test.VarChar(255)
+          b String @test.VarChar(255)
+
+          @@id([a(sort: Asc), b(sort: Desc)])
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::SqlServer, &["extendedIndexes"]);
+    assert!(datamodel::parse_schema(&schema).is_ok());
 }

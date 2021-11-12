@@ -88,6 +88,15 @@ pub(crate) enum ScalarFieldType {
     Unsupported,
 }
 
+impl ScalarFieldType {
+    pub(crate) fn as_builtin_scalar(self) -> Option<dml::scalars::ScalarType> {
+        match self {
+            ScalarFieldType::BuiltInScalar(s) => Some(s),
+            _ => None,
+        }
+    }
+}
+
 #[derive(Debug)]
 pub(crate) struct ScalarField<'ast> {
     pub(crate) r#type: ScalarFieldType,
