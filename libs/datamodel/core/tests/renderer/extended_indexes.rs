@@ -9,11 +9,11 @@ fn expanded_index_capability_rendering_works() {
         id         Int    @id
         firstName  String @unique(sort: Desc, length: 5)
         middleName String @unique(sort: Desc)
-        lastName   String @unique(length: 5)
+        lastName   String @unique(sort: Asc, length: 5)
         generation Int    @unique
         
-        @@index([firstName(sort: Desc), middleName(length: 5), lastName(sort: Desc, length: 5), generation])
-        @@unique([firstName(sort: Desc), middleName(length: 5), lastName(sort: Desc, length: 5), generation])
+        @@index([firstName(sort: Desc), middleName(sort: Asc, length: 5), lastName(sort: Desc, length: 5), generation(sort:Asc)])
+        @@unique([firstName(sort: Desc), middleName(length: 5), lastName(sort: Desc, length: 5), generation(sort:Asc)])
     }
     "#,
         Provider::Mysql,
@@ -41,7 +41,7 @@ fn expanded_index_capability_rendering_works() {
 }
 
 #[test]
-fn expanded_id_capability_rendering_works() {
+fn expanded_id_capability_rendering_works_for_mysql() {
     let dm = with_header(
         r#"
       model User {
@@ -52,7 +52,7 @@ fn expanded_id_capability_rendering_works() {
         firstName  String 
         lastName   String 
         
-        @@id([firstName, lastName( length: 5)])
+        @@id([firstName, lastName(length: 5)])
       }
     "#,
         Provider::Mysql,
@@ -69,6 +69,44 @@ fn expanded_id_capability_rendering_works() {
         lastName  String
 
         @@id([firstName, lastName(length: 5)])
+      }
+    "#]];
+
+    let dml = datamodel::parse_datamodel(&dm).unwrap().subject;
+    let configuration = datamodel::parse_configuration(&dm).unwrap().subject;
+    let rendered = datamodel::render_datamodel_to_string(&dml, Some(&configuration));
+    expected.assert_eq(&rendered)
+}
+
+#[test]
+fn expanded_id_capability_rendering_works_for_sqlserver() {
+    let dm = with_header(
+        r#"
+      model User {
+        id         String @id(sort: Asc)
+      }
+      
+      model User2 {
+        firstName  String 
+        lastName   String 
+        
+        @@id([firstName(sort: Asc), lastName(sort: Desc)])
+      }
+    "#,
+        Provider::SqlServer,
+        &["extendedIndexes"],
+    );
+
+    let expected = expect![[r#"
+      model User {
+        id String @id
+      }
+      
+      model User2 {
+        firstName String
+        lastName  String
+
+        @@id([firstName, lastName(sort: Desc)])
       }
     "#]];
 

@@ -69,7 +69,7 @@ pub fn introspect(
                 continue;
             }
 
-            model.add_index(calculate_index(index));
+            model.add_index(calculate_index(index, ctx));
         }
 
         if let Some(pk) = &table.primary_key {

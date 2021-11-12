@@ -276,9 +276,10 @@ impl<'a> LiftAstToDml<'a> {
             fields: pk
                 .iter_ast_fields()
                 .map(|(field, sort_order, length)|
-                    //(extended indexes) here it is ok to pass sort and length with out a preview flag
-                    //check since this is coming from the ast and the parsing would reject the args without
-                    //the flag set
+                    //TODO (extended indexes) here it is ok to pass sort and length with out a preview flag
+                    // check since this is coming from the ast and the parsing would reject the args without
+                    // the flag set
+                    // When we start using the extra args here could be a place to fill in the defaults. 
                     PrimaryKeyField {
                     name: field.name.name.to_owned(),
                     sort_order,
@@ -297,7 +298,12 @@ impl<'a> LiftAstToDml<'a> {
                     .attribute()
                     .fields
                     .iter()
-                    .map(|field| IndexField {
+                    .map(|field|
+                        //TODO(extended indexes) here it is ok to pass sort and length with out a preview flag
+                        // check since this is coming from the ast and the parsing would reject the args without
+                        // the flag set.
+                        // When we start using the extra args here could be a place to fill in the defaults. 
+                        IndexField {
                         name: self.db.ast()[model_id][field.field_id].name.name.clone(),
                         sort_order: field.sort_order,
                         length: field.length,

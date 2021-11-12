@@ -52,6 +52,7 @@ pub struct IndexField {
 }
 
 impl IndexField {
+    /// Tests only
     pub fn new(name: &str) -> Self {
         IndexField {
             name: name.to_string(),
@@ -79,6 +80,7 @@ pub struct PrimaryKeyField {
 }
 
 impl PrimaryKeyField {
+    /// Tests only
     pub fn new(name: &str) -> Self {
         PrimaryKeyField {
             name: name.to_string(),

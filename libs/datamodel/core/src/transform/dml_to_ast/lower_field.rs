@@ -4,7 +4,7 @@ use crate::common::RelationNames;
 use crate::transform::dml_to_ast::LowerDmlToAst;
 use crate::{
     ast::{self, Attribute, Span},
-    dml, Datasource, Field, Ignorable,
+    dml, Datasource, Field, Ignorable, SortOrder,
 };
 use ::dml::traits::WithName;
 use datamodel_connector::{Connector, EmptyDatamodelConnector};
@@ -105,10 +105,10 @@ impl<'a> LowerDmlToAst<'a> {
                         ));
                     }
 
-                    if let Some(sort) = pk.fields.first().unwrap().sort_order {
+                    if let Some(SortOrder::Desc) = pk.fields.first().unwrap().sort_order {
                         args.push(ast::Argument::new(
                             "sort",
-                            ast::Expression::NumericValue(sort.to_string(), Span::empty()),
+                            ast::Expression::NumericValue("Desc".to_string(), Span::empty()),
                         ));
                     }
                 };

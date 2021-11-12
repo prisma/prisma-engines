@@ -450,6 +450,7 @@ fn add_indices_to_models(models: &mut BTreeMap<String, Model>, indices: &mut BTr
                 .keys
                 .into_iter()
                 //TODO(extended indices) is the value here always the sort order? the driver docs are unclear
+                // If the flag is enabled this should return the sort, otherwise not
                 .map(|(k, _)| {
                     let field_name = match sanitize_string(&k) {
                         Some(sanitized) => sanitized,

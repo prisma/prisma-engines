@@ -1,9 +1,9 @@
 use crate::Dedup;
 use crate::SqlError;
 use datamodel::{
-    common::RelationNames, Datamodel, DefaultValue as DMLDef, FieldArity, FieldType, IndexDefinition, IndexField,
-    Model, PrimaryKeyField, ReferentialAction, RelationField, RelationInfo, ScalarField, ScalarType, SortOrder,
-    ValueGenerator as VG,
+    common::preview_features::PreviewFeature, common::RelationNames, Datamodel, DefaultValue as DMLDef, FieldArity,
+    FieldType, IndexDefinition, IndexField, Model, PrimaryKeyField, ReferentialAction, RelationField, RelationInfo,
+    ScalarField, ScalarType, SortOrder, ValueGenerator as VG,
 };
 use introspection_connector::IntrospectionContext;
 use sql_schema_describer::{
@@ -124,7 +124,7 @@ pub fn calculate_many_to_many_field(
     RelationField::new(&name, FieldArity::List, FieldArity::List, relation_info)
 }
 
-pub(crate) fn calculate_index(index: &Index) -> IndexDefinition {
+pub(crate) fn calculate_index(index: &Index, ctx: &IntrospectionContext) -> IndexDefinition {
     debug!("Handling index  {:?}", index);
     let tpe = match index.tpe {
         IndexType::Unique => datamodel::dml::IndexType::Unique,
@@ -143,14 +143,19 @@ pub(crate) fn calculate_index(index: &Index) -> IndexDefinition {
             .columns
             .iter()
             .map(|c| {
-                let sort_order = c.sort_order.map(|sort| match sort {
-                    SQLSortOrder::Asc => SortOrder::Asc,
-                    SQLSortOrder::Desc => SortOrder::Desc,
-                });
+                let (sort_order, length) = if !ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
+                    (None, None)
+                } else {
+                    let sort_order = c.sort_order.map(|sort| match sort {
+                        SQLSortOrder::Asc => SortOrder::Asc,
+                        SQLSortOrder::Desc => SortOrder::Desc,
+                    });
+                    (sort_order, c.length)
+                };
                 IndexField {
                     name: c.name().to_string(),
                     sort_order,
-                    length: c.length,
+                    length,
                 }
             })
             .collect(),
