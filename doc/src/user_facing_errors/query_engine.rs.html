@@ -297,6 +297,7 @@
 <span id="297">297</span>
 <span id="298">298</span>
 <span id="299">299</span>
+<span id="300">300</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde::Serialize</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="kw">use</span> <span class="ident">user_facing_error_macros</span>::<span class="kw-2">*</span>;
@@ -552,10 +553,11 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">user_facing</span>(
     <span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P2024&quot;</span>,
-    <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Timed out fetching a new connection from the connection pool. (More info: http://pris.ly/d/connection-pool, Current connection limit: {connection_limit})&quot;</span>
+    <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: {timeout}, connection limit: {connection_limit})&quot;</span>
 )]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PoolTimeout</span> {
     <span class="kw">pub</span> <span class="ident">connection_limit</span>: <span class="ident">u64</span>,
+    <span class="kw">pub</span> <span class="ident">timeout</span>: <span class="ident">u64</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
