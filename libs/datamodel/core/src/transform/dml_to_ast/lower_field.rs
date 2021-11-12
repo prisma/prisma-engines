@@ -1,4 +1,5 @@
 use crate::common::constraint_names::ConstraintNames;
+use crate::common::preview_features::PreviewFeature;
 use crate::common::RelationNames;
 use crate::transform::dml_to_ast::LowerDmlToAst;
 use crate::{
@@ -86,16 +87,31 @@ impl<'a> LowerDmlToAst<'a> {
             if model.field_is_primary_and_defined_on_field(&sf.name) {
                 let mut args = Vec::new();
                 let pk = model.primary_key.as_ref().unwrap();
-                if pk.db_name.is_some() {
-                    if let Some(src) = self.datasource {
+                if let Some(src) = self.datasource {
+                    if pk.db_name.is_some() {
                         if !ConstraintNames::primary_key_name_matches(pk, model, &*src.active_connector) {
                             args.push(ast::Argument::new(
                                 "map",
                                 ast::Expression::StringValue(String::from(pk.db_name.as_ref().unwrap()), Span::empty()),
                             ));
                         }
-                    };
+                    }
                 }
+                if self.preview_features.contains(PreviewFeature::ExtendedIndexes) {
+                    if let Some(length) = pk.fields.first().unwrap().length {
+                        args.push(ast::Argument::new(
+                            "length",
+                            ast::Expression::NumericValue(length.to_string(), Span::empty()),
+                        ));
+                    }
+
+                    if let Some(sort) = pk.fields.first().unwrap().sort_order {
+                        args.push(ast::Argument::new(
+                            "sort",
+                            ast::Expression::NumericValue(sort.to_string(), Span::empty()),
+                        ));
+                    }
+                };
 
                 attributes.push(ast::Attribute::new("id", args));
             }
@@ -111,7 +127,7 @@ impl<'a> LowerDmlToAst<'a> {
                         && i.fields.len() == 1
                         && i.fields.first().unwrap().name == field.name()
                 }) {
-                    self.push_index_map_argument(model, idx, &mut arguments)
+                    self.push_field_index_arguments(model, idx, &mut arguments)
                 }
 
                 attributes.push(ast::Attribute::new("unique", arguments));

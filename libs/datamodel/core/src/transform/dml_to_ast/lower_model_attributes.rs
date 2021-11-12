@@ -53,20 +53,7 @@ impl<'a> LowerDmlToAst<'a> {
             .iter()
             .filter(|index| index.is_unique() && !index.defined_on_field)
             .for_each(|index_def| {
-                let mut args = if self.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-                    vec![ast::Argument::new_array(
-                        "",
-                        LowerDmlToAst::index_field_array(&index_def.fields),
-                    )]
-                } else {
-                    vec![ast::Argument::new_array(
-                        "",
-                        LowerDmlToAst::field_array(
-                            &index_def.fields.clone().into_iter().map(|f| f.name).collect::<Vec<_>>(),
-                        ),
-                    )]
-                };
-
+                let mut args = self.fields_argument(&index_def);
                 if let Some(name) = &index_def.name {
                     args.push(ast::Argument::new_string("name", name.to_string()));
                 }
@@ -82,20 +69,7 @@ impl<'a> LowerDmlToAst<'a> {
             .iter()
             .filter(|index| index.tpe == IndexType::Normal)
             .for_each(|index_def| {
-                let mut args = if self.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-                    vec![ast::Argument::new_array(
-                        "",
-                        LowerDmlToAst::index_field_array(&index_def.fields),
-                    )]
-                } else {
-                    vec![ast::Argument::new_array(
-                        "",
-                        LowerDmlToAst::field_array(
-                            &index_def.fields.clone().into_iter().map(|f| f.name).collect::<Vec<_>>(),
-                        ),
-                    )]
-                };
-
+                let mut args = self.fields_argument(&index_def);
                 self.push_index_map_argument(model, index_def, &mut args);
 
                 attributes.push(ast::Attribute::new("index", args));
@@ -110,6 +84,20 @@ impl<'a> LowerDmlToAst<'a> {
         }
 
         attributes
+    }
+
+    fn fields_argument(&self, index_def: &&IndexDefinition) -> Vec<Argument> {
+        if self.preview_features.contains(PreviewFeature::ExtendedIndexes) {
+            vec![ast::Argument::new_array(
+                "",
+                LowerDmlToAst::index_field_array(&index_def.fields),
+            )]
+        } else {
+            vec![ast::Argument::new_array(
+                "",
+                LowerDmlToAst::field_array(&index_def.fields.clone().into_iter().map(|f| f.name).collect::<Vec<_>>()),
+            )]
+        }
     }
 
     pub(crate) fn push_field_index_arguments(
@@ -127,20 +115,21 @@ impl<'a> LowerDmlToAst<'a> {
                     ast::Expression::StringValue(String::from(index_def.db_name.as_ref().unwrap()), Span::empty()),
                 ));
             }
-        }
+            if self.preview_features.contains(PreviewFeature::ExtendedIndexes) {
+                if let Some(length) = field.length {
+                    args.push(ast::Argument::new(
+                        "length",
+                        ast::Expression::NumericValue(length.to_string(), Span::empty()),
+                    ));
+                }
 
-        if let Some(length) = field.length {
-            args.push(ast::Argument::new(
-                "length",
-                ast::Expression::NumericValue(length.to_string(), Span::empty()),
-            ));
-        }
-
-        if field.sort_order == Some(SortOrder::Desc) {
-            args.push(ast::Argument::new(
-                "sort",
-                ast::Expression::ConstantValue("Desc".to_string(), Span::empty()),
-            ));
+                if field.sort_order == Some(SortOrder::Desc) {
+                    args.push(ast::Argument::new(
+                        "sort",
+                        ast::Expression::ConstantValue("Desc".to_string(), Span::empty()),
+                    ));
+                }
+            }
         }
     }
 

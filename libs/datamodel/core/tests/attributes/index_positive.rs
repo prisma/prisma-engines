@@ -1,7 +1,6 @@
-use datamodel::{render_datamodel_to_string, IndexDefinition, IndexField, IndexType, SortOrder};
-
-use crate::attributes::{with_header, Provider};
 use crate::common::*;
+use crate::{with_header, Provider};
+use datamodel::{render_datamodel_to_string, IndexDefinition, IndexField, IndexType, SortOrder};
 
 #[test]
 fn basic_index_must_work() {

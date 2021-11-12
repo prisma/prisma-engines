@@ -141,20 +141,14 @@ impl<'a> LowerDmlToAst<'a> {
         fields
             .iter()
             .map(|f| {
-                let length = f
-                    .length
-                    .into_iter()
-                    .map(|length| ast::Argument::new_numeric("length", length));
+                let mut args = vec![];
+                args.extend(f.length.map(|length| ast::Argument::new_numeric("length", length)));
 
-                let sort = match f.sort_order {
-                    None => vec![],
-                    Some(SortOrder::Asc) => vec![],
-                    Some(SortOrder::Desc) => vec![ast::Argument::new_constant("sort", "Desc")],
-                };
+                args.extend(
+                    (f.sort_order == Some(SortOrder::Desc)).then(|| ast::Argument::new_constant("sort", "Desc")),
+                );
 
-                let args = length.chain(sort).collect();
-
-                ast::Expression::FieldWithArgs(f.to_string(), args, ast::Span::empty())
+                ast::Expression::FieldWithArgs(f.name.to_string(), args, ast::Span::empty())
             })
             .collect()
     }

@@ -1,5 +1,5 @@
-use crate::attributes::{with_header, Provider};
 use crate::common::*;
+use crate::{with_header, Provider};
 use datamodel::{render_datamodel_to_string, IndexDefinition, IndexField, IndexType};
 
 #[test]
