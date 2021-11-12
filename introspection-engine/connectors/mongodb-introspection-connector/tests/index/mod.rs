@@ -1,4 +1,6 @@
 use crate::test_api::*;
+use datamodel::common::preview_features::PreviewFeature;
+use introspection_connector::CompositeTypeDepth;
 use mongodb::{
     bson::{doc, Bson},
     options::IndexOptions,
@@ -33,6 +35,77 @@ fn single_column_normal_index() {
           name String
 
           @@index([age], map: "age_1")
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
+fn single_column_descending_index_no_preview_enabled() {
+    let depth = CompositeTypeDepth::Infinite;
+    let features = PreviewFeature::MongoDb;
+
+    let res = introspect_features(depth, features.into(), |db| async move {
+        db.create_collection("A", None).await?;
+        let collection = db.collection("A");
+        let docs = vec![doc! {"name": "Musti", "age": 9}];
+
+        collection.insert_many(docs, None).await.unwrap();
+
+        let options = IndexOptions::builder().unique(Some(false)).build();
+
+        let model = IndexModel::builder()
+            .keys(doc! { "age": -1 })
+            .options(Some(options))
+            .build();
+
+        collection.create_index(model, None).await?;
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          id   String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          age  Int
+          name String
+
+          @@index([age], map: "age_-1")
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
+fn single_column_descending_index() {
+    let res = introspect(|db| async move {
+        db.create_collection("A", None).await?;
+        let collection = db.collection("A");
+        let docs = vec![doc! {"name": "Musti", "age": 9}];
+
+        collection.insert_many(docs, None).await.unwrap();
+
+        let options = IndexOptions::builder().unique(Some(false)).build();
+
+        let model = IndexModel::builder()
+            .keys(doc! { "age": -1 })
+            .options(Some(options))
+            .build();
+
+        collection.create_index(model, None).await?;
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          id   String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          age  Int
+          name String
+
+          @@index([age(sort: Desc)], map: "age_-1")
         }
     "#]];
 
@@ -111,6 +184,43 @@ fn single_column_normal_index_default_name() {
 }
 
 #[test]
+fn multi_column_normal_index_no_preview() {
+    let depth = CompositeTypeDepth::Infinite;
+    let features = PreviewFeature::MongoDb;
+
+    let res = introspect_features(depth, features.into(), |db| async move {
+        db.create_collection("A", None).await?;
+        let collection = db.collection("A");
+        let docs = vec![doc! {"name": "Musti", "age": 9}];
+
+        collection.insert_many(docs, None).await.unwrap();
+
+        let options = IndexOptions::builder().unique(Some(false)).build();
+
+        let model = IndexModel::builder()
+            .keys(doc! { "age": 1, "name": -1 })
+            .options(Some(options))
+            .build();
+
+        collection.create_index(model, None).await?;
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          id   String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          age  Int
+          name String
+
+          @@index([age, name], map: "age_1_name_-1")
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
 fn multi_column_normal_index() {
     let res = introspect(|db| async move {
         db.create_collection("A", None).await?;
@@ -137,7 +247,7 @@ fn multi_column_normal_index() {
           age  Int
           name String
 
-          @@index([age, name], map: "age_1_name_-1")
+          @@index([age, name(sort: Desc)], map: "age_1_name_-1")
         }
     "#]];
 
@@ -212,6 +322,43 @@ fn single_column_unique_index_default_name() {
 }
 
 #[test]
+fn multi_column_unique_index_no_preview() {
+    let depth = CompositeTypeDepth::Infinite;
+    let features = PreviewFeature::MongoDb;
+
+    let res = introspect_features(depth, features.into(), |db| async move {
+        db.create_collection("A", None).await?;
+        let collection = db.collection("A");
+        let docs = vec![doc! {"name": "Musti", "age": 9}];
+
+        collection.insert_many(docs, None).await.unwrap();
+
+        let options = IndexOptions::builder().unique(Some(true)).build();
+
+        let model = IndexModel::builder()
+            .keys(doc! { "age": 1, "name": -1 })
+            .options(Some(options))
+            .build();
+
+        collection.create_index(model, None).await?;
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          id   String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          age  Int
+          name String
+
+          @@unique([age, name], map: "age_1_name_-1")
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
 fn multi_column_unique_index() {
     let res = introspect(|db| async move {
         db.create_collection("A", None).await?;
@@ -238,7 +385,7 @@ fn multi_column_unique_index() {
           age  Int
           name String
 
-          @@unique([age, name], map: "age_1_name_-1")
+          @@unique([age, name(sort: Desc)], map: "age_1_name_-1")
         }
     "#]];
 

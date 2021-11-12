@@ -1,8 +1,9 @@
-use crate::common::*;
 use crate::types::helper::{
     test_native_types_compatibility, test_native_types_with_field_attribute_support,
     test_native_types_without_attributes,
 };
+use crate::{common::*, with_header, Provider};
+use datamodel::parse_schema;
 use datamodel::{ast, diagnostics::DatamodelError};
 use indoc::indoc;
 
@@ -25,6 +26,92 @@ fn text_and_blob_data_types_should_fail_on_index() {
     for tpe in TEXT_TYPES {
         test_block_attribute_support(tpe, "String", "index", &error_msg(tpe));
     }
+}
+
+#[test]
+fn text_should_not_fail_on_length_prefixed_index() {
+    let dml = indoc! {r#"
+        model A {
+          id Int    @id
+          a  String @test.Text
+
+          @@index([a(length: 30)])
+        }
+    "#};
+
+    let dml = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+
+    assert!(parse_schema(&dml).is_ok());
+}
+
+#[test]
+fn text_should_not_fail_on_length_prefixed_unique() {
+    let dml = indoc! {r#"
+        model A {
+          id Int    @id
+          a  String @test.Text @unique(length: 30)
+        }
+    "#};
+
+    let dml = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+
+    assert!(parse_schema(&dml).is_ok());
+}
+
+#[test]
+fn text_should_not_fail_on_length_prefixed_pk() {
+    let dml = indoc! {r#"
+        model A {
+          id String @id(length: 30) @test.Text
+        }
+    "#};
+
+    let dml = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+
+    assert!(parse_schema(&dml).is_ok());
+}
+
+#[test]
+fn bytes_should_not_fail_on_length_prefixed_index() {
+    let dml = indoc! {r#"
+        model A {
+          id Int   @id
+          a  Bytes @test.Blob
+
+          @@index([a(length: 30)])
+        }
+    "#};
+
+    let dml = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+
+    assert!(parse_schema(&dml).is_ok());
+}
+
+#[test]
+fn bytes_should_not_fail_on_length_prefixed_unique() {
+    let dml = indoc! {r#"
+        model A {
+          id Int   @id
+          a  Bytes @test.Blob @unique(length: 30)
+        }
+    "#};
+
+    let dml = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+
+    assert!(parse_schema(&dml).is_ok());
+}
+
+#[test]
+fn bytes_should_not_fail_on_length_prefixed_pk() {
+    let dml = indoc! {r#"
+        model A {
+          id Bytes @id(length: 30) @test.Blob
+        }
+    "#};
+
+    let dml = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+
+    assert!(parse_schema(&dml).is_ok());
 }
 
 #[test]

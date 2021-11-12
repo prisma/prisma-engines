@@ -5,10 +5,11 @@ pub(crate) use name::Name;
 use super::{field_type::FieldType, CompositeTypeDepth};
 use convert_case::{Case, Casing};
 use datamodel::{
-    CompositeType, CompositeTypeField, Datamodel, DefaultValue, Field, IndexDefinition, IndexField, IndexType, Model,
-    NativeTypeInstance, PrimaryKeyDefinition, PrimaryKeyField, ScalarField, ScalarType, SortOrder, ValueGenerator,
-    WithDatabaseName,
+    common::preview_features::PreviewFeature, CompositeType, CompositeTypeField, Datamodel, DefaultValue, Field,
+    IndexDefinition, IndexField, IndexType, Model, NativeTypeInstance, PrimaryKeyDefinition, PrimaryKeyField,
+    ScalarField, ScalarType, SortOrder, ValueGenerator, WithDatabaseName,
 };
+use enumflags2::BitFlags;
 use introspection_connector::Warning;
 use mongodb::{
     bson::{Bson, Document},
@@ -42,12 +43,14 @@ pub(super) struct Statistics {
     /// How deep we travel in nested composite types until switching to Json. None will always use
     /// Json, Some(-1) will never switch to Json.
     composite_type_depth: CompositeTypeDepth,
+    preview_features: BitFlags<PreviewFeature>,
 }
 
 impl Statistics {
-    pub(super) fn new(composite_type_depth: CompositeTypeDepth) -> Self {
+    pub(super) fn new(composite_type_depth: CompositeTypeDepth, preview_features: BitFlags<PreviewFeature>) -> Self {
         Self {
             composite_type_depth,
+            preview_features,
             ..Default::default()
         }
     }
@@ -165,7 +168,7 @@ impl Statistics {
             }
         }
 
-        add_indices_to_models(&mut models, &mut indices);
+        add_indices_to_models(&mut models, &mut indices, self.preview_features);
 
         for (_, model) in models.into_iter() {
             data_model.add_model(model);
@@ -407,7 +410,11 @@ fn new_model(model_name: &str) -> Model {
     }
 }
 
-fn add_indices_to_models(models: &mut BTreeMap<String, Model>, indices: &mut BTreeMap<String, Vec<IndexModel>>) {
+fn add_indices_to_models(
+    models: &mut BTreeMap<String, Model>,
+    indices: &mut BTreeMap<String, Vec<IndexModel>>,
+    preview_features: BitFlags<PreviewFeature>,
+) {
     for (model_name, model) in models.iter_mut() {
         for index in indices.remove(model_name).into_iter().flat_map(|i| i.into_iter()) {
             let defined_on_field = index.keys.len() == 1;
@@ -451,14 +458,21 @@ fn add_indices_to_models(models: &mut BTreeMap<String, Model>, indices: &mut BTr
                 .into_iter()
                 //TODO(extended indices) is the value here always the sort order? the driver docs are unclear
                 // If the flag is enabled this should return the sort, otherwise not
-                .map(|(k, _)| {
+                .map(|(k, v)| {
                     let field_name = match sanitize_string(&k) {
                         Some(sanitized) => sanitized,
                         None => k,
                     };
+
+                    let sort_order = match v.as_i32() {
+                        _ if !preview_features.contains(PreviewFeature::ExtendedIndexes) => None,
+                        Some(-1) => Some(SortOrder::Desc),
+                        _ => Some(SortOrder::Asc),
+                    };
+
                     IndexField {
                         name: field_name,
-                        sort_order: Some(SortOrder::Asc),
+                        sort_order,
                         length: None,
                     }
                 })

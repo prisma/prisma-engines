@@ -256,12 +256,19 @@ impl Connector for MySqlDatamodelConnector {
             let fields = index_definition
                 .fields
                 .iter()
-                .map(|f| model.find_field(&f.name).unwrap());
-            for f in fields {
+                .map(|f| model.find_field(&f.name).unwrap())
+                .zip(index_definition.fields.iter());
+
+            for (f, definition) in fields {
                 if let FieldType::Scalar(_, _, Some(native_type)) = f.field_type() {
                     let native_type_name = native_type.name.as_str();
 
                     if NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name) {
+                        // Length defined, so we allow the index.
+                        if definition.length.is_some() {
+                            continue;
+                        }
+
                         if index_definition.is_unique() {
                             errors.push(
                                 self.native_instance_error(native_type.clone())
@@ -283,9 +290,16 @@ impl Connector for MySqlDatamodelConnector {
         if let Some(pk) = &model.primary_key {
             for id_field in pk.fields.iter() {
                 let field = model.find_field(&id_field.name).unwrap();
+
                 if let FieldType::Scalar(_, _, Some(native_type)) = field.field_type() {
                     let native_type_name = native_type.name.as_str();
+
                     if NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name) {
+                        // Length defined, so we allow the index.
+                        if id_field.length.is_some() {
+                            continue;
+                        }
+
                         errors.push(
                             self.native_instance_error(native_type.clone())
                                 .new_incompatible_native_type_with_id(),

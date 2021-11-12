@@ -2352,6 +2352,7 @@ dependencies = [
  "convert_case",
  "datamodel",
  "datamodel-connector",
+ "enumflags2",
  "expect-test",
  "futures",
  "indoc",
