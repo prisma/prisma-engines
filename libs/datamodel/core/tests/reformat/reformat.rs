@@ -1086,4 +1086,3 @@ fn composite_types_are_not_reformatted_into_models() {
     let result = Reformatter::new(input).reformat_to_string();
     expected.assert_eq(&result);
 }
-

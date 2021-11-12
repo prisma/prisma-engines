@@ -295,13 +295,13 @@ impl<'a> LiftAstToDml<'a> {
                 assert!(idx.fields().len() != 0);
 
                 dml::IndexDefinition {
-                name: idx.attribute().name.map(String::from),
-                db_name: Some(idx.final_database_name().into_owned()),
-                fields: idx
-                    .attribute()
-                    .fields
-                    .iter()
-                    .map(|field|
+                    name: idx.attribute().name.map(String::from),
+                    db_name: Some(idx.final_database_name().into_owned()),
+                    fields: idx
+                        .attribute()
+                        .fields
+                        .iter()
+                        .map(|field|
                         //TODO(extended indexes) here it is ok to pass sort and length with out a preview flag
                         // check since this is coming from the ast and the parsing would reject the args without
                         // the flag set.
@@ -311,13 +311,14 @@ impl<'a> LiftAstToDml<'a> {
                         sort_order: field.sort_order,
                         length: field.length,
                     })
-                    .collect(),
-                tpe: match idx.attribute().is_unique {
-                    true => dml::IndexType::Unique,
-                    false => dml::IndexType::Normal,
-                },
-                defined_on_field: idx.attribute().source_field.is_some(),
-            }})
+                        .collect(),
+                    tpe: match idx.attribute().is_unique {
+                        true => dml::IndexType::Unique,
+                        false => dml::IndexType::Normal,
+                    },
+                    defined_on_field: idx.attribute().source_field.is_some(),
+                }
+            })
             .collect();
 
         for scalar_field in walker.scalar_fields() {

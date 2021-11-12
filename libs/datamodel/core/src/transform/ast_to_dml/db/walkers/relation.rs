@@ -412,6 +412,7 @@ impl<'ast, 'db> CompleteInlineRelationWalker<'ast, 'db> {
     }
 
     /// 1:1, 1:n or m:n
+    #[allow(dead_code)]
     pub(crate) fn relation_type(self) -> RelationType {
         self.relation.r#type()
     }
