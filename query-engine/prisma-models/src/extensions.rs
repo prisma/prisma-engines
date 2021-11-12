@@ -72,8 +72,8 @@ impl ModelConverterUtilities for dml::Model {
     }
 
     fn is_compound_index_supported(&self, index: &dml::IndexDefinition) -> bool {
-        index.fields.iter().all(|field_name| {
-            let field = self.find_field(field_name).unwrap();
+        index.fields.iter().all(|field| {
+            let field = self.find_field(&field.name).unwrap();
             let is_supported = match field {
                 dml::Field::ScalarField(sf) => sf.type_identifier() != TypeIdentifier::Unsupported,
                 dml::Field::RelationField(_) => true,

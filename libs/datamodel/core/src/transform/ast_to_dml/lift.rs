@@ -1,6 +1,7 @@
 use crate::{
     ast, dml,
     transform::ast_to_dml::db::{self, walkers::*},
+    IndexField, PrimaryKeyField,
 };
 use ::dml::composite_type::{CompositeType, CompositeTypeField, CompositeTypeFieldType};
 use std::collections::HashMap;
@@ -272,7 +273,19 @@ impl<'a> LiftAstToDml<'a> {
         model.primary_key = walker.primary_key().map(|pk| dml::PrimaryKeyDefinition {
             name: pk.name().map(String::from),
             db_name: pk.final_database_name().map(|c| c.into_owned()),
-            fields: pk.iter_ast_fields().map(|field| field.name.name.to_owned()).collect(),
+            fields: pk
+                .iter_ast_fields()
+                .map(|(field, sort_order, length)|
+                    //TODO (extended indexes) here it is ok to pass sort and length with out a preview flag
+                    // check since this is coming from the ast and the parsing would reject the args without
+                    // the flag set
+                    // When we start using the extra args here could be a place to fill in the defaults. 
+                    PrimaryKeyField {
+                    name: field.name.name.to_owned(),
+                    sort_order,
+                    length,
+                })
+                .collect(),
             defined_on_field: pk.is_defined_on_field(),
         });
 
@@ -285,7 +298,16 @@ impl<'a> LiftAstToDml<'a> {
                     .attribute()
                     .fields
                     .iter()
-                    .map(|field| self.db.ast()[model_id][field.field_id].name.name.clone())
+                    .map(|field|
+                        //TODO(extended indexes) here it is ok to pass sort and length with out a preview flag
+                        // check since this is coming from the ast and the parsing would reject the args without
+                        // the flag set.
+                        // When we start using the extra args here could be a place to fill in the defaults. 
+                        IndexField {
+                        name: self.db.ast()[model_id][field.field_id].name.name.clone(),
+                        sort_order: field.sort_order,
+                        length: field.length,
+                    })
                     .collect(),
                 tpe: match idx.attribute().is_unique {
                     true => dml::IndexType::Unique,

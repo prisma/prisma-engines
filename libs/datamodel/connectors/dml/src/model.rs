@@ -3,6 +3,7 @@ use crate::field::{Field, FieldType, RelationField, ScalarField};
 use crate::scalars::ScalarType;
 use crate::traits::{Ignorable, WithDatabaseName, WithName};
 use indoc::formatdoc;
+use std::fmt;
 
 /// Represents a model in a prisma schema.
 #[derive(Debug, PartialEq, Clone, Default)]
@@ -32,7 +33,7 @@ pub struct Model {
 pub struct IndexDefinition {
     pub name: Option<String>,
     pub db_name: Option<String>,
-    pub fields: Vec<String>,
+    pub fields: Vec<IndexField>,
     pub tpe: IndexType,
     pub defined_on_field: bool,
 }
@@ -42,14 +43,69 @@ impl IndexDefinition {
         matches!(self.tpe, IndexType::Unique)
     }
 }
+///A field in an index that optionally defines a sort order and length limit.
+#[derive(Debug, PartialEq, Clone)]
+pub struct IndexField {
+    pub name: String,
+    pub sort_order: Option<SortOrder>,
+    pub length: Option<u32>,
+}
+
+impl IndexField {
+    /// Tests only
+    pub fn new(name: &str) -> Self {
+        IndexField {
+            name: name.to_string(),
+            sort_order: None,
+            length: None,
+        }
+    }
+}
 
 /// Represents a primary key defined via `@@id` or `@id`.
 #[derive(Debug, PartialEq, Clone)]
 pub struct PrimaryKeyDefinition {
     pub name: Option<String>,
     pub db_name: Option<String>,
-    pub fields: Vec<String>,
+    pub fields: Vec<PrimaryKeyField>,
     pub defined_on_field: bool,
+}
+
+///A field in a Primary Key that optionally defines a sort order and length limit.
+#[derive(Debug, PartialEq, Clone)]
+pub struct PrimaryKeyField {
+    pub name: String,
+    pub sort_order: Option<SortOrder>,
+    pub length: Option<u32>,
+}
+
+impl PrimaryKeyField {
+    /// Tests only
+    pub fn new(name: &str) -> Self {
+        PrimaryKeyField {
+            name: name.to_string(),
+            sort_order: None,
+            length: None,
+        }
+    }
+}
+
+impl fmt::Display for PrimaryKeyField {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.name)?;
+        if self.sort_order.is_some() || self.length.is_some() {
+            write!(f, "(")?;
+            if let Some(length) = self.length {
+                write!(f, "{}", length)?;
+            }
+            if let Some(sort) = self.sort_order {
+                write!(f, "{}", sort)?;
+            }
+            write!(f, ")")?;
+        }
+
+        Ok(())
+    }
 }
 
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -62,6 +118,15 @@ pub enum IndexType {
 pub enum SortOrder {
     Asc,
     Desc,
+}
+
+impl fmt::Display for SortOrder {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            SortOrder::Asc => write!(f, "sort: Asc"),
+            SortOrder::Desc => write!(f, "sort: Desc"),
+        }
+    }
 }
 
 /// A unique criteria is a set of fields through which a record can be uniquely identified.
@@ -229,7 +294,7 @@ impl Model {
                 let id_fields: Vec<_> = pk
                     .fields
                     .iter()
-                    .map(|f| match self.find_scalar_field(f) {
+                    .map(|f| match self.find_scalar_field(&f.name) {
                         Some(field) => field,
                         None => {
                             let error = formatdoc!(
@@ -267,7 +332,11 @@ impl Model {
                 .iter()
                 .filter(|id| id.is_unique())
                 .filter_map(|id| {
-                    let fields: Vec<_> = id.fields.iter().map(|f| self.find_scalar_field(f).unwrap()).collect();
+                    let fields: Vec<_> = id
+                        .fields
+                        .iter()
+                        .map(|f| self.find_scalar_field(&f.name).unwrap())
+                        .collect();
                     let no_fields_are_ineligible = !fields.iter().any(|f| in_eligible(f));
                     let all_fields_are_required = fields.iter().all(|f| f.is_required());
                     ((all_fields_are_required || allow_optional) && no_fields_are_ineligible)
@@ -293,9 +362,9 @@ impl Model {
         let is_first_in_index = self
             .indices
             .iter()
-            .any(|index| index.fields.first().unwrap() == field_name);
+            .any(|index| index.fields.first().unwrap().name == field_name);
 
-        let is_first_in_primary_key = matches!(&self.primary_key, Some(PrimaryKeyDefinition{ fields, ..}) if fields.first().unwrap() == field_name);
+        let is_first_in_primary_key = matches!(&self.primary_key, Some(PrimaryKeyDefinition{ fields, ..}) if fields.first().unwrap().name == field_name);
 
         is_first_in_index || is_first_in_primary_key
     }
@@ -325,21 +394,23 @@ impl Model {
     }
 
     pub fn field_is_unique(&self, name: &str) -> bool {
-        self.indices.iter().any(|i| i.is_unique() && i.fields == [name])
+        self.indices
+            .iter()
+            .any(|i| i.is_unique() && i.fields.len() == 1 && i.fields.first().unwrap().name == name)
     }
 
     pub fn field_is_unique_and_defined_on_field(&self, name: &str) -> bool {
-        self.indices
-            .iter()
-            .any(|i| i.is_unique() && i.fields == [name] && i.defined_on_field)
+        self.indices.iter().any(|i| {
+            i.is_unique() && i.fields.len() == 1 && i.fields.first().unwrap().name == name && i.defined_on_field
+        })
     }
 
     pub fn field_is_primary(&self, field_name: &str) -> bool {
-        matches!(&self.primary_key, Some(PrimaryKeyDefinition{ fields, .. }) if *fields == [field_name])
+        matches!(&self.primary_key, Some(pk) if pk.fields.len() == 1 && pk.fields.first().unwrap().name == field_name)
     }
 
     pub fn field_is_primary_and_defined_on_field(&self, field_name: &str) -> bool {
-        matches!(&self.primary_key, Some(PrimaryKeyDefinition{ fields, defined_on_field , ..}) if *fields == [field_name] && *defined_on_field)
+        matches!(&self.primary_key, Some(PrimaryKeyDefinition{ fields, defined_on_field , ..}) if fields.len()  == 1 && fields.first().unwrap().name == field_name && *defined_on_field)
     }
 
     pub fn field_is_auto_generated_int_id(&self, name: &str) -> bool {
@@ -348,14 +419,6 @@ impl Model {
         let is_an_int = matches!(field.field_type, FieldType::Scalar(ScalarType::Int, _, _));
 
         is_autogenerated_id && is_an_int
-    }
-
-    pub fn id_field_names(&self) -> Vec<String> {
-        if let Some(pk) = &self.primary_key {
-            pk.fields.clone()
-        } else {
-            vec![]
-        }
     }
 }
 

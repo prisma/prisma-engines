@@ -1,5 +1,5 @@
-use crate::attributes::{with_header, Provider};
 use crate::common::*;
+use crate::{with_header, Provider};
 use datamodel::dml::*;
 use prisma_value::PrismaValue;
 
@@ -128,7 +128,7 @@ fn multi_field_ids_must_work() {
     user_model.assert_has_pk(PrimaryKeyDefinition {
         name: None,
         db_name: None,
-        fields: vec!["a".into(), "b".into()],
+        fields: vec![PrimaryKeyField::new("a"), PrimaryKeyField::new("b")],
         defined_on_field: false,
     });
 }
@@ -146,14 +146,14 @@ fn should_allow_unique_and_id_on_same_field() {
     user_model.assert_has_pk(PrimaryKeyDefinition {
         name: None,
         db_name: None,
-        fields: vec!["id".into()],
+        fields: vec![PrimaryKeyField::new("id")],
         defined_on_field: true,
     });
 
     user_model.assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("Model_id_key".to_string()),
-        fields: vec!["id".into()],
+        fields: vec![IndexField::new("id")],
         tpe: IndexType::Unique,
         defined_on_field: true,
     });
@@ -304,18 +304,101 @@ fn id_accepts_length_arg_on_mysql() {
     );
 
     let schema = parse(&dml);
-    schema.assert_has_model("User");
+    let user_model = schema.assert_has_model("User");
+    let blog_model = schema.assert_has_model("Blog");
 
-    // user_model.assert_has_pk(PrimaryKeyDefinition {
-    //     name: None,
-    //     db_name: Some("User_pkey".to_string()),
-    //     fields: vec![
-    //         ("firstName".to_string(), None),
-    //         ("middleName".to_string(), Some(1)),
-    //         ("lastName".to_string(), None),
-    //     ],
-    //     defined_on_field: false,
-    // });
+    user_model.assert_has_pk(PrimaryKeyDefinition {
+        name: None,
+        db_name: None,
+        fields: vec![
+            PrimaryKeyField {
+                name: "firstName".to_string(),
+                sort_order: None,
+                length: None,
+            },
+            PrimaryKeyField {
+                name: "middleName".to_string(),
+                sort_order: None,
+                length: Some(1),
+            },
+            PrimaryKeyField {
+                name: "lastName".to_string(),
+                sort_order: None,
+                length: None,
+            },
+        ],
+        defined_on_field: false,
+    });
+
+    blog_model.assert_has_pk(PrimaryKeyDefinition {
+        name: None,
+        db_name: None,
+        fields: vec![PrimaryKeyField {
+            name: "title".to_string(),
+            sort_order: None,
+            length: Some(5),
+        }],
+        defined_on_field: true,
+    });
+}
+
+#[test]
+fn id_accepts_sort_arg_on_sqlserver() {
+    let dml = with_header(
+        r#"
+     model User {
+         firstName  String
+         middleName String
+         lastName   String
+         
+         @@id([firstName, middleName(sort: Desc), lastName])
+     }
+     
+     model Blog {
+         title  String @id(sort: Desc)
+     }
+     "#,
+        Provider::SqlServer,
+        &["extendedIndexes"],
+    );
+
+    let schema = parse(&dml);
+    let user_model = schema.assert_has_model("User");
+    let blog_model = schema.assert_has_model("Blog");
+
+    user_model.assert_has_pk(PrimaryKeyDefinition {
+        name: None,
+        db_name: Some("User_pkey".to_string()),
+        fields: vec![
+            PrimaryKeyField {
+                name: "firstName".to_string(),
+                sort_order: None,
+                length: None,
+            },
+            PrimaryKeyField {
+                name: "middleName".to_string(),
+                sort_order: Some(SortOrder::Desc),
+                length: None,
+            },
+            PrimaryKeyField {
+                name: "lastName".to_string(),
+                sort_order: None,
+                length: None,
+            },
+        ],
+        defined_on_field: false,
+    });
+
+    blog_model.assert_has_pk(PrimaryKeyDefinition {
+        name: None,
+        db_name: Some("Blog_pkey".to_string()),
+        fields: vec![PrimaryKeyField {
+            name: "title".to_string(),
+            sort_order: Some(SortOrder::Desc),
+            length: None,
+        }],
+        defined_on_field: true,
+    });
 }
 
 #[test]
@@ -325,7 +408,6 @@ fn mysql_allows_id_length_prefix() {
           id String @id(length: 30) @test.VarChar(255)
         }
     "#};
-
     let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
     assert!(datamodel::parse_schema(&schema).is_ok());
 }

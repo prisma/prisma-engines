@@ -4,11 +4,15 @@ use crate::introspection_helpers::{
     is_prisma_1_point_1_or_2_join_table, is_relay_table,
 };
 use crate::version_checker::VersionChecker;
+
 use crate::SqlError;
 use crate::{Dedup, SqlFamilyTrait};
-use datamodel::{dml, walkers::find_model_by_db_name, Datamodel, Field, Model, PrimaryKeyDefinition, RelationField};
+use datamodel::{
+    common::preview_features::PreviewFeature, dml, walkers::find_model_by_db_name, Datamodel, Field, Model,
+    PrimaryKeyDefinition, PrimaryKeyField, RelationField, SortOrder,
+};
 use introspection_connector::IntrospectionContext;
-use sql_schema_describer::{SqlSchema, Table};
+use sql_schema_describer::{SQLSortOrder, SqlSchema, Table};
 use tracing::debug;
 
 pub fn introspect(
@@ -59,18 +63,40 @@ pub fn introspect(
 
         for index in &table.indices {
             // TODO: enable with preview flag, when dml index extensions are done.
-            if index.columns.iter().any(|c| c.length.is_some()) {
+            if !ctx.preview_features.contains(PreviewFeature::ExtendedIndexes)
+                && index.columns.iter().any(|c| c.length.is_some())
+            {
                 continue;
             }
 
-            model.add_index(calculate_index(index));
+            model.add_index(calculate_index(index, ctx));
         }
 
         if let Some(pk) = &table.primary_key {
             model.primary_key = Some(PrimaryKeyDefinition {
                 name: None,
                 db_name: pk.constraint_name.clone(),
-                fields: pk.columns.iter().map(|c| c.name().to_string()).collect(),
+                fields: pk
+                    .columns
+                    .iter()
+                    .map(|c| {
+                        let (sort_order, length) = if !ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
+                            (None, None)
+                        } else {
+                            let sort_order = c.sort_order.map(|sort| match sort {
+                                SQLSortOrder::Asc => SortOrder::Asc,
+                                SQLSortOrder::Desc => SortOrder::Desc,
+                            });
+                            (sort_order, c.length)
+                        };
+
+                        PrimaryKeyField {
+                            name: c.name().to_string(),
+                            sort_order,
+                            length,
+                        }
+                    })
+                    .collect(),
                 defined_on_field: pk.columns.len() == 1,
             });
         }

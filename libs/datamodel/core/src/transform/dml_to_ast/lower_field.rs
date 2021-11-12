@@ -1,9 +1,10 @@
 use crate::common::constraint_names::ConstraintNames;
+use crate::common::preview_features::PreviewFeature;
 use crate::common::RelationNames;
 use crate::transform::dml_to_ast::LowerDmlToAst;
 use crate::{
     ast::{self, Attribute, Span},
-    dml, Datasource, Field, Ignorable,
+    dml, Datasource, Field, Ignorable, SortOrder,
 };
 use ::dml::traits::WithName;
 use datamodel_connector::{Connector, EmptyDatamodelConnector};
@@ -86,16 +87,31 @@ impl<'a> LowerDmlToAst<'a> {
             if model.field_is_primary_and_defined_on_field(&sf.name) {
                 let mut args = Vec::new();
                 let pk = model.primary_key.as_ref().unwrap();
-                if pk.db_name.is_some() {
-                    if let Some(src) = self.datasource {
-                        if !ConstraintNames::primary_key_name_matches(pk, model, &*src.active_connector) {
-                            args.push(ast::Argument::new(
-                                "map",
-                                ast::Expression::StringValue(String::from(pk.db_name.as_ref().unwrap()), Span::empty()),
-                            ));
-                        }
-                    };
+                if let Some(src) = self.datasource {
+                    if pk.db_name.is_some()
+                        && !ConstraintNames::primary_key_name_matches(pk, model, &*src.active_connector)
+                    {
+                        args.push(ast::Argument::new(
+                            "map",
+                            ast::Expression::StringValue(String::from(pk.db_name.as_ref().unwrap()), Span::empty()),
+                        ));
+                    }
                 }
+                if self.preview_features.contains(PreviewFeature::ExtendedIndexes) {
+                    if let Some(length) = pk.fields.first().unwrap().length {
+                        args.push(ast::Argument::new(
+                            "length",
+                            ast::Expression::NumericValue(length.to_string(), Span::empty()),
+                        ));
+                    }
+
+                    if let Some(SortOrder::Desc) = pk.fields.first().unwrap().sort_order {
+                        args.push(ast::Argument::new(
+                            "sort",
+                            ast::Expression::NumericValue("Desc".to_string(), Span::empty()),
+                        ));
+                    }
+                };
 
                 attributes.push(ast::Attribute::new("id", args));
             }
@@ -105,12 +121,13 @@ impl<'a> LowerDmlToAst<'a> {
         if let dml::Field::ScalarField(sf) = field {
             if model.field_is_unique_and_defined_on_field(&sf.name) {
                 let mut arguments = Vec::new();
-                if let Some(idx) = model
-                    .indices
-                    .iter()
-                    .find(|id| id.is_unique() && id.defined_on_field && id.fields == [field.name()])
-                {
-                    self.push_index_map_argument(model, idx, &mut arguments)
+                if let Some(idx) = model.indices.iter().find(|i| {
+                    i.is_unique()
+                        && i.defined_on_field
+                        && i.fields.len() == 1
+                        && i.fields.first().unwrap().name == field.name()
+                }) {
+                    self.push_field_index_arguments(model, idx, &mut arguments)
                 }
 
                 attributes.push(ast::Attribute::new("unique", arguments));
@@ -146,7 +163,7 @@ impl<'a> LowerDmlToAst<'a> {
         }
 
         // @map
-        <LowerDmlToAst<'a>>::push_map_attribute(field, &mut attributes);
+        <LowerDmlToAst<'a>>::push_model_index_map_arg(field, &mut attributes);
 
         // @relation
         if let dml::Field::RelationField(rf) = field {

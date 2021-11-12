@@ -1,7 +1,6 @@
-use datamodel::{render_datamodel_to_string, IndexDefinition, IndexType};
-
-use crate::attributes::{with_header, Provider};
 use crate::common::*;
+use crate::{with_header, Provider};
+use datamodel::{render_datamodel_to_string, IndexDefinition, IndexField, IndexType};
 
 #[test]
 fn basic_index_must_work() {
@@ -20,7 +19,7 @@ fn basic_index_must_work() {
     user_model.assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("User_firstName_lastName_idx".to_string()),
-        fields: vec!["firstName".to_string(), "lastName".to_string()],
+        fields: vec![IndexField::new("firstName"), IndexField::new("lastName")],
         tpe: IndexType::Normal,
         defined_on_field: false,
     });
@@ -47,7 +46,7 @@ fn indexes_on_enum_fields_must_work() {
     user_model.assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("User_role_idx".to_string()),
-        fields: vec!["role".to_string()],
+        fields: vec![IndexField::new("role")],
         tpe: IndexType::Normal,
         defined_on_field: false,
     });
@@ -71,7 +70,7 @@ fn the_name_argument_must_work() {
     user_model.assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("MyIndexName".to_string()),
-        fields: vec!["firstName".to_string(), "lastName".to_string()],
+        fields: vec![IndexField::new("firstName"), IndexField::new("lastName")],
         tpe: IndexType::Normal,
         defined_on_field: false,
     });
@@ -99,7 +98,7 @@ fn the_map_argument_must_work() {
     user_model.assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("MyIndexName".to_string()),
-        fields: vec!["firstName".to_string(), "lastName".to_string()],
+        fields: vec![IndexField::new("firstName"), IndexField::new("lastName")],
         tpe: IndexType::Normal,
         defined_on_field: false,
     });
@@ -124,7 +123,7 @@ fn multiple_index_must_work() {
     user_model.assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("User_firstName_lastName_idx".to_string()),
-        fields: vec!["firstName".to_string(), "lastName".to_string()],
+        fields: vec![IndexField::new("firstName"), IndexField::new("lastName")],
         tpe: IndexType::Normal,
         defined_on_field: false,
     });
@@ -132,7 +131,7 @@ fn multiple_index_must_work() {
     user_model.assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("MyIndexName".to_string()),
-        fields: vec!["firstName".to_string(), "lastName".to_string()],
+        fields: vec![IndexField::new("firstName"), IndexField::new("lastName")],
         tpe: IndexType::Normal,
         defined_on_field: false,
     });
@@ -181,7 +180,7 @@ fn index_accepts_three_different_notations() {
     user_model.assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("OtherIndexName".to_string()),
-        fields: vec!["firstName".to_string(), "lastName".to_string()],
+        fields: vec![IndexField::new("firstName"), IndexField::new("lastName")],
         tpe: IndexType::Normal,
         defined_on_field: false,
     });
@@ -189,7 +188,7 @@ fn index_accepts_three_different_notations() {
     user_model.assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("MyIndexName".to_string()),
-        fields: vec!["firstName".to_string(), "lastName".to_string()],
+        fields: vec![IndexField::new("firstName"), IndexField::new("lastName")],
         tpe: IndexType::Normal,
         defined_on_field: false,
     });
@@ -197,7 +196,7 @@ fn index_accepts_three_different_notations() {
     user_model.assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("User_firstName_lastName_idx".to_string()),
-        fields: vec!["firstName".to_string(), "lastName".to_string()],
+        fields: vec![IndexField::new("firstName"), IndexField::new("lastName")],
         tpe: IndexType::Normal,
         defined_on_field: false,
     });
@@ -212,7 +211,19 @@ fn mysql_allows_unique_length_prefix() {
     "#};
 
     let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
-    assert!(datamodel::parse_schema(&schema).is_ok());
+    let schema = parse(&schema);
+    let user_model = schema.assert_has_model("A");
+    user_model.assert_has_index(IndexDefinition {
+        name: None,
+        db_name: Some("A_id_key".to_string()),
+        fields: vec![IndexField {
+            name: "id".to_string(),
+            sort_order: None,
+            length: Some(30),
+        }],
+        tpe: IndexType::Unique,
+        defined_on_field: true,
+    });
 }
 
 #[test]

@@ -1,11 +1,14 @@
 use crate::Dedup;
 use crate::SqlError;
 use datamodel::{
-    common::RelationNames, Datamodel, DefaultValue as DMLDef, FieldArity, FieldType, IndexDefinition, Model,
-    ReferentialAction, RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator as VG,
+    common::preview_features::PreviewFeature, common::RelationNames, Datamodel, DefaultValue as DMLDef, FieldArity,
+    FieldType, IndexDefinition, IndexField, Model, PrimaryKeyField, ReferentialAction, RelationField, RelationInfo,
+    ScalarField, ScalarType, SortOrder, ValueGenerator as VG,
 };
 use introspection_connector::IntrospectionContext;
-use sql_schema_describer::{Column, ColumnArity, ColumnTypeFamily, ForeignKey, Index, IndexType, SqlSchema, Table};
+use sql_schema_describer::{
+    Column, ColumnArity, ColumnTypeFamily, ForeignKey, Index, IndexType, SQLSortOrder, SqlSchema, Table,
+};
 use sql_schema_describer::{DefaultKind, ForeignKeyAction};
 use tracing::debug;
 
@@ -121,7 +124,7 @@ pub fn calculate_many_to_many_field(
     RelationField::new(&name, FieldArity::List, FieldArity::List, relation_info)
 }
 
-pub(crate) fn calculate_index(index: &Index) -> IndexDefinition {
+pub(crate) fn calculate_index(index: &Index, ctx: &IntrospectionContext) -> IndexDefinition {
     debug!("Handling index  {:?}", index);
     let tpe = match index.tpe {
         IndexType::Unique => datamodel::dml::IndexType::Unique,
@@ -136,7 +139,26 @@ pub(crate) fn calculate_index(index: &Index) -> IndexDefinition {
     IndexDefinition {
         name: None,
         db_name: Some(index.name.clone()),
-        fields: index.columns.iter().map(|c| c.name().to_string()).collect(),
+        fields: index
+            .columns
+            .iter()
+            .map(|c| {
+                let (sort_order, length) = if !ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
+                    (None, None)
+                } else {
+                    let sort_order = c.sort_order.map(|sort| match sort {
+                        SQLSortOrder::Asc => SortOrder::Asc,
+                        SQLSortOrder::Desc => SortOrder::Desc,
+                    });
+                    (sort_order, c.length)
+                };
+                IndexField {
+                    name: c.name().to_string(),
+                    sort_order,
+                    length,
+                }
+            })
+            .collect(),
         tpe,
         defined_on_field: index.columns.len() == 1,
     }
@@ -442,12 +464,34 @@ pub fn columns_match(a_cols: &[String], b_cols: &[String]) -> bool {
     a_cols.len() == b_cols.len() && a_cols.iter().all(|a_col| b_cols.iter().any(|b_col| a_col == b_col))
 }
 
-pub fn replace_field_names(target: &mut Vec<String>, old_name: &str, new_name: &str) {
+pub fn replace_relation_info_field_names(target: &mut Vec<String>, old_name: &str, new_name: &str) {
     target
         .iter_mut()
         .map(|v| {
             if v == old_name {
                 *v = new_name.to_string()
+            }
+        })
+        .for_each(drop);
+}
+
+pub fn replace_pk_field_names(target: &mut Vec<PrimaryKeyField>, old_name: &str, new_name: &str) {
+    target
+        .iter_mut()
+        .map(|field| {
+            if field.name == old_name {
+                field.name = new_name.to_string()
+            }
+        })
+        .for_each(drop);
+}
+
+pub fn replace_index_field_names(target: &mut Vec<IndexField>, old_name: &str, new_name: &str) {
+    target
+        .iter_mut()
+        .map(|field| {
+            if field.name == old_name {
+                field.name = new_name.to_string()
             }
         })
         .for_each(drop);

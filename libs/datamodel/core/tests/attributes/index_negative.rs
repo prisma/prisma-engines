@@ -1,5 +1,5 @@
-use crate::attributes::{with_header, Provider};
 use crate::common::*;
+use crate::{with_header, Provider};
 
 #[test]
 fn indexes_on_relation_fields_must_error() {

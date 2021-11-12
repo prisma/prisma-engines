@@ -1,4 +1,6 @@
-use crate::introspection_helpers::replace_field_names;
+use crate::introspection_helpers::{
+    replace_index_field_names, replace_pk_field_names, replace_relation_info_field_names,
+};
 use crate::{warnings::*, SqlFamilyTrait};
 use datamodel::{Datamodel, DefaultValue, Field, FieldType, Ignorable, ValueGenerator, WithName};
 use introspection_connector::{IntrospectionContext, Warning};
@@ -160,11 +162,11 @@ fn merge_pre_3_0_index_names(old_data_model: &Datamodel, new_data_model: &mut Da
     for model in new_data_model.models() {
         if let Some(old_model) = &old_data_model.find_model(&model.name) {
             for index in &model.indices {
-                if let Some(old_index) = old_model
-                    .indices
-                    .iter()
-                    .find(|old| old.name == index.db_name && old.fields == index.fields)
-                {
+                if let Some(old_index) = old_model.indices.iter().find(|old| {
+                    old.name == index.db_name
+                        && old.fields.iter().map(|f| &f.name).collect::<Vec<_>>()
+                            == index.fields.iter().map(|f| &f.name).collect::<Vec<_>>()
+                }) {
                     retained_legacy_index_name_args
                         .push(ModelAndIndex::new(&model.name, old_index.name.as_ref().unwrap()))
                 }
@@ -235,7 +237,12 @@ fn merge_changed_primary_key_names(
         if let Some(old_model) = &old_data_model.find_model(&model.name) {
             if let Some(primary_key) = &model.primary_key {
                 if let Some(old_primary_key) = &old_model.primary_key {
-                    if old_primary_key.fields == primary_key.fields
+                    println!("OLD {:#?}", old_primary_key);
+                    println!("NEW {:#?}", primary_key);
+
+                    //TODO(extended indices) this should compare more than names at some point
+                    if old_primary_key.fields.iter().map(|f| &f.name).collect::<Vec<_>>()
+                        == primary_key.fields.iter().map(|f| &f.name).collect::<Vec<_>>()
                         && (old_primary_key.db_name == primary_key.db_name || primary_key.db_name.is_none())
                         && old_primary_key.name.is_some()
                     {
@@ -302,14 +309,14 @@ fn merge_changed_scalar_key_names(
         let model = new_data_model.find_model_mut(&changed_field_name.0.model);
 
         if let Some(pk) = &mut model.primary_key {
-            replace_field_names(&mut pk.fields, &changed_field_name.0.field, &changed_field_name.1);
+            replace_pk_field_names(&mut pk.fields, &changed_field_name.0.field, &changed_field_name.1);
         }
 
         for index in &mut model.indices {
-            replace_field_names(&mut index.fields, &changed_field_name.0.field, &changed_field_name.1);
+            replace_index_field_names(&mut index.fields, &changed_field_name.0.field, &changed_field_name.1);
         }
         for field in model.relation_fields_mut() {
-            replace_field_names(
+            replace_relation_info_field_names(
                 &mut field.relation_info.fields,
                 &changed_field_name.0.field,
                 &changed_field_name.1,
@@ -322,7 +329,7 @@ fn merge_changed_scalar_key_names(
         let fields_to_be_changed = new_data_model.find_relation_fields_for_model(&changed_field_name.0.model);
         for f in fields_to_be_changed {
             let field = new_data_model.find_relation_field_mut(&f.0, &f.1);
-            replace_field_names(
+            replace_relation_info_field_names(
                 &mut field.relation_info.references,
                 &changed_field_name.0.field,
                 &changed_field_name.1,
