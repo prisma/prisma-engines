@@ -1,5 +1,7 @@
 mod mssql;
 mod mysql;
+mod postgres;
+mod sqlite;
 
 use barrel::{functions, types};
 use expect_test::expect;

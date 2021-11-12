@@ -1,4 +1,5 @@
 use datamodel::common::preview_features::PreviewFeature;
+use enumflags2::BitFlags;
 use introspection_connector::{CompositeTypeDepth, IntrospectionConnector, IntrospectionContext, Warning};
 use mongodb::{Client, Database};
 use mongodb_introspection_connector::MongoDbIntrospectionConnector;
@@ -42,7 +43,11 @@ impl TestResult {
     }
 }
 
-pub(super) fn introspect_depth<F, U>(composite_type_depth: CompositeTypeDepth, init_database: F) -> TestResult
+pub(super) fn introspect_features<F, U>(
+    composite_type_depth: CompositeTypeDepth,
+    preview_features: BitFlags<PreviewFeature>,
+    init_database: F,
+) -> TestResult
 where
     F: FnOnce(Database) -> U,
     U: Future<Output = mongodb::error::Result<()>>,
@@ -58,6 +63,12 @@ where
     ));
     let connection_string = connection_string.to_string();
 
+    let features = preview_features
+        .iter()
+        .map(|f| format!("\"{}\"", f))
+        .collect::<Vec<_>>()
+        .join(", ");
+
     let datamodel_string = indoc::formatdoc!(
         r#"
             datasource db {{
@@ -67,10 +78,11 @@ where
 
             generator js {{
               provider        = "prisma-client-js"
-              previewFeatures = ["mongodb"]
+              previewFeatures = [{}]
             }}
         "#,
-        connection_string
+        connection_string,
+        features,
     );
 
     let mut config = datamodel::parse_configuration(&datamodel_string).unwrap();
@@ -79,7 +91,7 @@ where
     let ctx = IntrospectionContext {
         source: config.subject.datasources.pop().unwrap(),
         composite_type_depth,
-        preview_features: PreviewFeature::MongoDb.into(),
+        preview_features,
     };
 
     RT.block_on(async move {
@@ -102,6 +114,15 @@ where
             warnings: res.warnings,
         }
     })
+}
+
+pub(super) fn introspect_depth<F, U>(composite_type_depth: CompositeTypeDepth, init_database: F) -> TestResult
+where
+    F: FnOnce(Database) -> U,
+    U: Future<Output = mongodb::error::Result<()>>,
+{
+    let enabled_preview_features = BitFlags::all();
+    introspect_features(composite_type_depth, enabled_preview_features, init_database)
 }
 
 pub(super) fn introspect<F, U>(init_database: F) -> TestResult
