@@ -253,10 +253,11 @@ pub struct InconsistentColumnData {
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P2024",
-    message = "Timed out fetching a new connection from the connection pool. (More info: http://pris.ly/d/connection-pool, Current connection limit: {connection_limit})"
+    message = "Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: {timeout}, connection limit: {connection_limit})"
 )]
 pub struct PoolTimeout {
     pub connection_limit: u64,
+    pub timeout: u64,
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
