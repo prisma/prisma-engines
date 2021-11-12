@@ -2,6 +2,9 @@
 use std::{borrow::Cow, fmt, io, num};
 use thiserror::Error;
 
+#[cfg(feature = "pooled")]
+use std::time::Duration;
+
 #[derive(Debug, PartialEq, Eq)]
 pub enum DatabaseConstraint {
     Fields(Vec<String>),
@@ -206,11 +209,12 @@ pub enum ErrorKind {
     ConnectionClosed,
 
     #[error(
-        "Timed out fetching a connection from the pool (connection limit: {}, in use: {})",
+        "Timed out fetching a connection from the pool (connection limit: {}, in use: {}, pool timeout {})",
         max_open,
-        in_use
+        in_use,
+        timeout
     )]
-    PoolTimeout { max_open: u64, in_use: u64 },
+    PoolTimeout { max_open: u64, in_use: u64, timeout: u64 },
 
     #[error("Timed out during query execution.")]
     SocketTimeout,
@@ -256,8 +260,12 @@ impl ErrorKind {
     }
 
     #[cfg(feature = "pooled")]
-    pub(crate) fn pool_timeout(max_open: u64, in_use: u64) -> Self {
-        Self::PoolTimeout { max_open, in_use }
+    pub(crate) fn pool_timeout(max_open: u64, in_use: u64, timeout: Duration) -> Self {
+        Self::PoolTimeout {
+            max_open,
+            in_use,
+            timeout: timeout.as_secs(),
+        }
     }
 }
 

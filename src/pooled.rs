@@ -465,7 +465,11 @@ impl Quaint {
             Ok(conn) => conn,
             Err(mobc::Error::Timeout) => {
                 let state = self.inner.state().await;
-                return Err(Error::builder(ErrorKind::pool_timeout(state.max_open, state.in_use)).build());
+                // We can use unwrap here because a pool timeout has to be set to use a connection pool
+                let timeout_duration = self.pool_timeout.unwrap();
+                return Err(
+                    Error::builder(ErrorKind::pool_timeout(state.max_open, state.in_use, timeout_duration)).build(),
+                );
             }
             Err(mobc::Error::Inner(e)) => return Err(e),
             Err(e @ mobc::Error::BadConn) => {
