@@ -322,12 +322,6 @@
 <span id="322">322</span>
 <span id="323">323</span>
 <span id="324">324</span>
-<span id="325">325</span>
-<span id="326">326</span>
-<span id="327">327</span>
-<span id="328">328</span>
-<span id="329">329</span>
-<span id="330">330</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>,
     <span class="ident">transform::ast_to_dml::db</span>::{<span class="ident">context::Context</span>, <span class="ident">types::RelationField</span>},
@@ -436,12 +430,6 @@
     <span class="ident">ImplicitManyToMany</span>,
     <span class="ident">OneToOne</span>,
     <span class="ident">OneToMany</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">RelationType</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_one_to_one</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::OneToOne</span>)
-    }
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Debug</span>)]</span>

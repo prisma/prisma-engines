@@ -77,6 +77,16 @@
 <span id="77">77</span>
 <span id="78">78</span>
 <span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common::constraint_names::ConstraintNames</span>;
@@ -90,31 +100,42 @@
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">infer_implicit_indexes</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">indexes</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
-    <span class="kw">for</span> <span class="ident">relation</span> <span class="kw">in</span> <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">walk_complete_inline_relations</span>() {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">relation</span>.<span class="ident">relation_type</span>().<span class="ident">is_one_to_one</span>() {
+    <span class="kw">for</span> <span class="ident">relation</span> <span class="kw">in</span> <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">walk_relations</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">rel</span><span class="op">|</span> <span class="ident">rel</span>.<span class="ident">refine</span>().<span class="ident">as_inline</span>()) {
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">relation</span>.<span class="ident">is_one_to_one</span>() {
             <span class="kw">continue</span>;
         }
+
+        <span class="kw">let</span> <span class="ident">forward</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">forward</span>) <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">forward_relation_field</span>() {
+            <span class="ident">forward</span>
+        } <span class="kw">else</span> {
+            <span class="kw">continue</span>;
+        };
+
+        <span class="kw">if</span> <span class="ident">forward</span>.<span class="ident">fields</span>().<span class="ident">is_none</span>() {
+            <span class="kw">continue</span>;
+        };
+
+        <span class="kw">let</span> <span class="ident">referencing_fields</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> <span class="ident">forward</span>.<span class="ident">fields</span>().<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">referencing_model</span>();
 
         <span class="kw">if</span> <span class="ident">model</span>
             .<span class="ident">explicit_indexes</span>()
             .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> <span class="ident">index</span>.<span class="ident">is_unique</span>())
-            .<span class="ident">any</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> <span class="ident">index</span>.<span class="ident">contains_exactly_fields</span>(<span class="ident">relation</span>.<span class="ident">referencing_fields</span>()))
+            .<span class="ident">any</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> <span class="ident">index</span>.<span class="ident">contains_exactly_fields</span>(<span class="ident">referencing_fields</span>()))
         {
             <span class="kw">continue</span>;
         }
 
         <span class="kw">if</span> <span class="ident">model</span>
             .<span class="ident">primary_key</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">pk</span>.<span class="ident">contains_exactly_fields</span>(<span class="ident">relation</span>.<span class="ident">referencing_fields</span>()))
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">pk</span>.<span class="ident">contains_exactly_fields</span>(<span class="ident">referencing_fields</span>()))
             .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
         {
             <span class="kw">continue</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">column_names</span> <span class="op">=</span> <span class="ident">relation</span>
-            .<span class="ident">referencing_fields</span>()
+        <span class="kw">let</span> <span class="ident">column_names</span> <span class="op">=</span> <span class="ident">referencing_fields</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">final_database_name</span>())
             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 
@@ -122,7 +143,7 @@
             <span class="ident">ConstraintNames::unique_index_name</span>(<span class="ident">model</span>.<span class="ident">final_database_name</span>(), <span class="kw-2">&amp;</span><span class="ident">column_names</span>, <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">active_connector</span>());
 
         <span class="kw">let</span> <span class="ident">source_field</span> <span class="op">=</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fields</span> <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">referencing_fields</span>();
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fields</span> <span class="op">=</span> <span class="ident">referencing_fields</span>();
 
             <span class="kw">if</span> <span class="ident">fields</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span> {
                 <span class="ident">fields</span>.<span class="ident">next</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">field_id</span>())
@@ -135,8 +156,7 @@
             <span class="ident">model</span>.<span class="ident">model_id</span>(),
             <span class="ident">IndexAttribute</span> {
                 <span class="ident">is_unique</span>: <span class="bool-val">true</span>,
-                <span class="ident">fields</span>: <span class="ident">relation</span>
-                    .<span class="ident">referencing_fields</span>()
+                <span class="ident">fields</span>: <span class="ident">referencing_fields</span>()
                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">FieldWithArgs</span> {
                         <span class="ident">field_id</span>: <span class="ident">f</span>.<span class="ident">field_id</span>(),
                         <span class="ident">sort_order</span>: <span class="prelude-val">None</span>,

@@ -433,6 +433,10 @@
 <span id="433">433</span>
 <span id="434">434</span>
 <span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>, <span class="ident">dml</span>,
     <span class="ident">transform::ast_to_dml::db</span>::{<span class="self">self</span>, <span class="ident">walkers</span>::<span class="kw-2">*</span>},
@@ -726,14 +730,17 @@
 
         <span class="ident">model</span>.<span class="ident">indices</span> <span class="op">=</span> <span class="ident">walker</span>
             .<span class="ident">indexes</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="ident">dml::IndexDefinition</span> {
-                <span class="ident">name</span>: <span class="ident">idx</span>.<span class="ident">attribute</span>().<span class="ident">name</span>.<span class="ident">map</span>(<span class="ident">String::from</span>),
-                <span class="ident">db_name</span>: <span class="prelude-val">Some</span>(<span class="ident">idx</span>.<span class="ident">final_database_name</span>().<span class="ident">into_owned</span>()),
-                <span class="ident">fields</span>: <span class="ident">idx</span>
-                    .<span class="ident">attribute</span>()
-                    .<span class="ident">fields</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span>
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> {
+                <span class="macro">assert!</span>(<span class="ident">idx</span>.<span class="ident">fields</span>().<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">0</span>);
+
+                <span class="ident">dml::IndexDefinition</span> {
+                    <span class="ident">name</span>: <span class="ident">idx</span>.<span class="ident">attribute</span>().<span class="ident">name</span>.<span class="ident">map</span>(<span class="ident">String::from</span>),
+                    <span class="ident">db_name</span>: <span class="prelude-val">Some</span>(<span class="ident">idx</span>.<span class="ident">final_database_name</span>().<span class="ident">into_owned</span>()),
+                    <span class="ident">fields</span>: <span class="ident">idx</span>
+                        .<span class="ident">attribute</span>()
+                        .<span class="ident">fields</span>
+                        .<span class="ident">iter</span>()
+                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span>
                         <span class="comment">//TODO(extended indexes) here it is ok to pass sort and length with out a preview flag</span>
                         <span class="comment">// check since this is coming from the ast and the parsing would reject the args without</span>
                         <span class="comment">// the flag set.</span>
@@ -743,12 +750,13 @@
                         <span class="ident">sort_order</span>: <span class="ident">field</span>.<span class="ident">sort_order</span>,
                         <span class="ident">length</span>: <span class="ident">field</span>.<span class="ident">length</span>,
                     })
-                    .<span class="ident">collect</span>(),
-                <span class="ident">tpe</span>: <span class="kw">match</span> <span class="ident">idx</span>.<span class="ident">attribute</span>().<span class="ident">is_unique</span> {
-                    <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">dml::IndexType::Unique</span>,
-                    <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">dml::IndexType::Normal</span>,
-                },
-                <span class="ident">defined_on_field</span>: <span class="ident">idx</span>.<span class="ident">attribute</span>().<span class="ident">source_field</span>.<span class="ident">is_some</span>(),
+                        .<span class="ident">collect</span>(),
+                    <span class="ident">tpe</span>: <span class="kw">match</span> <span class="ident">idx</span>.<span class="ident">attribute</span>().<span class="ident">is_unique</span> {
+                        <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">dml::IndexType::Unique</span>,
+                        <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">dml::IndexType::Normal</span>,
+                    },
+                    <span class="ident">defined_on_field</span>: <span class="ident">idx</span>.<span class="ident">attribute</span>().<span class="ident">source_field</span>.<span class="ident">is_some</span>(),
+                }
             })
             .<span class="ident">collect</span>();
 
