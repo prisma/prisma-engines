@@ -1,10 +1,9 @@
-use super::{ColumnTypeChange, SqlSchemaDiffer};
+use super::{differ_database::DifferDatabase, ColumnTypeChange, SqlSchemaDiffer};
 use crate::{pair::Pair, sql_migration::SqlMigrationStep, sql_schema_differ};
 use sql_schema_describer::{
     walkers::{ColumnWalker, IndexWalker},
     ColumnId,
 };
-use std::collections::HashSet;
 
 mod mssql;
 mod mysql;
@@ -13,6 +12,10 @@ mod sqlite;
 
 /// Trait to specialize SQL schema diffing (resulting in migration steps) by SQL backend.
 pub(crate) trait SqlSchemaDifferFlavour {
+    fn can_redefine_tables_with_inbound_foreign_keys(&self) -> bool {
+        false
+    }
+
     /// If this returns `true`, the differ will generate
     /// SqlMigrationStep::RedefineIndex steps instead of
     /// SqlMigrationStep::AlterIndex.
@@ -115,9 +118,7 @@ pub(crate) trait SqlSchemaDifferFlavour {
 
     /// Return the tables that cannot be migrated without being redefined. This
     /// is currently useful only on SQLite.
-    fn tables_to_redefine(&self, _differ: &SqlSchemaDiffer<'_>) -> HashSet<String> {
-        HashSet::new()
-    }
+    fn set_tables_to_redefine(&self, _db: &mut DifferDatabase<'_>) {}
 
     /// By implementing this method, the flavour signals the differ that
     /// specific tables should be ignored. This is mostly for system tables.

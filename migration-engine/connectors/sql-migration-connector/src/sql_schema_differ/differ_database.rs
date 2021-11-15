@@ -1,14 +1,16 @@
-use super::column;
+use super::{column, table::TableDiffer};
 use crate::{flavour::SqlFlavour, pair::Pair};
 use sql_schema_describer::{walkers::ColumnWalker, ColumnId, SqlSchema, TableId};
 use std::{
     borrow::Cow,
-    collections::{BTreeMap, HashMap},
+    collections::{BTreeMap, BTreeSet, HashMap},
     ops::Bound,
 };
 
 pub(crate) struct DifferDatabase<'a> {
     pub(super) flavour: &'a dyn SqlFlavour,
+    /// The schemas being diffed
+    schemas: Pair<&'a SqlSchema>,
     /// Table name -> table indexes.
     tables: HashMap<Cow<'a, str>, Pair<Option<TableId>>>,
     /// (table_idxs, column_name) -> column_idxs. BTreeMap because we want range
@@ -16,6 +18,9 @@ pub(crate) struct DifferDatabase<'a> {
     columns: BTreeMap<(Pair<TableId>, &'a str), Pair<Option<ColumnId>>>,
     /// (table_idx, column_idx) -> ColumnChanges
     column_changes: HashMap<(Pair<TableId>, Pair<ColumnId>), column::ColumnChanges>,
+    /// Tables that will need to be completely redefined (dropped and recreated) for the migration
+    /// to succeed. It needs to be crate public because it is set from the flavour.
+    pub(crate) tables_to_redefine: BTreeSet<Pair<TableId>>,
 }
 
 impl<'a> DifferDatabase<'a> {
@@ -23,9 +28,11 @@ impl<'a> DifferDatabase<'a> {
         let table_count_lb = std::cmp::max(schemas.previous().tables.len(), schemas.next().tables.len());
         let mut db = DifferDatabase {
             flavour,
+            schemas,
             tables: HashMap::with_capacity(table_count_lb),
             columns: BTreeMap::new(),
             column_changes: Default::default(),
+            tables_to_redefine: Default::default(),
         };
 
         let mut columns_cache = HashMap::new();
@@ -88,6 +95,8 @@ impl<'a> DifferDatabase<'a> {
             }
         }
 
+        flavour.set_tables_to_redefine(&mut db);
+
         db
     }
 
@@ -139,7 +148,27 @@ impl<'a> DifferDatabase<'a> {
     }
 
     /// An iterator over the tables that are present in both schemas.
-    pub(crate) fn table_pairs(&self) -> impl Iterator<Item = Pair<TableId>> + '_ {
-        self.tables.values().filter_map(|p| p.transpose())
+    pub(crate) fn table_pairs<'db>(&'db self) -> impl Iterator<Item = TableDiffer<'a, 'db>> + 'db {
+        self.tables
+            .values()
+            .filter_map(|p| p.transpose())
+            .map(move |table_ids| TableDiffer {
+                tables: self.schemas.tables(&table_ids),
+                db: self,
+            })
+    }
+
+    /// Same as `table_pairs()`, but with the redefined tables filtered out.
+    pub(crate) fn non_redefined_table_pairs<'db>(&'db self) -> impl Iterator<Item = TableDiffer<'a, 'db>> + 'db {
+        self.table_pairs()
+            .filter(move |differ| !self.tables_to_redefine.contains(&differ.table_ids()))
+    }
+
+    pub(crate) fn table_is_redefined(&self, table_name: &str) -> bool {
+        self.tables
+            .get(table_name)
+            .and_then(|pair| pair.transpose())
+            .map(|ids| self.tables_to_redefine.contains(&ids))
+            .unwrap_or(false)
     }
 }

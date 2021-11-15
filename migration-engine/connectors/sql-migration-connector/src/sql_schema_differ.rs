@@ -43,23 +43,13 @@ pub(crate) fn calculate_steps(schemas: Pair<&SqlSchema>, flavour: &dyn SqlFlavou
 pub(crate) struct SqlSchemaDiffer<'a> {
     schemas: Pair<&'a SqlSchema>,
     db: DifferDatabase<'a>,
-    tables_to_redefine: HashSet<String>,
 }
 
 impl<'schema> SqlSchemaDiffer<'schema> {
     fn new(schemas: Pair<&'schema SqlSchema>, flavour: &'schema dyn SqlFlavour) -> Self {
         let db = DifferDatabase::new(schemas, flavour);
-        let tables_to_redefine = HashSet::new();
 
-        let mut differ = Self {
-            schemas,
-            db,
-            tables_to_redefine,
-        };
-
-        differ.tables_to_redefine = std::mem::take(&mut flavour.tables_to_redefine(&differ));
-
-        differ
+        Self { schemas, db }
     }
 
     fn push_created_tables(&self, steps: &mut Vec<SqlMigrationStep>) {
@@ -113,18 +103,10 @@ impl<'schema> SqlSchemaDiffer<'schema> {
     }
 
     fn push_altered_tables(&self, steps: &mut Vec<SqlMigrationStep>) {
-        let tables = self
-            .table_pairs()
-            .filter(move |tables| !self.tables_to_redefine.contains(tables.next().name()));
+        let tables = self.db.non_redefined_table_pairs();
 
         for table in tables {
-            // Foreign keys
             for created_fk in table.created_foreign_keys() {
-                // these are already created when we redefine the other table
-                if self.tables_to_redefine.contains(created_fk.referenced_table().name()) {
-                    continue;
-                }
-
                 steps.push(SqlMigrationStep::AddForeignKey {
                     table_id: created_fk.table().table_id(),
                     foreign_key_index: created_fk.foreign_key_index(),
@@ -138,33 +120,8 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                 })
             }
 
-            for fks in table.foreign_key_pairs() {
-                if self.db.flavour.has_unnamed_foreign_keys() {
-                    break;
-                }
-
-                if fks
-                    .map(|fk| fk.constraint_name())
-                    .transpose()
-                    .map(|names| names.previous() != names.next())
-                    .unwrap_or(false)
-                {
-                    if self.db.flavour.can_rename_foreign_key() {
-                        steps.push(SqlMigrationStep::RenameForeignKey {
-                            table_id: table.tables.map(|t| t.table_id()),
-                            foreign_key_id: fks.map(|fk| fk.foreign_key_index()),
-                        })
-                    } else {
-                        steps.push(SqlMigrationStep::AddForeignKey {
-                            table_id: table.next().table_id(),
-                            foreign_key_index: fks.next().foreign_key_index(),
-                        });
-                        steps.push(SqlMigrationStep::DropForeignKey {
-                            table_id: table.previous().table_id(),
-                            foreign_key_index: fks.previous().foreign_key_index(),
-                        })
-                    }
-                }
+            for fk in table.foreign_key_pairs() {
+                push_foreign_key_pair_changes(&table, fk, steps, &self.db)
             }
 
             // Indexes.
@@ -335,10 +292,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
     }
 
     fn push_create_indexes(&self, steps: &mut Vec<SqlMigrationStep>) {
-        for tables in self
-            .table_pairs()
-            .filter(|tables| !self.tables_to_redefine.contains(tables.next().name()))
-        {
+        for tables in self.db.non_redefined_table_pairs() {
             for index in tables.created_indexes() {
                 steps.push(SqlMigrationStep::CreateIndex {
                     table_id: (Some(tables.previous().table_id()), tables.next().table_id()),
@@ -376,7 +330,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
     fn drop_indexes(&self, steps: &mut Vec<SqlMigrationStep>) {
         let mut drop_indexes = HashSet::new();
 
-        for tables in self.table_pairs() {
+        for tables in self.db.non_redefined_table_pairs() {
             for index in tables.dropped_indexes() {
                 // On MySQL, foreign keys automatically create indexes. These foreign-key-created
                 // indexes should only be dropped as part of the foreign key.
@@ -390,7 +344,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
 
         // On SQLite, we will recreate indexes in the RedefineTables step,
         // because they are needed for implementing new foreign key constraints.
-        if !self.tables_to_redefine.is_empty() && self.db.flavour.should_drop_indexes_from_dropped_tables() {
+        if !self.db.tables_to_redefine.is_empty() && self.db.flavour.should_drop_indexes_from_dropped_tables() {
             for table in self.dropped_tables() {
                 for index in table.indexes() {
                     drop_indexes.insert((index.table().table_id(), index.index()));
@@ -404,13 +358,14 @@ impl<'schema> SqlSchemaDiffer<'schema> {
     }
 
     fn push_redefine_tables(&self, steps: &mut Vec<SqlMigrationStep>) {
-        if self.tables_to_redefine.is_empty() {
+        if self.db.tables_to_redefine.is_empty() {
             return;
         }
 
         let tables_to_redefine = self
+            .db
             .table_pairs()
-            .filter(|tables| self.tables_to_redefine.contains(tables.next().name()))
+            .filter(|tables| self.db.tables_to_redefine.contains(&tables.table_ids()))
             .map(|differ| {
                 let column_pairs = differ
                     .column_pairs()
@@ -439,14 +394,6 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             .collect();
 
         steps.push(SqlMigrationStep::RedefineTables(tables_to_redefine))
-    }
-
-    /// An iterator over the tables that are present in both schemas.
-    fn table_pairs(&self) -> impl Iterator<Item = TableDiffer<'schema, '_>> + '_ {
-        self.db.table_pairs().map(move |tables| TableDiffer {
-            tables: self.schemas.tables(&tables),
-            db: &self.db,
-        })
     }
 
     fn created_tables(&self) -> impl Iterator<Item = TableWalker<'schema>> + '_ {
@@ -530,4 +477,54 @@ fn foreign_keys_match(fks: Pair<&ForeignKeyWalker<'_>>, db: &DifferDatabase<'_>)
 
 fn enums_match(previous: &EnumWalker<'_>, next: &EnumWalker<'_>) -> bool {
     previous.name() == next.name()
+}
+
+fn push_foreign_key_pair_changes(
+    table: &TableDiffer<'_, '_>,
+    fk: Pair<ForeignKeyWalker<'_>>,
+    steps: &mut Vec<SqlMigrationStep>,
+    db: &DifferDatabase<'_>,
+) {
+    // Is the referenced table being redefined, meaning we need to drop and recreate
+    // the foreign key?
+    if db.table_is_redefined(fk.previous().referenced_table().name())
+        && !db.flavour.can_redefine_tables_with_inbound_foreign_keys()
+    {
+        steps.push(SqlMigrationStep::DropForeignKey {
+            table_id: table.previous().table_id(),
+            foreign_key_index: fk.previous().foreign_key_index(),
+        });
+        steps.push(SqlMigrationStep::AddForeignKey {
+            table_id: table.next().table_id(),
+            foreign_key_index: fk.next().foreign_key_index(),
+        });
+        return;
+    }
+
+    if db.flavour.has_unnamed_foreign_keys() {
+        return;
+    }
+
+    if fk
+        .map(|fk| fk.constraint_name())
+        .transpose()
+        .map(|names| names.previous() != names.next())
+        .unwrap_or(false)
+    {
+        if db.flavour.can_rename_foreign_key() {
+            steps.push(SqlMigrationStep::RenameForeignKey {
+                table_id: table.tables.map(|t| t.table_id()),
+                foreign_key_id: fk.map(|fk| fk.foreign_key_index()),
+            })
+        } else {
+            steps.push(SqlMigrationStep::AddForeignKey {
+                table_id: table.next().table_id(),
+                foreign_key_index: fk.next().foreign_key_index(),
+            });
+            steps.push(SqlMigrationStep::DropForeignKey {
+                table_id: table.previous().table_id(),
+                foreign_key_index: fk.previous().foreign_key_index(),
+            })
+        }
+    }
 }
