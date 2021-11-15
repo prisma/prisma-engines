@@ -321,10 +321,6 @@
 <span id="321">321</span>
 <span id="322">322</span>
 <span id="323">323</span>
-<span id="324">324</span>
-<span id="325">325</span>
-<span id="326">326</span>
-<span id="327">327</span>
 </pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::TestResult</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">expect_test::expect</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">test_macros::test_connector</span>;
@@ -570,13 +566,9 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">configuration</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Configuration</span> {
-        <span class="ident">datamodel::parse_configuration</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
-            <span class="string">&quot;{}\n{}&quot;</span>,
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">datasource_block</span>().<span class="ident">to_string</span>(),
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">generator_block</span>()
-        ))
-        .<span class="ident">unwrap</span>()
-        .<span class="ident">subject</span>
+        <span class="ident">datamodel::parse_configuration</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}\n{}&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">datasource_block</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">generator_block</span>()))
+            .<span class="ident">unwrap</span>()
+            .<span class="ident">subject</span>
     }
 
     <span class="attribute">#[<span class="ident">track_caller</span>]</span>

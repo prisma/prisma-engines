@@ -170,6 +170,9 @@
 <span id="170">170</span>
 <span id="171">171</span>
 <span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">interpreting_executor::InterpretingExecutor</span>, <span class="ident">QueryExecutor</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::CoreError</span>;
 <span class="kw">use</span> <span class="ident">connection_string::JdbcString</span>;
@@ -177,7 +180,9 @@
 <span class="kw">use</span> <span class="ident">datamodel</span>::{
     <span class="ident">common</span>::{
         <span class="ident">preview_features::PreviewFeature</span>,
-        <span class="ident">provider_names</span>::{<span class="ident">MSSQL_SOURCE_NAME</span>, <span class="ident">MYSQL_SOURCE_NAME</span>, <span class="ident">POSTGRES_SOURCE_NAME</span>, <span class="ident">SQLITE_SOURCE_NAME</span>},
+        <span class="ident">provider_names</span>::{
+            <span class="ident">COCKROACHDB_SOURCE_NAME</span>, <span class="ident">MSSQL_SOURCE_NAME</span>, <span class="ident">MYSQL_SOURCE_NAME</span>, <span class="ident">POSTGRES_SOURCE_NAME</span>, <span class="ident">SQLITE_SOURCE_NAME</span>,
+        },
     },
     <span class="ident">Datasource</span>,
 };
@@ -205,6 +210,7 @@
         <span class="ident">MYSQL_SOURCE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">mysql</span>(<span class="ident">source</span>, <span class="ident">url</span>).<span class="kw">await</span>,
         <span class="ident">POSTGRES_SOURCE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">postgres</span>(<span class="ident">source</span>, <span class="ident">url</span>).<span class="kw">await</span>,
         <span class="ident">MSSQL_SOURCE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">mssql</span>(<span class="ident">source</span>, <span class="ident">url</span>).<span class="kw">await</span>,
+        <span class="ident">COCKROACHDB_SOURCE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">postgres</span>(<span class="ident">source</span>, <span class="ident">url</span>).<span class="kw">await</span>,
 
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mongodb&quot;</span>)]</span>
         <span class="ident">MONGODB_SOURCE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> {
