@@ -998,51 +998,6 @@
     }
 }
 
-<span class="doccomment">/// A walker of a column in a primary key.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PrimaryKeyColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">SqlSchema</span>,
-    <span class="ident">primary_key_column_id</span>: <span class="ident">usize</span>,
-    <span class="ident">table_id</span>: <span class="ident">TableId</span>,
-    <span class="ident">column_id</span>: <span class="ident">ColumnId</span>,
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">PrimaryKeyColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Conversion to a normal column walker.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_column</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">ColumnWalker</span> {
-            <span class="ident">schema</span>: <span class="self">self</span>.<span class="ident">schema</span>,
-            <span class="ident">column_id</span>: <span class="self">self</span>.<span class="ident">column_id</span>,
-            <span class="ident">table_id</span>: <span class="self">self</span>.<span class="ident">table_id</span>,
-        }
-    }
-
-    <span class="doccomment">/// The length limit of the (text) column. Matters on MySQL only.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">length</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">length</span>
-    }
-
-    <span class="doccomment">/// The BTree ordering. Matters on SQL Server only.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sort_order</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SQLSortOrder</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">sort_order</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">table</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">TableWalker</span> {
-            <span class="ident">schema</span>: <span class="self">self</span>.<span class="ident">schema</span>,
-            <span class="ident">table_id</span>: <span class="self">self</span>.<span class="ident">table_id</span>,
-        }
-    }
-
-    <span class="kw">fn</span> <span class="ident">get</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">PrimaryKeyColumn</span> {
-        <span class="self">self</span>.<span class="ident">table</span>()
-            .<span class="ident">table</span>()
-            .<span class="ident">primary_key_columns</span>()
-            .<span class="ident">nth</span>(<span class="self">self</span>.<span class="ident">primary_key_column_id</span>)
-            .<span class="ident">unwrap</span>()
-    }
-}
-
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Create a TableWalker from a schema and a reference to one of its tables. This should stay private.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">SqlSchema</span>, <span class="ident">table_id</span>: <span class="ident">TableId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
@@ -1188,6 +1143,51 @@
     <span class="doccomment">/// The index of the table in the schema.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">table_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TableId</span> {
         <span class="self">self</span>.<span class="ident">table_id</span>
+    }
+}
+
+<span class="doccomment">/// A walker of a column in a primary key.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PrimaryKeyColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">SqlSchema</span>,
+    <span class="ident">primary_key_column_id</span>: <span class="ident">usize</span>,
+    <span class="ident">table_id</span>: <span class="ident">TableId</span>,
+    <span class="ident">column_id</span>: <span class="ident">ColumnId</span>,
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">PrimaryKeyColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Conversion to a normal column walker.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_column</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+        <span class="ident">ColumnWalker</span> {
+            <span class="ident">schema</span>: <span class="self">self</span>.<span class="ident">schema</span>,
+            <span class="ident">column_id</span>: <span class="self">self</span>.<span class="ident">column_id</span>,
+            <span class="ident">table_id</span>: <span class="self">self</span>.<span class="ident">table_id</span>,
+        }
+    }
+
+    <span class="doccomment">/// The length limit of the (text) column. Matters on MySQL only.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">length</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">length</span>
+    }
+
+    <span class="doccomment">/// The BTree ordering. Matters on SQL Server only.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sort_order</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SQLSortOrder</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">sort_order</span>
+    }
+
+    <span class="kw">fn</span> <span class="ident">table</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+        <span class="ident">TableWalker</span> {
+            <span class="ident">schema</span>: <span class="self">self</span>.<span class="ident">schema</span>,
+            <span class="ident">table_id</span>: <span class="self">self</span>.<span class="ident">table_id</span>,
+        }
+    }
+
+    <span class="kw">fn</span> <span class="ident">get</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">PrimaryKeyColumn</span> {
+        <span class="self">self</span>.<span class="ident">table</span>()
+            .<span class="ident">table</span>()
+            .<span class="ident">primary_key_columns</span>()
+            .<span class="ident">nth</span>(<span class="self">self</span>.<span class="ident">primary_key_column_id</span>)
+            .<span class="ident">unwrap</span>()
     }
 }
 
