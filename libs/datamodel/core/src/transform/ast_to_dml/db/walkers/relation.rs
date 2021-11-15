@@ -47,6 +47,15 @@ pub(crate) enum RefinedRelationWalker<'ast, 'db> {
     ImplicitManyToMany(ImplicitManyToManyRelationWalker<'ast, 'db>),
 }
 
+impl<'ast, 'db> RefinedRelationWalker<'ast, 'db> {
+    pub(crate) fn as_inline(&self) -> Option<InlineRelationWalker<'ast, 'db>> {
+        match self {
+            RefinedRelationWalker::Inline(inline) => Some(*inline),
+            _ => None,
+        }
+    }
+}
+
 /// A scalar inferred by loose/magic reformatting
 pub(crate) struct InferredField<'ast, 'db> {
     pub(crate) name: String,
@@ -403,6 +412,7 @@ impl<'ast, 'db> CompleteInlineRelationWalker<'ast, 'db> {
     }
 
     /// 1:1, 1:n or m:n
+    #[allow(dead_code)]
     pub(crate) fn relation_type(self) -> RelationType {
         self.relation.r#type()
     }
