@@ -216,7 +216,10 @@ pub(super) fn cycles<'ast, 'db>(relation: CompleteInlineRelationWalker<'ast, 'db
     if !ctx
         .connector
         .has_capability(ConnectorCapability::ReferenceCycleDetection)
-        || ctx.referential_integrity.is_prisma()
+        && ctx
+            .datasource
+            .map(|ds| ds.referential_integrity().uses_foreign_keys())
+            .unwrap_or(true)
     {
         return;
     }

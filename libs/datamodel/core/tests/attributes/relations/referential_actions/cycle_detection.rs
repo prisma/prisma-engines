@@ -82,6 +82,67 @@ fn cascading_cycles_cannot_loop_infinitely() {
 }
 
 #[test]
+fn cycles_are_allowed_outside_of_emulation_and_sqlserver() {
+    let dml = indoc! {
+        r#"
+        datasource db {
+            provider = "mysql"
+            url = "mysql://"
+        }
+
+        generator js1 {
+          provider = "javascript"
+          previewFeatures = ["referentialIntegrity"]
+        }
+
+        model A {
+            id     Int  @id @default(autoincrement())
+            child  A?   @relation(name: "a_self_relation")
+            parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: Cascade)
+            aId    Int?
+        }
+    "#};
+
+    assert!(datamodel::parse_schema(dml).is_ok());
+}
+
+#[test]
+fn emulated_cascading_on_delete_self_relations() {
+    let dml = indoc! {
+        r#"
+        datasource db {
+            provider = "mysql"
+            url = "mysql://"
+            referentialIntegrity = "prisma"
+        }
+
+        generator js1 {
+          provider = "javascript"
+          previewFeatures = ["referentialIntegrity"]
+        }
+
+        model A {
+            id     Int  @id @default(autoincrement())
+            child  A?   @relation(name: "a_self_relation")
+            parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: Cascade)
+            aId    Int?
+        }
+    "#};
+
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError validating: A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. (Implicit default `onUpdate`: `Cascade`) Read more at https://pris.ly/d/cyclic-referential-actions[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m    child  A?   @relation(name: "a_self_relation")
+        [1;94m15 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: Cascade)[0m
+        [1;94m16 | [0m    aId    Int?
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+}
+
+#[test]
 fn cascading_on_update_self_relations() {
     let dml = indoc! {
         r#"
@@ -105,6 +166,42 @@ fn cascading_on_update_self_relations() {
         [1;94m 8 | [0m    child  A?   @relation(name: "a_self_relation")
         [1;94m 9 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: Cascade)[0m
         [1;94m10 | [0m    aId    Int?
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+}
+
+#[test]
+fn emulated_cascading_on_update_self_relations() {
+    let dml = indoc! {
+        r#"
+        datasource db {
+            provider = "mysql"
+            url = "mysql://"
+            referentialIntegrity = "prisma"
+        }
+
+        generator js1 {
+          provider = "javascript"
+          previewFeatures = ["referentialIntegrity"]
+        }
+
+        model A {
+            id     Int  @id @default(autoincrement())
+            child  A?   @relation(name: "a_self_relation")
+            parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: Cascade)
+            aId    Int?
+        }
+    "#};
+
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError validating: A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. (Implicit default `onDelete`: `SetNull`) Read more at https://pris.ly/d/cyclic-referential-actions[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m    child  A?   @relation(name: "a_self_relation")
+        [1;94m15 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: Cascade)[0m
+        [1;94m16 | [0m    aId    Int?
         [1;94m   | [0m
     "#]];
 
@@ -142,6 +239,42 @@ fn null_setting_on_delete_self_relations() {
 }
 
 #[test]
+fn emulated_null_setting_on_delete_self_relations() {
+    let dml = indoc! {
+        r#"
+        datasource db {
+            provider = "mysql"
+            url = "mysql://"
+            referentialIntegrity = "prisma"
+        }
+
+        generator js1 {
+          provider = "javascript"
+          previewFeatures = ["referentialIntegrity"]
+        }
+
+        model A {
+            id     Int  @id @default(autoincrement())
+            child  A?   @relation(name: "a_self_relation")
+            parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: SetNull)
+            aId    Int?
+        }
+    "#};
+
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError validating: A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. (Implicit default `onUpdate`: `Cascade`) Read more at https://pris.ly/d/cyclic-referential-actions[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m    child  A?   @relation(name: "a_self_relation")
+        [1;94m15 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: SetNull)[0m
+        [1;94m16 | [0m    aId    Int?
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+}
+
+#[test]
 fn null_setting_on_update_self_relations() {
     let dml = indoc! {
         r#"
@@ -165,6 +298,42 @@ fn null_setting_on_update_self_relations() {
         [1;94m 8 | [0m    child  A?   @relation(name: "a_self_relation")
         [1;94m 9 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: SetNull)[0m
         [1;94m10 | [0m    aId    Int?
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+}
+
+#[test]
+fn emulated_null_setting_on_update_self_relations() {
+    let dml = indoc! {
+        r#"
+        datasource db {
+            provider = "mysql"
+            url = "mysql://"
+            referentialIntegrity = "prisma"
+        }
+
+        generator js1 {
+          provider = "javascript"
+          previewFeatures = ["referentialIntegrity"]
+        }
+
+        model A {
+            id     Int  @id @default(autoincrement())
+            child  A?   @relation(name: "a_self_relation")
+            parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: SetNull)
+            aId    Int?
+        }
+    "#};
+
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError validating: A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. (Implicit default `onDelete`: `SetNull`) Read more at https://pris.ly/d/cyclic-referential-actions[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m    child  A?   @relation(name: "a_self_relation")
+        [1;94m15 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: SetNull)[0m
+        [1;94m16 | [0m    aId    Int?
         [1;94m   | [0m
     "#]];
 
@@ -202,6 +371,48 @@ fn default_setting_on_delete_self_relations() {
 }
 
 #[test]
+fn emulated_default_setting_on_delete_self_relations() {
+    let dml = indoc! {
+        r#"
+        datasource db {
+            provider = "mysql"
+            url = "mysql://"
+            referentialIntegrity = "prisma"
+        }
+
+        generator js1 {
+          provider = "javascript"
+          previewFeatures = ["referentialIntegrity"]
+        }
+
+        model A {
+            id     Int  @id @default(autoincrement())
+            child  A?   @relation(name: "a_self_relation")
+            parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: SetDefault)
+            aId    Int?
+        }
+    "#};
+
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError validating: Invalid referential action: `SetDefault`. Allowed values: (`Cascade`, `Restrict`, `NoAction`, `SetNull`)[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m    child  A?   @relation(name: "a_self_relation")
+        [1;94m15 | [0m    parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], [1;91monDelete: SetDefault[0m)
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError validating: A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. (Implicit default `onUpdate`: `Cascade`) Read more at https://pris.ly/d/cyclic-referential-actions[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m    child  A?   @relation(name: "a_self_relation")
+        [1;94m15 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: SetDefault)[0m
+        [1;94m16 | [0m    aId    Int?
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+}
+
+#[test]
 fn default_setting_on_update_self_relations() {
     let dml = indoc! {
         r#"
@@ -225,6 +436,48 @@ fn default_setting_on_update_self_relations() {
         [1;94m 8 | [0m    child  A?   @relation(name: "a_self_relation")
         [1;94m 9 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: SetDefault)[0m
         [1;94m10 | [0m    aId    Int?
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+}
+
+#[test]
+fn emulated_default_setting_on_update_self_relations() {
+    let dml = indoc! {
+        r#"
+        datasource db {
+            provider = "mysql"
+            url = "mysql://"
+            referentialIntegrity = "prisma"
+        }
+
+        generator js1 {
+          provider = "javascript"
+          previewFeatures = ["referentialIntegrity"]
+        }
+
+        model A {
+            id     Int  @id @default(autoincrement())
+            child  A?   @relation(name: "a_self_relation")
+            parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: SetDefault)
+            aId    Int?
+        }
+    "#};
+
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError validating: Invalid referential action: `SetDefault`. Allowed values: (`Cascade`, `Restrict`, `NoAction`, `SetNull`)[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m    child  A?   @relation(name: "a_self_relation")
+        [1;94m15 | [0m    parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], [1;91monUpdate: SetDefault[0m)
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError validating: A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. (Implicit default `onDelete`: `SetNull`) Read more at https://pris.ly/d/cyclic-referential-actions[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m    child  A?   @relation(name: "a_self_relation")
+        [1;94m15 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: SetDefault)[0m
+        [1;94m16 | [0m    aId    Int?
         [1;94m   | [0m
     "#]];
 
@@ -269,6 +522,56 @@ fn cascading_cyclic_one_hop_relations() {
         [1;94m14 | [0m    id     Int @id @default(autoincrement())
         [1;94m15 | [0m    [1;91ma      A   @relation(name: "bar", fields: [aId], references: [id], onUpdate: Cascade)[0m
         [1;94m16 | [0m    as     A[] @relation(name: "foo")
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+}
+
+#[test]
+fn emulated_cascading_cyclic_one_hop_relations() {
+    let dml = indoc! {
+        r#"
+        datasource db {
+            provider = "mysql"
+            url = "mysql://"
+            referentialIntegrity = "prisma"
+        }
+
+        generator js1 {
+          provider = "javascript"
+          previewFeatures = ["referentialIntegrity"]
+        }
+
+        model A {
+            id     Int  @id @default(autoincrement())
+            b      B    @relation(name: "foo", fields: [bId], references: [id], onDelete: Cascade)
+            bId    Int
+            bs     B[]  @relation(name: "bar")
+        }
+
+        model B {
+            id     Int @id @default(autoincrement())
+            a      A   @relation(name: "bar", fields: [aId], references: [id], onUpdate: Cascade)
+            as     A[] @relation(name: "foo")
+            aId    Int
+        }
+    "#};
+
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError validating: Reference causes a cycle. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Cycle path: A.b → B.a. (Implicit default `onUpdate`: `Cascade`) Read more at https://pris.ly/d/cyclic-referential-actions[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m    id     Int  @id @default(autoincrement())
+        [1;94m14 | [0m    [1;91mb      B    @relation(name: "foo", fields: [bId], references: [id], onDelete: Cascade)[0m
+        [1;94m15 | [0m    bId    Int
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError validating: Reference causes a cycle. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Cycle path: B.a → A.b. Read more at https://pris.ly/d/cyclic-referential-actions[0m
+          [1;94m-->[0m  [4mschema.prisma:21[0m
+        [1;94m   | [0m
+        [1;94m20 | [0m    id     Int @id @default(autoincrement())
+        [1;94m21 | [0m    [1;91ma      A   @relation(name: "bar", fields: [aId], references: [id], onUpdate: Cascade)[0m
+        [1;94m22 | [0m    as     A[] @relation(name: "foo")
         [1;94m   | [0m
     "#]];
 
