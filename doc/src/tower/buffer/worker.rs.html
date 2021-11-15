@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;tower-0.4.8&#x2F;src&#x2F;buffer&#x2F;worker.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>worker.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../tower/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;tower-0.4.10&#x2F;src&#x2F;buffer&#x2F;worker.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>worker.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../tower/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -259,7 +259,6 @@
     <span class="ident">message::Message</span>,
 };
 <span class="kw">use</span> <span class="ident">futures_core::ready</span>;
-<span class="kw">use</span> <span class="ident">pin_project::pin_project</span>;
 <span class="kw">use</span> <span class="ident">std::sync</span>::{<span class="ident">Arc</span>, <span class="ident">Mutex</span>, <span class="ident">Weak</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">future::Future</span>,
@@ -269,33 +268,56 @@
 <span class="kw">use</span> <span class="ident">tokio::sync</span>::{<span class="ident">mpsc</span>, <span class="ident">Semaphore</span>};
 <span class="kw">use</span> <span class="ident">tower_service::Service</span>;
 
-<span class="doccomment">/// Task that handles processing the buffer. This type should not be used</span>
-<span class="doccomment">/// directly, instead `Buffer` requires an `Executor` that can accept this task.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The struct is `pub` in the private module and the type is *not* re-exported</span>
-<span class="doccomment">/// as part of the public API. This is the &quot;sealed&quot; pattern to include &quot;private&quot;</span>
-<span class="doccomment">/// types in public traits that are not meant for consumers of the library to</span>
-<span class="doccomment">/// implement (only call).</span>
-<span class="attribute">#[<span class="ident">pin_project</span>(<span class="ident">PinnedDrop</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Worker</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Request</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>,
-    <span class="ident">T::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::BoxError</span><span class="op">&gt;</span>,
-{
-    <span class="ident">current_message</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&lt;</span><span class="ident">Request</span>, <span class="ident">T::Future</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">rx</span>: <span class="ident">mpsc::UnboundedReceiver</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&lt;</span><span class="ident">Request</span>, <span class="ident">T::Future</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">service</span>: <span class="ident">T</span>,
-    <span class="ident">finish</span>: <span class="ident">bool</span>,
-    <span class="ident">failed</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ServiceError</span><span class="op">&gt;</span>,
-    <span class="ident">handle</span>: <span class="ident">Handle</span>,
-    <span class="ident">close</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Weak</span><span class="op">&lt;</span><span class="ident">Semaphore</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="macro">pin_project_lite::pin_project!</span> {
+    <span class="doccomment">/// Task that handles processing the buffer. This type should not be used</span>
+    <span class="doccomment">/// directly, instead `Buffer` requires an `Executor` that can accept this task.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The struct is `pub` in the private module and the type is *not* re-exported</span>
+    <span class="doccomment">/// as part of the public API. This is the &quot;sealed&quot; pattern to include &quot;private&quot;</span>
+    <span class="doccomment">/// types in public traits that are not meant for consumers of the library to</span>
+    <span class="doccomment">/// implement (only call).</span>
+    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Worker</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Request</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">T</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>,
+    {
+        <span class="ident">current_message</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&lt;</span><span class="ident">Request</span>, <span class="ident">T::Future</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">rx</span>: <span class="ident">mpsc::UnboundedReceiver</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&lt;</span><span class="ident">Request</span>, <span class="ident">T::Future</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">service</span>: <span class="ident">T</span>,
+        <span class="ident">finish</span>: <span class="ident">bool</span>,
+        <span class="ident">failed</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ServiceError</span><span class="op">&gt;</span>,
+        <span class="ident">handle</span>: <span class="ident">Handle</span>,
+        <span class="ident">close</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Weak</span><span class="op">&lt;</span><span class="ident">Semaphore</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    }
+
+    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>, <span class="ident">Request</span><span class="op">&gt;</span> <span class="ident">PinnedDrop</span> <span class="kw">for</span> <span class="ident">Worker</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Request</span><span class="op">&gt;</span>
+    {
+        <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">mut</span> <span class="ident">this</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>) {
+            <span class="ident">this</span>.<span class="ident">as_mut</span>().<span class="ident">close_semaphore</span>();
+        }
+    }
 }
 
 <span class="doccomment">/// Get the error out</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Handle</span> {
     <span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ServiceError</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Request</span><span class="op">&gt;</span> <span class="ident">Worker</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Request</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+    <span class="ident">T</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>,
+{
+    <span class="doccomment">/// Closes the buffer&#39;s semaphore if it is still open, waking any pending</span>
+    <span class="doccomment">/// tasks.</span>
+    <span class="kw">fn</span> <span class="ident">close_semaphore</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">close</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">close</span>.<span class="ident">take</span>().<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="ident">Weak::upgrade</span>) {
+            <span class="macro">tracing::debug!</span>(<span class="string">&quot;buffer closing; waking pending tasks&quot;</span>);
+            <span class="ident">close</span>.<span class="ident">close</span>();
+        } <span class="kw">else</span> {
+            <span class="macro">tracing::trace!</span>(<span class="string">&quot;buffer already closed&quot;</span>);
+        }
+    }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Request</span><span class="op">&gt;</span> <span class="ident">Worker</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Request</span><span class="op">&gt;</span>
@@ -397,17 +419,6 @@
         <span class="comment">// requests that we receive before we&#39;ve exhausted the receiver receive the error:</span>
         <span class="self">self</span>.<span class="ident">failed</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">error</span>);
     }
-
-    <span class="doccomment">/// Closes the buffer&#39;s semaphore if it is still open, waking any pending</span>
-    <span class="doccomment">/// tasks.</span>
-    <span class="kw">fn</span> <span class="ident">close_semaphore</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">close</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">close</span>.<span class="ident">take</span>().<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="ident">Weak::upgrade</span>) {
-            <span class="macro">tracing::debug!</span>(<span class="string">&quot;buffer closing; waking pending tasks&quot;</span>);
-            <span class="ident">close</span>.<span class="ident">close</span>();
-        } <span class="kw">else</span> {
-            <span class="macro">tracing::trace!</span>(<span class="string">&quot;buffer already closed&quot;</span>);
-        }
-    }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Request</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">Worker</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Request</span><span class="op">&gt;</span>
@@ -478,17 +489,6 @@
                 }
             }
         }
-    }
-}
-
-<span class="attribute">#[<span class="ident">pin_project::pinned_drop</span>]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Request</span><span class="op">&gt;</span> <span class="ident">PinnedDrop</span> <span class="kw">for</span> <span class="ident">Worker</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Request</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>,
-    <span class="ident">T::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::BoxError</span><span class="op">&gt;</span>,
-{
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">as_mut</span>().<span class="ident">close_semaphore</span>();
     }
 }
 

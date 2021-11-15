@@ -99,7 +99,7 @@
         }
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mongodb&quot;</span>)]</span>
         <span class="ident">provider</span> <span class="kw">if</span> <span class="ident">provider</span> <span class="op">=</span><span class="op">=</span> <span class="ident">MONGODB_SOURCE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">MongoDbMigrationConnector::new</span>(<span class="ident">url</span>);
+            <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">MongoDbMigrationConnector::new</span>(<span class="ident">url</span>, <span class="ident">preview_features</span>);
             <span class="comment">// Drop database. Creation is automatically done when collections are created.</span>
             <span class="ident">connector</span>.<span class="ident">drop_database</span>().<span class="kw">await</span><span class="question-mark">?</span>;
             <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">schema</span>) <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::parse_schema</span>(<span class="ident">prisma_schema</span>).<span class="ident">unwrap</span>();

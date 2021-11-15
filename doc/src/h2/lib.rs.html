@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;h2-0.3.6&#x2F;src&#x2F;lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../h2/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;h2-0.3.7&#x2F;src&#x2F;lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../h2/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -173,9 +173,9 @@
 <span id="173">173</span>
 <span id="174">174</span>
 <span id="175">175</span>
-</pre><pre class="rust"><code><span class="doccomment">//! An asynchronous, HTTP/2.0 server and client implementation.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! An asynchronous, HTTP/2 server and client implementation.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! This library implements the [HTTP/2.0] specification. The implementation is</span>
+<span class="doccomment">//! This library implements the [HTTP/2] specification. The implementation is</span>
 <span class="doccomment">//! asynchronous, using [futures] as the basis for the API. The implementation</span>
 <span class="doccomment">//! is also decoupled from TCP or TLS details. The user must handle ALPN and</span>
 <span class="doccomment">//! HTTP/1.1 upgrades themselves.</span>
@@ -199,19 +199,19 @@
 <span class="doccomment">//! # Handshake</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Both the client and the server require a connection to already be in a state</span>
-<span class="doccomment">//! ready to start the HTTP/2.0 handshake. This library does not provide</span>
+<span class="doccomment">//! ready to start the HTTP/2 handshake. This library does not provide</span>
 <span class="doccomment">//! facilities to do this.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! There are three ways to reach an appropriate state to start the HTTP/2.0</span>
+<span class="doccomment">//! There are three ways to reach an appropriate state to start the HTTP/2</span>
 <span class="doccomment">//! handshake.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! * Opening an HTTP/1.1 connection and performing an [upgrade].</span>
 <span class="doccomment">//! * Opening a connection with TLS and use ALPN to negotiate the protocol.</span>
 <span class="doccomment">//! * Open a connection with prior knowledge, i.e. both the client and the</span>
 <span class="doccomment">//!   server assume that the connection is immediately ready to start the</span>
-<span class="doccomment">//!   HTTP/2.0 handshake once opened.</span>
+<span class="doccomment">//!   HTTP/2 handshake once opened.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! Once the connection is ready to start the HTTP/2.0 handshake, it can be</span>
+<span class="doccomment">//! Once the connection is ready to start the HTTP/2 handshake, it can be</span>
 <span class="doccomment">//! passed to [`server::handshake`] or [`client::handshake`]. At this point, the</span>
 <span class="doccomment">//! library will start the handshake process, which consists of:</span>
 <span class="doccomment">//!</span>
@@ -223,10 +223,10 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Flow control</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! [Flow control] is a fundamental feature of HTTP/2.0. The `h2` library</span>
+<span class="doccomment">//! [Flow control] is a fundamental feature of HTTP/2. The `h2` library</span>
 <span class="doccomment">//! exposes flow control to the user.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! An HTTP/2.0 client or server may not send unlimited data to the peer. When a</span>
+<span class="doccomment">//! An HTTP/2 client or server may not send unlimited data to the peer. When a</span>
 <span class="doccomment">//! stream is initiated, both the client and the server are provided with an</span>
 <span class="doccomment">//! initial window size for that stream.  A window size is the number of bytes</span>
 <span class="doccomment">//! the endpoint can send to the peer. At any point in time, the peer may</span>
@@ -241,7 +241,7 @@
 <span class="doccomment">//! Managing flow control for outbound data is done through [`SendStream`]. See</span>
 <span class="doccomment">//! the struct level documentation for those two types for more details.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! [HTTP/2.0]: https://http2.github.io/</span>
+<span class="doccomment">//! [HTTP/2]: https://http2.github.io/</span>
 <span class="doccomment">//! [futures]: https://docs.rs/futures/</span>
 <span class="doccomment">//! [`client`]: client/index.html</span>
 <span class="doccomment">//! [`server`]: server/index.html</span>
@@ -253,7 +253,7 @@
 <span class="doccomment">//! [`server::handshake`]: server/fn.handshake.html</span>
 <span class="doccomment">//! [`client::handshake`]: client/fn.handshake.html</span>
 
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/h2/0.3.6&quot;</span>)]</span>
+<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/h2/0.3.7&quot;</span>)]</span>
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">missing_debug_implementations</span>, <span class="ident">missing_docs</span>)]</span>
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">test</span>, <span class="ident">deny</span>(<span class="ident">warnings</span>))]</span>
 

@@ -142,6 +142,10 @@
 <span id="142">142</span>
 <span id="143">143</span>
 <span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The MongoDB migration connector.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! It is intentionally structured after sql-migration-connector and implements the same</span>
@@ -157,6 +161,8 @@
 <span class="kw">mod</span> <span class="ident">schema_calculator</span>;
 
 <span class="kw">use</span> <span class="ident">client_wrapper::Client</span>;
+<span class="kw">use</span> <span class="ident">datamodel::common::preview_features::PreviewFeature</span>;
+<span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">migration::MongoDbMigration</span>;
 <span class="kw">use</span> <span class="ident">migration_connector</span>::{<span class="ident">ConnectorError</span>, <span class="ident">ConnectorResult</span>, <span class="ident">DiffTarget</span>, <span class="ident">Migration</span>, <span class="ident">MigrationConnector</span>};
 <span class="kw">use</span> <span class="ident">schema::MongoSchema</span>;
@@ -166,12 +172,14 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MongoDbMigrationConnector</span> {
     <span class="ident">connection_string</span>: <span class="ident">String</span>,
     <span class="ident">client</span>: <span class="ident">OnceCell</span><span class="op">&lt;</span><span class="ident">Client</span><span class="op">&gt;</span>,
+    <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">MongoDbMigrationConnector</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">connection_string</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">connection_string</span>: <span class="ident">String</span>, <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">connection_string</span>,
+            <span class="ident">preview_features</span>,
             <span class="ident">client</span>: <span class="ident">OnceCell::new</span>(),
         }
     }
@@ -203,7 +211,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mongodb_schema_from_diff_target</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">target</span>: <span class="ident">DiffTarget</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">MongoSchema</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">target</span> {
             <span class="ident">DiffTarget::Datamodel</span>((<span class="ident">_config</span>, <span class="ident">schema</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">schema_calculator::calculate</span>(<span class="ident">schema</span>)),
-            <span class="ident">DiffTarget::Database</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">client</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">describe</span>().<span class="kw">await</span>,
+            <span class="ident">DiffTarget::Database</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">client</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">describe</span>(<span class="self">self</span>.<span class="ident">preview_features</span>).<span class="kw">await</span>,
             <span class="ident">DiffTarget::Migrations</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">unsupported_command_error</span>()),
             <span class="ident">DiffTarget::Empty</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">MongoSchema::default</span>()),
         }

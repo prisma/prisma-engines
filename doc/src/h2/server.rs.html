@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;h2-0.3.6&#x2F;src&#x2F;server.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>server.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../h2/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;h2-0.3.7&#x2F;src&#x2F;server.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>server.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../h2/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1536,15 +1536,13 @@
 <span id="1536">1536</span>
 <span id="1537">1537</span>
 <span id="1538">1538</span>
-<span id="1539">1539</span>
-<span id="1540">1540</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Server implementation of the HTTP/2.0 protocol.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Server implementation of the HTTP/2 protocol.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Getting started</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! Running an HTTP/2.0 server requires the caller to manage accepting the</span>
+<span class="doccomment">//! Running an HTTP/2 server requires the caller to manage accepting the</span>
 <span class="doccomment">//! connections as well as getting the connections to a state that is ready to</span>
-<span class="doccomment">//! begin the HTTP/2.0 handshake. See [here](../index.html#handshake) for more</span>
+<span class="doccomment">//! begin the HTTP/2 handshake. See [here](../index.html#handshake) for more</span>
 <span class="doccomment">//! details.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! This could be as basic as using Tokio&#39;s [`TcpListener`] to accept</span>
@@ -1552,8 +1550,8 @@
 <span class="doccomment">//! upgrades.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Once a connection is obtained, it is passed to [`handshake`],</span>
-<span class="doccomment">//! which will begin the [HTTP/2.0 handshake]. This returns a future that</span>
-<span class="doccomment">//! completes once the handshake process is performed and HTTP/2.0 streams may</span>
+<span class="doccomment">//! which will begin the [HTTP/2 handshake]. This returns a future that</span>
+<span class="doccomment">//! completes once the handshake process is performed and HTTP/2 streams may</span>
 <span class="doccomment">//! be received.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! [`handshake`] uses default configuration values. There are a number of</span>
@@ -1561,7 +1559,7 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Inbound streams</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! The [`Connection`] instance is used to accept inbound HTTP/2.0 streams. It</span>
+<span class="doccomment">//! The [`Connection`] instance is used to accept inbound HTTP/2 streams. It</span>
 <span class="doccomment">//! does this by implementing [`futures::Stream`]. When a new stream is</span>
 <span class="doccomment">//! received, a call to [`Connection::accept`] will return `(request, response)`.</span>
 <span class="doccomment">//! The `request` handle (of type [`http::Request&lt;RecvStream&gt;`]) contains the</span>
@@ -1599,9 +1597,9 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Example</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! A basic HTTP/2.0 server example that runs over TCP and assumes [prior</span>
+<span class="doccomment">//! A basic HTTP/2 server example that runs over TCP and assumes [prior</span>
 <span class="doccomment">//! knowledge], i.e. both the client and the server assume that the TCP socket</span>
-<span class="doccomment">//! will use the HTTP/2.0 protocol without prior negotiation.</span>
+<span class="doccomment">//! will use the HTTP/2 protocol without prior negotiation.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```no_run</span>
 <span class="doccomment">//! use h2::server;</span>
@@ -1617,9 +1615,9 @@
 <span class="doccomment">//!         if let Ok((socket, _peer_addr)) = listener.accept().await {</span>
 <span class="doccomment">//!             // Spawn a new task to process each connection.</span>
 <span class="doccomment">//!             tokio::spawn(async {</span>
-<span class="doccomment">//!                 // Start the HTTP/2.0 connection handshake</span>
+<span class="doccomment">//!                 // Start the HTTP/2 connection handshake</span>
 <span class="doccomment">//!                 let mut h2 = server::handshake(socket).await.unwrap();</span>
-<span class="doccomment">//!                 // Accept all inbound HTTP/2.0 streams sent over the</span>
+<span class="doccomment">//!                 // Accept all inbound HTTP/2 streams sent over the</span>
 <span class="doccomment">//!                 // connection.</span>
 <span class="doccomment">//!                 while let Some(request) = h2.accept().await {</span>
 <span class="doccomment">//!                     let (request, mut respond) = request.unwrap();</span>
@@ -1644,7 +1642,7 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! [prior knowledge]: http://httpwg.org/specs/rfc7540.html#known-http</span>
 <span class="doccomment">//! [`handshake`]: fn.handshake.html</span>
-<span class="doccomment">//! [HTTP/2.0 handshake]: http://httpwg.org/specs/rfc7540.html#ConnectionHeader</span>
+<span class="doccomment">//! [HTTP/2 handshake]: http://httpwg.org/specs/rfc7540.html#ConnectionHeader</span>
 <span class="doccomment">//! [`Builder`]: struct.Builder.html</span>
 <span class="doccomment">//! [`Connection`]: struct.Connection.html</span>
 <span class="doccomment">//! [`Connection::poll`]: struct.Connection.html#method.poll</span>
@@ -1670,7 +1668,7 @@
 <span class="kw">use</span> <span class="ident">tokio::io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>, <span class="ident">ReadBuf</span>};
 <span class="kw">use</span> <span class="ident">tracing::instrument</span>::{<span class="ident">Instrument</span>, <span class="ident">Instrumented</span>};
 
-<span class="doccomment">/// In progress HTTP/2.0 connection handshake future.</span>
+<span class="doccomment">/// In progress HTTP/2 connection handshake future.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// This type implements `Future`, yielding a `Connection` instance once the</span>
 <span class="doccomment">/// handshake has completed.</span>
@@ -1694,10 +1692,10 @@
     <span class="ident">span</span>: <span class="ident">tracing::Span</span>,
 }
 
-<span class="doccomment">/// Accepts inbound HTTP/2.0 streams on a connection.</span>
+<span class="doccomment">/// Accepts inbound HTTP/2 streams on a connection.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// A `Connection` is backed by an I/O resource (usually a TCP socket) and</span>
-<span class="doccomment">/// implements the HTTP/2.0 server logic for that connection. It is responsible</span>
+<span class="doccomment">/// implements the HTTP/2 server logic for that connection. It is responsible</span>
 <span class="doccomment">/// for receiving inbound streams initiated by the client as well as driving the</span>
 <span class="doccomment">/// internal state forward.</span>
 <span class="doccomment">///</span>
@@ -1742,7 +1740,7 @@
 <span class="doccomment">/// Methods can be chained in order to set the configuration values.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// The server is constructed by calling [`handshake`] and passing the I/O</span>
-<span class="doccomment">/// handle that will back the HTTP/2.0 server.</span>
+<span class="doccomment">/// handle that will back the HTTP/2 server.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// New instances of `Builder` are obtained via [`Builder::new`].</span>
 <span class="doccomment">///</span>
@@ -1761,7 +1759,7 @@
 <span class="doccomment">/// # fn doc&lt;T: AsyncRead + AsyncWrite + Unpin&gt;(my_io: T)</span>
 <span class="doccomment">/// # -&gt; Handshake&lt;T&gt;</span>
 <span class="doccomment">/// # {</span>
-<span class="doccomment">/// // `server_fut` is a future representing the completion of the HTTP/2.0</span>
+<span class="doccomment">/// // `server_fut` is a future representing the completion of the HTTP/2</span>
 <span class="doccomment">/// // handshake.</span>
 <span class="doccomment">/// let server_fut = Builder::new()</span>
 <span class="doccomment">///     .initial_window_size(1_000_000)</span>
@@ -1797,7 +1795,7 @@
 <span class="doccomment">/// stream.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// If the `SendResponse` instance is dropped without sending a response, then</span>
-<span class="doccomment">/// the HTTP/2.0 stream will be reset.</span>
+<span class="doccomment">/// the HTTP/2 stream will be reset.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// See [module] level docs for more details.</span>
 <span class="doccomment">///</span>
@@ -1816,7 +1814,7 @@
 <span class="doccomment">/// It can not be used to initiate push promises.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// If the `SendPushedResponse` instance is dropped without sending a response, then</span>
-<span class="doccomment">/// the HTTP/2.0 stream will be reset.</span>
+<span class="doccomment">/// the HTTP/2 stream will be reset.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// See [module] level docs for more details.</span>
 <span class="doccomment">///</span>
@@ -1858,18 +1856,18 @@
 
 <span class="kw">const</span> <span class="ident">PREFACE</span>: [<span class="ident">u8</span>; <span class="number">24</span>] <span class="op">=</span> <span class="kw-2">*</span><span class="string">b&quot;PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n&quot;</span>;
 
-<span class="doccomment">/// Creates a new configured HTTP/2.0 server with default configuration</span>
+<span class="doccomment">/// Creates a new configured HTTP/2 server with default configuration</span>
 <span class="doccomment">/// values backed by `io`.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// It is expected that `io` already be in an appropriate state to commence</span>
-<span class="doccomment">/// the [HTTP/2.0 handshake]. See [Handshake] for more details.</span>
+<span class="doccomment">/// the [HTTP/2 handshake]. See [Handshake] for more details.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Returns a future which resolves to the [`Connection`] instance once the</span>
-<span class="doccomment">/// HTTP/2.0 handshake has been completed. The returned [`Connection`]</span>
+<span class="doccomment">/// HTTP/2 handshake has been completed. The returned [`Connection`]</span>
 <span class="doccomment">/// instance will be using default configuration values. Use [`Builder`] to</span>
 <span class="doccomment">/// customize the configuration values used by a [`Connection`] instance.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [HTTP/2.0 handshake]: http://httpwg.org/specs/rfc7540.html#ConnectionHeader</span>
+<span class="doccomment">/// [HTTP/2 handshake]: http://httpwg.org/specs/rfc7540.html#ConnectionHeader</span>
 <span class="doccomment">/// [Handshake]: ../index.html#handshake</span>
 <span class="doccomment">/// [`Connection`]: struct.Connection.html</span>
 <span class="doccomment">///</span>
@@ -1883,8 +1881,8 @@
 <span class="doccomment">/// # async fn doc&lt;T: AsyncRead + AsyncWrite + Unpin&gt;(my_io: T)</span>
 <span class="doccomment">/// # {</span>
 <span class="doccomment">/// let connection = server::handshake(my_io).await.unwrap();</span>
-<span class="doccomment">/// // The HTTP/2.0 handshake has completed, now use `connection` to</span>
-<span class="doccomment">/// // accept inbound HTTP/2.0 streams.</span>
+<span class="doccomment">/// // The HTTP/2 handshake has completed, now use `connection` to</span>
+<span class="doccomment">/// // accept inbound HTTP/2 streams.</span>
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// # pub fn main() {}</span>
@@ -2143,7 +2141,7 @@
     <span class="doccomment">/// # fn doc&lt;T: AsyncRead + AsyncWrite + Unpin&gt;(my_io: T)</span>
     <span class="doccomment">/// # -&gt; Handshake&lt;T&gt;</span>
     <span class="doccomment">/// # {</span>
-    <span class="doccomment">/// // `server_fut` is a future representing the completion of the HTTP/2.0</span>
+    <span class="doccomment">/// // `server_fut` is a future representing the completion of the HTTP/2</span>
     <span class="doccomment">/// // handshake.</span>
     <span class="doccomment">/// let server_fut = Builder::new()</span>
     <span class="doccomment">///     .initial_window_size(1_000_000)</span>
@@ -2182,7 +2180,7 @@
     <span class="doccomment">/// # fn doc&lt;T: AsyncRead + AsyncWrite + Unpin&gt;(my_io: T)</span>
     <span class="doccomment">/// # -&gt; Handshake&lt;T&gt;</span>
     <span class="doccomment">/// # {</span>
-    <span class="doccomment">/// // `server_fut` is a future representing the completion of the HTTP/2.0</span>
+    <span class="doccomment">/// // `server_fut` is a future representing the completion of the HTTP/2</span>
     <span class="doccomment">/// // handshake.</span>
     <span class="doccomment">/// let server_fut = Builder::new()</span>
     <span class="doccomment">///     .initial_window_size(1_000_000)</span>
@@ -2216,7 +2214,7 @@
     <span class="doccomment">/// # fn doc&lt;T: AsyncRead + AsyncWrite + Unpin&gt;(my_io: T)</span>
     <span class="doccomment">/// # -&gt; Handshake&lt;T&gt;</span>
     <span class="doccomment">/// # {</span>
-    <span class="doccomment">/// // `server_fut` is a future representing the completion of the HTTP/2.0</span>
+    <span class="doccomment">/// // `server_fut` is a future representing the completion of the HTTP/2</span>
     <span class="doccomment">/// // handshake.</span>
     <span class="doccomment">/// let server_fut = Builder::new()</span>
     <span class="doccomment">///     .initial_connection_window_size(1_000_000)</span>
@@ -2231,7 +2229,7 @@
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Indicates the size (in octets) of the largest HTTP/2.0 frame payload that the</span>
+    <span class="doccomment">/// Indicates the size (in octets) of the largest HTTP/2 frame payload that the</span>
     <span class="doccomment">/// configured server is able to accept.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The sender may send data frames that are **smaller** than this value,</span>
@@ -2249,7 +2247,7 @@
     <span class="doccomment">/// # fn doc&lt;T: AsyncRead + AsyncWrite + Unpin&gt;(my_io: T)</span>
     <span class="doccomment">/// # -&gt; Handshake&lt;T&gt;</span>
     <span class="doccomment">/// # {</span>
-    <span class="doccomment">/// // `server_fut` is a future representing the completion of the HTTP/2.0</span>
+    <span class="doccomment">/// // `server_fut` is a future representing the completion of the HTTP/2</span>
     <span class="doccomment">/// // handshake.</span>
     <span class="doccomment">/// let server_fut = Builder::new()</span>
     <span class="doccomment">///     .max_frame_size(1_000_000)</span>
@@ -2288,7 +2286,7 @@
     <span class="doccomment">/// # fn doc&lt;T: AsyncRead + AsyncWrite + Unpin&gt;(my_io: T)</span>
     <span class="doccomment">/// # -&gt; Handshake&lt;T&gt;</span>
     <span class="doccomment">/// # {</span>
-    <span class="doccomment">/// // `server_fut` is a future representing the completion of the HTTP/2.0</span>
+    <span class="doccomment">/// // `server_fut` is a future representing the completion of the HTTP/2</span>
     <span class="doccomment">/// // handshake.</span>
     <span class="doccomment">/// let server_fut = Builder::new()</span>
     <span class="doccomment">///     .max_header_list_size(16 * 1024)</span>
@@ -2323,7 +2321,7 @@
     <span class="doccomment">/// a protocol level error. Instead, the `h2` library will immediately reset</span>
     <span class="doccomment">/// the stream.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// See [Section 5.1.2] in the HTTP/2.0 spec for more details.</span>
+    <span class="doccomment">/// See [Section 5.1.2] in the HTTP/2 spec for more details.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Section 5.1.2]: https://http2.github.io/http2-spec/#rfc.section.5.1.2</span>
     <span class="doccomment">///</span>
@@ -2336,7 +2334,7 @@
     <span class="doccomment">/// # fn doc&lt;T: AsyncRead + AsyncWrite + Unpin&gt;(my_io: T)</span>
     <span class="doccomment">/// # -&gt; Handshake&lt;T&gt;</span>
     <span class="doccomment">/// # {</span>
-    <span class="doccomment">/// // `server_fut` is a future representing the completion of the HTTP/2.0</span>
+    <span class="doccomment">/// // `server_fut` is a future representing the completion of the HTTP/2</span>
     <span class="doccomment">/// // handshake.</span>
     <span class="doccomment">/// let server_fut = Builder::new()</span>
     <span class="doccomment">///     .max_concurrent_streams(1000)</span>
@@ -2355,7 +2353,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// When a stream is explicitly reset by either calling</span>
     <span class="doccomment">/// [`SendResponse::send_reset`] or by dropping a [`SendResponse`] instance</span>
-    <span class="doccomment">/// before completing the stream, the HTTP/2.0 specification requires that</span>
+    <span class="doccomment">/// before completing the stream, the HTTP/2 specification requires that</span>
     <span class="doccomment">/// any further frames received for that stream must be ignored for &quot;some</span>
     <span class="doccomment">/// time&quot;.</span>
     <span class="doccomment">///</span>
@@ -2382,7 +2380,7 @@
     <span class="doccomment">/// # fn doc&lt;T: AsyncRead + AsyncWrite + Unpin&gt;(my_io: T)</span>
     <span class="doccomment">/// # -&gt; Handshake&lt;T&gt;</span>
     <span class="doccomment">/// # {</span>
-    <span class="doccomment">/// // `server_fut` is a future representing the completion of the HTTP/2.0</span>
+    <span class="doccomment">/// // `server_fut` is a future representing the completion of the HTTP/2</span>
     <span class="doccomment">/// // handshake.</span>
     <span class="doccomment">/// let server_fut = Builder::new()</span>
     <span class="doccomment">///     .max_concurrent_reset_streams(1000)</span>
@@ -2401,7 +2399,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// When a stream is explicitly reset by either calling</span>
     <span class="doccomment">/// [`SendResponse::send_reset`] or by dropping a [`SendResponse`] instance</span>
-    <span class="doccomment">/// before completing the stream, the HTTP/2.0 specification requires that</span>
+    <span class="doccomment">/// before completing the stream, the HTTP/2 specification requires that</span>
     <span class="doccomment">/// any further frames received for that stream must be ignored for &quot;some</span>
     <span class="doccomment">/// time&quot;.</span>
     <span class="doccomment">///</span>
@@ -2429,7 +2427,7 @@
     <span class="doccomment">/// # fn doc&lt;T: AsyncRead + AsyncWrite + Unpin&gt;(my_io: T)</span>
     <span class="doccomment">/// # -&gt; Handshake&lt;T&gt;</span>
     <span class="doccomment">/// # {</span>
-    <span class="doccomment">/// // `server_fut` is a future representing the completion of the HTTP/2.0</span>
+    <span class="doccomment">/// // `server_fut` is a future representing the completion of the HTTP/2</span>
     <span class="doccomment">/// // handshake.</span>
     <span class="doccomment">/// let server_fut = Builder::new()</span>
     <span class="doccomment">///     .reset_stream_duration(Duration::from_secs(10))</span>
@@ -2444,18 +2442,18 @@
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Creates a new configured HTTP/2.0 server backed by `io`.</span>
+    <span class="doccomment">/// Creates a new configured HTTP/2 server backed by `io`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// It is expected that `io` already be in an appropriate state to commence</span>
-    <span class="doccomment">/// the [HTTP/2.0 handshake]. See [Handshake] for more details.</span>
+    <span class="doccomment">/// the [HTTP/2 handshake]. See [Handshake] for more details.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns a future which resolves to the [`Connection`] instance once the</span>
-    <span class="doccomment">/// HTTP/2.0 handshake has been completed.</span>
+    <span class="doccomment">/// HTTP/2 handshake has been completed.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This function also allows the caller to configure the send payload data</span>
     <span class="doccomment">/// type. See [Outbound data type] for more details.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [HTTP/2.0 handshake]: http://httpwg.org/specs/rfc7540.html#ConnectionHeader</span>
+    <span class="doccomment">/// [HTTP/2 handshake]: http://httpwg.org/specs/rfc7540.html#ConnectionHeader</span>
     <span class="doccomment">/// [Handshake]: ../index.html#handshake</span>
     <span class="doccomment">/// [`Connection`]: struct.Connection.html</span>
     <span class="doccomment">/// [Outbound data type]: ../index.html#outbound-data-type.</span>
@@ -2471,7 +2469,7 @@
     <span class="doccomment">/// # fn doc&lt;T: AsyncRead + AsyncWrite + Unpin&gt;(my_io: T)</span>
     <span class="doccomment">/// # -&gt; Handshake&lt;T&gt;</span>
     <span class="doccomment">/// # {</span>
-    <span class="doccomment">/// // `server_fut` is a future representing the completion of the HTTP/2.0</span>
+    <span class="doccomment">/// // `server_fut` is a future representing the completion of the HTTP/2</span>
     <span class="doccomment">/// // handshake.</span>
     <span class="doccomment">/// let server_fut = Builder::new()</span>
     <span class="doccomment">///     .handshake(my_io);</span>
@@ -2491,7 +2489,7 @@
     <span class="doccomment">/// # fn doc&lt;T: AsyncRead + AsyncWrite + Unpin&gt;(my_io: T)</span>
     <span class="doccomment">/// # -&gt; Handshake&lt;T, &amp;&#39;static [u8]&gt;</span>
     <span class="doccomment">/// # {</span>
-    <span class="doccomment">/// // `server_fut` is a future representing the completion of the HTTP/2.0</span>
+    <span class="doccomment">/// // `server_fut` is a future representing the completion of the HTTP/2</span>
     <span class="doccomment">/// // handshake.</span>
     <span class="doccomment">/// let server_fut: Handshake&lt;_, &amp;&#39;static [u8]&gt; = Builder::new()</span>
     <span class="doccomment">///     .handshake(my_io);</span>
@@ -2950,10 +2948,8 @@
             <span class="macro">malformed!</span>(<span class="string">&quot;malformed headers: missing method&quot;</span>);
         }
 
-        <span class="comment">// Specifying :status for a request is a protocol error</span>
         <span class="kw">if</span> <span class="ident">pseudo</span>.<span class="ident">status</span>.<span class="ident">is_some</span>() {
-            <span class="macro">tracing::trace!</span>(<span class="string">&quot;malformed headers: :status field on request; PROTOCOL_ERROR&quot;</span>);
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::library_go_away</span>(<span class="ident">Reason::PROTOCOL_ERROR</span>));
+            <span class="macro">malformed!</span>(<span class="string">&quot;malformed headers: :status field on request&quot;</span>);
         }
 
         <span class="comment">// Convert the URI</span>

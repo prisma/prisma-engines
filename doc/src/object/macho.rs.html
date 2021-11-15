@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;object-0.26.2&#x2F;src&#x2F;macho.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>macho.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../object/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;object-0.24.0&#x2F;src&#x2F;macho.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>macho.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../object/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -3193,65 +3193,6 @@
 <span id="3193">3193</span>
 <span id="3194">3194</span>
 <span id="3195">3195</span>
-<span id="3196">3196</span>
-<span id="3197">3197</span>
-<span id="3198">3198</span>
-<span id="3199">3199</span>
-<span id="3200">3200</span>
-<span id="3201">3201</span>
-<span id="3202">3202</span>
-<span id="3203">3203</span>
-<span id="3204">3204</span>
-<span id="3205">3205</span>
-<span id="3206">3206</span>
-<span id="3207">3207</span>
-<span id="3208">3208</span>
-<span id="3209">3209</span>
-<span id="3210">3210</span>
-<span id="3211">3211</span>
-<span id="3212">3212</span>
-<span id="3213">3213</span>
-<span id="3214">3214</span>
-<span id="3215">3215</span>
-<span id="3216">3216</span>
-<span id="3217">3217</span>
-<span id="3218">3218</span>
-<span id="3219">3219</span>
-<span id="3220">3220</span>
-<span id="3221">3221</span>
-<span id="3222">3222</span>
-<span id="3223">3223</span>
-<span id="3224">3224</span>
-<span id="3225">3225</span>
-<span id="3226">3226</span>
-<span id="3227">3227</span>
-<span id="3228">3228</span>
-<span id="3229">3229</span>
-<span id="3230">3230</span>
-<span id="3231">3231</span>
-<span id="3232">3232</span>
-<span id="3233">3233</span>
-<span id="3234">3234</span>
-<span id="3235">3235</span>
-<span id="3236">3236</span>
-<span id="3237">3237</span>
-<span id="3238">3238</span>
-<span id="3239">3239</span>
-<span id="3240">3240</span>
-<span id="3241">3241</span>
-<span id="3242">3242</span>
-<span id="3243">3243</span>
-<span id="3244">3244</span>
-<span id="3245">3245</span>
-<span id="3246">3246</span>
-<span id="3247">3247</span>
-<span id="3248">3248</span>
-<span id="3249">3249</span>
-<span id="3250">3250</span>
-<span id="3251">3251</span>
-<span id="3252">3252</span>
-<span id="3253">3253</span>
-<span id="3254">3254</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Mach-O definitions.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! These definitions are independent of read/write support, although we do implement</span>
@@ -3535,62 +3476,6 @@
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">VM_PROT_WRITE</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x02</span>;
 <span class="doccomment">/// execute permission</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">VM_PROT_EXECUTE</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x04</span>;
-
-<span class="comment">// Definitions from https://opensource.apple.com/source/dyld/dyld-210.2.3/launch-cache/dyld_cache_format.h.auto.html</span>
-
-<span class="doccomment">/// The dyld cache header, containing only the fields which are present</span>
-<span class="doccomment">/// in all versions of dyld caches (dyld-95.3 and up).</span>
-<span class="doccomment">/// Many more fields exist in later dyld versions, but we currently do</span>
-<span class="doccomment">/// not need to parse those.</span>
-<span class="doccomment">/// Corresponds to struct dyld_cache_header from dyld_cache_format.h.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DyldCacheHeader</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">Endian</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// e.g. &quot;dyld_v0    i386&quot;</span>
-    <span class="kw">pub</span> <span class="ident">magic</span>: [<span class="ident">u8</span>; <span class="number">16</span>],
-    <span class="doccomment">/// file offset to first dyld_cache_mapping_info</span>
-    <span class="kw">pub</span> <span class="ident">mapping_offset</span>: <span class="ident">U32</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// number of dyld_cache_mapping_info entries</span>
-    <span class="kw">pub</span> <span class="ident">mapping_count</span>: <span class="ident">U32</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// file offset to first dyld_cache_image_info</span>
-    <span class="kw">pub</span> <span class="ident">images_offset</span>: <span class="ident">U32</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// number of dyld_cache_image_info entries</span>
-    <span class="kw">pub</span> <span class="ident">images_count</span>: <span class="ident">U32</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// base address of dyld when cache was built</span>
-    <span class="kw">pub</span> <span class="ident">dyld_base_address</span>: <span class="ident">U64</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
-}
-
-<span class="doccomment">/// Corresponds to struct dyld_cache_mapping_info from dyld_cache_format.h.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DyldCacheMappingInfo</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">Endian</span><span class="op">&gt;</span> {
-    <span class="doccomment">///</span>
-    <span class="kw">pub</span> <span class="ident">address</span>: <span class="ident">U64</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
-    <span class="doccomment">///</span>
-    <span class="kw">pub</span> <span class="ident">size</span>: <span class="ident">U64</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
-    <span class="doccomment">///</span>
-    <span class="kw">pub</span> <span class="ident">file_offset</span>: <span class="ident">U64</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
-    <span class="doccomment">///</span>
-    <span class="kw">pub</span> <span class="ident">max_prot</span>: <span class="ident">U32</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
-    <span class="doccomment">///</span>
-    <span class="kw">pub</span> <span class="ident">init_prot</span>: <span class="ident">U32</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
-}
-
-<span class="doccomment">/// Corresponds to struct dyld_cache_image_info from dyld_cache_format.h.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DyldCacheImageInfo</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">Endian</span><span class="op">&gt;</span> {
-    <span class="doccomment">///</span>
-    <span class="kw">pub</span> <span class="ident">address</span>: <span class="ident">U64</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
-    <span class="doccomment">///</span>
-    <span class="kw">pub</span> <span class="ident">mod_time</span>: <span class="ident">U64</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
-    <span class="doccomment">///</span>
-    <span class="kw">pub</span> <span class="ident">inode</span>: <span class="ident">U64</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
-    <span class="doccomment">///</span>
-    <span class="kw">pub</span> <span class="ident">path_file_offset</span>: <span class="ident">U32</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
-    <span class="doccomment">///</span>
-    <span class="kw">pub</span> <span class="ident">pad</span>: <span class="ident">U32</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
-}
 
 <span class="comment">// Definitions from &quot;/usr/include/mach-o/loader.h&quot;.</span>
 
@@ -6450,9 +6335,6 @@ pub struct TlvDescriptor&lt;E: Endian&gt;
 
 <span class="macro">unsafe_impl_pod!</span>(<span class="ident">FatHeader</span>, <span class="ident">FatArch32</span>, <span class="ident">FatArch64</span>,);
 <span class="macro">unsafe_impl_endian_pod!</span>(
-    <span class="ident">DyldCacheHeader</span>,
-    <span class="ident">DyldCacheMappingInfo</span>,
-    <span class="ident">DyldCacheImageInfo</span>,
     <span class="ident">MachHeader32</span>,
     <span class="ident">MachHeader64</span>,
     <span class="ident">LoadCommand</span>,

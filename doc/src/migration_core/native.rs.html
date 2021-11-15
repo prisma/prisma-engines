@@ -167,7 +167,7 @@
             <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">connector</span>))
         }
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mongodb&quot;</span>)]</span>
-        <span class="ident">MONGODB_SOURCE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">MongoDbMigrationConnector::new</span>(<span class="ident">url</span>))),
+        <span class="ident">MONGODB_SOURCE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">MongoDbMigrationConnector::new</span>(<span class="ident">url</span>, <span class="ident">preview_features</span>))),
         <span class="ident">provider</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">CoreError::from_msg</span>(<span class="macro">format!</span>(
             <span class="string">&quot;`{}` is not a supported connector.&quot;</span>,
             <span class="ident">provider</span>

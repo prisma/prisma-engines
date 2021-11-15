@@ -674,6 +674,16 @@
 <span id="674">674</span>
 <span id="675">675</span>
 <span id="676">676</span>
+<span id="677">677</span>
+<span id="678">678</span>
+<span id="679">679</span>
+<span id="680">680</span>
+<span id="681">681</span>
+<span id="682">682</span>
+<span id="683">683</span>
+<span id="684">684</span>
+<span id="685">685</span>
+<span id="686">686</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{
     <span class="ident">common</span>::{<span class="ident">format_hex</span>, <span class="ident">render_nullability</span>, <span class="ident">IteratorJoin</span>, <span class="ident">Quoted</span>, <span class="ident">SQL_INDENTATION</span>},
     <span class="ident">SqlRenderer</span>,
@@ -688,9 +698,9 @@
 <span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
 <span class="kw">use</span> <span class="ident">prisma_value::PrismaValue</span>;
 <span class="kw">use</span> <span class="ident">regex::Regex</span>;
-<span class="kw">use</span> <span class="ident">sql_ddl::postgres</span> <span class="kw">as</span> <span class="ident">ddl</span>;
+<span class="kw">use</span> <span class="ident">sql_ddl</span>::{<span class="ident">postgres</span> <span class="kw">as</span> <span class="ident">ddl</span>, <span class="ident">IndexColumn</span>, <span class="ident">SortOrder</span>};
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{
-    <span class="ident">walkers</span>::<span class="kw-2">*</span>, <span class="ident">ColumnArity</span>, <span class="ident">ColumnTypeFamily</span>, <span class="ident">DefaultKind</span>, <span class="ident">DefaultValue</span>, <span class="ident">ForeignKeyAction</span>, <span class="ident">SqlSchema</span>,
+    <span class="ident">walkers</span>::<span class="kw-2">*</span>, <span class="ident">ColumnArity</span>, <span class="ident">ColumnTypeFamily</span>, <span class="ident">DefaultKind</span>, <span class="ident">DefaultValue</span>, <span class="ident">ForeignKeyAction</span>, <span class="ident">SQLSortOrder</span>, <span class="ident">SqlSchema</span>,
 };
 <span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 
@@ -1034,7 +1044,17 @@
             <span class="ident">index_name</span>: <span class="ident">index</span>.<span class="ident">name</span>().<span class="ident">into</span>(),
             <span class="ident">is_unique</span>: <span class="ident">index</span>.<span class="ident">index_type</span>().<span class="ident">is_unique</span>(),
             <span class="ident">table_reference</span>: <span class="ident">index</span>.<span class="ident">table</span>().<span class="ident">name</span>().<span class="ident">into</span>(),
-            <span class="ident">columns</span>: <span class="ident">index</span>.<span class="ident">columns</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">get</span>().<span class="ident">name</span>().<span class="ident">into</span>()).<span class="ident">collect</span>(),
+            <span class="ident">columns</span>: <span class="ident">index</span>
+                .<span class="ident">columns</span>()
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">IndexColumn</span> {
+                    <span class="ident">name</span>: <span class="ident">c</span>.<span class="ident">as_column</span>().<span class="ident">name</span>().<span class="ident">into</span>(),
+                    <span class="ident">length</span>: <span class="prelude-val">None</span>,
+                    <span class="ident">sort_order</span>: <span class="ident">c</span>.<span class="ident">sort_order</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">so</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">so</span> {
+                        <span class="ident">SQLSortOrder::Asc</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SortOrder::Asc</span>,
+                        <span class="ident">SQLSortOrder::Desc</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SortOrder::Desc</span>,
+                    }),
+                })
+                .<span class="ident">collect</span>(),
         }
         .<span class="ident">to_string</span>()
     }

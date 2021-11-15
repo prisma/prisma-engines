@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["mssql",""],["mysql",""],["postgres",""],["sqlite",""]]});
+initSidebarItems({"enum":[["SortOrder",""]],"mod":[["mssql",""],["mysql",""],["postgres",""],["sqlite",""]],"struct":[["IndexColumn",""]]});
