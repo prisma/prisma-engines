@@ -138,7 +138,16 @@ impl SqlRenderer for MssqlFlavour {
         let index_name = self.quote(index.name());
         let table_reference = self.quote_with_schema(index.table().name()).to_string();
 
-        let columns = index.columns().map(|c| self.quote(c.get().name()));
+        let columns = index.columns().map(|c| {
+            let mut rendered = format!("{}", self.quote(c.get().name()));
+
+            if let Some(sort_order) = c.sort_order() {
+                rendered.push(' ');
+                rendered.push_str(sort_order.as_ref());
+            }
+
+            rendered
+        });
 
         format!(
             "CREATE {index_type}INDEX {index_name} ON {table_reference}({columns})",
@@ -156,7 +165,20 @@ impl SqlRenderer for MssqlFlavour {
             .join(",\n    ");
 
         let primary_key = if let Some(pk) = table.primary_key() {
-            let column_names = pk.columns.iter().map(|col| self.quote(col.name())).join(",");
+            let column_names = pk
+                .columns
+                .iter()
+                .map(|col| {
+                    let mut rendered = format!("{}", self.quote(col.name()));
+
+                    if let Some(sort_order) = col.sort_order {
+                        rendered.push(' ');
+                        rendered.push_str(sort_order.as_ref());
+                    }
+
+                    rendered
+                })
+                .join(",");
 
             format!(
                 ",\n    CONSTRAINT {} PRIMARY KEY ({})",
@@ -176,7 +198,16 @@ impl SqlRenderer for MssqlFlavour {
             let constraints = constraints
                 .iter()
                 .map(|index| {
-                    let columns = index.columns().map(|col| self.quote(col.get().name()));
+                    let columns = index.columns().map(|col| {
+                        let mut rendered = format!("{}", self.quote(col.get().name()));
+
+                        if let Some(sort_order) = col.sort_order() {
+                            rendered.push(' ');
+                            rendered.push_str(sort_order.as_ref());
+                        }
+
+                        rendered
+                    });
 
                     format!("CONSTRAINT {} UNIQUE ({})", self.quote(index.name()), columns.join(","))
                 })

@@ -1,4 +1,6 @@
+use indoc::{formatdoc, indoc};
 use migration_engine_tests::test_api::*;
+use sql_schema_describer::SQLSortOrder;
 
 #[test_connector(preview_features("referentialIntegrity"))]
 fn index_on_compound_relation_fields_must_work(api: TestApi) {
@@ -532,4 +534,373 @@ fn column_type_migrations_should_not_implicitly_drop_compound_indexes(api: TestA
         cat.assert_indexes_count(1)
             .assert_index_on_columns(&["name", "age"], |idx| idx.assert_is_not_unique())
     });
+}
+
+#[test_connector(tags(Mysql8), preview_features("extendedIndexes"))]
+fn length_prefixed_index(api: TestApi) {
+    let dm = formatdoc! {r#"
+        {}
+
+        generator client {{
+            provider = "prisma-client-js"
+            previewFeatures = ["extendedIndexes"]
+        }}
+
+        model A {{
+          id Int    @id
+          a  String @db.Text
+          b  String @db.Text
+
+          @@index([a(length: 30), b(length: 20)])
+        }}
+    "#, api.datasource_block()};
+
+    api.schema_push(&dm).send().assert_green();
+
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_index_on_columns(&["a", "b"], |index| {
+            index
+                .assert_is_not_unique()
+                .assert_column("a", |attrs| attrs.assert_length_prefix(30))
+                .assert_column("b", |attrs| attrs.assert_length_prefix(20))
+        })
+    });
+}
+
+#[test_connector(tags(Mysql8), preview_features("extendedIndexes"))]
+fn length_prefixed_unique(api: TestApi) {
+    let dm = formatdoc! {r#"
+        {}
+
+        generator client {{
+            provider = "prisma-client-js"
+            previewFeatures = ["extendedIndexes"]
+        }}
+
+        model A {{
+          id Int    @id
+          a  String @db.Text
+          b  String @db.Text
+
+          @@unique([a(length: 30), b(length: 20)])
+        }}
+    "#, api.datasource_block()};
+
+    api.schema_push(&dm).send().assert_green();
+
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_index_on_columns(&["a", "b"], |index| {
+            index
+                .assert_is_unique()
+                .assert_column("a", |attrs| attrs.assert_length_prefix(30))
+                .assert_column("b", |attrs| attrs.assert_length_prefix(20))
+        })
+    });
+}
+
+#[test_connector(tags(Mysql8), preview_features("extendedIndexes"))]
+fn removal_length_prefix_unique(api: TestApi) {
+    let dm = formatdoc! {r#"
+        {}
+
+        generator client {{
+            provider = "prisma-client-js"
+            previewFeatures = ["extendedIndexes"]
+        }}
+
+        model A {{
+          id Int    @id
+          a  String @db.VarChar(255)
+          b  String @db.VarChar(255)
+
+          @@unique([a(length: 30), b(length: 20)])
+        }}
+    "#, api.datasource_block()};
+
+    api.schema_push(&dm).send().assert_green();
+
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_index_on_columns(&["a", "b"], |index| {
+            index
+                .assert_is_unique()
+                .assert_column("a", |attrs| attrs.assert_length_prefix(30))
+                .assert_column("b", |attrs| attrs.assert_length_prefix(20))
+        })
+    });
+
+    let dm = formatdoc! {r#"
+        {}
+
+        generator client {{
+            provider = "prisma-client-js"
+            previewFeatures = ["extendedIndexes"]
+        }}
+
+        model A {{
+          id Int    @id
+          a  String @db.VarChar(255)
+          b  String @db.VarChar(255)
+
+          @@unique([a, b])
+        }}
+    "#, api.datasource_block()};
+
+    api.schema_push(&dm).force(true).send().assert_warnings(&[
+        "A unique constraint covering the columns `[a,b]` on the table `A` will be added. If there are existing duplicate values, this will fail.".into()
+    ]);
+
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_index_on_columns(&["a", "b"], |index| {
+            index
+                .assert_is_unique()
+                .assert_column("a", |attrs| attrs.assert_no_length_prefix())
+                .assert_column("b", |attrs| attrs.assert_no_length_prefix())
+        })
+    });
+}
+
+#[test_connector(tags(Mysql8), preview_features("extendedIndexes"))]
+fn removal_length_prefix_index(api: TestApi) {
+    let dm = formatdoc! {r#"
+        {}
+
+        generator client {{
+            provider = "prisma-client-js"
+            previewFeatures = ["extendedIndexes"]
+        }}
+
+        model A {{
+          id Int    @id
+          a  String @db.VarChar(255)
+          b  String @db.VarChar(255)
+
+          @@index([a(length: 30), b(length: 20)])
+        }}
+    "#, api.datasource_block()};
+
+    api.schema_push(&dm).send().assert_green();
+
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_index_on_columns(&["a", "b"], |index| {
+            index
+                .assert_is_not_unique()
+                .assert_column("a", |attrs| attrs.assert_length_prefix(30))
+                .assert_column("b", |attrs| attrs.assert_length_prefix(20))
+        })
+    });
+
+    let dm = formatdoc! {r#"
+        {}
+
+        generator client {{
+            provider = "prisma-client-js"
+            previewFeatures = ["extendedIndexes"]
+        }}
+
+        model A {{
+          id Int    @id
+          a  String @db.VarChar(255)
+          b  String @db.VarChar(255)
+
+          @@index([a, b])
+        }}
+    "#, api.datasource_block()};
+
+    api.schema_push(&dm).send().assert_green();
+
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_index_on_columns(&["a", "b"], |index| {
+            index
+                .assert_is_not_unique()
+                .assert_column("a", |attrs| attrs.assert_no_length_prefix())
+                .assert_column("b", |attrs| attrs.assert_no_length_prefix())
+        })
+    });
+}
+
+#[test_connector(exclude(Mysql56, Mysql57, Mariadb), preview_features("extendedIndexes"))]
+fn descending_compound_index(api: TestApi) {
+    let dm = formatdoc! {r#"
+        {}
+
+        generator client {{
+            provider = "prisma-client-js"
+            previewFeatures = ["extendedIndexes"]
+        }}
+
+        model A {{
+          id Int    @id
+          a  Int
+          b  Int
+
+          @@index([a, b(sort: Desc)])
+        }}
+    "#, api.datasource_block()};
+
+    api.schema_push(&dm).send().assert_green();
+
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_index_on_columns(&["a", "b"], |index| {
+            index
+                .assert_is_not_unique()
+                .assert_column("a", |attrs| attrs.assert_sort_order(SQLSortOrder::Asc))
+                .assert_column("b", |attrs| attrs.assert_sort_order(SQLSortOrder::Desc))
+        })
+    });
+}
+
+#[test_connector(exclude(Mysql56, Mysql57, Mariadb), preview_features("extendedIndexes"))]
+fn descending_compound_unique(api: TestApi) {
+    let dm = formatdoc! {r#"
+        {}
+
+        generator client {{
+            provider = "prisma-client-js"
+            previewFeatures = ["extendedIndexes"]
+        }}
+
+        model A {{
+          id Int    @id
+          a  Int
+          b  Int
+
+          @@unique([a, b(sort: Desc)])
+        }}
+    "#, api.datasource_block()};
+
+    api.schema_push(&dm).send().assert_green();
+
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_index_on_columns(&["a", "b"], |index| {
+            index
+                .assert_is_unique()
+                .assert_column("a", |attrs| attrs.assert_sort_order(SQLSortOrder::Asc))
+                .assert_column("b", |attrs| attrs.assert_sort_order(SQLSortOrder::Desc))
+        })
+    });
+}
+
+#[test_connector(exclude(Mysql56, Mysql57, Mariadb), preview_features("extendedIndexes"))]
+fn descending_unique(api: TestApi) {
+    let dm = formatdoc! {r#"
+        {}
+
+        generator client {{
+            provider = "prisma-client-js"
+            previewFeatures = ["extendedIndexes"]
+        }}
+
+        model A {{
+          id Int @id
+          a  Int @unique(sort: Desc)
+        }}
+    "#, api.datasource_block()};
+
+    api.schema_push(&dm).send().assert_green();
+
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_index_on_columns(&["a"], |index| {
+            index
+                .assert_is_unique()
+                .assert_column("a", |attrs| attrs.assert_sort_order(SQLSortOrder::Desc))
+        })
+    });
+}
+
+#[test_connector(exclude(Mysql56, Mysql57, Mariadb), preview_features("extendedIndexes"))]
+fn removal_descending_unique(api: TestApi) {
+    let dm = formatdoc! {r#"
+        {}
+
+        generator client {{
+            provider = "prisma-client-js"
+            previewFeatures = ["extendedIndexes"]
+        }}
+
+        model A {{
+          id Int @id
+          a  Int @unique(sort: Desc)
+        }}
+    "#, api.datasource_block()};
+
+    api.schema_push(&dm).send().assert_green();
+
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_index_on_columns(&["a"], |index| {
+            index
+                .assert_is_unique()
+                .assert_column("a", |attrs| attrs.assert_sort_order(SQLSortOrder::Desc))
+        })
+    });
+
+    let dm = formatdoc! {r#"
+        {}
+
+        generator client {{
+            provider = "prisma-client-js"
+            previewFeatures = ["extendedIndexes"]
+        }}
+
+        model A {{
+          id Int @id
+          a  Int @unique
+        }}
+    "#, api.datasource_block()};
+
+    api.schema_push(dm)
+        .force(true)
+        .send()
+        .assert_warnings(&["A unique constraint covering the columns `[a]` on the table `A` will be added. If there are existing duplicate values, this will fail.".into()]);
+
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_index_on_columns(&["a"], |index| {
+            index
+                .assert_is_unique()
+                .assert_column("a", |attrs| attrs.assert_sort_order(SQLSortOrder::Asc))
+        })
+    });
+}
+
+#[test_connector(tags(Mysql8))]
+fn removal_descending_unique_should_not_happen_without_preview_feature(api: TestApi) {
+    let sql = indoc! {r#"
+        CREATE TABLE `A` (
+            id INT PRIMARY KEY,
+            a INT NOT NULL,
+            CONSTRAINT A_a_key UNIQUE (a DESC)
+        )
+    "#};
+
+    api.raw_cmd(sql);
+
+    let dm = indoc! {r#"
+        model A {
+          id Int @id
+          a  Int @unique
+        }
+    "#};
+
+    api.schema_push_w_datasource(dm).send().assert_no_steps();
+}
+
+#[test_connector(tags(Mysql8))]
+fn removal_index_length_prefix_should_not_happen_without_preview_feature(api: TestApi) {
+    let sql = indoc! {r#"
+        CREATE TABLE `A` (
+            id INT PRIMARY KEY,
+            a VARCHAR(255) NOT NULL,
+            CONSTRAINT A_a_key UNIQUE (a(30))
+        )
+    "#};
+
+    api.raw_cmd(sql);
+
+    let dm = indoc! {r#"
+        model A {
+          id Int    @id
+          a  String @unique @db.VarChar(255)
+        }
+    "#};
+
+    api.schema_push_w_datasource(dm).send().assert_no_steps();
 }

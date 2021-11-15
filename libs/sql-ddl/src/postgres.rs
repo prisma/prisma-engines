@@ -1,4 +1,4 @@
-use crate::common::IteratorJoin;
+use crate::common::{IndexColumn, IteratorJoin};
 use std::{borrow::Cow, fmt::Display};
 
 #[derive(Debug, Default)]
@@ -322,7 +322,7 @@ pub struct CreateIndex<'a> {
     pub index_name: PostgresIdentifier<'a>,
     pub is_unique: bool,
     pub table_reference: PostgresIdentifier<'a>,
-    pub columns: Vec<Cow<'a, str>>,
+    pub columns: Vec<IndexColumn<'a>>,
 }
 
 impl<'a> Display for CreateIndex<'a> {
@@ -335,7 +335,19 @@ impl<'a> Display for CreateIndex<'a> {
             table_reference = self.table_reference,
         )?;
 
-        self.columns.iter().map(|s| Ident(s)).join(", ", f)?;
+        self.columns
+            .iter()
+            .map(|c| {
+                let mut rendered = Ident(&c.name).to_string();
+
+                if let Some(sort_order) = c.sort_order {
+                    rendered.push(' ');
+                    rendered.push_str(sort_order.as_ref());
+                }
+
+                rendered
+            })
+            .join(", ", f)?;
 
         f.write_str(")")
     }
@@ -343,6 +355,8 @@ impl<'a> Display for CreateIndex<'a> {
 
 #[cfg(test)]
 mod tests {
+    use crate::SortOrder;
+
     use super::*;
 
     #[test]
@@ -371,7 +385,7 @@ mod tests {
 
     #[test]
     fn create_unique_index() {
-        let columns = vec!["name".into(), "age".into()];
+        let columns = vec![IndexColumn::new("name"), IndexColumn::new("age")];
 
         let create_index = CreateIndex {
             is_unique: true,
@@ -383,6 +397,34 @@ mod tests {
         assert_eq!(
             create_index.to_string(),
             "CREATE UNIQUE INDEX \"meow_idx\" ON \"Cat\"(\"name\", \"age\")"
+        )
+    }
+
+    #[test]
+    fn create_unique_index_sort_order() {
+        let columns = vec![
+            IndexColumn {
+                name: "name".into(),
+                sort_order: Some(SortOrder::Asc),
+                ..Default::default()
+            },
+            IndexColumn {
+                name: "age".into(),
+                sort_order: Some(SortOrder::Desc),
+                ..Default::default()
+            },
+        ];
+
+        let create_index = CreateIndex {
+            is_unique: true,
+            index_name: "meow_idx".into(),
+            table_reference: "Cat".into(),
+            columns,
+        };
+
+        assert_eq!(
+            create_index.to_string(),
+            "CREATE UNIQUE INDEX \"meow_idx\" ON \"Cat\"(\"name\" ASC, \"age\" DESC)"
         )
     }
 

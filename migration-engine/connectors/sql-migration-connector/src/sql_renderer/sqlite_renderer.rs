@@ -28,7 +28,17 @@ impl SqlRenderer for SqliteFlavour {
         };
         let index_name = self.quote(index.name());
         let table_reference = self.quote(index.table().name());
-        let columns = index.columns().map(|c| self.quote(c.get().name()));
+
+        let columns = index.columns().map(|c| {
+            let mut rendered = format!("{}", self.quote(c.get().name()));
+
+            if let Some(sort_order) = c.sort_order() {
+                rendered.push(' ');
+                rendered.push_str(sort_order.as_ref());
+            }
+
+            rendered
+        });
 
         let index_create = format!(
             "CREATE {index_type}INDEX {index_name} ON {table_reference}({columns})",

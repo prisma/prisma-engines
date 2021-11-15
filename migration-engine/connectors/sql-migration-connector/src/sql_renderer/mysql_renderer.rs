@@ -9,12 +9,12 @@ use native_types::MySqlType;
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
-use sql_ddl::mysql as ddl;
+use sql_ddl::{mysql as ddl, IndexColumn, SortOrder};
 use sql_schema_describer::{
     walkers::{
         ColumnWalker, EnumWalker, ForeignKeyWalker, IndexWalker, TableWalker, UserDefinedTypeWalker, ViewWalker,
     },
-    ColumnTypeFamily, DefaultKind, DefaultValue, ForeignKeyAction, SqlSchema,
+    ColumnTypeFamily, DefaultKind, DefaultValue, ForeignKeyAction, SQLSortOrder, SqlSchema,
 };
 use std::borrow::Cow;
 
@@ -117,10 +117,21 @@ impl SqlRenderer for MysqlFlavour {
                     "ADD PRIMARY KEY ({})",
                     tables
                         .next()
-                        .primary_key_column_names()
-                        .iter()
-                        .flat_map(|c| c.iter())
-                        .map(|colname| self.quote(colname))
+                        .primary_key_columns()
+                        .map(|c| {
+                            let mut rendered = format!("{}", self.quote(c.as_column().name()));
+
+                            if let Some(length) = c.length() {
+                                rendered.push_str(&format!("({})", length));
+                            }
+
+                            if let Some(sort_order) = c.sort_order() {
+                                rendered.push(' ');
+                                rendered.push_str(sort_order.as_ref());
+                            }
+
+                            rendered
+                        })
                         .join(", ")
                 )),
                 TableChange::AddColumn { column_id } => {
@@ -184,7 +195,17 @@ impl SqlRenderer for MysqlFlavour {
             index_name: index.name().into(),
             on: (
                 index.table().name().into(),
-                index.columns().map(|c| c.get().name().into()).collect(),
+                index
+                    .columns()
+                    .map(|c| IndexColumn {
+                        name: c.get().name().into(),
+                        length: c.length(),
+                        sort_order: c.sort_order().map(|so| match so {
+                            SQLSortOrder::Asc => SortOrder::Asc,
+                            SQLSortOrder::Desc => SortOrder::Desc,
+                        }),
+                    })
+                    .collect(),
             ),
         }
         .to_string()
@@ -199,14 +220,29 @@ impl SqlRenderer for MysqlFlavour {
                 .map(move |index| ddl::IndexClause {
                     index_name: Some(Cow::from(index.name())),
                     unique: index.index_type().is_unique(),
-                    columns: index.column_names().map(ToString::to_string).map(Cow::from).collect(),
+                    columns: index
+                        .columns()
+                        .map(|c| IndexColumn {
+                            name: c.get().name().into(),
+                            length: c.length(),
+                            sort_order: c.sort_order().map(|so| match so {
+                                SQLSortOrder::Asc => SortOrder::Asc,
+                                SQLSortOrder::Desc => SortOrder::Desc,
+                            }),
+                        })
+                        .collect(),
                 })
                 .collect(),
             primary_key: table
-                .primary_key_column_names()
-                .unwrap_or_default()
-                .iter()
-                .map(|s| Cow::Borrowed(s.as_str()))
+                .primary_key_columns()
+                .map(|c| IndexColumn {
+                    name: c.as_column().name().into(),
+                    length: c.length(),
+                    sort_order: c.sort_order().map(|so| match so {
+                        SQLSortOrder::Asc => SortOrder::Asc,
+                        SQLSortOrder::Desc => SortOrder::Desc,
+                    }),
+                })
                 .collect(),
             default_character_set: Some("utf8mb4".into()),
             collate: Some("utf8mb4_unicode_ci".into()),
