@@ -1,3 +1,4 @@
+mod cockroachdb;
 mod mongodb;
 mod mysql;
 mod postgres;
