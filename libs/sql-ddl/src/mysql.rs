@@ -197,7 +197,7 @@ impl Display for CreateIndex<'_> {
             .1
             .iter()
             .map(|s| {
-                let mut rendered = format!("{}", Ident(&s.name));
+                let mut rendered = Ident(&s.name).to_string();
 
                 if let Some(length) = s.length {
                     rendered.push_str(&format!("({})", length));

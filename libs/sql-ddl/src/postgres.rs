@@ -338,7 +338,7 @@ impl<'a> Display for CreateIndex<'a> {
         self.columns
             .iter()
             .map(|c| {
-                let mut rendered = format!("{}", Ident(&c.name));
+                let mut rendered = Ident(&c.name).to_string();
 
                 if let Some(sort_order) = c.sort_order {
                     rendered.push(' ');

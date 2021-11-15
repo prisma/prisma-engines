@@ -34,11 +34,7 @@ impl SqlRenderer for SqliteFlavour {
 
             if let Some(sort_order) = c.sort_order() {
                 rendered.push(' ');
-
-                match sort_order {
-                    SQLSortOrder::Asc => rendered.push_str("ASC"),
-                    SQLSortOrder::Desc => rendered.push_str("DESC"),
-                }
+                rendered.push_str(sort_order.as_ref());
             }
 
             rendered

@@ -1,4 +1,4 @@
-use indoc::formatdoc;
+use indoc::{formatdoc, indoc};
 use migration_engine_tests::test_api::*;
 use sql_schema_describer::SQLSortOrder;
 
@@ -859,4 +859,48 @@ fn removal_descending_unique(api: TestApi) {
                 .assert_column("a", |attrs| attrs.assert_sort_order(SQLSortOrder::Asc))
         })
     });
+}
+
+#[test_connector(tags(Mysql8))]
+fn removal_descending_unique_should_not_happen_without_preview_feature(api: TestApi) {
+    let sql = indoc! {r#"
+        CREATE TABLE `A` (
+            id INT PRIMARY KEY,
+            a INT NOT NULL,
+            CONSTRAINT A_a_key UNIQUE (a DESC)
+        )
+    "#};
+
+    api.raw_cmd(sql);
+
+    let dm = indoc! {r#"
+        model A {
+          id Int @id
+          a  Int @unique
+        }
+    "#};
+
+    api.schema_push_w_datasource(dm).send().assert_no_steps();
+}
+
+#[test_connector(tags(Mysql8))]
+fn removal_index_length_prefix_should_not_happen_without_preview_feature(api: TestApi) {
+    let sql = indoc! {r#"
+        CREATE TABLE `A` (
+            id INT PRIMARY KEY,
+            a VARCHAR(255) NOT NULL,
+            CONSTRAINT A_a_key UNIQUE (a(30))
+        )
+    "#};
+
+    api.raw_cmd(sql);
+
+    let dm = indoc! {r#"
+        model A {
+          id Int    @id
+          a  String @unique @db.VarChar(255)
+        }
+    "#};
+
+    api.schema_push_w_datasource(dm).send().assert_no_steps();
 }

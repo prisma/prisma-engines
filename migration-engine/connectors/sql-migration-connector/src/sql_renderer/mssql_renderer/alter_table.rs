@@ -8,7 +8,6 @@ use crate::{
     sql_renderer::{common::IteratorJoin, SqlRenderer},
     sql_schema_differ::ColumnChanges,
 };
-use sql_schema_describer::SQLSortOrder;
 use sql_schema_describer::{
     walkers::{ColumnWalker, TableWalker},
     ColumnId, DefaultValue,
@@ -177,10 +176,9 @@ impl<'a> AlterTableConstructor<'a> {
         for column in columns {
             let mut rendered = format!("{}", self.renderer.quote(column.as_column().name()));
 
-            match column.sort_order() {
-                Some(SQLSortOrder::Asc) => rendered.push_str(" ASC"),
-                Some(SQLSortOrder::Desc) => rendered.push_str(" DESC"),
-                None => (),
+            if let Some(sort_order) = column.sort_order() {
+                rendered.push(' ');
+                rendered.push_str(sort_order.as_ref());
             }
 
             quoted_columns.push(rendered);

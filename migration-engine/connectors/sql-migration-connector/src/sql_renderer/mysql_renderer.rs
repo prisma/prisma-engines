@@ -125,10 +125,9 @@ impl SqlRenderer for MysqlFlavour {
                                 rendered.push_str(&format!("({})", length));
                             }
 
-                            match c.sort_order() {
-                                Some(SQLSortOrder::Asc) => rendered.push_str(" ASC"),
-                                Some(SQLSortOrder::Desc) => rendered.push_str(" DESC"),
-                                None => (),
+                            if let Some(sort_order) = c.sort_order() {
+                                rendered.push(' ');
+                                rendered.push_str(sort_order.as_ref());
                             }
 
                             rendered

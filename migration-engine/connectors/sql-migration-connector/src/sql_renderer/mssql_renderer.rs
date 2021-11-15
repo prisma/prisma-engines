@@ -16,7 +16,7 @@ use sql_schema_describer::{
     walkers::{
         ColumnWalker, EnumWalker, ForeignKeyWalker, IndexWalker, TableWalker, UserDefinedTypeWalker, ViewWalker,
     },
-    ColumnTypeFamily, DefaultKind, DefaultValue, IndexType, SQLSortOrder, SqlSchema,
+    ColumnTypeFamily, DefaultKind, DefaultValue, IndexType, SqlSchema,
 };
 use std::{
     borrow::Cow,
@@ -141,10 +141,9 @@ impl SqlRenderer for MssqlFlavour {
         let columns = index.columns().map(|c| {
             let mut rendered = format!("{}", self.quote(c.get().name()));
 
-            match c.sort_order() {
-                Some(SQLSortOrder::Asc) => rendered.push_str(" ASC"),
-                Some(SQLSortOrder::Desc) => rendered.push_str(" DESC"),
-                None => (),
+            if let Some(sort_order) = c.sort_order() {
+                rendered.push(' ');
+                rendered.push_str(sort_order.as_ref());
             }
 
             rendered
@@ -174,11 +173,7 @@ impl SqlRenderer for MssqlFlavour {
 
                     if let Some(sort_order) = col.sort_order {
                         rendered.push(' ');
-
-                        match sort_order {
-                            SQLSortOrder::Asc => rendered.push_str("ASC"),
-                            SQLSortOrder::Desc => rendered.push_str("DESC"),
-                        }
+                        rendered.push_str(sort_order.as_ref());
                     }
 
                     rendered
@@ -206,10 +201,9 @@ impl SqlRenderer for MssqlFlavour {
                     let columns = index.columns().map(|col| {
                         let mut rendered = format!("{}", self.quote(col.get().name()));
 
-                        match col.sort_order() {
-                            Some(SQLSortOrder::Asc) => rendered.push_str(" ASC"),
-                            Some(SQLSortOrder::Desc) => rendered.push_str(" DESC"),
-                            None => (),
+                        if let Some(sort_order) = col.sort_order() {
+                            rendered.push(' ');
+                            rendered.push_str(sort_order.as_ref());
                         }
 
                         rendered

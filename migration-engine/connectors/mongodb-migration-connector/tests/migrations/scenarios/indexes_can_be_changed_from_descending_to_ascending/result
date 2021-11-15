@@ -1,0 +1,36 @@
+[-] Index `UserExistingIndex`
+[+] Index `User_firstName_lastName_age_idx` on ({"firstName":1,"lastName":1,"age":-1})
+
+------
+
+{
+  "collections": {
+    "User": {
+      "indexes": [
+        {
+          "name": "_id_",
+          "is_unique": false,
+          "keys": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "User_firstName_lastName_age_idx",
+          "is_unique": false,
+          "keys": {
+            "firstName": 1,
+            "lastName": 1,
+            "age": -1
+          }
+        }
+      ],
+      "documents": [
+        {
+          "_id": 1,
+          "age": 52,
+          "firstName": "George"
+        }
+      ]
+    }
+  }
+}

@@ -18,7 +18,7 @@ use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
-use std::fmt::Debug;
+use std::fmt::{self, Debug};
 use walkers::{EnumWalker, TableWalker, UserDefinedTypeWalker, ViewWalker};
 
 pub use error::{DescriberError, DescriberErrorKind, DescriberResult};
@@ -244,6 +244,21 @@ impl IndexType {
 pub enum SQLSortOrder {
     Asc,
     Desc,
+}
+
+impl AsRef<str> for SQLSortOrder {
+    fn as_ref(&self) -> &str {
+        match self {
+            SQLSortOrder::Asc => "ASC",
+            SQLSortOrder::Desc => "DESC",
+        }
+    }
+}
+
+impl fmt::Display for SQLSortOrder {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_ref())
+    }
 }
 
 #[derive(Default, Serialize, Deserialize, PartialEq, Debug, Clone)]

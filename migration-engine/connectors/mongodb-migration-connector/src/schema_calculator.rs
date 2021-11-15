@@ -1,10 +1,9 @@
 use crate::schema::MongoSchema;
-use datamodel::{common::preview_features::PreviewFeature, Datamodel};
-use enumflags2::BitFlags;
+use datamodel::Datamodel;
 use mongodb::bson::{Bson, Document};
 
 /// Datamodel -> MongoSchema
-pub(crate) fn calculate(datamodel: &Datamodel, preview_features: BitFlags<PreviewFeature>) -> MongoSchema {
+pub(crate) fn calculate(datamodel: &Datamodel) -> MongoSchema {
     let mut schema = MongoSchema::default();
 
     for model in datamodel.models() {
@@ -24,7 +23,6 @@ pub(crate) fn calculate(datamodel: &Datamodel, preview_features: BitFlags<Previe
                     (
                         name.to_owned(),
                         match sort_order {
-                            _ if !preview_features.contains(PreviewFeature::ExtendedIndexes) => Bson::Int32(1),
                             datamodel::SortOrder::Asc => Bson::Int32(1),
                             datamodel::SortOrder::Desc => Bson::Int32(-1),
                         },

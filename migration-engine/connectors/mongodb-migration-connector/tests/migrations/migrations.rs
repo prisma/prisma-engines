@@ -27,6 +27,7 @@ macro_rules! scenarios {
 scenarios! {
   indexes_can_be_created
   indexes_can_be_created_descending
+  indexes_can_be_changed_from_descending_to_ascending
   index_sort_order_doesnt_count_without_preview_feature
   indexes_can_be_dropped
   indexes_can_be_renamed
