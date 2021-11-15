@@ -1,6 +1,9 @@
-use super::{column, table::TableDiffer};
+use super::{column, enums::EnumDiffer, table::TableDiffer};
 use crate::{flavour::SqlFlavour, pair::Pair};
-use sql_schema_describer::{walkers::ColumnWalker, ColumnId, SqlSchema, TableId};
+use sql_schema_describer::{
+    walkers::{ColumnWalker, EnumWalker, SqlSchemaExt, TableWalker},
+    ColumnId, SqlSchema, TableId,
+};
 use std::{
     borrow::Cow,
     collections::{BTreeMap, BTreeSet, HashMap},
@@ -118,11 +121,12 @@ impl<'a> DifferDatabase<'a> {
             .filter_map(|(_k, v)| *v.next())
     }
 
-    pub(crate) fn created_tables(&self) -> impl Iterator<Item = TableId> + '_ {
+    pub(crate) fn created_tables(&self) -> impl Iterator<Item = TableWalker<'_>> + '_ {
         self.tables
             .values()
             .filter(|p| p.previous().is_none())
             .filter_map(|p| *p.next())
+            .map(move |table_id| self.schemas.next().table_walker_at(table_id))
     }
 
     pub(crate) fn dropped_columns(&self, table: Pair<TableId>) -> impl Iterator<Item = ColumnId> + '_ {
@@ -131,11 +135,12 @@ impl<'a> DifferDatabase<'a> {
             .filter_map(|(_k, v)| *v.previous())
     }
 
-    pub(crate) fn dropped_tables(&self) -> impl Iterator<Item = TableId> + '_ {
+    pub(crate) fn dropped_tables(&self) -> impl Iterator<Item = TableWalker<'a>> + '_ {
         self.tables
             .values()
             .filter(|p| p.next().is_none())
             .filter_map(|p| *p.previous())
+            .map(move |table_id| self.schemas.previous.table_walker_at(table_id))
     }
 
     fn range_columns(
@@ -171,4 +176,40 @@ impl<'a> DifferDatabase<'a> {
             .map(|ids| self.tables_to_redefine.contains(&ids))
             .unwrap_or(false)
     }
+
+    pub(crate) fn enum_pairs(&self) -> impl Iterator<Item = EnumDiffer<'_>> {
+        self.previous_enums().filter_map(move |previous| {
+            self.next_enums()
+                .find(|next| enums_match(&previous, next))
+                .map(|next| EnumDiffer {
+                    enums: Pair::new(previous, next),
+                })
+        })
+    }
+
+    pub(crate) fn created_enums<'db>(&'db self) -> impl Iterator<Item = EnumWalker<'a>> + 'db {
+        self.next_enums()
+            .filter(move |next| !self.previous_enums().any(|previous| enums_match(&previous, next)))
+    }
+
+    pub(crate) fn dropped_enums<'db>(&'db self) -> impl Iterator<Item = EnumWalker<'a>> + 'db {
+        self.previous_enums()
+            .filter(move |previous| !self.next_enums().any(|next| enums_match(previous, &next)))
+    }
+
+    fn previous_enums(&self) -> impl Iterator<Item = EnumWalker<'a>> {
+        self.schemas.previous().enum_walkers()
+    }
+
+    fn next_enums(&self) -> impl Iterator<Item = EnumWalker<'a>> {
+        self.schemas.next().enum_walkers()
+    }
+
+    pub(crate) fn schemas(&self) -> Pair<&SqlSchema> {
+        self.schemas
+    }
+}
+
+fn enums_match(previous: &EnumWalker<'_>, next: &EnumWalker<'_>) -> bool {
+    previous.name() == next.name()
 }

@@ -1,4 +1,4 @@
-use super::{differ_database::DifferDatabase, ColumnTypeChange, SqlSchemaDiffer};
+use super::{differ_database::DifferDatabase, ColumnTypeChange};
 use crate::{pair::Pair, sql_migration::SqlMigrationStep, sql_schema_differ};
 use sql_schema_describer::{
     walkers::{ColumnWalker, IndexWalker},
@@ -42,7 +42,7 @@ pub(crate) trait SqlSchemaDifferFlavour {
     }
 
     /// Push enum-related steps.
-    fn push_enum_steps(&self, _differ: &SqlSchemaDiffer<'_>, _steps: &mut Vec<SqlMigrationStep>) {}
+    fn push_enum_steps(&self, _steps: &mut Vec<SqlMigrationStep>, _db: &DifferDatabase<'_>) {}
 
     /// Returns whether the underlying database implicitly drops indexes on dropped (and potentially recreated) columns.
     fn indexes_should_be_recreated_after_column_drop(&self) -> bool {
