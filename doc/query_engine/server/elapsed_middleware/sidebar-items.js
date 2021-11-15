@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["ElapsedMiddleware","Middleware to set the `X-Elapsed` header."]]});
