@@ -2,7 +2,7 @@ use super::{differ_database::DifferDatabase, foreign_keys_match};
 use crate::pair::Pair;
 use sql_schema_describer::{
     walkers::{ColumnWalker, ForeignKeyWalker, IndexWalker, TableWalker},
-    PrimaryKey,
+    PrimaryKey, TableId,
 };
 
 pub(crate) struct TableDiffer<'a, 'b> {
@@ -152,6 +152,10 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
 
     pub(super) fn next(&self) -> &TableWalker<'schema> {
         self.tables.next()
+    }
+
+    pub(super) fn table_ids(&self) -> Pair<TableId> {
+        self.tables.map(|t| t.table_id())
     }
 }
 

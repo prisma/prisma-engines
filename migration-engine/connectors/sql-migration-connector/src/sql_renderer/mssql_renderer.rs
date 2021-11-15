@@ -277,24 +277,10 @@ impl SqlRenderer for MssqlFlavour {
                 .column_pairs
                 .iter()
                 .map(|(column_indexes, _, _)| tables.columns(column_indexes).next().name())
-                .map(|c| self.quote(c))
-                .map(|c| format!("{}", c))
+                .map(|c| self.quote(c).to_string())
                 .collect();
 
-            let keys = tables.previous().referencing_foreign_keys().filter(|prev| {
-                tables
-                    .next()
-                    .referencing_foreign_keys()
-                    .any(|next| prev.foreign_key() == next.foreign_key())
-            });
-
-            // We must drop foreign keys pointing to this table before removing
-            // any of the table constraints.
-            for fk in keys {
-                result.push(self.render_drop_foreign_key(&fk));
-            }
-
-            // Then the indices...
+            // Drop the indexes on the table.
             for index in tables.previous().indexes() {
                 result.push(self.render_drop_index(&index));
             }
@@ -353,12 +339,7 @@ impl SqlRenderer for MssqlFlavour {
             // Rename the temporary table with the name defined in the migration.
             result.push(self.render_rename_table(&temporary_table_name, tables.next().name()));
 
-            // Recreating all foreign keys pointing to this table
-            for fk in tables.next().referencing_foreign_keys() {
-                result.push(self.render_add_foreign_key(&fk));
-            }
-
-            // Then the indices...
+            // Recreate the indexes.
             for index in tables.next().indexes().filter(|i| !i.index_type().is_unique()) {
                 result.push(self.render_create_index(&index));
             }

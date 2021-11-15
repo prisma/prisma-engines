@@ -428,7 +428,7 @@ fn push_alter_enum_previous_usages_as_default(differ: &SqlSchemaDiffer<'_>, alte
         }
     }
 
-    for tables in differ.table_pairs() {
+    for tables in differ.db.table_pairs() {
         for column in tables
             .dropped_columns()
             .filter(|col| col.column_type_is_enum(enum_names.previous()) && col.default().is_some())

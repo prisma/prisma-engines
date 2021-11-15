@@ -204,3 +204,54 @@ fn foreign_key_renaming_to_default_works(api: TestApi) {
     // Check that the migration is idempotent.
     api.schema_push(target_schema).send().assert_green().assert_no_steps();
 }
+
+// Root cause: redefining a table recreated all the foreign keys pointing to that table, but if we
+// were creating them for the first time in the migration in the first place (here: new table), the
+// foreign key is created twice and that conflicts.
+#[test_connector(tags(Mssql))]
+fn prisma_9537(api: TestApi) {
+    let schema = r#"
+        datasource db {
+            provider = "sqlserver"
+            url = env("DBURL")
+        }
+
+        model User {
+          id   Int    @id
+          name String
+        }
+    "#;
+
+    api.schema_push(schema)
+        .migration_id(Some("first migration"))
+        .send()
+        .assert_green();
+
+    let schema = r#"
+        datasource db {
+            provider = "sqlserver"
+            url = env("DBURL")
+        }
+
+        model User {
+          id    Int     @id @default(autoincrement())
+          email String  @unique
+          name  String?
+          posts Post[]
+        }
+
+        model Post {
+          id        Int      @id @default(autoincrement())
+          title     String
+          content   String?
+          published Boolean  @default(false)
+          author    User?    @relation(fields: [authorId], references: [id])
+          authorId  Int?
+        }
+    "#;
+
+    api.schema_push(schema)
+        .migration_id(Some("second migration"))
+        .send()
+        .assert_green();
+}
