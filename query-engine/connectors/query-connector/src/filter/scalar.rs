@@ -65,6 +65,10 @@ impl ScalarFilter {
         self.len() > chunk_size
     }
 
+    pub fn can_batch(&self) -> bool {
+        !matches!(self.condition, ScalarCondition::NotIn(_))
+    }
+
     /// If possible, converts the filter into multiple smaller filters.
     pub fn batched(self, chunk_size: usize) -> Vec<ScalarFilter> {
         fn inner(mut list: PrismaListValue, chunk_size: usize) -> Vec<PrismaListValue> {

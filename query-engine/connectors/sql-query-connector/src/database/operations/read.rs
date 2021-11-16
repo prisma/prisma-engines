@@ -92,6 +92,13 @@ pub async fn get_many_records(
                 ));
             }
 
+            if query_arguments.has_unbatchable_filters() {
+                return Err(SqlError::QueryParameterLimitExceeded(
+                    "Your query cannot be split into multiple queries because the filter will cause incorrect results"
+                        .to_string(),
+                ));
+            }
+
             // We don't need to order in the database due to us ordering in this function.
             let order = std::mem::take(&mut query_arguments.order_by);
 
