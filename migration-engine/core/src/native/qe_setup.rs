@@ -46,8 +46,18 @@ pub async fn run(prisma_schema: &str) -> ConnectorResult<()> {
             let connector = MongoDbMigrationConnector::new(url, preview_features);
             // Drop database. Creation is automatically done when collections are created.
             connector.drop_database().await?;
-            let (_, schema) = crate::parse_schema(prisma_schema).unwrap();
-            connector.create_collections(&schema).await?;
+            let (config, schema) = crate::parse_schema(prisma_schema).unwrap();
+            let migration = connector
+                .diff(DiffTarget::Empty, DiffTarget::Datamodel((&config, &schema)))
+                .await
+                .unwrap();
+
+            connector
+                .database_migration_step_applier()
+                .apply_migration(&migration)
+                .await
+                .unwrap();
+            // connector.create_collections(&schema).await?;
         }
         x => unimplemented!("Connector {} is not supported yet", x),
     };
