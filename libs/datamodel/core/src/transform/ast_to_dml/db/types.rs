@@ -192,10 +192,11 @@ pub(crate) struct IndexAttribute<'ast> {
     pub(crate) db_name: Option<Cow<'ast, str>>,
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub(crate) struct IdAttribute<'ast> {
     pub(crate) fields: Vec<FieldWithArgs>,
     pub(super) source_field: Option<FieldId>,
+    pub(super) source_attribute: &'ast ast::Attribute,
     pub(super) name: Option<&'ast str>,
     pub(super) db_name: Option<&'ast str>,
 }

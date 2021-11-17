@@ -49,7 +49,14 @@ fn calculate_model_tables<'a>(
             columns: pk
                 .fields
                 .iter()
-                .map(|field| sql::PrimaryKeyColumn::new(model.find_scalar_field(&field.name).unwrap().db_name()))
+                .map(|field| sql::PrimaryKeyColumn {
+                    name: model.find_scalar_field(&field.name).unwrap().db_name().into(),
+                    length: field.length,
+                    sort_order: field.sort_order.map(|so| match so {
+                        datamodel::SortOrder::Asc => sql::SQLSortOrder::Asc,
+                        datamodel::SortOrder::Desc => sql::SQLSortOrder::Desc,
+                    }),
+                })
                 .collect(),
             sequence: None,
             constraint_name: pk.db_name.clone(),
@@ -58,13 +65,22 @@ fn calculate_model_tables<'a>(
         let indices = model
             .indexes()
             .map(|index_definition: &IndexDefinition| {
-                let referenced_fields: Vec<ScalarFieldWalker<'_>> = index_definition
+                let columns = index_definition
                     .fields
                     .iter()
                     .map(|field| {
-                        model
+                        let sf = model
                             .find_scalar_field(&field.name)
-                            .expect("Unknown field in index directive.")
+                            .expect("Unknown field in index directive.");
+
+                        sql::IndexColumn {
+                            name: sf.db_name().into(),
+                            sort_order: field.sort_order.map(|s| match s {
+                                datamodel::SortOrder::Asc => sql::SQLSortOrder::Asc,
+                                datamodel::SortOrder::Desc => sql::SQLSortOrder::Desc,
+                            }),
+                            length: field.length,
+                        }
                     })
                     .collect();
 
@@ -76,10 +92,7 @@ fn calculate_model_tables<'a>(
                 sql::Index {
                     name: index_definition.db_name.clone().unwrap(),
                     // The model index definition uses the model field names, but the SQL Index wants the column names.
-                    columns: referenced_fields
-                        .iter()
-                        .map(|field| sql::IndexColumn::new(field.db_name()))
-                        .collect(),
+                    columns,
                     tpe: index_type,
                 }
             })

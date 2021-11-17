@@ -10,11 +10,12 @@ migration-connector = { path = "../migration-connector" }
 
 async-trait = "0.1.17"
 futures = "0.3"
-mongodb = { git="https://github.com/mongodb/mongo-rust-driver.git", rev = "8e55cb2" }
+mongodb = { git = "https://github.com/mongodb/mongo-rust-driver.git", rev = "8e55cb2" }
 serde_json = "1"
 tokio = { version = "1.0", features = ["parking_lot"] }
 url = "2.1.1"
 tracing = "0.1.29"
+enumflags2 = "0.7"
 
 [dev-dependencies]
 dissimilar = "1.0.3"

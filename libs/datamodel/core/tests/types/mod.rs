@@ -1,3 +1,4 @@
+mod cockroachdb_native_types;
 mod composite_types;
 mod helper;
 mod mssql_native_types;

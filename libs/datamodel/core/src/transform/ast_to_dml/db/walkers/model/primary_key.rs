@@ -21,15 +21,7 @@ pub(crate) struct PrimaryKeyWalker<'ast, 'db> {
 impl<'ast, 'db> PrimaryKeyWalker<'ast, 'db> {
     #[track_caller]
     pub(crate) fn ast_attribute(self) -> &'ast ast::Attribute {
-        self.ast_model().id_attribute()
-    }
-
-    pub(crate) fn has_ast_attribute(self) -> bool {
-        self.ast_model().try_id_attribute().is_some()
-    }
-
-    fn ast_model(&self) -> &'ast ast::Model {
-        &self.db.ast[self.model_id]
+        self.attribute.source_attribute
     }
 
     pub(crate) fn final_database_name(self) -> Option<Cow<'ast, str>> {

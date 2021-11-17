@@ -20,6 +20,22 @@ impl DatasourceProvider for SqliteDatasourceProvider {
     }
 }
 
+pub struct CockroachDbDatasourceProvider;
+
+impl DatasourceProvider for CockroachDbDatasourceProvider {
+    fn is_provider(&self, provider: &str) -> bool {
+        provider == COCKROACHDB_SOURCE_NAME
+    }
+
+    fn canonical_name(&self) -> &str {
+        COCKROACHDB_SOURCE_NAME
+    }
+
+    fn connector(&self) -> &'static dyn Connector {
+        SqlDatamodelConnectors::POSTGRES
+    }
+}
+
 pub struct PostgresDatasourceProvider;
 
 impl DatasourceProvider for PostgresDatasourceProvider {

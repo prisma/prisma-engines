@@ -15,8 +15,19 @@ pub(crate) fn calculate(datamodel: &Datamodel) -> MongoSchema {
             let fields = index
                 .fields
                 .iter()
-                .map(|field| model.find_scalar_field(&field.name).unwrap().db_name())
-                .map(|field_final_name: &str| (field_final_name.to_owned(), Bson::Int32(1)));
+                .map(|field| {
+                    let sf = model.find_scalar_field(&field.name).unwrap();
+                    (sf.db_name(), field.sort_order.unwrap_or(datamodel::SortOrder::Asc))
+                })
+                .map(|(name, sort_order)| {
+                    (
+                        name.to_owned(),
+                        match sort_order {
+                            datamodel::SortOrder::Asc => Bson::Int32(1),
+                            datamodel::SortOrder::Desc => Bson::Int32(-1),
+                        },
+                    )
+                });
 
             path.extend(fields);
 

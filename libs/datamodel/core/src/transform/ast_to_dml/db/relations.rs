@@ -108,12 +108,6 @@ pub(crate) enum RelationType {
     OneToMany,
 }
 
-impl RelationType {
-    pub(crate) fn is_one_to_one(self) -> bool {
-        matches!(self, Self::OneToOne)
-    }
-}
-
 #[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
 pub(crate) struct Relation<'ast> {
     /// The `name` argument in `@relation`.

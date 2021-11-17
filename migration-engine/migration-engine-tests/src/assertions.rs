@@ -9,7 +9,7 @@ use pretty_assertions::assert_eq;
 use prisma_value::PrismaValue;
 use sql_schema_describer::{
     Column, ColumnTypeFamily, DefaultKind, DefaultValue, Enum, ForeignKey, ForeignKeyAction, Index, IndexType,
-    PrimaryKey, SqlSchema, Table,
+    PrimaryKey, SQLSortOrder, SqlSchema, Table,
 };
 use test_setup::{BitFlags, Tags};
 
@@ -583,6 +583,30 @@ impl<'a> ColumnAssertion<'a> {
     }
 }
 
+pub struct IndexColumnAssertion {
+    sort_order: Option<SQLSortOrder>,
+    length: Option<u32>,
+}
+
+impl IndexColumnAssertion {
+    pub fn assert_sort_order(self, sort_order: SQLSortOrder) -> Self {
+        assert_eq!(self.sort_order, Some(sort_order));
+
+        self
+    }
+
+    pub fn assert_length_prefix(self, length: u32) -> Self {
+        assert_eq!(self.length, Some(length));
+
+        self
+    }
+
+    pub fn assert_no_length_prefix(self) -> Self {
+        assert_eq!(self.length, None);
+        self
+    }
+}
+
 pub struct PrimaryKeyAssertion<'a> {
     pk: &'a PrimaryKey,
     table: &'a Table,
@@ -591,6 +615,25 @@ pub struct PrimaryKeyAssertion<'a> {
 impl<'a> PrimaryKeyAssertion<'a> {
     pub fn assert_columns(self, column_names: &[&str]) -> Self {
         assert_eq!(&self.pk.column_names().collect::<Vec<_>>(), column_names);
+
+        self
+    }
+
+    pub fn assert_column<F>(self, column_name: &str, f: F) -> Self
+    where
+        F: FnOnce(IndexColumnAssertion) -> IndexColumnAssertion,
+    {
+        let col = self
+            .pk
+            .columns
+            .iter()
+            .find(|c| c.name == column_name)
+            .unwrap_or_else(|| panic!("Could not find column {}", column_name));
+
+        f(IndexColumnAssertion {
+            length: col.length,
+            sort_order: col.sort_order,
+        });
 
         self
     }
@@ -707,6 +750,20 @@ impl<'a> IndexAssertion<'a> {
 
     pub fn assert_is_not_unique(self) -> Self {
         assert_eq!(self.0.tpe, IndexType::Normal);
+
+        self
+    }
+
+    pub fn assert_column<F>(self, column_name: &str, f: F) -> Self
+    where
+        F: FnOnce(IndexColumnAssertion) -> IndexColumnAssertion,
+    {
+        let col = self.0.columns.iter().find(|i| i.name == column_name).unwrap();
+
+        f(IndexColumnAssertion {
+            sort_order: col.sort_order,
+            length: col.length,
+        });
 
         self
     }

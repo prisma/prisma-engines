@@ -3,14 +3,13 @@ use crate::{
     flavour::MssqlFlavour,
     pair::Pair,
     sql_migration::SqlMigrationStep,
-    sql_schema_differ::{column::ColumnTypeChange, table::TableDiffer, ColumnChanges, SqlSchemaDiffer},
+    sql_schema_differ::{column::ColumnTypeChange, differ_database::DifferDatabase, table::TableDiffer, ColumnChanges},
 };
 use native_types::{MsSqlType, MsSqlTypeParameter};
 use sql_schema_describer::{
     walkers::{ColumnWalker, IndexWalker},
     ColumnId, ColumnTypeFamily,
 };
-use std::collections::HashSet;
 
 impl SqlSchemaDifferFlavour for MssqlFlavour {
     fn can_rename_foreign_key(&self) -> bool {
@@ -25,17 +24,17 @@ impl SqlSchemaDifferFlavour for MssqlFlavour {
         true
     }
 
-    fn tables_to_redefine(&self, differ: &SqlSchemaDiffer<'_>) -> HashSet<String> {
-        let autoincrement_changed = differ
+    fn set_tables_to_redefine(&self, db: &mut DifferDatabase<'_>) {
+        let autoincrement_changed = db
             .table_pairs()
             .filter(|differ| {
                 differ
                     .column_pairs()
-                    .any(|c| differ.db.column_changes_for_walkers(c).autoincrement_changed())
+                    .any(|c| db.column_changes_for_walkers(c).autoincrement_changed())
             })
-            .map(|table| table.next().name().to_owned());
+            .map(|t| t.table_ids());
 
-        let all_columns_of_the_table_gets_dropped = differ
+        let all_columns_of_the_table_gets_dropped = db
             .table_pairs()
             .filter(|tables| {
                 tables.column_pairs().all(|columns| {
@@ -43,11 +42,11 @@ impl SqlSchemaDifferFlavour for MssqlFlavour {
                     matches!(type_change, Some(ColumnTypeChange::NotCastable))
                 })
             })
-            .map(|tables| tables.previous().name().to_string());
+            .map(|t| t.table_ids());
 
-        autoincrement_changed
+        db.tables_to_redefine = autoincrement_changed
             .chain(all_columns_of_the_table_gets_dropped)
-            .collect()
+            .collect();
     }
 
     fn column_type_change(&self, differ: Pair<ColumnWalker<'_>>) -> Option<ColumnTypeChange> {

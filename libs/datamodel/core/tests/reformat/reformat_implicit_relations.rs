@@ -1221,3 +1221,46 @@ fn must_add_required_relation_field_if_underlying_scalar_is_required() {
     let result = Reformatter::new(input).reformat_to_string();
     expected.assert_eq(&result);
 }
+
+// this crashed
+#[test]
+fn issue_10118() {
+    let schema = r#"
+        datasource db {
+          provider = "postgres"
+          url = "postgres://"
+        }
+
+        model User {
+          id         String    @id @default(cuid()) @db.Char(30)
+          referralId String    @unique @db.Char(30)
+          referral   Referral? @relation("UserToReferral", fields: [referralId], references: [id])
+        }
+
+        model Referral {
+          id   String @id @default(cuid()) @db.Char(30)
+          user User   @relation("UserToReferral")
+        }
+    "#;
+
+    let result = Reformatter::new(schema).reformat_to_string();
+    let expected = expect![[r#"
+        datasource db {
+          provider = "postgres"
+          url      = "postgres://"
+        }
+
+        model User {
+          id         String    @id @default(cuid()) @db.Char(30)
+          referralId String    @unique @db.Char(30)
+          referral   Referral? @relation("UserToReferral", fields: [referralId], references: [id], map: "User_referralId_fkey")
+        }
+
+        model Referral {
+          id     String @id @default(cuid()) @db.Char(30)
+          user   User   @relation("UserToReferral", fields: [userId], references: [id])
+          userId String @db.Char(30)
+        }
+    "#]];
+    expected.assert_eq(&result);
+}

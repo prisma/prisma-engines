@@ -26,7 +26,7 @@ fn xml_data_type_should_fail_on_index() {
             "Native type Xml cannot be unique in Postgres."
         };
 
-        test_native_types_compatibility(&dml, error_msg, POSTGRES_SOURCE);
+        test_native_types_compatibility(&dml, error_msg, COCKROACHDB_SOURCE);
     }
 }
 
@@ -40,7 +40,7 @@ fn should_fail_on_invalid_precision_for_decimal_type() {
     }
 
     let native_type = "Decimal(1001,3)";
-    test_native_types_without_attributes(native_type, "Decimal", &error_msg(native_type), POSTGRES_SOURCE);
+    test_native_types_without_attributes(native_type, "Decimal", &error_msg(native_type), COCKROACHDB_SOURCE);
 }
 
 #[test]
@@ -54,9 +54,9 @@ fn should_fail_on_invalid_precision_for_time_types() {
 
     for tpe in &["Timestamp", "Time"] {
         let native_type = &format!("{}(7)", tpe);
-        test_native_types_without_attributes(native_type, "DateTime", &error_msg(native_type), POSTGRES_SOURCE);
+        test_native_types_without_attributes(native_type, "DateTime", &error_msg(native_type), COCKROACHDB_SOURCE);
         let native_type = &format!("{}(-1)", tpe);
-        test_native_types_without_attributes(native_type, "DateTime", &error_msg(native_type), POSTGRES_SOURCE);
+        test_native_types_without_attributes(native_type, "DateTime", &error_msg(native_type), COCKROACHDB_SOURCE);
     }
 }
 
@@ -71,7 +71,7 @@ fn should_fail_on_argument_out_of_range_for_bit_data_types() {
 
     for tpe in &["Bit", "VarBit"] {
         let native_type = &format!("{}(0)", tpe);
-        test_native_types_without_attributes(native_type, "String", &error_msg(native_type), POSTGRES_SOURCE);
+        test_native_types_without_attributes(native_type, "String", &error_msg(native_type), COCKROACHDB_SOURCE);
     }
 }
 
@@ -108,7 +108,7 @@ fn xml_should_work_with_string_scalar_type() {
             dec String @db.Xml
         }}
     "#,
-        datasource = POSTGRES_SOURCE
+        datasource = COCKROACHDB_SOURCE
     );
 
     let datamodel = parse(&dml);

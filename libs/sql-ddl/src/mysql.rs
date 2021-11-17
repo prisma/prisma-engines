@@ -1,4 +1,4 @@
-use crate::common::{Indented, IteratorJoin, SQL_INDENTATION};
+use crate::common::{Indented, IndexColumn, IteratorJoin, SQL_INDENTATION};
 use std::{borrow::Cow, fmt::Display};
 
 struct Ident<'a>(&'a str);
@@ -180,7 +180,7 @@ impl Display for Column<'_> {
 pub struct CreateIndex<'a> {
     pub unique: bool,
     pub index_name: Cow<'a, str>,
-    pub on: (Cow<'a, str>, Vec<Cow<'a, str>>),
+    pub on: (Cow<'a, str>, Vec<IndexColumn<'a>>),
 }
 
 impl Display for CreateIndex<'_> {
@@ -193,7 +193,24 @@ impl Display for CreateIndex<'_> {
             table_name = self.on.0,
         )?;
 
-        self.on.1.iter().map(|s| Ident(s)).join(", ", f)?;
+        self.on
+            .1
+            .iter()
+            .map(|s| {
+                let mut rendered = Ident(&s.name).to_string();
+
+                if let Some(length) = s.length {
+                    rendered.push_str(&format!("({})", length));
+                }
+
+                if let Some(sort_order) = s.sort_order {
+                    rendered.push(' ');
+                    rendered.push_str(sort_order.as_ref());
+                }
+
+                rendered
+            })
+            .join(", ", f)?;
 
         write!(f, ")")
     }
@@ -204,7 +221,7 @@ pub struct CreateTable<'a> {
     pub table_name: Cow<'a, str>,
     pub columns: Vec<Column<'a>>,
     pub indexes: Vec<IndexClause<'a>>,
-    pub primary_key: Vec<Cow<'a, str>>,
+    pub primary_key: Vec<IndexColumn<'a>>,
     pub default_character_set: Option<Cow<'a, str>>,
     pub collate: Option<Cow<'a, str>>,
 }
@@ -230,7 +247,23 @@ impl Display for CreateTable<'_> {
             }
             f.write_str(SQL_INDENTATION)?;
             f.write_str("PRIMARY KEY (")?;
-            self.primary_key.iter().map(|col| Ident(col.as_ref())).join(", ", f)?;
+            self.primary_key
+                .iter()
+                .map(|col| {
+                    let mut rendered = format!("{}", Ident(&col.name));
+
+                    if let Some(length) = col.length {
+                        rendered.push_str(&format!("({})", length));
+                    }
+
+                    if let Some(sort_order) = col.sort_order {
+                        rendered.push(' ');
+                        rendered.push_str(sort_order.as_ref());
+                    }
+
+                    rendered
+                })
+                .join(", ", f)?;
             f.write_str(")")?;
         }
 
@@ -277,7 +310,7 @@ impl Display for DropIndex<'_> {
 pub struct IndexClause<'a> {
     pub index_name: Option<Cow<'a, str>>,
     pub unique: bool,
-    pub columns: Vec<Cow<'a, str>>,
+    pub columns: Vec<IndexColumn<'a>>,
 }
 
 impl Display for IndexClause<'_> {
@@ -294,7 +327,23 @@ impl Display for IndexClause<'_> {
 
         f.write_str("(")?;
 
-        self.columns.iter().map(|col| Ident(col.as_ref())).join(", ", f)?;
+        self.columns
+            .iter()
+            .map(|col| {
+                let mut rendered = format!("{}", Ident(col.name.as_ref()));
+
+                if let Some(length) = col.length {
+                    rendered.push_str(&format!("({})", length));
+                };
+
+                if let Some(sort_order) = col.sort_order {
+                    rendered.push(' ');
+                    rendered.push_str(sort_order.as_ref());
+                };
+
+                rendered
+            })
+            .join(", ", f)?;
 
         f.write_str(")")
     }

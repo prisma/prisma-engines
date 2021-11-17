@@ -100,6 +100,7 @@ pub(super) fn model<'ast>(
 
     model_data.primary_key = Some(IdAttribute {
         name,
+        source_attribute: args.attribute(),
         db_name,
         fields: resolved_fields,
         source_field: None,
@@ -150,6 +151,7 @@ pub(super) fn field<'ast>(
             model_attributes.primary_key = Some(IdAttribute {
                 name: None,
                 db_name,
+                source_attribute: args.attribute(),
                 fields: vec![FieldWithArgs {
                     field_id,
                     sort_order,
