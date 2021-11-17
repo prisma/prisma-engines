@@ -225,7 +225,7 @@ mod order_by_dependent {
     }
 
     // "[Circular with differing records] Ordering by related record field ascending" should "work"
-    #[connector_test(exclude(SqlServer, MySql))]
+    #[connector_test(exclude(SqlServer))]
     async fn circular_diff_related_record_asc(runner: Runner) -> TestResult<()> {
         // Records form circles with their relations
         create_row(&runner, 1, Some(1), Some(1), Some(3)).await?;
@@ -256,7 +256,7 @@ mod order_by_dependent {
     }
 
     // "[Circular with differing records] Ordering by related record field descending" should "work"
-    #[connector_test(exclude(SqlServer, MySql))]
+    #[connector_test(exclude(SqlServer))]
     async fn circular_diff_related_record_desc(runner: Runner) -> TestResult<()> {
         // Records form circles with their relations
         create_row(&runner, 1, Some(1), Some(1), Some(3)).await?;
