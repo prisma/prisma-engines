@@ -5,12 +5,6 @@ use crate::{
 };
 use itertools::Itertools;
 
-impl ast::WithAttributes for Vec<ast::Attribute> {
-    fn attributes(&self) -> &Vec<ast::Attribute> {
-        self
-    }
-}
-
 pub fn parse_and_validate_preview_features(
     preview_features: Vec<String>,
     feature_map: &FeatureMap,

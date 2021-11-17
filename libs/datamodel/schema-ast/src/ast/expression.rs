@@ -1,8 +1,5 @@
+use super::{Argument, Span};
 use std::fmt;
-
-use itertools::Itertools;
-
-use super::*;
 
 /// Represents arbitrary, even nested, expressions.
 #[derive(Debug, Clone, PartialEq)]
@@ -32,13 +29,16 @@ impl fmt::Display for Expression {
             Expression::StringValue(val, _) => write!(f, "\"{}\"", val),
             Expression::ConstantValue(val, _) => write!(f, "{}", val),
             Expression::Function(fun, args, _) => {
-                write!(f, "{}({})", fun, args.iter().map(|arg| format!("{}", arg)).join(","))
+                let args = args.iter().map(ToString::to_string).collect::<Vec<_>>().join(",");
+                write!(f, "{}({})", fun, args)
             }
             Expression::Array(vals, _) => {
-                write!(f, "[{}]", vals.iter().map(|arg| format!("{}", arg)).join(","))
+                let vals = vals.iter().map(ToString::to_string).collect::<Vec<_>>().join(",");
+                write!(f, "[{}]", vals)
             }
             Expression::FieldWithArgs(ident, vals, _) => {
-                write!(f, "{}({})", ident, vals.iter().map(|arg| format!("{}", arg)).join(","))
+                let vals = vals.iter().map(ToString::to_string).collect::<Vec<_>>().join(",");
+                write!(f, "{}({})", ident, vals)
             }
         }
     }
@@ -57,10 +57,6 @@ impl Expression {
             Expression::ConstantValue(s, span) => Some((s, *span)),
             _ => None,
         }
-    }
-
-    pub fn render_to_string(&self) -> String {
-        crate::ast::renderer::Renderer::render_value_to_string(self)
     }
 
     pub fn span(&self) -> Span {

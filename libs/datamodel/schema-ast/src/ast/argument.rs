@@ -1,4 +1,4 @@
-use super::*;
+use super::{Expression, Identifier, Span, WithIdentifier};
 use std::fmt::{Display, Formatter};
 
 /// An argument, either for attributes, or for keys in source blocks.

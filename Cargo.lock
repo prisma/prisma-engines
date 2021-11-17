@@ -981,6 +981,7 @@ dependencies = [
  "pretty_assertions",
  "prisma-value",
  "regex",
+ "schema-ast",
  "serde",
  "serde_json",
  "sql-datamodel-connector",
@@ -3780,6 +3781,13 @@ checksum = "8f05ba609c234e60bee0d547fe94a4c7e9da733d1c962cf6e59efa4cd9c8bc75"
 dependencies = [
  "lazy_static",
  "winapi",
+]
+
+[[package]]
+name = "schema-ast"
+version = "0.1.0"
+dependencies = [
+ "pest",
 ]
 
 [[package]]
