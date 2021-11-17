@@ -1,11 +1,13 @@
 use crate::Dedup;
 use crate::SqlError;
+use datamodel::IndexAlgorithm;
 use datamodel::{
     common::preview_features::PreviewFeature, common::RelationNames, Datamodel, DefaultValue as DMLDef, FieldArity,
     FieldType, IndexDefinition, IndexField, Model, PrimaryKeyField, ReferentialAction, RelationField, RelationInfo,
     ScalarField, ScalarType, SortOrder, ValueGenerator as VG,
 };
 use introspection_connector::IntrospectionContext;
+use sql_schema_describer::SQLIndexAlgorithm;
 use sql_schema_describer::{
     Column, ColumnArity, ColumnTypeFamily, ForeignKey, Index, IndexType, SQLSortOrder, SqlSchema, Table,
 };
@@ -136,6 +138,15 @@ pub(crate) fn calculate_index(index: &Index, ctx: &IntrospectionContext) -> Inde
     //and re-introspection will keep them. This is a change in introspection behaviour,
     //but due to re-introspection previous datamodels and clients should keep working as before.
 
+    let using = if ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
+        index.algorithm.map(|algo| match algo {
+            SQLIndexAlgorithm::BTree => IndexAlgorithm::BTree,
+            SQLIndexAlgorithm::Hash => IndexAlgorithm::Hash,
+        })
+    } else {
+        None
+    };
+
     IndexDefinition {
         name: None,
         db_name: Some(index.name.clone()),
@@ -161,6 +172,7 @@ pub(crate) fn calculate_index(index: &Index, ctx: &IntrospectionContext) -> Inde
             .collect(),
         tpe,
         defined_on_field: index.columns.len() == 1,
+        algorithm: using,
     }
 }
 

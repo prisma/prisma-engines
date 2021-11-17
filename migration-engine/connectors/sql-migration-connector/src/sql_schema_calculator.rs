@@ -5,7 +5,7 @@ pub(super) use sql_schema_calculator_flavour::SqlSchemaCalculatorFlavour;
 use crate::flavour::SqlFlavour;
 use datamodel::{
     walkers::{walk_models, walk_relations, ModelWalker, ScalarFieldWalker, TypeWalker},
-    Configuration, Datamodel, DefaultValue, FieldArity, IndexDefinition, IndexType, ScalarType,
+    Configuration, Datamodel, DefaultValue, FieldArity, IndexAlgorithm, IndexDefinition, IndexType, ScalarType,
 };
 use prisma_value::PrismaValue;
 use sql_schema_describer::{self as sql, walkers::SqlSchemaExt, ColumnType};
@@ -89,11 +89,17 @@ fn calculate_model_tables<'a>(
                     IndexType::Normal => sql::IndexType::Normal,
                 };
 
+                let algorithm = index_definition.algorithm.map(|algo| match algo {
+                    IndexAlgorithm::BTree => sql::SQLIndexAlgorithm::BTree,
+                    IndexAlgorithm::Hash => sql::SQLIndexAlgorithm::Hash,
+                });
+
                 sql::Index {
                     name: index_definition.db_name.clone().unwrap(),
                     // The model index definition uses the model field names, but the SQL Index wants the column names.
                     columns,
                     tpe: index_type,
+                    algorithm,
                 }
             })
             .collect();
@@ -177,11 +183,13 @@ fn calculate_relation_tables<'a>(
                         sql::IndexColumn::new(m2m.model_b_column()),
                     ],
                     tpe: sql::IndexType::Unique,
+                    algorithm: None,
                 },
                 sql::Index {
                     name: format!("{}_B_index", &table_name),
                     columns: vec![sql::IndexColumn::new(m2m.model_b_column())],
                     tpe: sql::IndexType::Normal,
+                    algorithm: None,
                 },
             ];
 

@@ -239,6 +239,27 @@ impl IndexType {
     }
 }
 
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, Copy)]
+pub enum SQLIndexAlgorithm {
+    BTree,
+    Hash,
+}
+
+impl AsRef<str> for SQLIndexAlgorithm {
+    fn as_ref(&self) -> &str {
+        match self {
+            Self::BTree => "BTREE",
+            Self::Hash => "HASH",
+        }
+    }
+}
+
+impl fmt::Display for SQLIndexAlgorithm {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_ref())
+    }
+}
+
 /// The sort order of an index.
 #[derive(Serialize, Deserialize, PartialEq, Debug, Copy, Clone)]
 pub enum SQLSortOrder {
@@ -294,6 +315,8 @@ pub struct Index {
     pub columns: Vec<IndexColumn>,
     /// Type of index.
     pub tpe: IndexType,
+    /// BTree or Hash
+    pub algorithm: Option<SQLIndexAlgorithm>,
 }
 
 impl Index {

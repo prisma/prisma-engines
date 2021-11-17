@@ -104,31 +104,31 @@ fn index_does_not_accept_sort_or_length_without_extended_indexes() {
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@unique": The sort and length arguments are not yet available.[0m
+        [1;91merror[0m: [1mError parsing attribute "@unique": You must enable `extendedIndexes` preview feature to use sort or length parameters.[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m         id         Int    @id
         [1;94m14 | [0m         firstName  String @[1;91munique(sort:Desc, length: 5)[0m
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@unique": The sort and length arguments are not yet available.[0m
+        [1;91merror[0m: [1mError parsing attribute "@unique": You must enable `extendedIndexes` preview feature to use sort or length parameters.[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m         firstName  String @unique(sort:Desc, length: 5)
         [1;94m15 | [0m         middleName String @[1;91munique(sort:Desc)[0m
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@unique": The sort and length arguments are not yet available.[0m
+        [1;91merror[0m: [1mError parsing attribute "@unique": You must enable `extendedIndexes` preview feature to use sort or length parameters.[0m
           [1;94m-->[0m  [4mschema.prisma:16[0m
         [1;94m   | [0m
         [1;94m15 | [0m         middleName String @unique(sort:Desc)
         [1;94m16 | [0m         lastName   String @[1;91munique(length: 5)[0m
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@index": The sort and length arguments are not yet available.[0m
+        [1;91merror[0m: [1mError parsing attribute "@index": You must enable `extendedIndexes` preview feature to use sort or length parameters.[0m
           [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
         [1;94m18 | [0m         
         [1;94m19 | [0m         @@[1;91mindex([firstName(sort: Desc), middleName(length: 5), lastName(sort: Desc, length: 5), generation])[0m
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@unique": The sort and length arguments are not yet available.[0m
+        [1;91merror[0m: [1mError parsing attribute "@unique": You must enable `extendedIndexes` preview feature to use sort or length parameters.[0m
           [1;94m-->[0m  [4mschema.prisma:20[0m
         [1;94m   | [0m
         [1;94m19 | [0m         @@index([firstName(sort: Desc), middleName(length: 5), lastName(sort: Desc, length: 5), generation])
@@ -613,6 +613,110 @@ fn length_argument_does_not_work_with_int() {
         [1;94m   | [0m
         [1;94m14 | [0m
         [1;94m15 | [0m  @@[1;91mindex([a(length: 10)])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn hash_index_doesnt_work_on_sqlserver() {
+    let dml = indoc! {r#"
+        model A {
+          id Int @id
+          a  Int
+
+          @@index([a], type: Hash)
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::SqlServer, &["extendedIndexes"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@index": The given type argument is not supported with the current connector[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m
+        [1;94m15 | [0m  @@index([a], [1;91mtype: Hash[0m)
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn hash_index_doesnt_work_on_mysql() {
+    let dml = indoc! {r#"
+        model A {
+          id Int @id
+          a  Int
+
+          @@index([a], type: Hash)
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@index": The given type argument is not supported with the current connector[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m
+        [1;94m15 | [0m  @@index([a], [1;91mtype: Hash[0m)
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn hash_index_doesnt_work_on_sqlite() {
+    let dml = indoc! {r#"
+        model A {
+          id Int @id
+          a  Int
+
+          @@index([a], type: Hash)
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Sqlite, &["extendedIndexes"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@index": The given type argument is not supported with the current connector[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m
+        [1;94m15 | [0m  @@index([a], [1;91mtype: Hash[0m)
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn hash_index_doesnt_work_on_mongo() {
+    let dml = indoc! {r#"
+        model A {
+          id Int @id
+          a  Int
+
+          @@index([a], type: Hash)
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mongo, &["extendedIndexes", "mongoDb"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@index": The given type argument is not supported with the current connector[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m
+        [1;94m15 | [0m  @@index([a], [1;91mtype: Hash[0m)
         [1;94m   | [0m
     "#]];
 

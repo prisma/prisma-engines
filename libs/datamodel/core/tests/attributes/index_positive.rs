@@ -1,6 +1,6 @@
 use crate::common::*;
 use crate::{with_header, Provider};
-use datamodel::{render_datamodel_to_string, IndexDefinition, IndexField, IndexType};
+use datamodel::{render_datamodel_to_string, IndexAlgorithm, IndexDefinition, IndexField, IndexType};
 
 #[test]
 fn basic_index_must_work() {
@@ -22,6 +22,7 @@ fn basic_index_must_work() {
         fields: vec![IndexField::new("firstName"), IndexField::new("lastName")],
         tpe: IndexType::Normal,
         defined_on_field: false,
+        algorithm: None,
     });
 }
 
@@ -49,6 +50,7 @@ fn indexes_on_enum_fields_must_work() {
         fields: vec![IndexField::new("role")],
         tpe: IndexType::Normal,
         defined_on_field: false,
+        algorithm: None,
     });
 }
 
@@ -73,6 +75,7 @@ fn the_name_argument_must_work() {
         fields: vec![IndexField::new("firstName"), IndexField::new("lastName")],
         tpe: IndexType::Normal,
         defined_on_field: false,
+        algorithm: None,
     });
 }
 
@@ -101,6 +104,7 @@ fn the_map_argument_must_work() {
         fields: vec![IndexField::new("firstName"), IndexField::new("lastName")],
         tpe: IndexType::Normal,
         defined_on_field: false,
+        algorithm: None,
     });
 }
 
@@ -126,6 +130,7 @@ fn multiple_index_must_work() {
         fields: vec![IndexField::new("firstName"), IndexField::new("lastName")],
         tpe: IndexType::Normal,
         defined_on_field: false,
+        algorithm: None,
     });
 
     user_model.assert_has_index(IndexDefinition {
@@ -134,6 +139,7 @@ fn multiple_index_must_work() {
         fields: vec![IndexField::new("firstName"), IndexField::new("lastName")],
         tpe: IndexType::Normal,
         defined_on_field: false,
+        algorithm: None,
     });
 }
 
@@ -183,6 +189,7 @@ fn index_accepts_three_different_notations() {
         fields: vec![IndexField::new("firstName"), IndexField::new("lastName")],
         tpe: IndexType::Normal,
         defined_on_field: false,
+        algorithm: None,
     });
 
     user_model.assert_has_index(IndexDefinition {
@@ -191,6 +198,7 @@ fn index_accepts_three_different_notations() {
         fields: vec![IndexField::new("firstName"), IndexField::new("lastName")],
         tpe: IndexType::Normal,
         defined_on_field: false,
+        algorithm: None,
     });
 
     user_model.assert_has_index(IndexDefinition {
@@ -199,6 +207,7 @@ fn index_accepts_three_different_notations() {
         fields: vec![IndexField::new("firstName"), IndexField::new("lastName")],
         tpe: IndexType::Normal,
         defined_on_field: false,
+        algorithm: None,
     });
 }
 
@@ -223,6 +232,7 @@ fn mysql_allows_unique_length_prefix() {
         }],
         tpe: IndexType::Unique,
         defined_on_field: true,
+        algorithm: None,
     });
 }
 
@@ -402,4 +412,28 @@ fn sqlserver_allows_index_sort_order() {
 
     let schema = with_header(dml, Provider::SqlServer, &["extendedIndexes"]);
     assert!(datamodel::parse_schema(&schema).is_ok());
+}
+
+#[test]
+fn hash_index_works_on_postgres() {
+    let dml = indoc! {r#"
+        model A {
+          id Int @id
+          a  Int
+
+          @@index([a], type: Hash)
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = parse(&schema);
+
+    schema.assert_has_model("A").assert_has_index(IndexDefinition {
+        name: None,
+        db_name: Some("A_a_idx".to_string()),
+        fields: vec![IndexField::new("a")],
+        tpe: IndexType::Normal,
+        defined_on_field: false,
+        algorithm: Some(IndexAlgorithm::Hash),
+    });
 }

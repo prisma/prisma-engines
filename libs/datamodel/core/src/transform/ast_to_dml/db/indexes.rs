@@ -75,8 +75,8 @@ pub(super) fn infer_implicit_indexes(ctx: &mut Context<'_>) {
                     })
                     .collect(),
                 source_field,
-                name: None,
                 db_name: Some(Cow::from(db_name)),
+                ..Default::default()
             },
         ));
     }

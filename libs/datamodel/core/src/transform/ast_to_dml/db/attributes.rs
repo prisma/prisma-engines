@@ -9,7 +9,6 @@ use super::{
     context::{Arguments, Context},
     types::{EnumAttributes, IndexAttribute, ModelAttributes, RelationField, ScalarField, ScalarFieldType},
 };
-use crate::ast::{FieldId, Model};
 use crate::transform::ast_to_dml::db::types::FieldWithArgs;
 use crate::{
     ast::{self, WithName},
@@ -18,6 +17,10 @@ use crate::{
     dml,
     transform::helpers::ValueValidator,
     SortOrder,
+};
+use crate::{
+    ast::{FieldId, Model},
+    transform::ast_to_dml::db::types::IndexAlgorithm,
 };
 use prisma_value::PrismaValue;
 
@@ -137,6 +140,8 @@ fn resolve_model_attributes<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::
         attributes.visit_repeated("unique", ctx, |args, ctx| {
             model_unique(args, &mut model_attributes, model_id, ctx);
         });
+
+        // TODO: @@fulltext
     });
 
     // Model-global validations
@@ -272,8 +277,8 @@ fn visit_field_unique<'ast>(
                 length,
             }],
             source_field: Some(field_id),
-            name: None,
             db_name: db_name.map(Cow::from),
+            ..Default::default()
         },
     ))
 }
@@ -574,6 +579,23 @@ fn model_index<'ast>(
         (Some(name), None) => Some(Cow::from(name)),
         (None, Some(map)) => Some(Cow::from(map)),
         (None, None) => None,
+    };
+
+    index_attribute.algorithm = match args.optional_arg("type").map(|sort| sort.as_constant_literal()) {
+        Some(Ok("BTree")) => Some(IndexAlgorithm::BTree),
+        Some(Ok("Hash")) => Some(IndexAlgorithm::Hash),
+        Some(Ok(other)) => {
+            ctx.push_error(args.new_attribute_validation_error(&format!(
+                "The `type` argument can only be `BTree` or `Hash` you provided: {}.",
+                other
+            )));
+            None
+        }
+        Some(Err(err)) => {
+            ctx.push_error(err);
+            None
+        }
+        None => None,
     };
 
     data.ast_indexes.push((args.attribute(), index_attribute));

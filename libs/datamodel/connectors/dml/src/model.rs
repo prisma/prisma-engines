@@ -28,6 +28,18 @@ pub struct Model {
     pub is_ignored: bool,
 }
 
+#[derive(Debug, PartialEq, Clone, Copy)]
+pub enum IndexAlgorithm {
+    BTree,
+    Hash,
+}
+
+impl Default for IndexAlgorithm {
+    fn default() -> Self {
+        Self::BTree
+    }
+}
+
 /// Represents an index defined via `@@index`, `@unique` or `@@unique`.
 #[derive(Debug, PartialEq, Clone)]
 pub struct IndexDefinition {
@@ -35,6 +47,7 @@ pub struct IndexDefinition {
     pub db_name: Option<String>,
     pub fields: Vec<IndexField>,
     pub tpe: IndexType,
+    pub algorithm: Option<IndexAlgorithm>,
     pub defined_on_field: bool,
 }
 

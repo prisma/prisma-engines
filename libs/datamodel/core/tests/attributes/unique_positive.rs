@@ -22,6 +22,7 @@ fn basic_unique_index_must_work() {
         fields: vec![IndexField::new("firstName"), IndexField::new("lastName")],
         tpe: IndexType::Unique,
         defined_on_field: false,
+        algorithm: None,
     });
 }
 
@@ -100,6 +101,7 @@ fn the_name_argument_must_work() {
         fields: vec![IndexField::new("firstName"), IndexField::new("lastName")],
         tpe: IndexType::Unique,
         defined_on_field: false,
+        algorithm: None,
     });
 }
 
@@ -139,6 +141,7 @@ fn multiple_unique_must_work() {
                     },
                 ],
                 tpe: Unique,
+                algorithm: None,
                 defined_on_field: false,
             },
             IndexDefinition {
@@ -161,6 +164,7 @@ fn multiple_unique_must_work() {
                     },
                 ],
                 tpe: Unique,
+                algorithm: None,
                 defined_on_field: false,
             },
         ]
@@ -212,6 +216,7 @@ fn multi_field_unique_indexes_on_enum_fields_must_work() {
         fields: vec![IndexField::new("role")],
         tpe: IndexType::Unique,
         defined_on_field: false,
+        algorithm: None,
     });
 }
 
@@ -237,6 +242,7 @@ fn single_field_unique_indexes_on_enum_fields_must_work() {
         fields: vec![IndexField::new("role")],
         tpe: IndexType::Unique,
         defined_on_field: true,
+        algorithm: None,
     });
 }
 
@@ -279,6 +285,7 @@ fn named_multi_field_unique_must_work() {
         fields: vec![IndexField::new("a"), IndexField::new("b")],
         tpe: IndexType::Unique,
         defined_on_field: false,
+        algorithm: None,
     });
 }
 
@@ -304,6 +311,7 @@ fn mapped_multi_field_unique_must_work() {
         fields: vec![IndexField::new("a"), IndexField::new("b")],
         tpe: IndexType::Unique,
         defined_on_field: false,
+        algorithm: None,
     });
 }
 
@@ -331,6 +339,7 @@ fn mapped_singular_unique_must_work() {
         fields: vec![IndexField::new("a")],
         tpe: IndexType::Unique,
         defined_on_field: true,
+        algorithm: None,
     });
 
     let model2 = datamodel.assert_has_model("Model2");
@@ -340,6 +349,7 @@ fn mapped_singular_unique_must_work() {
         fields: vec![IndexField::new("a")],
         tpe: IndexType::Unique,
         defined_on_field: true,
+        algorithm: None,
     });
 }
 
@@ -365,6 +375,7 @@ fn named_and_mapped_multi_field_unique_must_work() {
         fields: vec![IndexField::new("a"), IndexField::new("b")],
         tpe: IndexType::Unique,
         defined_on_field: false,
+        algorithm: None,
     });
 }
 
@@ -390,6 +401,7 @@ fn implicit_names_must_work() {
         fields: vec![IndexField::new("a"), IndexField::new("b")],
         tpe: IndexType::Unique,
         defined_on_field: false,
+        algorithm: None,
     });
 
     model.assert_has_index(IndexDefinition {
@@ -398,6 +410,7 @@ fn implicit_names_must_work() {
         fields: vec![IndexField::new("a")],
         tpe: IndexType::Unique,
         defined_on_field: true,
+        algorithm: None,
     });
 }
 
@@ -423,6 +436,7 @@ fn defined_on_field_must_work() {
         fields: vec![IndexField::new("a")],
         tpe: IndexType::Unique,
         defined_on_field: true,
+        algorithm: None,
     });
 
     model.assert_has_index(IndexDefinition {
@@ -431,6 +445,7 @@ fn defined_on_field_must_work() {
         fields: vec![IndexField::new("b")],
         tpe: IndexType::Unique,
         defined_on_field: false,
+        algorithm: None,
     });
 }
 
@@ -454,5 +469,6 @@ fn mapping_unique_to_a_field_name_should_work() {
         fields: vec![IndexField::new("name"), IndexField::new("identification")],
         tpe: IndexType::Unique,
         defined_on_field: false,
+        algorithm: None,
     });
 }

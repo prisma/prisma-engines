@@ -183,6 +183,18 @@ impl ModelAttributes<'_> {
     }
 }
 
+#[derive(Debug, Clone, Copy)]
+pub enum IndexAlgorithm {
+    BTree,
+    Hash,
+}
+
+impl Default for IndexAlgorithm {
+    fn default() -> Self {
+        Self::BTree
+    }
+}
+
 #[derive(Debug, Default)]
 pub(crate) struct IndexAttribute<'ast> {
     pub(crate) is_unique: bool,
@@ -190,6 +202,7 @@ pub(crate) struct IndexAttribute<'ast> {
     pub(crate) source_field: Option<ast::FieldId>,
     pub(crate) name: Option<&'ast str>,
     pub(crate) db_name: Option<Cow<'ast, str>>,
+    pub(crate) algorithm: Option<IndexAlgorithm>,
 }
 
 #[derive(Debug)]

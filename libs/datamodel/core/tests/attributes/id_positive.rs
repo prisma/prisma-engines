@@ -156,6 +156,7 @@ fn should_allow_unique_and_id_on_same_field() {
         fields: vec![IndexField::new("id")],
         tpe: IndexType::Unique,
         defined_on_field: true,
+        algorithm: None,
     });
 }
 
