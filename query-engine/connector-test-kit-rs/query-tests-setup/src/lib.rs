@@ -33,9 +33,14 @@ lazy_static! {
     pub static ref CONFIG: TestConfig = TestConfig::load().unwrap();
 }
 
-/// Teardown & setup of everything as defined in the passed datamodel.
+/// Setup of everything as defined in the passed datamodel.
 pub async fn setup_project(datamodel: &str) -> TestResult<()> {
-    Ok(migration_core::qe_setup::run(datamodel).await?)
+    Ok(migration_core::query_engine::setup(datamodel).await?)
+}
+
+/// Teardown of a test setup.
+pub async fn teardown_project(datamodel: &str) -> TestResult<()> {
+    Ok(migration_core::query_engine::teardown(datamodel).await?)
 }
 
 /// Helper method to allow a sync shell function to run the async test blocks.
@@ -103,6 +108,7 @@ pub fn run_relation_link_test<F>(
 
                 setup_project(&datamodel).await.unwrap();
                 test_fn.call(&runner, &dm_with_params_json).await.unwrap();
+                teardown_project(&datamodel).await.unwrap();
             }
             .with_subscriber(test_tracing_subscriber(
                 std::env::var("LOG_LEVEL").unwrap_or_else(|_| "info".to_string()),

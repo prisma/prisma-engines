@@ -1,6 +1,6 @@
 mod rpc;
 
-pub mod qe_setup;
+pub mod query_engine;
 
 pub use crate::api::GenericApi;
 pub use rpc::rpc_api;
