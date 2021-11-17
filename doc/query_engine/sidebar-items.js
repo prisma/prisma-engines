@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["LogFormat",""]],"fn":[["main",""],["set_panic_hook",""]],"mod":[["cli",""],["context",""],["error",""],["logger",""],["opt",""],["server",""]],"type":[["AnyError",""],["PrismaResult",""]]});
+initSidebarItems({});

@@ -109,12 +109,6 @@
 <span id="109">109</span>
 <span id="110">110</span>
 <span id="111">111</span>
-<span id="112">112</span>
-<span id="113">113</span>
-<span id="114">114</span>
-<span id="115">115</span>
-<span id="116">116</span>
-<span id="117">117</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">fields</span>;
 <span class="kw">mod</span> <span class="ident">indexes</span>;
 <span class="kw">mod</span> <span class="ident">models</span>;
@@ -142,13 +136,7 @@
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pk</span>) <span class="op">=</span> <span class="ident">model</span>.<span class="ident">primary_key</span>() {
             <span class="kw">for</span> <span class="ident">field_attribute</span> <span class="kw">in</span> <span class="ident">pk</span>.<span class="ident">scalar_field_attributes</span>() {
-                <span class="comment">// Type aliases will panic here... :(</span>
-                <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">pk</span>.<span class="ident">has_ast_attribute</span>() {
-                    <span class="ident">pk</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>
-                } <span class="kw">else</span> {
-                    <span class="ident">ast::Span::empty</span>()
-                };
-
+                <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">pk</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>;
                 <span class="kw">let</span> <span class="ident">attribute</span> <span class="op">=</span> (<span class="string">&quot;id&quot;</span>, <span class="ident">span</span>);
                 <span class="ident">fields::validate_length_used_with_correct_types</span>(<span class="ident">db</span>, <span class="ident">field_attribute</span>, <span class="ident">attribute</span>, <span class="ident">diagnostics</span>);
             }

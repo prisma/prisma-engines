@@ -227,6 +227,8 @@
 <span id="227">227</span>
 <span id="228">228</span>
 <span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::FieldResolutionError</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::transform::ast_to_dml::db::attributes::resolve_field_array_with_args</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::transform::ast_to_dml::db::types::FieldWithArgs</span>;
@@ -329,6 +331,7 @@
 
     <span class="ident">model_data</span>.<span class="ident">primary_key</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">IdAttribute</span> {
         <span class="ident">name</span>,
+        <span class="ident">source_attribute</span>: <span class="ident">args</span>.<span class="ident">attribute</span>(),
         <span class="ident">db_name</span>,
         <span class="ident">fields</span>: <span class="ident">resolved_fields</span>,
         <span class="ident">source_field</span>: <span class="prelude-val">None</span>,
@@ -379,6 +382,7 @@
             <span class="ident">model_attributes</span>.<span class="ident">primary_key</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">IdAttribute</span> {
                 <span class="ident">name</span>: <span class="prelude-val">None</span>,
                 <span class="ident">db_name</span>,
+                <span class="ident">source_attribute</span>: <span class="ident">args</span>.<span class="ident">attribute</span>(),
                 <span class="ident">fields</span>: <span class="macro">vec!</span>[<span class="ident">FieldWithArgs</span> {
                     <span class="ident">field_id</span>,
                     <span class="ident">sort_order</span>,
