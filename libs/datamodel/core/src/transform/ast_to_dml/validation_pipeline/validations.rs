@@ -25,13 +25,7 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, r
 
         if let Some(pk) = model.primary_key() {
             for field_attribute in pk.scalar_field_attributes() {
-                // Type aliases will panic here... :(
-                let span = if pk.has_ast_attribute() {
-                    pk.ast_attribute().span
-                } else {
-                    ast::Span::empty()
-                };
-
+                let span = pk.ast_attribute().span;
                 let attribute = ("id", span);
                 fields::validate_length_used_with_correct_types(db, field_attribute, attribute, diagnostics);
             }
