@@ -66,7 +66,15 @@ impl ScalarFilter {
     }
 
     pub fn can_batch(&self) -> bool {
-        !matches!(self.condition, ScalarCondition::NotIn(_))
+        match self.condition {
+            ScalarCondition::NotContains(_) => false,
+            ScalarCondition::NotEquals(_) => false,
+            ScalarCondition::NotIn(_) => false,
+            ScalarCondition::NotSearch(..) => false,
+            ScalarCondition::NotStartsWith(_) => false,
+            ScalarCondition::NotEndsWith(_) => false,
+            _ => true,
+        }
     }
 
     /// If possible, converts the filter into multiple smaller filters.

@@ -94,7 +94,7 @@ pub async fn get_many_records(
 
             if query_arguments.has_unbatchable_filters() {
                 return Err(SqlError::QueryParameterLimitExceeded(
-                    "Your query cannot be split into multiple queries because the filter will cause incorrect results"
+                    "Parameter limits for this database provider require this query to be split into multiple queries, but the negation filters used prevent the query from being split. Please reduce the used values in the query."
                         .to_string(),
                 ));
             }
