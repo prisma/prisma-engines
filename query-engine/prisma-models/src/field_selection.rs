@@ -1,8 +1,8 @@
 use std::fmt::Display;
 
-use itertools::Itertools;
-
 use crate::{CompositeFieldRef, DomainError, Field, RelationField, ScalarFieldRef, SelectionResult};
+use itertools::Itertools;
+use prisma_value::PrismaValue;
 
 /// A selection of fields from a model.
 #[derive(Debug, Clone, PartialEq)]
@@ -43,6 +43,16 @@ impl CompositeSelection {
 
     pub fn get(&self, name: &str) -> Option<&SelectedField> {
         self.selections.iter().find(|selection| selection.prisma_name() == name)
+    }
+
+    /// Ensures that the given `PrismaValue` fits the
+    fn ensure_type_coherence(&self, pv: PrismaValue) -> crate::Result<PrismaValue> {
+        // match pv {
+        //     PrismaValue::Object
+        // }
+        // ConversionFailure
+
+        todo!()
     }
 }
 

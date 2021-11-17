@@ -1,4 +1,6 @@
-use crate::{DomainError, FieldSelection, PrismaValue, ScalarFieldRef, SelectedField};
+use crate::{
+    CompositeSelection, DomainError, FieldSelection, PrismaValue, PrismaValueExtensions, ScalarFieldRef, SelectedField,
+};
 use std::convert::TryFrom;
 
 /// Represents a set of results.
@@ -105,23 +107,6 @@ impl SelectionResult {
             .collect()
     }
 
-    /// Ensures that the contained values match the type identifier.
-    pub fn ensure_type_coherence(self) -> Self {
-        // let pairs = self
-        //     .pairs
-        //     .into_iter()
-        //     .map(|(field, value)| {
-        //         let value = value.coerce(&field.type_identifier).unwrap();
-
-        //         (field, value)
-        //     })
-        //     .collect();
-
-        // Self { pairs }
-
-        todo!()
-    }
-
     /// Checks if `self` only contains scalar field selections and if so, returns them all in a list.
     /// If any other selection is contained, returns `None`.
     pub fn as_scalar_fields(&self) -> Option<Vec<ScalarFieldRef>> {
@@ -139,6 +124,25 @@ impl SelectionResult {
         } else {
             None
         }
+    }
+
+    /// - Scalar fields coerce values based on the TypeIdentifier.
+    /// - Composite fields must be objects and contained fields must also follow the type coherence.
+    fn ensure_type_coherence(self) -> Self {
+        let pairs = self
+            .pairs
+            .into_iter()
+            .map(|(selection, value)| {
+                let value = match selection {
+                    SelectedField::Scalar(sf) => value.coerce(&sf.type_identifier).unwrap(),
+                    SelectedField::Composite(cs) => cs.ensure_type_coherence(value),
+                };
+
+                (selection, value)
+            })
+            .collect();
+
+        Self { pairs }
     }
 }
 

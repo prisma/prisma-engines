@@ -26,7 +26,7 @@ impl SingleRecord {
     }
 
     pub fn projection(&self, projection: &ModelProjection) -> crate::Result<SelectionResult> {
-        self.record.projection(&self.field_names, projection)
+        self.record.extract_selection_result(&self.field_names, projection)
     }
 
     pub fn get_field_value(&self, field: &str) -> crate::Result<&PrismaValue> {
@@ -101,10 +101,11 @@ impl ManyRecords {
         self.records.push(record);
     }
 
-    pub fn projections(&self, model_projection: &ModelProjection) -> crate::Result<Vec<SelectionResult>> {
+    /// Builds `SelectionResults` from this `ManyRecords` based on the given FieldSelection.
+    pub fn extract_selection_results(&self, selections: &FieldSelection) -> crate::Result<Vec<SelectionResult>> {
         self.records
             .iter()
-            .map(|record| record.projection(&self.field_names, model_projection))
+            .map(|record| record.extract_selection_result(&self.field_names, selections))
             .collect()
     }
 
@@ -149,25 +150,25 @@ impl Record {
         }
     }
 
-    pub fn projection(
+    pub fn extract_selection_result(
         &self,
         field_names: &[String],
-        model_projection: &ModelProjection,
+        selected_fields: &FieldSelection,
     ) -> crate::Result<SelectionResult> {
-        let pairs: Vec<(ScalarFieldRef, PrismaValue)> = model_projection
-            .fields()
+        let pairs: Vec<(ScalarFieldRef, PrismaValue)> = selected_fields
+            .selections()
             .into_iter()
-            .flat_map(|field| {
-                field.scalar_fields().into_iter().map(|field| {
-                    self.get_field_value(field_names, field.db_name()).map(|val| {
-                        let coerced = val
-                            .clone()
-                            .coerce(&field.type_identifier)
-                            .expect("Invalid coercion encountered");
+            .flat_map(|selection| {
+                // field.scalar_fields().into_iter().map(|field| {
+                self.get_field_value(field_names, selection.db_name()).map(|val| {
+                    let coerced = val
+                        .clone()
+                        .coerce(&field.type_identifier)
+                        .expect("Invalid coercion encountered");
 
-                        (field, coerced)
-                    })
+                    (field, coerced)
                 })
+                // })
             })
             .collect::<crate::Result<Vec<_>>>()?;
 

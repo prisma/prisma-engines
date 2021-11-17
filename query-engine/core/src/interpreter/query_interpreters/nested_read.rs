@@ -24,7 +24,7 @@ pub async fn m2m(
             let parent_model_id = query.parent_field.model().primary_identifier();
             parent_result
                 .expect("[ID retrieval] No parent results present in the query graph for reading related records.")
-                .projections(&parent_model_id)?
+                .extract_selection_results(&parent_model_id)?
         }
     };
 
@@ -92,7 +92,7 @@ pub async fn m2m(
     let mut additional_records: Vec<(usize, Vec<Record>)> = vec![];
 
     for (index, record) in scalars.records.iter_mut().enumerate() {
-        let record_id = record.projection(fields, &child_model_id)?;
+        let record_id = record.extract_selection_result(fields, &child_model_id)?;
         let mut parent_ids = id_map.remove(&record_id).expect("1");
         let first = parent_ids.pop().expect("2");
 
@@ -160,7 +160,7 @@ pub async fn one2m(
             let extractor = parent_model_id.clone().merge(parent_link_id.clone());
             parent_result
                 .expect("[ID retrieval] No parent results present in the query graph for reading related records.")
-                .projections(&extractor)?
+                .extract_selection_results(&extractor)?
         }
     };
 
@@ -221,7 +221,7 @@ pub async fn one2m(
         let mut additional_records = vec![];
 
         for mut record in scalars.records.iter_mut() {
-            let child_link: SelectionResult = record.projection(&scalars.field_names, &child_link_id)?;
+            let child_link: SelectionResult = record.extract_selection_result(&scalars.field_names, &child_link_id)?;
             let child_link_values: Vec<PrismaValue> = child_link.pairs.into_iter().map(|(_, v)| v).collect();
 
             if let Some(parent_ids) = link_mapping.get_mut(&child_link_values) {
@@ -245,7 +245,8 @@ pub async fn one2m(
         let child_link_fields = parent_field.related_field().linking_fields();
 
         for record in scalars.records.iter_mut() {
-            let child_link: SelectionResult = record.projection(&scalars.field_names, &child_link_fields)?;
+            let child_link: SelectionResult =
+                record.extract_selection_result(&scalars.field_names, &child_link_fields)?;
             let child_link_values: Vec<PrismaValue> = child_link.pairs.into_iter().map(|(_, v)| v).collect();
 
             if let Some(parent_ids) = link_mapping.get(&child_link_values) {
