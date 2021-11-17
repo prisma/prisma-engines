@@ -22,7 +22,7 @@ pub struct Field {
 
 impl Field {
     /// Finds the position span of the argument in the given field attribute.
-    pub(crate) fn span_for_argument(&self, attribute: &str, argument: &str) -> Option<Span> {
+    pub fn span_for_argument(&self, attribute: &str, argument: &str) -> Option<Span> {
         self.attributes
             .iter()
             .filter(|a| a.name() == attribute)
@@ -33,7 +33,7 @@ impl Field {
     }
 
     /// Finds the position span of the given attribute.
-    pub(crate) fn span_for_attribute(&self, attribute: &str) -> Option<Span> {
+    pub fn span_for_attribute(&self, attribute: &str) -> Option<Span> {
         self.attributes
             .iter()
             .filter(|a| a.name() == attribute)
@@ -60,7 +60,7 @@ impl WithSpan for Field {
 }
 
 impl WithAttributes for Field {
-    fn attributes(&self) -> &Vec<Attribute> {
+    fn attributes(&self) -> &[Attribute] {
         &self.attributes
     }
 }
@@ -103,14 +103,14 @@ pub enum FieldType {
 }
 
 impl FieldType {
-    pub(crate) fn span(&self) -> Span {
+    pub fn span(&self) -> Span {
         match self {
             FieldType::Supported(ident) => ident.span,
             FieldType::Unsupported(_, span) => *span,
         }
     }
 
-    pub(crate) fn as_unsupported(&self) -> Option<(&str, &Span)> {
+    pub fn as_unsupported(&self) -> Option<(&str, &Span)> {
         match self {
             FieldType::Unsupported(name, span) => Some((name, span)),
             FieldType::Supported(_) => None,

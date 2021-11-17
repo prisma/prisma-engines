@@ -2,7 +2,7 @@ use super::{CompositeType, Enum, Field, GeneratorConfig, Identifier, Model, Sour
 
 /// Enum for distinguishing between top-level entries
 #[derive(Debug, Clone, PartialEq)]
-pub(crate) enum Top {
+pub enum Top {
     CompositeType(CompositeType),
     Enum(Enum),
     Model(Model),
@@ -23,7 +23,7 @@ impl Top {
         }
     }
 
-    pub(crate) fn identifier(&self) -> &Identifier {
+    pub fn identifier(&self) -> &Identifier {
         match self {
             Top::CompositeType(ct) => &ct.name,
             Top::Enum(x) => &x.name,
@@ -34,11 +34,11 @@ impl Top {
         }
     }
 
-    pub(crate) fn name(&self) -> &str {
+    pub fn name(&self) -> &str {
         &self.identifier().name
     }
 
-    pub(crate) fn as_composite_type(&self) -> Option<&CompositeType> {
+    pub fn as_composite_type(&self) -> Option<&CompositeType> {
         match self {
             Top::CompositeType(ct) => Some(ct),
             _ => None,
@@ -52,28 +52,28 @@ impl Top {
         }
     }
 
-    pub(crate) fn as_enum(&self) -> Option<&Enum> {
+    pub fn as_enum(&self) -> Option<&Enum> {
         match self {
             Top::Enum(r#enum) => Some(r#enum),
             _ => None,
         }
     }
 
-    pub(crate) fn as_generator(&self) -> Option<&GeneratorConfig> {
+    pub fn as_generator(&self) -> Option<&GeneratorConfig> {
         match self {
             Top::Generator(gen) => Some(gen),
             _ => None,
         }
     }
 
-    pub(crate) fn as_type_alias(&self) -> Option<&Field> {
+    pub fn as_type_alias(&self) -> Option<&Field> {
         match self {
             Top::Type(r#type) => Some(r#type),
             _ => None,
         }
     }
 
-    pub(crate) fn as_source(&self) -> Option<&SourceConfig> {
+    pub fn as_source(&self) -> Option<&SourceConfig> {
         match self {
             Top::Source(source) => Some(source),
             _ => None,

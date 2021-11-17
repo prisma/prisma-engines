@@ -1,4 +1,4 @@
-use super::*;
+use super::{Attribute, Comment, Identifier, Span, WithAttributes, WithDocumentation, WithIdentifier, WithSpan};
 
 /// An enum declaration.
 #[derive(Debug, Clone, PartialEq)]
@@ -28,7 +28,7 @@ impl WithSpan for Enum {
 }
 
 impl WithAttributes for Enum {
-    fn attributes(&self) -> &Vec<Attribute> {
+    fn attributes(&self) -> &[Attribute] {
         &self.attributes
     }
 }
@@ -62,7 +62,7 @@ impl WithIdentifier for EnumValue {
 }
 
 impl WithAttributes for EnumValue {
-    fn attributes(&self) -> &Vec<Attribute> {
+    fn attributes(&self) -> &[Attribute] {
         &self.attributes
     }
 }
