@@ -211,6 +211,7 @@ impl QueryEngine {
                             true, // enable raw queries
                             data_source.capabilities(),
                             preview_features,
+                            data_source.referential_integrity(),
                         );
 
                         Ok(ConnectedEngine {

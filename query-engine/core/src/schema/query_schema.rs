@@ -1,6 +1,6 @@
 use super::*;
 use datamodel::common::preview_features::PreviewFeature;
-use datamodel_connector::ConnectorCapability;
+use datamodel_connector::{ConnectorCapability, ReferentialIntegrity};
 use fmt::Debug;
 use prisma_models::{InternalDataModelRef, ModelRef};
 use std::{borrow::Borrow, fmt};
@@ -47,15 +47,27 @@ pub struct ConnectorContext {
 
     /// Enabled preview features.
     pub features: Vec<PreviewFeature>,
+
+    /// Referential integrity mode of the provider
+    pub referential_integrity: ReferentialIntegrity,
 }
 
 impl ConnectorContext {
-    pub fn new(capabilities: Vec<ConnectorCapability>, features: Vec<PreviewFeature>) -> Self {
-        Self { capabilities, features }
+    pub fn new(
+        capabilities: Vec<ConnectorCapability>,
+        features: Vec<PreviewFeature>,
+        referential_integrity: ReferentialIntegrity,
+    ) -> Self {
+        Self {
+            capabilities,
+            features,
+            referential_integrity,
+        }
     }
 }
 
 impl QuerySchema {
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         query: OutputTypeRef,
         mutation: OutputTypeRef,
@@ -64,6 +76,7 @@ impl QuerySchema {
         internal_data_model: InternalDataModelRef,
         capabilities: Vec<ConnectorCapability>,
         features: Vec<PreviewFeature>,
+        referential_integrity: ReferentialIntegrity,
     ) -> Self {
         QuerySchema {
             query,
@@ -71,7 +84,7 @@ impl QuerySchema {
             input_object_types,
             output_object_types,
             internal_data_model,
-            context: ConnectorContext::new(capabilities, features),
+            context: ConnectorContext::new(capabilities, features, referential_integrity),
         }
     }
 

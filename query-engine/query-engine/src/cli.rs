@@ -86,10 +86,11 @@ impl CliCommand {
     }
 
     async fn dmmf(request: DmmfRequest) -> PrismaResult<()> {
-        let capabilities = match request.config.datasources.first() {
-            Some(datasource) => datasource.capabilities(),
-            None => ConnectorCapabilities::empty(),
-        };
+        let datasource = request.config.datasources.first();
+        let capabilities = datasource
+            .map(|ds| ds.capabilities())
+            .unwrap_or_else(ConnectorCapabilities::empty);
+        let referential_integrity = datasource.map(|ds| ds.referential_integrity()).unwrap_or_default();
 
         // temporary code duplication
         let internal_data_model = InternalDataModelBuilder::from(&request.datamodel).build("".into());
@@ -99,6 +100,7 @@ impl CliCommand {
             request.enable_raw_queries,
             capabilities,
             request.config.preview_features().iter().collect(),
+            referential_integrity,
         ));
 
         let dmmf = dmmf::render_dmmf(&request.datamodel, query_schema);

@@ -111,7 +111,6 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::QueryRaw,
     ConnectorCapability::NamedForeignKeys,
     ConnectorCapability::AdvancedJsonNullability,
-    ConnectorCapability::ForeignKeys,
     ConnectorCapability::IndexColumnLengthPrefixing,
     ConnectorCapability::FullTextIndex,
 ];

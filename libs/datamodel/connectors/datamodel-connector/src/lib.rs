@@ -258,7 +258,6 @@ capabilities!(
     Json,
     AutoIncrement,
     RelationFieldsInArbitraryOrder,
-    ForeignKeys,
     CompositeTypes,
     //Start of ME/IE only capabilities
     AutoIncrementAllowedOnNonId,

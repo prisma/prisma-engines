@@ -5,7 +5,6 @@ use crate::{
 };
 use connector::{DatasourceFieldName, Filter, RecordFilter, WriteArgs};
 use datamodel::ReferentialAction;
-use datamodel_connector::ConnectorCapability;
 use prisma_models::{ModelProjection, ModelRef, PrismaValue, RelationFieldRef};
 use std::sync::Arc;
 
@@ -315,16 +314,14 @@ pub fn insert_emulated_on_delete(
     parent_node: &NodeRef,
     child_node: &NodeRef,
 ) -> QueryGraphBuilderResult<()> {
-    let has_fks = connector_ctx.capabilities.contains(&ConnectorCapability::ForeignKeys);
-
-    // If the connector supports foreign keys and the new mode is enabled (preview feature), we do not do any checks / emulation.
-    if has_fks {
+    // If the connector uses the `ReferentialIntegrity::ForeignKeys` mode, we do not do any checks / emulation.
+    if connector_ctx.referential_integrity.uses_foreign_keys() {
         return Ok(());
     }
 
-    // If it's non-fk dbs, then the emulation will kick in. If it has Fks, then preserve the old behavior (`has_fks` -> only required ones).
+    // If the connector uses the `ReferentialIntegrity::Prisma` mode, then the emulation will kick in.
     let internal_model = model_to_delete.internal_data_model();
-    let relation_fields = internal_model.fields_pointing_to_model(model_to_delete, has_fks);
+    let relation_fields = internal_model.fields_pointing_to_model(model_to_delete, false);
 
     for rf in relation_fields {
         match rf.relation().on_delete() {
@@ -818,16 +815,14 @@ pub fn insert_emulated_on_update_with_intermediary_node(
     parent_node: &NodeRef,
     child_node: &NodeRef,
 ) -> QueryGraphBuilderResult<Option<NodeRef>> {
-    let has_fks = connector_ctx.capabilities.contains(&ConnectorCapability::ForeignKeys);
-
-    // If the connector supports foreign keys and the new mode is enabled (preview feature), we do not do any checks / emulation.
-    if has_fks {
+    // If the connector uses the `ReferentialIntegrity::ForeignKeys` mode, we do not do any checks / emulation.
+    if connector_ctx.referential_integrity.uses_foreign_keys() {
         return Ok(None);
     }
 
-    // If it's non-fk dbs, then the emulation will kick in. If it has Fks, then preserve the old behavior (`has_fks` -> only required ones).
+    // If the connector uses the `ReferentialIntegrity::Prisma` mode, then the emulation will kick in.
     let internal_model = model_to_update.internal_data_model();
-    let relation_fields = internal_model.fields_pointing_to_model(model_to_update, has_fks);
+    let relation_fields = internal_model.fields_pointing_to_model(model_to_update, false);
 
     let join_node = graph.create_node(Flow::Return(None));
 
@@ -869,16 +864,14 @@ pub fn insert_emulated_on_update(
     parent_node: &NodeRef,
     child_node: &NodeRef,
 ) -> QueryGraphBuilderResult<()> {
-    let has_fks = connector_ctx.capabilities.contains(&ConnectorCapability::ForeignKeys);
-
-    // If the connector supports foreign keys and the new mode is enabled (preview feature), we do not do any checks / emulation.
-    if has_fks {
+    // If the connector uses the `ReferentialIntegrity::ForeignKeys` mode, we do not do any checks / emulation.
+    if connector_ctx.referential_integrity.uses_foreign_keys() {
         return Ok(());
     }
 
-    // If it's non-fk dbs, then the emulation will kick in. If it has Fks, then preserve the old behavior (`has_fks` -> only required ones).
+    // If the connector uses the `ReferentialIntegrity::Prisma` mode, then the emulation will kick in.
     let internal_model = model_to_update.internal_data_model();
-    let relation_fields = internal_model.fields_pointing_to_model(model_to_update, has_fks);
+    let relation_fields = internal_model.fields_pointing_to_model(model_to_update, false);
 
     for rf in relation_fields {
         match rf.relation().on_update() {
