@@ -408,11 +408,7 @@ impl RelationField {
     pub fn default_on_update_action(&self) -> ReferentialAction {
         use ReferentialAction::*;
 
-        match self.referential_arity {
-            _ if !self.emulates_referential_actions.unwrap_or(false) => Cascade,
-            FieldArity::Required => NoAction,
-            _ => SetNull,
-        }
+        Cascade
     }
 }
 
@@ -420,6 +416,7 @@ impl WithName for RelationField {
     fn name(&self) -> &String {
         &self.name
     }
+
     fn set_name(&mut self, name: &str) {
         self.name = String::from(name)
     }
