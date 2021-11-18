@@ -1,4 +1,4 @@
-use crate::{column_metadata, error::*, model_extensions::*, AliasedCondition, ColumnMetadata, SqlRow, ToSqlRow};
+use crate::{AliasedCondition, ColumnMetadata, SqlRow, ToSqlRow, column_metadata, error::*, model_extensions::*, sql_trace::SqlTraceComment};
 use async_trait::async_trait;
 use connector_interface::{filter::Filter, RecordFilter};
 use futures::future::FutureExt;
@@ -13,10 +13,10 @@ use tracing_futures::Instrument;
 use serde_json::{Map, Value};
 use std::panic::AssertUnwindSafe;
 
+use crate::sql_trace::trace_parent_to_string;
 use opentelemetry::trace::TraceContextExt;
 use tracing::Span;
 use tracing_opentelemetry::OpenTelemetrySpanExt;
-use crate::{sql_trace::trace_parent_to_string};
 
 impl<'t> QueryExt for connector::Transaction<'t> {}
 impl QueryExt for PooledConnection {}
@@ -126,19 +126,10 @@ pub trait QueryExt: Queryable + Send + Sync {
         let model_id = model.primary_identifier();
         let id_cols: Vec<Column<'static>> = model_id.as_columns().collect();
 
-        let span_ctx = Span::current().context();
-        let otel_ctx = span_ctx.span().span_context();
-
-        let select = if otel_ctx.trace_flags() == 1 {
-            Select::from_table(model.as_table())
-                .columns(id_cols)
-                .comment(trace_parent_to_string(otel_ctx))
-                .so_that(filter.aliased_cond(None))
-        } else {
-            Select::from_table(model.as_table())
-                .columns(id_cols)
-                .so_that(filter.aliased_cond(None))
-        };
+        let select = Select::from_table(model.as_table())
+            .columns(id_cols)
+            .append_trace(&Span::current())
+            .so_that(filter.aliased_cond(None));
 
         self.select_ids(select, model_id).await
     }
@@ -157,6 +148,7 @@ pub trait QueryExt: Queryable + Send + Sync {
         let field_names: Vec<_> = model_id.fields().map(|field| field.name()).collect();
         let meta = column_metadata::create(field_names.as_slice(), &idents);
 
+        // TODO: Add tracing
         let mut rows = self.filter(select.into(), &meta).await?;
         let mut result = Vec::new();
 

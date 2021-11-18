@@ -1,10 +1,9 @@
-use crate::{
-    cursor_condition, filter_conversion::AliasedCondition, model_extensions::*, nested_aggregations, ordering,
-};
+use crate::{cursor_condition, filter_conversion::AliasedCondition, model_extensions::*, nested_aggregations, ordering, sql_trace::SqlTraceComment};
 use connector_interface::{filter::Filter, AggregationSelection, QueryArguments, RelAggregationSelection};
 use itertools::Itertools;
 use prisma_models::*;
 use quaint::ast::*;
+use tracing::Span;
 
 pub trait SelectDefinition {
     fn into_select(
@@ -80,7 +79,8 @@ impl SelectDefinition for QueryArguments {
 
         let select_ast = Select::from_table(joined_table)
             .so_that(conditions)
-            .offset(skip as usize);
+            .offset(skip as usize)
+            .append_trace(&Span::current());
 
         let select_ast = if let Some(table) = table_opt {
             select_ast.and_from(table)
@@ -111,6 +111,8 @@ where
 {
     let (select, additional_selection_set) = query.into_select(model, aggr_selections);
     let select = columns.fold(select, |acc, col| acc.column(col));
+
+    let select = select.append_trace(&Span::current());
 
     additional_selection_set
         .into_iter()
@@ -151,7 +153,7 @@ pub fn aggregate(model: &ModelRef, selections: &[AggregationSelection], args: Qu
 
     selections
         .iter()
-        .fold(Select::from_table(sub_table), |select, next_op| match next_op {
+        .fold(Select::from_table(sub_table).append_trace(&Span::current()), |select, next_op| match next_op {
             AggregationSelection::Field(field) => select.column(Column::from(field.db_name().to_owned())),
 
             AggregationSelection::Count { all, fields } => {
@@ -229,6 +231,8 @@ pub fn group_by_aggregate(
     let grouped = group_by
         .into_iter()
         .fold(select_query, |query, field| query.group_by(field.as_column()));
+
+    let grouped = grouped.append_trace(&Span::current());
 
     match having {
         Some(filter) => grouped.having(filter.aliased_cond(None)),

@@ -199,7 +199,7 @@ pub fn create_relation_table_records(
         insert.values(values)
     });
 
-
+    // NOTE: There is no comment support for MultiRowInsert
     insert.build().on_conflict(OnConflict::DoNothing).into()
 }
 
@@ -223,5 +223,7 @@ pub fn delete_relation_table_records(
 
     let child_id_criteria = super::conditions(&child_columns, child_ids);
 
-    Delete::from_table(relation.as_table()).so_that(parent_id_criteria.and(child_id_criteria))
+    Delete::from_table(relation.as_table())
+        .so_that(parent_id_criteria.and(child_id_criteria))
+        .append_trace(&Span::current())
 }
