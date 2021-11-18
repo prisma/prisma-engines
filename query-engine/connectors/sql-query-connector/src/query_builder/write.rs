@@ -81,7 +81,6 @@ pub fn create_records_nonempty(
     let insert = Insert::multi_into(model.as_table(), columns);
     let insert = values.into_iter().fold(insert, |stmt, values| stmt.values(values));
     let insert: Insert = insert.into();
-
     let insert = insert.append_trace(&Span::current());
 
     if skip_duplicates {
@@ -95,7 +94,6 @@ pub fn create_records_nonempty(
 #[tracing::instrument(skip(model, skip_duplicates))]
 pub fn create_records_empty(model: &ModelRef, skip_duplicates: bool) -> Insert<'static> {
     let insert: Insert<'static> = Insert::single_into(model.as_table()).into();
-
     let insert = insert.append_trace(&Span::current());
 
     if skip_duplicates {

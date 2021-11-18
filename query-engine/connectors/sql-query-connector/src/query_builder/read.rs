@@ -234,9 +234,9 @@ pub fn group_by_aggregate(
 
     let grouped = group_by
         .into_iter()
-        .fold(select_query, |query, field| query.group_by(field.as_column()));
-
-    let grouped = grouped.append_trace(&Span::current());
+        .fold(select_query.append_trace(&Span::current()), |query, field| {
+            query.group_by(field.as_column())
+        });
 
     match having {
         Some(filter) => grouped.having(filter.aliased_cond(None)),

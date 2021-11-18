@@ -15,54 +15,27 @@ pub trait SqlTraceComment: Sized {
     fn append_trace(self, span: &Span) -> Self;
 }
 
-impl SqlTraceComment for Insert<'_> {
-    fn append_trace(self, span: &Span) -> Self {
-        let span_ctx = span.context();
-        let otel_ctx = span_ctx.span().span_context();
+macro_rules! sql_trace {
+    ($what:ty) => {
+        impl SqlTraceComment for $what {
+            fn append_trace(self, span: &Span) -> Self {
+                let span_ctx = span.context();
+                let otel_ctx = span_ctx.span().span_context();
 
-        if otel_ctx.trace_flags() == 1 {
-            self.comment(trace_parent_to_string(otel_ctx))
-        } else {
-            self
+                if otel_ctx.trace_flags() == 1 {
+                    self.comment(trace_parent_to_string(otel_ctx))
+                } else {
+                    self
+                }
+            }
         }
-    }
+    };
 }
 
-impl SqlTraceComment for Update<'_> {
-    fn append_trace(self, span: &Span) -> Self {
-        let span_ctx = span.context();
-        let otel_ctx = span_ctx.span().span_context();
+sql_trace!(Insert<'_>);
 
-        if otel_ctx.trace_flags() == 1 {
-            self.comment(trace_parent_to_string(otel_ctx))
-        } else {
-            self
-        }
-    }
-}
+sql_trace!(Update<'_>);
 
-impl SqlTraceComment for Delete<'_> {
-    fn append_trace(self, span: &Span) -> Self {
-        let span_ctx = span.context();
-        let otel_ctx = span_ctx.span().span_context();
+sql_trace!(Delete<'_>);
 
-        if otel_ctx.trace_flags() == 1 {
-            self.comment(trace_parent_to_string(otel_ctx))
-        } else {
-            self
-        }
-    }
-}
-
-impl SqlTraceComment for Select<'_> {
-    fn append_trace(self, span: &Span) -> Self {
-        let span_ctx = span.context();
-        let otel_ctx = span_ctx.span().span_context();
-
-        if otel_ctx.trace_flags() == 1 {
-            self.comment(trace_parent_to_string(otel_ctx))
-        } else {
-            self
-        }
-    }
-}
+sql_trace!(Select<'_>);
