@@ -22,6 +22,7 @@ mod query_builder;
 mod query_ext;
 mod row;
 mod sql_info;
+mod sql_trace;
 
 use column_metadata::*;
 use filter_conversion::*;

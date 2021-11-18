@@ -13,6 +13,11 @@ use tracing_futures::Instrument;
 use serde_json::{Map, Value};
 use std::panic::AssertUnwindSafe;
 
+use opentelemetry::trace::TraceContextExt;
+use tracing::Span;
+use tracing_opentelemetry::OpenTelemetrySpanExt;
+use crate::{sql_trace::trace_parent_to_string};
+
 impl<'t> QueryExt for connector::Transaction<'t> {}
 impl QueryExt for PooledConnection {}
 
@@ -23,10 +28,19 @@ pub trait QueryExt: Queryable + Send + Sync {
     /// Filter and map the resulting types with the given identifiers.
     #[tracing::instrument(skip(self, q, idents))]
     async fn filter(&self, q: Query<'_>, idents: &[ColumnMetadata<'_>]) -> crate::Result<Vec<SqlRow>> {
-        let result_set = self
-            .query(q)
-            .instrument(tracing::info_span!("Filter read query"))
-            .await?;
+        let span = tracing::span!(tracing::Level::INFO, "filter read query");
+
+        let span_ctx = span.context();
+        let otel_ctx = span_ctx.span().span_context();
+
+        let q = match q {
+            Query::Select(x) if otel_ctx.trace_flags() == 1 => {
+                Query::Select(Box::from(x.comment(trace_parent_to_string(otel_ctx))))
+            }
+            _ => q,
+        };
+
+        let result_set = self.query(q).instrument(span).await?;
 
         let mut sql_rows = Vec::new();
 
@@ -112,9 +126,19 @@ pub trait QueryExt: Queryable + Send + Sync {
         let model_id = model.primary_identifier();
         let id_cols: Vec<Column<'static>> = model_id.as_columns().collect();
 
-        let select = Select::from_table(model.as_table())
-            .columns(id_cols)
-            .so_that(filter.aliased_cond(None));
+        let span_ctx = Span::current().context();
+        let otel_ctx = span_ctx.span().span_context();
+
+        let select = if otel_ctx.trace_flags() == 1 {
+            Select::from_table(model.as_table())
+                .columns(id_cols)
+                .comment(trace_parent_to_string(otel_ctx))
+                .so_that(filter.aliased_cond(None))
+        } else {
+            Select::from_table(model.as_table())
+                .columns(id_cols)
+                .so_that(filter.aliased_cond(None))
+        };
 
         self.select_ids(select, model_id).await
     }
