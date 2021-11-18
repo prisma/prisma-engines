@@ -16,7 +16,8 @@ pub fn try_convert(model_projection: &ModelProjection, result_set: ResultSet) ->
                 None => {
                     return Err(SqlError::DomainError(DomainError::ScalarFieldNotFound {
                         name: columns[i].clone(),
-                        model: String::from("unspecified"),
+                        container_type: "model",
+                        container_name: String::from("unspecified"),
                     }))
                 }
             }

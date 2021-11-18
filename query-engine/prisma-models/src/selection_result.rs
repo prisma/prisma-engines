@@ -1,6 +1,4 @@
-use crate::{
-    CompositeSelection, DomainError, FieldSelection, PrismaValue, PrismaValueExtensions, ScalarFieldRef, SelectedField,
-};
+use crate::{DomainError, FieldSelection, PrismaValue, ScalarFieldRef, SelectedField};
 use std::convert::TryFrom;
 
 /// Represents a set of results.
@@ -17,28 +15,6 @@ use std::convert::TryFrom;
 pub struct SelectionResult {
     pub pairs: Vec<(SelectedField, PrismaValue)>,
 }
-
-// #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-// pub enum SelectedField {
-//     /// Return type for a scalar field.
-//     ScalarField(ScalarFieldRef),
-
-//     /// Return type for a composite field.
-//     CompositeField(CompositeFieldRef),
-//     // Return type for an aggregate computation?
-// }
-
-// impl From<ScalarFieldRef> for SelectedField {
-//     fn from(sf: ScalarFieldRef) -> Self {
-//         Self::ScalarField(sf)
-//     }
-// }
-
-// impl From<CompositeFieldRef> for SelectedField {
-//     fn from(cf: CompositeFieldRef) -> Self {
-//         Self::CompositeField(cf)
-//     }
-// }
 
 impl SelectionResult {
     pub fn new<T>(pairs: Vec<(T, PrismaValue)>) -> Self
@@ -126,23 +102,20 @@ impl SelectionResult {
         }
     }
 
+    /// Coerces contained values to best fit their type.
     /// - Scalar fields coerce values based on the TypeIdentifier.
     /// - Composite fields must be objects and contained fields must also follow the type coherence.
-    fn ensure_type_coherence(self) -> Self {
+    pub fn coerce_values(self) -> crate::Result<Self> {
         let pairs = self
             .pairs
             .into_iter()
             .map(|(selection, value)| {
-                let value = match selection {
-                    SelectedField::Scalar(sf) => value.coerce(&sf.type_identifier).unwrap(),
-                    SelectedField::Composite(cs) => cs.ensure_type_coherence(value),
-                };
-
-                (selection, value)
+                let value = selection.coerce_value(value)?;
+                Ok((selection, value))
             })
-            .collect();
+            .collect::<crate::Result<Vec<_>>>()?;
 
-        Self { pairs }
+        Ok(Self { pairs })
     }
 }
 

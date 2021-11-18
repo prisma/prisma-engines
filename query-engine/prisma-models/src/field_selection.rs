@@ -1,6 +1,8 @@
 use std::fmt::Display;
 
-use crate::{CompositeFieldRef, DomainError, Field, RelationField, ScalarFieldRef, SelectionResult};
+use crate::{
+    CompositeFieldRef, DomainError, Field, PrismaValueExtensions, RelationField, ScalarFieldRef, SelectionResult,
+};
 use itertools::Itertools;
 use prisma_value::PrismaValue;
 
@@ -8,52 +10,6 @@ use prisma_value::PrismaValue;
 #[derive(Debug, Clone, PartialEq)]
 pub struct FieldSelection {
     selections: Vec<SelectedField>,
-}
-
-/// A selected field. Can be contained on a model or composite type.
-// Todo: Think about virtual selections like aggregations.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum SelectedField {
-    Scalar(ScalarFieldRef),
-    Composite(CompositeSelection),
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CompositeSelection {
-    pub field: CompositeFieldRef,
-    pub selections: Vec<SelectedField>,
-}
-
-impl CompositeSelection {
-    pub fn is_superset(&self, other: &Self) -> bool {
-        self.field.typ == other.field.typ
-            && other.selections.iter().all(|selection| match selection {
-                SelectedField::Scalar(sf) => self.contains(&sf.name),
-                SelectedField::Composite(other_cs) => self
-                    .get(&other_cs.field.name)
-                    .and_then(|selection| selection.as_composite())
-                    .map(|cs| cs.is_superset(other_cs))
-                    .unwrap_or(false),
-            })
-    }
-
-    pub fn contains(&self, name: &str) -> bool {
-        self.get(name).is_some()
-    }
-
-    pub fn get(&self, name: &str) -> Option<&SelectedField> {
-        self.selections.iter().find(|selection| selection.prisma_name() == name)
-    }
-
-    /// Ensures that the given `PrismaValue` fits the
-    fn ensure_type_coherence(&self, pv: PrismaValue) -> crate::Result<PrismaValue> {
-        // match pv {
-        //     PrismaValue::Object
-        // }
-        // ConversionFailure
-
-        todo!()
-    }
 }
 
 impl FieldSelection {
@@ -122,7 +78,7 @@ impl FieldSelection {
         }
     }
 
-    /// Inserts this selections fields into the given field values.
+    /// Inserts this `FieldSelection`s selections into the given `SelectionResult`.
     /// Assumes caller knows that the exchange can be done, but still errors if lengths mismatch.
     /// Additionally performs a type coercion based on the source and destination field types.
     /// Resistance is futile.
@@ -133,29 +89,27 @@ impl FieldSelection {
                 "assimilated field values".to_owned(),
             ))
         } else {
-            // let fields = self.as_fields();
+            let pairs = values
+                .pairs
+                .into_iter()
+                .zip(self.selections())
+                .map(|((_, value), new_selection)| {
+                    let value = new_selection.coerce_value(value)?;
+                    Ok((new_selection.clone(), value))
+                })
+                .collect::<crate::Result<Vec<_>>>()?;
 
-            // Ok(values
-            //     .pairs
-            //     .into_iter()
-            //     .zip(fields)
-            //     .map(|((og_field, value), other_field)| {
-            //         match og_field {
-
-            //         }
-            //         if og_field.type_identifier != other_field.type_identifier {
-            //             let value = value.coerce(&other_field.type_identifier)?;
-            //             Ok((other_field, value))
-            //         } else {
-            //             Ok((other_field, value))
-            //         }
-            //     })
-            //     .collect::<crate::Result<Vec<_>>>()?
-            //     .into())
-
-            todo!()
+            Ok(SelectionResult::new(pairs))
         }
     }
+}
+
+/// A selected field. Can be contained on a model or composite type.
+// Todo: Think about virtual selections like aggregations.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SelectedField {
+    Scalar(ScalarFieldRef),
+    Composite(CompositeSelection),
 }
 
 impl SelectedField {
@@ -177,6 +131,68 @@ impl SelectedField {
         match self {
             SelectedField::Composite(ref cs) => Some(cs),
             _ => None,
+        }
+    }
+
+    /// Coerces a value to fit the selection. If the conversion is not possible, an error will be thrown.
+    pub fn coerce_value(&self, value: PrismaValue) -> crate::Result<PrismaValue> {
+        match self {
+            SelectedField::Scalar(sf) => value.coerce(&sf.type_identifier),
+            SelectedField::Composite(cs) => cs.coerce_value(value),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct CompositeSelection {
+    pub field: CompositeFieldRef,
+    pub selections: Vec<SelectedField>,
+}
+
+impl CompositeSelection {
+    pub fn is_superset(&self, other: &Self) -> bool {
+        self.field.typ == other.field.typ
+            && other.selections.iter().all(|selection| match selection {
+                SelectedField::Scalar(sf) => self.contains(&sf.name),
+                SelectedField::Composite(other_cs) => self
+                    .get(&other_cs.field.name)
+                    .and_then(|selection| selection.as_composite())
+                    .map(|cs| cs.is_superset(other_cs))
+                    .unwrap_or(false),
+            })
+    }
+
+    pub fn contains(&self, name: &str) -> bool {
+        self.get(name).is_some()
+    }
+
+    pub fn get(&self, name: &str) -> Option<&SelectedField> {
+        self.selections.iter().find(|selection| selection.prisma_name() == name)
+    }
+
+    /// Ensures that the given `PrismaValue` fits this composite selection. That includes:
+    /// - Discarding extra fields on objects.
+    /// - All scalar leafs are coerced to their type ident.
+    fn coerce_value(&self, pv: PrismaValue) -> crate::Result<PrismaValue> {
+        match pv {
+            PrismaValue::Object(pairs) => Ok(PrismaValue::Object(
+                pairs
+                    .into_iter()
+                    .map(|(key, value)| match self.get(&key) {
+                        Some(selection) => Ok((key, selection.coerce_value(value)?)),
+                        None => Err(DomainError::FieldNotFound {
+                            name: key.clone(),
+                            container_name: self.field.name.clone(),
+                            container_type: "composite type",
+                        }),
+                    })
+                    .collect::<crate::Result<Vec<_>>>()?,
+            )),
+
+            val => Err(DomainError::ConversionFailure(
+                val.to_string(),
+                "Prisma object value".to_owned(),
+            )),
         }
     }
 }

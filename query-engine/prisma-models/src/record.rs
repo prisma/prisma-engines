@@ -1,7 +1,4 @@
-use crate::{
-    DomainError, FieldSelection, ModelProjection, OrderBy, PrismaValue, PrismaValueExtensions, ScalarFieldRef,
-    SelectionResult, SortOrder,
-};
+use crate::{DomainError, FieldSelection, ModelProjection, OrderBy, PrismaValue, SelectionResult, SortOrder};
 use itertools::Itertools;
 use std::collections::HashMap;
 
@@ -25,8 +22,9 @@ impl SingleRecord {
         Self { record, field_names }
     }
 
-    pub fn projection(&self, projection: &ModelProjection) -> crate::Result<SelectionResult> {
-        self.record.extract_selection_result(&self.field_names, projection)
+    pub fn extract_selection_result(&self, extraction_selection: &FieldSelection) -> crate::Result<SelectionResult> {
+        self.record
+            .extract_selection_result(&self.field_names, extraction_selection)
     }
 
     pub fn get_field_value(&self, field: &str) -> crate::Result<&PrismaValue> {
@@ -150,25 +148,20 @@ impl Record {
         }
     }
 
+    /// Extract a `SelectionResult` from this `Record`
+    /// `field_names`: Database names of the fields contained in this `Record`.
+    /// `selected_fields`: The selection to extract.
     pub fn extract_selection_result(
         &self,
         field_names: &[String],
-        selected_fields: &FieldSelection,
+        extraction_selection: &FieldSelection,
     ) -> crate::Result<SelectionResult> {
-        let pairs: Vec<(ScalarFieldRef, PrismaValue)> = selected_fields
+        let pairs: Vec<_> = extraction_selection
             .selections()
             .into_iter()
-            .flat_map(|selection| {
-                // field.scalar_fields().into_iter().map(|field| {
-                self.get_field_value(field_names, selection.db_name()).map(|val| {
-                    let coerced = val
-                        .clone()
-                        .coerce(&field.type_identifier)
-                        .expect("Invalid coercion encountered");
-
-                    (field, coerced)
-                })
-                // })
+            .map(|selection| {
+                self.get_field_value(field_names, selection.db_name())
+                    .and_then(|val| Ok((selection.clone(), selection.coerce_value(val.clone())?)))
             })
             .collect::<crate::Result<Vec<_>>>()?;
 
@@ -198,10 +191,8 @@ impl Record {
         let index = field_names.iter().position(|r| r == field).map(Ok).unwrap_or_else(|| {
             Err(DomainError::FieldNotFound {
                 name: field.to_string(),
-                model: format!(
-                    "Field not found in record {:?}. Field names are: {:?}, looking for: {:?}",
-                    &self, &field_names, field
-                ),
+                container_type: "field",
+                container_name: format!("Record values: {:?}. Field names: {:?}.", &self, &field_names),
             })
         })?;
 

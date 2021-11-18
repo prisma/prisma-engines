@@ -154,7 +154,8 @@ impl Fields {
             .find(|field| field.name() == name)
             .ok_or_else(|| DomainError::FieldNotFound {
                 name: name.to_string(),
-                model: self.model().name.clone(),
+                container_name: self.model().name.clone(),
+                container_type: "model",
             })
     }
 
@@ -165,7 +166,8 @@ impl Fields {
             .find(|field| field.name == name)
             .ok_or_else(|| DomainError::ScalarFieldNotFound {
                 name: name.to_string(),
-                model: self.model().name.clone(),
+                container_name: self.model().name.clone(),
+                container_type: "model",
             })
     }
 
