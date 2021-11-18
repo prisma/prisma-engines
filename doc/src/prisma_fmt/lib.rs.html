@@ -23,21 +23,6 @@
 <span id="23">23</span>
 <span id="24">24</span>
 <span id="25">25</span>
-<span id="26">26</span>
-<span id="27">27</span>
-<span id="28">28</span>
-<span id="29">29</span>
-<span id="30">30</span>
-<span id="31">31</span>
-<span id="32">32</span>
-<span id="33">33</span>
-<span id="34">34</span>
-<span id="35">35</span>
-<span id="36">36</span>
-<span id="37">37</span>
-<span id="38">38</span>
-<span id="39">39</span>
-<span id="40">40</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">actions</span>;
 <span class="kw">mod</span> <span class="ident">lint</span>;
 <span class="kw">mod</span> <span class="ident">native</span>;
@@ -62,21 +47,6 @@
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">referential_actions</span>(<span class="ident">schema</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
     <span class="ident">actions::run</span>(<span class="kw-2">&amp;</span><span class="ident">schema</span>)
-}
-
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">version</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
-    <span class="kw">let</span> <span class="ident">git_hash</span> <span class="op">=</span> <span class="macro">env!</span>(<span class="string">&quot;GIT_HASH&quot;</span>);
-    <span class="macro">format!</span>(<span class="string">&quot;wasm+{}&quot;</span>, <span class="ident">git_hash</span>)
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">version_works</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">version</span>().<span class="ident">len</span>(), <span class="number">45</span>) <span class="comment">// 40 from the sha + 5 for &quot;wasm+&quot;</span>
-    }
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="prisma_fmt" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
