@@ -266,6 +266,13 @@
 <span id="266">266</span>
 <span id="267">267</span>
 <span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">column_metadata</span>,
     <span class="ident">model_extensions</span>::<span class="kw-2">*</span>,
@@ -356,6 +363,13 @@
             <span class="kw">if</span> <span class="ident">query_arguments</span>.<span class="ident">has_unbatchable_ordering</span>() {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">SqlError::QueryParameterLimitExceeded</span>(
                     <span class="string">&quot;Your query cannot be split into multiple queries because of the order by aggregation or relevance&quot;</span>
+                        .<span class="ident">to_string</span>(),
+                ));
+            }
+
+            <span class="kw">if</span> <span class="ident">query_arguments</span>.<span class="ident">has_unbatchable_filters</span>() {
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">SqlError::QueryParameterLimitExceeded</span>(
+                    <span class="string">&quot;Parameter limits for this database provider require this query to be split into multiple queries, but the negation filters used prevent the query from being split. Please reduce the used values in the query.&quot;</span>
                         .<span class="ident">to_string</span>(),
                 ));
             }
