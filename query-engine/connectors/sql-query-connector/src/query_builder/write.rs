@@ -1,11 +1,11 @@
 use crate::model_extensions::*;
+use crate::sql_trace::SqlTraceComment;
 use connector_interface::{DatasourceFieldName, WriteArgs, WriteExpression};
 use itertools::Itertools;
 use prisma_models::*;
 use quaint::ast::*;
 use std::{collections::HashSet, convert::TryInto};
-use tracing::{Span};
-use crate::sql_trace::SqlTraceComment;
+use tracing::Span;
 
 /// `INSERT` a new record to the database. Resulting an `INSERT` ast and an
 /// optional `RecordProjection` if available from the arguments or model.
@@ -96,7 +96,7 @@ pub fn create_records_nonempty(
 pub fn create_records_empty(model: &ModelRef, skip_duplicates: bool) -> Insert<'static> {
     let insert: Insert<'static> = Insert::single_into(model.as_table()).into();
 
-    let insert= insert.append_trace(&Span::current());
+    let insert = insert.append_trace(&Span::current());
 
     if skip_duplicates {
         insert.on_conflict(OnConflict::DoNothing)
@@ -160,7 +160,6 @@ pub fn update_many(model: &ModelRef, ids: &[&RecordProjection], args: WriteArgs)
             acc.set(name, value)
         });
 
-
     let query = query.append_trace(&Span::current());
 
     let columns: Vec<_> = model.primary_identifier().as_columns().collect();
@@ -174,7 +173,9 @@ pub fn delete_many(model: &ModelRef, ids: &[&RecordProjection]) -> Vec<Query<'st
     let columns: Vec<_> = model.primary_identifier().as_columns().collect();
 
     super::chunked_conditions(&columns, ids, |conditions| {
-        Delete::from_table(model.as_table()).so_that(conditions).append_trace(&Span::current())
+        Delete::from_table(model.as_table())
+            .so_that(conditions)
+            .append_trace(&Span::current())
     })
 }
 

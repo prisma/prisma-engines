@@ -1,5 +1,5 @@
 use opentelemetry::trace::{SpanContext, TraceContextExt};
-use quaint::ast::{Insert, Update, Delete, Select};
+use quaint::ast::{Delete, Insert, Select, Update};
 use tracing::Span;
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
@@ -22,7 +22,9 @@ impl SqlTraceComment for Insert<'_> {
 
         if otel_ctx.trace_flags() == 1 {
             self.comment(trace_parent_to_string(otel_ctx))
-        } else { self }
+        } else {
+            self
+        }
     }
 }
 
@@ -33,7 +35,9 @@ impl SqlTraceComment for Update<'_> {
 
         if otel_ctx.trace_flags() == 1 {
             self.comment(trace_parent_to_string(otel_ctx))
-        } else { self }
+        } else {
+            self
+        }
     }
 }
 
@@ -44,7 +48,9 @@ impl SqlTraceComment for Delete<'_> {
 
         if otel_ctx.trace_flags() == 1 {
             self.comment(trace_parent_to_string(otel_ctx))
-        } else { self }
+        } else {
+            self
+        }
     }
 }
 
@@ -55,6 +61,8 @@ impl SqlTraceComment for Select<'_> {
 
         if otel_ctx.trace_flags() == 1 {
             self.comment(trace_parent_to_string(otel_ctx))
-        } else { self }
+        } else {
+            self
+        }
     }
 }

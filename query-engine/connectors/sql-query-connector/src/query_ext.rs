@@ -1,4 +1,7 @@
-use crate::{AliasedCondition, ColumnMetadata, SqlRow, ToSqlRow, column_metadata, error::*, model_extensions::*, sql_trace::SqlTraceComment};
+use crate::{
+    column_metadata, error::*, model_extensions::*, sql_trace::SqlTraceComment, AliasedCondition, ColumnMetadata,
+    SqlRow, ToSqlRow,
+};
 use async_trait::async_trait;
 use connector_interface::{filter::Filter, RecordFilter};
 use futures::future::FutureExt;
