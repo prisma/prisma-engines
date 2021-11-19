@@ -3,7 +3,7 @@ use query_engine_tests::*;
 #[test_suite(schema(schema))]
 mod order_by_dependent {
     use indoc::indoc;
-    use query_engine_tests::{assert_query_many, run_query};
+    use query_engine_tests::run_query;
 
     fn schema() -> String {
         let schema = indoc! {
@@ -82,7 +82,7 @@ mod order_by_dependent {
         create_row(&runner, 2, Some(2), None, None).await?;
         create_row(&runner, 3, None, None, None).await?;
 
-        assert_query_many!(
+        connector_results!(
             &runner,
             r#"{
               findManyModelA(orderBy: { b: { id: asc }}) {
@@ -92,10 +92,8 @@ mod order_by_dependent {
                 }
               }
             }"#,
-            vec![
-                r#"{"data":{"findManyModelA":[{"id":3,"b":null},{"id":1,"b":{"id":1}},{"id":2,"b":{"id":2}}]}}"#,
-                r#"{"data":{"findManyModelA":[{"id":1,"b":{"id":1}},{"id":2,"b":{"id":2}},{"id":3,"b":null}]}}"#
-            ]
+            [MongoDb, Sqlite] => r#"{"data":{"findManyModelA":[{"id":3,"b":null},{"id":1,"b":{"id":1}},{"id":2,"b":{"id":2}}]}}"#,
+            [MySql, Postgres] => r#"{"data":{"findManyModelA":[{"id":1,"b":{"id":1}},{"id":2,"b":{"id":2}},{"id":3,"b":null}]}}"#
         );
 
         Ok(())
@@ -147,7 +145,7 @@ mod order_by_dependent {
         create_row(&runner, 2, Some(2), None, None).await?;
         create_row(&runner, 3, None, None, None).await?;
 
-        assert_query_many!(
+        connector_results!(
             &runner,
             r#"{
               findManyModelA(orderBy: { b: { c: { id: asc }}}) {
@@ -160,13 +158,11 @@ mod order_by_dependent {
               }
             }"#,
             // Depends on how null values are handled.
-            vec![
-                r#"{"data":{"findManyModelA":[{"id":2,"b":{"c":null}},{"id":3,"b":null},{"id":1,"b":{"c":{"id":1}}}]}}"#,
-                r#"{"data":{"findManyModelA":[{"id":3,"b":null},{"id":2,"b":{"c":null}},{"id":1,"b":{"c":{"id":1}}}]}}"#,
-                r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"id":1}}},{"id":2,"b":{"c":null}},{"id":3,"b":null}]}}"#,
+            [MongoDb, Sqlite] => r#"{"data":{"findManyModelA":[{"id":2,"b":{"c":null}},{"id":3,"b":null},{"id":1,"b":{"c":{"id":1}}}]}}"#,
+            [MySql] => r#"{"data":{"findManyModelA":[{"id":3,"b":null},{"id":2,"b":{"c":null}},{"id":1,"b":{"c":{"id":1}}}]}}"#,
+            [Postgres] => r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"id":1}}},{"id":2,"b":{"c":null}},{"id":3,"b":null}]}}"#,
                 // CockroachDB can order ModelA.id in any order if ModelC.b_id is NULL.
-                r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"id":1}}},{"id":3,"b":null},{"id":2,"b":{"c":null}}]}}"#,
-            ]
+            [Postgres] => r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"id":1}}},{"id":3,"b":null},{"id":2,"b":{"c":null}}]}}"#
         );
 
         Ok(())
@@ -231,27 +227,23 @@ mod order_by_dependent {
         create_row(&runner, 1, Some(1), Some(1), Some(3)).await?;
         create_row(&runner, 2, Some(2), Some(2), Some(4)).await?;
 
-        assert_query_many!(
-            &runner,
-            r#"{
-              findManyModelA(orderBy: { b: { c: { a: { id: asc }}}}) {
-                id
-                b {
-                  c {
-                    a {
-                      id
-                    }
+        connector_results!(
+          &runner,
+          r#"{
+            findManyModelA(orderBy: { b: { c: { a: { id: asc }}}}) {
+              id
+              b {
+                c {
+                  a {
+                    id
                   }
                 }
               }
-            }"#,
-            // Depends on how null values are handled.
-            vec![
-                r#"{"data":{"findManyModelA":[{"id":3,"b":null},{"id":4,"b":null},{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}}]}}"#,
-                r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":3,"b":null},{"id":4,"b":null}]}}"#,
-                //mysql 5.7
-                r#"{"data":{"findManyModelA":[{"id":4,"b":null},{"id":3,"b":null},{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}}]}}"#
-            ]
+            }
+          }"#,
+          [MySql] => r#"{"data":{"findManyModelA":[{"id":4,"b":null},{"id":3,"b":null},{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}}]}}"#,
+          [MongoDb, Sqlite] => r#"{"data":{"findManyModelA":[{"id":3,"b":null},{"id":4,"b":null},{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}}]}}"#,
+          [Postgres] => r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":3,"b":null},{"id":4,"b":null}]}}"#
         );
 
         Ok(())
@@ -264,7 +256,7 @@ mod order_by_dependent {
         create_row(&runner, 1, Some(1), Some(1), Some(3)).await?;
         create_row(&runner, 2, Some(2), Some(2), Some(4)).await?;
 
-        assert_query_many!(
+        connector_results!(
             &runner,
             r#"{
               findManyModelA(orderBy: { b: { c: { a: { id: desc }}}}) {
@@ -278,13 +270,9 @@ mod order_by_dependent {
                 }
               }
             }"#,
-            // Depends on how null values are handled.
-            vec![
-                r#"{"data":{"findManyModelA":[{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":3,"b":null},{"id":4,"b":null}]}}"#,
-                r#"{"data":{"findManyModelA":[{"id":3,"b":null},{"id":4,"b":null},{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":1,"b":{"c":{"a":{"id":3}}}}]}}"#,
-                //Mysql 5.6
-                r#"{"data":{"findManyModelA":[{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":4,"b":null},{"id":3,"b":null}]}}"#
-            ]
+            [MongoDb, Sqlite] => r#"{"data":{"findManyModelA":[{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":3,"b":null},{"id":4,"b":null}]}}"#,
+            [Postgres] =>  r#"{"data":{"findManyModelA":[{"id":3,"b":null},{"id":4,"b":null},{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":1,"b":{"c":{"a":{"id":3}}}}]}}"#,
+            [MySql] => r#"{"data":{"findManyModelA":[{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":4,"b":null},{"id":3,"b":null}]}}"#
         );
 
         Ok(())
