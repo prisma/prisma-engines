@@ -393,6 +393,7 @@ mod tests {
                     fields: vec![IndexField::new("unique")],
                     tpe: dml::IndexType::Unique,
                     defined_on_field: true,
+                    algorithm: None,
                 }],
                 primary_key: None,
             }],
@@ -420,6 +421,7 @@ mod tests {
                 name: "unique_unique".to_string(),
                 columns: vec![IndexColumn::new("unique")],
                 tpe: IndexType::Unique,
+                algorithm: None,
             }],
             primary_key: None,
             foreign_keys: vec![],
@@ -761,6 +763,7 @@ mod tests {
                     fields: vec![IndexField::new("name"), IndexField::new("lastname")],
                     tpe: datamodel::dml::IndexType::Unique,
                     defined_on_field: false,
+                    algorithm: None,
                 }],
                 primary_key: Some(PrimaryKeyDefinition {
                     name: None,
@@ -814,6 +817,7 @@ mod tests {
                 name: "name_last_name_unique".to_string(),
                 columns: vec![IndexColumn::new("name"), IndexColumn::new("lastname")],
                 tpe: IndexType::Unique,
+                algorithm: None,
             }],
             primary_key: Some(PrimaryKey {
                 columns: vec![PrimaryKeyColumn::new("id")],

@@ -235,6 +235,8 @@ fn filter_extended_index_capabilities(schema: &mut SqlSchema) {
                 col.sort_order = None;
             }
 
+            index.algorithm = None;
+
             if !remove_index {
                 kept_indexes.push(index);
             }

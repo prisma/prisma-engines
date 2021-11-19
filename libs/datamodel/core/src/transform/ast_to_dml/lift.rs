@@ -1,6 +1,6 @@
 use crate::{
     ast, dml,
-    transform::ast_to_dml::db::{self, walkers::*},
+    transform::ast_to_dml::db::{self, walkers::*, IndexAlgorithm},
     IndexField, PrimaryKeyField,
 };
 use ::dml::composite_type::{CompositeType, CompositeTypeField, CompositeTypeFieldType};
@@ -316,6 +316,10 @@ impl<'a> LiftAstToDml<'a> {
                         true => dml::IndexType::Unique,
                         false => dml::IndexType::Normal,
                     },
+                    algorithm: idx.attribute().algorithm.map(|using| match using {
+                        IndexAlgorithm::BTree => dml::IndexAlgorithm::BTree,
+                        IndexAlgorithm::Hash => dml::IndexAlgorithm::Hash,
+                    }),
                     defined_on_field: idx.attribute().source_field.is_some(),
                 }
             })

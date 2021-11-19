@@ -482,8 +482,9 @@ fn add_indices_to_models(
                 fields,
                 tpe,
                 defined_on_field,
-                name: None,
                 db_name,
+                name: None,
+                algorithm: None,
             });
         }
     }

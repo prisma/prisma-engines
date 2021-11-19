@@ -270,6 +270,7 @@ capabilities!(
     NamedDefaultValues,
     IndexColumnLengthPrefixing,
     PrimaryKeySortOrderDefinition,
+    UsingHashIndex,
     // Start of query-engine-only Capabilities
     InsensitiveFilters,
     CreateMany,

@@ -54,6 +54,8 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, r
             indexes::has_a_unique_constraint_name(db, index, diagnostics);
             indexes::uses_length_or_sort_without_preview_flag(db, index, diagnostics);
             indexes::field_length_prefix_supported(db, index, diagnostics);
+            indexes::index_algorithm_preview_feature(db, index, diagnostics);
+            indexes::index_algorithm_is_supported(db, index, diagnostics);
 
             for field_attribute in index.scalar_field_attributes() {
                 let span = index

@@ -571,6 +571,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                     length: None,
                 }],
                 tpe: IndexType::Unique,
+                algorithm: Some(SQLIndexAlgorithm::BTree),
             },],
             primary_key: Some(PrimaryKey {
                 columns: vec![PrimaryKeyColumn::new("primary_col")],
@@ -686,7 +687,7 @@ fn postgres_sequences_must_work(api: TestApi) {
     assert_eq!(got_seq, &Sequence { name: "test".into() },);
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(Cockroach))]
 fn postgres_multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
     let schema = format!(
         r##"

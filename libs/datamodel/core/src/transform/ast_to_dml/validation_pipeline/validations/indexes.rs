@@ -1,6 +1,7 @@
 use datamodel_connector::ConnectorCapability;
 
 use crate::ast::Span;
+use crate::transform::ast_to_dml::db::IndexAlgorithm;
 use crate::{
     common::preview_features::PreviewFeature,
     diagnostics::{DatamodelError, Diagnostics},
@@ -54,7 +55,7 @@ pub(crate) fn uses_length_or_sort_without_preview_flag(
         .scalar_field_attributes()
         .any(|f| f.sort_order().is_some() || f.length().is_some())
     {
-        let message = "The sort and length arguments are not yet available.";
+        let message = "You must enable `extendedIndexes` preview feature to use sort or length parameters.";
 
         diagnostics.push_error(DatamodelError::new_attribute_validation_error(
             message,
@@ -86,6 +87,51 @@ pub(crate) fn field_length_prefix_supported(
             index.attribute_name(),
             span,
         ));
+    }
+}
+
+/// Is `Hash` supported as `type`
+pub(crate) fn index_algorithm_is_supported(
+    db: &ParserDatabase<'_>,
+    index: IndexWalker<'_, '_>,
+    diagnostics: &mut Diagnostics,
+) {
+    if db
+        .active_connector()
+        .has_capability(ConnectorCapability::UsingHashIndex)
+    {
+        return;
+    }
+
+    if let Some(IndexAlgorithm::Hash) = index.attribute().algorithm {
+        let message = "The given type argument is not supported with the current connector";
+        let span = index
+            .ast_attribute()
+            .and_then(|i| i.span_for_argument("type"))
+            .unwrap_or_else(Span::empty);
+
+        diagnostics.push_error(DatamodelError::new_attribute_validation_error(message, "index", span));
+    }
+}
+
+pub(crate) fn index_algorithm_preview_feature(
+    db: &ParserDatabase<'_>,
+    index: IndexWalker<'_, '_>,
+    diagnostics: &mut Diagnostics,
+) {
+    if db.preview_features.contains(PreviewFeature::ExtendedIndexes) {
+        return;
+    }
+
+    if index.attribute().algorithm.is_some() {
+        let message = "You must enable `extendedIndexes` preview feature to be able to define the index type.";
+
+        let span = index
+            .ast_attribute()
+            .and_then(|i| i.span_for_argument("type"))
+            .unwrap_or_else(Span::empty);
+
+        diagnostics.push_error(DatamodelError::new_attribute_validation_error(message, "index", span));
     }
 }
 

@@ -1,3 +1,5 @@
+use ::dml::model::IndexAlgorithm;
+
 use crate::ast::{Argument, Attribute};
 use crate::common::constraint_names::ConstraintNames;
 use crate::common::preview_features::PreviewFeature;
@@ -71,6 +73,13 @@ impl<'a> LowerDmlToAst<'a> {
             .for_each(|index_def| {
                 let mut args = self.fields_argument(&index_def);
                 self.push_index_map_argument(model, index_def, &mut args);
+
+                if let Some(IndexAlgorithm::Hash) = index_def.algorithm {
+                    args.push(ast::Argument::new(
+                        "type",
+                        ast::Expression::ConstantValue("Hash".to_string(), Span::empty()),
+                    ));
+                };
 
                 attributes.push(ast::Attribute::new("index", args));
             });
