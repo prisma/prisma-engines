@@ -415,7 +415,6 @@ fn sqlserver_allows_index_sort_order() {
 }
 
 #[test]
-<<<<<<< HEAD
 fn hash_index_works_on_postgres() {
     let dml = indoc! {r#"
         model A {
@@ -458,6 +457,7 @@ fn mysql_fulltext_index() {
         db_name: Some("A_a_b_idx".to_string()),
         fields: vec![IndexField::new("a"), IndexField::new("b")],
         tpe: IndexType::Fulltext,
+        algorithm: None,
         defined_on_field: false,
     });
 }
@@ -481,6 +481,7 @@ fn mysql_fulltext_index_map() {
         db_name: Some("my_text_index".to_string()),
         fields: vec![IndexField::new("a"), IndexField::new("b")],
         tpe: IndexType::Fulltext,
+        algorithm: None,
         defined_on_field: false,
     });
 }
