@@ -441,6 +441,8 @@
 <span id="441">441</span>
 <span id="442">442</span>
 <span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>, <span class="ident">dml</span>,
     <span class="ident">transform::ast_to_dml::db</span>::{<span class="self">self</span>, <span class="ident">walkers</span>::<span class="kw-2">*</span>, <span class="ident">IndexAlgorithm</span>},
@@ -737,32 +739,34 @@
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> {
                 <span class="macro">assert!</span>(<span class="ident">idx</span>.<span class="ident">fields</span>().<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">0</span>);
 
-                <span class="ident">dml::IndexDefinition</span> {
-                    <span class="ident">name</span>: <span class="ident">idx</span>.<span class="ident">attribute</span>().<span class="ident">name</span>.<span class="ident">map</span>(<span class="ident">String::from</span>),
-                    <span class="ident">db_name</span>: <span class="prelude-val">Some</span>(<span class="ident">idx</span>.<span class="ident">final_database_name</span>().<span class="ident">into_owned</span>()),
-                    <span class="ident">fields</span>: <span class="ident">idx</span>
-                        .<span class="ident">attribute</span>()
-                        .<span class="ident">fields</span>
-                        .<span class="ident">iter</span>()
-                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span>
-                        <span class="comment">//TODO(extended indexes) here it is ok to pass sort and length with out a preview flag</span>
-                        <span class="comment">// check since this is coming from the ast and the parsing would reject the args without</span>
-                        <span class="comment">// the flag set.</span>
-                        <span class="comment">// When we start using the extra args here could be a place to fill in the defaults. </span>
-                        <span class="ident">IndexField</span> {
+                <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="ident">idx</span>
+                    .<span class="ident">attribute</span>()
+                    .<span class="ident">fields</span>
+                    .<span class="ident">iter</span>()
+                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">IndexField</span> {
                         <span class="ident">name</span>: <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>()[<span class="ident">model_id</span>][<span class="ident">field</span>.<span class="ident">field_id</span>].<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
                         <span class="ident">sort_order</span>: <span class="ident">field</span>.<span class="ident">sort_order</span>,
                         <span class="ident">length</span>: <span class="ident">field</span>.<span class="ident">length</span>,
                     })
-                        .<span class="ident">collect</span>(),
-                    <span class="ident">tpe</span>: <span class="kw">match</span> <span class="ident">idx</span>.<span class="ident">attribute</span>().<span class="ident">is_unique</span> {
-                        <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">dml::IndexType::Unique</span>,
-                        <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">dml::IndexType::Normal</span>,
-                    },
-                    <span class="ident">algorithm</span>: <span class="ident">idx</span>.<span class="ident">attribute</span>().<span class="ident">algorithm</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">using</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">using</span> {
-                        <span class="ident">IndexAlgorithm::BTree</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">dml::IndexAlgorithm::BTree</span>,
-                        <span class="ident">IndexAlgorithm::Hash</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">dml::IndexAlgorithm::Hash</span>,
-                    }),
+                    .<span class="ident">collect</span>();
+
+                <span class="kw">let</span> <span class="ident">tpe</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">idx</span>.<span class="ident">attribute</span>().<span class="ident">r#type</span> {
+                    <span class="ident">db::IndexType::Unique</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">dml::IndexType::Unique</span>,
+                    <span class="ident">db::IndexType::Normal</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">dml::IndexType::Normal</span>,
+                    <span class="ident">db::IndexType::Fulltext</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">dml::IndexType::Fulltext</span>,
+                };
+
+                <span class="kw">let</span> <span class="ident">algorithm</span> <span class="op">=</span> <span class="ident">idx</span>.<span class="ident">attribute</span>().<span class="ident">algorithm</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">using</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">using</span> {
+                    <span class="ident">IndexAlgorithm::BTree</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">dml::IndexAlgorithm::BTree</span>,
+                    <span class="ident">IndexAlgorithm::Hash</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">dml::IndexAlgorithm::Hash</span>,
+                });
+
+                <span class="ident">dml::IndexDefinition</span> {
+                    <span class="ident">name</span>: <span class="ident">idx</span>.<span class="ident">attribute</span>().<span class="ident">name</span>.<span class="ident">map</span>(<span class="ident">String::from</span>),
+                    <span class="ident">db_name</span>: <span class="prelude-val">Some</span>(<span class="ident">idx</span>.<span class="ident">final_database_name</span>().<span class="ident">into_owned</span>()),
+                    <span class="ident">fields</span>,
+                    <span class="ident">tpe</span>,
+                    <span class="ident">algorithm</span>,
                     <span class="ident">defined_on_field</span>: <span class="ident">idx</span>.<span class="ident">attribute</span>().<span class="ident">source_field</span>.<span class="ident">is_some</span>(),
                 }
             })

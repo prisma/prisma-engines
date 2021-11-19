@@ -1067,6 +1067,43 @@
 <span id="1067">1067</span>
 <span id="1068">1068</span>
 <span id="1069">1069</span>
+<span id="1070">1070</span>
+<span id="1071">1071</span>
+<span id="1072">1072</span>
+<span id="1073">1073</span>
+<span id="1074">1074</span>
+<span id="1075">1075</span>
+<span id="1076">1076</span>
+<span id="1077">1077</span>
+<span id="1078">1078</span>
+<span id="1079">1079</span>
+<span id="1080">1080</span>
+<span id="1081">1081</span>
+<span id="1082">1082</span>
+<span id="1083">1083</span>
+<span id="1084">1084</span>
+<span id="1085">1085</span>
+<span id="1086">1086</span>
+<span id="1087">1087</span>
+<span id="1088">1088</span>
+<span id="1089">1089</span>
+<span id="1090">1090</span>
+<span id="1091">1091</span>
+<span id="1092">1092</span>
+<span id="1093">1093</span>
+<span id="1094">1094</span>
+<span id="1095">1095</span>
+<span id="1096">1096</span>
+<span id="1097">1097</span>
+<span id="1098">1098</span>
+<span id="1099">1099</span>
+<span id="1100">1100</span>
+<span id="1101">1101</span>
+<span id="1102">1102</span>
+<span id="1103">1103</span>
+<span id="1104">1104</span>
+<span id="1105">1105</span>
+<span id="1106">1106</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">autoincrement</span>;
 <span class="kw">mod</span> <span class="ident">id</span>;
 <span class="kw">mod</span> <span class="ident">map</span>;
@@ -1076,7 +1113,7 @@
 
 <span class="kw">use</span> <span class="kw">super</span>::{
     <span class="ident">context</span>::{<span class="ident">Arguments</span>, <span class="ident">Context</span>},
-    <span class="ident">types</span>::{<span class="ident">EnumAttributes</span>, <span class="ident">IndexAttribute</span>, <span class="ident">ModelAttributes</span>, <span class="ident">RelationField</span>, <span class="ident">ScalarField</span>, <span class="ident">ScalarFieldType</span>},
+    <span class="ident">types</span>::{<span class="ident">EnumAttributes</span>, <span class="ident">IndexAttribute</span>, <span class="ident">IndexType</span>, <span class="ident">ModelAttributes</span>, <span class="ident">RelationField</span>, <span class="ident">ScalarField</span>, <span class="ident">ScalarFieldType</span>},
 };
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::transform::ast_to_dml::db::types::FieldWithArgs</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -1210,7 +1247,10 @@
             <span class="ident">model_unique</span>(<span class="ident">args</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">model_attributes</span>, <span class="ident">model_id</span>, <span class="ident">ctx</span>);
         });
 
-        <span class="comment">// TODO: @@fulltext</span>
+        <span class="comment">// @@fulltext</span>
+        <span class="ident">attributes</span>.<span class="ident">visit_repeated</span>(<span class="string">&quot;fulltext&quot;</span>, <span class="ident">ctx</span>, <span class="op">|</span><span class="ident">args</span>, <span class="ident">ctx</span><span class="op">|</span> {
+            <span class="ident">model_fulltext</span>(<span class="ident">args</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">model_attributes</span>, <span class="ident">model_id</span>, <span class="ident">ctx</span>);
+        });
     });
 
     <span class="comment">// Model-global validations</span>
@@ -1339,7 +1379,7 @@
     <span class="ident">model_attributes</span>.<span class="ident">ast_indexes</span>.<span class="ident">push</span>((
         <span class="ident">args</span>.<span class="ident">attribute</span>(),
         <span class="ident">IndexAttribute</span> {
-            <span class="ident">is_unique</span>: <span class="bool-val">true</span>,
+            <span class="ident">r#type</span>: <span class="ident">IndexType::Unique</span>,
             <span class="ident">fields</span>: <span class="macro">vec!</span>[<span class="ident">FieldWithArgs</span> {
                 <span class="ident">field_id</span>,
                 <span class="ident">sort_order</span>,
@@ -1594,6 +1634,40 @@
     <span class="ident">model_data</span>.<span class="ident">is_ignored</span> <span class="op">=</span> <span class="bool-val">true</span>;
 }
 
+<span class="doccomment">/// Validate @@fulltext on models</span>
+<span class="kw">fn</span> <span class="ident">model_fulltext</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>(
+    <span class="ident">args</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Arguments</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
+    <span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ModelAttributes</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
+    <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>,
+    <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
+) {
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">index_attribute</span> <span class="op">=</span> <span class="ident">IndexAttribute</span> {
+        <span class="ident">r#type</span>: <span class="ident">IndexType::Fulltext</span>,
+        ..<span class="ident">Default::default</span>()
+    };
+
+    <span class="ident">common_index_validations</span>(<span class="ident">args</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">index_attribute</span>, <span class="ident">model_id</span>, <span class="ident">ctx</span>);
+    <span class="kw">let</span> <span class="ident">ast_model</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="ident">model_id</span>];
+
+    <span class="kw">let</span> <span class="ident">db_name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">args</span>.<span class="ident">optional_arg</span>(<span class="string">&quot;map&quot;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">name</span><span class="op">|</span> <span class="ident">name</span>.<span class="ident">as_str</span>()) {
+        <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="string">&quot;&quot;</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">args</span>.<span class="ident">new_attribute_validation_error</span>(<span class="string">&quot;The `map` argument cannot be an empty string.&quot;</span>));
+            <span class="prelude-val">None</span>
+        }
+        <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">name</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>),
+        <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">err</span>);
+            <span class="prelude-val">None</span>
+        }
+        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+    };
+
+    <span class="ident">validate_db_name</span>(<span class="ident">ast_model</span>, <span class="ident">args</span>, <span class="ident">db_name</span>, <span class="string">&quot;@@fulltext&quot;</span>, <span class="ident">ctx</span>);
+    <span class="ident">index_attribute</span>.<span class="ident">db_name</span> <span class="op">=</span> <span class="ident">db_name</span>.<span class="ident">map</span>(<span class="ident">Cow::from</span>);
+
+    <span class="ident">data</span>.<span class="ident">ast_indexes</span>.<span class="ident">push</span>((<span class="ident">args</span>.<span class="ident">attribute</span>(), <span class="ident">index_attribute</span>));
+}
+
 <span class="doccomment">/// Validate @@index on models.</span>
 <span class="kw">fn</span> <span class="ident">model_index</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>(
     <span class="ident">args</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Arguments</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
@@ -1602,7 +1676,7 @@
     <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
 ) {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">index_attribute</span> <span class="op">=</span> <span class="ident">IndexAttribute</span> {
-        <span class="ident">is_unique</span>: <span class="bool-val">false</span>,
+        <span class="ident">r#type</span>: <span class="ident">IndexType::Normal</span>,
         ..<span class="ident">Default::default</span>()
     };
 
@@ -1678,7 +1752,7 @@
     <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
 ) {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">index_attribute</span> <span class="op">=</span> <span class="ident">IndexAttribute</span> {
-        <span class="ident">is_unique</span>: <span class="bool-val">true</span>,
+        <span class="ident">r#type</span>: <span class="ident">IndexType::Unique</span>,
         ..<span class="ident">Default::default</span>()
     };
     <span class="ident">common_index_validations</span>(<span class="ident">args</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">index_attribute</span>, <span class="ident">model_id</span>, <span class="ident">ctx</span>);
@@ -1751,7 +1825,7 @@
                 <span class="ident">ctx</span>.<span class="ident">push_error</span>({
                     <span class="kw">let</span> <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">format!</span>(
                         <span class="string">&quot;The {}index definition refers to the unknown fields {}.&quot;</span>,
-                        <span class="kw">if</span> <span class="ident">index_data</span>.<span class="ident">is_unique</span> { <span class="string">&quot;unique &quot;</span> } <span class="kw">else</span> { <span class="string">&quot;&quot;</span> },
+                        <span class="kw">if</span> <span class="ident">index_data</span>.<span class="ident">is_unique</span>() { <span class="string">&quot;unique &quot;</span> } <span class="kw">else</span> { <span class="string">&quot;&quot;</span> },
                         <span class="ident">unresolvable_fields</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>),
                     );
                     <span class="kw">let</span> <span class="ident">model_name</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">ast</span>()[<span class="ident">model_id</span>].<span class="ident">name</span>();
@@ -1777,7 +1851,7 @@
                 <span class="kw">let</span> <span class="ident">suggestion</span> <span class="op">=</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">suggested_fields</span>.<span class="ident">is_empty</span>() {
                     <span class="macro">format!</span>(
                         <span class="string">&quot; Did you mean `@@{attribute_name}([{fields}])`?&quot;</span>,
-                        <span class="ident">attribute_name</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">index_data</span>.<span class="ident">is_unique</span> { <span class="string">&quot;unique&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;index&quot;</span> },
+                        <span class="ident">attribute_name</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">index_data</span>.<span class="ident">is_unique</span>() { <span class="string">&quot;unique&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;index&quot;</span> },
                         <span class="ident">fields</span> <span class="op">=</span> <span class="ident">suggested_fields</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>)
                     )
                 } <span class="kw">else</span> {
@@ -1787,7 +1861,7 @@
                 <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_model_validation_error</span>(
                     <span class="kw-2">&amp;</span><span class="macro">format!</span>(
                         <span class="string">&quot;The {prefix}index definition refers to the relation fields {the_fields}. Index definitions must reference only scalar fields.{suggestion}&quot;</span>,
-                        <span class="ident">prefix</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">index_data</span>.<span class="ident">is_unique</span> { <span class="string">&quot;unique &quot;</span> } <span class="kw">else</span> { <span class="string">&quot;&quot;</span> },
+                        <span class="ident">prefix</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">index_data</span>.<span class="ident">is_unique</span>() { <span class="string">&quot;unique &quot;</span> } <span class="kw">else</span> { <span class="string">&quot;&quot;</span> },
                         <span class="ident">the_fields</span> <span class="op">=</span> <span class="ident">relation_fields</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">f</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>()).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>().<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>),
                         <span class="ident">suggestion</span> <span class="op">=</span> <span class="ident">suggestion</span>
                     ),

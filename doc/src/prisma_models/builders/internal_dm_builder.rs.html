@@ -457,6 +457,8 @@
 <span id="457">457</span>
 <span id="458">458</span>
 <span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{
     <span class="ident">build_composites</span>, <span class="ident">field_builders::RelationFieldBuilder</span>, <span class="ident">relation_builder::RelationBuilder</span>, <span class="ident">CompositeTypeBuilder</span>,
     <span class="ident">FieldBuilder</span>, <span class="ident">IndexBuilder</span>, <span class="ident">ModelBuilder</span>, <span class="ident">PrimaryKeyBuilder</span>,
@@ -683,6 +685,8 @@
             <span class="ident">typ</span>: <span class="kw">match</span> <span class="ident">i</span>.<span class="ident">tpe</span> {
                 <span class="ident">dml::IndexType::Unique</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">IndexType::Unique</span>,
                 <span class="ident">dml::IndexType::Normal</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">IndexType::Normal</span>,
+                <span class="comment">// TODO: When introducing the indexes in QE, change this.</span>
+                <span class="ident">dml::IndexType::Fulltext</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">IndexType::Normal</span>,
             },
         })
         .<span class="ident">collect</span>()

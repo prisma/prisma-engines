@@ -314,7 +314,7 @@
         <span class="self">self</span>.<span class="ident">model_attributes</span>
             .<span class="ident">ast_indexes</span>
             .<span class="ident">iter</span>()
-            .<span class="ident">any</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">idx</span>)<span class="op">|</span> <span class="ident">idx</span>.<span class="ident">is_unique</span> <span class="op">&amp;&amp;</span> <span class="ident">idx</span>.<span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">field_id</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">fields</span>)
+            .<span class="ident">any</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">idx</span>)<span class="op">|</span> <span class="ident">idx</span>.<span class="ident">is_unique</span>() <span class="op">&amp;&amp;</span> <span class="ident">idx</span>.<span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">field_id</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">fields</span>)
     }
 
     <span class="doccomment">/// The name of the database table the model points to.</span>
@@ -391,7 +391,7 @@
 
         <span class="kw">let</span> <span class="ident">from_indices</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">indexes</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">walker</span><span class="op">|</span> <span class="ident">walker</span>.<span class="ident">attribute</span>().<span class="ident">is_unique</span>)
+            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">walker</span><span class="op">|</span> <span class="ident">walker</span>.<span class="ident">attribute</span>().<span class="ident">is_unique</span>())
             .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">walker</span><span class="op">|</span> <span class="ident">UniqueCriteriaWalker</span> {
                 <span class="ident">model_id</span>,
                 <span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="ident">walker</span>.<span class="ident">attribute</span>().<span class="ident">fields</span>,
