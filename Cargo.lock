@@ -4196,6 +4196,7 @@ dependencies = [
  "futures",
  "itertools 0.10.1",
  "once_cell",
+ "opentelemetry",
  "prisma-models",
  "prisma-value",
  "quaint",
@@ -4207,6 +4208,7 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-futures",
+ "tracing-opentelemetry",
  "user-facing-errors",
  "uuid",
 ]

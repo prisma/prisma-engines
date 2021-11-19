@@ -223,3 +223,8 @@ use-local-query-engine:
 	cargo build --release
 	cp target/release/query-engine $(PRISMA2_BINARY_PATH)/runtime/
 	cp target/release/query-engine $(PRISMA2_BINARY_PATH)/query-engine-darwin
+
+
+## OpenTelemetry
+otel:
+	docker-compose up --remove-orphans otel
