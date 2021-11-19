@@ -244,6 +244,8 @@
 <span id="244">244</span>
 <span id="245">245</span>
 <span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">SqlError</span>, <span class="ident">SqlResult</span>};
 <span class="kw">use</span> <span class="ident">datamodel::common::preview_features::PreviewFeature</span>;
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
@@ -480,6 +482,8 @@
 
                 <span class="ident">col</span>.<span class="ident">sort_order</span> <span class="op">=</span> <span class="prelude-val">None</span>;
             }
+
+            <span class="ident">index</span>.<span class="ident">algorithm</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 
             <span class="kw">if</span> <span class="op">!</span><span class="ident">remove_index</span> {
                 <span class="ident">kept_indexes</span>.<span class="ident">push</span>(<span class="ident">index</span>);

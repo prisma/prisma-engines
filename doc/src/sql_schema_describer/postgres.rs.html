@@ -1035,6 +1035,17 @@
 <span id="1035">1035</span>
 <span id="1036">1036</span>
 <span id="1037">1037</span>
+<span id="1038">1038</span>
+<span id="1039">1039</span>
+<span id="1040">1040</span>
+<span id="1041">1041</span>
+<span id="1042">1042</span>
+<span id="1043">1043</span>
+<span id="1044">1044</span>
+<span id="1045">1045</span>
+<span id="1046">1046</span>
+<span id="1047">1047</span>
+<span id="1048">1048</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Postgres schema description.</span>
 
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
@@ -1585,6 +1596,7 @@
                rawIndex.indisunique                        AS is_unique,
                rawIndex.indisprimary                       AS is_primary_key,
                tableInfos.relname                          AS table_name,
+               indexAccess.amname                          AS index_algo,
                rawIndex.indkeyidx,
                CASE rawIndex.sort_order &amp; 1
                    WHEN 1 THEN &#39;DESC&#39;
@@ -1617,7 +1629,9 @@
             -- pg_attribute stores infos about columns: https://www.postgresql.org/docs/current/catalog-pg-attribute.html
             pg_attribute columnInfos,
             -- pg_namespace stores info about the schema
-            pg_namespace schemaInfo
+            pg_namespace schemaInfo,
+            -- index access methods: https://www.postgresql.org/docs/9.3/catalog-pg-am.html     
+            pg_am indexAccess
         WHERE
           -- find table info for index
             tableInfos.oid = rawIndex.indrelid
@@ -1632,8 +1646,9 @@
           AND tableInfos.relnamespace = schemaInfo.oid
           AND schemaInfo.nspname = $1
           AND rawIndex.sort_order_colnum = columnInfos.attnum
+          AND indexAccess.oid = indexInfos.relam
         GROUP BY tableInfos.relname, indexInfos.relname, rawIndex.indisunique, rawIndex.indisprimary, columnInfos.attname,
-                 rawIndex.indkeyidx, column_order
+                 rawIndex.indkeyidx, column_order, index_algo
         ORDER BY rawIndex.indkeyidx;
         &quot;#</span>;
 
@@ -1656,6 +1671,12 @@
                     <span class="ident">misc</span>
                 ),
             });
+
+            <span class="kw">let</span> <span class="ident">algorithm</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">get_string</span>(<span class="string">&quot;index_algo&quot;</span>).<span class="ident">as_deref</span>() {
+                <span class="prelude-val">Some</span>(<span class="string">&quot;btree&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">SQLIndexAlgorithm::BTree</span>),
+                <span class="prelude-val">Some</span>(<span class="string">&quot;hash&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">SQLIndexAlgorithm::Hash</span>),
+                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            };
 
             <span class="kw">if</span> <span class="ident">is_primary_key</span> {
                 <span class="kw">let</span> <span class="ident">entry</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> (<span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrimaryKey</span><span class="op">&gt;</span>) <span class="op">=</span>
@@ -1698,6 +1719,7 @@
                             <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">IndexType::Unique</span>,
                             <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">IndexType::Normal</span>,
                         },
+                        <span class="ident">algorithm</span>,
                     })
                 }
             }

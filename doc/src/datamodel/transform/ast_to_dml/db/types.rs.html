@@ -567,6 +567,19 @@
 <span id="567">567</span>
 <span id="568">568</span>
 <span id="569">569</span>
+<span id="570">570</span>
+<span id="571">571</span>
+<span id="572">572</span>
+<span id="573">573</span>
+<span id="574">574</span>
+<span id="575">575</span>
+<span id="576">576</span>
+<span id="577">577</span>
+<span id="578">578</span>
+<span id="579">579</span>
+<span id="580">580</span>
+<span id="581">581</span>
+<span id="582">582</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">context::Context</span>, <span class="ident">walkers::CompositeTypeFieldWalker</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast::FieldId</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ast</span>, <span class="ident">diagnostics::DatamodelError</span>, <span class="ident">transform::ast_to_dml::db::walkers::CompositeTypeWalker</span>, <span class="ident">SortOrder</span>};
@@ -752,6 +765,18 @@
     }
 }
 
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">IndexAlgorithm</span> {
+    <span class="ident">BTree</span>,
+    <span class="ident">Hash</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">IndexAlgorithm</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::BTree</span>
+    }
+}
+
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">IndexAttribute</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">is_unique</span>: <span class="ident">bool</span>,
@@ -759,6 +784,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">source_field</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ast::FieldId</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">db_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">algorithm</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IndexAlgorithm</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>

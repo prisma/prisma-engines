@@ -758,14 +758,19 @@
 <span id="758">758</span>
 <span id="759">759</span>
 <span id="760">760</span>
+<span id="761">761</span>
+<span id="762">762</span>
+<span id="763">763</span>
+<span id="764">764</span>
+<span id="765">765</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Functions and types for conveniently traversing and querying a SqlSchema.</span>
 
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">missing_docs</span>)]</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">Column</span>, <span class="ident">ColumnArity</span>, <span class="ident">ColumnId</span>, <span class="ident">ColumnType</span>, <span class="ident">ColumnTypeFamily</span>, <span class="ident">DefaultValue</span>, <span class="ident">Enum</span>, <span class="ident">ForeignKey</span>, <span class="ident">ForeignKeyAction</span>,
-    <span class="ident">Index</span>, <span class="ident">IndexColumn</span>, <span class="ident">IndexType</span>, <span class="ident">PrimaryKey</span>, <span class="ident">PrimaryKeyColumn</span>, <span class="ident">SQLSortOrder</span>, <span class="ident">SqlSchema</span>, <span class="ident">Table</span>, <span class="ident">TableId</span>,
-    <span class="ident">UserDefinedType</span>, <span class="ident">View</span>,
+    <span class="ident">Index</span>, <span class="ident">IndexColumn</span>, <span class="ident">IndexType</span>, <span class="ident">PrimaryKey</span>, <span class="ident">PrimaryKeyColumn</span>, <span class="ident">SQLIndexAlgorithm</span>, <span class="ident">SQLSortOrder</span>, <span class="ident">SqlSchema</span>, <span class="ident">Table</span>,
+    <span class="ident">TableId</span>, <span class="ident">UserDefinedType</span>, <span class="ident">View</span>,
 };
 <span class="kw">use</span> <span class="ident">serde::de::DeserializeOwned</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -1428,6 +1433,11 @@
             <span class="ident">table_id</span>: <span class="self">self</span>.<span class="ident">table_id</span>,
             <span class="ident">schema</span>: <span class="self">self</span>.<span class="ident">schema</span>,
         }
+    }
+
+    <span class="doccomment">/// The hash algorithm used in the index.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SQLIndexAlgorithm</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">algorithm</span>
     }
 }
 

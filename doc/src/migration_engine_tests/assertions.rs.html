@@ -768,6 +768,12 @@
 <span id="768">768</span>
 <span id="769">769</span>
 <span id="770">770</span>
+<span id="771">771</span>
+<span id="772">772</span>
+<span id="773">773</span>
+<span id="774">774</span>
+<span id="775">775</span>
+<span id="776">776</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">migration_assertions</span>;
 <span class="kw">mod</span> <span class="ident">quaint_result_set_ext</span>;
 
@@ -779,7 +785,7 @@
 <span class="kw">use</span> <span class="ident">prisma_value::PrismaValue</span>;
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{
     <span class="ident">Column</span>, <span class="ident">ColumnTypeFamily</span>, <span class="ident">DefaultKind</span>, <span class="ident">DefaultValue</span>, <span class="ident">Enum</span>, <span class="ident">ForeignKey</span>, <span class="ident">ForeignKeyAction</span>, <span class="ident">Index</span>, <span class="ident">IndexType</span>,
-    <span class="ident">PrimaryKey</span>, <span class="ident">SQLSortOrder</span>, <span class="ident">SqlSchema</span>, <span class="ident">Table</span>,
+    <span class="ident">PrimaryKey</span>, <span class="ident">SQLIndexAlgorithm</span>, <span class="ident">SQLSortOrder</span>, <span class="ident">SqlSchema</span>, <span class="ident">Table</span>,
 };
 <span class="kw">use</span> <span class="ident">test_setup</span>::{<span class="ident">BitFlags</span>, <span class="ident">Tags</span>};
 
@@ -1520,6 +1526,12 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_is_not_unique</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="macro">assert_eq!</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">tpe</span>, <span class="ident">IndexType::Normal</span>);
+
+        <span class="self">self</span>
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_algorithm</span>(<span class="self">self</span>, <span class="ident">algo</span>: <span class="ident">SQLIndexAlgorithm</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="macro">assert_eq!</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">algorithm</span>, <span class="prelude-val">Some</span>(<span class="ident">algo</span>));
 
         <span class="self">self</span>
     }

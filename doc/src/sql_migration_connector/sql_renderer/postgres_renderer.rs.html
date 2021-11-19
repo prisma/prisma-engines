@@ -684,6 +684,11 @@
 <span id="684">684</span>
 <span id="685">685</span>
 <span id="686">686</span>
+<span id="687">687</span>
+<span id="688">688</span>
+<span id="689">689</span>
+<span id="690">690</span>
+<span id="691">691</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{
     <span class="ident">common</span>::{<span class="ident">format_hex</span>, <span class="ident">render_nullability</span>, <span class="ident">IteratorJoin</span>, <span class="ident">Quoted</span>, <span class="ident">SQL_INDENTATION</span>},
     <span class="ident">SqlRenderer</span>,
@@ -700,7 +705,8 @@
 <span class="kw">use</span> <span class="ident">regex::Regex</span>;
 <span class="kw">use</span> <span class="ident">sql_ddl</span>::{<span class="ident">postgres</span> <span class="kw">as</span> <span class="ident">ddl</span>, <span class="ident">IndexColumn</span>, <span class="ident">SortOrder</span>};
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{
-    <span class="ident">walkers</span>::<span class="kw-2">*</span>, <span class="ident">ColumnArity</span>, <span class="ident">ColumnTypeFamily</span>, <span class="ident">DefaultKind</span>, <span class="ident">DefaultValue</span>, <span class="ident">ForeignKeyAction</span>, <span class="ident">SQLSortOrder</span>, <span class="ident">SqlSchema</span>,
+    <span class="ident">walkers</span>::<span class="kw-2">*</span>, <span class="ident">ColumnArity</span>, <span class="ident">ColumnTypeFamily</span>, <span class="ident">DefaultKind</span>, <span class="ident">DefaultValue</span>, <span class="ident">ForeignKeyAction</span>, <span class="ident">SQLIndexAlgorithm</span>,
+    <span class="ident">SQLSortOrder</span>, <span class="ident">SqlSchema</span>,
 };
 <span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 
@@ -1044,6 +1050,10 @@
             <span class="ident">index_name</span>: <span class="ident">index</span>.<span class="ident">name</span>().<span class="ident">into</span>(),
             <span class="ident">is_unique</span>: <span class="ident">index</span>.<span class="ident">index_type</span>().<span class="ident">is_unique</span>(),
             <span class="ident">table_reference</span>: <span class="ident">index</span>.<span class="ident">table</span>().<span class="ident">name</span>().<span class="ident">into</span>(),
+            <span class="ident">using</span>: <span class="ident">index</span>.<span class="ident">algorithm</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">algo</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">algo</span> {
+                <span class="ident">SQLIndexAlgorithm::BTree</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ddl::IndexAlgorithm::BTree</span>,
+                <span class="ident">SQLIndexAlgorithm::Hash</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ddl::IndexAlgorithm::Hash</span>,
+            }),
             <span class="ident">columns</span>: <span class="ident">index</span>
                 .<span class="ident">columns</span>()
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">IndexColumn</span> {

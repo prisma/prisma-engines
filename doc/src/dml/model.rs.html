@@ -450,6 +450,19 @@
 <span id="450">450</span>
 <span id="451">451</span>
 <span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::default_value::DefaultKind</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::field</span>::{<span class="ident">Field</span>, <span class="ident">FieldType</span>, <span class="ident">RelationField</span>, <span class="ident">ScalarField</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::scalars::ScalarType</span>;
@@ -480,6 +493,18 @@
     <span class="kw">pub</span> <span class="ident">is_ignored</span>: <span class="ident">bool</span>,
 }
 
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">IndexAlgorithm</span> {
+    <span class="ident">BTree</span>,
+    <span class="ident">Hash</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">IndexAlgorithm</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::BTree</span>
+    }
+}
+
 <span class="doccomment">/// Represents an index defined via `@@index`, `@unique` or `@@unique`.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IndexDefinition</span> {
@@ -487,6 +512,7 @@
     <span class="kw">pub</span> <span class="ident">db_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">IndexField</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">tpe</span>: <span class="ident">IndexType</span>,
+    <span class="kw">pub</span> <span class="ident">algorithm</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IndexAlgorithm</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">defined_on_field</span>: <span class="ident">bool</span>,
 }
 

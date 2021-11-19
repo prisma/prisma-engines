@@ -801,6 +801,7 @@
 <span id="801">801</span>
 <span id="802">802</span>
 <span id="803">803</span>
+<span id="804">804</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">getters::Getter</span>, <span class="ident">parsers::Parser</span>, <span class="ident">Column</span>, <span class="ident">ColumnArity</span>, <span class="ident">ColumnType</span>, <span class="ident">ColumnTypeFamily</span>, <span class="ident">DefaultValue</span>, <span class="ident">DescriberError</span>,
     <span class="ident">DescriberErrorKind</span>, <span class="ident">DescriberResult</span>, <span class="ident">ForeignKey</span>, <span class="ident">ForeignKeyAction</span>, <span class="ident">Index</span>, <span class="ident">IndexColumn</span>, <span class="ident">IndexType</span>, <span class="ident">PrimaryKey</span>,
@@ -1286,6 +1287,7 @@
                                     <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">IndexType::Unique</span>,
                                     <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">IndexType::Normal</span>,
                                 },
+                                <span class="ident">algorithm</span>: <span class="prelude-val">None</span>,
                             },
                         );
                     }

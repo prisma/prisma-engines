@@ -337,6 +337,7 @@
 <span id="337">337</span>
 <span id="338">338</span>
 <span id="339">339</span>
+<span id="340">340</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel_connector</span>::{
     <span class="ident">connector_error::ConnectorError</span>,
     <span class="ident">helper</span>::{<span class="ident">arg_vec_from_opt</span>, <span class="ident">args_vec_from_opt</span>, <span class="ident">parse_one_opt_u32</span>, <span class="ident">parse_two_opt_u32</span>},
@@ -438,6 +439,7 @@
     <span class="ident">ConnectorCapability::ScalarLists</span>,
     <span class="ident">ConnectorCapability::UpdateableId</span>,
     <span class="ident">ConnectorCapability::WritableAutoincField</span>,
+    <span class="ident">ConnectorCapability::UsingHashIndex</span>,
 ];
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PostgresDatamodelConnector</span>;

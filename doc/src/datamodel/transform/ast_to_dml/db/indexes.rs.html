@@ -164,8 +164,8 @@
                     })
                     .<span class="ident">collect</span>(),
                 <span class="ident">source_field</span>,
-                <span class="ident">name</span>: <span class="prelude-val">None</span>,
                 <span class="ident">db_name</span>: <span class="prelude-val">Some</span>(<span class="ident">Cow::from</span>(<span class="ident">db_name</span>)),
+                ..<span class="ident">Default::default</span>()
             },
         ));
     }

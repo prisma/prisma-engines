@@ -496,14 +496,28 @@
 <span id="496">496</span>
 <span id="497">497</span>
 <span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Dedup</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::SqlError</span>;
+<span class="kw">use</span> <span class="ident">datamodel::IndexAlgorithm</span>;
 <span class="kw">use</span> <span class="ident">datamodel</span>::{
     <span class="ident">common::preview_features::PreviewFeature</span>, <span class="ident">common::RelationNames</span>, <span class="ident">Datamodel</span>, <span class="ident">DefaultValue</span> <span class="kw">as</span> <span class="ident">DMLDef</span>, <span class="ident">FieldArity</span>,
     <span class="ident">FieldType</span>, <span class="ident">IndexDefinition</span>, <span class="ident">IndexField</span>, <span class="ident">Model</span>, <span class="ident">PrimaryKeyField</span>, <span class="ident">ReferentialAction</span>, <span class="ident">RelationField</span>, <span class="ident">RelationInfo</span>,
     <span class="ident">ScalarField</span>, <span class="ident">ScalarType</span>, <span class="ident">SortOrder</span>, <span class="ident">ValueGenerator</span> <span class="kw">as</span> <span class="ident">VG</span>,
 };
 <span class="kw">use</span> <span class="ident">introspection_connector::IntrospectionContext</span>;
+<span class="kw">use</span> <span class="ident">sql_schema_describer::SQLIndexAlgorithm</span>;
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{
     <span class="ident">Column</span>, <span class="ident">ColumnArity</span>, <span class="ident">ColumnTypeFamily</span>, <span class="ident">ForeignKey</span>, <span class="ident">Index</span>, <span class="ident">IndexType</span>, <span class="ident">SQLSortOrder</span>, <span class="ident">SqlSchema</span>, <span class="ident">Table</span>,
 };
@@ -634,6 +648,15 @@
     <span class="comment">//and re-introspection will keep them. This is a change in introspection behaviour,</span>
     <span class="comment">//but due to re-introspection previous datamodels and clients should keep working as before.</span>
 
+    <span class="kw">let</span> <span class="ident">using</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::ExtendedIndexes</span>) {
+        <span class="ident">index</span>.<span class="ident">algorithm</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">algo</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">algo</span> {
+            <span class="ident">SQLIndexAlgorithm::BTree</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">IndexAlgorithm::BTree</span>,
+            <span class="ident">SQLIndexAlgorithm::Hash</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">IndexAlgorithm::Hash</span>,
+        })
+    } <span class="kw">else</span> {
+        <span class="prelude-val">None</span>
+    };
+
     <span class="ident">IndexDefinition</span> {
         <span class="ident">name</span>: <span class="prelude-val">None</span>,
         <span class="ident">db_name</span>: <span class="prelude-val">Some</span>(<span class="ident">index</span>.<span class="ident">name</span>.<span class="ident">clone</span>()),
@@ -659,6 +682,7 @@
             .<span class="ident">collect</span>(),
         <span class="ident">tpe</span>,
         <span class="ident">defined_on_field</span>: <span class="ident">index</span>.<span class="ident">columns</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span>,
+        <span class="ident">algorithm</span>: <span class="ident">using</span>,
     }
 }
 
