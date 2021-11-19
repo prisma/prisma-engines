@@ -166,7 +166,7 @@ fn handle_one_to_many(
                 }?;
 
                 if let Node::Query(Query::Write(ref mut wq)) = parent_node {
-                    wq.inject_projection_into_args(parent_link.assimilate(child_link)?);
+                    wq.inject_result_into_args(parent_link.assimilate(child_link)?);
                 }
 
                 Ok(parent_node)
@@ -194,7 +194,7 @@ fn handle_one_to_many(
                     }?;
 
                     if let Node::Query(Query::Write(ref mut wq)) = create_node {
-                        wq.inject_projection_into_args(child_link.assimilate(parent_link)?);
+                        wq.inject_result_into_args(child_link.assimilate(parent_link)?);
                     }
 
                     Ok(create_node)
@@ -360,7 +360,7 @@ fn handle_one_to_one(
 
             // We ONLY inject for creates here. Check end of doc comment for explanation.
             if let Node::Query(Query::Write(ref mut q @ WriteQuery::CreateRecord(_))) = child_node {
-                q.inject_projection_into_args(assimilator.assimilate(link)?);
+                q.inject_result_into_args(assimilator.assimilate(link)?);
             }
 
             Ok(child_node)
@@ -391,7 +391,7 @@ fn handle_one_to_one(
                 }?;
 
                 if let Node::Query(Query::Write(ref mut wq)) = update_node {
-                    wq.inject_projection_into_args(parent_link.assimilate(child_link)?);
+                    wq.inject_result_into_args(parent_link.assimilate(child_link)?);
                 }
 
                 Ok(update_node)
@@ -487,7 +487,7 @@ pub fn nested_create_many(
 
                 // Inject the parent id into all nested records.
                 if let Node::Query(Query::Write(WriteQuery::CreateManyRecords(ref mut cmr))) = create_many_node {
-                    cmr.inject_all(child_linking_fields.assimilate(parent_link)?);
+                    cmr.inject_result_into_all(child_linking_fields.assimilate(parent_link)?);
                 }
 
                 Ok(create_many_node)

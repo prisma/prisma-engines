@@ -23,11 +23,11 @@ impl ReadQuery {
     }
 
     /// Checks whether or not this query returns a specific set of fields from the underlying data source model.
-    pub fn returns(&self, selection: &FieldSelection) -> bool {
+    pub fn returns(&self, field_selection: &FieldSelection) -> bool {
         match self {
-            ReadQuery::RecordQuery(x) => x.selected_fields.is_superset(selection),
-            ReadQuery::ManyRecordsQuery(x) => x.selected_fields.is_superset(selection),
-            ReadQuery::RelatedRecordsQuery(x) => x.selected_fields.is_superset(selection),
+            ReadQuery::RecordQuery(x) => x.selected_fields.is_superset_of(field_selection),
+            ReadQuery::ManyRecordsQuery(x) => x.selected_fields.is_superset_of(field_selection),
+            ReadQuery::RelatedRecordsQuery(x) => x.selected_fields.is_superset_of(field_selection),
             ReadQuery::AggregateRecordsQuery(_x) => false,
         }
     }
@@ -123,7 +123,7 @@ pub struct RelatedRecordsQuery {
 
     /// Fields and values of the parent to satisfy the relation query without
     /// relying on the parent result passed by the interpreter.
-    pub parent_projections: Option<Vec<FieldValues>>,
+    pub parent_projections: Option<Vec<SelectionResult>>,
 }
 
 #[derive(Debug, Clone)]

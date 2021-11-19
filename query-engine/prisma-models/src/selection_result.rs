@@ -159,3 +159,14 @@ where
         Self::new(tuples.into_iter().map(|(x, value)| (x.into(), value)).collect())
     }
 }
+
+impl From<&FieldSelection> for SelectionResult {
+    fn from(fs: &FieldSelection) -> Self {
+        Self {
+            pairs: fs
+                .selections()
+                .map(|selection| (selection.clone(), PrismaValue::Null))
+                .collect(),
+        }
+    }
+}

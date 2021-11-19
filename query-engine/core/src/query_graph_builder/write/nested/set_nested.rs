@@ -2,7 +2,7 @@ use super::*;
 use crate::{query_ast::*, query_graph::*, ParsedInputValue};
 use connector::Filter;
 use itertools::Itertools;
-use prisma_models::{ModelRef, RelationFieldRef};
+use prisma_models::{ModelRef, RelationFieldRef, SelectionResult};
 use std::convert::TryInto;
 use std::sync::Arc;
 
@@ -218,7 +218,7 @@ fn handle_one_to_many(
     let child_model_identifier = parent_relation_field.related_model().primary_identifier();
     let child_link = parent_relation_field.related_field().linking_fields();
     let parent_link = parent_relation_field.linking_fields();
-    let empty_child_link = child_link.empty_record_projection();
+    let empty_child_link = SelectionResult::from(&child_link);
 
     let child_model = parent_relation_field.related_model();
     let read_old_node =
@@ -301,7 +301,7 @@ fn handle_one_to_many(
                 }?;
 
                 if let Node::Query(Query::Write(ref mut wq)) = update_connect_node {
-                    wq.inject_projection_into_args(child_link.assimilate(parent_link)?);
+                    wq.inject_result_into_args(child_link.assimilate(parent_link)?);
                 }
 
                 Ok(update_connect_node)
@@ -363,7 +363,7 @@ fn handle_one_to_many(
             }
 
             if let Node::Query(Query::Write(ref mut wq)) = node {
-                wq.inject_projection_into_args(empty_child_link);
+                wq.inject_result_into_args(empty_child_link);
             }
 
             Ok(node)

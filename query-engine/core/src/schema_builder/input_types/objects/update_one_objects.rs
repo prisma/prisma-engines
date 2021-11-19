@@ -1,7 +1,7 @@
 use super::*;
 use constants::{args, operations};
 use datamodel_connector::ConnectorCapability;
-use prisma_models::{dml::DefaultValue, ModelProjection};
+use prisma_models::dml::DefaultValue;
 
 #[tracing::instrument(skip(ctx, model, parent_field))]
 pub(crate) fn update_one_input_types(
@@ -106,7 +106,10 @@ pub(super) fn scalar_input_fields_for_unchecked_update(
     let linking_fields = if let Some(parent_field) = parent_field {
         let child_field = parent_field.related_field();
         if child_field.is_inlined_on_enclosing_model() {
-            child_field.linking_fields().scalar_fields().collect()
+            child_field
+                .linking_fields()
+                .as_scalar_fields()
+                .expect("Expected linking fields to be scalar.")
         } else {
             vec![]
         }
@@ -387,9 +390,8 @@ fn field_should_be_kept_for_checked_update_input_type(ctx: &BuilderContext, fiel
             (TypeIdentifier::Int, true, true)
         );
 
-    // WIP assumption: All fields we're reaching here _must_ be enclosed by a model.
-    let model_id: ModelProjection = field.container.as_model().unwrap().primary_identifier();
-    let is_not_disallowed_id = if model_id.contains(field.clone()) {
+    let model_id = field.container.as_model().unwrap().primary_identifier();
+    let is_not_disallowed_id = if model_id.contains(&field.name) {
         // Is part of the id, connector must allow updating ID fields.
         ctx.capabilities.contains(ConnectorCapability::UpdateableId)
     } else {

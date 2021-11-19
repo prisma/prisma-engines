@@ -13,7 +13,7 @@ use crate::{
 use connector::{IntoFilter, QueryArguments};
 use guard::*;
 use petgraph::{graph::*, visit::EdgeRef as PEdgeRef, *};
-use prisma_models::{ModelProjection, ModelRef, SelectionResult};
+use prisma_models::{FieldSelection, ModelRef, SelectionResult};
 use std::{borrow::Borrow, collections::HashSet, fmt};
 
 pub type QueryGraphResult<T> = std::result::Result<T, QueryGraphError>;
@@ -122,14 +122,14 @@ pub enum QueryGraphDependency {
 
     /// More specialized version of `ParentResult` with more guarantees and side effects.
     ///
-    /// Performs a transformation on the child node based on the requested projection of the parent result (represented as a single merged `ModelProjection`).
+    /// Performs a transformation on the child node based on the requested projection of the parent result (represented as a single merged `FieldSelection`).
     /// Assumes that the parent result can be converted into the requested projection, else a runtime error will occur.
-    /// The `ModelProjection` is used to determine the set of values to extract from the parent result.
+    /// The `FieldSelection` is used to determine the set of values to extract from the parent result.
     ///
     /// Important note: As opposed to `ParentResult`, this dependency guarantees that if the closure is called, the parent result was projected successfully.
     /// To achieve that, the query graph is post-processed in the `finalize` and reloads are injected at points where a projection is not fulfilled.
     /// See `insert_reloads` for more information.
-    ParentProjection(ModelProjection, ParentProjectionFn),
+    ParentProjection(FieldSelection, ParentProjectionFn), // [Composites] todo rename
 
     /// Only valid in the context of a `If` control flow node.
     Then,
@@ -650,7 +650,7 @@ impl QueryGraph {
 
     /// Traverses the query graph and checks if reloads of nodes are necessary.
     /// Whether or not a node needs to be reloaded is determined based on the
-    /// outgoing edges of parent-projection-based transformers, as those hold the `ModelProjection`s
+    /// outgoing edges of parent-projection-based transformers, as those hold the `FieldSelection`s
     /// all records of the parent result need to contain in order to satisfy dependencies.
     ///
     /// If a node needs to be reloaded, ALL edges going out from the reloaded node need to be repointed, not
@@ -702,7 +702,7 @@ impl QueryGraph {
     /// Unwraps are safe because we're operating on the unprocessed state of the graph (`Expressionista` changes that).
     #[tracing::instrument(skip(self))]
     fn insert_reloads(&mut self) -> QueryGraphResult<()> {
-        let reloads: Vec<(NodeRef, ModelRef, Vec<ModelProjection>)> = self
+        let reloads: Vec<(NodeRef, ModelRef, Vec<FieldSelection>)> = self
             .graph
             .node_indices()
             .filter_map(|ix| {
@@ -711,7 +711,7 @@ impl QueryGraph {
                 if let Node::Query(q) = self.node_content(&node).unwrap() {
                     let edges = self.outgoing_edges(&node);
 
-                    let unsatisfied_dependencies: Vec<ModelProjection> = edges
+                    let unsatisfied_dependencies: Vec<FieldSelection> = edges
                         .into_iter()
                         .filter_map(|edge| match self.edge_content(&edge).unwrap() {
                             QueryGraphDependency::ParentProjection(ref requested_projection, _)
@@ -720,7 +720,7 @@ impl QueryGraph {
                                 trace!(
                                     "Query {:?} does not return requested projection {:?} and will be reloaded.",
                                     q,
-                                    requested_projection.names().collect::<Vec<_>>()
+                                    requested_projection.prisma_names().collect::<Vec<_>>()
                                 );
                                 Some(requested_projection.clone())
                             }
@@ -749,7 +749,7 @@ impl QueryGraph {
                 alias: None,
                 model: model.clone(),
                 args: QueryArguments::new(model),
-                selected_fields: ModelProjection::union(identifiers),
+                selected_fields: FieldSelection::union(identifiers),
                 nested: vec![],
                 selection_order: vec![],
                 aggregation_selections: vec![],

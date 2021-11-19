@@ -189,7 +189,7 @@ fn handle_one_to_many(
                     }?;
 
                     if let Node::Query(Query::Write(ref mut wq)) = read_children_node {
-                        wq.inject_projection_into_args(parent_link.assimilate(child_link)?);
+                        wq.inject_result_into_args(parent_link.assimilate(child_link)?);
                     }
 
                     Ok(read_children_node)
@@ -219,7 +219,7 @@ fn handle_one_to_many(
                     }?;
 
                     if let Node::Query(Query::Write(ref mut wq)) = update_node {
-                        wq.inject_projection_into_args(child_link.assimilate(parent_link)?)
+                        wq.inject_result_into_args(child_link.assimilate(parent_link)?)
                     }
 
                     Ok(update_node)
@@ -399,7 +399,7 @@ fn handle_one_to_one(
 
 
                     if let Node::Query(Query::Write(ref mut wq)) = read_new_child_node {
-                        wq.inject_projection_into_args(parent_linking_fields.assimilate(child_link)?);
+                        wq.inject_result_into_args(parent_linking_fields.assimilate(child_link)?);
                     }
                 }
 
@@ -469,7 +469,7 @@ fn handle_one_to_one(
                  }?;
 
                  if let Node::Query(Query::Write(ref mut wq)) = update_children_node {
-                     wq.inject_projection_into_args(child_linking_fields.assimilate(parent_link)?);
+                     wq.inject_result_into_args(child_linking_fields.assimilate(parent_link)?);
                  }
 
                  Ok(update_children_node)
@@ -500,7 +500,7 @@ fn handle_one_to_one(
                 }?;
 
                 if let Node::Query(Query::Write(ref mut wq)) = update_parent_node {
-                    wq.inject_projection_into_args(parent_linking_fields.assimilate(child_link)?);
+                    wq.inject_result_into_args(parent_linking_fields.assimilate(child_link)?);
                 }
 
                 Ok(update_parent_node)

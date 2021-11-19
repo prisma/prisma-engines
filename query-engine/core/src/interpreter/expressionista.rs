@@ -350,7 +350,7 @@ impl Expressionista {
 
                                     let res = match dependency {
                                         QueryGraphDependency::ParentProjection(projection, f) => binding
-                                            .as_projections(&projection)
+                                            .as_selection_results(&projection)
                                             .and_then(|parent_projections| Ok(f(node, parent_projections)?)),
 
                                         QueryGraphDependency::ParentResult(f) => Ok(f(node, &binding)?),

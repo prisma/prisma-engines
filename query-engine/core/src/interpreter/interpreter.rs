@@ -15,7 +15,7 @@ use prisma_models::prelude::*;
 #[derive(Debug, Clone)]
 pub enum ExpressionResult {
     Query(QueryResult),
-    RawProjections(Vec<FieldValues>),
+    RawProjections(Vec<SelectionResult>),
     Computation(ComputationResult),
     Empty,
 }
@@ -30,21 +30,25 @@ pub enum ComputationResult {
 /// `right` contains all elements that are in B but not in A.
 #[derive(Debug, Clone)]
 pub struct DiffResult {
-    pub left: Vec<FieldValues>,
-    pub right: Vec<FieldValues>,
+    pub left: Vec<SelectionResult>,
+    pub right: Vec<SelectionResult>,
 }
 
 impl ExpressionResult {
     /// Attempts to transform the result into a vector of record projections.
-    #[tracing::instrument(skip(self, model_projection))]
-    pub fn as_projections(&self, model_projection: &ModelProjection) -> InterpretationResult<Vec<FieldValues>> {
+    #[tracing::instrument(skip(self, field_selection))]
+    pub fn as_selection_results(&self, field_selection: &FieldSelection) -> InterpretationResult<Vec<SelectionResult>> {
         let converted = match self {
             Self::Query(ref result) => match result {
                 QueryResult::Id(id) => match id {
-                    Some(id) if model_projection.matches(id) => Some(vec![id.clone()]),
+                    Some(id) if field_selection.matches(id) => Some(vec![id.clone()]),
                     None => Some(vec![]),
                     Some(id) => {
-                        trace!("RID {:?} does not match MID {:?}", id, model_projection);
+                        trace!(
+                            "Selection result {:?} does not match field selection {:?}",
+                            id,
+                            field_selection
+                        );
                         None
                     }
                 },
@@ -52,7 +56,7 @@ impl ExpressionResult {
                 // We always select IDs, the unwraps are safe.
                 QueryResult::RecordSelection(rs) => Some(
                     rs.scalars
-                        .projections(model_projection)
+                        .extract_selection_results(field_selection)
                         .expect("Expected record selection to contain required model ID fields.")
                         .into_iter()
                         .collect(),
@@ -64,7 +68,7 @@ impl ExpressionResult {
             Self::RawProjections(p) => p
                 .clone()
                 .into_iter()
-                .map(|p| model_projection.assimilate(p))
+                .map(|sr| field_selection.assimilate(sr))
                 .collect::<std::result::Result<Vec<_>, _>>()
                 .ok(),
 

@@ -6,7 +6,7 @@ use crate::{
 use connector::{Filter, RecordFilter, WriteArgs};
 use datamodel::ReferentialAction;
 use datamodel_connector::ConnectorCapability;
-use prisma_models::{ModelProjection, ModelRef, RelationFieldRef};
+use prisma_models::{FieldSelection, ModelRef, RelationFieldRef, SelectionResult};
 use std::sync::Arc;
 
 /// Coerces single values (`ParsedInputValue::Single` and `ParsedInputValue::Map`) into a vector.
@@ -26,8 +26,8 @@ pub fn node_is_create(graph: &QueryGraph, node: &NodeRef) -> bool {
     )
 }
 
-/// Produces a non-failing read query that fetches the requested projection of records for a given filterable.
-pub fn read_ids_infallible<T>(model: ModelRef, projection: ModelProjection, filter: T) -> Query
+/// Produces a non-failing read query that fetches the requested selection of records for a given filterable.
+pub fn read_ids_infallible<T>(model: ModelRef, projection: FieldSelection, filter: T) -> Query
 where
     T: Into<Filter>,
 {
@@ -48,7 +48,7 @@ where
     Query::Read(read_query)
 }
 
-fn get_selected_fields(model: &ModelRef, projection: ModelProjection) -> ModelProjection {
+fn get_selected_fields(model: &ModelRef, projection: FieldSelection) -> FieldSelection {
     // Always fetch the primary identifier as well.
     let primary_model_id = model.primary_identifier();
 
@@ -253,7 +253,7 @@ pub fn insert_existing_1to1_related_model_checks(
             }?;
 
             if let Node::Query(Query::Write(ref mut wq)) = update_existing_child {
-                wq.inject_projection_into_args(child_linking_fields.empty_record_projection())
+                wq.inject_result_into_args(SelectionResult::from(&child_linking_fields));
             }
 
             if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = update_existing_child {

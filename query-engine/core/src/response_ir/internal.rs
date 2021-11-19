@@ -310,7 +310,7 @@ fn serialize_objects(
     // Write all fields, nested and list fields unordered into a map, afterwards order all into the final order.
     // If nothing is written to the object, write null instead.
     for (r_index, record) in result.scalars.records.into_iter().enumerate() {
-        let record_id = Some(record.projection(&scalar_db_field_names, &model.primary_identifier())?);
+        let record_id = Some(record.extract_selection_result(&scalar_db_field_names, &model.primary_identifier())?);
 
         if !object_mapping.contains_key(&record.parent_id) {
             object_mapping.insert(record.parent_id.clone(), Vec::new());

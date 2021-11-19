@@ -9,6 +9,7 @@ pub use crate::order_by::*;
 pub use crate::projections::*;
 pub use crate::record::*;
 pub use crate::relation::*;
+pub use crate::selection_result::*;
 
 pub use datamodel::dml;
 pub use prisma_value::*;

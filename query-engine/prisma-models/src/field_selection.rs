@@ -7,21 +7,25 @@ use itertools::Itertools;
 use prisma_value::PrismaValue;
 
 /// A selection of fields from a model.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Default, Hash, Eq)]
 pub struct FieldSelection {
     selections: Vec<SelectedField>,
 }
 
 impl FieldSelection {
+    pub fn new(selections: Vec<SelectedField>) -> Self {
+        Self { selections }
+    }
+
     /// Returns `true` if self contains (at least) all fields specified in `other`. `false` otherwise.
     /// Recurses into composite selections and ensures that composite selections are supersets as well.
-    pub fn is_superset(&self, other: &Self) -> bool {
+    pub fn is_superset_of(&self, other: &Self) -> bool {
         other.selections.iter().all(|selection| match selection {
             SelectedField::Scalar(sf) => self.contains(&sf.name),
             SelectedField::Composite(other_cs) => self
                 .get(&other_cs.field.name)
                 .and_then(|selection| selection.as_composite())
-                .map(|cs| cs.is_superset(other_cs))
+                .map(|cs| cs.is_superset_of(other_cs))
                 .unwrap_or(false),
         })
     }
@@ -102,6 +106,35 @@ impl FieldSelection {
             Ok(SelectionResult::new(pairs))
         }
     }
+
+    /// Checks if a given `SelectionResult` belongs to this `FieldSelection`.
+    pub fn matches(&self, result: &SelectionResult) -> bool {
+        result.pairs.iter().all(|(rt, _)| self.selections.contains(rt))
+    }
+
+    /// Merges all given `FieldSelection` a set union of all.
+    /// Each selection is contained exactly once, with the first
+    /// occurrence of the first field in order from left to right
+    /// is retained.
+    ///
+    /// /!\ Important assumption: All selections are on the same model.
+    pub fn union(selections: Vec<Self>) -> Self {
+        let chained = selections.into_iter().flat_map(std::convert::identity);
+
+        FieldSelection {
+            selections: chained.unique().collect(),
+        }
+    }
+
+    /// Consumes both `FieldSelection`s to create a new one that contains a union
+    /// of both. Each selection is contained exactly once, with the first
+    /// occurrence of the first field in order from left (`self`) to right (`other`)
+    /// is retained. Assumes that both selections reason over the same model.
+    pub fn merge(self, other: FieldSelection) -> FieldSelection {
+        let selections = self.selections.into_iter().chain(other.selections).unique().collect();
+
+        FieldSelection { selections }
+    }
 }
 
 /// A selected field. Can be contained on a model or composite type.
@@ -150,14 +183,14 @@ pub struct CompositeSelection {
 }
 
 impl CompositeSelection {
-    pub fn is_superset(&self, other: &Self) -> bool {
+    pub fn is_superset_of(&self, other: &Self) -> bool {
         self.field.typ == other.field.typ
             && other.selections.iter().all(|selection| match selection {
                 SelectedField::Scalar(sf) => self.contains(&sf.name),
                 SelectedField::Composite(other_cs) => self
                     .get(&other_cs.field.name)
                     .and_then(|selection| selection.as_composite())
-                    .map(|cs| cs.is_superset(other_cs))
+                    .map(|cs| cs.is_superset_of(other_cs))
                     .unwrap_or(false),
             })
     }
@@ -261,5 +294,26 @@ impl Display for SelectedField {
                     .join(", ")
             ),
         }
+    }
+}
+
+impl From<&SelectionResult> for FieldSelection {
+    fn from(p: &SelectionResult) -> Self {
+        let selections = p
+            .pairs
+            .iter()
+            .map(|(selected_field, _)| selected_field.clone())
+            .collect::<Vec<_>>();
+
+        Self { selections }
+    }
+}
+
+impl IntoIterator for FieldSelection {
+    type Item = SelectedField;
+    type IntoIter = std::vec::IntoIter<Self::Item>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.selections.into_iter()
     }
 }

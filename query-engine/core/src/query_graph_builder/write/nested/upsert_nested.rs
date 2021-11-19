@@ -222,7 +222,7 @@ pub fn nested_upsert(
                     }?;
 
                     if let Node::Query(Query::Write(ref mut wq)) = update_node {
-                        wq.inject_projection_into_args(parent_link.assimilate(child_link)?);
+                        wq.inject_result_into_args(parent_link.assimilate(child_link)?);
                     }
 
                     Ok(update_node)
@@ -248,7 +248,7 @@ pub fn nested_upsert(
                     }?;
 
                     if let Node::Query(Query::Write(ref mut wq)) = create_node {
-                        wq.inject_projection_into_args(child_link.assimilate(parent_link)?);
+                        wq.inject_result_into_args(child_link.assimilate(parent_link)?);
                     }
 
                     Ok(create_node)

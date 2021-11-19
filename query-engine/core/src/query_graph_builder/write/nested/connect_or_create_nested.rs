@@ -319,7 +319,7 @@ fn one_to_many_inlined_child(
                     }?;
 
                     if let Node::Query(Query::Write(ref mut wq)) = create_node {
-                        wq.inject_projection_into_args(child_link.assimilate(parent_id)?);
+                        wq.inject_result_into_args(child_link.assimilate(parent_id)?);
                     }
 
                     Ok(create_node)
@@ -347,7 +347,7 @@ fn one_to_many_inlined_child(
                     }?;
 
                     if let Node::Query(Query::Write(ref mut wq)) = update_node {
-                        wq.inject_projection_into_args(child_link.assimilate(parent_id)?);
+                        wq.inject_result_into_args(child_link.assimilate(parent_id)?);
                     }
 
                     Ok(update_node)
@@ -454,7 +454,7 @@ fn one_to_many_inlined_parent(
             Box::new(move |mut parent, mut child_ids| {
                 let child_id = child_ids.pop().unwrap();
                 if let Node::Query(Query::Write(ref mut wq)) = parent {
-                    wq.inject_projection_into_args(parent_link.assimilate(child_id)?);
+                    wq.inject_result_into_args(parent_link.assimilate(child_id)?);
                 }
 
                 Ok(parent)
@@ -659,7 +659,7 @@ fn one_to_one_inlined_parent(
                 Box::new(move |mut parent, mut child_ids| {
                     let child_id = child_ids.pop().unwrap();
                     if let Node::Query(Query::Write(ref mut wq)) = parent {
-                        wq.inject_projection_into_args(parent_link.assimilate(child_id)?);
+                        wq.inject_result_into_args(parent_link.assimilate(child_id)?);
                     }
 
                     Ok(parent)
@@ -714,7 +714,7 @@ fn one_to_one_inlined_parent(
                 }?;
 
                 if let Node::Query(Query::Write(ref mut wq)) = update_parent_node {
-                    wq.inject_projection_into_args(parent_link.assimilate(child_projection)?);
+                    wq.inject_result_into_args(parent_link.assimilate(child_projection)?);
                 }
 
                 Ok(update_parent_node)
@@ -890,7 +890,7 @@ fn one_to_one_inlined_child(
             }?;
 
             if let Node::Query(Query::Write(ref mut wq)) = update_child_node {
-                wq.inject_projection_into_args(child_link.assimilate(parent_link)?);
+                wq.inject_result_into_args(child_link.assimilate(parent_link)?);
             }
 
             Ok(update_child_node)
@@ -917,7 +917,7 @@ fn one_to_one_inlined_child(
             }?;
 
             if let Node::Query(Query::Write(ref mut wq)) = update_child_node {
-                wq.inject_projection_into_args(child_link.assimilate(parent_link)?);
+                wq.inject_result_into_args(child_link.assimilate(parent_link)?);
             }
 
             Ok(update_child_node)

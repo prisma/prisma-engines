@@ -17,7 +17,7 @@ impl Query {
     pub fn returns(&self, fields: &FieldSelection) -> bool {
         match self {
             Self::Read(rq) => rq.returns(fields),
-            Self::Write(wq) => wq.returns(&fields.into()),
+            Self::Write(wq) => wq.returns(fields),
         }
     }
 

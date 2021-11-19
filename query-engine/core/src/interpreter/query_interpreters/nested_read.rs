@@ -3,7 +3,7 @@ use crate::{interpreter::InterpretationResult, query_ast::*};
 use connector::{
     self, filter::Filter, ConnectionLike, QueryArguments, RelAggregationRow, RelAggregationSelection, ScalarCompare,
 };
-use prisma_models::{ManyRecords, ModelProjection, Record, RelationFieldRef, SelectionResult};
+use prisma_models::{FieldSelection, ManyRecords, Record, RelationFieldRef, SelectionResult};
 use prisma_value::PrismaValue;
 use std::collections::HashMap;
 
@@ -80,10 +80,7 @@ pub async fn m2m(
         match id_map.get_mut(&child_id) {
             Some(v) => v.push(parent_id),
             None => {
-                id_map.insert(
-                    child_id.ensure_type_coherence(),
-                    vec![parent_id.ensure_type_coherence()],
-                );
+                id_map.insert(child_id.coerce_values()?, vec![parent_id.coerce_values()?]);
             }
         };
     }
@@ -145,7 +142,7 @@ pub async fn one2m(
     parent_projections: Option<Vec<SelectionResult>>,
     parent_result: Option<&ManyRecords>,
     query_args: QueryArguments,
-    selected_fields: &ModelProjection,
+    selected_fields: &FieldSelection,
     aggr_selections: Vec<RelAggregationSelection>,
     processor: InMemoryRecordProcessor,
 ) -> InterpretationResult<(ManyRecords, Option<Vec<RelAggregationRow>>)> {
