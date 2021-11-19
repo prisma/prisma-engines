@@ -271,6 +271,7 @@ capabilities!(
     IndexColumnLengthPrefixing,
     PrimaryKeySortOrderDefinition,
     UsingHashIndex,
+    FullTextIndex,
     // Start of query-engine-only Capabilities
     InsensitiveFilters,
     CreateMany,

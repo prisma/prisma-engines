@@ -55,7 +55,12 @@ impl IndexDefinition {
     pub fn is_unique(&self) -> bool {
         matches!(self.tpe, IndexType::Unique)
     }
+
+    pub fn is_fulltext(&self) -> bool {
+        matches!(self.tpe, IndexType::Fulltext)
+    }
 }
+
 ///A field in an index that optionally defines a sort order and length limit.
 #[derive(Debug, PartialEq, Clone)]
 pub struct IndexField {
@@ -125,6 +130,7 @@ impl fmt::Display for PrimaryKeyField {
 pub enum IndexType {
     Unique,
     Normal,
+    Fulltext,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy)]

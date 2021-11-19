@@ -35,7 +35,7 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
             )
             .collect();
 
-        if self.index_attribute.is_unique {
+        if self.index_attribute.is_unique() {
             ConstraintNames::unique_index_name(model_db_name, &field_db_names, self.db.active_connector()).into()
         } else {
             ConstraintNames::non_unique_index_name(model_db_name, &field_db_names, self.db.active_connector()).into()
@@ -93,7 +93,7 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
     }
 
     pub(crate) fn is_unique(self) -> bool {
-        self.index_attribute.is_unique
+        self.index_attribute.is_unique()
     }
 
     pub(crate) fn model(self) -> ModelWalker<'ast, 'db> {

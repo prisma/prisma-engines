@@ -294,32 +294,34 @@ impl<'a> LiftAstToDml<'a> {
             .map(|idx| {
                 assert!(idx.fields().len() != 0);
 
-                dml::IndexDefinition {
-                    name: idx.attribute().name.map(String::from),
-                    db_name: Some(idx.final_database_name().into_owned()),
-                    fields: idx
-                        .attribute()
-                        .fields
-                        .iter()
-                        .map(|field|
-                        //TODO(extended indexes) here it is ok to pass sort and length with out a preview flag
-                        // check since this is coming from the ast and the parsing would reject the args without
-                        // the flag set.
-                        // When we start using the extra args here could be a place to fill in the defaults. 
-                        IndexField {
+                let fields = idx
+                    .attribute()
+                    .fields
+                    .iter()
+                    .map(|field| IndexField {
                         name: self.db.ast()[model_id][field.field_id].name.name.clone(),
                         sort_order: field.sort_order,
                         length: field.length,
                     })
-                        .collect(),
-                    tpe: match idx.attribute().is_unique {
-                        true => dml::IndexType::Unique,
-                        false => dml::IndexType::Normal,
-                    },
-                    algorithm: idx.attribute().algorithm.map(|using| match using {
-                        IndexAlgorithm::BTree => dml::IndexAlgorithm::BTree,
-                        IndexAlgorithm::Hash => dml::IndexAlgorithm::Hash,
-                    }),
+                    .collect();
+
+                let tpe = match idx.attribute().r#type {
+                    db::IndexType::Unique => dml::IndexType::Unique,
+                    db::IndexType::Normal => dml::IndexType::Normal,
+                    db::IndexType::Fulltext => dml::IndexType::Fulltext,
+                };
+
+                let algorithm = idx.attribute().algorithm.map(|using| match using {
+                    IndexAlgorithm::BTree => dml::IndexAlgorithm::BTree,
+                    IndexAlgorithm::Hash => dml::IndexAlgorithm::Hash,
+                });
+
+                dml::IndexDefinition {
+                    name: idx.attribute().name.map(String::from),
+                    db_name: Some(idx.final_database_name().into_owned()),
+                    fields,
+                    tpe,
+                    algorithm,
                     defined_on_field: idx.attribute().source_field.is_some(),
                 }
             })

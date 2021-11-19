@@ -7,7 +7,7 @@ use std::borrow::Cow;
 
 use super::{
     context::{Arguments, Context},
-    types::{EnumAttributes, IndexAttribute, ModelAttributes, RelationField, ScalarField, ScalarFieldType},
+    types::{EnumAttributes, IndexAttribute, IndexType, ModelAttributes, RelationField, ScalarField, ScalarFieldType},
 };
 use crate::transform::ast_to_dml::db::types::FieldWithArgs;
 use crate::{
@@ -141,7 +141,10 @@ fn resolve_model_attributes<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::
             model_unique(args, &mut model_attributes, model_id, ctx);
         });
 
-        // TODO: @@fulltext
+        // @@fulltext
+        attributes.visit_repeated("fulltext", ctx, |args, ctx| {
+            model_fulltext(args, &mut model_attributes, model_id, ctx);
+        });
     });
 
     // Model-global validations
@@ -270,7 +273,7 @@ fn visit_field_unique<'ast>(
     model_attributes.ast_indexes.push((
         args.attribute(),
         IndexAttribute {
-            is_unique: true,
+            r#type: IndexType::Unique,
             fields: vec![FieldWithArgs {
                 field_id,
                 sort_order,
@@ -525,6 +528,40 @@ fn visit_model_ignore(model_id: ast::ModelId, model_data: &mut ModelAttributes<'
     model_data.is_ignored = true;
 }
 
+/// Validate @@fulltext on models
+fn model_fulltext<'ast>(
+    args: &mut Arguments<'ast>,
+    data: &mut ModelAttributes<'ast>,
+    model_id: ast::ModelId,
+    ctx: &mut Context<'ast>,
+) {
+    let mut index_attribute = IndexAttribute {
+        r#type: IndexType::Fulltext,
+        ..Default::default()
+    };
+
+    common_index_validations(args, &mut index_attribute, model_id, ctx);
+    let ast_model = &ctx.db.ast[model_id];
+
+    let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
+        Some(Ok("")) => {
+            ctx.push_error(args.new_attribute_validation_error("The `map` argument cannot be an empty string."));
+            None
+        }
+        Some(Ok(name)) => Some(name),
+        Some(Err(err)) => {
+            ctx.push_error(err);
+            None
+        }
+        None => None,
+    };
+
+    validate_db_name(ast_model, args, db_name, "@@fulltext", ctx);
+    index_attribute.db_name = db_name.map(Cow::from);
+
+    data.ast_indexes.push((args.attribute(), index_attribute));
+}
+
 /// Validate @@index on models.
 fn model_index<'ast>(
     args: &mut Arguments<'ast>,
@@ -533,7 +570,7 @@ fn model_index<'ast>(
     ctx: &mut Context<'ast>,
 ) {
     let mut index_attribute = IndexAttribute {
-        is_unique: false,
+        r#type: IndexType::Normal,
         ..Default::default()
     };
 
@@ -609,7 +646,7 @@ fn model_unique<'ast>(
     ctx: &mut Context<'ast>,
 ) {
     let mut index_attribute = IndexAttribute {
-        is_unique: true,
+        r#type: IndexType::Unique,
         ..Default::default()
     };
     common_index_validations(args, &mut index_attribute, model_id, ctx);
@@ -682,7 +719,7 @@ fn common_index_validations<'ast>(
                 ctx.push_error({
                     let message: &str = &format!(
                         "The {}index definition refers to the unknown fields {}.",
-                        if index_data.is_unique { "unique " } else { "" },
+                        if index_data.is_unique() { "unique " } else { "" },
                         unresolvable_fields.join(", "),
                     );
                     let model_name = ctx.db.ast()[model_id].name();
@@ -708,7 +745,7 @@ fn common_index_validations<'ast>(
                 let suggestion = if !suggested_fields.is_empty() {
                     format!(
                         " Did you mean `@@{attribute_name}([{fields}])`?",
-                        attribute_name = if index_data.is_unique { "unique" } else { "index" },
+                        attribute_name = if index_data.is_unique() { "unique" } else { "index" },
                         fields = suggested_fields.join(", ")
                     )
                 } else {
@@ -718,7 +755,7 @@ fn common_index_validations<'ast>(
                 ctx.push_error(DatamodelError::new_model_validation_error(
                     &format!(
                         "The {prefix}index definition refers to the relation fields {the_fields}. Index definitions must reference only scalar fields.{suggestion}",
-                        prefix = if index_data.is_unique { "unique " } else { "" },
+                        prefix = if index_data.is_unique() { "unique " } else { "" },
                         the_fields = relation_fields.iter().map(|(f, _)| f.name()).collect::<Vec<_>>().join(", "),
                         suggestion = suggestion
                     ),

@@ -113,6 +113,7 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::AdvancedJsonNullability,
     ConnectorCapability::ForeignKeys,
     ConnectorCapability::IndexColumnLengthPrefixing,
+    ConnectorCapability::FullTextIndex,
 ];
 
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[ConstraintScope::GlobalForeignKey, ConstraintScope::ModelKeyIndex];

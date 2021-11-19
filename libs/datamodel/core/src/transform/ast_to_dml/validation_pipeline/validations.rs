@@ -56,6 +56,9 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, r
             indexes::field_length_prefix_supported(db, index, diagnostics);
             indexes::index_algorithm_preview_feature(db, index, diagnostics);
             indexes::index_algorithm_is_supported(db, index, diagnostics);
+            indexes::fulltext_index_preview_feature_enabled(db, index, diagnostics);
+            indexes::fulltext_index_supported(db, index, diagnostics);
+            indexes::fulltext_columns_should_not_use_arguments(db, index, diagnostics);
 
             for field_attribute in index.scalar_field_attributes() {
                 let span = index

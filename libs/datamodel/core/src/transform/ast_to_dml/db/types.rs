@@ -195,14 +195,37 @@ impl Default for IndexAlgorithm {
     }
 }
 
+#[derive(Debug, Clone, Copy)]
+pub(crate) enum IndexType {
+    Normal,
+    Unique,
+    Fulltext,
+}
+
+impl Default for IndexType {
+    fn default() -> Self {
+        Self::Normal
+    }
+}
+
 #[derive(Debug, Default)]
 pub(crate) struct IndexAttribute<'ast> {
-    pub(crate) is_unique: bool,
+    pub(crate) r#type: IndexType,
     pub(crate) fields: Vec<FieldWithArgs>,
     pub(crate) source_field: Option<ast::FieldId>,
     pub(crate) name: Option<&'ast str>,
     pub(crate) db_name: Option<Cow<'ast, str>>,
     pub(crate) algorithm: Option<IndexAlgorithm>,
+}
+
+impl<'ast> IndexAttribute<'ast> {
+    pub(crate) fn is_unique(&self) -> bool {
+        matches!(self.r#type, IndexType::Unique)
+    }
+
+    pub(crate) fn is_fulltext(&self) -> bool {
+        matches!(self.r#type, IndexType::Fulltext)
+    }
 }
 
 #[derive(Debug)]

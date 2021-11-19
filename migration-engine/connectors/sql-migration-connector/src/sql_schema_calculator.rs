@@ -87,6 +87,7 @@ fn calculate_model_tables<'a>(
                 let index_type = match index_definition.tpe {
                     IndexType::Unique => sql::IndexType::Unique,
                     IndexType::Normal => sql::IndexType::Normal,
+                    IndexType::Fulltext => todo!("Fulltext migration support"),
                 };
 
                 let algorithm = index_definition.algorithm.map(|algo| match algo {
