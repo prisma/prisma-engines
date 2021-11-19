@@ -4,7 +4,7 @@ pub(crate) fn get_sort_index_of_attribute(is_field_attribute: bool, attribute_na
     let correct_order: &[&str] = if is_field_attribute {
         &["id", "unique", "default", "updatedAt", "map", "relation"]
     } else {
-        &["id", "unique", "index", "map"]
+        &["id", "unique", "index", "fulltext", "map"]
     };
 
     correct_order

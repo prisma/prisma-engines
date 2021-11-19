@@ -224,6 +224,8 @@ fn index_builders(model: &dml::Model) -> Vec<IndexBuilder> {
             typ: match i.tpe {
                 dml::IndexType::Unique => IndexType::Unique,
                 dml::IndexType::Normal => IndexType::Normal,
+                // TODO: When introducing the indexes in QE, change this.
+                dml::IndexType::Fulltext => IndexType::Normal,
             },
         })
         .collect()

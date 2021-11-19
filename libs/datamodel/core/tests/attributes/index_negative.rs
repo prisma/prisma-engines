@@ -646,6 +646,33 @@ fn hash_index_doesnt_work_on_sqlserver() {
 }
 
 #[test]
+fn fulltext_index_no_preview_feature() {
+    let dml = indoc! {r#"
+        model A {
+          id Int @id
+          a String
+          b String
+
+          @@fulltext([a, b])
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mysql, &[]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@fulltext": You must enable `fullTextIndex` preview feature to be able to define a @@fulltext index.[0m
+          [1;94m-->[0m  [4mschema.prisma:16[0m
+        [1;94m   | [0m
+        [1;94m15 | [0m
+        [1;94m16 | [0m  @@[1;91mfulltext([a, b])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
 fn hash_index_doesnt_work_on_mysql() {
     let dml = indoc! {r#"
         model A {
@@ -665,6 +692,33 @@ fn hash_index_doesnt_work_on_mysql() {
         [1;94m   | [0m
         [1;94m14 | [0m
         [1;94m15 | [0m  @@index([a], [1;91mtype: Hash[0m)
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn fulltext_index_length_attribute() {
+    let dml = indoc! {r#"
+        model A {
+          id Int @id
+          a String
+          b String
+
+          @@fulltext([a(length: 30), b])
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mysql, &["fullTextIndex", "extendedIndexes"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@index": The length and sort arguments are not supported in a @@fulltext attribute.[0m
+          [1;94m-->[0m  [4mschema.prisma:16[0m
+        [1;94m   | [0m
+        [1;94m15 | [0m
+        [1;94m16 | [0m  @@[1;91mfulltext([a(length: 30), b])[0m
         [1;94m   | [0m
     "#]];
 
@@ -698,6 +752,33 @@ fn hash_index_doesnt_work_on_sqlite() {
 }
 
 #[test]
+fn fulltext_index_sort_attribute() {
+    let dml = indoc! {r#"
+        model A {
+          id Int @id
+          a String
+          b String
+
+          @@fulltext([a(sort: Desc), b])
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mysql, &["fullTextIndex", "extendedIndexes"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@index": The length and sort arguments are not supported in a @@fulltext attribute.[0m
+          [1;94m-->[0m  [4mschema.prisma:16[0m
+        [1;94m   | [0m
+        [1;94m15 | [0m
+        [1;94m16 | [0m  @@[1;91mfulltext([a(sort: Desc), b])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
 fn hash_index_doesnt_work_on_mongo() {
     let dml = indoc! {r#"
         model A {
@@ -717,6 +798,114 @@ fn hash_index_doesnt_work_on_mongo() {
         [1;94m   | [0m
         [1;94m14 | [0m
         [1;94m15 | [0m  @@index([a], [1;91mtype: Hash[0m)
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn fulltext_index_mongodb() {
+    let dml = indoc! {r#"
+        model A {
+          id String  @id @map("_id") @test.ObjectId
+          a  String
+          b  String
+
+          @@fulltext([a, b])
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mongo, &["fullTextIndex", "mongoDb"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@fulltext": Defining fulltext indexes is not supported with the current connector.[0m
+          [1;94m-->[0m  [4mschema.prisma:16[0m
+        [1;94m   | [0m
+        [1;94m15 | [0m
+        [1;94m16 | [0m  @@[1;91mfulltext([a, b])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn fulltext_index_postgres() {
+    let dml = indoc! {r#"
+        model A {
+          id Int    @id
+          a  String
+          b  String
+
+          @@fulltext([a, b])
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mongo, &["fullTextIndex"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@fulltext": Defining fulltext indexes is not supported with the current connector.[0m
+          [1;94m-->[0m  [4mschema.prisma:16[0m
+        [1;94m   | [0m
+        [1;94m15 | [0m
+        [1;94m16 | [0m  @@[1;91mfulltext([a, b])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn fulltext_index_sql_server() {
+    let dml = indoc! {r#"
+        model A {
+          id Int    @id
+          a  String
+          b  String
+
+          @@fulltext([a, b])
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::SqlServer, &["fullTextIndex"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@fulltext": Defining fulltext indexes is not supported with the current connector.[0m
+          [1;94m-->[0m  [4mschema.prisma:16[0m
+        [1;94m   | [0m
+        [1;94m15 | [0m
+        [1;94m16 | [0m  @@[1;91mfulltext([a, b])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn fulltext_index_sqlite() {
+    let dml = indoc! {r#"
+        model A {
+          id Int    @id
+          a  String
+          b  String
+
+          @@fulltext([a, b])
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Sqlite, &["fullTextIndex"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@fulltext": Defining fulltext indexes is not supported with the current connector.[0m
+          [1;94m-->[0m  [4mschema.prisma:16[0m
+        [1;94m   | [0m
+        [1;94m15 | [0m
+        [1;94m16 | [0m  @@[1;91mfulltext([a, b])[0m
         [1;94m   | [0m
     "#]];
 

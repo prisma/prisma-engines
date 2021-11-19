@@ -437,3 +437,51 @@ fn hash_index_works_on_postgres() {
         algorithm: Some(IndexAlgorithm::Hash),
     });
 }
+
+#[test]
+fn mysql_fulltext_index() {
+    let dml = indoc! {r#"
+        model A {
+          id Int @id
+          a String
+          b String
+
+          @@fulltext([a, b])
+        }
+    "#};
+
+    let dml = with_header(dml, Provider::Mysql, &["fullTextIndex"]);
+
+    parse(&dml).assert_has_model("A").assert_has_index(IndexDefinition {
+        name: None,
+        db_name: Some("A_a_b_idx".to_string()),
+        fields: vec![IndexField::new("a"), IndexField::new("b")],
+        tpe: IndexType::Fulltext,
+        algorithm: None,
+        defined_on_field: false,
+    });
+}
+
+#[test]
+fn mysql_fulltext_index_map() {
+    let dml = indoc! {r#"
+        model A {
+          id Int @id
+          a String
+          b String
+
+          @@fulltext([a, b], map: "my_text_index")
+        }
+    "#};
+
+    let dml = with_header(dml, Provider::Mysql, &["fullTextIndex"]);
+
+    parse(&dml).assert_has_model("A").assert_has_index(IndexDefinition {
+        name: None,
+        db_name: Some("my_text_index".to_string()),
+        fields: vec![IndexField::new("a"), IndexField::new("b")],
+        tpe: IndexType::Fulltext,
+        algorithm: None,
+        defined_on_field: false,
+    });
+}

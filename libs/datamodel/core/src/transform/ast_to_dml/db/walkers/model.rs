@@ -66,7 +66,7 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
         self.model_attributes
             .ast_indexes
             .iter()
-            .any(|(_, idx)| idx.is_unique && idx.fields.iter().map(|f| f.field_id).collect::<Vec<_>>() == fields)
+            .any(|(_, idx)| idx.is_unique() && idx.fields.iter().map(|f| f.field_id).collect::<Vec<_>>() == fields)
     }
 
     /// The name of the database table the model points to.
@@ -143,7 +143,7 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
 
         let from_indices = self
             .indexes()
-            .filter(|walker| walker.attribute().is_unique)
+            .filter(|walker| walker.attribute().is_unique())
             .map(move |walker| UniqueCriteriaWalker {
                 model_id,
                 fields: &walker.attribute().fields,

@@ -2,7 +2,10 @@ use std::borrow::Cow;
 
 use crate::common::constraint_names::ConstraintNames;
 
-use super::{context::Context, types::IndexAttribute};
+use super::{
+    context::Context,
+    types::{IndexAttribute, IndexType},
+};
 use crate::transform::ast_to_dml::db::types::FieldWithArgs;
 
 /// Prisma forces a 1:1 relation to be unique from the defining side. If the
@@ -66,7 +69,7 @@ pub(super) fn infer_implicit_indexes(ctx: &mut Context<'_>) {
         indexes.push((
             model.model_id(),
             IndexAttribute {
-                is_unique: true,
+                r#type: IndexType::Unique,
                 fields: referencing_fields()
                     .map(|f| FieldWithArgs {
                         field_id: f.field_id(),

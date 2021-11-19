@@ -13,7 +13,7 @@ pub(crate) mod walkers;
 
 // We should strive to make these private and expose that data through walkers.
 pub(crate) use names::constraint_namespace::ConstraintName;
-pub(crate) use types::{IndexAlgorithm, RelationField, ScalarField, ScalarFieldType};
+pub(crate) use types::{IndexAlgorithm, IndexType, RelationField, ScalarField, ScalarFieldType};
 
 use self::{context::Context, relations::Relations, types::Types};
 use crate::PreviewFeature;

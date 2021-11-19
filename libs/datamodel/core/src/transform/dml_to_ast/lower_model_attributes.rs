@@ -84,6 +84,18 @@ impl<'a> LowerDmlToAst<'a> {
                 attributes.push(ast::Attribute::new("index", args));
             });
 
+        // @@fulltext
+        model
+            .indices
+            .iter()
+            .filter(|index| index.is_fulltext())
+            .for_each(|index_def| {
+                let mut args = self.fields_argument(&index_def);
+                self.push_index_map_argument(model, index_def, &mut args);
+
+                attributes.push(ast::Attribute::new("fulltext", args));
+            });
+
         // @@map
         <LowerDmlToAst<'a>>::push_model_index_map_arg(model, &mut attributes);
 
