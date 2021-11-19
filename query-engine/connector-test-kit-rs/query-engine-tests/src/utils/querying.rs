@@ -35,16 +35,16 @@ macro_rules! connector_results {
             )*
         )*
 
-        if results.len() == 0 {
-            panic!(format!("No results defined for connector {}", connector));
-        }
-
         let query_result = $runner.query($q).await?.to_string();
+
+        if results.len() == 0 {
+            panic!(format!("No results defined for connector {}. Query result: {}", connector, query_result));
+        }
 
         assert_eq!(
             results.contains(&query_result.as_str()),
             true,
-            "Query result: {} is not part of the expected results: {:?} for connector {:?}",
+            "Query result: {} is not part of the expected results: {:?} for connector {}",
             query_result,
             results,
             connector
