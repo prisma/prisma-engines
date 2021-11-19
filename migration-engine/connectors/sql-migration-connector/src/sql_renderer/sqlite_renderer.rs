@@ -25,7 +25,9 @@ impl SqlRenderer for SqliteFlavour {
         let index_type = match index.index_type() {
             IndexType::Unique => "UNIQUE ",
             IndexType::Normal => "",
+            IndexType::Fulltext => unreachable!("Fulltext index on SQLite"),
         };
+
         let index_name = self.quote(index.name());
         let table_reference = self.quote(index.table().name());
 

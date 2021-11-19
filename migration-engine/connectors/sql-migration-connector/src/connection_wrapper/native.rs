@@ -168,6 +168,10 @@ impl Connection {
             filter_extended_index_capabilities(&mut schema);
         }
 
+        if !preview_features.contains(PreviewFeature::FullTextIndex) {
+            filter_fulltext_capabilities(&mut schema);
+        }
+
         Ok(schema)
     }
     pub(crate) async fn query(&self, query: impl Into<Query<'_>>) -> SqlResult<ResultSet> {
@@ -210,6 +214,28 @@ impl Connection {
             ConnectionInner::Mysql(inner) => &**inner,
             other => panic!("{:?} in Connection::unwrap_mysql()", other),
         }
+    }
+}
+
+fn filter_fulltext_capabilities(schema: &mut SqlSchema) {
+    for (_, table) in schema.iter_tables_mut() {
+        if let Some(ref mut pk) = &mut table.primary_key {
+            for col in pk.columns.iter_mut() {
+                col.length = None;
+                col.sort_order = None;
+            }
+        }
+
+        let mut kept_indexes = Vec::new();
+
+        while let Some(index) = table.indices.pop() {
+            if !index.is_fulltext() {
+                kept_indexes.push(index);
+            }
+        }
+
+        kept_indexes.reverse();
+        table.indices = kept_indexes;
     }
 }
 

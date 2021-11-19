@@ -430,7 +430,8 @@ impl<'a> SqlSchemaDescriber<'a> {
                 seq_in_index AS seq_in_index,
                 Binary table_name AS table_name,
                 sub_part AS partial,
-                Binary collation AS column_order
+                Binary collation AS column_order,
+                Binary index_type AS index_type
             FROM INFORMATION_SCHEMA.STATISTICS
             WHERE table_schema = ?
             ORDER BY index_name, seq_in_index
@@ -506,15 +507,18 @@ impl<'a> SqlSchemaDescriber<'a> {
                         column.length = length;
                         column.sort_order = sort_order;
 
+                        let tpe = match (is_unique, row.get_string("index_type").as_deref()) {
+                            (true, _) => IndexType::Unique,
+                            (_, Some("FULLTEXT")) => IndexType::Fulltext,
+                            _ => IndexType::Normal,
+                        };
+
                         indexes_map.insert(
                             index_name.clone(),
                             Index {
                                 name: index_name,
                                 columns: vec![column],
-                                tpe: match is_unique {
-                                    true => IndexType::Unique,
-                                    false => IndexType::Normal,
-                                },
+                                tpe,
                                 algorithm: None,
                             },
                         );

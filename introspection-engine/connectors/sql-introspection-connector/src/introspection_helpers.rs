@@ -131,6 +131,10 @@ pub(crate) fn calculate_index(index: &Index, ctx: &IntrospectionContext) -> Inde
     let tpe = match index.tpe {
         IndexType::Unique => datamodel::dml::IndexType::Unique,
         IndexType::Normal => datamodel::dml::IndexType::Normal,
+        IndexType::Fulltext if ctx.preview_features.contains(PreviewFeature::FullTextIndex) => {
+            datamodel::dml::IndexType::Fulltext
+        }
+        IndexType::Fulltext => datamodel::dml::IndexType::Normal,
     };
 
     //We do not populate name in client by default. It increases datamodel noise,
