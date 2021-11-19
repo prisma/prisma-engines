@@ -146,7 +146,29 @@
 <span id="146">146</span>
 <span id="147">147</span>
 <span id="148">148</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">column_metadata</span>, <span class="ident">error</span>::<span class="kw-2">*</span>, <span class="ident">model_extensions</span>::<span class="kw-2">*</span>, <span class="ident">AliasedCondition</span>, <span class="ident">ColumnMetadata</span>, <span class="ident">SqlRow</span>, <span class="ident">ToSqlRow</span>};
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">column_metadata</span>, <span class="ident">error</span>::<span class="kw-2">*</span>, <span class="ident">model_extensions</span>::<span class="kw-2">*</span>, <span class="ident">sql_trace::SqlTraceComment</span>, <span class="ident">AliasedCondition</span>, <span class="ident">ColumnMetadata</span>,
+    <span class="ident">SqlRow</span>, <span class="ident">ToSqlRow</span>,
+};
 <span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
 <span class="kw">use</span> <span class="ident">connector_interface</span>::{<span class="ident">filter::Filter</span>, <span class="ident">RecordFilter</span>};
 <span class="kw">use</span> <span class="ident">futures::future::FutureExt</span>;
@@ -161,6 +183,11 @@
 <span class="kw">use</span> <span class="ident">serde_json</span>::{<span class="ident">Map</span>, <span class="ident">Value</span>};
 <span class="kw">use</span> <span class="ident">std::panic::AssertUnwindSafe</span>;
 
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sql_trace::trace_parent_to_string</span>;
+<span class="kw">use</span> <span class="ident">opentelemetry::trace::TraceContextExt</span>;
+<span class="kw">use</span> <span class="ident">tracing::Span</span>;
+<span class="kw">use</span> <span class="ident">tracing_opentelemetry::OpenTelemetrySpanExt</span>;
+
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;t</span><span class="op">&gt;</span> <span class="ident">QueryExt</span> <span class="kw">for</span> <span class="ident">connector::Transaction</span><span class="op">&lt;</span><span class="lifetime">&#39;t</span><span class="op">&gt;</span> {}
 <span class="kw">impl</span> <span class="ident">QueryExt</span> <span class="kw">for</span> <span class="ident">PooledConnection</span> {}
 
@@ -171,10 +198,19 @@
     <span class="doccomment">/// Filter and map the resulting types with the given identifiers.</span>
     <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>, <span class="ident">q</span>, <span class="ident">idents</span>))]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">filter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">q</span>: <span class="ident">Query</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">idents</span>: <span class="kw-2">&amp;</span>[<span class="ident">ColumnMetadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SqlRow</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">result_set</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">query</span>(<span class="ident">q</span>)
-            .<span class="ident">instrument</span>(<span class="macro">tracing::info_span!</span>(<span class="string">&quot;Filter read query&quot;</span>))
-            .<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::span!</span>(<span class="ident">tracing::Level::INFO</span>, <span class="string">&quot;filter read query&quot;</span>);
+
+        <span class="kw">let</span> <span class="ident">span_ctx</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">context</span>();
+        <span class="kw">let</span> <span class="ident">otel_ctx</span> <span class="op">=</span> <span class="ident">span_ctx</span>.<span class="ident">span</span>().<span class="ident">span_context</span>();
+
+        <span class="kw">let</span> <span class="ident">q</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">q</span> {
+            <span class="ident">Query::Select</span>(<span class="ident">x</span>) <span class="kw">if</span> <span class="ident">otel_ctx</span>.<span class="ident">trace_flags</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">Query::Select</span>(<span class="ident">Box::from</span>(<span class="ident">x</span>.<span class="ident">comment</span>(<span class="ident">trace_parent_to_string</span>(<span class="ident">otel_ctx</span>))))
+            }
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">q</span>,
+        };
+
+        <span class="kw">let</span> <span class="ident">result_set</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">query</span>(<span class="ident">q</span>).<span class="ident">instrument</span>(<span class="ident">span</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sql_rows</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
@@ -262,6 +298,7 @@
 
         <span class="kw">let</span> <span class="ident">select</span> <span class="op">=</span> <span class="ident">Select::from_table</span>(<span class="ident">model</span>.<span class="ident">as_table</span>())
             .<span class="ident">columns</span>(<span class="ident">id_cols</span>)
+            .<span class="ident">append_trace</span>(<span class="kw-2">&amp;</span><span class="ident">Span::current</span>())
             .<span class="ident">so_that</span>(<span class="ident">filter</span>.<span class="ident">aliased_cond</span>(<span class="prelude-val">None</span>));
 
         <span class="self">self</span>.<span class="ident">select_ids</span>(<span class="ident">select</span>, <span class="ident">model_id</span>).<span class="kw">await</span>
@@ -281,6 +318,7 @@
         <span class="kw">let</span> <span class="ident">field_names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">model_id</span>.<span class="ident">fields</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">name</span>()).<span class="ident">collect</span>();
         <span class="kw">let</span> <span class="ident">meta</span> <span class="op">=</span> <span class="ident">column_metadata::create</span>(<span class="ident">field_names</span>.<span class="ident">as_slice</span>(), <span class="kw-2">&amp;</span><span class="ident">idents</span>);
 
+        <span class="comment">// TODO: Add tracing</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rows</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">filter</span>(<span class="ident">select</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="ident">meta</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
