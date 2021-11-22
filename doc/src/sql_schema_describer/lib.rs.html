@@ -730,6 +730,12 @@
 <span id="730">730</span>
 <span id="731">731</span>
 <span id="732">732</span>
+<span id="733">733</span>
+<span id="734">734</span>
+<span id="735">735</span>
+<span id="736">736</span>
+<span id="737">737</span>
+<span id="738">738</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Database description. This crate is used heavily in the introspection and migration engines.</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::trivial_regex</span>)]</span> <span class="comment">// this is allowed, because we want to do CoW replaces and these regexes will grow.</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::match_bool</span>)]</span> <span class="comment">// we respectfully disagree that it makes the code less readable.</span>
@@ -963,6 +969,8 @@
     <span class="ident">Unique</span>,
     <span class="doccomment">/// Normal type.</span>
     <span class="ident">Normal</span>,
+    <span class="doccomment">/// Fulltext type.</span>
+    <span class="ident">Fulltext</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">IndexType</span> {
@@ -1054,6 +1062,10 @@
 <span class="kw">impl</span> <span class="ident">Index</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_unique</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">tpe</span> <span class="op">=</span><span class="op">=</span> <span class="ident">IndexType::Unique</span>
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_fulltext</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">tpe</span> <span class="op">=</span><span class="op">=</span> <span class="ident">IndexType::Fulltext</span>
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column_names</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {

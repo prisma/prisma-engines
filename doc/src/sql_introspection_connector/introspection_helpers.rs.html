@@ -508,6 +508,10 @@
 <span id="508">508</span>
 <span id="509">509</span>
 <span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Dedup</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::SqlError</span>;
 <span class="kw">use</span> <span class="ident">datamodel::IndexAlgorithm</span>;
@@ -641,6 +645,10 @@
     <span class="kw">let</span> <span class="ident">tpe</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">index</span>.<span class="ident">tpe</span> {
         <span class="ident">IndexType::Unique</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">datamodel::dml::IndexType::Unique</span>,
         <span class="ident">IndexType::Normal</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">datamodel::dml::IndexType::Normal</span>,
+        <span class="ident">IndexType::Fulltext</span> <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::FullTextIndex</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">datamodel::dml::IndexType::Fulltext</span>
+        }
+        <span class="ident">IndexType::Fulltext</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">datamodel::dml::IndexType::Normal</span>,
     };
 
     <span class="comment">//We do not populate name in client by default. It increases datamodel noise,</span>

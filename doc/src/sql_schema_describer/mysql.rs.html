@@ -826,6 +826,10 @@
 <span id="826">826</span>
 <span id="827">827</span>
 <span id="828">828</span>
+<span id="829">829</span>
+<span id="830">830</span>
+<span id="831">831</span>
+<span id="832">832</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">getters::Getter</span>, <span class="ident">parsers::Parser</span>};
 <span class="kw">use</span> <span class="ident">bigdecimal::ToPrimitive</span>;
@@ -1258,7 +1262,8 @@
                 seq_in_index AS seq_in_index,
                 Binary table_name AS table_name,
                 sub_part AS partial,
-                Binary collation AS column_order
+                Binary collation AS column_order,
+                Binary index_type AS index_type
             FROM INFORMATION_SCHEMA.STATISTICS
             WHERE table_schema = ?
             ORDER BY index_name, seq_in_index
@@ -1334,15 +1339,18 @@
                         <span class="ident">column</span>.<span class="ident">length</span> <span class="op">=</span> <span class="ident">length</span>;
                         <span class="ident">column</span>.<span class="ident">sort_order</span> <span class="op">=</span> <span class="ident">sort_order</span>;
 
+                        <span class="kw">let</span> <span class="ident">tpe</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">is_unique</span>, <span class="ident">row</span>.<span class="ident">get_string</span>(<span class="string">&quot;index_type&quot;</span>).<span class="ident">as_deref</span>()) {
+                            (<span class="bool-val">true</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">IndexType::Unique</span>,
+                            (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;FULLTEXT&quot;</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">IndexType::Fulltext</span>,
+                            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">IndexType::Normal</span>,
+                        };
+
                         <span class="ident">indexes_map</span>.<span class="ident">insert</span>(
                             <span class="ident">index_name</span>.<span class="ident">clone</span>(),
                             <span class="ident">Index</span> {
                                 <span class="ident">name</span>: <span class="ident">index_name</span>,
                                 <span class="ident">columns</span>: <span class="macro">vec!</span>[<span class="ident">column</span>],
-                                <span class="ident">tpe</span>: <span class="kw">match</span> <span class="ident">is_unique</span> {
-                                    <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">IndexType::Unique</span>,
-                                    <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">IndexType::Normal</span>,
-                                },
+                                <span class="ident">tpe</span>,
                                 <span class="ident">algorithm</span>: <span class="prelude-val">None</span>,
                             },
                         );
