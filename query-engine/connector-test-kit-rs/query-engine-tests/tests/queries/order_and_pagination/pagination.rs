@@ -788,10 +788,10 @@ mod pagination {
                 id
               }
           }"#,
-          [Postgres, Sqlite, SqlServer, MySql, MongoDb] => r#"{"data":{"findManyTestModel":[{"id":3},{"id":5},{"id":2}]}}"#,
+          [] => r#"{"data":{"findManyTestModel":[{"id":3},{"id":5},{"id":2}]}}"#,
           [] => r#"{"data":{"findManyTestModel":[{"id":5},{"id":3},{"id":2}]}}"#,
           [] => r#"{"data":{"findManyTestModel":[{"id":3},{"id":2},{"id":1}]}}"#,
-          [] => r#"{"data":{"findManyTestModel":[{"id":5},{"id":2},{"id":1}]}}"#,
+          [Sqlite, MongoDb, Postgres, MySql, SqlServer] => r#"{"data":{"findManyTestModel":[{"id":5},{"id":2},{"id":1}]}}"#,
           [] => r#"{"data":{"findManyTestModel":[{"id":2},{"id":1}]}}"#
         );
 
