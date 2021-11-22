@@ -62,13 +62,6 @@ impl FieldType {
         }
     }
 
-    pub fn is_compatible_with(&self, other: &FieldType) -> bool {
-        match (self, other) {
-            (Self::Scalar(a, _, nta), Self::Scalar(b, _, ntb)) => a == b && nta == ntb, // the name of the type alias is not important for the comparison
-            (a, b) => a == b,
-        }
-    }
-
     pub fn is_datetime(&self) -> bool {
         self.scalar_type().map(|st| st.is_datetime()).unwrap_or(false)
     }

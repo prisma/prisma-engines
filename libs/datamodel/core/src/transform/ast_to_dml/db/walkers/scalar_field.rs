@@ -2,13 +2,12 @@ use std::borrow::Cow;
 
 use dml::{default_value::DefaultValue, model::SortOrder};
 
+use super::ModelWalker;
 use crate::{
     ast,
     common::constraint_names::ConstraintNames,
     transform::ast_to_dml::db::{types::FieldWithArgs, ParserDatabase, ScalarField},
 };
-
-use super::ModelWalker;
 
 #[derive(Copy, Clone)]
 pub(crate) struct ScalarFieldWalker<'ast, 'db> {
@@ -52,7 +51,6 @@ impl<'ast, 'db> ScalarFieldWalker<'ast, 'db> {
         self.scalar_field
     }
 
-    #[allow(dead_code)] // we'll need this
     pub(crate) fn model(self) -> ModelWalker<'ast, 'db> {
         ModelWalker {
             model_id: self.model_id,
