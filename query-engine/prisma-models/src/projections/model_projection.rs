@@ -1,6 +1,4 @@
-use crate::{
-    dml::FieldArity, Field, FieldSelection, PrismaValue, ScalarFieldRef, SelectedField, SelectionResult, TypeIdentifier,
-};
+use crate::{dml::FieldArity, Field, FieldSelection, ScalarFieldRef, SelectedField, SelectionResult, TypeIdentifier};
 use itertools::Itertools;
 
 /// Projection of a `Model`. A projection is a (sub)set of fields of a model.
@@ -69,11 +67,6 @@ impl ModelProjection {
         self.scalar_fields().count()
     }
 
-    /// Attempts to retrieve a field by name (NOT database level column name) from this projection.
-    pub fn find(&self, name: &str) -> Option<&Field> {
-        self.fields().find(|field| field.name() == name)
-    }
-
     /// Returns an iterator over all scalar fields represented by this model projection, in order.
     /// Resolves relation fields to all backing scalar fields, if existing.
     pub fn scalar_fields(&self) -> impl Iterator<Item = ScalarFieldRef> + '_ {
@@ -98,68 +91,6 @@ impl ModelProjection {
 
     pub fn type_identifiers_with_arities(&self) -> Vec<(TypeIdentifier, FieldArity)> {
         self.scalar_fields().map(|f| f.type_identifier_with_arity()).collect()
-    }
-
-    /// Checks if a given `ReturnValues` belongs to this `ModelProjection`.
-    pub fn matches(&self, return_values: &SelectionResult) -> bool {
-        return_values.pairs.iter().all(|(rt, _)| match rt {
-            SelectedField::Scalar(sf) => self.find(&sf.name).is_some(),
-            SelectedField::Composite(cf) => self.find(&cf.field.name).is_some(),
-        })
-    }
-
-    /// Creates a record projection of the model projection containing only null values.
-    pub fn empty_record_projection(&self) -> SelectionResult {
-        self.scalar_fields()
-            .map(|f| (f, PrismaValue::Null))
-            .collect::<Vec<_>>()
-            .into()
-    }
-
-    /// Consumes both `ModelProjection`s to create a new one that contains
-    /// both fields. Each field is contained exactly once, with the first
-    /// occurrence of the first field in order from left (`self`) to right (`other`)
-    /// is retained. Assumes that both projections reason over the same model.
-    pub fn merge(self, other: ModelProjection) -> ModelProjection {
-        let fields = self.fields.into_iter().chain(other.fields).unique().collect();
-
-        ModelProjection { fields }
-    }
-
-    /// Creates a record identifier from raw values.
-    /// No checks for length, type, or similar is performed, hence "unchecked".
-    pub fn from_unchecked(&self, values: Vec<PrismaValue>) -> SelectionResult {
-        SelectionResult::new(self.scalar_fields().zip(values).collect())
-    }
-
-    /// Checks if this model projection contains given field.
-    pub fn contains<T>(&self, field: T) -> bool
-    where
-        T: Into<Field>,
-    {
-        let field: Field = field.into();
-        self.fields().any(|f| f.name() == field.name())
-    }
-
-    /// Checks if this model projection contains all the given database names.
-    pub fn contains_all_db_names(&self, names: impl Iterator<Item = String>) -> bool {
-        let selected_db_names: Vec<_> = self.db_names().collect();
-        let names_to_select: Vec<_> = names.collect();
-
-        if names_to_select.len() > selected_db_names.len() {
-            false
-        } else {
-            names_to_select
-                .into_iter()
-                .all(|to_select| selected_db_names.contains(&to_select))
-        }
-    }
-
-    /// Merges this model projection with given model projections and creates a set union of all.
-    pub fn union(projections: Vec<ModelProjection>) -> ModelProjection {
-        projections
-            .into_iter()
-            .fold(ModelProjection::default(), |acc, next| acc.merge(next))
     }
 }
 

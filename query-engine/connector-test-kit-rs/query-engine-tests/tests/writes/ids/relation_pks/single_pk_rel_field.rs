@@ -292,6 +292,67 @@ mod single_pk_rel_field {
         Ok(())
     }
 
+    fn tododododo() -> String {
+        let schema = indoc! {
+            r#"model Parent {
+            name     String
+            age      Int
+            #id(child_id, Int, @id)
+
+            child Child  @relation(fields: [child_id], references: [id])
+          }
+
+          model Child {
+            #id(id, Int, @id)
+            name    String
+            parent  Parent?
+          }"#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(tododododo))]
+    async fn wurst(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+            createOneParent(data: { name: "Paul" , age: 40, child: { create: { id: 1, name: "Panther" }}}) {
+              name
+              age
+              child{
+                 id
+                 name
+              }
+            }
+          }"#),
+          @r###"{"data":{"createOneParent":{"name":"Paul","age":40,"child":{"id":1,"name":"Panther"}}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+            updateOneChild(
+              where: { id: 1 }
+              data: {
+                parent: {
+                  delete: true
+                }
+              }
+            ) {
+              id
+              parent {
+                child {
+                  id
+                  name
+                }
+              }
+            }
+          }"#),
+          @r###"{"data":{"updateOneChild":{"id":1,"parent":null}}}"###
+        );
+
+        Ok(())
+    }
+
     // Mutations in this test:
     //  create         | root   | checked
     //  update         | root   | checked

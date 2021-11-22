@@ -146,6 +146,8 @@ pub async fn one2m(
     aggr_selections: Vec<RelAggregationSelection>,
     processor: InMemoryRecordProcessor,
 ) -> InterpretationResult<(ManyRecords, Option<Vec<RelAggregationRow>>)> {
+    dbg!(&parent_result);
+
     let parent_model_id = parent_field.model().primary_identifier();
     let parent_link_id = parent_field.linking_fields();
     let child_link_id = parent_field.related_field().linking_fields();
@@ -154,12 +156,15 @@ pub async fn one2m(
     let joined_projections = match parent_projections {
         Some(projections) => projections,
         None => {
+            dbg!("EXTRACTING");
             let extractor = parent_model_id.clone().merge(parent_link_id.clone());
             parent_result
                 .expect("[ID retrieval] No parent results present in the query graph for reading related records.")
                 .extract_selection_results(&extractor)?
         }
     };
+
+    dbg!(&joined_projections);
 
     // Maps the identifying link values to all primary IDs they are tied to.
     // Only the values are hashed for easier comparison.
