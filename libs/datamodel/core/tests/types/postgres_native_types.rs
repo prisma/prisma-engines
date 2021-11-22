@@ -1,6 +1,7 @@
-use crate::common::*;
-use crate::types::helper::test_native_types_compatibility;
-use crate::types::helper::test_native_types_without_attributes;
+use crate::{
+    common::*,
+    types::helper::{test_native_types_compatibility, test_native_types_without_attributes},
+};
 use datamodel::{ast, diagnostics::DatamodelError};
 use native_types::PostgresType;
 

@@ -1,6 +1,8 @@
 mod field_type;
 mod statistics;
 
+use datamodel::common::preview_features::PreviewFeature;
+use enumflags2::BitFlags;
 use futures::TryStreamExt;
 use introspection_connector::{CompositeTypeDepth, IntrospectionResult, Version};
 use mongodb::{
@@ -20,9 +22,10 @@ use statistics::*;
 pub(super) async fn sample(
     database: Database,
     composite_type_depth: CompositeTypeDepth,
+    preview_features: BitFlags<PreviewFeature>,
 ) -> crate::Result<IntrospectionResult> {
     let collections = database.list_collection_names(None).await?;
-    let mut statistics = Statistics::new(composite_type_depth);
+    let mut statistics = Statistics::new(composite_type_depth, preview_features);
     let mut warnings = Vec::new();
 
     for collection_name in &collections {

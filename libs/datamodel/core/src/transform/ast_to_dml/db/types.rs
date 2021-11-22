@@ -88,6 +88,15 @@ pub(crate) enum ScalarFieldType {
     Unsupported,
 }
 
+impl ScalarFieldType {
+    pub(crate) fn as_builtin_scalar(self) -> Option<dml::scalars::ScalarType> {
+        match self {
+            ScalarFieldType::BuiltInScalar(s) => Some(s),
+            _ => None,
+        }
+    }
+}
+
 #[derive(Debug)]
 pub(crate) struct ScalarField<'ast> {
     pub(crate) r#type: ScalarFieldType,
@@ -174,19 +183,56 @@ impl ModelAttributes<'_> {
     }
 }
 
+#[derive(Debug, Clone, Copy)]
+pub enum IndexAlgorithm {
+    BTree,
+    Hash,
+}
+
+impl Default for IndexAlgorithm {
+    fn default() -> Self {
+        Self::BTree
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub(crate) enum IndexType {
+    Normal,
+    Unique,
+    Fulltext,
+}
+
+impl Default for IndexType {
+    fn default() -> Self {
+        Self::Normal
+    }
+}
+
 #[derive(Debug, Default)]
 pub(crate) struct IndexAttribute<'ast> {
-    pub(crate) is_unique: bool,
+    pub(crate) r#type: IndexType,
     pub(crate) fields: Vec<FieldWithArgs>,
     pub(crate) source_field: Option<ast::FieldId>,
     pub(crate) name: Option<&'ast str>,
     pub(crate) db_name: Option<Cow<'ast, str>>,
+    pub(crate) algorithm: Option<IndexAlgorithm>,
 }
 
-#[derive(Debug, Default)]
+impl<'ast> IndexAttribute<'ast> {
+    pub(crate) fn is_unique(&self) -> bool {
+        matches!(self.r#type, IndexType::Unique)
+    }
+
+    pub(crate) fn is_fulltext(&self) -> bool {
+        matches!(self.r#type, IndexType::Fulltext)
+    }
+}
+
+#[derive(Debug)]
 pub(crate) struct IdAttribute<'ast> {
     pub(crate) fields: Vec<FieldWithArgs>,
     pub(super) source_field: Option<FieldId>,
+    pub(super) source_attribute: &'ast ast::Attribute,
     pub(super) name: Option<&'ast str>,
     pub(super) db_name: Option<&'ast str>,
 }

@@ -305,6 +305,7 @@ fn indices_must_work(api: TestApi) {
             auto_increment: false,
         },
     ];
+
     let pk_sequence = match api.sql_family() {
         SqlFamily::Postgres => Some(Sequence {
             name: "User_id_seq".to_string(),
@@ -315,10 +316,10 @@ fn indices_must_work(api: TestApi) {
     assert_eq!("User", user_table.name);
     assert_eq!(expected_columns, user_table.columns);
 
-    let sort_order = if api.is_mysql() && !api.is_mysql_8() {
-        None
+    let algorithm = if api.is_postgres() && !api.is_cockroach() {
+        Some(SQLIndexAlgorithm::BTree)
     } else {
-        Some(SQLSortOrder::Asc)
+        None
     };
 
     assert_eq!(
@@ -326,10 +327,11 @@ fn indices_must_work(api: TestApi) {
             name: "count".to_string(),
             columns: vec![IndexColumn {
                 name: "count".into(),
-                sort_order,
+                sort_order: Some(SQLSortOrder::Asc),
                 length: None,
             }],
             tpe: IndexType::Normal,
+            algorithm
         }],
         user_table.indices
     );

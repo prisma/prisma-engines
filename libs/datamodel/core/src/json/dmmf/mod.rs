@@ -64,6 +64,7 @@ pub struct UniqueIndex {
     pub fields: Vec<String>,
 }
 
+//TODO(extended indices) add field options here
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PrimaryKey {

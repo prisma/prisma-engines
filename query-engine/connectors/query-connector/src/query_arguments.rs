@@ -153,6 +153,13 @@ impl QueryArguments {
         })
     }
 
+    pub fn has_unbatchable_filters(&self) -> bool {
+        match &self.filter {
+            None => false,
+            Some(filter) => !filter.can_batch(),
+        }
+    }
+
     pub fn should_batch(&self, chunk_size: usize) -> bool {
         self.filter
             .as_ref()

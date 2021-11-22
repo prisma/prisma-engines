@@ -8,7 +8,7 @@ use quaint::{
     prelude::{ConnectionInfo, Query, Queryable, ResultSet},
     single::Quaint,
 };
-use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
+use sql_schema_describer::{DescriberErrorKind, IndexType, SqlSchema, SqlSchemaDescriberBackend};
 use std::sync::Arc;
 use user_facing_errors::{introspection_engine::DatabaseSchemaInconsistent, KnownError};
 
@@ -168,6 +168,10 @@ impl Connection {
             filter_extended_index_capabilities(&mut schema);
         }
 
+        if !preview_features.contains(PreviewFeature::FullTextIndex) {
+            filter_fulltext_capabilities(&mut schema);
+        }
+
         Ok(schema)
     }
     pub(crate) async fn query(&self, query: impl Into<Query<'_>>) -> SqlResult<ResultSet> {
@@ -213,23 +217,23 @@ impl Connection {
     }
 }
 
+fn filter_fulltext_capabilities(schema: &mut SqlSchema) {
+    let indices = schema
+        .iter_tables_mut()
+        .flat_map(|(_, t)| t.indices.iter_mut().filter(|i| i.is_fulltext()));
+
+    for index in indices {
+        index.tpe = IndexType::Normal;
+    }
+}
+
 fn filter_extended_index_capabilities(schema: &mut SqlSchema) {
     for (_, table) in schema.iter_tables_mut() {
-        let mut pk_removal = false;
-
         if let Some(ref mut pk) = &mut table.primary_key {
             for col in pk.columns.iter_mut() {
-                if col.length.is_some() {
-                    pk_removal = true;
-                }
-
                 col.length = None;
                 col.sort_order = None;
             }
-        }
-
-        if pk_removal {
-            table.primary_key = None;
         }
 
         let mut kept_indexes = Vec::new();
@@ -244,6 +248,8 @@ fn filter_extended_index_capabilities(schema: &mut SqlSchema) {
 
                 col.sort_order = None;
             }
+
+            index.algorithm = None;
 
             if !remove_index {
                 kept_indexes.push(index);

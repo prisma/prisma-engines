@@ -1,3 +1,5 @@
+use datamodel::common::preview_features::PreviewFeature;
+use enumflags2::BitFlags;
 use futures::TryStreamExt;
 use migration_connector::{DiffTarget, MigrationConnector};
 use mongodb::bson::{self, doc};
@@ -65,11 +67,14 @@ pub(crate) struct StateCollection {
     documents: Vec<bson::Document>,
 }
 
-fn new_connector() -> (String, MongoDbMigrationConnector) {
+fn new_connector(preview_features: BitFlags<PreviewFeature>) -> (String, MongoDbMigrationConnector) {
     let db_name = fresh_db_name();
     let mut url: url::Url = CONN_STR.parse().unwrap();
     url.set_path(&db_name);
-    (db_name, MongoDbMigrationConnector::new(url.to_string()))
+    (
+        db_name,
+        MongoDbMigrationConnector::new(url.to_string(), preview_features),
+    )
 }
 
 async fn get_state(db: &mongodb::Database) -> State {
@@ -157,13 +162,13 @@ pub(crate) fn test_scenario(scenario_name: &str) {
 
     // let state: State = serde_json::from_str(state).unwrap();
     RT.block_on(async move {
-        let (db_name, connector) = new_connector();
+        let parsed_schema = datamodel::parse_schema(&schema).unwrap();
+        let (db_name, connector) = new_connector(parsed_schema.0.preview_features());
         let client = client().await;
         let db = client.database(&db_name);
         db.drop(None).await.unwrap();
         apply_state(&db, state).await;
 
-        let parsed_schema = datamodel::parse_schema(&schema).unwrap();
         let migration = connector
             .diff(
                 DiffTarget::Database,

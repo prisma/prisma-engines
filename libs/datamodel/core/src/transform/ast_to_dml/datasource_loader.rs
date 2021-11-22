@@ -1,8 +1,8 @@
 use super::{
     super::helpers::{ValueListValidator, ValueValidator},
     builtin_datasource_providers::{
-        MongoDbDatasourceProvider, MsSqlDatasourceProvider, MySqlDatasourceProvider, PostgresDatasourceProvider,
-        SqliteDatasourceProvider,
+        CockroachDbDatasourceProvider, MongoDbDatasourceProvider, MsSqlDatasourceProvider, MySqlDatasourceProvider,
+        PostgresDatasourceProvider, SqliteDatasourceProvider,
     },
     datasource_provider::DatasourceProvider,
 };
@@ -157,20 +157,15 @@ impl DatasourceLoader {
         let documentation = ast_source.documentation.as_ref().map(|comment| comment.text.clone());
         let referential_integrity = get_referential_integrity(&args, preview_features, ast_source, diagnostics);
 
-        let datasource_provider: Box<dyn DatasourceProvider> = match provider {
-            p if p == MYSQL_SOURCE_NAME => {
-                Box::new(MySqlDatasourceProvider::new(referential_integrity.unwrap_or_default()))
+        let datasource_provider: &'static dyn DatasourceProvider = match provider {
+            p if p == MYSQL_SOURCE_NAME => &MySqlDatasourceProvider,
+            p if p == POSTGRES_SOURCE_NAME || p == POSTGRES_SOURCE_NAME_HEROKU => &PostgresDatasourceProvider,
+            p if p == SQLITE_SOURCE_NAME => &SqliteDatasourceProvider,
+            p if p == MSSQL_SOURCE_NAME => &MsSqlDatasourceProvider,
+            p if p == MONGODB_SOURCE_NAME => &MongoDbDatasourceProvider,
+            p if p == COCKROACHDB_SOURCE_NAME && preview_features.contains(PreviewFeature::Cockroachdb) => {
+                &CockroachDbDatasourceProvider
             }
-            p if p == POSTGRES_SOURCE_NAME || p == POSTGRES_SOURCE_NAME_HEROKU => Box::new(
-                PostgresDatasourceProvider::new(referential_integrity.unwrap_or_default()),
-            ),
-            p if p == SQLITE_SOURCE_NAME => {
-                Box::new(SqliteDatasourceProvider::new(referential_integrity.unwrap_or_default()))
-            }
-            p if p == MSSQL_SOURCE_NAME => {
-                Box::new(MsSqlDatasourceProvider::new(referential_integrity.unwrap_or_default()))
-            }
-            p if p == MONGODB_SOURCE_NAME => Box::new(MongoDbDatasourceProvider::new()),
             _ => {
                 diagnostics.push_error(DatamodelError::new_datasource_provider_not_known_error(
                     provider,
@@ -181,8 +176,10 @@ impl DatasourceLoader {
             }
         };
 
+        let active_connector = datasource_provider.connector();
+
         if let Some(integrity) = referential_integrity {
-            if !datasource_provider
+            if !active_connector
                 .allowed_referential_integrity_settings()
                 .contains(integrity)
             {
@@ -191,7 +188,7 @@ impl DatasourceLoader {
                     .map(|v| v.span())
                     .unwrap_or_else(Span::empty);
 
-                let supported_values = datasource_provider
+                let supported_values = active_connector
                     .allowed_referential_integrity_settings()
                     .iter()
                     .map(|v| format!(r#""{}""#, v))
@@ -216,10 +213,9 @@ impl DatasourceLoader {
             url,
             url_span: url_arg.span(),
             documentation,
-            active_connector: datasource_provider.connector(),
+            active_connector,
             shadow_database_url,
             referential_integrity,
-            default_referential_integrity: datasource_provider.default_referential_integrity(),
         })
     }
 }

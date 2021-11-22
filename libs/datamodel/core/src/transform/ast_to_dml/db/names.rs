@@ -47,13 +47,13 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
         let namespace = match (top_id, top) {
             (_, ast::Top::Enum(ast_enum)) => {
                 tmp_names.clear();
-                ast_enum.name.validate("Enum", &mut ctx.diagnostics);
+                validate_identifier(&ast_enum.name, "Enum", ctx);
                 validate_enum_name(ast_enum, &mut ctx.diagnostics);
-                ast_enum.validate_attributes(&mut ctx.diagnostics);
+                validate_attribute_identifiers(ast_enum, ctx);
 
                 for value in &ast_enum.values {
-                    value.name.validate("Enum Value", &mut ctx.diagnostics);
-                    value.validate_attributes(&mut ctx.diagnostics);
+                    validate_identifier(&value.name, "Enum Value", ctx);
+                    validate_attribute_identifiers(value, ctx);
 
                     if !tmp_names.insert(&value.name.name) {
                         ctx.push_error(DatamodelError::new_duplicate_enum_value_error(
@@ -67,13 +67,13 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
                 &mut names.tops
             }
             (ast::TopId::Model(model_id), ast::Top::Model(model)) => {
-                model.name.validate("Model", &mut ctx.diagnostics);
+                validate_identifier(&model.name, "Model", ctx);
                 validate_model_name(model, &mut ctx.diagnostics);
-                model.validate_attributes(&mut ctx.diagnostics);
+                validate_attribute_identifiers(model, ctx);
 
                 for (field_id, field) in model.iter_fields() {
-                    field.name.validate("Field", &mut ctx.diagnostics);
-                    field.validate_attributes(&mut ctx.diagnostics);
+                    validate_identifier(&field.name, "Field", ctx);
+                    validate_attribute_identifiers(field, ctx);
 
                     if names
                         .model_fields
@@ -102,7 +102,7 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
                     continue;
                 }
 
-                ct.name.validate("Composite type", &mut ctx.diagnostics);
+                validate_identifier(&ct.name, "Composite type", ctx);
 
                 for (field_id, field) in ct.iter_fields() {
                     // Check that there is no duplicate field on the composite type
@@ -220,5 +220,30 @@ fn check_for_duplicate_properties<'a>(
                 arg.identifier().span,
             ));
         }
+    }
+}
+
+fn validate_attribute_identifiers(with_attrs: &dyn WithAttributes, ctx: &mut Context<'_>) {
+    for attribute in with_attrs.attributes() {
+        validate_identifier(&attribute.name, "Attribute", ctx);
+    }
+}
+
+fn validate_identifier(ident: &ast::Identifier, schema_item: &str, ctx: &mut Context<'_>) {
+    if ident.name.is_empty() {
+        ctx.push_error(DatamodelError::new_validation_error(
+            &format!("The name of a {} must not be empty.", schema_item),
+            ident.span,
+        ))
+    } else if ident.name.chars().next().unwrap().is_numeric() {
+        ctx.push_error(DatamodelError::new_validation_error(
+            &format!("The name of a {} must not start with a number.", schema_item),
+            ident.span,
+        ))
+    } else if ident.name.contains('-') {
+        ctx.push_error(DatamodelError::new_validation_error(
+            &format!("The character `-` is not allowed in {} names.", schema_item),
+            ident.span,
+        ))
     }
 }

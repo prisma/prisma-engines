@@ -1,4 +1,4 @@
-use crate::common::IteratorJoin;
+use crate::common::{IndexColumn, IteratorJoin};
 use std::{borrow::Cow, fmt::Display};
 
 #[derive(Debug, Default)]
@@ -318,24 +318,48 @@ impl<'a> Display for CreateEnum<'a> {
     }
 }
 
+pub enum IndexAlgorithm {
+    BTree,
+    Hash,
+}
+
 pub struct CreateIndex<'a> {
     pub index_name: PostgresIdentifier<'a>,
     pub is_unique: bool,
     pub table_reference: PostgresIdentifier<'a>,
-    pub columns: Vec<Cow<'a, str>>,
+    pub columns: Vec<IndexColumn<'a>>,
+    pub using: Option<IndexAlgorithm>,
 }
 
 impl<'a> Display for CreateIndex<'a> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let using = match self.using {
+            Some(IndexAlgorithm::Hash) => " USING HASH ",
+            _ => "",
+        };
+
         write!(
             f,
-            "CREATE {uniqueness}INDEX {index_name} ON {table_reference}(",
+            "CREATE {uniqueness}INDEX {index_name} ON {table_reference}{using}(",
             uniqueness = if self.is_unique { "UNIQUE " } else { "" },
             index_name = self.index_name,
             table_reference = self.table_reference,
+            using = using,
         )?;
 
-        self.columns.iter().map(|s| Ident(s)).join(", ", f)?;
+        self.columns
+            .iter()
+            .map(|c| {
+                let mut rendered = Ident(&c.name).to_string();
+
+                if let Some(sort_order) = c.sort_order {
+                    rendered.push(' ');
+                    rendered.push_str(sort_order.as_ref());
+                }
+
+                rendered
+            })
+            .join(", ", f)?;
 
         f.write_str(")")
     }
@@ -343,6 +367,8 @@ impl<'a> Display for CreateIndex<'a> {
 
 #[cfg(test)]
 mod tests {
+    use crate::SortOrder;
+
     use super::*;
 
     #[test]
@@ -371,18 +397,66 @@ mod tests {
 
     #[test]
     fn create_unique_index() {
-        let columns = vec!["name".into(), "age".into()];
+        let columns = vec![IndexColumn::new("name"), IndexColumn::new("age")];
 
         let create_index = CreateIndex {
             is_unique: true,
             index_name: "meow_idx".into(),
             table_reference: "Cat".into(),
             columns,
+            using: None,
         };
 
         assert_eq!(
             create_index.to_string(),
             "CREATE UNIQUE INDEX \"meow_idx\" ON \"Cat\"(\"name\", \"age\")"
+        )
+    }
+
+    #[test]
+    fn create_hash_index() {
+        let columns = vec![IndexColumn::new("name")];
+
+        let create_index = CreateIndex {
+            is_unique: false,
+            index_name: "meow_idx".into(),
+            table_reference: "Cat".into(),
+            columns,
+            using: Some(IndexAlgorithm::Hash),
+        };
+
+        assert_eq!(
+            create_index.to_string(),
+            "CREATE INDEX \"meow_idx\" ON \"Cat\" USING HASH (\"name\")"
+        )
+    }
+
+    #[test]
+    fn create_unique_index_sort_order() {
+        let columns = vec![
+            IndexColumn {
+                name: "name".into(),
+                sort_order: Some(SortOrder::Asc),
+                ..Default::default()
+            },
+            IndexColumn {
+                name: "age".into(),
+                sort_order: Some(SortOrder::Desc),
+                ..Default::default()
+            },
+        ];
+
+        let create_index = CreateIndex {
+            is_unique: true,
+            index_name: "meow_idx".into(),
+            table_reference: "Cat".into(),
+            columns,
+            using: None,
+        };
+
+        assert_eq!(
+            create_index.to_string(),
+            "CREATE UNIQUE INDEX \"meow_idx\" ON \"Cat\"(\"name\" ASC, \"age\" DESC)"
         )
     }
 

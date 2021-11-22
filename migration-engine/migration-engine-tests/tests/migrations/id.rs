@@ -1,6 +1,237 @@
 mod vitess;
 
+use indoc::{formatdoc, indoc};
 use migration_engine_tests::test_api::*;
+use sql_schema_describer::SQLSortOrder;
+
+#[test_connector(tags(Mysql8), preview_features("extendedIndexes"))]
+fn length_prefixed_primary_key(api: TestApi) {
+    let dm = formatdoc! {r#"
+        {}
+
+        generator client {{
+            provider = "prisma-client-js"
+            previewFeatures = ["extendedIndexes"]
+        }}
+
+        model A {{
+          id String @id(length: 30) @db.Text
+        }}
+    "#, api.datasource_block()};
+
+    api.schema_push(&dm).send().assert_green();
+
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_pk(|pk| pk.assert_column("id", |attr| attr.assert_length_prefix(30)))
+    });
+}
+
+#[test_connector(tags(Mysql8))]
+fn should_not_change_primary_key_length_prefix_without_preview_flag(api: TestApi) {
+    let query = indoc! {r#"
+        CREATE TABLE `A` (id VARCHAR(255) NOT NULL, CONSTRAINT A_id_pkey PRIMARY KEY (id(30)))
+    "#};
+
+    api.raw_cmd(query);
+
+    let dm = indoc! {r#"
+        model A {
+          id String @id @db.VarChar(255)
+        }
+    "#};
+
+    api.schema_push_w_datasource(dm).send().assert_no_steps();
+}
+
+#[test_connector(tags(Mysql8), preview_features("extendedIndexes"))]
+fn changing_of_length_prefix(api: TestApi) {
+    let dm = formatdoc! {r#"
+        {}
+
+        generator client {{
+            provider = "prisma-client-js"
+            previewFeatures = ["extendedIndexes"]
+        }}
+
+        model A {{
+          id String @id(length: 30) @db.VarChar(255)
+        }}
+    "#, api.datasource_block()};
+
+    api.schema_push(&dm).send().assert_green();
+
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_pk(|pk| pk.assert_column("id", |attr| attr.assert_length_prefix(30)))
+    });
+
+    let dm = formatdoc! {r#"
+        {}
+
+        generator client {{
+            provider = "prisma-client-js"
+            previewFeatures = ["extendedIndexes"]
+        }}
+
+        model A {{
+          id String @id(length: 20) @db.VarChar(255)
+        }}
+    "#, api.datasource_block()};
+
+    api.schema_push(&dm).send().assert_green();
+
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_pk(|pk| pk.assert_column("id", |attr| attr.assert_length_prefix(20)))
+    });
+}
+
+#[test_connector(tags(Mysql8), preview_features("extendedIndexes"))]
+fn removing_length_prefix(api: TestApi) {
+    let dm = formatdoc! {r#"
+        {}
+
+        generator client {{
+            provider = "prisma-client-js"
+            previewFeatures = ["extendedIndexes"]
+        }}
+
+        model A {{
+          id String @id(length: 30) @db.VarChar(255)
+        }}
+    "#, api.datasource_block()};
+
+    api.schema_push(&dm).send().assert_green();
+
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_pk(|pk| pk.assert_column("id", |attr| attr.assert_length_prefix(30)))
+    });
+
+    let dm = formatdoc! {r#"
+        {}
+
+        generator client {{
+            provider = "prisma-client-js"
+            previewFeatures = ["extendedIndexes"]
+        }}
+
+        model A {{
+          id String @id @db.VarChar(255)
+        }}
+    "#, api.datasource_block()};
+
+    api.schema_push(&dm).send().assert_green();
+
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_pk(|pk| pk.assert_column("id", |attr| attr.assert_no_length_prefix()))
+    });
+}
+
+#[test_connector(tags(Mysql8), preview_features("extendedIndexes"))]
+fn length_prefixed_compound_primary_key(api: TestApi) {
+    let dm = formatdoc! {r#"
+        {}
+
+        generator client {{
+            provider = "prisma-client-js"
+            previewFeatures = ["extendedIndexes"]
+        }}
+
+        model A {{
+          a String @db.Text
+          b String @db.Text
+
+          @@id([a(length: 30), b(length: 20)])
+        }}
+    "#, api.datasource_block()};
+
+    api.schema_push(&dm).send().assert_green();
+
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_pk(|pk| {
+            pk.assert_column("a", |attr| attr.assert_length_prefix(30))
+                .assert_column("b", |attr| attr.assert_length_prefix(20))
+        })
+    });
+}
+
+#[test_connector(tags(Mssql), preview_features("extendedIndexes"))]
+fn descending_primary_key(api: TestApi) {
+    let dm = formatdoc! {r#"
+        {}
+
+        generator client {{
+            provider = "prisma-client-js"
+            previewFeatures = ["extendedIndexes"]
+        }}
+
+        model A {{
+          id Int @id(sort: Desc)
+        }}
+    "#, api.datasource_block()};
+
+    api.schema_push(&dm).send().assert_green();
+
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_pk(|pk| pk.assert_column("id", |attr| attr.assert_sort_order(SQLSortOrder::Desc)))
+    });
+}
+
+#[test_connector(tags(Mssql))]
+fn should_not_change_primary_key_sort_order_without_preview_feature(api: TestApi) {
+    let query = formatdoc! {r#"
+        CREATE TABLE [{}].[A] (id VARCHAR(255) NOT NULL, CONSTRAINT A_pkey PRIMARY KEY (id DESC))
+    "#, api.schema_name()};
+
+    api.raw_cmd(&query);
+
+    let dm = indoc! {r#"
+        model A {
+          id String @id @db.VarChar(255)
+        }
+    "#};
+
+    api.schema_push_w_datasource(dm).send().assert_no_steps();
+}
+
+#[test_connector(tags(Mssql), preview_features("extendedIndexes"))]
+fn altering_descending_primary_key(api: TestApi) {
+    let dm = formatdoc! {r#"
+        {}
+
+        generator client {{
+            provider = "prisma-client-js"
+            previewFeatures = ["extendedIndexes"]
+        }}
+
+        model A {{
+          id Int @id(sort: Desc)
+        }}
+    "#, api.datasource_block()};
+
+    api.schema_push(&dm).send().assert_green();
+
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_pk(|pk| pk.assert_column("id", |attr| attr.assert_sort_order(SQLSortOrder::Desc)))
+    });
+
+    let dm = formatdoc! {r#"
+        {}
+
+        generator client {{
+            provider = "prisma-client-js"
+            previewFeatures = ["extendedIndexes"]
+        }}
+
+        model A {{
+          id Int @id
+        }}
+    "#, api.datasource_block()};
+
+    api.schema_push(&dm).force(true).send().assert_green();
+
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_pk(|pk| pk.assert_column("id", |attr| attr.assert_sort_order(SQLSortOrder::Asc)))
+    });
+}
 
 #[test_connector(exclude(Vitess))]
 fn changing_the_type_of_an_id_field_must_work(api: TestApi) {

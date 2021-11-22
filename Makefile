@@ -198,6 +198,9 @@ dev-vitess_8_0: start-vitess_8_0
 qe:
 	cargo run --bin query-engine -- --enable-playground --enable-raw-queries
 
+qe-dmmf:
+	cargo run --bin query-engine -- cli dmmf > dmmf.json
+
 push-schema:
 	cargo run --bin test-cli -- schema-push $(DEV_SCHEMA_FILE) --force
 
@@ -220,3 +223,8 @@ use-local-query-engine:
 	cargo build --release
 	cp target/release/query-engine $(PRISMA2_BINARY_PATH)/runtime/
 	cp target/release/query-engine $(PRISMA2_BINARY_PATH)/query-engine-darwin
+
+
+## OpenTelemetry
+otel:
+	docker-compose up --remove-orphans otel

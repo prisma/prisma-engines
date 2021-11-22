@@ -1,5 +1,5 @@
 use crate::common::preview_features::PreviewFeature;
-use crate::{ast, dml, Datasource};
+use crate::{ast, dml, Datasource, IndexField, PrimaryKeyField, SortOrder};
 use enumflags2::BitFlags;
 
 pub struct LowerDmlToAst<'a> {
@@ -134,6 +134,41 @@ impl<'a> LowerDmlToAst<'a> {
         fields
             .iter()
             .map(|f| ast::Expression::ConstantValue(f.to_string(), ast::Span::empty()))
+            .collect()
+    }
+
+    pub fn pk_field_array(fields: &[PrimaryKeyField]) -> Vec<ast::Expression> {
+        fields
+            .iter()
+            .map(|f| {
+                let mut args = vec![];
+                args.extend(f.length.map(|length| ast::Argument::new_numeric("length", length)));
+
+                args.extend(
+                    (f.sort_order == Some(SortOrder::Desc)).then(|| ast::Argument::new_constant("sort", "Desc")),
+                );
+
+                ast::Expression::FieldWithArgs(f.name.to_string(), args, ast::Span::empty())
+            })
+            .collect()
+    }
+
+    pub fn index_field_array(fields: &[IndexField]) -> Vec<ast::Expression> {
+        fields
+            .iter()
+            .map(|f| {
+                let mut args = vec![];
+
+                args.extend(f.length.map(|length| ast::Argument::new_numeric("length", length)));
+
+                args.extend(
+                    f.sort_order
+                        .filter(|s| *s == SortOrder::Desc)
+                        .map(|_| ast::Argument::new_constant("sort", "Desc")),
+                );
+
+                ast::Expression::FieldWithArgs(f.name.clone(), args, ast::Span::empty())
+            })
             .collect()
     }
 }

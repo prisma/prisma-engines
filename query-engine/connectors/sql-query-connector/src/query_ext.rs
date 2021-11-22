@@ -1,4 +1,7 @@
-use crate::{column_metadata, error::*, model_extensions::*, AliasedCondition, ColumnMetadata, SqlRow, ToSqlRow};
+use crate::{
+    column_metadata, error::*, model_extensions::*, sql_trace::SqlTraceComment, AliasedCondition, ColumnMetadata,
+    SqlRow, ToSqlRow,
+};
 use async_trait::async_trait;
 use connector_interface::{filter::Filter, RecordFilter};
 use futures::future::FutureExt;
@@ -13,6 +16,11 @@ use tracing_futures::Instrument;
 use serde_json::{Map, Value};
 use std::panic::AssertUnwindSafe;
 
+use crate::sql_trace::trace_parent_to_string;
+use opentelemetry::trace::TraceContextExt;
+use tracing::Span;
+use tracing_opentelemetry::OpenTelemetrySpanExt;
+
 impl<'t> QueryExt for connector::Transaction<'t> {}
 impl QueryExt for PooledConnection {}
 
@@ -23,10 +31,19 @@ pub trait QueryExt: Queryable + Send + Sync {
     /// Filter and map the resulting types with the given identifiers.
     #[tracing::instrument(skip(self, q, idents))]
     async fn filter(&self, q: Query<'_>, idents: &[ColumnMetadata<'_>]) -> crate::Result<Vec<SqlRow>> {
-        let result_set = self
-            .query(q)
-            .instrument(tracing::info_span!("Filter read query"))
-            .await?;
+        let span = tracing::span!(tracing::Level::INFO, "filter read query");
+
+        let span_ctx = span.context();
+        let otel_ctx = span_ctx.span().span_context();
+
+        let q = match q {
+            Query::Select(x) if otel_ctx.trace_flags() == 1 => {
+                Query::Select(Box::from(x.comment(trace_parent_to_string(otel_ctx))))
+            }
+            _ => q,
+        };
+
+        let result_set = self.query(q).instrument(span).await?;
 
         let mut sql_rows = Vec::new();
 
@@ -114,6 +131,7 @@ pub trait QueryExt: Queryable + Send + Sync {
 
         let select = Select::from_table(model.as_table())
             .columns(id_cols)
+            .append_trace(&Span::current())
             .so_that(filter.aliased_cond(None));
 
         self.select_ids(select, model_id).await
@@ -133,6 +151,7 @@ pub trait QueryExt: Queryable + Send + Sync {
         let field_names: Vec<_> = model_id.fields().map(|field| field.name()).collect();
         let meta = column_metadata::create(field_names.as_slice(), &idents);
 
+        // TODO: Add tracing
         let mut rows = self.filter(select.into(), &meta).await?;
         let mut result = Vec::new();
 

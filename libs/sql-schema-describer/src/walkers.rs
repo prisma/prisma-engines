@@ -4,8 +4,8 @@
 
 use crate::{
     Column, ColumnArity, ColumnId, ColumnType, ColumnTypeFamily, DefaultValue, Enum, ForeignKey, ForeignKeyAction,
-    Index, IndexColumn, IndexType, PrimaryKey, PrimaryKeyColumn, SQLSortOrder, SqlSchema, Table, TableId,
-    UserDefinedType, View,
+    Index, IndexColumn, IndexType, PrimaryKey, PrimaryKeyColumn, SQLIndexAlgorithm, SQLSortOrder, SqlSchema, Table,
+    TableId, UserDefinedType, View,
 };
 use serde::de::DeserializeOwned;
 use std::fmt;
@@ -238,51 +238,6 @@ impl<'a> fmt::Debug for TableWalker<'a> {
     }
 }
 
-/// A walker of a column in a primary key.
-#[derive(Clone, Copy)]
-pub struct PrimaryKeyColumnWalker<'a> {
-    schema: &'a SqlSchema,
-    primary_key_column_id: usize,
-    table_id: TableId,
-    column_id: ColumnId,
-}
-
-impl<'a> PrimaryKeyColumnWalker<'a> {
-    /// Conversion to a normal column walker.
-    pub fn as_column(self) -> ColumnWalker<'a> {
-        ColumnWalker {
-            schema: self.schema,
-            column_id: self.column_id,
-            table_id: self.table_id,
-        }
-    }
-
-    /// The length limit of the (text) column. Matters on MySQL only.
-    pub fn length(self) -> Option<u32> {
-        self.get().length
-    }
-
-    /// The BTree ordering. Matters on SQL Server only.
-    pub fn sort_order(self) -> Option<SQLSortOrder> {
-        self.get().sort_order
-    }
-
-    fn table(self) -> TableWalker<'a> {
-        TableWalker {
-            schema: self.schema,
-            table_id: self.table_id,
-        }
-    }
-
-    fn get(self) -> &'a PrimaryKeyColumn {
-        self.table()
-            .table()
-            .primary_key_columns()
-            .nth(self.primary_key_column_id)
-            .unwrap()
-    }
-}
-
 impl<'a> TableWalker<'a> {
     /// Create a TableWalker from a schema and a reference to one of its tables. This should stay private.
     pub(crate) fn new(schema: &'a SqlSchema, table_id: TableId) -> Self {
@@ -428,6 +383,51 @@ impl<'a> TableWalker<'a> {
     /// The index of the table in the schema.
     pub fn table_id(&self) -> TableId {
         self.table_id
+    }
+}
+
+/// A walker of a column in a primary key.
+#[derive(Clone, Copy)]
+pub struct PrimaryKeyColumnWalker<'a> {
+    schema: &'a SqlSchema,
+    primary_key_column_id: usize,
+    table_id: TableId,
+    column_id: ColumnId,
+}
+
+impl<'a> PrimaryKeyColumnWalker<'a> {
+    /// Conversion to a normal column walker.
+    pub fn as_column(self) -> ColumnWalker<'a> {
+        ColumnWalker {
+            schema: self.schema,
+            column_id: self.column_id,
+            table_id: self.table_id,
+        }
+    }
+
+    /// The length limit of the (text) column. Matters on MySQL only.
+    pub fn length(self) -> Option<u32> {
+        self.get().length
+    }
+
+    /// The BTree ordering. Matters on SQL Server only.
+    pub fn sort_order(self) -> Option<SQLSortOrder> {
+        self.get().sort_order
+    }
+
+    fn table(self) -> TableWalker<'a> {
+        TableWalker {
+            schema: self.schema,
+            table_id: self.table_id,
+        }
+    }
+
+    fn get(self) -> &'a PrimaryKeyColumn {
+        self.table()
+            .table()
+            .primary_key_columns()
+            .nth(self.primary_key_column_id)
+            .unwrap()
     }
 }
 
@@ -653,8 +653,8 @@ impl<'a> IndexWalker<'a> {
     }
 
     /// The IndexType
-    pub fn index_type(&self) -> &'a IndexType {
-        &self.get().tpe
+    pub fn index_type(&self) -> IndexType {
+        self.get().tpe
     }
 
     /// The name of the index.
@@ -668,6 +668,11 @@ impl<'a> IndexWalker<'a> {
             table_id: self.table_id,
             schema: self.schema,
         }
+    }
+
+    /// The hash algorithm used in the index.
+    pub fn algorithm(&self) -> Option<SQLIndexAlgorithm> {
+        self.get().algorithm
     }
 }
 

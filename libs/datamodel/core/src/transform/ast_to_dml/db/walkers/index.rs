@@ -5,7 +5,7 @@ use crate::{
 };
 use std::borrow::Cow;
 
-use super::{ModelWalker, ScalarFieldWalker};
+use super::{ModelWalker, ScalarFieldAttributeWalker, ScalarFieldWalker};
 
 #[allow(dead_code)]
 #[derive(Copy, Clone)]
@@ -35,7 +35,7 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
             )
             .collect();
 
-        if self.index_attribute.is_unique {
+        if self.index_attribute.is_unique() {
             ConstraintNames::unique_index_name(model_db_name, &field_db_names, self.db.active_connector()).into()
         } else {
             ConstraintNames::non_unique_index_name(model_db_name, &field_db_names, self.db.active_connector()).into()
@@ -70,6 +70,21 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
             })
     }
 
+    pub(crate) fn scalar_field_attributes(
+        self,
+    ) -> impl ExactSizeIterator<Item = ScalarFieldAttributeWalker<'ast, 'db>> + 'db {
+        self.attribute()
+            .fields
+            .iter()
+            .enumerate()
+            .map(move |(field_arg_id, _)| ScalarFieldAttributeWalker {
+                model_id: self.model_id,
+                fields: &self.attribute().fields,
+                db: self.db,
+                field_arg_id,
+            })
+    }
+
     pub(crate) fn contains_exactly_fields(
         self,
         fields: impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>>,
@@ -78,7 +93,7 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
     }
 
     pub(crate) fn is_unique(self) -> bool {
-        self.index_attribute.is_unique
+        self.index_attribute.is_unique()
     }
 
     pub(crate) fn model(self) -> ModelWalker<'ast, 'db> {

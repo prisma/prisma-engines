@@ -43,7 +43,7 @@ pub async fn run(prisma_schema: &str) -> ConnectorResult<()> {
         }
         #[cfg(feature = "mongodb")]
         provider if provider == MONGODB_SOURCE_NAME => {
-            let connector = MongoDbMigrationConnector::new(url);
+            let connector = MongoDbMigrationConnector::new(url, preview_features);
             // Drop database. Creation is automatically done when collections are created.
             connector.drop_database().await?;
             let (_, schema) = crate::parse_schema(prisma_schema).unwrap();

@@ -388,13 +388,12 @@ impl<'a> Renderer<'a> {
         }
     }
 
-    fn render_argument(target: &mut dyn LineWriteable, args: &ast::Argument) {
-        if !args.name.name.is_empty() {
-            target.write(&args.name.name);
+    fn render_argument(target: &mut dyn LineWriteable, arg: &ast::Argument) {
+        if !arg.name.name.is_empty() {
+            target.write(&arg.name.name);
             target.write(": ");
         }
-
-        Self::render_value(target, &args.value);
+        Self::render_value(target, &arg.value);
     }
 
     pub(crate) fn render_value_to_string(val: &ast::Expression) -> String {

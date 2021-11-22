@@ -76,6 +76,15 @@ impl Filter {
         }
     }
 
+    pub fn can_batch(&self) -> bool {
+        match self {
+            Self::Scalar(sf) => sf.can_batch(),
+            Self::And(filters) => filters.iter().all(|f| f.can_batch()),
+            Self::Or(filters) => filters.iter().all(|f| f.can_batch()),
+            _ => true,
+        }
+    }
+
     pub fn batched(self, chunk_size: usize) -> Vec<Filter> {
         fn split_longest(mut filters: Vec<Filter>, chunk_size: usize) -> (Option<ScalarFilter>, Vec<Filter>) {
             let mut longest: Option<ScalarFilter> = None;

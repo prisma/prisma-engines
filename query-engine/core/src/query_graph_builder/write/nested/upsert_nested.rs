@@ -15,73 +15,81 @@ use std::{convert::TryInto, sync::Arc};
 ///
 /// Many-to-many relation:
 /// ```text
-///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐
-///          Parent       ────────────────────────┐
-///    └ ─ ─ ─ ─ ─ ─ ─ ─ ┘         │              │
-///             │                                 │
-///             │                  │              │
-///             │                                 │
-///             ▼                  ▼              │
-///    ┌─────────────────┐  ┌ ─ ─ ─ ─ ─ ─         │
-/// ┌──│   Read Child    │      Result   │        │
-/// │  └─────────────────┘  └ ─ ─ ─ ─ ─ ─         │
-/// │           │                                 │
-/// │           │                                 │
-/// │           │                                 │
-/// │           ▼                                 │
-/// │  ┌─────────────────┐                        │
-/// │  │   If (exists)   │────────────┐           │
-/// │  └─────────────────┘            │           │
-/// │           │                     │           │
-/// │           │                     │           │
-/// │           │                     │           │
-/// │           ▼                     ▼           │
-/// │  ┌─────────────────┐   ┌─────────────────┐  │
-/// └─▶│  Update Child   │   │  Create Child   │  │
-///    └─────────────────┘   └─────────────────┘  │
-///                                   │           │
-///                                   │           │
-///                                   │           │
-///                                   ▼           │
-///                          ┌─────────────────┐  │
-///                          │     Connect     │◀─┘
-///                          └─────────────────┘
+///                           ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐                    
+///                                 Parent       ───────────────────┐
+///                           └ ─ ─ ─ ─ ─ ─ ─ ─ ┘         │         │
+///                                    │                            │
+///                                    │                  │         │
+///                                    ▼                            │
+///                           ┌─────────────────┐         │         │
+/// ┌───────────┬─────────────│   Read Child    │                   │
+/// │           │             └─────────────────┘         │         │
+/// │           │                      │                  ▼         │
+/// │           │                      │           ┌ ─ ─ ─ ─ ─ ─    │
+/// │           │                      │               Result   │   │
+/// │           │                      │           └ ─ ─ ─ ─ ─ ─    │
+/// │           │                      ▼                            │
+/// │           │             ┌─────────────────┐                   │
+/// │           │             │   If (exists)   │───────┐           │
+/// │ ┌ ─ ─ ─ ─ ▼ ─ ─ ─ ─ ┐   └─────────────────┘       │           │
+/// │  ┌─────────────────┐             │                │           │
+/// │ ││    Join Node    │◀────Then────┘                │           │
+/// │  └─────────────────┘                              │           │
+/// │ │         │         │                             │           │
+/// │           │                                       │           │
+/// │ │         ▼         │                             │           │
+/// │  ┌─────────────────┐                              ▼           │
+/// │ ││ Insert onUpdate ││                    ┌─────────────────┐  │
+/// │  │emulation subtree│                     │  Create Child   │  │
+/// │ ││for all relations││                    └─────────────────┘  │
+/// │  │ pointing to the │                              │           │
+/// │ ││   Child model   ││                             │           │
+/// │  └─────────────────┘                              │           │
+/// │ └ ─ ─ ─ ─ ┬ ─ ─ ─ ─ ┘                             ▼           │
+/// │           │                              ┌─────────────────┐  │
+/// │           │                              │     Connect     │◀─┘
+/// │           ▼                              └─────────────────┘   
+/// │  ┌─────────────────┐                                           
+/// └─▶│  Update Child   │                                           
+///    └─────────────────┘                                           
 /// ```
 ///
 /// One-to-x relation:
 /// ```text
-///    Inlined in parent:                                     Inlined in child:
-///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐                                    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐
-///          Parent       ────────────────────────┐                 Parent       ────────────────────────┐
-///    └ ─ ─ ─ ─ ─ ─ ─ ─ ┘         │              │           └ ─ ─ ─ ─ ─ ─ ─ ─ ┘         │              │
-///             │                                 │                    │                                 │
-///             │                  │              │                    │                  │              │
-///             │                                 │                    │                                 │
-///             ▼                  ▼              │                    ▼                  ▼              │
-///    ┌─────────────────┐  ┌ ─ ─ ─ ─ ─ ─         │           ┌─────────────────┐  ┌ ─ ─ ─ ─ ─ ─         │
-/// ┌──│   Read Child    │      Result   │        │        ┌──│   Read Child    │      Result   │        │
-/// │  └─────────────────┘  └ ─ ─ ─ ─ ─ ─         │        │  └─────────────────┘  └ ─ ─ ─ ─ ─ ─         │
-/// │           │                                 │        │           │                                 │
-/// │           │                                 │        │           │                                 │
-/// │           │                                 │        │           │                                 │
-/// │           ▼                                 │        │           ▼                                 │
-/// │  ┌─────────────────┐                        │        │  ┌─────────────────┐                        │
-/// │  │   If (exists)   │────────────┐           │        │  │   If (exists)   │────────────┐           │
-/// │  └─────────────────┘            │           │        │  └─────────────────┘            │           │
-/// │           │                     │           │        │           │                     │           │
-/// │           │                     │           │        │           │                     │           │
-/// │           │                     │           │        │           │                     │           │
-/// │           ▼                     ▼           │        │           ▼                     ▼           │
-/// │  ┌─────────────────┐   ┌─────────────────┐  │        │  ┌─────────────────┐   ┌─────────────────┐  │
-/// └─▶│  Update Child   │   │  Create Child   │  │        └─▶│  Update Child   │   │  Create Child   │◀─┘
-///    └─────────────────┘   └─────────────────┘  │           └─────────────────┘   └─────────────────┘
-///                                   │           │
-///                                   │           │
-///                                   │           │
-///                                   ▼           │
-///                          ┌─────────────────┐  │
-///                          │  Update Parent  │◀─┘
-///                          └─────────────────┘
+///    Inlined in parent:                                                                      Inlined in child:
+///                                                                                                                          ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐                     
+///                                     ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐                                                                        Parent       ────────────────────┐
+///                                           Parent       ────────┬──────────┐                                              └ ─ ─ ─ ─ ─ ─ ─ ─ ┘           │        │
+///                                     └ ─ ─ ─ ─ ─ ─ ─ ─ ┘                   │                                                       │                             │
+///                                              │                 │          │                                                       │                    │        │
+///                                              │                            │                                                       │                             │
+///                                              │                 │          │                                                       ▼                    ▼        │
+///                                              ▼                 ▼          │                                              ┌─────────────────┐    ┌ ─ ─ ─ ─ ─ ─   │
+///                                     ┌─────────────────┐ ┌ ─ ─ ─ ─ ─ ─     │                ┌─────────────────────────────│   Read Child    │        Result   │  │
+/// ┌───────────────────────────────────│   Read Child    │     Result   │    │                │                             └─────────────────┘    └ ─ ─ ─ ─ ─ ─   │
+/// │                                   └─────────────────┘ └ ─ ─ ─ ─ ─ ─     │                │                                      │                             │
+/// │                                            │                            │                │                                      │                             │
+/// │                                            │                            │                │ ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐                ▼                             │
+/// │                                            │                            │                │  ┌─────────────────┐        ┌─────────────────┐                    │
+/// │ ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐                      ▼                            │                │ ││    Join node    │◀───────│   If (exists)   │────────┐           │
+/// │  ┌─────────────────┐              ┌─────────────────┐                   │                │  └─────────────────┘        └─────────────────┘        │           │
+/// │ ││    Join node    │◀────Then─────│   If (exists)   │───────┐           │                │ │         │         │                                  │           │
+/// │  └─────────────────┘              └─────────────────┘       │           │                │           ▼                                            │           │
+/// │ │         │         │                                       │           │                │ │┌─────────────────┐│                                  │           │
+/// │           ▼                                                 │           │                │  │ Insert onUpdate │                                   │           │
+/// │ │┌─────────────────┐│                                       │           │                │ ││emulation subtree││                                  │           │
+/// │  │ Insert onUpdate │                                        ▼           │                │  │for all relations│                                   ▼           │
+/// │ ││emulation subtree││                              ┌─────────────────┐  │                │ ││ pointing to the ││                         ┌─────────────────┐  │
+/// │  │for all relations│                               │  Create Child   │  │                │  │   Child model   │                          │  Create Child   │◀─┘
+/// │ ││ pointing to the ││                              └─────────────────┘  │                │ │└─────────────────┘│                         └─────────────────┘   
+/// │  │   Child model   │                                        │           │                │  ─ ─ ─ ─ ─│─ ─ ─ ─ ─                                                
+/// │ │└─────────────────┘│                                       │           │                │           │                                                         
+/// │  ─ ─ ─ ─ ─│─ ─ ─ ─ ─                                        │           │                │           │                                                         
+/// │           │                                                 ▼           │                │           ▼                                                         
+/// │           ▼                                        ┌─────────────────┐  │                │  ┌─────────────────┐                                                
+/// │  ┌─────────────────┐                               │  Update Parent  │◀─┘                └─▶│  Update Child   │                                                
+/// └─▶│  Update Child   │                               └─────────────────┘                      └─────────────────┘                                                
+///    └─────────────────┘                                                                                                                                           
 /// ```
 /// Todo split this mess up and clean up the code.
 #[tracing::instrument(skip(graph, parent_node, parent_relation_field, value))]
@@ -169,7 +177,27 @@ pub fn nested_upsert(
             ),
         )?;
 
-        graph.create_edge(&if_node, &update_node, QueryGraphDependency::Then)?;
+        // In case the connector doesn't support referential integrity, we add a subtree to the graph that emulates the ON_UPDATE referential action.
+        // When that's the case, we create an intermediary node to which we connect all the nodes reponsible for emulating the referential action
+        // Then, we connect the if node to that intermediary emulation node. This enables performing the emulation only in case the graph traverses
+        // the update path (if the children already exists and goes to the THEN node).
+        // It's only after we've executed the emulation that it'll traverse the update node, hence the ExecutionOrder between
+        // the emulation node and the update node.
+        let then_node = if let Some(emulation_node) = utils::insert_emulated_on_update_with_intermediary_node(
+            graph,
+            connector_ctx,
+            &child_model,
+            &read_children_node,
+            &update_node,
+        )? {
+            graph.create_edge(&emulation_node, &update_node, QueryGraphDependency::ExecutionOrder)?;
+
+            emulation_node
+        } else {
+            update_node
+        };
+
+        graph.create_edge(&if_node, &then_node, QueryGraphDependency::Then)?;
         graph.create_edge(&if_node, &create_node, QueryGraphDependency::Else)?;
 
         // Specific handling based on relation type and inlining side.

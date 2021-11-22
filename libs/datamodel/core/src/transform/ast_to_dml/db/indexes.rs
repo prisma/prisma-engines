@@ -2,7 +2,10 @@ use std::borrow::Cow;
 
 use crate::common::constraint_names::ConstraintNames;
 
-use super::{context::Context, types::IndexAttribute};
+use super::{
+    context::Context,
+    types::{IndexAttribute, IndexType},
+};
 use crate::transform::ast_to_dml::db::types::FieldWithArgs;
 
 /// Prisma forces a 1:1 relation to be unique from the defining side. If the
@@ -11,31 +14,42 @@ use crate::transform::ast_to_dml::db::types::FieldWithArgs;
 pub(super) fn infer_implicit_indexes(ctx: &mut Context<'_>) {
     let mut indexes = Vec::new();
 
-    for relation in ctx.db.walk_complete_inline_relations() {
-        if !relation.relation_type().is_one_to_one() {
+    for relation in ctx.db.walk_relations().filter_map(|rel| rel.refine().as_inline()) {
+        if !relation.is_one_to_one() {
             continue;
         }
+
+        let forward = if let Some(forward) = relation.forward_relation_field() {
+            forward
+        } else {
+            continue;
+        };
+
+        if forward.fields().is_none() {
+            continue;
+        };
+
+        let referencing_fields = || forward.fields().unwrap();
 
         let model = relation.referencing_model();
 
         if model
             .explicit_indexes()
             .filter(|index| index.is_unique())
-            .any(|index| index.contains_exactly_fields(relation.referencing_fields()))
+            .any(|index| index.contains_exactly_fields(referencing_fields()))
         {
             continue;
         }
 
         if model
             .primary_key()
-            .map(|pk| pk.contains_exactly_fields(relation.referencing_fields()))
+            .map(|pk| pk.contains_exactly_fields(referencing_fields()))
             .unwrap_or(false)
         {
             continue;
         }
 
-        let column_names = relation
-            .referencing_fields()
+        let column_names = referencing_fields()
             .map(|f| f.final_database_name())
             .collect::<Vec<_>>();
 
@@ -43,7 +57,7 @@ pub(super) fn infer_implicit_indexes(ctx: &mut Context<'_>) {
             ConstraintNames::unique_index_name(model.final_database_name(), &column_names, ctx.db.active_connector());
 
         let source_field = {
-            let mut fields = relation.referencing_fields();
+            let mut fields = referencing_fields();
 
             if fields.len() == 1 {
                 fields.next().map(|f| f.field_id())
@@ -55,9 +69,8 @@ pub(super) fn infer_implicit_indexes(ctx: &mut Context<'_>) {
         indexes.push((
             model.model_id(),
             IndexAttribute {
-                is_unique: true,
-                fields: relation
-                    .referencing_fields()
+                r#type: IndexType::Unique,
+                fields: referencing_fields()
                     .map(|f| FieldWithArgs {
                         field_id: f.field_id(),
                         sort_order: None,
@@ -65,8 +78,8 @@ pub(super) fn infer_implicit_indexes(ctx: &mut Context<'_>) {
                     })
                     .collect(),
                 source_field,
-                name: None,
                 db_name: Some(Cow::from(db_name)),
+                ..Default::default()
             },
         ));
     }

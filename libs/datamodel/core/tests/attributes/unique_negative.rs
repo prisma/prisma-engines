@@ -1,5 +1,5 @@
-use crate::attributes::{with_header, Provider};
 use crate::common::*;
+use crate::{with_header, Provider};
 
 #[test]
 fn must_error_on_model_without_unique_criteria() {

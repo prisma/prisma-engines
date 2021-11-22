@@ -735,7 +735,8 @@ fn mssql_multi_field_indexes_must_be_inferred(api: TestApi) {
         &[Index {
             name: "age_and_name_index".into(),
             columns,
-            tpe: IndexType::Unique
+            tpe: IndexType::Unique,
+            algorithm: None,
         }]
     );
 }
@@ -785,6 +786,7 @@ fn mssql_join_table_unique_indexes_must_be_inferred(api: TestApi) {
             name: "cat_and_human_index".into(),
             columns,
             tpe: IndexType::Unique,
+            algorithm: None,
         }]
     );
 }

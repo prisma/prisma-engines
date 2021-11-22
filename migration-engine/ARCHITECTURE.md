@@ -107,6 +107,8 @@ Here is how we generate a new migration:
 
 This logic is implemented in the migration connectors.
 
+![image](https://user-images.githubusercontent.com/6864947/141001419-3d0fb4ff-e2e3-4e95-bb67-255dc66b7acb.png)
+
 ### Can `prisma migrate deploy` ask to reset the database? Does it use the shadow database?
 
 No. `prisma migrate deploy` will never use a shadow database, and it will never reset

@@ -296,27 +296,13 @@ services:
     networks:
       - databases
 
-  jaeger:
-    image: jaegertracing/all-in-one:latest
-    restart: always
+  otel:
+    # Jaeger supports OTEL out of the box
+    image: jaegertracing/opentelemetry-all-in-one:latest
     ports:
-      - "16686:16686" # the trace viewer (http)
-    networks:
-      - telemetry
-
-  otel-agent:
-    image: otel/opentelemetry-collector-dev:latest
-    command: ["--config=/etc/otel-agent-config.yaml"]
-    restart: always
-    volumes:
-      - ./otel-agent-config.yaml:/etc/otel-agent-config.yaml
-    ports:
-      - "4317:4317" # OTLP gRPC receiver
-    depends_on:
-      - jaeger
-    networks:
-      - telemetry
+      - 13133:13133  # health check port
+      - 16686:16686  # UI viewer
+      - 4317:55680   # Otel endpoint
 
 networks:
   databases:
-  telemetry:

@@ -57,7 +57,8 @@ fn model_to_dmmf(model: &dml::Model) -> Model {
     let primary_key = if let Some(pk) = &model.primary_key {
         (!pk.defined_on_field).then(|| PrimaryKey {
             name: pk.name.clone(),
-            fields: pk.fields.clone(),
+            //TODO(extended indices) add field options here
+            fields: pk.fields.clone().into_iter().map(|f| f.name).collect(),
         })
     } else {
         None
@@ -77,7 +78,9 @@ fn model_to_dmmf(model: &dml::Model) -> Model {
         unique_fields: model
             .indices
             .iter()
-            .filter_map(|i| (i.is_unique() && !i.defined_on_field).then(|| i.fields.clone()))
+            .filter_map(|i| {
+                (i.is_unique() && !i.defined_on_field).then(|| i.fields.clone().into_iter().map(|f| f.name).collect())
+            })
             .collect(),
         unique_indexes: model
             .indices
@@ -85,7 +88,8 @@ fn model_to_dmmf(model: &dml::Model) -> Model {
             .filter_map(|i| {
                 (i.is_unique() && !i.defined_on_field).then(|| UniqueIndex {
                     name: i.name.clone(),
-                    fields: i.fields.clone(),
+                    //TODO(extended indices) add field options here
+                    fields: i.fields.clone().into_iter().map(|f| f.name).collect(),
                 })
             })
             .collect(),

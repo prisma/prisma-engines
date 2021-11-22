@@ -12,9 +12,10 @@ use native_types::PostgresType;
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
-use sql_ddl::postgres as ddl;
+use sql_ddl::{postgres as ddl, IndexColumn, SortOrder};
 use sql_schema_describer::{
-    walkers::*, ColumnArity, ColumnTypeFamily, DefaultKind, DefaultValue, ForeignKeyAction, SqlSchema,
+    walkers::*, ColumnArity, ColumnTypeFamily, DefaultKind, DefaultValue, ForeignKeyAction, SQLIndexAlgorithm,
+    SQLSortOrder, SqlSchema,
 };
 use std::borrow::Cow;
 
@@ -358,7 +359,21 @@ impl SqlRenderer for PostgresFlavour {
             index_name: index.name().into(),
             is_unique: index.index_type().is_unique(),
             table_reference: index.table().name().into(),
-            columns: index.columns().map(|c| c.get().name().into()).collect(),
+            using: index.algorithm().map(|algo| match algo {
+                SQLIndexAlgorithm::BTree => ddl::IndexAlgorithm::BTree,
+                SQLIndexAlgorithm::Hash => ddl::IndexAlgorithm::Hash,
+            }),
+            columns: index
+                .columns()
+                .map(|c| IndexColumn {
+                    name: c.as_column().name().into(),
+                    length: None,
+                    sort_order: c.sort_order().map(|so| match so {
+                        SQLSortOrder::Asc => SortOrder::Asc,
+                        SQLSortOrder::Desc => SortOrder::Desc,
+                    }),
+                })
+                .collect(),
         }
         .to_string()
     }

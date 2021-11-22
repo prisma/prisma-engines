@@ -483,6 +483,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                                     true => IndexType::Unique,
                                     false => IndexType::Normal,
                                 },
+                                algorithm: None,
                             },
                         );
                     }

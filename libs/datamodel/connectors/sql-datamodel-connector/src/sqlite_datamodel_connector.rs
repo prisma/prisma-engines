@@ -7,54 +7,37 @@ use dml::{
 use enumflags2::BitFlags;
 use std::borrow::Cow;
 
-pub struct SqliteDatamodelConnector {
-    capabilities: Vec<ConnectorCapability>,
-    referential_integrity: ReferentialIntegrity,
-}
-
 const NATIVE_TYPE_CONSTRUCTORS: &[NativeTypeConstructor] = &[];
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[ConstraintScope::GlobalKeyIndex];
+const CAPABILITIES: &[ConnectorCapability] = &[
+    ConnectorCapability::AnyId,
+    ConnectorCapability::AutoIncrement,
+    ConnectorCapability::CompoundIds,
+    ConnectorCapability::ForeignKeys,
+    ConnectorCapability::QueryRaw,
+    ConnectorCapability::RelationFieldsInArbitraryOrder,
+    ConnectorCapability::UpdateableId,
+];
 
-impl SqliteDatamodelConnector {
-    pub fn new(referential_integrity: ReferentialIntegrity) -> SqliteDatamodelConnector {
-        let mut capabilities = vec![
-            ConnectorCapability::RelationFieldsInArbitraryOrder,
-            ConnectorCapability::UpdateableId,
-            ConnectorCapability::AutoIncrement,
-            ConnectorCapability::CompoundIds,
-            ConnectorCapability::AnyId,
-            ConnectorCapability::QueryRaw,
-        ];
-
-        if referential_integrity.uses_foreign_keys() {
-            capabilities.push(ConnectorCapability::ForeignKeys);
-        }
-
-        SqliteDatamodelConnector {
-            capabilities,
-            referential_integrity,
-        }
-    }
-}
+pub struct SqliteDatamodelConnector;
 
 impl Connector for SqliteDatamodelConnector {
     fn name(&self) -> &str {
         "sqlite"
     }
 
-    fn capabilities(&self) -> &[ConnectorCapability] {
-        &self.capabilities
+    fn capabilities(&self) -> &'static [ConnectorCapability] {
+        CAPABILITIES
     }
 
     fn constraint_name_length(&self) -> usize {
         10000
     }
 
-    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
+    fn referential_actions(&self, referential_integrity: &ReferentialIntegrity) -> BitFlags<ReferentialAction> {
         use ReferentialAction::*;
 
-        self.referential_integrity
-            .allowed_referential_actions(SetNull | SetDefault | Cascade | Restrict | NoAction)
+        referential_integrity.allowed_referential_actions(SetNull | SetDefault | Cascade | Restrict | NoAction)
     }
 
     fn scalar_type_for_native_type(&self, _native_type: serde_json::Value) -> ScalarType {
