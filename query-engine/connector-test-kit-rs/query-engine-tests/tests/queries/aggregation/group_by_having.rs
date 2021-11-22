@@ -55,7 +55,7 @@ mod aggregation_group_by_having {
               }
             }"#,
             [SqlServer, Postgres, MySql, Sqlite, MongoDb] => r#"{"data":{"groupByTestModel":[{"string":"group1","int":5,"_count":{"_all":1},"_sum":{"int":5}},{"string":"group2","int":5,"_count":{"_all":1},"_sum":{"int":5}}]}}"#,
-            [] =>   r#"{"data":{"groupByTestModel":[{"string":"group2","int":5,"_count":{"_all":1},"_sum":{"int":5}},{"string":"group1","int":5,"_count":{"_all":1},"_sum":{"int":5}}]}}"#
+            [MongoDb] =>   r#"{"data":{"groupByTestModel":[{"string":"group2","int":5,"_count":{"_all":1},"_sum":{"int":5}},{"string":"group1","int":5,"_count":{"_all":1},"_sum":{"int":5}}]}}"#
         );
         Ok(())
     }
