@@ -8,7 +8,7 @@ use quaint::{
     prelude::{ConnectionInfo, Query, Queryable, ResultSet},
     single::Quaint,
 };
-use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
+use sql_schema_describer::{DescriberErrorKind, IndexType, SqlSchema, SqlSchemaDescriberBackend};
 use std::sync::Arc;
 use user_facing_errors::{introspection_engine::DatabaseSchemaInconsistent, KnownError};
 
@@ -218,24 +218,12 @@ impl Connection {
 }
 
 fn filter_fulltext_capabilities(schema: &mut SqlSchema) {
-    for (_, table) in schema.iter_tables_mut() {
-        if let Some(ref mut pk) = &mut table.primary_key {
-            for col in pk.columns.iter_mut() {
-                col.length = None;
-                col.sort_order = None;
-            }
-        }
+    let indices = schema
+        .iter_tables_mut()
+        .flat_map(|(_, t)| t.indices.iter_mut().filter(|i| i.is_fulltext()));
 
-        let mut kept_indexes = Vec::new();
-
-        while let Some(index) = table.indices.pop() {
-            if !index.is_fulltext() {
-                kept_indexes.push(index);
-            }
-        }
-
-        kept_indexes.reverse();
-        table.indices = kept_indexes;
+    for index in indices {
+        index.tpe = IndexType::Normal;
     }
 }
 
