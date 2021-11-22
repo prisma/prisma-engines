@@ -161,7 +161,7 @@ mod order_by_dependent {
             }"#,
             // Depends on how null values are handled.
             [MongoDb, Sqlite] => r#"{"data":{"findManyModelA":[{"id":2,"b":{"c":null}},{"id":3,"b":null},{"id":1,"b":{"c":{"id":1}}}]}}"#,
-            [SqlServer] => r#"{"data":{"findManyModelA":[{"id":3,"b":null},{"id":2,"b":{"c":null}},{"id":1,"b":{"c":{"id":1}}}]}}"#,
+            [SqlServer, MySql] => r#"{"data":{"findManyModelA":[{"id":3,"b":null},{"id":2,"b":{"c":null}},{"id":1,"b":{"c":{"id":1}}}]}}"#,
             [Postgres] => r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"id":1}}},{"id":2,"b":{"c":null}},{"id":3,"b":null}]}}"#,
                 // CockroachDB can order ModelA.id in any order if ModelC.b_id is NULL.
             [Postgres] => r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"id":1}}},{"id":3,"b":null},{"id":2,"b":{"c":null}}]}}"#,
