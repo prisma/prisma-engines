@@ -3,10 +3,10 @@ use crate::ast::helper::get_sort_index_of_attribute;
 use crate::ast::SchemaAst;
 use crate::diagnostics::{ValidatedDatamodel, ValidatedMissingFields};
 use crate::Datasource;
-use crate::{ast, ast::parser::*, ast::renderer::*};
+use crate::{ast, ast::renderer::*};
 use enumflags2::BitFlags;
-use pest::iterators::Pair;
-use pest::Parser;
+use pest::{iterators::Pair, Parser};
+use schema_ast::parser::{PrismaDatamodelParser, Rule};
 
 pub struct Reformatter<'a> {
     input: &'a str,

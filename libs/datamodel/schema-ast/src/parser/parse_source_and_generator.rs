@@ -2,12 +2,11 @@ use super::{
     helpers::{parsing_catch_all, ToIdentifier, Token, TokenExtensions},
     parse_comments::*,
     parse_expression::parse_expression,
-    Rule,
+    Diagnostics, ParserError, Rule,
 };
 use crate::ast::*;
-use crate::diagnostics::{DatamodelError, Diagnostics};
 
-pub fn parse_source(token: &Token<'_>, diagnostics: &mut Diagnostics) -> SourceConfig {
+pub(crate) fn parse_source(token: &Token<'_>, diagnostics: &mut Diagnostics) -> SourceConfig {
     let mut name: Option<Identifier> = None;
     let mut properties: Vec<Argument> = vec![];
     let mut comment: Option<Comment> = None;
@@ -17,9 +16,9 @@ pub fn parse_source(token: &Token<'_>, diagnostics: &mut Diagnostics) -> SourceC
             Rule::non_empty_identifier => name = Some(current.to_id()),
             Rule::key_value => properties.push(parse_key_value(&current)),
             Rule::comment_block => comment = parse_comment_block(&current),
-            Rule::BLOCK_LEVEL_CATCH_ALL => diagnostics.push_error(DatamodelError::new_validation_error(
-                "This line is not a valid definition within a datasource.",
-                Span::from_pest(current.as_span()),
+            Rule::BLOCK_LEVEL_CATCH_ALL => diagnostics.push(ParserError::new_validation_error(
+                "This line is not a valid definition within a datasource.".to_owned(),
+                current.as_span(),
             )),
             _ => parsing_catch_all(&current, "source"),
         }
@@ -50,9 +49,9 @@ pub fn parse_generator(token: &Token<'_>, diagnostics: &mut Diagnostics) -> Gene
             Rule::key_value => properties.push(parse_key_value(&current)),
             Rule::doc_comment => comments.push(parse_doc_comment(&current)),
             Rule::doc_comment_and_new_line => comments.push(parse_doc_comment(&current)),
-            Rule::BLOCK_LEVEL_CATCH_ALL => diagnostics.push_error(DatamodelError::new_validation_error(
-                "This line is not a valid definition within a generator.",
-                Span::from_pest(current.as_span()),
+            Rule::BLOCK_LEVEL_CATCH_ALL => diagnostics.push(ParserError::new_validation_error(
+                "This line is not a valid definition within a generator.".to_owned(),
+                current.as_span(),
             )),
             _ => parsing_catch_all(&current, "generator"),
         }

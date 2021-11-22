@@ -5,3 +5,6 @@
 /// The AST data structure. It aims to faithfully represent the syntax of a Prisma Schema, with
 /// source span information.
 pub mod ast;
+
+/// String -> AST
+pub mod parser;

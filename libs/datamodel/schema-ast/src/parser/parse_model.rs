@@ -3,10 +3,9 @@ use super::{
     parse_attribute::parse_attribute,
     parse_comments::*,
     parse_field::parse_field,
-    Rule,
+    Diagnostics, ParserError, Rule,
 };
 use crate::ast::*;
-use crate::diagnostics::{DatamodelError, Diagnostics};
 
 pub(crate) fn parse_model(token: &Token<'_>, diagnostics: &mut Diagnostics) -> Model {
     let mut name: Option<Identifier> = None;
@@ -21,12 +20,12 @@ pub(crate) fn parse_model(token: &Token<'_>, diagnostics: &mut Diagnostics) -> M
             Rule::block_level_attribute => attributes.push(parse_attribute(&current)),
             Rule::field_declaration => match parse_field(&name.as_ref().unwrap().name, &current) {
                 Ok(field) => fields.push(field),
-                Err(err) => diagnostics.push_error(err),
+                Err(err) => diagnostics.push(err),
             },
             Rule::comment_block => comment = parse_comment_block(&current),
-            Rule::BLOCK_LEVEL_CATCH_ALL => diagnostics.push_error(DatamodelError::new_validation_error(
-                "This line is not a valid field or attribute definition.",
-                Span::from_pest(current.as_span()),
+            Rule::BLOCK_LEVEL_CATCH_ALL => diagnostics.push(ParserError::new_validation_error(
+                "This line is not a valid field or attribute definition.".to_owned(),
+                current.as_span(),
             )),
             _ => parsing_catch_all(&current, "model"),
         }

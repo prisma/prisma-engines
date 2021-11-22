@@ -1,12 +1,10 @@
 use super::{
-    helpers::{parsing_catch_all, ToIdentifier, Token},
+    helpers::{parsing_catch_all, ToIdentifier, Token, TokenExtensions},
     parse_attribute::parse_attribute,
     parse_comments::*,
-    Rule,
+    Diagnostics, ParserError, Rule,
 };
-use crate::ast::parser::helpers::TokenExtensions;
-use crate::ast::*;
-use crate::diagnostics::{DatamodelError, Diagnostics};
+use crate::ast::{Attribute, Comment, Enum, EnumValue, Identifier, Span};
 
 pub fn parse_enum(token: &Token<'_>, diagnostics: &mut Diagnostics) -> Enum {
     let mut name: Option<Identifier> = None;
@@ -20,12 +18,12 @@ pub fn parse_enum(token: &Token<'_>, diagnostics: &mut Diagnostics) -> Enum {
             Rule::block_level_attribute => attributes.push(parse_attribute(&current)),
             Rule::enum_value_declaration => match parse_enum_value(&name.as_ref().unwrap().name, &current) {
                 Ok(enum_value) => values.push(enum_value),
-                Err(err) => diagnostics.push_error(err),
+                Err(err) => diagnostics.push(err),
             },
             Rule::comment_block => comment = parse_comment_block(&current),
-            Rule::BLOCK_LEVEL_CATCH_ALL => diagnostics.push_error(DatamodelError::new_validation_error(
-                "This line is not an enum value definition.",
-                Span::from_pest(current.as_span()),
+            Rule::BLOCK_LEVEL_CATCH_ALL => diagnostics.push(ParserError::new_validation_error(
+                "This line is not an enum value definition.".to_owned(),
+                current.as_span(),
             )),
             _ => parsing_catch_all(&current, "enum"),
         }
@@ -46,7 +44,7 @@ pub fn parse_enum(token: &Token<'_>, diagnostics: &mut Diagnostics) -> Enum {
     }
 }
 
-fn parse_enum_value(enum_name: &str, token: &Token<'_>) -> Result<EnumValue, DatamodelError> {
+fn parse_enum_value(enum_name: &str, token: &Token<'_>) -> Result<EnumValue, ParserError> {
     let mut name: Option<Identifier> = None;
     let mut attributes: Vec<Attribute> = vec![];
     let mut comments: Vec<String> = vec![];
@@ -58,13 +56,13 @@ fn parse_enum_value(enum_name: &str, token: &Token<'_>) -> Result<EnumValue, Dat
             Rule::maybe_empty_identifier => name = Some(current.to_id()),
             Rule::attribute => attributes.push(parse_attribute(&current)),
             Rule::number => {
-                return Err(DatamodelError::new_enum_validation_error(
-                    &format!(
+                return Err(ParserError::new_enum_validation_error(
+                    format!(
                         "The enum value `{}` is not valid. Enum values must not start with a number.",
                         current.as_str()
                     ),
-                    enum_name,
-                    Span::from_pest(token.as_span()),
+                    enum_name.to_owned(),
+                    token.as_span(),
                 ));
             }
             Rule::doc_comment => {

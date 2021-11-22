@@ -28,7 +28,7 @@ pub(crate) fn validate_singular_id(relation: ImplicitManyToManyRelationWalker<'_
 
         if !relation_field.references_singular_id_field() {
             diagnostics.push_error(DatamodelError::new_validation_error(
-            &format!(
+            format!(
                 "Many to many relations must always reference the id field of the related model. Change the argument `references` to use the id field of the related model `{}`. But it is referencing the following fields that are not the id: {}",
                 &relation_field.related_model().name(),
                 relation_field.referenced_fields().into_iter().flatten().map(|f| f.name()).join(", ")

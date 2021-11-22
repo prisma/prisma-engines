@@ -97,6 +97,16 @@ impl From<DatamodelWarning> for Diagnostics {
     }
 }
 
+impl From<schema_ast::parser::Diagnostics> for Diagnostics {
+    fn from(src: schema_ast::parser::Diagnostics) -> Self {
+        let errors: Vec<DatamodelError> = src.into_iter().map(From::from).collect();
+        Diagnostics {
+            errors,
+            warnings: Vec::new(),
+        }
+    }
+}
+
 impl Default for Diagnostics {
     fn default() -> Self {
         Self::new()

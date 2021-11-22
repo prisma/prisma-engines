@@ -68,7 +68,7 @@ pub(super) fn field_arity(relation: CompleteInlineRelationWalker<'_, '_>, diagno
     }
 
     diagnostics.push_error(DatamodelError::new_validation_error(
-        &format!(
+        format!(
             "The relation field `{}` uses the scalar fields {}. At least one of those fields is optional. Hence the relation field must be optional as well.",
             relation.referencing_field().name(),
             relation.referencing_fields().map(|field| field.name()).join(", "),
@@ -94,7 +94,7 @@ pub(super) fn same_length_in_referencing_and_referenced(
     let span = ast_field.span_for_attribute("relation").unwrap_or(ast_field.span);
 
     diagnostics.push_error(DatamodelError::new_validation_error(
-        "You must specify the same number of fields in `fields` and `references`.",
+        "You must specify the same number of fields in `fields` and `references`.".to_owned(),
         span,
     ));
 }
@@ -128,7 +128,7 @@ pub(super) fn references_unique_fields(
     }
 
     diagnostics.push_error(DatamodelError::new_validation_error(
-        &format!(
+        format!(
             "The argument `references` must refer to a unique criteria in the related model `{}`. But it is referencing the following fields that are not a unique criteria: {}",
             relation.referenced_model().name(),
             relation.referenced_fields().map(|f| f.name()).join(", ")
@@ -167,7 +167,7 @@ pub(super) fn referencing_fields_in_correct_order(
     }
 
     diagnostics.push_error(DatamodelError::new_validation_error(
-        &format!(
+        format!(
             "The argument `references` must refer to a unique criteria in the related model `{}` using the same order of fields. Please check the ordering in the following fields: `{}`.",
             relation.referenced_model().name(),
             relation.referenced_fields().map(|f| f.name()).join(", ")
@@ -408,7 +408,7 @@ fn cascade_error_with_default_values(relation: CompleteInlineRelationWalker<'_, 
 
     msg.push_str(" Read more at https://pris.ly/d/cyclic-referential-actions");
 
-    DatamodelError::new_validation_error(&msg, relation.referencing_field().ast_field().span)
+    DatamodelError::new_validation_error(msg, relation.referencing_field().ast_field().span)
 }
 
 fn is_empty_fields(fields: Option<&[ast::FieldId]>) -> bool {
