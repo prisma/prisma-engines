@@ -82,7 +82,7 @@ mod order_by_dependent {
         create_row(&runner, 2, Some(2), None, None).await?;
         create_row(&runner, 3, None, None, None).await?;
 
-        connector_results!(
+        match_connector_result!(
             &runner,
             r#"{
               findManyModelA(orderBy: { b: { id: asc }}) {
@@ -147,7 +147,7 @@ mod order_by_dependent {
         create_row(&runner, 2, Some(2), None, None).await?;
         create_row(&runner, 3, None, None, None).await?;
 
-        connector_results!(
+        match_connector_result!(
             &runner,
             r#"{
               findManyModelA(orderBy: { b: { c: { id: asc }}}) {
@@ -230,7 +230,7 @@ mod order_by_dependent {
         create_row(&runner, 1, Some(1), Some(1), Some(3)).await?;
         create_row(&runner, 2, Some(2), Some(2), Some(4)).await?;
 
-        connector_results!(
+        match_connector_result!(
           &runner,
           r#"{
             findManyModelA(orderBy: { b: { c: { a: { id: asc }}}}) {
@@ -260,7 +260,7 @@ mod order_by_dependent {
         create_row(&runner, 1, Some(1), Some(1), Some(3)).await?;
         create_row(&runner, 2, Some(2), Some(2), Some(4)).await?;
 
-        connector_results!(
+        match_connector_result!(
             &runner,
             r#"{
               findManyModelA(orderBy: { b: { c: { a: { id: desc }}}}) {

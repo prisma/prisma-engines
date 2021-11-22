@@ -7,7 +7,7 @@ macro_rules! assert_query {
 }
 
 #[macro_export]
-macro_rules! connector_results {
+macro_rules! match_connector_result {
     ($runner:expr, $q:expr, $([$($connector_opt:ident),*] => $result:expr),*) => {
         use query_tests_setup::ConnectorTag::*;
         let connector = $runner.connector();

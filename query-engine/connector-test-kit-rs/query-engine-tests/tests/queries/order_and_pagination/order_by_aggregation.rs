@@ -215,7 +215,7 @@ mod order_by_aggr {
     async fn m2one2m_count_desc(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
-        connector_results!(
+        match_connector_result!(
             &runner,
             r#"{
               findManyPost(orderBy: { user: { categories: { _count: desc } } }) {
@@ -255,7 +255,7 @@ mod order_by_aggr {
     async fn m2one_field_asc_m2one2m_count_desc(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
-        connector_results!(
+        match_connector_result!(
             &runner,
             r#"{
               findManyPost(orderBy: [{ user: { name: asc }}, { user: { categories: { _count: desc }} }]) {

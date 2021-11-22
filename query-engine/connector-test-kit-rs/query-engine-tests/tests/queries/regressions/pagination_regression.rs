@@ -82,7 +82,7 @@ mod pagination_regr {
         // There are 2 options, depending on how the underlying db orders NULLS (first or last, * ids have nulls in `field`):
         // Nulls last:  5, 3, 1*, 2*, 4* => take only 4
         // Nulls first: 1*, 2*, 4*, 5, 3 => take 4, 5
-        connector_results!(
+        match_connector_result!(
           &runner,
           r#"{
           findManyTestModel(
@@ -108,7 +108,7 @@ mod pagination_regr {
         // Contain some nulls for `field`.
         create_test_data_3505_2(&runner).await?;
 
-        connector_results!(
+        match_connector_result!(
           &runner,
           r#"{
           findManyTestModel(

@@ -42,7 +42,7 @@ mod aggregation_group_by_having {
         // group1, 0
         // group2, 5
         // group3, 5
-        connector_results!(
+        match_connector_result!(
             &runner,
             r#"query { groupByTestModel(by: [string, int], having: {
                 string: { in: ["group1", "group2"] }

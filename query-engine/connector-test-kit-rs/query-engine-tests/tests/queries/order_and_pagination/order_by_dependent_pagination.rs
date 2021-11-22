@@ -86,7 +86,7 @@ mod order_by_dependent_pag {
         create_row(&runner, 2, Some(2), None, None).await?;
         create_row(&runner, 3, None, None, None).await?;
 
-        connector_results!(
+        match_connector_result!(
             &runner,
             r#"{
               findManyModelA(orderBy: { b: { id: asc }}, cursor: { id: 1 }, take: 3) {
@@ -154,7 +154,7 @@ mod order_by_dependent_pag {
         create_row(&runner, 2, Some(2), None, None).await?;
         create_row(&runner, 3, None, None, None).await?;
 
-        connector_results!(
+        match_connector_result!(
             &runner,
             r#"{
               findManyModelA(orderBy: { b: { c: { id: asc }}}, cursor: { id: 1 }, take: 3) {
@@ -237,7 +237,7 @@ mod order_by_dependent_pag {
         create_row(&runner, 1, Some(1), Some(1), Some(3)).await?;
         create_row(&runner, 2, Some(2), Some(2), Some(4)).await?;
 
-        connector_results!(
+        match_connector_result!(
             &runner,
             r#"{
               findManyModelA(orderBy: { b: { c: { a: { id: asc }}}}, cursor: { id: 1 }, take: 4) {
@@ -270,7 +270,7 @@ mod order_by_dependent_pag {
         create_row(&runner, 1, Some(1), Some(1), Some(3)).await?;
         create_row(&runner, 2, Some(2), Some(2), Some(4)).await?;
 
-        connector_results!(
+        match_connector_result!(
             &runner,
             r#"{
               findManyModelA(orderBy: { b: { c: { a: { id: desc }}}}, cursor: { id: 2 }, take: 4) {
@@ -286,12 +286,7 @@ mod order_by_dependent_pag {
             }"#,
             // Depends on how null values are handled.
             [MongoDb, Sqlite, MySql] => r#"{"data":{"findManyModelA":[{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":3,"b":null},{"id":4,"b":null}]}}"#,
-            // [MySql] => r#"{"data":{"findManyModelA":[{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":1,"b":{"c":{"a":{"id":3}}}}]}}"#,
             [Postgres] => r#"{"data":{"findManyModelA":[{"id":3,"b":null},{"id":4,"b":null},{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":1,"b":{"c":{"a":{"id":3}}}}]}}"#
-            // MySql 5
-            // [MySql] => r#"{"data":{"findManyModelA":[{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":4,"b":null},{"id":3,"b":null}]}}"#,
-            //MariaDB, MySql8
-            // [MySql] => r#"data":{"findManyModelA":[{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":3,"b":null},{"id":4,"b":null}]}}"#
         );
         Ok(())
     }

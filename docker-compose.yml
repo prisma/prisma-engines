@@ -255,7 +255,6 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: "prisma"
       MONGO_INITDB_ROOT_PASSWORD: "prisma"
-      INIT_WAIT_SEC: 10
     ports:
       - "27017:27017"
     networks:
