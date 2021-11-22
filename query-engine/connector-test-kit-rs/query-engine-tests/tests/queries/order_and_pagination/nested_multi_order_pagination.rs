@@ -144,7 +144,6 @@ mod paging_one2m_stable_order {
 #[test_suite(schema(schema))]
 mod paging_one2m_unstable_order {
     use indoc::indoc;
-    use query_engine_tests::assert_query_many;
 
     fn schema() -> String {
         let schema = indoc! {
@@ -182,9 +181,9 @@ mod paging_one2m_unstable_order {
         // 3 => 5 C C B A <- take
         // 3 => 6 A C D C
         // Makes: [1 => 2, 2 => 3 | 4, 3 => 5]
-        assert_query_many!(
-            &runner,
-            r#"query {
+        connector_results!(
+          &runner,
+          r#"query {
             findManyTestModel {
               id
               related(take: 1, orderBy: [{ fieldA: desc }, {fieldB: asc }, { fieldC: asc }, { fieldD: desc }]) {
@@ -192,10 +191,8 @@ mod paging_one2m_unstable_order {
               }
             }
           }"#,
-            vec![
-                r#"{"data":{"findManyTestModel":[{"id":1,"related":[{"id":2}]},{"id":2,"related":[{"id":3}]},{"id":3,"related":[{"id":5}]}]}}"#,
-                r#"{"data":{"findManyTestModel":[{"id":1,"related":[{"id":2}]},{"id":2,"related":[{"id":4}]},{"id":3,"related":[{"id":5}]}]}}"#
-            ]
+          [Postgres, MongoDb, Sqlite, SqlServer, MySql] => r#"{"data":{"findManyTestModel":[{"id":1,"related":[{"id":2}]},{"id":2,"related":[{"id":3}]},{"id":3,"related":[{"id":5}]}]}}"#,
+          [] => r#"{"data":{"findManyTestModel":[{"id":1,"related":[{"id":2}]},{"id":2,"related":[{"id":4}]},{"id":3,"related":[{"id":5}]}]}}"#
         );
 
         Ok(())
@@ -213,7 +210,7 @@ mod paging_one2m_unstable_order {
         // 3 => 5 C C B A
         // 3 => 6 A C D C <- take
         // Makes: [1 => 1, 2 => 4, 3 => 6]
-        assert_query_many!(
+        connector_results!(
             &runner,
             r#"query {
             findManyTestModel {
@@ -223,10 +220,8 @@ mod paging_one2m_unstable_order {
               }
             }
           }"#,
-            vec![
-                r#"{"data":{"findManyTestModel":[{"id":1,"related":[{"id":1}]},{"id":2,"related":[{"id":3}]},{"id":3,"related":[{"id":6}]}]}}"#,
-                r#"{"data":{"findManyTestModel":[{"id":1,"related":[{"id":1}]},{"id":2,"related":[{"id":4}]},{"id":3,"related":[{"id":6}]}]}}"#
-            ]
+          [Postgres, MongoDb, Sqlite, SqlServer, MySql] => r#"{"data":{"findManyTestModel":[{"id":1,"related":[{"id":1}]},{"id":2,"related":[{"id":3}]},{"id":3,"related":[{"id":6}]}]}}"#,
+          [] => r#"{"data":{"findManyTestModel":[{"id":1,"related":[{"id":1}]},{"id":2,"related":[{"id":4}]},{"id":3,"related":[{"id":6}]}]}}"#
         );
 
         Ok(())
@@ -244,7 +239,7 @@ mod paging_one2m_unstable_order {
         // 3 => 5 C C B A
         // 3 => 6 A C D C
         // Makes: [1 => [], 2 => [3, 4] | [4, 3] | [3] | [4], 3 => []]
-        assert_query_many!(
+        connector_results!(
             &runner,
             r#"query {
             findManyTestModel {
@@ -254,12 +249,10 @@ mod paging_one2m_unstable_order {
               }
             }
           }"#,
-            vec![
-                r#"{"data":{"findManyTestModel":[{"id":1,"related":[]},{"id":2,"related":[{"id":3},{"id":4}]},{"id":3,"related":[]}]}}"#,
-                r#"{"data":{"findManyTestModel":[{"id":1,"related":[]},{"id":2,"related":[{"id":4},{"id":3}]},{"id":3,"related":[]}]}}"#,
-                r#"{"data":{"findManyTestModel":[{"id":1,"related":[]},{"id":2,"related":[{"id":3}]},{"id":3,"related":[]}]}}"#,
-                r#"{"data":{"findManyTestModel":[{"id":1,"related":[]},{"id":2,"related":[{"id":4}]},{"id":3,"related":[]}]}}"#
-            ]
+          [Postgres, MongoDb, Sqlite, SqlServer, MySql] => r#"{"data":{"findManyTestModel":[{"id":1,"related":[]},{"id":2,"related":[{"id":3},{"id":4}]},{"id":3,"related":[]}]}}"#,
+          [] => r#"{"data":{"findManyTestModel":[{"id":1,"related":[]},{"id":2,"related":[{"id":4},{"id":3}]},{"id":3,"related":[]}]}}"#,
+          [] => r#"{"data":{"findManyTestModel":[{"id":1,"related":[]},{"id":2,"related":[{"id":3}]},{"id":3,"related":[]}]}}"#,
+          [] => r#"{"data":{"findManyTestModel":[{"id":1,"related":[]},{"id":2,"related":[{"id":4}]},{"id":3,"related":[]}]}}"#
         );
 
         Ok(())

@@ -7,21 +7,6 @@ macro_rules! assert_query {
 }
 
 #[macro_export]
-macro_rules! assert_query_many {
-    ($runner:expr, $q:expr, $potential_results:expr) => {
-        let query_result = $runner.query($q).await?.to_string();
-
-        assert_eq!(
-            $potential_results.contains(&query_result.as_str()),
-            true,
-            "Query result: {} is not part of the expected results: {:?}",
-            query_result,
-            $potential_results
-        );
-    };
-}
-
-#[macro_export]
 macro_rules! connector_results {
     ($runner:expr, $q:expr, $([$($connector_opt:ident),*] => $result:expr),*) => {
         use query_tests_setup::ConnectorTag::*;
