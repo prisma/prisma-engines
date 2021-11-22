@@ -133,6 +133,7 @@ impl SqlRenderer for MssqlFlavour {
         let index_type = match index.index_type() {
             IndexType::Unique => "UNIQUE ",
             IndexType::Normal => "",
+            IndexType::Fulltext => unreachable!("Fulltext index on SQL Server"),
         };
 
         let index_name = self.quote(index.name());
@@ -254,6 +255,7 @@ impl SqlRenderer for MssqlFlavour {
                 self.quote_with_schema(index.table().name()),
                 self.quote(index.name()),
             ),
+            IndexType::Fulltext => unreachable!("Fulltext index on SQL Server"),
         }
     }
 

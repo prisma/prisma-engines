@@ -1227,12 +1227,12 @@ fn old_mysql_multi_field_indexes_must_be_inferred(api: TestApi) {
     let columns = vec![
         IndexColumn {
             name: "name".into(),
-            sort_order: None,
+            sort_order: Some(SQLSortOrder::Asc),
             length: None,
         },
         IndexColumn {
             name: "age".into(),
-            sort_order: None,
+            sort_order: Some(SQLSortOrder::Asc),
             length: None,
         },
     ];

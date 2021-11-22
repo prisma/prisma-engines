@@ -116,20 +116,12 @@ impl TestApi {
         self.tags.contains(Tags::Mssql)
     }
 
-    pub(crate) fn is_mysql(&self) -> bool {
-        self.tags.contains(Tags::Mysql)
-    }
-
     pub(crate) fn is_postgres(&self) -> bool {
         self.tags.contains(Tags::Postgres)
     }
 
     pub(crate) fn is_cockroach(&self) -> bool {
         self.tags.contains(Tags::Cockroach)
-    }
-
-    pub(crate) fn is_mysql_8(&self) -> bool {
-        self.tags.contains(Tags::Mysql8)
     }
 
     pub(crate) fn schema_name(&self) -> &str {

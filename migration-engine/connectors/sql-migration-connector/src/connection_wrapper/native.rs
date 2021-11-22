@@ -8,7 +8,7 @@ use quaint::{
     prelude::{ConnectionInfo, Query, Queryable, ResultSet},
     single::Quaint,
 };
-use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
+use sql_schema_describer::{DescriberErrorKind, IndexType, SqlSchema, SqlSchemaDescriberBackend};
 use std::sync::Arc;
 use user_facing_errors::{introspection_engine::DatabaseSchemaInconsistent, KnownError};
 
@@ -168,6 +168,10 @@ impl Connection {
             filter_extended_index_capabilities(&mut schema);
         }
 
+        if !preview_features.contains(PreviewFeature::FullTextIndex) {
+            filter_fulltext_capabilities(&mut schema);
+        }
+
         Ok(schema)
     }
     pub(crate) async fn query(&self, query: impl Into<Query<'_>>) -> SqlResult<ResultSet> {
@@ -210,6 +214,16 @@ impl Connection {
             ConnectionInner::Mysql(inner) => &**inner,
             other => panic!("{:?} in Connection::unwrap_mysql()", other),
         }
+    }
+}
+
+fn filter_fulltext_capabilities(schema: &mut SqlSchema) {
+    let indices = schema
+        .iter_tables_mut()
+        .flat_map(|(_, t)| t.indices.iter_mut().filter(|i| i.is_fulltext()));
+
+    for index in indices {
+        index.tpe = IndexType::Normal;
     }
 }
 

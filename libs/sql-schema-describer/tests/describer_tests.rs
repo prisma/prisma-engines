@@ -316,12 +316,6 @@ fn indices_must_work(api: TestApi) {
     assert_eq!("User", user_table.name);
     assert_eq!(expected_columns, user_table.columns);
 
-    let sort_order = if api.is_mysql() && !api.is_mysql_8() {
-        None
-    } else {
-        Some(SQLSortOrder::Asc)
-    };
-
     let algorithm = if api.is_postgres() && !api.is_cockroach() {
         Some(SQLIndexAlgorithm::BTree)
     } else {
@@ -333,7 +327,7 @@ fn indices_must_work(api: TestApi) {
             name: "count".to_string(),
             columns: vec![IndexColumn {
                 name: "count".into(),
-                sort_order,
+                sort_order: Some(SQLSortOrder::Asc),
                 length: None,
             }],
             tpe: IndexType::Normal,
