@@ -653,8 +653,8 @@ impl<'a> IndexWalker<'a> {
     }
 
     /// The IndexType
-    pub fn index_type(&self) -> &'a IndexType {
-        &self.get().tpe
+    pub fn index_type(&self) -> IndexType {
+        self.get().tpe
     }
 
     /// The name of the index.

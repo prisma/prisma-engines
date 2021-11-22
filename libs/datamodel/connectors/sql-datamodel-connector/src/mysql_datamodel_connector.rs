@@ -270,6 +270,10 @@ impl Connector for MySqlDatamodelConnector {
                             continue;
                         }
 
+                        if index_definition.is_fulltext() {
+                            continue;
+                        }
+
                         if index_definition.is_unique() {
                             errors.push(
                                 self.native_instance_error(native_type.clone())
