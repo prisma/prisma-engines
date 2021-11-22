@@ -225,7 +225,7 @@ impl Table {
 }
 
 /// The type of an index.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, Copy)]
 pub enum IndexType {
     /// Unique type.
     Unique,

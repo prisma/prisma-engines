@@ -742,6 +742,12 @@ impl<'a> IndexAssertion<'a> {
         self
     }
 
+    pub fn assert_is_fulltext(self) -> Self {
+        assert_eq!(self.0.tpe, IndexType::Fulltext);
+
+        self
+    }
+
     pub fn assert_is_unique(self) -> Self {
         assert_eq!(self.0.tpe, IndexType::Unique);
 

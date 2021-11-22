@@ -219,7 +219,11 @@ impl SqlRenderer for MysqlFlavour {
                 .indexes()
                 .map(move |index| ddl::IndexClause {
                     index_name: Some(Cow::from(index.name())),
-                    unique: index.index_type().is_unique(),
+                    r#type: match index.index_type() {
+                        sql_schema_describer::IndexType::Unique => ddl::IndexType::Unique,
+                        sql_schema_describer::IndexType::Normal => ddl::IndexType::Normal,
+                        sql_schema_describer::IndexType::Fulltext => ddl::IndexType::Fulltext,
+                    },
                     columns: index
                         .columns()
                         .map(|c| IndexColumn {
