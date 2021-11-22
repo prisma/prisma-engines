@@ -37,7 +37,8 @@ mod update_many {
           @r###"{"data":{"updateManyTestModel":{"count":1}}}"###
         );
 
-        connector_results!(
+        insta::assert_snapshot!(
+        run_query!(
           &runner,
           r#"{
             findManyTestModel(orderBy: { id: asc }) {
@@ -45,9 +46,8 @@ mod update_many {
               optInt
               optFloat
             }
-          }"#,
-          [Postgres, Sqlite, SqlServer, MySql, MongoDb] => r#"{"data":{"findManyTestModel":[{"optStr":"str1new","optInt":1,"optFloat":null},{"optStr":"str2","optInt":null,"optFloat":null}]}}"#,
-          [] => r#"{"data":{"findManyTestModel":[{"optStr":"str1new","optInt":1,"optFloat":0.0},{"optStr":"str2","optInt":null,"optFloat":null}]}}"#
+          }"#),
+          @r###"{"data":{"findManyTestModel":[{"optStr":"str1new","optInt":1,"optFloat":null},{"optStr":"str2","optInt":null,"optFloat":null}]}}"###
         );
 
         Ok(())
@@ -71,17 +71,17 @@ mod update_many {
           @r###"{"data":{"updateManyTestModel":{"count":1}}}"###
         );
 
-        connector_results!(
-          &runner,
-          r#"{
-          findManyTestModel(orderBy: { id: asc }) {
-            optStr
-            optInt
-            optFloat
-            }
-          }"#,
-          [Postgres, Sqlite, SqlServer, MySql, MongoDb] => r#"{"data":{"findManyTestModel":[{"optStr":"str1new","optInt":null,"optFloat":null},{"optStr":"str2","optInt":null,"optFloat":null}]}}"#,
-          [] => r#"{"data":{"findManyTestModel":[{"optStr":"str1new","optInt":null,"optFloat":0.0},{"optStr":"str2","optInt":null,"optFloat":null}]}}"#
+        insta::assert_snapshot!(
+          run_query!(
+            &runner,
+            r#"{
+              findManyTestModel(orderBy: { id: asc }) {
+                optStr
+                optInt
+                optFloat
+              }
+            }"#),
+          @r###"{"data":{"findManyTestModel":[{"optStr":"str1new","optInt":null,"optFloat":null},{"optStr":"str2","optInt":null,"optFloat":null}]}}"###
         );
 
         Ok(())
@@ -106,7 +106,8 @@ mod update_many {
           @r###"{"data":{"updateManyTestModel":{"count":3}}}"###
         );
 
-        connector_results!(
+        insta::assert_snapshot!(
+          run_query!(
             &runner,
             r#"{
               findManyTestModel {
@@ -114,9 +115,8 @@ mod update_many {
                 optInt
                 optFloat
               }
-            }"#,
-            [Postgres, Sqlite, SqlServer, MySql, MongoDb] => r#"{"data":{"findManyTestModel":[{"optStr":"updated","optInt":null,"optFloat":null},{"optStr":"updated","optInt":1,"optFloat":null},{"optStr":"updated","optInt":2,"optFloat":1.55}]}}"#,
-            [] => r#"{"data":{"findManyTestModel":[{"optStr":"updated","optInt":-1,"optFloat":0.0},{"optStr":"updated","optInt":1,"optFloat":0.0},{"optStr":"updated","optInt":2,"optFloat":1.55}]}}"#
+            }"#),
+          @r###"{"data":{"findManyTestModel":[{"optStr":"updated","optInt":null,"optFloat":null},{"optStr":"updated","optInt":1,"optFloat":null},{"optStr":"updated","optInt":2,"optFloat":1.55}]}}"###
         );
 
         Ok(())

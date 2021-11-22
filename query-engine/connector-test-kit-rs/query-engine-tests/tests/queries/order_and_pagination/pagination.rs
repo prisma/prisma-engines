@@ -781,18 +781,15 @@ mod pagination {
         // 3 => B B B B <- take
         // 2 => A A A B <- take
         // 1 => A B C D <- take
-        connector_results!(
-          &runner,
-          r#"query {
-              findManyTestModel(cursor: { id: 4 }, take: 3, skip: 1, orderBy: [{ fieldA: desc }, { fieldB: asc }, { fieldC: asc }, { fieldD: desc }]) {
-                id
-              }
-          }"#,
-          [] => r#"{"data":{"findManyTestModel":[{"id":3},{"id":5},{"id":2}]}}"#,
-          [] => r#"{"data":{"findManyTestModel":[{"id":5},{"id":3},{"id":2}]}}"#,
-          [] => r#"{"data":{"findManyTestModel":[{"id":3},{"id":2},{"id":1}]}}"#,
-          [Sqlite, MongoDb, Postgres, MySql, SqlServer] => r#"{"data":{"findManyTestModel":[{"id":5},{"id":2},{"id":1}]}}"#,
-          [] => r#"{"data":{"findManyTestModel":[{"id":2},{"id":1}]}}"#
+        insta::assert_snapshot!(
+          run_query!(
+            &runner,
+            r#"query {
+                findManyTestModel(cursor: { id: 4 }, take: 3, skip: 1, orderBy: [{ fieldA: desc }, { fieldB: asc }, { fieldC: asc }, { fieldD: desc }]) {
+                  id
+                }
+            }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":5},{"id":2},{"id":1}]}}"###
         );
 
         // >>> TEST #2
@@ -809,18 +806,15 @@ mod pagination {
         // 3 => B B B B <- take
         // 5 => B B B B <- take
         // 6 => C C D C <- take
-        connector_results!(
-          &runner,
-          r#"query {
-              findManyTestModel(cursor: { id: 4 }, take: 3, skip: 1, orderBy: [{ fieldA: asc }, { fieldB: desc }, { fieldC: desc }, { fieldD: asc }]) {
-                id
-              }
-          }"#,
-          [] => r#"{"data":{"findManyTestModel":[{"id":3},{"id":5},{"id":6}]}}"#,
-          [] => r#"{"data":{"findManyTestModel":[{"id":5},{"id":3},{"id":6}]}}"#,
-          [] => r#"{"data":{"findManyTestModel":[{"id":3},{"id":6}]}}"#,
-          [SqlServer, Sqlite, MongoDb, Postgres, MySql] => r#"{"data":{"findManyTestModel":[{"id":5},{"id":6}]}}"#,
-          [] => r#"{"data":{"findManyTestModel":[{"id":6}]}}"#
+        insta::assert_snapshot!(
+          run_query!(
+            &runner,
+            r#"query {
+                findManyTestModel(cursor: { id: 4 }, take: 3, skip: 1, orderBy: [{ fieldA: asc }, { fieldB: desc }, { fieldC: desc }, { fieldD: asc }]) {
+                  id
+                }
+            }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":5},{"id":6}]}}"###
         );
 
         // Note: Negative takes reverse the order, the following tests check that.
@@ -852,10 +846,7 @@ mod pagination {
               }
           }"#,
           [SqlServer] => r#"{"data":{"findManyTestModel":[{"id":6},{"id":5},{"id":3}]}}"#,
-          [] => r#"{"data":{"findManyTestModel":[{"id":6},{"id":3},{"id":5}]}}"#,
-          [] => r#"{"data":{"findManyTestModel":[{"id":6},{"id":3}]}}"#,
-          [MongoDb, Sqlite, Postgres, MySql, SqlServer] => r#"{"data":{"findManyTestModel":[{"id":6},{"id":5}]}}"#,
-          [] => r#"{"data":{"findManyTestModel":[{"id":6}]}}"#
+          [MongoDb, Sqlite, Postgres, MySql, SqlServer] => r#"{"data":{"findManyTestModel":[{"id":6},{"id":5}]}}"#
         );
 
         Ok(())
