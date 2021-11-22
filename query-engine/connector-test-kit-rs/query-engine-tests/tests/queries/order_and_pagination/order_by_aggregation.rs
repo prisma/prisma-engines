@@ -223,10 +223,10 @@ mod order_by_aggr {
                 user { categories { name } }
               }
             }"#,
-            [Sqlite, MySql, MongoDb, Postgres] => r#"{"data":{"findManyPost":[{"id":2,"user":{"categories":[{"name":"Computer Science"},{"name":"Music"}]}},{"id":3,"user":{"categories":[{"name":"Computer Science"},{"name":"Music"}]}},{"id":1,"user":{"categories":[{"name":"Startup"}]}}]}}"#,
-            [SqlServer] => r#"{"data":{"findManyPost":[{"id":3,"user":{"categories":[{"name":"Computer Science"},{"name":"Music"}]}},{"id":2,"user":{"categories":[{"name":"Computer Science"},{"name":"Music"}]}},{"id":1,"user":{"categories":[{"name":"Startup"}]}}]}}"#
+            [Sqlite, MySql, MongoDb, Postgres, SqlServer] => r#"{"data":{"findManyPost":[{"id":2,"user":{"categories":[{"name":"Computer Science"},{"name":"Music"}]}},{"id":3,"user":{"categories":[{"name":"Computer Science"},{"name":"Music"}]}},{"id":1,"user":{"categories":[{"name":"Startup"}]}}]}}"#,
+            // MySql 5.6, Postgres 9
+            [SqlServer, MySql, Postgres] => r#"{"data":{"findManyPost":[{"id":3,"user":{"categories":[{"name":"Computer Science"},{"name":"Music"}]}},{"id":2,"user":{"categories":[{"name":"Computer Science"},{"name":"Music"}]}},{"id":1,"user":{"categories":[{"name":"Startup"}]}}]}}"#
         );
-
         Ok(())
     }
 

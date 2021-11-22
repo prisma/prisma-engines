@@ -854,7 +854,7 @@ mod pagination {
           [SqlServer] => r#"{"data":{"findManyTestModel":[{"id":6},{"id":5},{"id":3}]}}"#,
           [] => r#"{"data":{"findManyTestModel":[{"id":6},{"id":3},{"id":5}]}}"#,
           [] => r#"{"data":{"findManyTestModel":[{"id":6},{"id":3}]}}"#,
-          [MongoDb, Sqlite, Postgres, MySql] => r#"{"data":{"findManyTestModel":[{"id":6},{"id":5}]}}"#,
+          [MongoDb, Sqlite, Postgres, MySql, SqlServer] => r#"{"data":{"findManyTestModel":[{"id":6},{"id":5}]}}"#,
           [] => r#"{"data":{"findManyTestModel":[{"id":6}]}}"#
         );
 

@@ -169,7 +169,7 @@ mod order_by_dependent_pag {
             // Depends on how null values are handled.
             [MongoDb] => r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"id":1}}}]}}"#,
             [Postgres] => r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"id":1}}},{"id":2,"b":{"c":null}},{"id":3,"b":null}]}}"#,
-            [Sqlite] => r#"{"data":{"findManyModelA":[{"id":2,"b":{"c":null}},{"id":3,"b":null},{"id":1,"b":{"c":{"id":1}}}]}}"#,
+            [Sqlite, MySql] => r#"{"data":{"findManyModelA":[{"id":2,"b":{"c":null}},{"id":3,"b":null},{"id":1,"b":{"c":{"id":1}}}]}}"#,
             [MySql] => r#"{"data":{"findManyModelA":[{"id":3,"b":null},{"id":2,"b":{"c":null}},{"id":1,"b":{"c":{"id":1}}}]}}"#
         );
 
