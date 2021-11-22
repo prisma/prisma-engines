@@ -444,7 +444,7 @@
                 <span class="kw">let</span> <span class="ident">index_type</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">index_definition</span>.<span class="ident">tpe</span> {
                     <span class="ident">IndexType::Unique</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sql::IndexType::Unique</span>,
                     <span class="ident">IndexType::Normal</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sql::IndexType::Normal</span>,
-                    <span class="ident">IndexType::Fulltext</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">todo!</span>(<span class="string">&quot;Fulltext migration support&quot;</span>),
+                    <span class="ident">IndexType::Fulltext</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sql::IndexType::Fulltext</span>,
                 };
 
                 <span class="kw">let</span> <span class="ident">algorithm</span> <span class="op">=</span> <span class="ident">index_definition</span>.<span class="ident">algorithm</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">algo</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">algo</span> {
