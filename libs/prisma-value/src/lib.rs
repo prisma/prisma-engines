@@ -259,7 +259,7 @@ impl fmt::Display for PrismaValue {
                     .collect::<Vec<_>>()
                     .join(", ");
 
-                write!(f,"{{ {} }}", joined)
+                write!(f, "{{ {} }}", joined)
             }
         }
     }

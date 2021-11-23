@@ -119,7 +119,7 @@ impl FieldSelection {
     ///
     /// /!\ Important assumption: All selections are on the same model.
     pub fn union(selections: Vec<Self>) -> Self {
-        let chained = selections.into_iter().flat_map(std::convert::identity);
+        let chained = selections.into_iter().flatten();
 
         FieldSelection {
             selections: chained.unique().collect(),
