@@ -34,13 +34,9 @@ pub fn collect_selected_fields(
         })
         .collect::<Vec<Field>>();
 
-    let selection = FieldSelection::from(fields);
-    dbg!(&selection);
-
     let model_id = model.primary_identifier();
+    let selection = FieldSelection::from(fields);
     let selection = model_id.merge(selection);
-
-    dbg!(&selection);
 
     // Distinct fields are always selected because we are processing them in-memory
     if let Some(distinct) = distinct {
