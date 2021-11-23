@@ -417,6 +417,10 @@
 <span id="417">417</span>
 <span id="418">418</span>
 <span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">ModelWalker</span>, <span class="ident">RelationFieldWalker</span>, <span class="ident">RelationName</span>, <span class="ident">ScalarFieldWalker</span>};
@@ -501,6 +505,10 @@
     <span class="doccomment">/// Get the relation attributes defined in the AST.</span>
     <span class="kw">fn</span> <span class="ident">get</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">Relation</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">relations</span>.<span class="ident">relations_storage</span>[<span class="self">self</span>.<span class="ident">relation_id</span>]
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">db</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ParserDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">db</span>
     }
 
     <span class="doccomment">/// The relation is 1:1, having at most one record on both sides of the relation.</span>

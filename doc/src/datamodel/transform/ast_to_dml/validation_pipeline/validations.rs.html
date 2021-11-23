@@ -198,11 +198,11 @@
                     <span class="ident">relations::cycles</span>(<span class="ident">relation</span>, <span class="ident">db</span>, <span class="ident">diagnostics</span>);
                     <span class="ident">relations::multiple_cascading_paths</span>(<span class="ident">relation</span>, <span class="ident">db</span>, <span class="ident">diagnostics</span>);
                     <span class="ident">relations::has_a_unique_constraint_name</span>(<span class="ident">db</span>, <span class="ident">relation</span>, <span class="ident">diagnostics</span>);
-
-                    <span class="comment">// These needs to run last to prevent error spam.</span>
                     <span class="ident">relations::references_unique_fields</span>(<span class="ident">relation</span>, <span class="ident">connector</span>, <span class="ident">diagnostics</span>);
                     <span class="ident">relations::referencing_fields_in_correct_order</span>(<span class="ident">relation</span>, <span class="ident">connector</span>, <span class="ident">diagnostics</span>);
                 }
+
+                <span class="ident">relations::referencing_scalar_field_types</span>(<span class="ident">relation</span>, <span class="ident">diagnostics</span>);
 
                 <span class="comment">// Only run these when you are not formatting the data model. These validations</span>
                 <span class="comment">// test against broken relations that we could fix with a code action. The flag is</span>

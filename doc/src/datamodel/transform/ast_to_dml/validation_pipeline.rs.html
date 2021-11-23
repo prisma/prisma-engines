@@ -66,12 +66,6 @@
 <span id="66">66</span>
 <span id="67">67</span>
 <span id="68">68</span>
-<span id="69">69</span>
-<span id="70">70</span>
-<span id="71">71</span>
-<span id="72">72</span>
-<span id="73">73</span>
-<span id="74">74</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">validations</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">db::ParserDatabase</span>, <span class="ident">lift::LiftAstToDml</span>, <span class="ident">validate::Validator</span>};
@@ -107,9 +101,9 @@
     <span class="doccomment">/// This method will attempt to</span>
     <span class="doccomment">/// * Resolve all attributes</span>
     <span class="doccomment">/// * Recursively evaluate all functions</span>
-    <span class="doccomment">/// * Perform string interpolation</span>
     <span class="doccomment">/// * Resolve and check default values</span>
     <span class="doccomment">/// * Resolve and check all field types</span>
+    <span class="doccomment">/// * etc.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">validate</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">ast_schema</span>: <span class="kw-2">&amp;</span><span class="ident">ast::SchemaAst</span>,
@@ -117,26 +111,20 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ValidatedDatamodel</span>, <span class="ident">Diagnostics</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">diagnostics</span> <span class="op">=</span> <span class="ident">Diagnostics::new</span>();
 
-        <span class="comment">// Phase 0 is parsing.</span>
-        <span class="comment">// Phase 1 is source block loading.</span>
-
-        <span class="comment">// Phase 2: Make sense of the AST.</span>
+        <span class="comment">// Make sense of the AST.</span>
         <span class="kw">let</span> (<span class="ident">db</span>, <span class="kw-2">mut</span> <span class="ident">diagnostics</span>) <span class="op">=</span> <span class="ident">ParserDatabase::new</span>(<span class="ident">ast_schema</span>, <span class="self">self</span>.<span class="ident">source</span>, <span class="ident">diagnostics</span>, <span class="self">self</span>.<span class="ident">preview_features</span>);
 
         <span class="comment">// Early return so that the validator does not have to deal with invalid schemas</span>
         <span class="ident">diagnostics</span>.<span class="ident">to_result</span>()<span class="question-mark">?</span>;
 
-        <span class="comment">// Phase 3: Global validations after we have consistent data model.</span>
         <span class="ident">validations::validate</span>(<span class="kw-2">&amp;</span><span class="ident">db</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">diagnostics</span>, <span class="ident">relation_transformation_enabled</span>);
         <span class="ident">diagnostics</span>.<span class="ident">to_result</span>()<span class="question-mark">?</span>;
 
-        <span class="comment">// Phase 4: Lift AST to DML. This can&#39;t fail.</span>
         <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">LiftAstToDml::new</span>(<span class="kw-2">&amp;</span><span class="ident">db</span>).<span class="ident">lift</span>();
 
         <span class="comment">// From now on we do not operate on the internal ast anymore, but DML.</span>
         <span class="comment">// Please try to avoid all new validations after this, if you can.</span>
 
-        <span class="comment">// Phase 5: Validation (deprecated, move stuff out from here if you can)</span>
         <span class="self">self</span>.<span class="ident">validator</span>.<span class="ident">validate</span>(<span class="ident">db</span>.<span class="ident">ast</span>(), <span class="kw-2">&amp;</span><span class="ident">schema</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">diagnostics</span>);
         <span class="ident">diagnostics</span>.<span class="ident">to_result</span>()<span class="question-mark">?</span>;
 
