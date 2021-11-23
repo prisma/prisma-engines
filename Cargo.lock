@@ -3384,7 +3384,6 @@ dependencies = [
  "tokio",
  "tonic",
  "tracing",
- "tracing-attributes",
  "tracing-futures",
  "tracing-opentelemetry",
  "tracing-subscriber",

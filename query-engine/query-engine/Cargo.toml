@@ -41,7 +41,6 @@ url = "2.1"
 
 tracing = "0.1"
 tracing-opentelemetry = "0.11"
-tracing-attributes = "0.1"
 tracing-subscriber = { version = "0.2", features = ["json"] }
 tracing-futures = "0.2.3"
 opentelemetry = { version = "0.12", features = ["async-std"] }
