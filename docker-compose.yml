@@ -215,6 +215,16 @@ services:
       - "1433:1433"
     networks:
       - databases
+  azure-edge:
+    image: mcr.microsoft.com/azure-sql-edge
+    restart: always
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "<YourStrong@Passw0rd>"
+    ports:
+      - "1433:1433"
+    networks:
+      - databases
 
   mssql-2017:
     image: mcr.microsoft.com/mssql/server:2017-latest

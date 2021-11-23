@@ -3,7 +3,7 @@ use query_engine_tests::*;
 #[test_suite]
 mod pagination_regr {
     use indoc::indoc;
-    use query_engine_tests::{assert_query_many, run_query};
+    use query_engine_tests::run_query;
 
     fn schema_2855() -> String {
         let schema = indoc! {
@@ -82,20 +82,18 @@ mod pagination_regr {
         // There are 2 options, depending on how the underlying db orders NULLS (first or last, * ids have nulls in `field`):
         // Nulls last:  5, 3, 1*, 2*, 4* => take only 4
         // Nulls first: 1*, 2*, 4*, 5, 3 => take 4, 5
-        assert_query_many!(
-            &runner,
-            r#"{
-            findManyTestModel(
-              cursor: { id: 2 },
-              take: 2,
-              skip: 1,
-              orderBy: [{ field: desc }, { id: asc }]
-            ) { id }
+        match_connector_result!(
+          &runner,
+          r#"{
+          findManyTestModel(
+            cursor: { id: 2 },
+            take: 2,
+            skip: 1,
+            orderBy: [{ field: desc }, { id: asc }]
+          ) { id }
           }"#,
-            vec![
-                r#"{"data":{"findManyTestModel":[{"id":4}]}}"#,
-                r#"{"data":{"findManyTestModel":[{"id":4},{"id":5}]}}"#
-            ]
+          [Sqlite, SqlServer, MySql, MongoDb] => r#"{"data":{"findManyTestModel":[{"id":4}]}}"#,
+          [Postgres] => r#"{"data":{"findManyTestModel":[{"id":4},{"id":5}]}}"#
         );
 
         Ok(())
@@ -110,20 +108,18 @@ mod pagination_regr {
         // Contain some nulls for `field`.
         create_test_data_3505_2(&runner).await?;
 
-        assert_query_many!(
-            &runner,
-            r#"{
-            findManyTestModel(
-              cursor: { id: 5 },
-              take: 2,
-              skip: 1,
-              orderBy: [{ field: desc }, { id: asc }]
-            ) { id }
+        match_connector_result!(
+          &runner,
+          r#"{
+          findManyTestModel(
+            cursor: { id: 5 },
+            take: 2,
+            skip: 1,
+            orderBy: [{ field: desc }, { id: asc }]
+          ) { id }
           }"#,
-            vec![
-                r#"{"data":{"findManyTestModel":[{"id":2}]}}"#,
-                r#"{"data":{"findManyTestModel":[{"id":2},{"id":1}]}}"#
-            ]
+          [Postgres] => r#"{"data":{"findManyTestModel":[{"id":2}]}}"#,
+          [Sqlite, MongoDb, MySql, SqlServer] => r#"{"data":{"findManyTestModel":[{"id":2},{"id":1}]}}"#
         );
 
         Ok(())

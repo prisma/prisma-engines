@@ -7,16 +7,32 @@ macro_rules! assert_query {
 }
 
 #[macro_export]
-macro_rules! assert_query_many {
-    ($runner:expr, $q:expr, $potential_results:expr) => {
+macro_rules! match_connector_result {
+    ($runner:expr, $q:expr, $([$($connector_opt:ident),*] => $result:expr),*) => {
+        use query_tests_setup::ConnectorTag::*;
+        let connector = $runner.connector();
+        let mut results: Vec<&str> = vec![];
+        $(
+            $(
+                if matches!(connector, $connector_opt(_)) {
+                    results.push($result);
+                }
+            )*
+        )*
+
         let query_result = $runner.query($q).await?.to_string();
 
+        if results.len() == 0 {
+            panic!(format!("No results defined for connector {}. Query result: {}", connector, query_result));
+        }
+
         assert_eq!(
-            $potential_results.contains(&query_result.as_str()),
+            results.contains(&query_result.as_str()),
             true,
-            "Query result: {} is not part of the expected results: {:?}",
+            "Query result: {} is not part of the expected results: {:?} for connector {}",
             query_result,
-            $potential_results
+            results,
+            connector
         );
     };
 }

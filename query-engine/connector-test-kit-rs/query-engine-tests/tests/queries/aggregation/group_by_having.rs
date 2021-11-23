@@ -8,7 +8,7 @@ use query_engine_tests::*;
 //   operators applied. For a good confidence, we choose `equals`, `in`, `not equals`, `endsWith` (where applicable).
 #[test_suite(schema(schemas::common_text_and_numeric_types_optional))]
 mod aggregation_group_by_having {
-    use query_engine_tests::{assert_error, assert_query_many, run_query, Runner};
+    use query_engine_tests::{assert_error, run_query, Runner};
 
     // This is just basic confirmation that scalar filters are applied correctly.
     // The assumption is that we don't need to test all normal scalar filters as they share the exact same code path
@@ -42,7 +42,7 @@ mod aggregation_group_by_having {
         // group1, 0
         // group2, 5
         // group3, 5
-        assert_query_many!(
+        match_connector_result!(
             &runner,
             r#"query { groupByTestModel(by: [string, int], having: {
                 string: { in: ["group1", "group2"] }
@@ -54,12 +54,9 @@ mod aggregation_group_by_having {
                 _sum { int }
               }
             }"#,
-            vec![
-                r#"{"data":{"groupByTestModel":[{"string":"group1","int":5,"_count":{"_all":1},"_sum":{"int":5}},{"string":"group2","int":5,"_count":{"_all":1},"_sum":{"int":5}}]}}"#, // SQL
-                r#"{"data":{"groupByTestModel":[{"string":"group2","int":5,"_count":{"_all":1},"_sum":{"int":5}},{"string":"group1","int":5,"_count":{"_all":1},"_sum":{"int":5}}]}}"# // Mongo
-            ]
+            [SqlServer, Postgres, MySql, Sqlite, MongoDb] => r#"{"data":{"groupByTestModel":[{"string":"group1","int":5,"_count":{"_all":1},"_sum":{"int":5}},{"string":"group2","int":5,"_count":{"_all":1},"_sum":{"int":5}}]}}"#,
+            [MongoDb] =>   r#"{"data":{"groupByTestModel":[{"string":"group2","int":5,"_count":{"_all":1},"_sum":{"int":5}},{"string":"group1","int":5,"_count":{"_all":1},"_sum":{"int":5}}]}}"#
         );
-
         Ok(())
     }
 
