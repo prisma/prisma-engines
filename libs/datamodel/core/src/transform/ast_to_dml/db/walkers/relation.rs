@@ -84,6 +84,10 @@ impl<'ast, 'db> InlineRelationWalker<'ast, 'db> {
         &self.db.relations.relations_storage[self.relation_id]
     }
 
+    pub(crate) fn db(self) -> &'db ParserDatabase<'ast> {
+        self.db
+    }
+
     /// The relation is 1:1, having at most one record on both sides of the relation.
     pub(crate) fn is_one_to_one(self) -> bool {
         matches!(self.get().attributes, RelationAttributes::OneToOne(_))

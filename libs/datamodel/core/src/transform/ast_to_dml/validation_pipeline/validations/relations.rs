@@ -6,8 +6,12 @@ mod visited_relation;
 
 use crate::{
     ast,
+    common::provider_names::MONGODB_SOURCE_NAME,
     diagnostics::{DatamodelError, Diagnostics},
-    transform::ast_to_dml::db::{walkers::CompleteInlineRelationWalker, ConstraintName, ParserDatabase},
+    transform::ast_to_dml::db::{
+        walkers::{CompleteInlineRelationWalker, InlineRelationWalker, ReferencingFields},
+        ConstraintName, ParserDatabase, ScalarFieldType,
+    },
 };
 use datamodel_connector::{Connector, ConnectorCapability};
 use itertools::Itertools;
@@ -409,6 +413,62 @@ fn cascade_error_with_default_values(relation: CompleteInlineRelationWalker<'_, 
     msg.push_str(" Read more at https://pris.ly/d/cyclic-referential-actions");
 
     DatamodelError::new_validation_error(&msg, relation.referencing_field().ast_field().span)
+}
+
+/// The types of the referencing and referenced scalar fields in a relation must be compatible.
+pub(super) fn referencing_scalar_field_types(relation: InlineRelationWalker<'_, '_>, diagnostics: &mut Diagnostics) {
+    let datasource = relation.db().datasource();
+    // see https://github.com/prisma/prisma/issues/10105
+    if datasource
+        .as_ref()
+        .map(|source| source.provider == MONGODB_SOURCE_NAME)
+        .unwrap_or(false)
+    {
+        return;
+    }
+
+    let referencing_fields = match relation.referencing_fields() {
+        ReferencingFields::Concrete(fields) => fields,
+        _ => return,
+    };
+
+    for (referencing, referenced) in referencing_fields.zip(relation.referenced_fields()) {
+        if !field_types_match(
+            referencing.scalar_field.r#type,
+            referenced.scalar_field.r#type,
+            relation.db(),
+        ) {
+            diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+                &format!(
+                    "The type of the field `{}` in the model `{}` is not matching the type of the referenced field `{}` in model `{}`.",
+                    referencing.name(),
+                    referencing.model().name(),
+                    referenced.name(),
+                    referenced.model().name(),
+                ),
+                RELATION_ATTRIBUTE_NAME,
+                relation.forward_relation_field().unwrap().ast_field().span,
+            ))
+        }
+    }
+
+    fn field_types_match(referencing: ScalarFieldType, referenced: ScalarFieldType, db: &ParserDatabase<'_>) -> bool {
+        match (referencing, referenced) {
+            (ScalarFieldType::CompositeType(a), ScalarFieldType::CompositeType(b)) if a == b => true,
+            (ScalarFieldType::Enum(a), ScalarFieldType::Enum(b)) if a == b => true,
+            (ScalarFieldType::BuiltInScalar(a), ScalarFieldType::BuiltInScalar(b)) if a == b => true,
+            (ScalarFieldType::Unsupported, ScalarFieldType::Unsupported) => true,
+            (ScalarFieldType::Alias(a), b) => {
+                let a_type = db.alias_scalar_field_type(&a);
+                field_types_match(*a_type, b, db)
+            }
+            (a, ScalarFieldType::Alias(b)) => {
+                let b_type = db.alias_scalar_field_type(&b);
+                field_types_match(a, *b_type, db)
+            }
+            _ => false,
+        }
+    }
 }
 
 fn is_empty_fields(fields: Option<&[ast::FieldId]>) -> bool {
