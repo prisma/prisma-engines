@@ -7,7 +7,7 @@ pub(crate) fn init_logger() {
     let subscriber = FmtSubscriber::builder()
         .with_env_filter(EnvFilter::from_default_env())
         .json()
-        .with_timer(tracing_subscriber::fmt::time::ChronoUtc::rfc3339())
+        .with_timer(tracing_subscriber::fmt::time::UtcTime::rfc_3339())
         .with_writer(std::io::stderr)
         .finish()
         .with(ErrorLayer::default());
