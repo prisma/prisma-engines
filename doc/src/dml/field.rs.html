@@ -590,9 +590,6 @@
 <span id="590">590</span>
 <span id="591">591</span>
 <span id="592">592</span>
-<span id="593">593</span>
-<span id="594">594</span>
-<span id="595">595</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A field in a model.</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::native_type_instance::NativeTypeInstance</span>;
@@ -996,11 +993,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_on_update_action</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ReferentialAction</span> {
         <span class="kw">use</span> <span class="ident">ReferentialAction</span>::<span class="kw-2">*</span>;
 
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">referential_arity</span> {
-            <span class="kw">_</span> <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">emulates_referential_actions</span>.<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Cascade</span>,
-            <span class="ident">FieldArity::Required</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">NoAction</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SetNull</span>,
-        }
+        <span class="ident">Cascade</span>
     }
 }
 
@@ -1008,6 +1001,7 @@
     <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">String</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>
     }
+
     <span class="kw">fn</span> <span class="ident">set_name</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
         <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">String::from</span>(<span class="ident">name</span>)
     }
