@@ -156,7 +156,7 @@ fn handle_one_to_many(
         graph.create_edge(
             &parent_node,
             &child_node,
-            QueryGraphDependency::ParentProjection(child_link, Box::new(move |mut parent_node, mut child_links| {
+            QueryGraphDependency::ProjectedDataDependency(child_link, Box::new(move |mut parent_node, mut child_links| {
                 let child_link = match child_links.pop() {
                     Some(link) => Ok(link),
                     None => Err(QueryGraphBuilderError::RecordNotFound(format!(
@@ -184,7 +184,7 @@ fn handle_one_to_many(
             graph.create_edge(
                 &parent_node,
                 &create_node,
-                QueryGraphDependency::ParentProjection(parent_link, Box::new(move |mut create_node, mut parent_links| {
+                QueryGraphDependency::ProjectedDataDependency(parent_link, Box::new(move |mut create_node, mut parent_links| {
                     let parent_link = match parent_links.pop() {
                         Some(link) => Ok(link),
                         None => Err(QueryGraphBuilderError::RecordNotFound(format!(
@@ -349,7 +349,7 @@ fn handle_one_to_one(
     graph.create_edge(
         &parent_node,
         &create_node,
-        QueryGraphDependency::ParentProjection(extractor, Box::new(move |mut child_node, mut links| {
+        QueryGraphDependency::ProjectedDataDependency(extractor, Box::new(move |mut child_node, mut links| {
             let link = match links.pop() {
                 Some(link) => Ok(link),
                 None => Err(QueryGraphBuilderError::RecordNotFound(format!(
@@ -381,7 +381,7 @@ fn handle_one_to_one(
         graph.create_edge(
             &create_node,
             &update_node,
-            QueryGraphDependency::ParentProjection(child_link, Box::new(move |mut update_node, mut child_links| {
+            QueryGraphDependency::ProjectedDataDependency(child_link, Box::new(move |mut update_node, mut child_links| {
                 let child_link = match child_links.pop() {
                     Some(link) => Ok(link),
                     None => Err(QueryGraphBuilderError::RecordNotFound(format!(
@@ -405,7 +405,7 @@ fn handle_one_to_one(
         graph.create_edge(
             &parent_node,
             &update_node,
-            QueryGraphDependency::ParentProjection(parent_model_identifier, Box::new(move |mut update_node, mut parent_ids| {
+            QueryGraphDependency::ProjectedDataDependency(parent_model_identifier, Box::new(move |mut update_node, mut parent_ids| {
                 let parent_id = match parent_ids.pop() {
                     Some(pid) => Ok(pid),
                     None => Err(QueryGraphBuilderError::RecordNotFound(format!(
@@ -473,7 +473,7 @@ pub fn nested_create_many(
     graph.create_edge(
         &parent_node,
         &create_node,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             linking_fields,
             Box::new(move |mut create_many_node, mut parent_links| {
                 // There can only be one parent.

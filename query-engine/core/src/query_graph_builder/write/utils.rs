@@ -27,11 +27,11 @@ pub fn node_is_create(graph: &QueryGraph, node: &NodeRef) -> bool {
 }
 
 /// Produces a non-failing read query that fetches the requested selection of records for a given filterable.
-pub fn read_ids_infallible<T>(model: ModelRef, projection: FieldSelection, filter: T) -> Query
+pub fn read_ids_infallible<T>(model: ModelRef, selection: FieldSelection, filter: T) -> Query
 where
     T: Into<Filter>,
 {
-    let selected_fields = get_selected_fields(&model, projection);
+    let selected_fields = get_selected_fields(&model, selection);
     let filter: Filter = filter.into();
 
     let read_query = ReadQuery::ManyRecordsQuery(ManyRecordsQuery {
@@ -48,14 +48,14 @@ where
     Query::Read(read_query)
 }
 
-fn get_selected_fields(model: &ModelRef, projection: FieldSelection) -> FieldSelection {
+fn get_selected_fields(model: &ModelRef, selection: FieldSelection) -> FieldSelection {
     // Always fetch the primary identifier as well.
     let primary_model_id = model.primary_identifier();
 
-    if projection != primary_model_id {
-        primary_model_id.merge(projection)
+    if selection != primary_model_id {
+        primary_model_id.merge(selection)
     } else {
-        projection
+        selection
     }
 }
 
@@ -97,7 +97,7 @@ where
 {
     let parent_model_id = parent_relation_field.model().primary_identifier();
     let parent_linking_fields = parent_relation_field.linking_fields();
-    let projection = parent_model_id.merge(parent_linking_fields);
+    let selection = parent_model_id.merge(parent_linking_fields);
     let child_model = parent_relation_field.related_model();
 
     let selected_fields = get_selected_fields(
@@ -109,7 +109,7 @@ where
         name: "find_children_by_parent".to_owned(),
         alias: None,
         parent_field: Arc::clone(parent_relation_field),
-        parent_projections: None,
+        parent_results: None,
         args: (child_model, filter).into(),
         selected_fields,
         aggregation_selections: vec![],
@@ -120,11 +120,11 @@ where
     graph.create_edge(
         parent_node,
         &read_children_node,
-        QueryGraphDependency::ParentProjection(
-            projection,
-            Box::new(|mut read_children_node, projections| {
+        QueryGraphDependency::ProjectedDataDependency(
+            selection,
+            Box::new(|mut read_children_node, selections| {
                 if let Node::Query(Query::Read(ReadQuery::RelatedRecordsQuery(ref mut rq))) = read_children_node {
-                    rq.parent_projections = Some(projections);
+                    rq.parent_results = Some(selections);
                 };
 
                 Ok(read_children_node)
@@ -215,7 +215,7 @@ pub fn insert_existing_1to1_related_model_checks(
     graph.create_edge(
         &read_existing_children,
         &if_node,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             child_model_identifier.clone(),
             Box::new(move |if_node, child_ids| {
                 // If the other side ("child") requires the connection, we need to make sure that there isn't a child already connected
@@ -242,7 +242,7 @@ pub fn insert_existing_1to1_related_model_checks(
     graph.create_edge(
         &read_existing_children,
         &update_existing_child,
-        QueryGraphDependency::ParentProjection(child_model_identifier, Box::new(move |mut update_existing_child, mut child_ids| {
+        QueryGraphDependency::ProjectedDataDependency(child_model_identifier, Box::new(move |mut update_existing_child, mut child_ids| {
             // This has to succeed or the if-then node wouldn't trigger.
             let child_id = match child_ids.pop() {
                 Some(pid) => Ok(pid),
@@ -385,7 +385,7 @@ pub fn emulate_restrict(
     graph.create_edge(
         &read_node,
         &noop_node,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             child_model_identifier,
             Box::new(move |noop_node, child_ids| {
                 if !child_ids.is_empty() {
@@ -474,7 +474,7 @@ pub fn emulate_on_delete_cascade(
     graph.create_edge(
         &dependent_records_node,
         &delete_dependents_node,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             child_model_identifier.clone(),
             Box::new(move |mut delete_dependents_node, dependent_ids| {
                 if let Node::Query(Query::Write(WriteQuery::DeleteManyRecords(ref mut dmr))) = delete_dependents_node {
@@ -575,7 +575,7 @@ pub fn emulate_on_delete_set_null(
     graph.create_edge(
         &dependent_records_node,
         &set_null_dependents_node,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             child_model_identifier.clone(),
             Box::new(move |mut set_null_dependents_node, dependent_ids| {
                 if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut dmr))) = set_null_dependents_node
@@ -695,7 +695,7 @@ pub fn emulate_on_update_set_null(
     graph.create_edge(
         &dependent_records_node,
         &set_null_dependents_node,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             child_model_identifier.clone(),
             Box::new(move |mut set_null_dependents_node, dependent_ids| {
                 if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut dmr))) = set_null_dependents_node
@@ -834,7 +834,7 @@ pub fn insert_emulated_on_update_with_intermediary_node(
     graph.create_edge(
         &parent_node,
         &join_node,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             model_to_update.primary_identifier(),
             Box::new(move |return_node, parent_ids| {
                 if let Node::Flow(Flow::Return(_)) = return_node {
@@ -1001,7 +1001,7 @@ pub fn emulate_on_update_cascade(
     graph.create_edge(
         &dependent_records_node,
         &update_dependents_node,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             child_model_identifier.clone(),
             Box::new(move |mut update_dependents_node, dependent_ids| {
                 if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut dmr))) = update_dependents_node {

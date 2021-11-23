@@ -14,9 +14,16 @@ use prisma_models::prelude::*;
 
 #[derive(Debug, Clone)]
 pub enum ExpressionResult {
+    /// A result from a query execution.
     Query(QueryResult),
-    RawProjections(Vec<SelectionResult>),
+
+    /// A fixed result returned in the query graph.
+    FixedResult(Vec<SelectionResult>),
+
+    /// A result from a computation in the query graph.
     Computation(ComputationResult),
+
+    /// An empty result
     Empty,
 }
 
@@ -35,7 +42,8 @@ pub struct DiffResult {
 }
 
 impl ExpressionResult {
-    /// Attempts to transform the result into a vector of record projections.
+    /// Attempts to transform this `ExpressionResult` into a vector of `SelectionResult`s corresponding to the passed desired selection shape.
+    /// A vector is returned as some expression results return more than one result row at once.
     #[tracing::instrument(skip(self, field_selection))]
     pub fn as_selection_results(&self, field_selection: &FieldSelection) -> InterpretationResult<Vec<SelectionResult>> {
         let converted = match self {
@@ -65,7 +73,7 @@ impl ExpressionResult {
                 _ => None,
             },
 
-            Self::RawProjections(p) => p
+            Self::FixedResult(p) => p
                 .clone()
                 .into_iter()
                 .map(|sr| field_selection.assimilate(sr))
@@ -76,7 +84,10 @@ impl ExpressionResult {
         };
 
         converted.ok_or_else(|| {
-            InterpreterError::InterpretationError("Unable to convert result into a set of projections".to_owned(), None)
+            InterpreterError::InterpretationError(
+                "Unable to convert expression result into a set of selection results".to_owned(),
+                None,
+            )
         })
     }
 

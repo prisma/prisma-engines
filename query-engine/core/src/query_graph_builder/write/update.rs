@@ -43,7 +43,7 @@ pub fn update_record(
         graph.create_edge(
             &read_parent_node,
             &update_node,
-            QueryGraphDependency::ParentProjection(
+            QueryGraphDependency::ProjectedDataDependency(
                 model.primary_identifier(),
                 Box::new(move |mut update_node, parent_ids| {
                     if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut ur))) = update_node {
@@ -60,7 +60,7 @@ pub fn update_record(
     graph.create_edge(
         &update_node,
         &read_node,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             model.primary_identifier(),
             Box::new(move |mut read_node, mut parent_ids| {
                 let parent_id = match parent_ids.pop() {
@@ -117,7 +117,7 @@ pub fn update_many_records(
         graph.create_edge(
             &pre_read_node,
             &update_many_node,
-            QueryGraphDependency::ParentProjection(
+            QueryGraphDependency::ProjectedDataDependency(
                 model.primary_identifier(),
                 Box::new(move |mut update_node, parent_ids| {
                     if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = update_node {

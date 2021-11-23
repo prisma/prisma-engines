@@ -59,7 +59,7 @@ pub fn connect_records_node(
     graph.create_edge(
         parent_node,
         &connect_node,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             parent_model_id,
             Box::new(|mut connect_node, mut parent_ids| {
                 let len = parent_ids.len();
@@ -84,7 +84,7 @@ pub fn connect_records_node(
     graph.create_edge(
         &child_node,
         &connect_node,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             child_model_id,
             Box::new(move |mut connect_node, child_ids| {
                 let len = child_ids.len();

@@ -302,7 +302,7 @@ impl Expressionista {
 
             if let Flow::Return(result) = flow {
                 let result = match result {
-                    Some(r) => Box::new(ExpressionResult::RawProjections(r)),
+                    Some(r) => Box::new(ExpressionResult::FixedResult(r)),
                     None => Box::new(ExpressionResult::Empty),
                 };
 
@@ -365,11 +365,11 @@ impl Expressionista {
                                     }?;
 
                                     let res = match dependency {
-                                        QueryGraphDependency::ParentProjection(projection, f) => binding
-                                            .as_selection_results(&projection)
-                                            .and_then(|parent_projections| Ok(f(node, parent_projections)?)),
+                                        QueryGraphDependency::ProjectedDataDependency(selection, f) => binding
+                                            .as_selection_results(&selection)
+                                            .and_then(|parent_selections| Ok(f(node, parent_selections)?)),
 
-                                        QueryGraphDependency::ParentResult(f) => Ok(f(node, &binding)?),
+                                        QueryGraphDependency::DataDependency(f) => Ok(f(node, &binding)?),
 
                                         _ => unreachable!(),
                                     };
@@ -398,11 +398,11 @@ impl Expressionista {
         parent_edges
             .into_iter()
             .filter_map(|edge| match graph.pluck_edge(&edge) {
-                x @ QueryGraphDependency::ParentResult(_) => {
+                x @ QueryGraphDependency::DataDependency(_) => {
                     let parent_binding_name = graph.edge_source(&edge).id();
                     Some((parent_binding_name, x))
                 }
-                x @ QueryGraphDependency::ParentProjection(_, _) => {
+                x @ QueryGraphDependency::ProjectedDataDependency(_, _) => {
                     let parent_binding_name = graph.edge_source(&edge).id();
                     Some((parent_binding_name, x))
                 }

@@ -127,7 +127,7 @@ fn handle_many_to_many(
         graph.create_edge(
             &read_node,
             &if_node,
-            QueryGraphDependency::ParentProjection(
+            QueryGraphDependency::ProjectedDataDependency(
                 child_model.primary_identifier(),
                 Box::new(|if_node, child_ids| {
                     if let Node::Flow(Flow::If(_)) = if_node {
@@ -288,7 +288,7 @@ fn one_to_many_inlined_child(
         graph.create_edge(
             &read_node,
             &if_node,
-            QueryGraphDependency::ParentProjection(
+            QueryGraphDependency::ProjectedDataDependency(
                 child_model.primary_identifier(),
                 Box::new(|if_node, child_ids| {
                     if let Node::Flow(Flow::If(_)) = if_node {
@@ -307,7 +307,7 @@ fn one_to_many_inlined_child(
         graph.create_edge(
             &parent_node,
             &create_node,
-            QueryGraphDependency::ParentProjection(
+            QueryGraphDependency::ProjectedDataDependency(
                 parent_link.clone(),
                 Box::new(move |mut create_node, mut parent_ids| {
                     let parent_id = match parent_ids.pop() {
@@ -335,7 +335,7 @@ fn one_to_many_inlined_child(
         graph.create_edge(
             &parent_node,
             &update_child_node,
-            QueryGraphDependency::ParentProjection(
+            QueryGraphDependency::ProjectedDataDependency(
                 parent_link,
                 Box::new(move |mut update_node, mut parent_ids| {
                     let parent_id = match parent_ids.pop() {
@@ -431,7 +431,7 @@ fn one_to_many_inlined_parent(
     graph.create_edge(
         &read_node,
         &if_node,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             child_model.primary_identifier(),
             Box::new(|if_node, child_ids| {
                 if let Node::Flow(Flow::If(_)) = if_node {
@@ -449,7 +449,7 @@ fn one_to_many_inlined_parent(
     graph.create_edge(
         &if_node,
         &parent_node,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             child_link.clone(),
             Box::new(move |mut parent, mut child_ids| {
                 let child_id = child_ids.pop().unwrap();
@@ -465,7 +465,7 @@ fn one_to_many_inlined_parent(
     graph.create_edge(
         &read_node,
         &return_existing,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             child_link.clone(),
             Box::new(move |return_node, child_ids| {
                 if let Node::Flow(Flow::Return(_)) = return_node {
@@ -480,7 +480,7 @@ fn one_to_many_inlined_parent(
     graph.create_edge(
         &create_node,
         &return_create,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             child_link,
             Box::new(move |return_node, child_ids| {
                 if let Node::Flow(Flow::Return(_)) = return_node {
@@ -594,7 +594,7 @@ fn one_to_one_inlined_parent(
     graph.create_edge(
         &read_node,
         &if_node,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             child_model.primary_identifier(),
             Box::new(|if_node, child_ids| {
                 if let Node::Flow(Flow::If(_)) = if_node {
@@ -620,7 +620,7 @@ fn one_to_one_inlined_parent(
     graph.create_edge(
         &read_node,
         &return_existing,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             child_link.clone(),
             Box::new(move |return_node, child_ids| {
                 if let Node::Flow(Flow::Return(_)) = return_node {
@@ -637,7 +637,7 @@ fn one_to_one_inlined_parent(
     graph.create_edge(
         &create_node,
         &return_create,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             child_link.clone(),
             Box::new(move |return_node, child_ids| {
                 if let Node::Flow(Flow::Return(_)) = return_node {
@@ -654,7 +654,7 @@ fn one_to_one_inlined_parent(
         graph.create_edge(
             &if_node,
             &parent_node,
-            QueryGraphDependency::ParentProjection(
+            QueryGraphDependency::ProjectedDataDependency(
                 child_link,
                 Box::new(move |mut parent, mut child_ids| {
                     let child_id = child_ids.pop().unwrap();
@@ -680,7 +680,7 @@ fn one_to_one_inlined_parent(
         graph.create_edge(
             &parent_node,
             &update_parent_node,
-            QueryGraphDependency::ParentProjection(parent_model.primary_identifier(), Box::new(move |mut update_parent_node, mut parent_ids| {
+            QueryGraphDependency::ProjectedDataDependency(parent_model.primary_identifier(), Box::new(move |mut update_parent_node, mut parent_ids| {
                 let parent_id = match parent_ids.pop() {
                     Some(id) => Ok(id),
                     None => Err(QueryGraphBuilderError::RecordNotFound(format!(
@@ -704,8 +704,8 @@ fn one_to_one_inlined_parent(
         graph.create_edge(
             &if_node,
             &update_parent_node,
-            QueryGraphDependency::ParentProjection(child_link, Box::new(move |mut update_parent_node, mut child_projections| {
-                let child_projection = match child_projections.pop() {
+            QueryGraphDependency::ProjectedDataDependency(child_link, Box::new(move |mut update_parent_node, mut child_results| {
+                let child_result = match child_results.pop() {
                     Some(p) => Ok(p),
                     None => Err(QueryGraphBuilderError::RecordNotFound(format!(
                         "No '{}' record (needed to inline the relation with an update on '{}' record(s)) was found for a nested connect or create on one-to-one relation '{}'.",
@@ -714,7 +714,7 @@ fn one_to_one_inlined_parent(
                 }?;
 
                 if let Node::Query(Query::Write(ref mut wq)) = update_parent_node {
-                    wq.inject_result_into_args(parent_link.assimilate(child_projection)?);
+                    wq.inject_result_into_args(parent_link.assimilate(child_result)?);
                 }
 
                 Ok(update_parent_node)
@@ -821,7 +821,7 @@ fn one_to_one_inlined_child(
     graph.create_edge(
         &read_node,
         &if_node,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             child_model.primary_identifier(),
             Box::new(|if_node, child_ids| {
                 if let Node::Flow(Flow::If(_)) = if_node {
@@ -853,7 +853,7 @@ fn one_to_one_inlined_child(
     graph.create_edge(
         &read_node,
         &update_child_node,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             child_model.primary_identifier(),
             Box::new(move |mut update_child_node, mut child_ids| {
                 let child_id = match child_ids.pop() {
@@ -880,7 +880,7 @@ fn one_to_one_inlined_child(
     graph.create_edge(
         &parent_node,
         &update_child_node,
-        QueryGraphDependency::ParentProjection(parent_link.clone(), Box::new(move |mut update_child_node, mut parent_links| {
+        QueryGraphDependency::ProjectedDataDependency(parent_link.clone(), Box::new(move |mut update_child_node, mut parent_links| {
             let parent_link = match parent_links.pop() {
                 Some(link) => Ok(link),
                 None => Err(QueryGraphBuilderError::RecordNotFound(format!(
@@ -907,7 +907,7 @@ fn one_to_one_inlined_child(
     graph.create_edge(
         &parent_node,
         &create_node,
-        QueryGraphDependency::ParentProjection(parent_link, Box::new(move |mut update_child_node, mut parent_links| {
+        QueryGraphDependency::ProjectedDataDependency(parent_link, Box::new(move |mut update_child_node, mut parent_links| {
             let parent_link = match parent_links.pop() {
                 Some(link) => Ok(link),
                 None => Err(QueryGraphBuilderError::RecordNotFound(format!(

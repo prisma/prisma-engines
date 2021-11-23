@@ -35,7 +35,7 @@ pub fn create_record(
     graph.create_edge(
         &create_node,
         &read_node,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             model.primary_identifier(),
             Box::new(move |mut read_node, mut parent_ids| {
                 let parent_id = match parent_ids.pop() {

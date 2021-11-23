@@ -53,19 +53,6 @@ impl ManyRecords {
         }
     }
 
-    pub fn from_projection(projection: Vec<Vec<PrismaValue>>, selected_fields: &FieldSelection) -> Self {
-        Self {
-            records: projection
-                .into_iter()
-                .map(|v| Record {
-                    values: v,
-                    parent_id: None,
-                })
-                .collect(),
-            field_names: selected_fields.db_names().collect(),
-        }
-    }
-
     pub fn order_by(&mut self, order_bys: &[OrderBy]) {
         let field_indices: HashMap<&str, usize> = self
             .field_names
@@ -131,6 +118,21 @@ impl ManyRecords {
     pub fn with_unique_records(mut self) -> Self {
         self.records = self.records.into_iter().unique().collect();
         self
+    }
+}
+
+impl From<(Vec<Vec<PrismaValue>>, &FieldSelection)> for ManyRecords {
+    fn from((values, selected_fields): (Vec<Vec<PrismaValue>>, &FieldSelection)) -> Self {
+        Self {
+            records: values
+                .into_iter()
+                .map(|value| Record {
+                    values: value,
+                    parent_id: None,
+                })
+                .collect(),
+            field_names: selected_fields.db_names().collect(),
+        }
     }
 }
 

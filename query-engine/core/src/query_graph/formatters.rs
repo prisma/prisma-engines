@@ -56,7 +56,7 @@ impl Display for Flow {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::If(_) => write!(f, "(If (condition func)"),
-            Self::Return(_) => write!(f, "(return projections)"),
+            Self::Return(_) => write!(f, "(return results)"),
         }
     }
 }
@@ -96,11 +96,11 @@ impl Display for QueryGraphDependency {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::ExecutionOrder => write!(f, "ExecutionOrder"),
-            Self::ParentResult(_) => write!(f, "ParentResult"),
-            Self::ParentProjection(selection, _) => {
+            Self::DataDependency(_) => write!(f, "ParentResult"),
+            Self::ProjectedDataDependency(selection, _) => {
                 write!(
                     f,
-                    "ParentProjection ({:?})",
+                    "ProjectedDataDependency ({:?})",
                     selection.prisma_names().collect::<Vec<_>>()
                 )
             }

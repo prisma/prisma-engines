@@ -193,7 +193,7 @@ fn handle_one_to_x(
     graph.create_edge(
         node_to_attach,
         &update_node,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             extractor_model_id,
             Box::new(move |mut update_node, links| {
                 if links.is_empty() {

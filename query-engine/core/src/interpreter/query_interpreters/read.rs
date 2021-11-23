@@ -140,7 +140,7 @@ fn read_related<'conn>(
             nested_read::one2m(
                 tx,
                 &query.parent_field,
-                query.parent_projections,
+                query.parent_results,
                 parent_result,
                 query.args.clone(),
                 &query.selected_fields,
