@@ -783,6 +783,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "crossbeam-channel"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "06ed27e177f16d65f0f0c22a213e17c696ace5dd64b14258b52f9417ccb52db4"
+dependencies = [
+ "cfg-if 1.0.0",
+ "crossbeam-utils 0.8.5",
+]
+
+[[package]]
 name = "crossbeam-queue"
 version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2711,6 +2721,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "opentelemetry"
+version = "0.16.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e1cf9b1c4e9a6c4de793c632496fa490bdc0e1eea73f0c91394f7b6990935d22"
+dependencies = [
+ "async-std",
+ "async-trait",
+ "crossbeam-channel",
+ "futures",
+ "js-sys",
+ "lazy_static",
+ "percent-encoding",
+ "pin-project",
+ "rand 0.8.4",
+ "thiserror",
+]
+
+[[package]]
 name = "opentelemetry-otlp"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2718,7 +2746,7 @@ checksum = "ff889e68a02000126fa635a311abc329ce128c576b7dddc4cd3270f3c240afd0"
 dependencies = [
  "async-trait",
  "futures",
- "opentelemetry",
+ "opentelemetry 0.12.0",
  "prost 0.7.0",
  "thiserror",
  "tokio",
@@ -3373,7 +3401,7 @@ dependencies = [
  "itertools 0.10.1",
  "mongodb-query-connector",
  "once_cell",
- "opentelemetry",
+ "opentelemetry 0.12.0",
  "opentelemetry-otlp",
  "prisma-models",
  "quaint",
@@ -3394,7 +3422,7 @@ dependencies = [
  "tonic",
  "tracing",
  "tracing-futures",
- "tracing-opentelemetry",
+ "tracing-opentelemetry 0.11.0",
  "tracing-subscriber 0.2.24",
  "url",
  "user-facing-errors",
@@ -3410,7 +3438,7 @@ dependencies = [
  "napi",
  "napi-build",
  "napi-derive",
- "opentelemetry",
+ "opentelemetry 0.12.0",
  "opentelemetry-otlp",
  "prisma-models",
  "query-connector",
@@ -3423,7 +3451,7 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-futures",
- "tracing-opentelemetry",
+ "tracing-opentelemetry 0.11.0",
  "tracing-subscriber 0.2.24",
  "url",
  "user-facing-errors",
@@ -4204,7 +4232,7 @@ dependencies = [
  "futures",
  "itertools 0.10.1",
  "once_cell",
- "opentelemetry",
+ "opentelemetry 0.16.0",
  "prisma-models",
  "prisma-value",
  "quaint",
@@ -4216,7 +4244,7 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-futures",
- "tracing-opentelemetry",
+ "tracing-opentelemetry 0.16.0",
  "user-facing-errors",
  "uuid",
 ]
@@ -4900,11 +4928,24 @@ version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cccdf13c28f1654fe806838f28c5b9cb23ca4c0eae71450daa489f50e523ceb1"
 dependencies = [
- "opentelemetry",
+ "opentelemetry 0.12.0",
  "tracing",
  "tracing-core",
  "tracing-log",
  "tracing-subscriber 0.2.24",
+]
+
+[[package]]
+name = "tracing-opentelemetry"
+version = "0.16.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3ffbf13a0f8b054a4e59df3a173b818e9c6177c02789871f2073977fd0062076"
+dependencies = [
+ "opentelemetry 0.16.0",
+ "tracing",
+ "tracing-core",
+ "tracing-log",
+ "tracing-subscriber 0.3.2",
 ]
 
 [[package]]
