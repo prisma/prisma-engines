@@ -53,6 +53,7 @@ impl ConnectorTagInterface for PostgresConnectorTag {
             Some(PostgresVersion::Cockroach) if is_ci => {
                 format!("postgresql://root@test-db-cockroach:5436/{0}?schema={0}", database)
             }
+
             Some(PostgresVersion::V9) => format!("postgresql://postgres:prisma@127.0.0.1:5431/db?schema={}", database),
             Some(PostgresVersion::V10) => format!("postgresql://postgres:prisma@127.0.0.1:5432/db?schema={}", database),
             Some(PostgresVersion::V11) => format!("postgresql://postgres:prisma@127.0.0.1:5433/db?schema={}", database),
