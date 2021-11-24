@@ -361,7 +361,6 @@ fn new_model(model_name: &str) -> Model {
     let primary_key = PrimaryKeyDefinition {
         name: None,
         db_name: None,
-        //TODO(extended indexes) If the flag is enabled this should return the sort, otherwise not
         fields: vec![PrimaryKeyField {
             name: "id".to_string(),
             sort_order: None,
@@ -491,7 +490,28 @@ fn add_indices_to_models(
     }
 }
 
-/// In a case of
+/// In a case of a fulltext index, the index definition is super weird. Let's imagine the
+/// following:
+///
+/// ```ignore
+/// @@fulltext([a(sort: Desc), b, c, d, e(sort: Asc)])
+/// ```
+///
+/// When we push this to the database, we pull the following bson out:
+///
+/// ```ignore
+/// { "a" -1, "_fts": -1, "_ftsx": 1, "e": 1 }
+/// ```
+///
+/// The keys that are part of the text index, `b`, `c` and `d`, are combined into two index keys:
+/// `_fts` and `_ftsx`. This will break our data model, diffing and all if we just handle them
+/// as-is.
+///
+/// Therefore we must take a look into the headers, where we have specified the index weights. In
+/// this parameter we have listed all the fields that are part of the text index, in this case `b`,
+/// `c`, and `d`. These can come in any order, but when we define a full-text index in mongo, the
+/// order of the text columns in the bunch doesn't matter, only the order in comparison with the
+/// non-text columns (defined with the sort param) matters.
 fn sanitize_index_fields(fields: Vec<IndexField>, opts: Option<&IndexOptions>) -> Vec<IndexField> {
     let is_fts = |f: &IndexField| f.name == "_fts" || f.name == "_ftsx";
 
