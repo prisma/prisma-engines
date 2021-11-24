@@ -1048,7 +1048,7 @@
                 <span class="ident">errors</span>.<span class="ident">push</span>((
                     <span class="kw-2">*</span><span class="ident">alias_id</span>,
                     <span class="ident">DatamodelError::new_validation_error</span>(
-                        <span class="kw-2">&amp;</span><span class="macro">format!</span>(
+                        <span class="macro">format!</span>(
                             <span class="string">&quot;Recursive type definitions are not allowed. Recursive path was: {} -&gt; {}.&quot;</span>,
                             <span class="ident">path</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="kw-2">*</span><span class="ident">id</span>].<span class="ident">name</span>.<span class="ident">name</span>).<span class="ident">join</span>(<span class="string">&quot; -&gt; &quot;</span>),
                             <span class="kw-2">&amp;</span><span class="ident">next_alias</span>.<span class="ident">name</span>.<span class="ident">name</span>,
@@ -1109,7 +1109,7 @@
 <span class="kw">fn</span> <span class="ident">visit_enum</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>(<span class="ident">enm</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::Enum</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>) {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">active_connector</span>().<span class="ident">supports_enums</span>() {
         <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(
-            <span class="kw-2">&amp;</span><span class="macro">format!</span>(
+            <span class="macro">format!</span>(
                 <span class="string">&quot;You defined the enum `{}`. But the current connector does not support enums.&quot;</span>,
                 <span class="kw-2">&amp;</span><span class="ident">enm</span>.<span class="ident">name</span>.<span class="ident">name</span>
             ),
@@ -1119,7 +1119,7 @@
 
     <span class="kw">if</span> <span class="ident">enm</span>.<span class="ident">values</span>.<span class="ident">is_empty</span>() {
         <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(
-            <span class="string">&quot;An enum must have at least one value.&quot;</span>,
+            <span class="string">&quot;An enum must have at least one value.&quot;</span>.<span class="ident">to_owned</span>(),
             <span class="ident">enm</span>.<span class="ident">span</span>,
         ))
     }
@@ -1131,7 +1131,7 @@
             <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">types</span>.<span class="ident">type_aliases</span>.<span class="ident">insert</span>(<span class="ident">alias_id</span>, <span class="ident">scalar_field_type</span>);
         }
         <span class="prelude-val">Ok</span>(<span class="ident">FieldType::Model</span>(<span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(
-            <span class="string">&quot;Only scalar types can be used for defining custom types.&quot;</span>,
+            <span class="string">&quot;Only scalar types can be used for defining custom types.&quot;</span>.<span class="ident">to_owned</span>(),
             <span class="ident">alias</span>.<span class="ident">field_type</span>.<span class="ident">span</span>(),
         )),
         <span class="prelude-val">Err</span>(<span class="ident">supported</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_type_not_found_error</span>(
@@ -1203,7 +1203,7 @@
                         <span class="ident">unsupported_lit</span>, <span class="ident">ast_field</span>.<span class="ident">name</span>.<span class="ident">name</span>, <span class="ident">prisma_type</span>.<span class="ident">to_string</span>(), <span class="kw-2">&amp;</span><span class="ident">source</span>.<span class="ident">name</span>, <span class="ident">native_type</span>.<span class="ident">render</span>()
                     );
 
-                <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">ast_field</span>.<span class="ident">span</span>));
+                <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(<span class="ident">msg</span>, <span class="ident">ast_field</span>.<span class="ident">span</span>));
             }
         }
     }

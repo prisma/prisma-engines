@@ -1010,10 +1010,10 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast::SchemaAst</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::diagnostics</span>::{<span class="ident">ValidatedDatamodel</span>, <span class="ident">ValidatedMissingFields</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Datasource</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ast</span>, <span class="ident">ast::parser</span>::<span class="kw-2">*</span>, <span class="ident">ast::renderer</span>::<span class="kw-2">*</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ast</span>, <span class="ident">ast::renderer</span>::<span class="kw-2">*</span>};
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
-<span class="kw">use</span> <span class="ident">pest::iterators::Pair</span>;
-<span class="kw">use</span> <span class="ident">pest::Parser</span>;
+<span class="kw">use</span> <span class="ident">pest</span>::{<span class="ident">iterators::Pair</span>, <span class="ident">Parser</span>};
+<span class="kw">use</span> <span class="ident">schema_ast::parser</span>::{<span class="ident">PrismaDatamodelParser</span>, <span class="ident">Rule</span>};
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Reformatter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,

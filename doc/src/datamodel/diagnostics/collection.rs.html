@@ -102,6 +102,16 @@
 <span id="102">102</span>
 <span id="103">103</span>
 <span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::DatamodelError</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::diagnostics::warning::DatamodelWarning</span>;
 
@@ -198,6 +208,16 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">col</span> <span class="op">=</span> <span class="ident">Diagnostics::new</span>();
         <span class="ident">col</span>.<span class="ident">push_warning</span>(<span class="ident">warning</span>);
         <span class="ident">col</span>
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">schema_ast::parser::Diagnostics</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Diagnostics</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">src</span>: <span class="ident">schema_ast::parser::Diagnostics</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">errors</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DatamodelError</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">From::from</span>).<span class="ident">collect</span>();
+        <span class="ident">Diagnostics</span> {
+            <span class="ident">errors</span>,
+            <span class="ident">warnings</span>: <span class="ident">Vec::new</span>(),
+        }
     }
 }
 
