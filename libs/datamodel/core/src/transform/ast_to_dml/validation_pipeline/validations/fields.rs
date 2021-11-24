@@ -109,3 +109,21 @@ pub(crate) fn validate_length_used_with_correct_types(
         attribute.1,
     ));
 }
+
+pub(super) fn validate_native_type_arguments(field: ScalarFieldWalker<'_, '_>, diagnostics: &mut Diagnostics) {
+    let connector = field.db.active_connector();
+    let (scalar_type, native_type) = match (field.scalar_type(), field.native_type_instance()) {
+        (Some(scalar_type), Some(native_type)) => (scalar_type, native_type),
+        _ => return,
+    };
+
+    let mut errors = Vec::new();
+    connector.validate_native_type_arguments(&native_type, &scalar_type, &mut errors);
+
+    for error in errors {
+        diagnostics.push_error(DatamodelError::ConnectorError {
+            message: error.to_string(),
+            span: field.ast_field().span,
+        });
+    }
+}

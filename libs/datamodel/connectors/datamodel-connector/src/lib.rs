@@ -11,8 +11,8 @@ pub use referential_integrity::ReferentialIntegrity;
 
 use crate::connector_error::{ConnectorError, ConnectorErrorFactory, ErrorKind};
 use dml::{
-    field::Field, model::Model, native_type_constructor::NativeTypeConstructor,
-    native_type_instance::NativeTypeInstance, relation_info::ReferentialAction, scalars::ScalarType,
+    model::Model, native_type_constructor::NativeTypeConstructor, native_type_instance::NativeTypeInstance,
+    relation_info::ReferentialAction, scalars::ScalarType,
 };
 use enumflags2::BitFlags;
 use std::{borrow::Cow, collections::BTreeMap, str::FromStr};
@@ -67,7 +67,13 @@ pub trait Connector: Send + Sync {
         self.referential_actions(integrity).contains(action)
     }
 
-    fn validate_field(&self, _: &Field, _: &mut Vec<ConnectorError>) {}
+    fn validate_native_type_arguments(
+        &self,
+        _native_type: &NativeTypeInstance,
+        _scalar_type: &ScalarType,
+        _: &mut Vec<ConnectorError>,
+    ) {
+    }
 
     fn validate_model(&self, _: &Model, _: &mut Vec<ConnectorError>) {}
 
@@ -185,7 +191,7 @@ pub trait Connector: Send + Sync {
         self.has_capability(ConnectorCapability::RelationFieldsInArbitraryOrder)
     }
 
-    fn native_instance_error(&self, instance: NativeTypeInstance) -> ConnectorErrorFactory {
+    fn native_instance_error(&self, instance: &NativeTypeInstance) -> ConnectorErrorFactory {
         ConnectorErrorFactory {
             connector: self.name().to_owned(),
             native_type: instance.render(),
