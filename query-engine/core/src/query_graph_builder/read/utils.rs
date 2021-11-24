@@ -25,13 +25,7 @@ pub fn collect_selected_fields(
 ) -> FieldSelection {
     let fields = from_pairs
         .iter()
-        .filter_map(|pair| {
-            model
-                .fields()
-                .find_from_all(&pair.parsed_field.name)
-                .ok()
-                .map(|field| field.clone())
-        })
+        .filter_map(|pair| model.fields().find_from_all(&pair.parsed_field.name).ok().cloned())
         .collect::<Vec<Field>>();
 
     let model_id = model.primary_identifier();

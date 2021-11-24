@@ -194,15 +194,7 @@ pub async fn one2m(
         return Ok((ManyRecords::empty(selected_fields), None));
     }
 
-    // a roundtrip can be avoided if:
-    // - there is no additional filter
-    // - there is no aggregation selection
-    // - the selection set is the child_link_id
     let mut scalars = {
-        // if dbg!(query_args.do_nothing()) && aggr_selections.is_empty() && &child_link_id == selected_fields && false {
-        //     dbg!("SHORTCUT");
-        //     ManyRecords::from_projection(uniq_selections, selected_fields).with_unique_records()
-        // } else {
         let filter = child_link_id.is_in(uniq_selections);
         let mut args = query_args;
 
