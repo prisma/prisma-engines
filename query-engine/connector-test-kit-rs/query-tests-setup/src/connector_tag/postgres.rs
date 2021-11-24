@@ -51,7 +51,10 @@ impl ConnectorTagInterface for PostgresConnectorTag {
             // Use the same database and schema name for CockroachDB - unfortunately CockroachDB
             // can't handle 1 schema per test in a database well at this point in time.
             Some(PostgresVersion::Cockroach) if is_ci => {
-                format!("postgresql://root@test-db-cockroach:5436/{0}?schema={0}", database)
+                format!(
+                    "postgresql://root@test-db-postgres-cockroach:5436/{0}?schema={0}",
+                    database
+                )
             }
 
             Some(PostgresVersion::V9) => format!("postgresql://postgres:prisma@127.0.0.1:5431/db?schema={}", database),
