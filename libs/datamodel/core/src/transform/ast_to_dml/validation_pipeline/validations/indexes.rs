@@ -184,8 +184,8 @@ pub(crate) fn index_algorithm_preview_feature(
     }
 }
 
-/// `@@fulltext` index columns should not define `length` or `sort` argument (yet).
-pub(crate) fn fulltext_columns_should_not_use_arguments(
+/// `@@fulltext` index columns should not define `length` argument.
+pub(crate) fn fulltext_columns_should_not_define_length(
     db: &ParserDatabase<'_>,
     index: IndexWalker<'_, '_>,
     diagnostics: &mut Diagnostics,
@@ -202,11 +202,8 @@ pub(crate) fn fulltext_columns_should_not_use_arguments(
         return;
     }
 
-    if index
-        .scalar_field_attributes()
-        .any(|f| f.length().is_some() || f.sort_order().is_some())
-    {
-        let message = "The length and sort arguments are not supported in a @@fulltext attribute.";
+    if index.scalar_field_attributes().any(|f| f.length().is_some()) {
+        let message = "The length argument is not supported in a @@fulltext attribute.";
         let span = index
             .ast_attribute()
             .map(|i| i.span)
@@ -217,6 +214,113 @@ pub(crate) fn fulltext_columns_should_not_use_arguments(
             index.attribute_name(),
             span,
         ));
+    }
+}
+
+/// Only MongoDB supports sort order in a fulltext index.
+pub(crate) fn fulltext_column_sort_is_supported(
+    db: &ParserDatabase<'_>,
+    index: IndexWalker<'_, '_>,
+    diagnostics: &mut Diagnostics,
+) {
+    if !db.preview_features.contains(PreviewFeature::FullTextIndex) {
+        return;
+    }
+
+    if !db.active_connector().has_capability(ConnectorCapability::FullTextIndex) {
+        return;
+    }
+
+    if !index.attribute().is_fulltext() {
+        return;
+    }
+
+    if db
+        .active_connector()
+        .has_capability(ConnectorCapability::SortOrderInFullTextIndex)
+    {
+        return;
+    }
+
+    if index.scalar_field_attributes().any(|f| f.sort_order().is_some()) {
+        let message = "The sort argument is not supported in a @@fulltext attribute in the current connector.";
+        let span = index
+            .ast_attribute()
+            .map(|i| i.span)
+            .unwrap_or_else(|| index.model().ast_model().span);
+
+        diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+            message,
+            index.attribute_name(),
+            span,
+        ));
+    }
+}
+
+/// Mongo wants all text keys to be bundled together, so e.g. this doesn't work:
+///
+/// ```ignore
+/// @@fulltext([a(sort: Asc), b, c(sort: Asc), d])
+/// ```
+pub(crate) fn fulltext_text_columns_should_be_bundled_together(
+    db: &ParserDatabase<'_>,
+    index: IndexWalker<'_, '_>,
+    diagnostics: &mut Diagnostics,
+) {
+    if !db.preview_features.contains(PreviewFeature::FullTextIndex) {
+        return;
+    }
+
+    if !db.active_connector().has_capability(ConnectorCapability::FullTextIndex) {
+        return;
+    }
+
+    if !index.attribute().is_fulltext() {
+        return;
+    }
+
+    if !db
+        .active_connector()
+        .has_capability(ConnectorCapability::SortOrderInFullTextIndex)
+    {
+        return;
+    }
+
+    enum State {
+        // The empty state in the beginning. Must move to another state in every case.
+        Init,
+        // We've only had sorted fields so far.
+        SortParamHead,
+        // The bundle of text fields, we can have only one per index.
+        TextFieldBundle,
+        // The sort params after one text bundle.
+        SortParamTail,
+    }
+
+    let mut state = State::Init;
+
+    for field in index.scalar_field_attributes() {
+        state = match state {
+            State::Init if field.sort_order().is_some() => State::SortParamHead,
+            State::SortParamHead if field.sort_order().is_some() => State::SortParamHead,
+            State::TextFieldBundle if field.sort_order().is_some() => State::SortParamTail,
+            State::SortParamTail if field.sort_order().is_some() => State::SortParamTail,
+            State::Init | State::SortParamHead | State::TextFieldBundle => State::TextFieldBundle,
+            State::SortParamTail => {
+                let message = "All index fields must be listed adjacently in the fields argument.";
+
+                let span = index
+                    .ast_attribute()
+                    .map(|i| i.span)
+                    .unwrap_or_else(|| index.model().ast_model().span);
+
+                diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+                    message, "fulltext", span,
+                ));
+
+                return;
+            }
+        }
     }
 }
 

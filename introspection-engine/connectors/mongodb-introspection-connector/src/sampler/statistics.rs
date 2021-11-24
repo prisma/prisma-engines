@@ -13,6 +13,7 @@ use enumflags2::BitFlags;
 use introspection_connector::Warning;
 use mongodb::{
     bson::{Bson, Document},
+    options::IndexOptions,
     IndexModel,
 };
 use native_types::MongoDbType;
@@ -434,59 +435,98 @@ fn add_indices_to_models(
                 continue;
             }
 
-            // Points to a field that does not exist (yet).
-            if !index.keys.keys().all(|k| {
-                model
-                    .fields
-                    .iter()
-                    .any(|f| f.name() == k || f.database_name() == Some(k))
-            }) {
-                continue;
-            }
-
             let tpe = index
                 .options
                 .as_ref()
-                .and_then(|opts| opts.unique)
-                .map(|uniq| if uniq { IndexType::Unique } else { IndexType::Normal })
+                .map(|opts| match (opts.unique, opts.text_index_version.as_ref()) {
+                    (Some(_), _) => IndexType::Unique,
+                    (_, Some(_)) => IndexType::Fulltext,
+                    _ => IndexType::Normal,
+                })
                 .unwrap_or(IndexType::Normal);
 
-            let db_name = index.options.and_then(|opts| opts.name);
+            if tpe.is_fulltext() && !preview_features.contains(PreviewFeature::FullTextIndex) {
+                continue;
+            }
 
             let fields = index
                 .keys
                 .into_iter()
                 //TODO(extended indices) is the value here always the sort order? the driver docs are unclear
                 // If the flag is enabled this should return the sort, otherwise not
-                .map(|(k, v)| {
-                    let field_name = match sanitize_string(&k) {
-                        Some(sanitized) => sanitized,
-                        None => k,
-                    };
-
-                    let sort_order = match v.as_i32() {
-                        _ if !preview_features.contains(PreviewFeature::ExtendedIndexes) => None,
-                        Some(-1) => Some(SortOrder::Desc),
-                        _ => Some(SortOrder::Asc),
-                    };
+                .map(|(name, v)| {
+                    let sort_order = v.as_i32().map(|v| match v {
+                        -1 => SortOrder::Desc,
+                        _ => SortOrder::Asc,
+                    });
 
                     IndexField {
-                        name: field_name,
+                        name,
                         sort_order,
                         length: None,
                     }
                 })
                 .collect();
 
+            let fields = sanitize_index_fields(fields, index.options.as_ref());
+
+            if !fields.iter().all(|indf| {
+                model
+                    .fields
+                    .iter()
+                    .any(|mf| mf.name() == indf.name || mf.database_name() == Some(&indf.name))
+            }) {
+                continue;
+            }
+
             model.add_index(IndexDefinition {
                 fields,
                 tpe,
                 defined_on_field,
-                db_name,
+                db_name: index.options.and_then(|opts| opts.name),
                 name: None,
                 algorithm: None,
             });
         }
+    }
+}
+
+/// In a case of
+fn sanitize_index_fields(fields: Vec<IndexField>, opts: Option<&IndexOptions>) -> Vec<IndexField> {
+    let is_fts = |f: &IndexField| f.name == "_fts" || f.name == "_ftsx";
+
+    let sanitize = |mut field: IndexField| {
+        if let Some(name) = sanitize_string(&field.name) {
+            field.name = name;
+        }
+
+        field
+    };
+
+    let fts_field = |name: String| IndexField {
+        name: sanitize_string(&name).unwrap_or(name),
+        sort_order: None,
+        length: None,
+    };
+
+    if fields.iter().any(is_fts) {
+        let head = fields.iter().take_while(|f| !is_fts(f)).cloned();
+
+        let middle = opts
+            .and_then(|o| o.weights.as_ref())
+            .into_iter()
+            .flat_map(|weights| weights.keys().map(ToString::to_string))
+            .map(fts_field);
+
+        let tail = fields
+            .iter()
+            .skip_while(|f| !is_fts(f))
+            .skip_while(|f| is_fts(f))
+            .cloned();
+
+        head.chain(middle).chain(tail).collect()
+    } else {
+        fields.into_iter().map(sanitize).collect()
     }
 }
 

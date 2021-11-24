@@ -1,0 +1,31 @@
+[+] Collection `User`
+[+] Index `User_age_firstName_lastName_location_idx` on ({"age":-1,"firstName":"text","lastName":"text","location":1})
+
+------
+
+{
+  "collections": {
+    "User": {
+      "indexes": [
+        {
+          "name": "_id_",
+          "is_unique": false,
+          "keys": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "User_age_firstName_lastName_location_idx",
+          "is_unique": false,
+          "keys": {
+            "age": -1,
+            "_fts": "text",
+            "_ftsx": 1,
+            "location": 1
+          }
+        }
+      ],
+      "documents": []
+    }
+  }
+}

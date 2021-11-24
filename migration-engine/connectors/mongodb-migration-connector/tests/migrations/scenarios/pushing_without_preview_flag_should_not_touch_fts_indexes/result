@@ -1,0 +1,29 @@
+
+------
+
+{
+  "collections": {
+    "User": {
+      "indexes": [
+        {
+          "name": "_id_",
+          "is_unique": false,
+          "keys": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "UserExistingIndex",
+          "is_unique": false,
+          "keys": {
+            "age": -1,
+            "_fts": "text",
+            "_ftsx": 1,
+            "location": 1
+          }
+        }
+      ],
+      "documents": []
+    }
+  }
+}

@@ -1,0 +1,29 @@
+[+] Collection `User`
+[+] Index `User_firstName_lastName_idx` on ({"firstName":"text","lastName":"text"})
+
+------
+
+{
+  "collections": {
+    "User": {
+      "indexes": [
+        {
+          "name": "_id_",
+          "is_unique": false,
+          "keys": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "User_firstName_lastName_idx",
+          "is_unique": false,
+          "keys": {
+            "_fts": "text",
+            "_ftsx": 1
+          }
+        }
+      ],
+      "documents": []
+    }
+  }
+}

@@ -1,5 +1,6 @@
 mod walkers;
 
+use datamodel::IndexType;
 pub(crate) use walkers::IndexWalker;
 
 use mongodb::bson::Document;
@@ -20,7 +21,7 @@ struct Collection {
 struct Index {
     name: String,
     keys: Document,
-    is_unique: bool,
+    tpe: IndexType,
     collection_id: CollectionId,
 }
 
@@ -62,12 +63,12 @@ impl MongoSchema {
         CollectionId(self.collections.len() as u32 - 1)
     }
 
-    pub(crate) fn push_index(&mut self, collection_id: CollectionId, name: String, is_unique: bool, keys: Document) {
+    pub(crate) fn push_index(&mut self, collection_id: CollectionId, name: String, tpe: IndexType, keys: Document) {
         let index_id = IndexId(self.indexes.len() as u32);
         self.indexes.push(Index {
             name,
             keys,
-            is_unique,
+            tpe,
             collection_id,
         });
         self.collection_indexes.insert((collection_id, index_id));
