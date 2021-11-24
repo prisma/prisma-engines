@@ -121,7 +121,7 @@ fn should_fail_on_custom_related_types() {
     let error = parse_error(dml);
 
     error.assert_is(DatamodelError::new_validation_error(
-        "Only scalar types can be used for defining custom types.",
+        "Only scalar types can be used for defining custom types.".to_owned(),
         ast::Span::new(25, 29),
     ));
 }
@@ -273,11 +273,11 @@ fn should_fail_on_native_type_in_unsupported_postgres() {
 
     error.assert_are(&[
         DatamodelError::new_validation_error(
-        "The type `Unsupported(\"Decimal(10,2)\")` you specified in the type definition for the field `decimal` is supported as a native type by Prisma. Please use the native type notation `Decimal @pg.Decimal(10,2)` for full support.",
+        "The type `Unsupported(\"Decimal(10,2)\")` you specified in the type definition for the field `decimal` is supported as a native type by Prisma. Please use the native type notation `Decimal @pg.Decimal(10,2)` for full support.".to_owned(),
         ast::Span::new(172, 217),
     ),
         DatamodelError::new_validation_error(
-            "The type `Unsupported(\"Text\")` you specified in the type definition for the field `text` is supported as a native type by Prisma. Please use the native type notation `String @pg.Text` for full support.",
+            "The type `Unsupported(\"Text\")` you specified in the type definition for the field `text` is supported as a native type by Prisma. Please use the native type notation `String @pg.Text` for full support.".to_owned(),
             ast::Span::new(229, 265),
         )
     ]);
@@ -302,11 +302,11 @@ fn should_fail_on_native_type_in_unsupported_mysql() {
 
     error.assert_are(&[
         DatamodelError::new_validation_error(
-            "The type `Unsupported(\"Text\")` you specified in the type definition for the field `text` is supported as a native type by Prisma. Please use the native type notation `String @pg.Text` for full support.",
+            "The type `Unsupported(\"Text\")` you specified in the type definition for the field `text` is supported as a native type by Prisma. Please use the native type notation `String @pg.Text` for full support.".to_owned(),
             ast::Span::new(160, 192),
         ),
         DatamodelError::new_validation_error(
-            "The type `Unsupported(\"Float\")` you specified in the type definition for the field `decimal` is supported as a native type by Prisma. Please use the native type notation `Float @pg.Float` for full support.",
+            "The type `Unsupported(\"Float\")` you specified in the type definition for the field `decimal` is supported as a native type by Prisma. Please use the native type notation `Float @pg.Float` for full support.".to_owned(),
             ast::Span::new(204, 237),
         )
     ]);
@@ -332,11 +332,11 @@ fn should_fail_on_native_type_in_unsupported_sqlserver() {
 
     error.assert_are(&[
         DatamodelError::new_validation_error(
-            "The type `Unsupported(\"Text\")` you specified in the type definition for the field `text` is supported as a native type by Prisma. Please use the native type notation `String @pg.Text` for full support.",
+            "The type `Unsupported(\"Text\")` you specified in the type definition for the field `text` is supported as a native type by Prisma. Please use the native type notation `String @pg.Text` for full support.".to_owned(),
             ast::Span::new(168, 200),
         ),
         DatamodelError::new_validation_error(
-            "The type `Unsupported(\"Real\")` you specified in the type definition for the field `decimal` is supported as a native type by Prisma. Please use the native type notation `Float @pg.Real` for full support.",
+            "The type `Unsupported(\"Real\")` you specified in the type definition for the field `decimal` is supported as a native type by Prisma. Please use the native type notation `Float @pg.Real` for full support.".to_owned(),
             ast::Span::new(212, 244),
         )
     ]);

@@ -29,26 +29,25 @@ impl ToIdentifier for pest::iterators::Pair<'_, Rule> {
     }
 }
 
-pub trait TokenExtensions {
+pub trait TokenExtensions<'a> {
     /// Gets the first child token that is relevant.
     /// Irrelevant Tokens are e.g. new lines which we do not want to match during parsing.
-    fn first_relevant_child(&self) -> Token<'_>;
+    fn first_relevant_child(&self) -> Token<'a>;
 
     /// Returns all child token of this Token that are relevant.
     /// Irrelevant Tokens are e.g. new lines which we do not want to match during parsing.
-    fn relevant_children(&self) -> Vec<Token<'_>>;
+    fn relevant_children(&self) -> Vec<Token<'a>>;
 }
 
-// this is not implemented for Token because auto completion does not work then
-impl TokenExtensions for pest::iterators::Pair<'_, Rule> {
-    fn first_relevant_child(&self) -> Token<'_> {
+impl<'a> TokenExtensions<'a> for pest::iterators::Pair<'a, Rule> {
+    fn first_relevant_child(&self) -> Token<'a> {
         self.relevant_children()
             .into_iter()
             .next()
             .unwrap_or_else(|| panic!("Token `{}` had no children.", &self))
     }
 
-    fn relevant_children(&self) -> Vec<Token<'_>> {
+    fn relevant_children(&self) -> Vec<Token<'a>> {
         self.clone()
             .into_inner()
             .filter(|rule| {

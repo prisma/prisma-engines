@@ -314,10 +314,10 @@ impl DatamodelError {
         }
     }
 
-    pub fn new_enum_validation_error(message: &str, enum_name: &str, span: Span) -> DatamodelError {
+    pub fn new_enum_validation_error(message: String, enum_name: String, span: Span) -> DatamodelError {
         DatamodelError::EnumValidationError {
-            message: String::from(message),
-            r#enum_name: String::from(enum_name),
+            message,
+            enum_name,
             span,
         }
     }
@@ -355,11 +355,8 @@ impl DatamodelError {
         }
     }
 
-    pub fn new_validation_error(message: &str, span: Span) -> DatamodelError {
-        DatamodelError::ValidationError {
-            message: String::from(message),
-            span,
-        }
+    pub fn new_validation_error(message: String, span: Span) -> DatamodelError {
+        DatamodelError::ValidationError { message, span }
     }
 
     pub fn new_legacy_parser_error(message: &str, span: Span) -> DatamodelError {
@@ -512,5 +509,27 @@ impl DatamodelError {
 
     pub fn pretty_print(&self, f: &mut dyn std::io::Write, file_name: &str, text: &str) -> std::io::Result<()> {
         pretty_print(f, file_name, text, self.span(), self.description().as_str())
+    }
+}
+
+impl From<schema_ast::parser::ParserError> for DatamodelError {
+    fn from(err: schema_ast::parser::ParserError) -> Self {
+        match err {
+            schema_ast::parser::ParserError::ParserError(message, span) => {
+                DatamodelError::new_parser_error(&message, span)
+            }
+            schema_ast::parser::ParserError::ValidationError(message, span) => {
+                DatamodelError::new_validation_error(message, span)
+            }
+            schema_ast::parser::ParserError::LegacyParserError(message, span) => {
+                DatamodelError::new_legacy_parser_error(message, span)
+            }
+            schema_ast::parser::ParserError::EnumValidationError(message, enum_name, span) => {
+                DatamodelError::new_enum_validation_error(message, enum_name, span)
+            }
+            schema_ast::parser::ParserError::ModelValidationError(message, model_name, span) => {
+                DatamodelError::new_model_validation_error(&message, &model_name, span)
+            }
+        }
     }
 }
