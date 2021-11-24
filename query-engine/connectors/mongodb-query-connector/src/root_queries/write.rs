@@ -3,18 +3,19 @@ use crate::{
     filter::{convert_filter, MongoFilter},
     output_meta,
     query_builder::MongoReadQueryBuilder,
-    BsonTransform, IntoBson,
+    root_queries::raw::{MongoCommand, MongoOperation},
+    vacuum_cursor, BsonTransform, IntoBson,
 };
 use connector_interface::*;
+use itertools::Itertools;
 use mongodb::{
     bson::{doc, Document},
     error::ErrorKind,
     options::InsertManyOptions,
-    ClientSession, Collection, Database,
+    ClientSession, Collection, Database, SessionCursor,
 };
 use prisma_models::{ModelRef, PrismaValue, RecordProjection};
-use serde_json::Value;
-use std::convert::TryInto;
+use std::convert::{TryFrom, TryInto};
 
 /// Create a single record to the database resulting in a
 /// `RecordProjection` as an identifier pointing to the just-created document.
@@ -386,8 +387,8 @@ pub async fn execute_raw<'conn>(
     query: String,
     _parameters: Vec<PrismaValue>,
 ) -> crate::Result<usize> {
-    let query_json: Value = serde_json::from_str(query.as_str())?;
-    let query_bson: Bson = query_json.try_into()?;
+    let query_json: serde_json::Value = serde_json::from_str(query.as_str())?;
+    let query_bson = Bson::try_from(query_json)?;
     let cmd = query_bson.into_document()?;
 
     database.run_command_with_session(cmd, None, session).await?;
@@ -403,12 +404,98 @@ pub async fn query_raw<'conn>(
     query: String,
     _parameters: Vec<PrismaValue>,
 ) -> crate::Result<serde_json::Value> {
-    let query_json: Value = serde_json::from_str(query.as_str())?;
-    let query_bson: Bson = query_json.try_into()?;
-    let cmd = query_bson.into_document()?;
+    let query_json: serde_json::Value = serde_json::from_str(query.as_str())?;
+    let query_bson = Bson::try_from(query_json)?;
+    let document = query_bson.into_document()?;
+    let mongo_command = MongoCommand::try_from(document)?;
 
-    let bson_result = Bson::Document(database.run_command_with_session(cmd, None, session).await?);
-    let json_result: Value = bson_result.into();
+    let json_result = match mongo_command {
+        MongoCommand::Raw { cmd } => {
+            let result = database.run_command_with_session(cmd, None, session).await?;
+            let json_result: serde_json::Value = Bson::Document(result).into();
+
+            json_result
+        }
+        MongoCommand::Handled { collection, operation } => {
+            let coll = database.collection::<Document>(collection.as_str());
+
+            match operation {
+                MongoOperation::Find(filter, options) => {
+                    let cursor = coll.find_with_session(filter, Some(options), session).await?;
+
+                    cursor_to_json(cursor, session).await?
+                }
+                MongoOperation::FindAndUpdate(filter, modifications, options) => {
+                    let find_one_result = coll
+                        .find_one_and_update_with_session(filter, modifications, options, session)
+                        .await?;
+                    let bson = find_one_result.map(Bson::Document).unwrap_or(Bson::Null);
+                    let json: serde_json::Value = bson.into();
+
+                    json
+                }
+                MongoOperation::FindAndReplace(filter, replacement, options) => {
+                    let find_one_result = coll
+                        .find_one_and_replace_with_session(filter, replacement, options, session)
+                        .await?;
+                    let bson = find_one_result.map(Bson::Document).unwrap_or(Bson::Null);
+                    let json: serde_json::Value = bson.into();
+
+                    json
+                }
+                MongoOperation::FindAndDelete(filter, options) => {
+                    let find_one_result = coll.find_one_and_delete_with_session(filter, options, session).await?;
+                    let bson = find_one_result.map(Bson::Document).unwrap_or(Bson::Null);
+                    let json: serde_json::Value = bson.into();
+
+                    json
+                }
+                MongoOperation::Aggregate(pipeline, options) => {
+                    let cursor = coll.aggregate_with_session(pipeline, options, session).await?;
+
+                    cursor_to_json(cursor, session).await?
+                }
+                MongoOperation::Count(filter, options) => {
+                    let count_res = coll.count_documents_with_session(filter, options, session).await?;
+                    let json: serde_json::Value = count_res.into();
+
+                    json
+                }
+                MongoOperation::Distinct(key, filter, options) => {
+                    let distinct_result = coll.distinct_with_session(key, filter, options, session).await?;
+                    let bson = Bson::Array(distinct_result);
+                    let json: serde_json::Value = bson.into();
+
+                    json
+                }
+                MongoOperation::DeleteOne(_, _) => todo!(),
+                MongoOperation::DeleteMany(_, _) => todo!(),
+                MongoOperation::UpdateOne(_, _, _) => todo!(),
+                MongoOperation::UpdateMany(_, _, _) => todo!(),
+                MongoOperation::InsertMany(inserts, options) => {
+                    let insert_result = coll.insert_many_with_session(inserts, options, session).await?;
+                    let json_str = serde_json::to_string(&insert_result)?;
+                    let json = serde_json::from_str(json_str.as_str())?;
+
+                    json
+                }
+            }
+        }
+    };
+
+    Ok(json_result)
+}
+
+async fn cursor_to_json(
+    cursor: SessionCursor<Document>,
+    session: &mut ClientSession,
+) -> crate::Result<serde_json::Value> {
+    let bson_result = vacuum_cursor(cursor, session)
+        .await?
+        .into_iter()
+        .map(Bson::Document)
+        .collect_vec();
+    let json_result: serde_json::Value = Bson::Array(bson_result).into();
 
     Ok(json_result)
 }

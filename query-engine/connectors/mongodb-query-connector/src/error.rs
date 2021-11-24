@@ -1,7 +1,7 @@
 use connector_interface::error::{ConnectorError, ErrorKind, MultiError};
 use itertools::Itertools;
 use mongodb::{
-    bson::extjson,
+    bson::{self, extjson},
     error::{CommandError, Error as DriverError},
 };
 use regex::Regex;
@@ -34,6 +34,12 @@ pub enum MongoError {
 
     #[error("{0}")]
     JsonError(#[from] serde_json::Error),
+
+    #[error("{0}")]
+    BsonDeserializationError(#[from] bson::de::Error),
+
+    #[error("Query raw error: {0}.")]
+    QueryRawError(String),
 }
 
 // Error translation is WIP.
@@ -44,6 +50,10 @@ impl MongoError {
             MongoError::UnhandledError(reason) => ConnectorError::from_kind(ErrorKind::UnsupportedFeature(reason)),
             MongoError::UuidError(err) => ConnectorError::from_kind(ErrorKind::ConversionError(err.into())),
             MongoError::JsonError(err) => ConnectorError::from_kind(ErrorKind::ConversionError(err.into())),
+            MongoError::BsonDeserializationError(err) => {
+                ConnectorError::from_kind(ErrorKind::ConversionError(err.into()))
+            }
+            MongoError::QueryRawError(message) => ConnectorError::from_kind(ErrorKind::RawApiError(message)),
 
             err @ MongoError::ConversionError { .. } => {
                 ConnectorError::from_kind(ErrorKind::ConversionError(err.into()))
@@ -70,7 +80,7 @@ impl MongoError {
                 mongodb::error::ErrorKind::Write(write_failure) => match write_failure {
                     mongodb::error::WriteFailure::WriteConcernError(concern_error) => match concern_error.code {
                         11000 => ConnectorError::from_kind(unique_violation_error(concern_error.message.as_str())),
-                        code => ConnectorError::from_kind(ErrorKind::RawError {
+                        code => ConnectorError::from_kind(ErrorKind::RawDatabaseError {
                             code: code.to_string(),
                             message: concern_error.message.clone(),
                         }),
@@ -78,7 +88,7 @@ impl MongoError {
 
                     mongodb::error::WriteFailure::WriteError(write_error) => match write_error.code {
                         11000 => ConnectorError::from_kind(unique_violation_error(write_error.message.as_str())),
-                        code => ConnectorError::from_kind(ErrorKind::RawError {
+                        code => ConnectorError::from_kind(ErrorKind::RawDatabaseError {
                             code: code.to_string(),
                             message: write_error.message.clone(),
                         }),
@@ -93,7 +103,7 @@ impl MongoError {
                             .iter()
                             .map(|err| match err.code {
                                 11000 => unique_violation_error(err.message.as_str()),
-                                _ => ErrorKind::RawError {
+                                _ => ErrorKind::RawDatabaseError {
                                     code: err.code.to_string(),
                                     message: format!(
                                         "Bulk write error on write index '{}': {}",
@@ -109,7 +119,7 @@ impl MongoError {
                     if let Some(ref err) = err.write_concern_error {
                         let kind = match err.code {
                             11000 => unique_violation_error(err.message.as_str()),
-                            _ => ErrorKind::RawError {
+                            _ => ErrorKind::RawDatabaseError {
                                 code: err.code.to_string(),
                                 message: format!("Bulk write concern error: {}", err.message),
                             },
@@ -133,7 +143,7 @@ impl MongoError {
                     ErrorKind::InternalConversionError(format!("BSON encode error: {}", err)),
                 ),
 
-                _ => ConnectorError::from_kind(ErrorKind::RawError {
+                _ => ConnectorError::from_kind(ErrorKind::RawDatabaseError {
                     code: "unknown".to_owned(),
                     message: format!("{}", err),
                 }),
