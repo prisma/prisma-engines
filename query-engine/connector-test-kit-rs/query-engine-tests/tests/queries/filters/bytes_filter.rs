@@ -63,6 +63,16 @@ mod bytes_filter_spec {
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { bytes: { in: ["dGVzdA==", "dA=="] }}) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { bytes: { not: { in: ["dGVzdA=="] }}}) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+
         Ok(())
     }
 
