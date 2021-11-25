@@ -83,7 +83,6 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::CreateManyWriteableAutoIncId,
     ConnectorCapability::CreateSkipDuplicates,
     ConnectorCapability::Enums,
-    ConnectorCapability::ForeignKeys,
     ConnectorCapability::FullTextSearchWithoutIndex,
     ConnectorCapability::InsensitiveFilters,
     ConnectorCapability::Json,

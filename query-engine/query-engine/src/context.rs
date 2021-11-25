@@ -70,6 +70,7 @@ impl PrismaContext {
             enable_raw_queries,
             data_source.capabilities(),
             preview_features,
+            data_source.referential_integrity(),
         ));
 
         let context = Self {

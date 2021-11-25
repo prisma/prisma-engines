@@ -1,17 +1,20 @@
 use crate::dmmf::{schema::*, DataModelMetaFormat};
-use datamodel_connector::ConnectorCapabilities;
+use datamodel_connector::{ConnectorCapabilities, ReferentialIntegrity};
 use prisma_models::InternalDataModelBuilder;
 use query_core::{schema_builder, BuildMode, QuerySchema};
 use std::collections::HashMap;
 
 pub fn get_query_schema(datamodel_string: &str) -> (QuerySchema, datamodel::dml::Datamodel) {
     let config = datamodel::parse_configuration(datamodel_string).unwrap();
+    let datasource = config.subject.datasources.first();
     let dm = datamodel::parse_datamodel(datamodel_string).unwrap().subject;
 
-    let capabilities = match config.subject.datasources.first() {
-        Some(ds) => ds.capabilities(),
-        None => ConnectorCapabilities::empty(),
-    };
+    let capabilities = datasource
+        .map(|ds| ds.capabilities())
+        .unwrap_or(ConnectorCapabilities::empty());
+    let referential_integrity = datasource
+        .map(|ds| ds.referential_integrity())
+        .unwrap_or(ReferentialIntegrity::default());
 
     let internal_dm_template = InternalDataModelBuilder::new(datamodel_string);
     let internal_ref = internal_dm_template.build("db".to_owned());
@@ -21,6 +24,7 @@ pub fn get_query_schema(datamodel_string: &str) -> (QuerySchema, datamodel::dml:
         false,
         capabilities,
         config.subject.preview_features().iter().collect(),
+        referential_integrity,
     );
 
     (schema, dm)
