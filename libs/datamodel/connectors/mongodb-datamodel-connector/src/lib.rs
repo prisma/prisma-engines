@@ -6,7 +6,7 @@ use datamodel_connector::{
 };
 use dml::{
     default_value::DefaultKind, field::FieldType, native_type_instance::NativeTypeInstance,
-    relation_info::ReferentialAction, traits::WithDatabaseName,
+    relation_info::ReferentialAction, scalars::ScalarType, traits::WithDatabaseName,
 };
 use enumflags2::BitFlags;
 use mongodb_types::*;
@@ -43,6 +43,29 @@ impl Connector for MongoDbDatamodelConnector {
 
     fn referential_actions(&self, referential_integrity: &ReferentialIntegrity) -> BitFlags<ReferentialAction> {
         referential_integrity.allowed_referential_actions(BitFlags::empty())
+    }
+
+    fn validate_field_default(
+        &self,
+        field_name: &str,
+        _scalar_type: &ScalarType,
+        native_type: Option<&NativeTypeInstance>,
+        default: Option<&dml::default_value::DefaultValue>,
+        errors: &mut Vec<ConnectorError>,
+    ) {
+        if native_type.is_some() {
+            return;
+        }
+
+        if !matches!(default.map(|d| d.kind()), Some(dml::default_value::DefaultKind::Expression(expr)) if expr.is_dbgenerated())
+        {
+            return;
+        }
+
+        errors.push(ConnectorError::from_kind(ErrorKind::FieldValidationError {
+            field: field_name.to_owned(),
+            message: "MongoDB `@default(dbgenerated())` fields must have a native type annotation.".to_owned(),
+        }))
     }
 
     fn validate_model(&self, model: &dml::model::Model, errors: &mut Vec<ConnectorError>) {

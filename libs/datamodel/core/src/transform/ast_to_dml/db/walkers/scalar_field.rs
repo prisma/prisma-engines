@@ -115,6 +115,10 @@ impl<'ast, 'db> DefaultValueWalker<'ast, 'db> {
         })
     }
 
+    pub(crate) fn default(self) -> &'db DefaultValue {
+        self.default
+    }
+
     fn field(self) -> ScalarFieldWalker<'ast, 'db> {
         ScalarFieldWalker {
             model_id: self.model_id,

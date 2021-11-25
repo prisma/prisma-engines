@@ -67,6 +67,17 @@ pub trait Connector: Send + Sync {
         self.referential_actions(integrity).contains(action)
     }
 
+    fn validate_field_default(
+        &self,
+        _field_name: &str,
+        _scalar_type: &ScalarType,
+        _native_type: Option<&NativeTypeInstance>,
+        _default: Option<&dml::default_value::DefaultValue>,
+        _errors: &mut Vec<ConnectorError>,
+    ) {
+    }
+
+    /// Validate that the arguments passed to a native type attribute are valid.
     fn validate_native_type_arguments(
         &self,
         _native_type: &NativeTypeInstance,
