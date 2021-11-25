@@ -22,6 +22,8 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::ScalarLists,
     ConnectorCapability::InsensitiveFilters,
     ConnectorCapability::CompositeTypes,
+    ConnectorCapability::FullTextIndex,
+    ConnectorCapability::SortOrderInFullTextIndex,
 ];
 
 type Result<T> = std::result::Result<T, ConnectorError>;

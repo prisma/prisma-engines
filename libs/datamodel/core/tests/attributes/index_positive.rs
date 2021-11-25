@@ -1,6 +1,6 @@
 use crate::common::*;
 use crate::{with_header, Provider};
-use datamodel::{render_datamodel_to_string, IndexAlgorithm, IndexDefinition, IndexField, IndexType};
+use datamodel::{render_datamodel_to_string, IndexAlgorithm, IndexDefinition, IndexField, IndexType, SortOrder};
 
 #[test]
 fn basic_index_must_work() {
@@ -484,4 +484,101 @@ fn mysql_fulltext_index_map() {
         algorithm: None,
         defined_on_field: false,
     });
+}
+
+#[test]
+fn fulltext_index_mongodb() {
+    let dml = indoc! {r#"
+        model A {
+          id String  @id @map("_id") @test.ObjectId
+          a  String
+          b  String
+
+          @@fulltext([a, b])
+        }
+    "#};
+
+    let dml = with_header(dml, Provider::Mongo, &["fullTextIndex"]);
+
+    parse(&dml).assert_has_model("A").assert_has_index(IndexDefinition {
+        name: None,
+        db_name: Some("A_a_b_idx".to_string()),
+        fields: vec![IndexField::new("a"), IndexField::new("b")],
+        tpe: IndexType::Fulltext,
+        algorithm: None,
+        defined_on_field: false,
+    });
+}
+
+#[test]
+fn fulltext_index_sort_mongodb() {
+    let dml = indoc! {r#"
+        model A {
+          id String  @id @map("_id") @test.ObjectId
+          a  String
+          b  String
+
+          @@fulltext([a, b(sort: Desc)])
+        }
+    "#};
+
+    let dml = with_header(dml, Provider::Mongo, &["fullTextIndex", "extendedIndexes"]);
+
+    parse(&dml).assert_has_model("A").assert_has_index(IndexDefinition {
+        name: None,
+        db_name: Some("A_a_b_idx".to_string()),
+        fields: vec![
+            IndexField::new("a"),
+            IndexField {
+                name: "b".to_string(),
+                sort_order: Some(SortOrder::Desc),
+                length: None,
+            },
+        ],
+        tpe: IndexType::Fulltext,
+        algorithm: None,
+        defined_on_field: false,
+    });
+}
+
+#[test]
+fn multiple_fulltext_indexes_allowed_per_model_in_mysql() {
+    let dml = indoc! {r#"
+        model A {
+          id Int    @id
+          a  String
+          b  String
+          c  String
+          d  String
+
+          @@fulltext([a, b])
+          @@fulltext([a, b, c, d])
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mysql, &["fullTextIndex"]);
+
+    parse(&schema)
+        .assert_has_model("A")
+        .assert_has_index(IndexDefinition {
+            name: None,
+            db_name: Some("A_a_b_idx".to_string()),
+            fields: vec![IndexField::new("a"), IndexField::new("b")],
+            tpe: IndexType::Fulltext,
+            algorithm: None,
+            defined_on_field: false,
+        })
+        .assert_has_index(IndexDefinition {
+            name: None,
+            db_name: Some("A_a_b_c_d_idx".to_string()),
+            fields: vec![
+                IndexField::new("a"),
+                IndexField::new("b"),
+                IndexField::new("c"),
+                IndexField::new("d"),
+            ],
+            tpe: IndexType::Fulltext,
+            algorithm: None,
+            defined_on_field: false,
+        });
 }

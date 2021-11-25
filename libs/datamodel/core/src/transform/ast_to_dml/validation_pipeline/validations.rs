@@ -22,6 +22,7 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, r
         models::uses_sort_or_length_on_primary_without_preview_flag(db, model, diagnostics);
         models::primary_key_length_prefix_supported(db, model, diagnostics);
         models::primary_key_sort_order_supported(db, model, diagnostics);
+        models::only_one_fulltext_attribute_allowed(db, model, diagnostics);
 
         if let Some(pk) = model.primary_key() {
             for field_attribute in pk.scalar_field_attributes() {
@@ -60,7 +61,9 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, r
             indexes::index_algorithm_is_supported(db, index, diagnostics);
             indexes::fulltext_index_preview_feature_enabled(db, index, diagnostics);
             indexes::fulltext_index_supported(db, index, diagnostics);
-            indexes::fulltext_columns_should_not_use_arguments(db, index, diagnostics);
+            indexes::fulltext_columns_should_not_define_length(db, index, diagnostics);
+            indexes::fulltext_column_sort_is_supported(db, index, diagnostics);
+            indexes::fulltext_text_columns_should_be_bundled_together(db, index, diagnostics);
 
             for field_attribute in index.scalar_field_attributes() {
                 let span = index

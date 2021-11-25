@@ -153,7 +153,7 @@ impl<'a> LowerDmlToAst<'a> {
             .collect()
     }
 
-    pub fn index_field_array(fields: &[IndexField]) -> Vec<ast::Expression> {
+    pub fn index_field_array(fields: &[IndexField], always_render_sort_order: bool) -> Vec<ast::Expression> {
         fields
             .iter()
             .map(|f| {
@@ -161,11 +161,21 @@ impl<'a> LowerDmlToAst<'a> {
 
                 args.extend(f.length.map(|length| ast::Argument::new_numeric("length", length)));
 
-                args.extend(
-                    f.sort_order
+                if always_render_sort_order {
+                    let ordering = f.sort_order.map(|ordering| match ordering {
+                        SortOrder::Asc => ast::Argument::new_constant("sort", "Asc"),
+                        SortOrder::Desc => ast::Argument::new_constant("sort", "Desc"),
+                    });
+
+                    args.extend(ordering);
+                } else {
+                    let ordering = f
+                        .sort_order
                         .filter(|s| *s == SortOrder::Desc)
-                        .map(|_| ast::Argument::new_constant("sort", "Desc")),
-                );
+                        .map(|_| ast::Argument::new_constant("sort", "Desc"));
+
+                    args.extend(ordering);
+                }
 
                 ast::Expression::FieldWithArgs(f.name.clone(), args, ast::Span::empty())
             })

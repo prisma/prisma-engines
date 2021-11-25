@@ -110,6 +110,7 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::ForeignKeys,
     ConnectorCapability::IndexColumnLengthPrefixing,
     ConnectorCapability::FullTextIndex,
+    ConnectorCapability::MultipleFullTextAttributesPerModel,
 ];
 
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[ConstraintScope::GlobalForeignKey, ConstraintScope::ModelKeyIndex];

@@ -17,21 +17,22 @@ pub(crate) fn calculate(datamodel: &Datamodel) -> MongoSchema {
                 .iter()
                 .map(|field| {
                     let sf = model.find_scalar_field(&field.name).unwrap();
-                    (sf.db_name(), field.sort_order.unwrap_or(datamodel::SortOrder::Asc))
+                    (sf.db_name(), field.sort_order)
                 })
                 .map(|(name, sort_order)| {
                     (
                         name.to_owned(),
                         match sort_order {
-                            datamodel::SortOrder::Asc => Bson::Int32(1),
-                            datamodel::SortOrder::Desc => Bson::Int32(-1),
+                            Some(datamodel::SortOrder::Desc) => Bson::Int32(-1),
+                            None if index.is_fulltext() => Bson::String("text".to_string()),
+                            _ => Bson::Int32(1),
                         },
                     )
                 });
 
             path.extend(fields);
 
-            schema.push_index(collection_id, name, index.is_unique(), path);
+            schema.push_index(collection_id, name, index.tpe, path);
         }
     }
 

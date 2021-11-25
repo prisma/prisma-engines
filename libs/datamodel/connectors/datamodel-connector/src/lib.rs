@@ -289,6 +289,8 @@ capabilities!(
     PrimaryKeySortOrderDefinition,
     UsingHashIndex,
     FullTextIndex,
+    SortOrderInFullTextIndex,
+    MultipleFullTextAttributesPerModel,
     // Start of query-engine-only Capabilities
     InsensitiveFilters,
     CreateMany,

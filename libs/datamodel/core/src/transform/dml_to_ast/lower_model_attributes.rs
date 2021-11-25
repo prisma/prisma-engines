@@ -55,7 +55,7 @@ impl<'a> LowerDmlToAst<'a> {
             .iter()
             .filter(|index| index.is_unique() && !index.defined_on_field)
             .for_each(|index_def| {
-                let mut args = self.fields_argument(&index_def);
+                let mut args = self.fields_argument(index_def, false);
                 if let Some(name) = &index_def.name {
                     args.push(ast::Argument::new_string("name", name.to_string()));
                 }
@@ -71,7 +71,7 @@ impl<'a> LowerDmlToAst<'a> {
             .iter()
             .filter(|index| index.tpe == IndexType::Normal)
             .for_each(|index_def| {
-                let mut args = self.fields_argument(&index_def);
+                let mut args = self.fields_argument(index_def, false);
                 self.push_index_map_argument(model, index_def, &mut args);
 
                 if let Some(IndexAlgorithm::Hash) = index_def.algorithm {
@@ -90,7 +90,7 @@ impl<'a> LowerDmlToAst<'a> {
             .iter()
             .filter(|index| index.is_fulltext())
             .for_each(|index_def| {
-                let mut args = self.fields_argument(&index_def);
+                let mut args = self.fields_argument(index_def, true);
                 self.push_index_map_argument(model, index_def, &mut args);
 
                 attributes.push(ast::Attribute::new("fulltext", args));
@@ -107,11 +107,11 @@ impl<'a> LowerDmlToAst<'a> {
         attributes
     }
 
-    fn fields_argument(&self, index_def: &&IndexDefinition) -> Vec<Argument> {
+    fn fields_argument(&self, index_def: &IndexDefinition, always_render_sort_order: bool) -> Vec<Argument> {
         if self.preview_features.contains(PreviewFeature::ExtendedIndexes) {
             vec![ast::Argument::new_array(
                 "",
-                LowerDmlToAst::index_field_array(&index_def.fields),
+                LowerDmlToAst::index_field_array(&index_def.fields, always_render_sort_order),
             )]
         } else {
             vec![ast::Argument::new_array(

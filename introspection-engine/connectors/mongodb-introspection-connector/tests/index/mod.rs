@@ -113,6 +113,290 @@ fn single_column_descending_index() {
 }
 
 #[test]
+fn single_column_fulltext_index() {
+    let res = introspect(|db| async move {
+        db.create_collection("A", None).await?;
+        let collection = db.collection("A");
+        let docs = vec![doc! {"name": "Musti", "age": 9}];
+
+        collection.insert_many(docs, None).await.unwrap();
+
+        let options = IndexOptions::builder().unique(Some(false)).build();
+
+        let model = IndexModel::builder()
+            .keys(doc! { "name": "text" })
+            .options(Some(options))
+            .build();
+
+        collection.create_index(model, None).await?;
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          id   String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          age  Int
+          name String
+
+          @@fulltext([name], map: "name_\"text\"")
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
+fn multi_column_fulltext_index() {
+    let res = introspect(|db| async move {
+        db.create_collection("A", None).await?;
+        let collection = db.collection("A");
+        let docs = vec![doc! {"name": "Musti", "title": "cat", "age": 9}];
+
+        collection.insert_many(docs, None).await.unwrap();
+
+        let options = IndexOptions::builder().unique(Some(false)).build();
+
+        let model = IndexModel::builder()
+            .keys(doc! { "name": "text", "title": "text" })
+            .options(Some(options))
+            .build();
+
+        collection.create_index(model, None).await?;
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          id    String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          age   Int
+          name  String
+          title String
+
+          @@fulltext([name, title], map: "name_\"text\"_title_\"text\"")
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
+fn multi_column_fulltext_index_with_desc_in_end() {
+    let res = introspect(|db| async move {
+        db.create_collection("A", None).await?;
+        let collection = db.collection("A");
+        let docs = vec![doc! {"name": "Musti", "title": "cat", "age": 9}];
+
+        collection.insert_many(docs, None).await.unwrap();
+
+        let options = IndexOptions::builder().unique(Some(false)).build();
+
+        let model = IndexModel::builder()
+            .keys(doc! { "name": "text", "title": "text", "age": -1 })
+            .options(Some(options))
+            .build();
+
+        collection.create_index(model, None).await?;
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          id    String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          age   Int
+          name  String
+          title String
+
+          @@fulltext([name, title, age(sort: Desc)], map: "name_\"text\"_title_\"text\"_age_-1")
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
+fn multi_column_fulltext_index_with_desc_in_beginning() {
+    let res = introspect(|db| async move {
+        db.create_collection("A", None).await?;
+        let collection = db.collection("A");
+        let docs = vec![doc! {"name": "Musti", "title": "cat", "age": 9}];
+
+        collection.insert_many(docs, None).await.unwrap();
+
+        let options = IndexOptions::builder().unique(Some(false)).build();
+
+        let model = IndexModel::builder()
+            .keys(doc! { "age": -1, "name": "text", "title": "text" })
+            .options(Some(options))
+            .build();
+
+        collection.create_index(model, None).await?;
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          id    String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          age   Int
+          name  String
+          title String
+
+          @@fulltext([age(sort: Desc), name, title], map: "age_-1_name_\"text\"_title_\"text\"")
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
+fn multi_column_fulltext_index_with_asc_in_end() {
+    let res = introspect(|db| async move {
+        db.create_collection("A", None).await?;
+        let collection = db.collection("A");
+        let docs = vec![doc! {"name": "Musti", "title": "cat", "age": 9}];
+
+        collection.insert_many(docs, None).await.unwrap();
+
+        let options = IndexOptions::builder().unique(Some(false)).build();
+
+        let model = IndexModel::builder()
+            .keys(doc! { "name": "text", "title": "text", "age": 1 })
+            .options(Some(options))
+            .build();
+
+        collection.create_index(model, None).await?;
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          id    String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          age   Int
+          name  String
+          title String
+
+          @@fulltext([name, title, age(sort: Asc)], map: "name_\"text\"_title_\"text\"_age_1")
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
+fn multi_column_fulltext_index_with_asc_in_beginning() {
+    let res = introspect(|db| async move {
+        db.create_collection("A", None).await?;
+        let collection = db.collection("A");
+        let docs = vec![doc! {"name": "Musti", "title": "cat", "age": 9}];
+
+        collection.insert_many(docs, None).await.unwrap();
+
+        let options = IndexOptions::builder().unique(Some(false)).build();
+
+        let model = IndexModel::builder()
+            .keys(doc! { "age": 1, "name": "text", "title": "text" })
+            .options(Some(options))
+            .build();
+
+        collection.create_index(model, None).await?;
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          id    String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          age   Int
+          name  String
+          title String
+
+          @@fulltext([age(sort: Asc), name, title], map: "age_1_name_\"text\"_title_\"text\"")
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
+fn multi_column_fulltext_index_with_asc_in_beginning_desc_in_end() {
+    let res = introspect(|db| async move {
+        db.create_collection("A", None).await?;
+
+        let collection = db.collection("A");
+        let docs = vec![doc! { "name": "Musti", "title": "cat", "age": 9, "weight": 5 }];
+
+        collection.insert_many(docs, None).await.unwrap();
+
+        let options = IndexOptions::builder()
+            .unique(Some(false))
+            .name(Some("long_name".to_string()))
+            .build();
+
+        let model = IndexModel::builder()
+            .keys(doc! { "age": 1, "name": "text", "title": "text", "weight": -1 })
+            .options(Some(options))
+            .build();
+
+        collection.create_index(model, None).await?;
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          id     String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          age    Int
+          name   String
+          title  String
+          weight Int
+
+          @@fulltext([age(sort: Asc), name, title, weight(sort: Desc)], map: "long_name")
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
+fn fultext_index_without_preview_flag() {
+    let depth = CompositeTypeDepth::Infinite;
+    let features = PreviewFeature::MongoDb;
+
+    let res = introspect_features(depth, features.into(), |db| async move {
+        db.create_collection("A", None).await?;
+        let collection = db.collection("A");
+        let docs = vec![doc! {"name": "Musti", "age": 9}];
+
+        collection.insert_many(docs, None).await.unwrap();
+
+        let options = IndexOptions::builder().unique(Some(false)).build();
+
+        let model = IndexModel::builder()
+            .keys(doc! { "name": "text" })
+            .options(Some(options))
+            .build();
+
+        collection.create_index(model, None).await?;
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          id   String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          age  Int
+          name String
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
 fn index_pointing_to_a_renamed_field() {
     let res = introspect(|db| async move {
         db.create_collection("A", None).await?;
