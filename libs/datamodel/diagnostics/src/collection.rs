@@ -1,5 +1,5 @@
 use super::DatamodelError;
-use crate::diagnostics::warning::DatamodelWarning;
+use crate::warning::DatamodelWarning;
 
 /// Represents a list of validation or parser errors and warnings.
 ///
@@ -12,7 +12,7 @@ pub struct Diagnostics {
 }
 
 impl Diagnostics {
-    pub(crate) fn new() -> Diagnostics {
+    pub fn new() -> Diagnostics {
         Diagnostics {
             errors: Vec::new(),
             warnings: Vec::new(),
@@ -27,34 +27,34 @@ impl Diagnostics {
         &self.warnings
     }
 
-    pub(crate) fn warnings_mut(&mut self) -> &mut Vec<DatamodelWarning> {
+    pub fn warnings_mut(&mut self) -> &mut Vec<DatamodelWarning> {
         &mut self.warnings
     }
 
-    pub(crate) fn push_error(&mut self, err: DatamodelError) {
+    pub fn push_error(&mut self, err: DatamodelError) {
         self.errors.push(err)
     }
 
-    pub(crate) fn push_warning(&mut self, warning: DatamodelWarning) {
+    pub fn push_warning(&mut self, warning: DatamodelWarning) {
         self.warnings.push(warning)
     }
 
     /// Returns true, if there is at least one error in this collection.
-    pub(crate) fn has_errors(&self) -> bool {
+    pub fn has_errors(&self) -> bool {
         !self.errors.is_empty()
     }
 
     /// Appends all errors and warnings from another collection to this collection.
-    pub(crate) fn append(&mut self, err_and_warn: &mut Diagnostics) {
+    pub fn append(&mut self, err_and_warn: &mut Diagnostics) {
         self.errors.append(&mut err_and_warn.errors);
         self.warnings.append(&mut err_and_warn.warnings)
     }
 
-    pub(crate) fn append_warning_vec(&mut self, mut warnings: Vec<DatamodelWarning>) {
+    pub fn append_warning_vec(&mut self, mut warnings: Vec<DatamodelWarning>) {
         self.warnings.append(&mut warnings);
     }
 
-    pub(crate) fn to_result(&self) -> Result<(), Diagnostics> {
+    pub fn to_result(&self) -> Result<(), Diagnostics> {
         if self.has_errors() {
             Err(self.clone())
         } else {
@@ -94,16 +94,6 @@ impl From<DatamodelWarning> for Diagnostics {
         let mut col = Diagnostics::new();
         col.push_warning(warning);
         col
-    }
-}
-
-impl From<schema_ast::parser::Diagnostics> for Diagnostics {
-    fn from(src: schema_ast::parser::Diagnostics) -> Self {
-        let errors: Vec<DatamodelError> = src.into_iter().map(From::from).collect();
-        Diagnostics {
-            errors,
-            warnings: Vec::new(),
-        }
     }
 }
 

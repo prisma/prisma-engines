@@ -1,9 +1,9 @@
 use super::helpers::*;
 use crate::ast::helper::get_sort_index_of_attribute;
 use crate::ast::SchemaAst;
-use crate::diagnostics::{ValidatedDatamodel, ValidatedMissingFields};
 use crate::Datasource;
 use crate::{ast, ast::renderer::*};
+use crate::{ValidatedDatamodel, ValidatedMissingFields};
 use enumflags2::BitFlags;
 use pest::{iterators::Pair, Parser};
 use schema_ast::parser::{PrismaDatamodelParser, Rule};

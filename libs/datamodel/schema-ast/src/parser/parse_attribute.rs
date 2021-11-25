@@ -22,7 +22,7 @@ pub fn parse_attribute(token: &Token<'_>) -> Attribute {
         Some(name) => Attribute {
             name,
             arguments,
-            span: Span::from_pest(token.as_span()),
+            span: Span::from(token.as_span()),
         },
         _ => panic!("Encountered impossible type during parsing: {:?}", token.as_str()),
     }
@@ -37,7 +37,7 @@ pub(crate) fn parse_attribute_args(token: &Token<'_>, arguments: &mut Vec<Argume
             Rule::argument_value => arguments.push(Argument {
                 name: Identifier::new(""),
                 value: parse_arg_value(&current),
-                span: Span::from_pest(current.as_span()),
+                span: Span::from(current.as_span()),
             }),
             _ => parsing_catch_all(&current, "attribute arguments"),
         }
@@ -60,7 +60,7 @@ pub fn parse_attribute_arg(token: &Token<'_>) -> Argument {
         (Some(name), Some(value)) => Argument {
             name,
             value,
-            span: Span::from_pest(token.as_span()),
+            span: Span::from(token.as_span()),
         },
         _ => panic!(
             "Encountered impossible attribute arg during parsing: {:?}",

@@ -3,7 +3,7 @@ use crate::{
     opt::{CliOpt, PrismaOpt, Subcommand},
     PrismaResult,
 };
-use datamodel::diagnostics::ValidatedConfiguration;
+use datamodel::ValidatedConfiguration;
 use datamodel::{Configuration, Datamodel};
 use datamodel_connector::ConnectorCapabilities;
 use prisma_models::InternalDataModelBuilder;

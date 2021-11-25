@@ -1,4 +1,4 @@
-use crate::ast::Span;
+use crate::Span;
 use colored::Colorize;
 
 /// Given the datamodel text representation, pretty prints an error or warning, including

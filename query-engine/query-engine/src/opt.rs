@@ -1,6 +1,6 @@
 use crate::{error::PrismaError, PrismaResult};
-use datamodel::diagnostics::ValidatedConfiguration;
 use datamodel::Datamodel;
+use datamodel::ValidatedConfiguration;
 use serde::Deserialize;
 use std::env;
 use std::{ffi::OsStr, fs::File, io::Read};

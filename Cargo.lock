@@ -966,8 +966,8 @@ version = "0.1.0"
 dependencies = [
  "bigdecimal",
  "chrono",
- "colored",
  "datamodel-connector",
+ "diagnostics",
  "dml",
  "enumflags2",
  "expect-test",
@@ -977,7 +977,6 @@ dependencies = [
  "native-types",
  "once_cell",
  "pest",
- "pest_derive",
  "pretty_assertions",
  "prisma-value",
  "regex",
@@ -985,7 +984,6 @@ dependencies = [
  "serde",
  "serde_json",
  "sql-datamodel-connector",
- "thiserror",
 ]
 
 [[package]]
@@ -1008,6 +1006,15 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "diagnostics"
+version = "0.1.0"
+dependencies = [
+ "colored",
+ "pest",
+ "thiserror",
 ]
 
 [[package]]
@@ -3787,6 +3794,7 @@ dependencies = [
 name = "schema-ast"
 version = "0.1.0"
 dependencies = [
+ "diagnostics",
  "pest",
  "pest_derive",
 ]

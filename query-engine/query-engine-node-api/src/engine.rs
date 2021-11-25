@@ -1,5 +1,5 @@
 use crate::{error::ApiError, logger::ChannelLogger};
-use datamodel::{diagnostics::ValidatedConfiguration, Datamodel};
+use datamodel::{Datamodel, ValidatedConfiguration};
 use napi::threadsafe_function::ThreadsafeFunction;
 use opentelemetry::global;
 use prisma_models::InternalDataModelBuilder;
