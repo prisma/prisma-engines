@@ -5,7 +5,7 @@ services:
     restart: always
     command: start-single-node --insecure
     ports:
-      - "5436:26257"
+      - "26257:26257"
     networks:
       - databases
 
@@ -306,7 +306,7 @@ services:
 
   otel-agent:
     image: otel/opentelemetry-collector-dev:latest
-    command: ["--config=/etc/otel-agent-config.yaml"]
+    command: [ "--config=/etc/otel-agent-config.yaml" ]
     restart: always
     volumes:
       - ./otel-agent-config.yaml:/etc/otel-agent-config.yaml
@@ -318,5 +318,5 @@ services:
       - telemetry
 
 networks:
-  databases:
-  telemetry:
+  databases: null
+  telemetry: null
