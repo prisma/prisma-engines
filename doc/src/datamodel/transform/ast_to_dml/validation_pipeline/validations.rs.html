@@ -119,6 +119,7 @@
 <span id="119">119</span>
 <span id="120">120</span>
 <span id="121">121</span>
+<span id="122">122</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">fields</span>;
 <span class="kw">mod</span> <span class="ident">indexes</span>;
 <span class="kw">mod</span> <span class="ident">models</span>;
@@ -180,6 +181,7 @@
             <span class="ident">indexes::field_length_prefix_supported</span>(<span class="ident">db</span>, <span class="ident">index</span>, <span class="ident">diagnostics</span>);
             <span class="ident">indexes::index_algorithm_preview_feature</span>(<span class="ident">db</span>, <span class="ident">index</span>, <span class="ident">diagnostics</span>);
             <span class="ident">indexes::index_algorithm_is_supported</span>(<span class="ident">db</span>, <span class="ident">index</span>, <span class="ident">diagnostics</span>);
+            <span class="ident">indexes::hash_index_must_not_use_sort_param</span>(<span class="ident">db</span>, <span class="ident">index</span>, <span class="ident">diagnostics</span>);
             <span class="ident">indexes::fulltext_index_preview_feature_enabled</span>(<span class="ident">db</span>, <span class="ident">index</span>, <span class="ident">diagnostics</span>);
             <span class="ident">indexes::fulltext_index_supported</span>(<span class="ident">db</span>, <span class="ident">index</span>, <span class="ident">diagnostics</span>);
             <span class="ident">indexes::fulltext_columns_should_not_define_length</span>(<span class="ident">db</span>, <span class="ident">index</span>, <span class="ident">diagnostics</span>);

@@ -325,6 +325,39 @@
 <span id="325">325</span>
 <span id="326">326</span>
 <span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel_connector::ConnectorCapability</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast::Span</span>;
@@ -648,6 +681,39 @@
                 <span class="kw">return</span>;
             }
         }
+    }
+}
+
+<span class="doccomment">/// The ordering is only possible with `BTree` access method.</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">hash_index_must_not_use_sort_param</span>(
+    <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="ident">ParserDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+    <span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+    <span class="ident">diagnostics</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Diagnostics</span>,
+) {
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">db</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::ExtendedIndexes</span>) {
+        <span class="kw">return</span>;
+    }
+
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">db</span>
+        .<span class="ident">active_connector</span>()
+        .<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::UsingHashIndex</span>)
+    {
+        <span class="kw">return</span>;
+    }
+
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">index</span>.<span class="ident">attribute</span>().<span class="ident">algorithm</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">alg</span><span class="op">|</span> <span class="ident">alg</span>.<span class="ident">is_hash</span>()).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>) {
+        <span class="kw">return</span>;
+    }
+
+    <span class="kw">if</span> <span class="ident">index</span>.<span class="ident">scalar_field_attributes</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">sort_order</span>().<span class="ident">is_some</span>()) {
+        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Hash type does not support sort option.&quot;</span>;
+
+        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">index</span>
+            .<span class="ident">ast_attribute</span>()
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">span</span>)
+            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">index</span>.<span class="ident">model</span>().<span class="ident">ast_model</span>().<span class="ident">span</span>);
+
+        <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(<span class="ident">message</span>, <span class="string">&quot;index&quot;</span>, <span class="ident">span</span>));
     }
 }
 

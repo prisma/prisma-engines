@@ -603,6 +603,12 @@
 <span id="603">603</span>
 <span id="604">604</span>
 <span id="605">605</span>
+<span id="606">606</span>
+<span id="607">607</span>
+<span id="608">608</span>
+<span id="609">609</span>
+<span id="610">610</span>
+<span id="611">611</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">context::Context</span>, <span class="ident">walkers::CompositeTypeFieldWalker</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast::FieldId</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ast</span>, <span class="ident">diagnostics::DatamodelError</span>, <span class="ident">transform::ast_to_dml::db::walkers::CompositeTypeWalker</span>, <span class="ident">SortOrder</span>};
@@ -792,6 +798,12 @@
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">IndexAlgorithm</span> {
     <span class="ident">BTree</span>,
     <span class="ident">Hash</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">IndexAlgorithm</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_hash</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::Hash</span>)
+    }
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">IndexAlgorithm</span> {
