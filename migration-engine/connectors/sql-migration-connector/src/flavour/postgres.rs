@@ -334,16 +334,15 @@ impl SqlFlavour for PostgresFlavour {
     }
 
     async fn qe_teardown(&self, database_str: &str) -> ConnectorResult<()> {
-        if std::env::var("TEARDOWN_DATABASE").is_ok() {
-            let mut url = Url::parse(database_str).map_err(ConnectorError::url_parse_error)?;
-            strip_schema_param_from_url(&mut url);
+        let mut url = Url::parse(database_str).map_err(ConnectorError::url_parse_error)?;
+        strip_schema_param_from_url(&mut url);
 
-            let conn = create_postgres_admin_conn(url.clone()).await?;
-            let db_name = self.url.dbname();
+        let conn = create_postgres_admin_conn(url.clone()).await?;
+        let db_name = self.url.dbname();
 
-            let query = format!("DROP DATABASE \"{}\" CASCADE", db_name);
-            conn.raw_cmd(&query).await.ok();
-        }
+        let query = format!("DROP DATABASE \"{}\" CASCADE", db_name);
+        conn.raw_cmd(&query).await.ok();
+
         Ok(())
     }
 

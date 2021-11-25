@@ -85,6 +85,10 @@ impl ConnectorTagInterface for PostgresConnectorTag {
     fn is_versioned(&self) -> bool {
         true
     }
+
+    fn requires_teardown(&self) -> bool {
+        matches!(self.version, Some(PostgresVersion::Cockroach))
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]

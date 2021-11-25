@@ -97,6 +97,7 @@ pub fn run_relation_link_test<F>(
     if ConnectorTag::should_run(config, &enabled_connectors, capabilities, test_name) {
         let datamodel = render_test_datamodel(config, test_database, template);
         let connector = config.test_connector_tag().unwrap();
+        let requires_teardown = connector.requires_teardown();
 
         run_with_tokio(
             async move {
@@ -108,7 +109,10 @@ pub fn run_relation_link_test<F>(
 
                 setup_project(&datamodel).await.unwrap();
                 test_fn.call(&runner, &dm_with_params_json).await.unwrap();
-                teardown_project(&datamodel).await.unwrap();
+
+                if requires_teardown {
+                    teardown_project(&datamodel).await.unwrap();
+                }
             }
             .with_subscriber(test_tracing_subscriber(
                 std::env::var("LOG_LEVEL").unwrap_or_else(|_| "info".to_string()),
