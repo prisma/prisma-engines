@@ -428,6 +428,7 @@
 <span id="428">428</span>
 <span id="429">429</span>
 <span id="430">430</span>
+<span id="431">431</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error::ApiError</span>, <span class="ident">logger::ChannelLogger</span>};
 <span class="kw">use</span> <span class="ident">datamodel</span>::{<span class="ident">diagnostics::ValidatedConfiguration</span>, <span class="ident">Datamodel</span>};
 <span class="kw">use</span> <span class="ident">napi::threadsafe_function::ThreadsafeFunction</span>;
@@ -641,6 +642,7 @@
                             <span class="bool-val">true</span>, <span class="comment">// enable raw queries</span>
                             <span class="ident">data_source</span>.<span class="ident">capabilities</span>(),
                             <span class="ident">preview_features</span>,
+                            <span class="ident">data_source</span>.<span class="ident">referential_integrity</span>(),
                         );
 
                         <span class="prelude-val">Ok</span>(<span class="ident">ConnectedEngine</span> {

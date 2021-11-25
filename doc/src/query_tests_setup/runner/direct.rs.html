@@ -73,6 +73,7 @@
 <span id="73">73</span>
 <span id="74">74</span>
 <span id="75">75</span>
+<span id="76">76</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ConnectorTag</span>, <span class="ident">RunnerInterface</span>, <span class="ident">TestResult</span>};
 <span class="kw">use</span> <span class="ident">prisma_models::InternalDataModelBuilder</span>;
 <span class="kw">use</span> <span class="ident">query_core</span>::{<span class="ident">executor</span>, <span class="ident">schema_builder</span>, <span class="ident">BuildMode</span>, <span class="ident">QueryExecutor</span>, <span class="ident">QuerySchemaRef</span>, <span class="ident">TxId</span>};
@@ -105,6 +106,7 @@
             <span class="bool-val">true</span>,
             <span class="ident">data_source</span>.<span class="ident">capabilities</span>(),
             <span class="ident">preview_features</span>,
+            <span class="ident">data_source</span>.<span class="ident">referential_integrity</span>(),
         ));
 
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {

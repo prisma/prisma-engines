@@ -138,17 +138,16 @@
 <span class="attribute">#[<span class="ident">js_function</span>(<span class="number">1</span>)]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dmmf</span>(<span class="ident">ctx</span>: <span class="ident">CallContext</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">napi::Result</span><span class="op">&lt;</span><span class="ident">JsString</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">datamodel_string</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident">JsString</span><span class="op">&gt;</span>(<span class="number">0</span>)<span class="question-mark">?</span>.<span class="ident">into_utf8</span>()<span class="question-mark">?</span>.<span class="ident">into_owned</span>()<span class="question-mark">?</span>;
-
     <span class="kw">let</span> <span class="ident">datamodel</span> <span class="op">=</span> <span class="ident">datamodel::parse_datamodel</span>(<span class="kw-2">&amp;</span><span class="ident">datamodel_string</span>)
         .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">errors</span><span class="op">|</span> <span class="ident">ApiError::conversion</span>(<span class="ident">errors</span>, <span class="kw-2">&amp;</span><span class="ident">datamodel_string</span>))<span class="question-mark">?</span>;
-
     <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">datamodel::parse_configuration</span>(<span class="kw-2">&amp;</span><span class="ident">datamodel_string</span>)
         .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">errors</span><span class="op">|</span> <span class="ident">ApiError::conversion</span>(<span class="ident">errors</span>, <span class="kw-2">&amp;</span><span class="ident">datamodel_string</span>))<span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">datasource</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">subject</span>.<span class="ident">datasources</span>.<span class="ident">first</span>();
 
-    <span class="kw">let</span> <span class="ident">capabilities</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">config</span>.<span class="ident">subject</span>.<span class="ident">datasources</span>.<span class="ident">first</span>() {
-        <span class="prelude-val">Some</span>(<span class="ident">datasource</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">datasource</span>.<span class="ident">capabilities</span>(),
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ConnectorCapabilities::empty</span>(),
-    };
+    <span class="kw">let</span> <span class="ident">capabilities</span> <span class="op">=</span> <span class="ident">datasource</span>
+        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">ds</span><span class="op">|</span> <span class="ident">ds</span>.<span class="ident">capabilities</span>())
+        .<span class="ident">unwrap_or_else</span>(<span class="ident">ConnectorCapabilities::empty</span>);
+    <span class="kw">let</span> <span class="ident">referential_integrity</span> <span class="op">=</span> <span class="ident">datasource</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">ds</span><span class="op">|</span> <span class="ident">ds</span>.<span class="ident">referential_integrity</span>()).<span class="ident">unwrap_or_default</span>();
 
     <span class="kw">let</span> <span class="ident">internal_data_model</span> <span class="op">=</span> <span class="ident">InternalDataModelBuilder::from</span>(<span class="kw-2">&amp;</span><span class="ident">datamodel</span>.<span class="ident">subject</span>).<span class="ident">build</span>(<span class="string">&quot;&quot;</span>.<span class="ident">into</span>());
 
@@ -158,6 +157,7 @@
         <span class="bool-val">true</span>,
         <span class="ident">capabilities</span>,
         <span class="ident">config</span>.<span class="ident">subject</span>.<span class="ident">preview_features</span>().<span class="ident">iter</span>().<span class="ident">collect</span>(),
+        <span class="ident">referential_integrity</span>,
     ));
 
     <span class="kw">let</span> <span class="ident">dmmf</span> <span class="op">=</span> <span class="ident">dmmf::render_dmmf</span>(<span class="kw-2">&amp;</span><span class="ident">datamodel</span>.<span class="ident">subject</span>, <span class="ident">query_schema</span>);

@@ -109,6 +109,7 @@
 <span id="109">109</span>
 <span id="110">110</span>
 <span id="111">111</span>
+<span id="112">112</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">PrismaError</span>, <span class="ident">PrismaResult</span>};
 <span class="kw">use</span> <span class="ident">datamodel</span>::{<span class="ident">Configuration</span>, <span class="ident">Datamodel</span>};
 <span class="kw">use</span> <span class="ident">prisma_models::InternalDataModelBuilder</span>;
@@ -181,6 +182,7 @@
             <span class="ident">enable_raw_queries</span>,
             <span class="ident">data_source</span>.<span class="ident">capabilities</span>(),
             <span class="ident">preview_features</span>,
+            <span class="ident">data_source</span>.<span class="ident">referential_integrity</span>(),
         ));
 
         <span class="kw">let</span> <span class="ident">context</span> <span class="op">=</span> <span class="self">Self</span> {
