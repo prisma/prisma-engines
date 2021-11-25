@@ -24,35 +24,10 @@ impl<'a> Validator<'a> {
         for model in schema.models() {
             let ast_model = ast.find_model(&model.name).expect(STATE_ERROR);
 
-            if let Err(ref mut the_errors) = self.validate_field_connector_specific(ast_model, model) {
-                diagnostics.append(the_errors)
-            }
-
             if let Err(ref mut the_errors) = self.validate_model_connector_specific(ast_model, model) {
                 diagnostics.append(the_errors)
             }
         }
-    }
-
-    fn validate_field_connector_specific(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {
-        let mut diagnostics = Diagnostics::new();
-
-        if let Some(source) = self.source {
-            let connector = &source.active_connector;
-            for field in model.fields.iter() {
-                let mut errors = Vec::new();
-                connector.validate_field(field, &mut errors);
-
-                for error in errors {
-                    diagnostics.push_error(DatamodelError::ConnectorError {
-                        message: error.to_string(),
-                        span: ast_model.find_field_bang(field.name()).span,
-                    });
-                }
-            }
-        }
-
-        diagnostics.to_result()
     }
 
     fn validate_model_connector_specific(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {

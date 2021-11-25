@@ -4,12 +4,8 @@ use datamodel_connector::{
     Connector, ConnectorCapability, ConstraintScope, ReferentialIntegrity,
 };
 use dml::{
-    field::{Field, FieldType},
-    model::Model,
-    native_type_constructor::NativeTypeConstructor,
-    native_type_instance::NativeTypeInstance,
-    relation_info::ReferentialAction,
-    scalars::ScalarType,
+    field::FieldType, model::Model, native_type_constructor::NativeTypeConstructor,
+    native_type_instance::NativeTypeInstance, relation_info::ReferentialAction, scalars::ScalarType,
 };
 use enumflags2::BitFlags;
 use native_types::MySqlType::{self, *};
@@ -220,35 +216,38 @@ impl Connector for MySqlDatamodelConnector {
             .any(|(st, nt)| scalar_type == st && &native_type == nt)
     }
 
-    fn validate_field(&self, field: &Field, errors: &mut Vec<ConnectorError>) {
-        if let FieldType::Scalar(scalar_type, _, Some(native_type_instance)) = field.field_type() {
-            let native_type: MySqlType = native_type_instance.deserialize_native_type();
-            let error = self.native_instance_error(native_type_instance);
+    fn validate_native_type_arguments(
+        &self,
+        native_type_instance: &NativeTypeInstance,
+        scalar_type: &ScalarType,
+        errors: &mut Vec<ConnectorError>,
+    ) {
+        let native_type: MySqlType = native_type_instance.deserialize_native_type();
+        let error = self.native_instance_error(native_type_instance);
 
-            match native_type {
-                Decimal(Some((precision, scale))) if scale > precision => {
-                    errors.push(error.new_scale_larger_than_precision_error())
-                }
-                Decimal(Some((precision, _))) if precision > 65 => {
-                    errors.push(error.new_argument_m_out_of_range_error("Precision can range from 1 to 65."))
-                }
-                Decimal(Some((_, scale))) if scale > 30 => {
-                    errors.push(error.new_argument_m_out_of_range_error("Scale can range from 0 to 30."))
-                }
-                Bit(length) if length == 0 || length > 64 => {
-                    errors.push(error.new_argument_m_out_of_range_error("M can range from 1 to 64."))
-                }
-                Char(length) if length > 255 => {
-                    errors.push(error.new_argument_m_out_of_range_error("M can range from 0 to 255."))
-                }
-                VarChar(length) if length > 65535 => {
-                    errors.push(error.new_argument_m_out_of_range_error("M can range from 0 to 65,535."))
-                }
-                Bit(n) if n > 1 && scalar_type.is_boolean() => {
-                    errors.push(error.new_argument_m_out_of_range_error("only Bit(1) can be used as Boolean."))
-                }
-                _ => (),
+        match native_type {
+            Decimal(Some((precision, scale))) if scale > precision => {
+                errors.push(error.new_scale_larger_than_precision_error())
             }
+            Decimal(Some((precision, _))) if precision > 65 => {
+                errors.push(error.new_argument_m_out_of_range_error("Precision can range from 1 to 65."))
+            }
+            Decimal(Some((_, scale))) if scale > 30 => {
+                errors.push(error.new_argument_m_out_of_range_error("Scale can range from 0 to 30."))
+            }
+            Bit(length) if length == 0 || length > 64 => {
+                errors.push(error.new_argument_m_out_of_range_error("M can range from 1 to 64."))
+            }
+            Char(length) if length > 255 => {
+                errors.push(error.new_argument_m_out_of_range_error("M can range from 0 to 255."))
+            }
+            VarChar(length) if length > 65535 => {
+                errors.push(error.new_argument_m_out_of_range_error("M can range from 0 to 65,535."))
+            }
+            Bit(n) if n > 1 && scalar_type.is_boolean() => {
+                errors.push(error.new_argument_m_out_of_range_error("only Bit(1) can be used as Boolean."))
+            }
+            _ => (),
         }
     }
 
@@ -276,12 +275,12 @@ impl Connector for MySqlDatamodelConnector {
 
                         if index_definition.is_unique() {
                             errors.push(
-                                self.native_instance_error(native_type.clone())
+                                self.native_instance_error(&native_type)
                                     .new_incompatible_native_type_with_unique(),
                             )
                         } else {
                             errors.push(
-                                self.native_instance_error(native_type.clone())
+                                self.native_instance_error(&native_type)
                                     .new_incompatible_native_type_with_index(),
                             )
                         };
@@ -306,7 +305,7 @@ impl Connector for MySqlDatamodelConnector {
                         }
 
                         errors.push(
-                            self.native_instance_error(native_type.clone())
+                            self.native_instance_error(&native_type)
                                 .new_incompatible_native_type_with_id(),
                         );
 

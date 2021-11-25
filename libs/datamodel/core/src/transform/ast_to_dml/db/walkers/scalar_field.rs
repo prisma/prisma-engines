@@ -1,12 +1,12 @@
 use std::borrow::Cow;
 
-use dml::{default_value::DefaultValue, model::SortOrder};
+use dml::{default_value::DefaultValue, model::SortOrder, native_type_instance::NativeTypeInstance};
 
 use super::ModelWalker;
 use crate::{
     ast,
     common::constraint_names::ConstraintNames,
-    transform::ast_to_dml::db::{types::FieldWithArgs, ParserDatabase, ScalarField},
+    transform::ast_to_dml::db::{types::FieldWithArgs, ParserDatabase, ScalarField, ScalarFieldType},
 };
 
 #[derive(Copy, Clone)]
@@ -59,6 +59,15 @@ impl<'ast, 'db> ScalarFieldWalker<'ast, 'db> {
         }
     }
 
+    pub(crate) fn native_type_instance(self) -> Option<NativeTypeInstance> {
+        self.scalar_field.native_type.as_ref().map(|(name, args)| {
+            self.db
+                .active_connector()
+                .parse_native_type(name, args.clone())
+                .unwrap()
+        })
+    }
+
     pub(crate) fn is_unsupported(self) -> bool {
         matches!(self.ast_field().field_type, ast::FieldType::Unsupported(_, _))
     }
@@ -70,6 +79,18 @@ impl<'ast, 'db> ScalarFieldWalker<'ast, 'db> {
             db: self.db,
             default: d,
         })
+    }
+
+    pub(crate) fn scalar_type(self) -> Option<dml::scalars::ScalarType> {
+        let mut tpe = &self.scalar_field.r#type;
+
+        loop {
+            match tpe {
+                ScalarFieldType::BuiltInScalar(scalar) => return Some(*scalar),
+                ScalarFieldType::Alias(alias_id) => tpe = &self.db.types.type_aliases[alias_id],
+                _ => return None,
+            }
+        }
     }
 }
 
@@ -92,6 +113,10 @@ impl<'ast, 'db> DefaultValueWalker<'ast, 'db> {
 
             Cow::from(name)
         })
+    }
+
+    pub(crate) fn default(self) -> &'db DefaultValue {
+        self.default
     }
 
     fn field(self) -> ScalarFieldWalker<'ast, 'db> {
