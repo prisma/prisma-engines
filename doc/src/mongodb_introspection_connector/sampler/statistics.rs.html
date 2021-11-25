@@ -505,6 +505,66 @@
 <span id="505">505</span>
 <span id="506">506</span>
 <span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
+<span id="566">566</span>
+<span id="567">567</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">name</span>;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">name::Name</span>;
@@ -520,6 +580,7 @@
 <span class="kw">use</span> <span class="ident">introspection_connector::Warning</span>;
 <span class="kw">use</span> <span class="ident">mongodb</span>::{
     <span class="ident">bson</span>::{<span class="ident">Bson</span>, <span class="ident">Document</span>},
+    <span class="ident">options::IndexOptions</span>,
     <span class="ident">IndexModel</span>,
 };
 <span class="kw">use</span> <span class="ident">native_types::MongoDbType</span>;
@@ -867,7 +928,6 @@
     <span class="kw">let</span> <span class="ident">primary_key</span> <span class="op">=</span> <span class="ident">PrimaryKeyDefinition</span> {
         <span class="ident">name</span>: <span class="prelude-val">None</span>,
         <span class="ident">db_name</span>: <span class="prelude-val">None</span>,
-        <span class="comment">//TODO(extended indexes) If the flag is enabled this should return the sort, otherwise not</span>
         <span class="ident">fields</span>: <span class="macro">vec!</span>[<span class="ident">PrimaryKeyField</span> {
             <span class="ident">name</span>: <span class="string">&quot;id&quot;</span>.<span class="ident">to_string</span>(),
             <span class="ident">sort_order</span>: <span class="prelude-val">None</span>,
@@ -941,59 +1001,119 @@
                 <span class="kw">continue</span>;
             }
 
-            <span class="comment">// Points to a field that does not exist (yet).</span>
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">index</span>.<span class="ident">keys</span>.<span class="ident">keys</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">k</span><span class="op">|</span> {
-                <span class="ident">model</span>
-                    .<span class="ident">fields</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">any</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">k</span> <span class="op">|</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">database_name</span>() <span class="op">=</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">k</span>))
-            }) {
-                <span class="kw">continue</span>;
-            }
-
             <span class="kw">let</span> <span class="ident">tpe</span> <span class="op">=</span> <span class="ident">index</span>
                 .<span class="ident">options</span>
                 .<span class="ident">as_ref</span>()
-                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">opts</span><span class="op">|</span> <span class="ident">opts</span>.<span class="ident">unique</span>)
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">uniq</span><span class="op">|</span> <span class="kw">if</span> <span class="ident">uniq</span> { <span class="ident">IndexType::Unique</span> } <span class="kw">else</span> { <span class="ident">IndexType::Normal</span> })
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">opts</span><span class="op">|</span> <span class="kw">match</span> (<span class="ident">opts</span>.<span class="ident">unique</span>, <span class="ident">opts</span>.<span class="ident">text_index_version</span>.<span class="ident">as_ref</span>()) {
+                    (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">IndexType::Unique</span>,
+                    (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">IndexType::Fulltext</span>,
+                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">IndexType::Normal</span>,
+                })
                 .<span class="ident">unwrap_or</span>(<span class="ident">IndexType::Normal</span>);
 
-            <span class="kw">let</span> <span class="ident">db_name</span> <span class="op">=</span> <span class="ident">index</span>.<span class="ident">options</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">opts</span><span class="op">|</span> <span class="ident">opts</span>.<span class="ident">name</span>);
+            <span class="kw">if</span> <span class="ident">tpe</span>.<span class="ident">is_fulltext</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::FullTextIndex</span>) {
+                <span class="kw">continue</span>;
+            }
 
             <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="ident">index</span>
                 .<span class="ident">keys</span>
                 .<span class="ident">into_iter</span>()
                 <span class="comment">//TODO(extended indices) is the value here always the sort order? the driver docs are unclear</span>
                 <span class="comment">// If the flag is enabled this should return the sort, otherwise not</span>
-                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> {
-                    <span class="kw">let</span> <span class="ident">field_name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">sanitize_string</span>(<span class="kw-2">&amp;</span><span class="ident">k</span>) {
-                        <span class="prelude-val">Some</span>(<span class="ident">sanitized</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sanitized</span>,
-                        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">k</span>,
-                    };
-
-                    <span class="kw">let</span> <span class="ident">sort_order</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">v</span>.<span class="ident">as_i32</span>() {
-                        <span class="kw">_</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::ExtendedIndexes</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-                        <span class="prelude-val">Some</span>(<span class="op">-</span><span class="number">1</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">SortOrder::Desc</span>),
-                        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">SortOrder::Asc</span>),
-                    };
+                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">name</span>, <span class="ident">v</span>)<span class="op">|</span> {
+                    <span class="kw">let</span> <span class="ident">sort_order</span> <span class="op">=</span> <span class="ident">v</span>.<span class="ident">as_i32</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">v</span> {
+                        <span class="op">-</span><span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SortOrder::Desc</span>,
+                        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SortOrder::Asc</span>,
+                    });
 
                     <span class="ident">IndexField</span> {
-                        <span class="ident">name</span>: <span class="ident">field_name</span>,
+                        <span class="ident">name</span>,
                         <span class="ident">sort_order</span>,
                         <span class="ident">length</span>: <span class="prelude-val">None</span>,
                     }
                 })
                 .<span class="ident">collect</span>();
 
+            <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="ident">sanitize_index_fields</span>(<span class="ident">fields</span>, <span class="ident">index</span>.<span class="ident">options</span>.<span class="ident">as_ref</span>());
+
+            <span class="kw">if</span> <span class="op">!</span><span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">indf</span><span class="op">|</span> {
+                <span class="ident">model</span>
+                    .<span class="ident">fields</span>
+                    .<span class="ident">iter</span>()
+                    .<span class="ident">any</span>(<span class="op">|</span><span class="ident">mf</span><span class="op">|</span> <span class="ident">mf</span>.<span class="ident">name</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">indf</span>.<span class="ident">name</span> <span class="op">|</span><span class="op">|</span> <span class="ident">mf</span>.<span class="ident">database_name</span>() <span class="op">=</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">indf</span>.<span class="ident">name</span>))
+            }) {
+                <span class="kw">continue</span>;
+            }
+
             <span class="ident">model</span>.<span class="ident">add_index</span>(<span class="ident">IndexDefinition</span> {
                 <span class="ident">fields</span>,
                 <span class="ident">tpe</span>,
                 <span class="ident">defined_on_field</span>,
-                <span class="ident">db_name</span>,
+                <span class="ident">db_name</span>: <span class="ident">index</span>.<span class="ident">options</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">opts</span><span class="op">|</span> <span class="ident">opts</span>.<span class="ident">name</span>),
                 <span class="ident">name</span>: <span class="prelude-val">None</span>,
                 <span class="ident">algorithm</span>: <span class="prelude-val">None</span>,
             });
         }
+    }
+}
+
+<span class="doccomment">/// In a case of a fulltext index, the index definition is super weird. Let&#39;s imagine the</span>
+<span class="doccomment">/// following:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```ignore</span>
+<span class="doccomment">/// @@fulltext([a(sort: Desc), b, c, d, e(sort: Asc)])</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// When we push this to the database, we pull the following bson out:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```ignore</span>
+<span class="doccomment">/// { &quot;a&quot; -1, &quot;_fts&quot;: -1, &quot;_ftsx&quot;: 1, &quot;e&quot;: 1 }</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The keys that are part of the text index, `b`, `c` and `d`, are combined into two index keys:</span>
+<span class="doccomment">/// `_fts` and `_ftsx`. This will break our data model, diffing and all if we just handle them</span>
+<span class="doccomment">/// as-is.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Therefore we must take a look into the headers, where we have specified the index weights. In</span>
+<span class="doccomment">/// this parameter we have listed all the fields that are part of the text index, in this case `b`,</span>
+<span class="doccomment">/// `c`, and `d`. These can come in any order, but when we define a full-text index in mongo, the</span>
+<span class="doccomment">/// order of the text columns in the bunch doesn&#39;t matter, only the order in comparison with the</span>
+<span class="doccomment">/// non-text columns (defined with the sort param) matters.</span>
+<span class="kw">fn</span> <span class="ident">sanitize_index_fields</span>(<span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">IndexField</span><span class="op">&gt;</span>, <span class="ident">opts</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">IndexOptions</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">IndexField</span><span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">is_fts</span> <span class="op">=</span> <span class="op">|</span><span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">IndexField</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;_fts&quot;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;_ftsx&quot;</span>;
+
+    <span class="kw">let</span> <span class="ident">sanitize</span> <span class="op">=</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">field</span>: <span class="ident">IndexField</span><span class="op">|</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="ident">sanitize_string</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">name</span>) {
+            <span class="ident">field</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>;
+        }
+
+        <span class="ident">field</span>
+    };
+
+    <span class="kw">let</span> <span class="ident">fts_field</span> <span class="op">=</span> <span class="op">|</span><span class="ident">name</span>: <span class="ident">String</span><span class="op">|</span> <span class="ident">IndexField</span> {
+        <span class="ident">name</span>: <span class="ident">sanitize_string</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>).<span class="ident">unwrap_or</span>(<span class="ident">name</span>),
+        <span class="ident">sort_order</span>: <span class="prelude-val">None</span>,
+        <span class="ident">length</span>: <span class="prelude-val">None</span>,
+    };
+
+    <span class="kw">if</span> <span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="ident">is_fts</span>) {
+        <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">take_while</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="op">!</span><span class="ident">is_fts</span>(<span class="ident">f</span>)).<span class="ident">cloned</span>();
+
+        <span class="kw">let</span> <span class="ident">middle</span> <span class="op">=</span> <span class="ident">opts</span>
+            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> <span class="ident">o</span>.<span class="ident">weights</span>.<span class="ident">as_ref</span>())
+            .<span class="ident">into_iter</span>()
+            .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">weights</span><span class="op">|</span> <span class="ident">weights</span>.<span class="ident">keys</span>().<span class="ident">map</span>(<span class="ident">ToString::to_string</span>))
+            .<span class="ident">map</span>(<span class="ident">fts_field</span>);
+
+        <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="ident">fields</span>
+            .<span class="ident">iter</span>()
+            .<span class="ident">skip_while</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="op">!</span><span class="ident">is_fts</span>(<span class="ident">f</span>))
+            .<span class="ident">skip_while</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">is_fts</span>(<span class="ident">f</span>))
+            .<span class="ident">cloned</span>();
+
+        <span class="ident">head</span>.<span class="ident">chain</span>(<span class="ident">middle</span>).<span class="ident">chain</span>(<span class="ident">tail</span>).<span class="ident">collect</span>()
+    } <span class="kw">else</span> {
+        <span class="ident">fields</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">sanitize</span>).<span class="ident">collect</span>()
     }
 }
 

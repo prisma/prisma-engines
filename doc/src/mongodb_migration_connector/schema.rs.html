@@ -73,8 +73,10 @@
 <span id="73">73</span>
 <span id="74">74</span>
 <span id="75">75</span>
+<span id="76">76</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">walkers</span>;
 
+<span class="kw">use</span> <span class="ident">datamodel::IndexType</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">walkers::IndexWalker</span>;
 
 <span class="kw">use</span> <span class="ident">mongodb::bson::Document</span>;
@@ -95,7 +97,7 @@
 <span class="kw">struct</span> <span class="ident">Index</span> {
     <span class="ident">name</span>: <span class="ident">String</span>,
     <span class="ident">keys</span>: <span class="ident">Document</span>,
-    <span class="ident">is_unique</span>: <span class="ident">bool</span>,
+    <span class="ident">tpe</span>: <span class="ident">IndexType</span>,
     <span class="ident">collection_id</span>: <span class="ident">CollectionId</span>,
 }
 
@@ -137,12 +139,12 @@
         <span class="ident">CollectionId</span>(<span class="self">self</span>.<span class="ident">collections</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span> <span class="op">-</span> <span class="number">1</span>)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">push_index</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">collection_id</span>: <span class="ident">CollectionId</span>, <span class="ident">name</span>: <span class="ident">String</span>, <span class="ident">is_unique</span>: <span class="ident">bool</span>, <span class="ident">keys</span>: <span class="ident">Document</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">push_index</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">collection_id</span>: <span class="ident">CollectionId</span>, <span class="ident">name</span>: <span class="ident">String</span>, <span class="ident">tpe</span>: <span class="ident">IndexType</span>, <span class="ident">keys</span>: <span class="ident">Document</span>) {
         <span class="kw">let</span> <span class="ident">index_id</span> <span class="op">=</span> <span class="ident">IndexId</span>(<span class="self">self</span>.<span class="ident">indexes</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>);
         <span class="self">self</span>.<span class="ident">indexes</span>.<span class="ident">push</span>(<span class="ident">Index</span> {
             <span class="ident">name</span>,
             <span class="ident">keys</span>,
-            <span class="ident">is_unique</span>,
+            <span class="ident">tpe</span>,
             <span class="ident">collection_id</span>,
         });
         <span class="self">self</span>.<span class="ident">collection_indexes</span>.<span class="ident">insert</span>((<span class="ident">collection_id</span>, <span class="ident">index_id</span>));

@@ -81,6 +81,10 @@
 <span id="81">81</span>
 <span id="82">82</span>
 <span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">parse_schema</span>, <span class="ident">CoreResult</span>};
 <span class="kw">use</span> <span class="ident">migration_connector</span>::{<span class="ident">ConnectorError</span>, <span class="ident">DiffTarget</span>, <span class="ident">MigrationConnector</span>};
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
@@ -125,14 +129,18 @@
         }
     };
 
+    <span class="kw">let</span> <span class="ident">warnings</span> <span class="op">=</span> <span class="ident">checks</span>.<span class="ident">warnings</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">warning</span><span class="op">|</span> <span class="ident">warning</span>.<span class="ident">description</span>).<span class="ident">collect</span>();
+
+    <span class="kw">let</span> <span class="ident">unexecutable</span> <span class="op">=</span> <span class="ident">checks</span>
+        .<span class="ident">unexecutable_migrations</span>
+        .<span class="ident">into_iter</span>()
+        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">unexecutable</span><span class="op">|</span> <span class="ident">unexecutable</span>.<span class="ident">description</span>)
+        .<span class="ident">collect</span>();
+
     <span class="prelude-val">Ok</span>(<span class="ident">SchemaPushOutput</span> {
         <span class="ident">executed_steps</span>,
-        <span class="ident">warnings</span>: <span class="ident">checks</span>.<span class="ident">warnings</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">warning</span><span class="op">|</span> <span class="ident">warning</span>.<span class="ident">description</span>).<span class="ident">collect</span>(),
-        <span class="ident">unexecutable</span>: <span class="ident">checks</span>
-            .<span class="ident">unexecutable_migrations</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">unexecutable</span><span class="op">|</span> <span class="ident">unexecutable</span>.<span class="ident">description</span>)
-            .<span class="ident">collect</span>(),
+        <span class="ident">warnings</span>,
+        <span class="ident">unexecutable</span>,
     })
 }
 

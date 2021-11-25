@@ -116,6 +116,9 @@
 <span id="116">116</span>
 <span id="117">117</span>
 <span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">fields</span>;
 <span class="kw">mod</span> <span class="ident">indexes</span>;
 <span class="kw">mod</span> <span class="ident">models</span>;
@@ -140,6 +143,7 @@
         <span class="ident">models::uses_sort_or_length_on_primary_without_preview_flag</span>(<span class="ident">db</span>, <span class="ident">model</span>, <span class="ident">diagnostics</span>);
         <span class="ident">models::primary_key_length_prefix_supported</span>(<span class="ident">db</span>, <span class="ident">model</span>, <span class="ident">diagnostics</span>);
         <span class="ident">models::primary_key_sort_order_supported</span>(<span class="ident">db</span>, <span class="ident">model</span>, <span class="ident">diagnostics</span>);
+        <span class="ident">models::only_one_fulltext_attribute_allowed</span>(<span class="ident">db</span>, <span class="ident">model</span>, <span class="ident">diagnostics</span>);
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pk</span>) <span class="op">=</span> <span class="ident">model</span>.<span class="ident">primary_key</span>() {
             <span class="kw">for</span> <span class="ident">field_attribute</span> <span class="kw">in</span> <span class="ident">pk</span>.<span class="ident">scalar_field_attributes</span>() {
@@ -178,7 +182,9 @@
             <span class="ident">indexes::index_algorithm_is_supported</span>(<span class="ident">db</span>, <span class="ident">index</span>, <span class="ident">diagnostics</span>);
             <span class="ident">indexes::fulltext_index_preview_feature_enabled</span>(<span class="ident">db</span>, <span class="ident">index</span>, <span class="ident">diagnostics</span>);
             <span class="ident">indexes::fulltext_index_supported</span>(<span class="ident">db</span>, <span class="ident">index</span>, <span class="ident">diagnostics</span>);
-            <span class="ident">indexes::fulltext_columns_should_not_use_arguments</span>(<span class="ident">db</span>, <span class="ident">index</span>, <span class="ident">diagnostics</span>);
+            <span class="ident">indexes::fulltext_columns_should_not_define_length</span>(<span class="ident">db</span>, <span class="ident">index</span>, <span class="ident">diagnostics</span>);
+            <span class="ident">indexes::fulltext_column_sort_is_supported</span>(<span class="ident">db</span>, <span class="ident">index</span>, <span class="ident">diagnostics</span>);
+            <span class="ident">indexes::fulltext_text_columns_should_be_bundled_together</span>(<span class="ident">db</span>, <span class="ident">index</span>, <span class="ident">diagnostics</span>);
 
             <span class="kw">for</span> <span class="ident">field_attribute</span> <span class="kw">in</span> <span class="ident">index</span>.<span class="ident">scalar_field_attributes</span>() {
                 <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">index</span>

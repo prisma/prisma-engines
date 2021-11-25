@@ -177,6 +177,8 @@
 <span id="177">177</span>
 <span id="178">178</span>
 <span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">mongodb_types</span>;
 
 <span class="kw">use</span> <span class="ident">datamodel_connector</span>::{
@@ -201,6 +203,8 @@
     <span class="ident">ConnectorCapability::ScalarLists</span>,
     <span class="ident">ConnectorCapability::InsensitiveFilters</span>,
     <span class="ident">ConnectorCapability::CompositeTypes</span>,
+    <span class="ident">ConnectorCapability::FullTextIndex</span>,
+    <span class="ident">ConnectorCapability::SortOrderInFullTextIndex</span>,
 ];
 
 <span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">ConnectorError</span><span class="op">&gt;</span>;

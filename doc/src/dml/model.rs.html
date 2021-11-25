@@ -469,6 +469,12 @@
 <span id="469">469</span>
 <span id="470">470</span>
 <span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::default_value::DefaultKind</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::field</span>::{<span class="ident">Field</span>, <span class="ident">FieldType</span>, <span class="ident">RelationField</span>, <span class="ident">ScalarField</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::scalars::ScalarType</span>;
@@ -602,6 +608,12 @@
     <span class="ident">Unique</span>,
     <span class="ident">Normal</span>,
     <span class="ident">Fulltext</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">IndexType</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_fulltext</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">IndexType::Fulltext</span>)
+    }
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
