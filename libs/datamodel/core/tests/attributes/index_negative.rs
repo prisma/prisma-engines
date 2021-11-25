@@ -620,6 +620,32 @@ fn length_argument_does_not_work_with_int() {
 }
 
 #[test]
+fn hash_index_doesnt_allow_sorting() {
+    let dml = indoc! {r#"
+        model A {
+          id Int @id
+          a  Int
+
+          @@index([a(sort: Desc)], type: Hash)
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@index": Hash type does not support sort option.[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m
+        [1;94m15 | [0m  @@[1;91mindex([a(sort: Desc)], type: Hash)[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
 fn hash_index_doesnt_work_on_sqlserver() {
     let dml = indoc! {r#"
         model A {

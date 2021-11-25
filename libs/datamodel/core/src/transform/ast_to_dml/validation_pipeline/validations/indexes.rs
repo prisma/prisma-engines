@@ -324,4 +324,37 @@ pub(crate) fn fulltext_text_columns_should_be_bundled_together(
     }
 }
 
+/// The ordering is only possible with `BTree` access method.
+pub(crate) fn hash_index_must_not_use_sort_param(
+    db: &ParserDatabase<'_>,
+    index: IndexWalker<'_, '_>,
+    diagnostics: &mut Diagnostics,
+) {
+    if !db.preview_features.contains(PreviewFeature::ExtendedIndexes) {
+        return;
+    }
+
+    if !db
+        .active_connector()
+        .has_capability(ConnectorCapability::UsingHashIndex)
+    {
+        return;
+    }
+
+    if !index.attribute().algorithm.map(|alg| alg.is_hash()).unwrap_or(false) {
+        return;
+    }
+
+    if index.scalar_field_attributes().any(|f| f.sort_order().is_some()) {
+        let message = "Hash type does not support sort option.";
+
+        let span = index
+            .ast_attribute()
+            .map(|i| i.span)
+            .unwrap_or_else(|| index.model().ast_model().span);
+
+        diagnostics.push_error(DatamodelError::new_attribute_validation_error(message, "index", span));
+    }
+}
+
 //TODO(extended indices) add db specific validations to sort and length

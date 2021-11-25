@@ -189,6 +189,12 @@ pub enum IndexAlgorithm {
     Hash,
 }
 
+impl IndexAlgorithm {
+    pub fn is_hash(self) -> bool {
+        matches!(self, Self::Hash)
+    }
+}
+
 impl Default for IndexAlgorithm {
     fn default() -> Self {
         Self::BTree
