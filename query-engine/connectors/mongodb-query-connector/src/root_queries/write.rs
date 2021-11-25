@@ -3,7 +3,7 @@ use crate::{
     filter::{convert_filter, MongoFilter},
     output_meta,
     query_builder::MongoReadQueryBuilder,
-    root_queries::raw::{MongoCommand, MongoOperation},
+    root_queries::raw::{MongoCommand, MongoOperation, QueryRawDocumentExtension},
     vacuum_cursor, BsonTransform, IntoBson,
 };
 use connector_interface::*;
@@ -411,7 +411,10 @@ pub async fn query_raw<'conn>(
 
     let json_result = match mongo_command {
         MongoCommand::Raw { cmd } => {
-            let result = database.run_command_with_session(cmd, None, session).await?;
+            let mut result = database.run_command_with_session(cmd, None, session).await?;
+
+            result.cleanup_raw_result();
+
             let json_result: serde_json::Value = Bson::Document(result).into();
 
             json_result
@@ -468,10 +471,6 @@ pub async fn query_raw<'conn>(
 
                     json
                 }
-                MongoOperation::DeleteOne(_, _) => todo!(),
-                MongoOperation::DeleteMany(_, _) => todo!(),
-                MongoOperation::UpdateOne(_, _, _) => todo!(),
-                MongoOperation::UpdateMany(_, _, _) => todo!(),
                 MongoOperation::InsertMany(inserts, options) => {
                     let insert_result = coll.insert_many_with_session(inserts, options, session).await?;
                     let json_str = serde_json::to_string(&insert_result)?;

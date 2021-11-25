@@ -1,8 +1,8 @@
-use indoc::indoc;
 use query_engine_tests::*;
 
 #[test_suite(schema(schema), only(MongoDb))]
 mod raw_mongo {
+    use indoc::indoc;
     use query_engine_tests::{fmt_execute_raw, fmt_query_raw, run_query, run_query_json, Runner};
 
     fn schema() -> String {
@@ -49,7 +49,7 @@ mod raw_mongo {
     }
 
     #[connector_test]
-    async fn query_raw(runner: Runner) -> TestResult<()> {
+    async fn raw_find(runner: Runner) -> TestResult<()> {
         let insertion_res = run_query_json!(
             runner,
             fmt_query_raw(
@@ -59,31 +59,76 @@ mod raw_mongo {
             &["data", "queryRaw"]
         );
 
-        assert_eq!(&insertion_res["ok"].to_string(), "1.0");
-        assert_eq!(&insertion_res["n"].to_string(), "3");
+        assert_eq!(
+            insertion_res["insertedIds"],
+            serde_json::json!({ "0": 1, "1": 2, "2": 3 })
+        );
 
-        let update_res = run_query_json!(
+        insta::assert_snapshot!(
+          run_query!(&runner, fmt_query_raw(r#"{ "find": "TestModel" }"#, vec![])),
+          @r###"{"data":{"queryRaw":[{"_id":1,"field":"A"},{"_id":2,"field":"B"},{"_id":3,"field":"C"}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn raw_aggregate(runner: Runner) -> TestResult<()> {
+        run_query!(
             runner,
             fmt_query_raw(
-                r#"{ "update": "TestModel", "updates": [{ "q": { "_id": 1 }, "u": { "field": "updated" } }] }"#,
+                r#"{ "insert": "TestModel", "documents": [{ "_id": 1, "field": "A" }, { "_id": 2, "field": "B" }, { "_id": 3, "field": "C" }] }"#,
                 vec![]
-            ),
-            &["data", "queryRaw"]
+            )
         );
 
-        assert_eq!(&update_res["ok"].to_string(), "1.0");
-        assert_eq!(&update_res["nModified"].to_string(), "1");
+        // Should consume the cursors before returning the result
+        insta::assert_snapshot!(
+          run_query!(runner, fmt_query_raw( r#"{ "aggregate": "TestModel", "pipeline": [{ "$project": { "_id": 1 } }] }"#, vec![])),
+          @r###"{"data":{"queryRaw":[{"_id":1},{"_id":2},{"_id":3}]}}"###
+        );
 
-        let find_res = run_query_json!(
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn raw_find_and_modify(runner: Runner) -> TestResult<()> {
+        run_query!(
             runner,
-            fmt_query_raw(r#"{ "find": "TestModel" }"#, vec![]),
-            &["data", "queryRaw"]
+            fmt_query_raw(
+                r#"{ "insert": "TestModel", "documents": [{ "_id": 1, "field": "A", "age": 1 }, { "_id": 2, "field": "B", "age": 2 }, { "_id": 3, "field": "C", "age": 3 }] }"#,
+                vec![]
+            )
         );
 
-        assert_eq!(&find_res["ok"].to_string(), "1.0");
-        assert_eq!(
-            &find_res["cursor"]["firstBatch"].to_string(),
-            "[{\"_id\":1,\"field\":\"updated\"},{\"_id\":2,\"field\":\"B\"},{\"_id\":3,\"field\":\"C\"}]"
+        // Should fail if neither "remove" or "update" is set
+        insta::assert_snapshot!(
+          run_query!(&runner, fmt_query_raw( r#"{ "findAndModify": "TestModel" }"#, vec![])),
+          @r###"{"errors":[{"error":"Error occurred during query execution:\nConnectorError(ConnectorError { user_facing_error: None, kind: RawApiError(\"Either an 'update' or 'remove' key must be specified\") })","user_facing_error":{"is_panic":false,"message":"Error occurred during query execution:\nConnectorError(ConnectorError { user_facing_error: None, kind: RawApiError(\"Either an 'update' or 'remove' key must be specified\") })","backtrace":null}}]}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, fmt_query_raw(r#"{ "findAndModify": "TestModel", "query": { "field": "A" }, "update": { "field": "updated" }, "new": true, "fields": { "field": 1 } }"#, vec![])),
+          @r###"{"data":{"queryRaw":{"_id":1,"field":"updated"}}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn raw_update(runner: Runner) -> TestResult<()> {
+        run_query!(
+            runner,
+            fmt_query_raw(
+                r#"{ "insert": "TestModel", "documents": [{ "_id": 1, "field": "A" }, { "_id": 2, "field": "B" }, { "_id": 3, "field": "C" }] }"#,
+                vec![]
+            )
+        );
+
+        // result should not contain $cluster, optTime and similar keys
+        insta::assert_snapshot!(
+          run_query!(&runner, fmt_query_raw(r#"{ "update": "TestModel", "updates": [{ "q": { "field": "A" }, "u": { "field": "updated" } }] }"#, vec![])),
+          @r###"{"data":{"queryRaw":{"n":1,"nModified":1,"ok":1.0}}}"###
         );
 
         Ok(())
@@ -107,11 +152,8 @@ mod raw_mongo {
         let first_query = &res_json[0]["data"]["queryRaw"];
         let second_query = &res_json[1]["data"]["queryRaw"];
 
-        assert_eq!(&first_query["ok"].to_string(), "1.0");
-        assert_eq!(&first_query["n"].to_string(), "1");
-
-        assert_eq!(&second_query["ok"].to_string(), "1.0");
-        assert_eq!(&second_query["n"].to_string(), "2");
+        assert_eq!(first_query["insertedIds"], serde_json::json!({ "0": 1 }));
+        assert_eq!(second_query["insertedIds"], serde_json::json!({ "0": 2, "1": 3 }));
 
         Ok(())
     }
