@@ -134,15 +134,40 @@
 <span id="134">134</span>
 <span id="135">135</span>
 <span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 
-<span class="kw">use</span> <span class="ident">dml</span>::{<span class="ident">default_value::DefaultValue</span>, <span class="ident">model::SortOrder</span>};
+<span class="kw">use</span> <span class="ident">dml</span>::{<span class="ident">default_value::DefaultValue</span>, <span class="ident">model::SortOrder</span>, <span class="ident">native_type_instance::NativeTypeInstance</span>};
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ModelWalker</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>,
     <span class="ident">common::constraint_names::ConstraintNames</span>,
-    <span class="ident">transform::ast_to_dml::db</span>::{<span class="ident">types::FieldWithArgs</span>, <span class="ident">ParserDatabase</span>, <span class="ident">ScalarField</span>},
+    <span class="ident">transform::ast_to_dml::db</span>::{<span class="ident">types::FieldWithArgs</span>, <span class="ident">ParserDatabase</span>, <span class="ident">ScalarField</span>, <span class="ident">ScalarFieldType</span>},
 };
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
@@ -195,6 +220,15 @@
         }
     }
 
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">native_type_instance</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">scalar_field</span>.<span class="ident">native_type</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">name</span>, <span class="ident">args</span>)<span class="op">|</span> {
+            <span class="self">self</span>.<span class="ident">db</span>
+                .<span class="ident">active_connector</span>()
+                .<span class="ident">parse_native_type</span>(<span class="ident">name</span>, <span class="ident">args</span>.<span class="ident">clone</span>())
+                .<span class="ident">unwrap</span>()
+        })
+    }
+
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_unsupported</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">ast_field</span>().<span class="ident">field_type</span>, <span class="ident">ast::FieldType::Unsupported</span>(<span class="kw">_</span>, <span class="kw">_</span>))
     }
@@ -206,6 +240,18 @@
             <span class="ident">db</span>: <span class="self">self</span>.<span class="ident">db</span>,
             <span class="ident">default</span>: <span class="ident">d</span>,
         })
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">scalar_type</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">dml::scalars::ScalarType</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tpe</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">scalar_field</span>.<span class="ident">r#type</span>;
+
+        <span class="kw">loop</span> {
+            <span class="kw">match</span> <span class="ident">tpe</span> {
+                <span class="ident">ScalarFieldType::BuiltInScalar</span>(<span class="ident">scalar</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">scalar</span>),
+                <span class="ident">ScalarFieldType::Alias</span>(<span class="ident">alias_id</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">tpe</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">types</span>.<span class="ident">type_aliases</span>[<span class="ident">alias_id</span>],
+                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>,
+            }
+        }
     }
 }
 
@@ -228,6 +274,10 @@
 
             <span class="ident">Cow::from</span>(<span class="ident">name</span>)
         })
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">default</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">DefaultValue</span> {
+        <span class="self">self</span>.<span class="ident">default</span>
     }
 
     <span class="kw">fn</span> <span class="ident">field</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
