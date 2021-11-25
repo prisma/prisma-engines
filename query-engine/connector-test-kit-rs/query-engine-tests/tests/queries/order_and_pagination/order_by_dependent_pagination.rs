@@ -3,7 +3,7 @@ use query_engine_tests::*;
 #[test_suite(schema(schema))]
 mod order_by_dependent_pag {
     use indoc::indoc;
-    use query_engine_tests::{assert_query_many, run_query};
+    use query_engine_tests::run_query;
 
     fn schema() -> String {
         let schema = indoc! {
@@ -78,14 +78,15 @@ mod order_by_dependent_pag {
     }
 
     // "[Hops: 1] Ordering by related record field ascending with nulls" should "work"
-    #[connector_test(only(MongoDb, Postgres))]
+    // TODO(julius): should enable for SQL Server when partial indices are in the PSL
+    #[connector_test(exclude(SqlServer))]
     async fn hop_1_related_record_asc_nulls(runner: Runner) -> TestResult<()> {
         // 1 record has the "full chain", one half, one none
         create_row(&runner, 1, Some(1), Some(1), None).await?;
         create_row(&runner, 2, Some(2), None, None).await?;
         create_row(&runner, 3, None, None, None).await?;
 
-        assert_query_many!(
+        match_connector_result!(
             &runner,
             r#"{
               findManyModelA(orderBy: { b: { id: asc }}, cursor: { id: 1 }, take: 3) {
@@ -96,10 +97,9 @@ mod order_by_dependent_pag {
               }
             }"#,
             // Depends on how null values are handled.
-            vec![
-                r#"{"data":{"findManyModelA":[{"id":1,"b":{"id":1}},{"id":2,"b":{"id":2}}]}}"#,
-                r#"{"data":{"findManyModelA":[{"id":1,"b":{"id":1}},{"id":2,"b":{"id":2}},{"id":3,"b":null}]}}"#,
-            ]
+            [MongoDb] => r#"{"data":{"findManyModelA":[{"id":1,"b":{"id":1}},{"id":2,"b":{"id":2}}]}}"#,
+            [Postgres] =>  r#"{"data":{"findManyModelA":[{"id":1,"b":{"id":1}},{"id":2,"b":{"id":2}},{"id":3,"b":null}]}}"#,
+            [MySql, Sqlite] => r#"{"data":{"findManyModelA":[{"id":3,"b":null},{"id":1,"b":{"id":1}},{"id":2,"b":{"id":2}}]}}"#
         );
 
         Ok(())
@@ -146,14 +146,15 @@ mod order_by_dependent_pag {
     }
 
     // "[Hops: 2] Ordering by related record field ascending with nulls" should "work"
-    #[connector_test(only(MongoDb, Postgres))]
+    // TODO(garren): should enable for SQL Server when partial indices are in the PSL
+    #[connector_test(exclude(SqlServer))]
     async fn hop_2_related_record_asc_null(runner: Runner) -> TestResult<()> {
         // 1 record has the "full chain", one half, one none
         create_row(&runner, 1, Some(1), Some(1), None).await?;
         create_row(&runner, 2, Some(2), None, None).await?;
         create_row(&runner, 3, None, None, None).await?;
 
-        assert_query_many!(
+        match_connector_result!(
             &runner,
             r#"{
               findManyModelA(orderBy: { b: { c: { id: asc }}}, cursor: { id: 1 }, take: 3) {
@@ -166,10 +167,10 @@ mod order_by_dependent_pag {
               }
             }"#,
             // Depends on how null values are handled.
-            vec![
-                r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"id":1}}}]}}"#,
-                r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"id":1}}},{"id":2,"b":{"c":null}},{"id":3,"b":null}]}}"#,
-            ]
+            [MongoDb] => r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"id":1}}}]}}"#,
+            [Postgres] => r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"id":1}}},{"id":2,"b":{"c":null}},{"id":3,"b":null}]}}"#,
+            [Sqlite, MySql] => r#"{"data":{"findManyModelA":[{"id":2,"b":{"c":null}},{"id":3,"b":null},{"id":1,"b":{"c":{"id":1}}}]}}"#,
+            [MySql] => r#"{"data":{"findManyModelA":[{"id":3,"b":null},{"id":2,"b":{"c":null}},{"id":1,"b":{"c":{"id":1}}}]}}"#
         );
 
         Ok(())
@@ -230,13 +231,13 @@ mod order_by_dependent_pag {
     // "[Circular with differing records] Ordering by related record field ascending" should "work"
     // TODO: Does not work on MySQL & SQLite. Figure out why?
     // TODO(julius): should enable for SQL Server when partial indices are in the PSL
-    #[connector_test(exclude(SqlServer, MySql, Sqlite))]
+    #[connector_test(exclude(SqlServer))]
     async fn circular_diff_related_record_asc(runner: Runner) -> TestResult<()> {
         // Records form circles with their relations
         create_row(&runner, 1, Some(1), Some(1), Some(3)).await?;
         create_row(&runner, 2, Some(2), Some(2), Some(4)).await?;
 
-        assert_query_many!(
+        match_connector_result!(
             &runner,
             r#"{
               findManyModelA(orderBy: { b: { c: { a: { id: asc }}}}, cursor: { id: 1 }, take: 4) {
@@ -249,29 +250,27 @@ mod order_by_dependent_pag {
                   }
                 }
               }
-            }"#,
-            // Depends on how null values are handled.
-            vec![
-                r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}}]}}"#,
-                r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":3,"b":null},{"id":4,"b":null}]}}"#,
+            }"#, // Depends on how null values are handled.
+            [MongoDb] => r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}}]}}"#,
+            [Postgres] =>  r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":3,"b":null},{"id":4,"b":null}]}}"#,
                 // CockroachDB can order ModelA.id in any order if ModelB.a_id is NULL.
-                r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":4,"b":null},{"id":3,"b":null}]}}"#,
-            ]
+            [Postgres] =>  r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":4,"b":null},{"id":3,"b":null}]}}"#,
+            // Mariadb
+            [Sqlite, MySql] =>  r#"{"data":{"findManyModelA":[{"id":3,"b":null},{"id":4,"b":null},{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}}]}}"#,
+            [MySql] =>  r#"{"data":{"findManyModelA":[{"id":4,"b":null},{"id":3,"b":null},{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}}]}}"#
         );
-
         Ok(())
     }
 
     // "[Circular with differing records] Ordering by related record field descending" should "work"
     // TODO(julius): should enable for SQL Server when partial indices are in the PSL
-    // TODO(pagination): Fix this test for Postgres & Sqlite
-    #[connector_test(exclude(SqlServer, MySql, Postgres, Sqlite))]
+    #[connector_test(exclude(SqlServer))]
     async fn circular_diff_related_record_desc(runner: Runner) -> TestResult<()> {
         // Records form circles with their relations
         create_row(&runner, 1, Some(1), Some(1), Some(3)).await?;
         create_row(&runner, 2, Some(2), Some(2), Some(4)).await?;
 
-        assert_query_many!(
+        match_connector_result!(
             &runner,
             r#"{
               findManyModelA(orderBy: { b: { c: { a: { id: desc }}}}, cursor: { id: 2 }, take: 4) {
@@ -286,12 +285,9 @@ mod order_by_dependent_pag {
               }
             }"#,
             // Depends on how null values are handled.
-            vec![
-                r#"{"data":{"findManyModelA":[{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":3,"b":null},{"id":4,"b":null}]}}"#,
-                r#"{"data":{"findManyModelA":[{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":1,"b":{"c":{"a":{"id":3}}}}]}}"#,
-            ]
+            [MongoDb, Sqlite, MySql] => r#"{"data":{"findManyModelA":[{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":3,"b":null},{"id":4,"b":null}]}}"#,
+            [Postgres] => r#"{"data":{"findManyModelA":[{"id":3,"b":null},{"id":4,"b":null},{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":1,"b":{"c":{"a":{"id":3}}}}]}}"#
         );
-
         Ok(())
     }
 

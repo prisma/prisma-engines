@@ -1,5 +1,3 @@
-use pest::Parser;
-
 use super::{
     helpers::{parsing_catch_all, TokenExtensions},
     parse_composite_type::parse_composite_type,
@@ -7,14 +5,14 @@ use super::{
     parse_model::parse_model,
     parse_source_and_generator::{parse_generator, parse_source},
     parse_types::parse_type_alias,
-    PrismaDatamodelParser, Rule,
+    Diagnostics, ParserError, PrismaDatamodelParser, Rule,
 };
 use crate::ast::*;
-use crate::diagnostics::{DatamodelError, Diagnostics};
+use pest::Parser;
 
 /// Parses a Prisma V2 datamodel document into an internal AST representation.
 pub fn parse_schema(datamodel_string: &str) -> Result<SchemaAst, Diagnostics> {
-    let mut errors = Diagnostics::new();
+    let mut diagnostics = Diagnostics::new();
     let datamodel_result = PrismaDatamodelParser::parse(Rule::schema, datamodel_string);
 
     match datamodel_result {
@@ -28,43 +26,45 @@ pub fn parse_schema(datamodel_string: &str) -> Result<SchemaAst, Diagnostics> {
 
                         match keyword.as_rule() {
                             Rule::TYPE_KEYWORD => {
-                                top_level_definitions.push(Top::CompositeType(parse_composite_type(&current, &mut errors)))
+                                top_level_definitions.push(Top::CompositeType(parse_composite_type(&current, &mut diagnostics)))
                             }
                             Rule::MODEL_KEYWORD => {
-                                top_level_definitions.push(Top::Model(parse_model(&current, &mut errors)))
+                                top_level_definitions.push(Top::Model(parse_model(&current, &mut diagnostics)))
                             }
                             _ => unreachable!(),
                         }
 
                     },
-                    Rule::enum_declaration => top_level_definitions.push(Top::Enum(parse_enum(&current, &mut errors))),
-                    Rule::source_block => top_level_definitions.push(Top::Source(parse_source(&current, &mut errors))),
-                    Rule::generator_block => top_level_definitions.push(Top::Generator(parse_generator(&current, &mut errors))),
+                    Rule::enum_declaration => top_level_definitions.push(Top::Enum(parse_enum(&current, &mut diagnostics))),
+                    Rule::source_block => top_level_definitions.push(Top::Source(parse_source(&current, &mut diagnostics))),
+                    Rule::generator_block => top_level_definitions.push(Top::Generator(parse_generator(&current, &mut diagnostics))),
                     Rule::type_alias => top_level_definitions.push(Top::Type(parse_type_alias(&current))),
                     Rule::comment_block => (),
                     Rule::EOI => {}
-                    Rule::CATCH_ALL => errors.push_error(DatamodelError::new_validation_error(
-                        &"This line is invalid. It does not start with any known Prisma schema keyword.".to_string(),
-                        Span::from_pest(current.as_span()),
+                    Rule::CATCH_ALL => diagnostics.push(ParserError::new_validation_error(
+                        "This line is invalid. It does not start with any known Prisma schema keyword.".to_owned(),
+                        current.as_span(),
                     )),
-                    Rule::arbitrary_block => errors.push_error(DatamodelError::new_validation_error(
-                        &"This block is invalid. It does not start with any known Prisma schema keyword. Valid keywords include \'model\', \'enum\', \'datasource\' and \'generator\'.".to_string(),
-                        Span::from_pest(current.as_span()),
+                    Rule::arbitrary_block => diagnostics.push(ParserError::new_validation_error(
+                        "This block is invalid. It does not start with any known Prisma schema keyword. Valid keywords include \'model\', \'enum\', \'datasource\' and \'generator\'.".to_owned(),
+                        current.as_span(),
                     )),
                     _ => parsing_catch_all(&current, "datamodel"),
                 }
             }
 
-            errors.to_result()?;
-
-            Ok(SchemaAst {
-                tops: top_level_definitions,
-            })
+            if diagnostics.is_empty() {
+                Ok(SchemaAst {
+                    tops: top_level_definitions,
+                })
+            } else {
+                Err(diagnostics)
+            }
         }
         Err(err) => {
-            let location = match err.location {
-                pest::error::InputLocation::Pos(pos) => Span::new(pos, pos),
-                pest::error::InputLocation::Span((from, to)) => Span::new(from, to),
+            let location: pest::Span<'_> = match err.location {
+                pest::error::InputLocation::Pos(pos) => pest::Span::new(datamodel_string, pos, pos).unwrap(),
+                pest::error::InputLocation::Span((from, to)) => pest::Span::new(datamodel_string, from, to).unwrap(),
             };
 
             let expected = match err.variant {
@@ -72,8 +72,8 @@ pub fn parse_schema(datamodel_string: &str) -> Result<SchemaAst, Diagnostics> {
                 _ => panic!("Could not construct parsing error. This should never happend."),
             };
 
-            errors.push_error(DatamodelError::new_parser_error(&expected, location));
-            Err(errors)
+            diagnostics.push(ParserError::new_parser_error(expected, location));
+            Err(diagnostics)
         }
     }
 }

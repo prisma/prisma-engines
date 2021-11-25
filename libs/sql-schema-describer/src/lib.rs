@@ -225,17 +225,40 @@ impl Table {
 }
 
 /// The type of an index.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, Copy)]
 pub enum IndexType {
     /// Unique type.
     Unique,
     /// Normal type.
     Normal,
+    /// Fulltext type.
+    Fulltext,
 }
 
 impl IndexType {
     pub fn is_unique(&self) -> bool {
         matches!(self, IndexType::Unique)
+    }
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, Copy)]
+pub enum SQLIndexAlgorithm {
+    BTree,
+    Hash,
+}
+
+impl AsRef<str> for SQLIndexAlgorithm {
+    fn as_ref(&self) -> &str {
+        match self {
+            Self::BTree => "BTREE",
+            Self::Hash => "HASH",
+        }
+    }
+}
+
+impl fmt::Display for SQLIndexAlgorithm {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_ref())
     }
 }
 
@@ -294,11 +317,17 @@ pub struct Index {
     pub columns: Vec<IndexColumn>,
     /// Type of index.
     pub tpe: IndexType,
+    /// BTree or Hash
+    pub algorithm: Option<SQLIndexAlgorithm>,
 }
 
 impl Index {
     pub fn is_unique(&self) -> bool {
         self.tpe == IndexType::Unique
+    }
+
+    pub fn is_fulltext(&self) -> bool {
+        self.tpe == IndexType::Fulltext
     }
 
     pub fn column_names(&self) -> impl ExactSizeIterator<Item = &str> + '_ {

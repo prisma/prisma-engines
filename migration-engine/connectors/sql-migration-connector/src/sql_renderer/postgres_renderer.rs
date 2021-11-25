@@ -14,7 +14,8 @@ use prisma_value::PrismaValue;
 use regex::Regex;
 use sql_ddl::{postgres as ddl, IndexColumn, SortOrder};
 use sql_schema_describer::{
-    walkers::*, ColumnArity, ColumnTypeFamily, DefaultKind, DefaultValue, ForeignKeyAction, SQLSortOrder, SqlSchema,
+    walkers::*, ColumnArity, ColumnTypeFamily, DefaultKind, DefaultValue, ForeignKeyAction, SQLIndexAlgorithm,
+    SQLSortOrder, SqlSchema,
 };
 use std::borrow::Cow;
 
@@ -358,6 +359,10 @@ impl SqlRenderer for PostgresFlavour {
             index_name: index.name().into(),
             is_unique: index.index_type().is_unique(),
             table_reference: index.table().name().into(),
+            using: index.algorithm().map(|algo| match algo {
+                SQLIndexAlgorithm::BTree => ddl::IndexAlgorithm::BTree,
+                SQLIndexAlgorithm::Hash => ddl::IndexAlgorithm::Hash,
+            }),
             columns: index
                 .columns()
                 .map(|c| IndexColumn {

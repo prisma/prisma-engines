@@ -1204,6 +1204,7 @@ fn mysql_multi_field_indexes_must_be_inferred(api: TestApi) {
             name: "age_and_name_index".into(),
             columns,
             tpe: IndexType::Unique,
+            algorithm: None,
         }]
     );
 }
@@ -1226,12 +1227,12 @@ fn old_mysql_multi_field_indexes_must_be_inferred(api: TestApi) {
     let columns = vec![
         IndexColumn {
             name: "name".into(),
-            sort_order: None,
+            sort_order: Some(SQLSortOrder::Asc),
             length: None,
         },
         IndexColumn {
             name: "age".into(),
-            sort_order: None,
+            sort_order: Some(SQLSortOrder::Asc),
             length: None,
         },
     ];
@@ -1242,6 +1243,7 @@ fn old_mysql_multi_field_indexes_must_be_inferred(api: TestApi) {
             name: "age_and_name_index".into(),
             columns,
             tpe: IndexType::Unique,
+            algorithm: None,
         }]
     );
 }

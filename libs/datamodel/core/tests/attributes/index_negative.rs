@@ -104,31 +104,31 @@ fn index_does_not_accept_sort_or_length_without_extended_indexes() {
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@unique": The sort and length arguments are not yet available.[0m
+        [1;91merror[0m: [1mError parsing attribute "@unique": You must enable `extendedIndexes` preview feature to use sort or length parameters.[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m         id         Int    @id
         [1;94m14 | [0m         firstName  String @[1;91munique(sort:Desc, length: 5)[0m
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@unique": The sort and length arguments are not yet available.[0m
+        [1;91merror[0m: [1mError parsing attribute "@unique": You must enable `extendedIndexes` preview feature to use sort or length parameters.[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m         firstName  String @unique(sort:Desc, length: 5)
         [1;94m15 | [0m         middleName String @[1;91munique(sort:Desc)[0m
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@unique": The sort and length arguments are not yet available.[0m
+        [1;91merror[0m: [1mError parsing attribute "@unique": You must enable `extendedIndexes` preview feature to use sort or length parameters.[0m
           [1;94m-->[0m  [4mschema.prisma:16[0m
         [1;94m   | [0m
         [1;94m15 | [0m         middleName String @unique(sort:Desc)
         [1;94m16 | [0m         lastName   String @[1;91munique(length: 5)[0m
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@index": The sort and length arguments are not yet available.[0m
+        [1;91merror[0m: [1mError parsing attribute "@index": You must enable `extendedIndexes` preview feature to use sort or length parameters.[0m
           [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
         [1;94m18 | [0m         
         [1;94m19 | [0m         @@[1;91mindex([firstName(sort: Desc), middleName(length: 5), lastName(sort: Desc, length: 5), generation])[0m
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@unique": The sort and length arguments are not yet available.[0m
+        [1;91merror[0m: [1mError parsing attribute "@unique": You must enable `extendedIndexes` preview feature to use sort or length parameters.[0m
           [1;94m-->[0m  [4mschema.prisma:20[0m
         [1;94m   | [0m
         [1;94m19 | [0m         @@index([firstName(sort: Desc), middleName(length: 5), lastName(sort: Desc, length: 5), generation])
@@ -613,6 +613,299 @@ fn length_argument_does_not_work_with_int() {
         [1;94m   | [0m
         [1;94m14 | [0m
         [1;94m15 | [0m  @@[1;91mindex([a(length: 10)])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn hash_index_doesnt_work_on_sqlserver() {
+    let dml = indoc! {r#"
+        model A {
+          id Int @id
+          a  Int
+
+          @@index([a], type: Hash)
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::SqlServer, &["extendedIndexes"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@index": The given type argument is not supported with the current connector[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m
+        [1;94m15 | [0m  @@index([a], [1;91mtype: Hash[0m)
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn fulltext_index_no_preview_feature() {
+    let dml = indoc! {r#"
+        model A {
+          id Int @id
+          a String
+          b String
+
+          @@fulltext([a, b])
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mysql, &[]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@fulltext": You must enable `fullTextIndex` preview feature to be able to define a @@fulltext index.[0m
+          [1;94m-->[0m  [4mschema.prisma:16[0m
+        [1;94m   | [0m
+        [1;94m15 | [0m
+        [1;94m16 | [0m  @@[1;91mfulltext([a, b])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn hash_index_doesnt_work_on_mysql() {
+    let dml = indoc! {r#"
+        model A {
+          id Int @id
+          a  Int
+
+          @@index([a], type: Hash)
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@index": The given type argument is not supported with the current connector[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m
+        [1;94m15 | [0m  @@index([a], [1;91mtype: Hash[0m)
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn fulltext_index_length_attribute() {
+    let dml = indoc! {r#"
+        model A {
+          id Int @id
+          a String
+          b String
+
+          @@fulltext([a(length: 30), b])
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mysql, &["fullTextIndex", "extendedIndexes"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@index": The length and sort arguments are not supported in a @@fulltext attribute.[0m
+          [1;94m-->[0m  [4mschema.prisma:16[0m
+        [1;94m   | [0m
+        [1;94m15 | [0m
+        [1;94m16 | [0m  @@[1;91mfulltext([a(length: 30), b])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn hash_index_doesnt_work_on_sqlite() {
+    let dml = indoc! {r#"
+        model A {
+          id Int @id
+          a  Int
+
+          @@index([a], type: Hash)
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Sqlite, &["extendedIndexes"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@index": The given type argument is not supported with the current connector[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m
+        [1;94m15 | [0m  @@index([a], [1;91mtype: Hash[0m)
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn fulltext_index_sort_attribute() {
+    let dml = indoc! {r#"
+        model A {
+          id Int @id
+          a String
+          b String
+
+          @@fulltext([a(sort: Desc), b])
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mysql, &["fullTextIndex", "extendedIndexes"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@index": The length and sort arguments are not supported in a @@fulltext attribute.[0m
+          [1;94m-->[0m  [4mschema.prisma:16[0m
+        [1;94m   | [0m
+        [1;94m15 | [0m
+        [1;94m16 | [0m  @@[1;91mfulltext([a(sort: Desc), b])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn hash_index_doesnt_work_on_mongo() {
+    let dml = indoc! {r#"
+        model A {
+          id Int @id
+          a  Int
+
+          @@index([a], type: Hash)
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mongo, &["extendedIndexes", "mongoDb"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@index": The given type argument is not supported with the current connector[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m
+        [1;94m15 | [0m  @@index([a], [1;91mtype: Hash[0m)
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn fulltext_index_mongodb() {
+    let dml = indoc! {r#"
+        model A {
+          id String  @id @map("_id") @test.ObjectId
+          a  String
+          b  String
+
+          @@fulltext([a, b])
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mongo, &["fullTextIndex", "mongoDb"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@fulltext": Defining fulltext indexes is not supported with the current connector.[0m
+          [1;94m-->[0m  [4mschema.prisma:16[0m
+        [1;94m   | [0m
+        [1;94m15 | [0m
+        [1;94m16 | [0m  @@[1;91mfulltext([a, b])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn fulltext_index_postgres() {
+    let dml = indoc! {r#"
+        model A {
+          id Int    @id
+          a  String
+          b  String
+
+          @@fulltext([a, b])
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mongo, &["fullTextIndex"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@fulltext": Defining fulltext indexes is not supported with the current connector.[0m
+          [1;94m-->[0m  [4mschema.prisma:16[0m
+        [1;94m   | [0m
+        [1;94m15 | [0m
+        [1;94m16 | [0m  @@[1;91mfulltext([a, b])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn fulltext_index_sql_server() {
+    let dml = indoc! {r#"
+        model A {
+          id Int    @id
+          a  String
+          b  String
+
+          @@fulltext([a, b])
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::SqlServer, &["fullTextIndex"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@fulltext": Defining fulltext indexes is not supported with the current connector.[0m
+          [1;94m-->[0m  [4mschema.prisma:16[0m
+        [1;94m   | [0m
+        [1;94m15 | [0m
+        [1;94m16 | [0m  @@[1;91mfulltext([a, b])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn fulltext_index_sqlite() {
+    let dml = indoc! {r#"
+        model A {
+          id Int    @id
+          a  String
+          b  String
+
+          @@fulltext([a, b])
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Sqlite, &["fullTextIndex"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@fulltext": Defining fulltext indexes is not supported with the current connector.[0m
+          [1;94m-->[0m  [4mschema.prisma:16[0m
+        [1;94m   | [0m
+        [1;94m15 | [0m
+        [1;94m16 | [0m  @@[1;91mfulltext([a, b])[0m
         [1;94m   | [0m
     "#]];
 

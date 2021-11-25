@@ -1,9 +1,11 @@
 use crate::model_extensions::*;
+use crate::sql_trace::SqlTraceComment;
 use connector_interface::{DatasourceFieldName, WriteArgs, WriteExpression};
 use itertools::Itertools;
 use prisma_models::*;
 use quaint::ast::*;
 use std::{collections::HashSet, convert::TryInto};
+use tracing::Span;
 
 /// `INSERT` a new record to the database. Resulting an `INSERT` ast and an
 /// optional `RecordProjection` if available from the arguments or model.
@@ -31,7 +33,9 @@ pub fn create_record(model: &ModelRef, mut args: WriteArgs) -> (Insert<'static>,
         });
 
     (
-        Insert::from(insert).returning(model.primary_identifier().as_columns()),
+        Insert::from(insert)
+            .returning(model.primary_identifier().as_columns())
+            .append_trace(&Span::current()),
         return_id,
     )
 }
@@ -77,6 +81,7 @@ pub fn create_records_nonempty(
     let insert = Insert::multi_into(model.as_table(), columns);
     let insert = values.into_iter().fold(insert, |stmt, values| stmt.values(values));
     let insert: Insert = insert.into();
+    let insert = insert.append_trace(&Span::current());
 
     if skip_duplicates {
         insert.on_conflict(OnConflict::DoNothing)
@@ -89,6 +94,7 @@ pub fn create_records_nonempty(
 #[tracing::instrument(skip(model, skip_duplicates))]
 pub fn create_records_empty(model: &ModelRef, skip_duplicates: bool) -> Insert<'static> {
     let insert: Insert<'static> = Insert::single_into(model.as_table()).into();
+    let insert = insert.append_trace(&Span::current());
 
     if skip_duplicates {
         insert.on_conflict(OnConflict::DoNothing)
@@ -152,6 +158,8 @@ pub fn update_many(model: &ModelRef, ids: &[&RecordProjection], args: WriteArgs)
             acc.set(name, value)
         });
 
+    let query = query.append_trace(&Span::current());
+
     let columns: Vec<_> = model.primary_identifier().as_columns().collect();
     let result: Vec<Query> = super::chunked_conditions(&columns, ids, |conditions| query.clone().so_that(conditions));
 
@@ -163,7 +171,9 @@ pub fn delete_many(model: &ModelRef, ids: &[&RecordProjection]) -> Vec<Query<'st
     let columns: Vec<_> = model.primary_identifier().as_columns().collect();
 
     super::chunked_conditions(&columns, ids, |conditions| {
-        Delete::from_table(model.as_table()).so_that(conditions)
+        Delete::from_table(model.as_table())
+            .so_that(conditions)
+            .append_trace(&Span::current())
     })
 }
 
@@ -188,6 +198,7 @@ pub fn create_relation_table_records(
         insert.values(values)
     });
 
+    // NOTE: There is no comment support for MultiRowInsert
     insert.build().on_conflict(OnConflict::DoNothing).into()
 }
 
@@ -211,5 +222,7 @@ pub fn delete_relation_table_records(
 
     let child_id_criteria = super::conditions(&child_columns, child_ids);
 
-    Delete::from_table(relation.as_table()).so_that(parent_id_criteria.and(child_id_criteria))
+    Delete::from_table(relation.as_table())
+        .so_that(parent_id_criteria.and(child_id_criteria))
+        .append_trace(&Span::current())
 }

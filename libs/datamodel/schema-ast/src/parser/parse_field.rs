@@ -3,12 +3,11 @@ use super::{
     parse_attribute::parse_attribute,
     parse_comments::*,
     parse_types::parse_field_type,
-    Rule,
+    ParserError, Rule,
 };
 use crate::ast::*;
-use crate::diagnostics::DatamodelError;
 
-pub fn parse_field(model_name: &str, token: &Token<'_>) -> Result<Field, DatamodelError> {
+pub fn parse_field(model_name: &str, token: &Token<'_>) -> Result<Field, ParserError> {
     let mut name: Option<Identifier> = None;
     let mut attributes: Vec<Attribute> = Vec::new();
     let mut field_type: Option<(FieldArity, FieldType)> = None;
@@ -19,9 +18,9 @@ pub fn parse_field(model_name: &str, token: &Token<'_>) -> Result<Field, Datamod
             Rule::non_empty_identifier => name = Some(current.to_id()),
             Rule::field_type => field_type = Some(parse_field_type(&current)?),
             Rule::LEGACY_COLON => {
-                return Err(DatamodelError::new_legacy_parser_error(
+                return Err(ParserError::new_legacy_parser_error(
                     "Field declarations don't require a `:`.",
-                    Span::from_pest(current.as_span()),
+                    current.as_span(),
                 ))
             }
             Rule::attribute => attributes.push(parse_attribute(&current)),
@@ -41,10 +40,10 @@ pub fn parse_field(model_name: &str, token: &Token<'_>) -> Result<Field, Datamod
             span: Span::from_pest(token.as_span()),
             is_commented_out: false,
         }),
-        _ => Err(DatamodelError::new_model_validation_error(
-            &"This field declaration is invalid. It is either missing a name or a type.".to_string(),
-            model_name,
-            Span::from_pest(token.as_span()),
+        _ => Err(ParserError::new_model_validation_error(
+            "This field declaration is invalid. It is either missing a name or a type.".to_owned(),
+            model_name.to_owned(),
+            token.as_span(),
         )),
     }
 }

@@ -28,6 +28,18 @@ pub struct Model {
     pub is_ignored: bool,
 }
 
+#[derive(Debug, PartialEq, Clone, Copy)]
+pub enum IndexAlgorithm {
+    BTree,
+    Hash,
+}
+
+impl Default for IndexAlgorithm {
+    fn default() -> Self {
+        Self::BTree
+    }
+}
+
 /// Represents an index defined via `@@index`, `@unique` or `@@unique`.
 #[derive(Debug, PartialEq, Clone)]
 pub struct IndexDefinition {
@@ -35,6 +47,7 @@ pub struct IndexDefinition {
     pub db_name: Option<String>,
     pub fields: Vec<IndexField>,
     pub tpe: IndexType,
+    pub algorithm: Option<IndexAlgorithm>,
     pub defined_on_field: bool,
 }
 
@@ -42,7 +55,12 @@ impl IndexDefinition {
     pub fn is_unique(&self) -> bool {
         matches!(self.tpe, IndexType::Unique)
     }
+
+    pub fn is_fulltext(&self) -> bool {
+        matches!(self.tpe, IndexType::Fulltext)
+    }
 }
+
 ///A field in an index that optionally defines a sort order and length limit.
 #[derive(Debug, PartialEq, Clone)]
 pub struct IndexField {
@@ -112,6 +130,7 @@ impl fmt::Display for PrimaryKeyField {
 pub enum IndexType {
     Unique,
     Normal,
+    Fulltext,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy)]

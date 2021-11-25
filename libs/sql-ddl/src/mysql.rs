@@ -306,17 +306,26 @@ impl Display for DropIndex<'_> {
     }
 }
 
+#[derive(Debug, Copy, Clone)]
+pub enum IndexType {
+    Normal,
+    Unique,
+    Fulltext,
+}
+
 #[derive(Debug)]
 pub struct IndexClause<'a> {
     pub index_name: Option<Cow<'a, str>>,
-    pub unique: bool,
+    pub r#type: IndexType,
     pub columns: Vec<IndexColumn<'a>>,
 }
 
 impl Display for IndexClause<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if self.unique {
-            f.write_str("UNIQUE ")?;
+        match self.r#type {
+            IndexType::Normal => (),
+            IndexType::Unique => f.write_str("UNIQUE ")?,
+            IndexType::Fulltext => f.write_str("FULLTEXT ")?,
         }
 
         f.write_str("INDEX ")?;

@@ -134,6 +134,7 @@ fn format_should_enforce_order_of_block_attributes() {
           yearOfBirth Int
           @@map("blog")
           @@index([yearOfBirth])
+          @@fulltext([firstName, lastName, codeName])
           @@unique([codeName, yearOfBirth])
           @@id([firstName, lastName])
         }
@@ -143,6 +144,7 @@ fn format_should_enforce_order_of_block_attributes() {
           name  String
           posts Post[]
           @@id([id])
+          @@fulltext([name])
           @@index([id, name])
           @@unique([name])
           @@map("blog")
@@ -159,6 +161,7 @@ fn format_should_enforce_order_of_block_attributes() {
           @@id([firstName, lastName])
           @@unique([codeName, yearOfBirth])
           @@index([yearOfBirth])
+          @@fulltext([firstName, lastName, codeName])
           @@map("blog")
         }
 
@@ -170,6 +173,7 @@ fn format_should_enforce_order_of_block_attributes() {
           @@id([id])
           @@unique([name])
           @@index([id, name])
+          @@fulltext([name])
           @@map("blog")
         }
     "#]];

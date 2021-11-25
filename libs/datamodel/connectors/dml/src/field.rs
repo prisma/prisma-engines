@@ -62,13 +62,6 @@ impl FieldType {
         }
     }
 
-    pub fn is_compatible_with(&self, other: &FieldType) -> bool {
-        match (self, other) {
-            (Self::Scalar(a, _, nta), Self::Scalar(b, _, ntb)) => a == b && nta == ntb, // the name of the type alias is not important for the comparison
-            (a, b) => a == b,
-        }
-    }
-
     pub fn is_datetime(&self) -> bool {
         self.scalar_type().map(|st| st.is_datetime()).unwrap_or(false)
     }
@@ -408,11 +401,7 @@ impl RelationField {
     pub fn default_on_update_action(&self) -> ReferentialAction {
         use ReferentialAction::*;
 
-        match self.referential_arity {
-            _ if !self.emulates_referential_actions.unwrap_or(false) => Cascade,
-            FieldArity::Required => NoAction,
-            _ => SetNull,
-        }
+        Cascade
     }
 }
 
@@ -420,6 +409,7 @@ impl WithName for RelationField {
     fn name(&self) -> &String {
         &self.name
     }
+
     fn set_name(&mut self, name: &str) {
         self.name = String::from(name)
     }

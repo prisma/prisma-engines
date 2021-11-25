@@ -183,13 +183,49 @@ impl ModelAttributes<'_> {
     }
 }
 
+#[derive(Debug, Clone, Copy)]
+pub enum IndexAlgorithm {
+    BTree,
+    Hash,
+}
+
+impl Default for IndexAlgorithm {
+    fn default() -> Self {
+        Self::BTree
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub(crate) enum IndexType {
+    Normal,
+    Unique,
+    Fulltext,
+}
+
+impl Default for IndexType {
+    fn default() -> Self {
+        Self::Normal
+    }
+}
+
 #[derive(Debug, Default)]
 pub(crate) struct IndexAttribute<'ast> {
-    pub(crate) is_unique: bool,
+    pub(crate) r#type: IndexType,
     pub(crate) fields: Vec<FieldWithArgs>,
     pub(crate) source_field: Option<ast::FieldId>,
     pub(crate) name: Option<&'ast str>,
     pub(crate) db_name: Option<Cow<'ast, str>>,
+    pub(crate) algorithm: Option<IndexAlgorithm>,
+}
+
+impl<'ast> IndexAttribute<'ast> {
+    pub(crate) fn is_unique(&self) -> bool {
+        matches!(self.r#type, IndexType::Unique)
+    }
+
+    pub(crate) fn is_fulltext(&self) -> bool {
+        matches!(self.r#type, IndexType::Fulltext)
+    }
 }
 
 #[derive(Debug)]
@@ -407,7 +443,7 @@ fn detect_alias_cycles(ctx: &mut Context<'_>) {
                 errors.push((
                     *alias_id,
                     DatamodelError::new_validation_error(
-                        &format!(
+                        format!(
                             "Recursive type definitions are not allowed. Recursive path was: {} -> {}.",
                             path.iter().map(|id| &ctx.db.ast[*id].name.name).join(" -> "),
                             &next_alias.name.name,
@@ -468,7 +504,7 @@ fn visit_composite_type<'ast>(ct_id: ast::CompositeTypeId, ct: &'ast ast::Compos
 fn visit_enum<'ast>(enm: &'ast ast::Enum, ctx: &mut Context<'ast>) {
     if !ctx.db.active_connector().supports_enums() {
         ctx.push_error(DatamodelError::new_validation_error(
-            &format!(
+            format!(
                 "You defined the enum `{}`. But the current connector does not support enums.",
                 &enm.name.name
             ),
@@ -478,7 +514,7 @@ fn visit_enum<'ast>(enm: &'ast ast::Enum, ctx: &mut Context<'ast>) {
 
     if enm.values.is_empty() {
         ctx.push_error(DatamodelError::new_validation_error(
-            "An enum must have at least one value.",
+            "An enum must have at least one value.".to_owned(),
             enm.span,
         ))
     }
@@ -490,7 +526,7 @@ fn visit_type_alias<'ast>(alias_id: ast::AliasId, alias: &'ast ast::Field, ctx: 
             ctx.db.types.type_aliases.insert(alias_id, scalar_field_type);
         }
         Ok(FieldType::Model(_)) => ctx.push_error(DatamodelError::new_validation_error(
-            "Only scalar types can be used for defining custom types.",
+            "Only scalar types can be used for defining custom types.".to_owned(),
             alias.field_type.span(),
         )),
         Err(supported) => ctx.push_error(DatamodelError::new_type_not_found_error(
@@ -562,7 +598,7 @@ fn validate_unsupported_field_type(ast_field: &ast::Field, unsupported_lit: &str
                         unsupported_lit, ast_field.name.name, prisma_type.to_string(), &source.name, native_type.render()
                     );
 
-                ctx.push_error(DatamodelError::new_validation_error(&msg, ast_field.span));
+                ctx.push_error(DatamodelError::new_validation_error(msg, ast_field.span));
             }
         }
     }

@@ -5,7 +5,6 @@ use crate::{
     ast,
     transform::ast_to_dml::db::{relations::*, ParserDatabase, ScalarFieldType},
 };
-use datamodel_connector::ConnectorCapability;
 use dml::relation_info::ReferentialAction;
 
 /// A relation that has the minimal amount of information for us to create one. Useful for
@@ -82,6 +81,10 @@ impl<'ast, 'db> InlineRelationWalker<'ast, 'db> {
     /// Get the relation attributes defined in the AST.
     fn get(self) -> &'db Relation<'ast> {
         &self.db.relations.relations_storage[self.relation_id]
+    }
+
+    pub(crate) fn db(self) -> &'db ParserDatabase<'ast> {
+        self.db
     }
 
     /// The relation is 1:1, having at most one record on both sides of the relation.
@@ -369,18 +372,7 @@ impl<'ast, 'db> CompleteInlineRelationWalker<'ast, 'db> {
     pub(crate) fn on_update(self) -> ReferentialAction {
         use ReferentialAction::*;
 
-        self.referencing_field().attributes().on_update.unwrap_or_else(|| {
-            let uses_foreign_keys = self
-                .db
-                .active_connector()
-                .has_capability(ConnectorCapability::ForeignKeys);
-
-            match self.referential_arity() {
-                _ if uses_foreign_keys => Cascade,
-                ast::FieldArity::Required => NoAction,
-                _ => SetNull,
-            }
-        })
+        self.referencing_field().attributes().on_update.unwrap_or(Cascade)
     }
 
     /// Gives the onDelete referential action of the relation. If not defined

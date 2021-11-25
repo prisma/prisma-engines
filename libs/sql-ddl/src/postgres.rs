@@ -318,21 +318,33 @@ impl<'a> Display for CreateEnum<'a> {
     }
 }
 
+pub enum IndexAlgorithm {
+    BTree,
+    Hash,
+}
+
 pub struct CreateIndex<'a> {
     pub index_name: PostgresIdentifier<'a>,
     pub is_unique: bool,
     pub table_reference: PostgresIdentifier<'a>,
     pub columns: Vec<IndexColumn<'a>>,
+    pub using: Option<IndexAlgorithm>,
 }
 
 impl<'a> Display for CreateIndex<'a> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let using = match self.using {
+            Some(IndexAlgorithm::Hash) => " USING HASH ",
+            _ => "",
+        };
+
         write!(
             f,
-            "CREATE {uniqueness}INDEX {index_name} ON {table_reference}(",
+            "CREATE {uniqueness}INDEX {index_name} ON {table_reference}{using}(",
             uniqueness = if self.is_unique { "UNIQUE " } else { "" },
             index_name = self.index_name,
             table_reference = self.table_reference,
+            using = using,
         )?;
 
         self.columns
@@ -392,11 +404,30 @@ mod tests {
             index_name: "meow_idx".into(),
             table_reference: "Cat".into(),
             columns,
+            using: None,
         };
 
         assert_eq!(
             create_index.to_string(),
             "CREATE UNIQUE INDEX \"meow_idx\" ON \"Cat\"(\"name\", \"age\")"
+        )
+    }
+
+    #[test]
+    fn create_hash_index() {
+        let columns = vec![IndexColumn::new("name")];
+
+        let create_index = CreateIndex {
+            is_unique: false,
+            index_name: "meow_idx".into(),
+            table_reference: "Cat".into(),
+            columns,
+            using: Some(IndexAlgorithm::Hash),
+        };
+
+        assert_eq!(
+            create_index.to_string(),
+            "CREATE INDEX \"meow_idx\" ON \"Cat\" USING HASH (\"name\")"
         )
     }
 
@@ -420,6 +451,7 @@ mod tests {
             index_name: "meow_idx".into(),
             table_reference: "Cat".into(),
             columns,
+            using: None,
         };
 
         assert_eq!(

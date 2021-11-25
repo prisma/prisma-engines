@@ -1,6 +1,6 @@
 use indoc::{formatdoc, indoc};
 use migration_engine_tests::test_api::*;
-use sql_schema_describer::SQLSortOrder;
+use sql_schema_describer::{SQLIndexAlgorithm, SQLSortOrder};
 
 #[test_connector(preview_features("referentialIntegrity"))]
 fn index_on_compound_relation_fields_must_work(api: TestApi) {
@@ -536,6 +536,33 @@ fn column_type_migrations_should_not_implicitly_drop_compound_indexes(api: TestA
     });
 }
 
+#[test_connector(tags(Postgres), exclude(Cockroach), preview_features("extendedIndexes"))]
+fn hash_index(api: TestApi) {
+    let dm = formatdoc! {r#"
+        {}
+
+        generator client {{
+            provider = "prisma-client-js"
+            previewFeatures = ["extendedIndexes"]
+        }}
+
+        model A {{
+          id Int @id
+          a  Int
+
+          @@index([a], type: Hash)
+        }}
+    "#, api.datasource_block()};
+
+    api.schema_push(&dm).send().assert_green();
+
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_index_on_columns(&["a"], |index| {
+            index.assert_is_not_unique().assert_algorithm(SQLIndexAlgorithm::Hash)
+        })
+    });
+}
+
 #[test_connector(tags(Mysql8), preview_features("extendedIndexes"))]
 fn length_prefixed_index(api: TestApi) {
     let dm = formatdoc! {r#"
@@ -861,6 +888,31 @@ fn removal_descending_unique(api: TestApi) {
     });
 }
 
+#[test_connector(tags(Postgres), exclude(Cockroach))]
+fn index_algo_should_not_change_without_preview_feature(api: TestApi) {
+    let sql = indoc! {r#"
+        CREATE TABLE "A" (
+            id INT PRIMARY KEY,
+            a INT NOT NULL
+        );
+
+        CREATE INDEX "A_a_idx" ON "A" USING HASH (a);
+    "#};
+
+    api.raw_cmd(sql);
+
+    let dm = indoc! {r#"
+        model A {
+          id Int @id
+          a  Int
+
+          @@index([a])
+        }
+    "#};
+
+    api.schema_push_w_datasource(dm).send().assert_no_steps();
+}
+
 #[test_connector(tags(Mysql8))]
 fn removal_descending_unique_should_not_happen_without_preview_feature(api: TestApi) {
     let sql = indoc! {r#"
@@ -899,6 +951,85 @@ fn removal_index_length_prefix_should_not_happen_without_preview_feature(api: Te
         model A {
           id Int    @id
           a  String @unique @db.VarChar(255)
+        }
+    "#};
+
+    api.schema_push_w_datasource(dm).send().assert_no_steps();
+}
+
+#[test_connector(tags(Mysql), preview_features("fullTextIndex"))]
+fn fulltext_index(api: TestApi) {
+    let dm = formatdoc! {r#"
+        {}
+
+        generator client {{
+          provider = "prisma-client-js"
+          previewFeatures = ["fullTextIndex"]
+        }}
+
+        model A {{
+          id Int    @id
+          a  String @db.Text
+          b  String @db.Text
+
+          @@fulltext([a, b])
+        }}
+    "#, api.datasource_block()};
+
+    api.schema_push(&dm).send().assert_green();
+
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_index_on_columns(&["a", "b"], |index| index.assert_is_fulltext().assert_name("A_a_b_idx"))
+    });
+}
+
+#[test_connector(tags(Mysql), preview_features("fullTextIndex"))]
+fn fulltext_index_with_map(api: TestApi) {
+    let dm = formatdoc! {r#"
+        {}
+
+        generator client {{
+          provider = "prisma-client-js"
+          previewFeatures = ["fullTextIndex"]
+        }}
+
+        model A {{
+          id Int    @id
+          a  String @db.Text
+          b  String @db.Text
+
+          @@fulltext([a, b], map: "with_map")
+        }}
+    "#, api.datasource_block()};
+
+    api.schema_push(&dm).send().assert_green();
+
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_index_on_columns(&["a", "b"], |index| index.assert_is_fulltext().assert_name("with_map"))
+    });
+}
+
+#[test_connector(tags(Mysql))]
+fn do_not_overwrite_fulltext_index_without_preview_feature(api: TestApi) {
+    let sql = indoc! {r#"
+        CREATE TABLE `A` (
+            id INT PRIMARY KEY,
+            a VARCHAR(255) NOT NULL,
+            b VARCHAR(255) NOT NULL
+        );
+
+        CREATE FULLTEXT INDEX `A_a_b_idx` ON `A` (a, b);
+    "#};
+
+    api.raw_cmd(sql);
+
+    let dm = indoc! {r#"
+        model A {
+          id Int    @id
+          a  String @db.VarChar(255)
+          b  String @db.VarChar(255)
+
+          @@index([a, b])
         }
     "#};
 

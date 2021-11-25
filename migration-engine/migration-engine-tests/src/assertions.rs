@@ -9,7 +9,7 @@ use pretty_assertions::assert_eq;
 use prisma_value::PrismaValue;
 use sql_schema_describer::{
     Column, ColumnTypeFamily, DefaultKind, DefaultValue, Enum, ForeignKey, ForeignKeyAction, Index, IndexType,
-    PrimaryKey, SQLSortOrder, SqlSchema, Table,
+    PrimaryKey, SQLIndexAlgorithm, SQLSortOrder, SqlSchema, Table,
 };
 use test_setup::{BitFlags, Tags};
 
@@ -742,6 +742,12 @@ impl<'a> IndexAssertion<'a> {
         self
     }
 
+    pub fn assert_is_fulltext(self) -> Self {
+        assert_eq!(self.0.tpe, IndexType::Fulltext);
+
+        self
+    }
+
     pub fn assert_is_unique(self) -> Self {
         assert_eq!(self.0.tpe, IndexType::Unique);
 
@@ -750,6 +756,12 @@ impl<'a> IndexAssertion<'a> {
 
     pub fn assert_is_not_unique(self) -> Self {
         assert_eq!(self.0.tpe, IndexType::Normal);
+
+        self
+    }
+
+    pub fn assert_algorithm(self, algo: SQLIndexAlgorithm) -> Self {
+        assert_eq!(self.0.algorithm, Some(algo));
 
         self
     }

@@ -1,5 +1,5 @@
 use crate::test_api::*;
-use sql_schema_describer::ColumnTypeFamily;
+use sql_schema_describer::{ColumnTypeFamily, IndexColumn, SQLSortOrder};
 
 #[test_connector(tags(Cockroach))]
 fn views_can_be_described(api: TestApi) {
@@ -206,4 +206,63 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                 .assert_column_type_family(ColumnTypeFamily::Uuid)
         })
     });
+}
+
+#[test_connector(tags(Cockroach))]
+fn cockroach_multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
+    let schema = format!(
+        r##"
+            CREATE TABLE "{schema_name}"."indexes_test" (
+                id TEXT PRIMARY KEY,
+                name TEXT NOT NULL,
+                age INTEGER NOT NULL
+            );
+
+            CREATE UNIQUE INDEX "my_idx" ON "{schema_name}"."indexes_test" (name, age);
+            CREATE INDEX "my_idx2" ON "{schema_name}"."indexes_test" (age, name);
+        "##,
+        schema_name = api.schema_name()
+    );
+    api.raw_cmd(&schema);
+
+    let schema = api.describe();
+
+    let table = schema.table_bang("indexes_test");
+    let index = &table.indices[1];
+
+    assert_eq!(
+        &index.columns,
+        &[
+            IndexColumn {
+                name: "name".to_string(),
+                sort_order: Some(SQLSortOrder::Asc),
+                length: None
+            },
+            IndexColumn {
+                name: "age".to_string(),
+                sort_order: Some(SQLSortOrder::Asc),
+                length: None
+            },
+        ]
+    );
+    assert!(index.tpe.is_unique());
+
+    let index = &table.indices[0];
+
+    assert!(!index.tpe.is_unique());
+    assert_eq!(
+        &index.columns,
+        &[
+            IndexColumn {
+                name: "age".to_string(),
+                sort_order: Some(SQLSortOrder::Asc),
+                length: None
+            },
+            IndexColumn {
+                name: "name".to_string(),
+                sort_order: Some(SQLSortOrder::Asc),
+                length: None
+            },
+        ]
+    );
 }

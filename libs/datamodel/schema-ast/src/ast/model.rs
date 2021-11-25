@@ -1,15 +1,15 @@
-use super::*;
+use super::{Attribute, Comment, Field, Identifier, Span, WithAttributes, WithDocumentation, WithIdentifier, WithSpan};
 
 /// An opaque identifier for a field in an AST model. Use the
 /// `model[field_id]` syntax to resolve the id to an `ast::Field`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub(crate) struct FieldId(pub(super) u32);
+pub struct FieldId(pub(super) u32);
 
 impl FieldId {
     /// Used for range bounds when iterating over BTreeMaps.
-    pub(crate) const ZERO: FieldId = FieldId(0);
+    pub const ZERO: FieldId = FieldId(0);
     /// Used for range bounds when iterating over BTreeMaps.
-    pub(crate) const MAX: FieldId = FieldId(u32::MAX);
+    pub const MAX: FieldId = FieldId(u32::MAX);
 }
 
 impl std::ops::Index<FieldId> for Model {
@@ -38,22 +38,22 @@ pub struct Model {
 }
 
 impl Model {
-    pub(crate) fn iter_fields(&self) -> impl Iterator<Item = (FieldId, &Field)> {
+    pub fn iter_fields(&self) -> impl Iterator<Item = (FieldId, &Field)> {
         self.fields
             .iter()
             .enumerate()
             .map(|(idx, field)| (FieldId(idx as u32), field))
     }
 
-    pub(crate) fn find_field(&self, name: &str) -> Option<&Field> {
+    pub fn find_field(&self, name: &str) -> Option<&Field> {
         self.fields.iter().find(|ast_field| ast_field.name.name == name)
     }
 
-    pub(crate) fn find_field_bang(&self, name: &str) -> &Field {
+    pub fn find_field_bang(&self, name: &str) -> &Field {
         self.find_field(name).unwrap()
     }
 
-    pub(crate) fn name(&self) -> &str {
+    pub fn name(&self) -> &str {
         &self.name.name
     }
 }
@@ -71,7 +71,7 @@ impl WithSpan for Model {
 }
 
 impl WithAttributes for Model {
-    fn attributes(&self) -> &Vec<Attribute> {
+    fn attributes(&self) -> &[Attribute] {
         &self.attributes
     }
 }

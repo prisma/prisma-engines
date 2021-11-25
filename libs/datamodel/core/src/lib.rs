@@ -166,7 +166,7 @@ fn parse_datamodel_internal(
 }
 
 pub fn parse_schema_ast(datamodel_string: &str) -> Result<SchemaAst, diagnostics::Diagnostics> {
-    ast::parse_schema(datamodel_string)
+    Ok(ast::parse_schema(datamodel_string)?)
 }
 
 /// Loads all configuration blocks from a datamodel using the built-in source definitions.

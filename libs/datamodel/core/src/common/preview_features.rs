@@ -60,6 +60,7 @@ features!(
     InteractiveTransactions,
     NamedConstraints,
     FullTextSearch,
+    FullTextIndex,
     DataProxy,
     ExtendedIndexes,
     Cockroachdb,
@@ -77,6 +78,7 @@ pub static GENERATOR: Lazy<FeatureMap> = Lazy::new(|| {
             MongoDb,
             InteractiveTransactions,
             FullTextSearch,
+            FullTextIndex,
             DataProxy,
             ExtendedIndexes,
         ])

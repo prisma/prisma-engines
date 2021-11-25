@@ -401,6 +401,7 @@ fn implicit_unique_constraint_on_one_to_one() {
         fields: vec![IndexField::new("user_id")],
         tpe: IndexType::Unique,
         defined_on_field: true,
+        algorithm: None,
     });
 }
 
@@ -445,6 +446,7 @@ fn implicit_unique_constraint_on_compound_one_to_one() {
         fields: vec![IndexField::new("user_id_1"), IndexField::new("user_id_2")],
         tpe: IndexType::Unique,
         defined_on_field: false,
+        algorithm: None,
     });
 }
 

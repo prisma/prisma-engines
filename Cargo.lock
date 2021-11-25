@@ -981,6 +981,7 @@ dependencies = [
  "pretty_assertions",
  "prisma-value",
  "regex",
+ "schema-ast",
  "serde",
  "serde_json",
  "sql-datamodel-connector",
@@ -3783,6 +3784,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "schema-ast"
+version = "0.1.0"
+dependencies = [
+ "pest",
+ "pest_derive",
+]
+
+[[package]]
 name = "scopeguard"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4188,6 +4197,7 @@ dependencies = [
  "futures",
  "itertools 0.10.1",
  "once_cell",
+ "opentelemetry",
  "prisma-models",
  "prisma-value",
  "quaint",
@@ -4199,6 +4209,7 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-futures",
+ "tracing-opentelemetry",
  "user-facing-errors",
  "uuid",
 ]

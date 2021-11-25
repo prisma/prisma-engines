@@ -2,11 +2,9 @@ use super::{
     helpers::{parsing_catch_all, ToIdentifier, Token, TokenExtensions},
     parse_attribute::parse_attribute,
     parse_comments::parse_comment_block,
-    Rule,
+    ParserError, Rule,
 };
-use crate::ast::parser::parse_expression::parse_expression;
-use crate::ast::*;
-use crate::diagnostics::DatamodelError;
+use crate::{ast::*, parser::parse_expression::parse_expression};
 
 pub fn parse_type_alias(token: &Token<'_>) -> Field {
     let mut name: Option<Identifier> = None;
@@ -42,23 +40,23 @@ pub fn parse_type_alias(token: &Token<'_>) -> Field {
     }
 }
 
-pub fn parse_field_type(token: &Token<'_>) -> Result<(FieldArity, FieldType), DatamodelError> {
+pub fn parse_field_type(token: &Token<'_>) -> Result<(FieldArity, FieldType), ParserError> {
     let current = token.first_relevant_child();
     match current.as_rule() {
         Rule::optional_type => Ok((FieldArity::Optional, parse_base_type(&current.first_relevant_child()))),
         Rule::base_type => Ok((FieldArity::Required, parse_base_type(&current))),
         Rule::list_type => Ok((FieldArity::List, parse_base_type(&current.first_relevant_child()))),
-        Rule::legacy_required_type => Err(DatamodelError::new_legacy_parser_error(
+        Rule::legacy_required_type => Err(ParserError::new_legacy_parser_error(
             "Fields are required by default, `!` is no longer required.",
-            Span::from_pest(current.as_span()),
+            current.as_span(),
         )),
-        Rule::legacy_list_type => Err(DatamodelError::new_legacy_parser_error(
+        Rule::legacy_list_type => Err(ParserError::new_legacy_parser_error(
             "To specify a list, please use `Type[]` instead of `[Type]`.",
-            Span::from_pest(current.as_span()),
+            current.as_span(),
         )),
-        Rule::unsupported_optional_list_type => Err(DatamodelError::new_legacy_parser_error(
+        Rule::unsupported_optional_list_type => Err(ParserError::new_legacy_parser_error(
             "Optional lists are not supported. Use either `Type[]` or `Type?`.",
-            Span::from_pest(current.as_span()),
+            current.as_span(),
         )),
         _ => unreachable!("Encountered impossible field during parsing: {:?}", current.tokens()),
     }

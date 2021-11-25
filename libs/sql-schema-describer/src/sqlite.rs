@@ -454,6 +454,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                     false => IndexType::Normal,
                 },
                 columns: vec![],
+                algorithm: None,
             };
 
             let sql = format!(r#"PRAGMA index_info("{}");"#, name);

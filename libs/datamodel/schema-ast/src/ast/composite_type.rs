@@ -2,7 +2,7 @@ use crate::ast::{Comment, Field, FieldId, Identifier, SchemaAst, Span};
 
 /// A composite type declaration.
 #[derive(Debug, Clone, PartialEq)]
-pub(crate) struct CompositeType {
+pub struct CompositeType {
     /// The name of the type.
     pub name: Identifier,
     /// The fields of the type.
@@ -14,11 +14,11 @@ pub(crate) struct CompositeType {
 }
 
 impl CompositeType {
-    pub(crate) fn is_commented_out(&self) -> bool {
+    pub fn is_commented_out(&self) -> bool {
         false
     }
 
-    pub(crate) fn iter_fields(&self) -> impl Iterator<Item = (FieldId, &Field)> {
+    pub fn iter_fields(&self) -> impl Iterator<Item = (FieldId, &Field)> {
         self.fields
             .iter()
             .enumerate()
@@ -29,7 +29,7 @@ impl CompositeType {
 /// An opaque identifier for a type definition in a schema AST. Use the
 /// `schema[type_id]` syntax to resolve the id to an `ast::CompositeType`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub(crate) struct CompositeTypeId(pub(super) u32);
+pub struct CompositeTypeId(pub(super) u32);
 
 impl std::ops::Index<CompositeTypeId> for SchemaAst {
     type Output = CompositeType;

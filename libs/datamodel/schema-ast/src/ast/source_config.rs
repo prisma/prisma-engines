@@ -1,4 +1,4 @@
-use super::*;
+use super::{Argument, Comment, Identifier, Span, WithDocumentation, WithIdentifier, WithSpan};
 
 /// A source block declaration.
 #[derive(Debug, Clone, PartialEq)]

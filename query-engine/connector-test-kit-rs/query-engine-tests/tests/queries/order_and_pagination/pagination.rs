@@ -4,7 +4,7 @@ use std::cmp;
 #[test_suite(schema(schema))]
 mod pagination {
     use indoc::indoc;
-    use query_engine_tests::{assert_query_many, run_query};
+    use query_engine_tests::run_query;
 
     fn schema() -> String {
         let schema = indoc! {
@@ -781,20 +781,15 @@ mod pagination {
         // 3 => B B B B <- take
         // 2 => A A A B <- take
         // 1 => A B C D <- take
-        assert_query_many!(
+        insta::assert_snapshot!(
+          run_query!(
             &runner,
             r#"query {
                 findManyTestModel(cursor: { id: 4 }, take: 3, skip: 1, orderBy: [{ fieldA: desc }, { fieldB: asc }, { fieldC: asc }, { fieldD: desc }]) {
                   id
                 }
-            }"#,
-            vec![
-                r#"{"data":{"findManyTestModel":[{"id":3},{"id":5},{"id":2}]}}"#,
-                r#"{"data":{"findManyTestModel":[{"id":5},{"id":3},{"id":2}]}}"#,
-                r#"{"data":{"findManyTestModel":[{"id":3},{"id":2},{"id":1}]}}"#,
-                r#"{"data":{"findManyTestModel":[{"id":5},{"id":2},{"id":1}]}}"#,
-                r#"{"data":{"findManyTestModel":[{"id":2},{"id":1}]}}"#,
-            ]
+            }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":5},{"id":2},{"id":1}]}}"###
         );
 
         // >>> TEST #2
@@ -811,20 +806,15 @@ mod pagination {
         // 3 => B B B B <- take
         // 5 => B B B B <- take
         // 6 => C C D C <- take
-        assert_query_many!(
+        insta::assert_snapshot!(
+          run_query!(
             &runner,
             r#"query {
                 findManyTestModel(cursor: { id: 4 }, take: 3, skip: 1, orderBy: [{ fieldA: asc }, { fieldB: desc }, { fieldC: desc }, { fieldD: asc }]) {
                   id
                 }
-            }"#,
-            vec![
-                r#"{"data":{"findManyTestModel":[{"id":3},{"id":5},{"id":6}]}}"#,
-                r#"{"data":{"findManyTestModel":[{"id":5},{"id":3},{"id":6}]}}"#,
-                r#"{"data":{"findManyTestModel":[{"id":3},{"id":6}]}}"#,
-                r#"{"data":{"findManyTestModel":[{"id":5},{"id":6}]}}"#,
-                r#"{"data":{"findManyTestModel":[{"id":6}]}}"#
-            ]
+            }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":5},{"id":6}]}}"###
         );
 
         // Note: Negative takes reverse the order, the following tests check that.
@@ -848,20 +838,15 @@ mod pagination {
         // 6 => C C D C <- take
         //
         // Because the final result gets reversed again to restore original order, the result possibilities are the same as #2, just reversed.
-        assert_query_many!(
-            &runner,
-            r#"query {
-                findManyTestModel(cursor: { id: 4 }, take: -3, skip: 1, orderBy: [{ fieldA: desc }, { fieldB: asc }, { fieldC: asc }, { fieldD: desc }]) {
-                  id
-                }
-            }"#,
-            vec![
-                r#"{"data":{"findManyTestModel":[{"id":6},{"id":5},{"id":3}]}}"#,
-                r#"{"data":{"findManyTestModel":[{"id":6},{"id":3},{"id":5}]}}"#,
-                r#"{"data":{"findManyTestModel":[{"id":6},{"id":3}]}}"#,
-                r#"{"data":{"findManyTestModel":[{"id":6},{"id":5}]}}"#,
-                r#"{"data":{"findManyTestModel":[{"id":6}]}}"#
-            ]
+        match_connector_result!(
+          &runner,
+          r#"query {
+              findManyTestModel(cursor: { id: 4 }, take: -3, skip: 1, orderBy: [{ fieldA: desc }, { fieldB: asc }, { fieldC: asc }, { fieldD: desc }]) {
+                id
+              }
+          }"#,
+          [SqlServer] => r#"{"data":{"findManyTestModel":[{"id":6},{"id":5},{"id":3}]}}"#,
+          [MongoDb, Sqlite, Postgres, MySql, SqlServer] => r#"{"data":{"findManyTestModel":[{"id":6},{"id":5}]}}"#
         );
 
         Ok(())
