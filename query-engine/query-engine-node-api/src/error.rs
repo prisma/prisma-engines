@@ -3,6 +3,9 @@ use query_connector::error::ConnectorError;
 use query_core::CoreError;
 use thiserror::Error;
 
+// TODO (garren): CoreError is quite large. Clippy recommends
+// that we should box it. This would be a future improvement to this
+#[allow(clippy::large_enum_variant)]
 #[derive(Debug, Error)]
 pub enum ApiError {
     #[error("{}", _0)]

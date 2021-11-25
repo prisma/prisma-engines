@@ -1,3 +1,4 @@
+use crate::ErrorDetails;
 use serde::Serialize;
 use user_facing_error_macros::*;
 
@@ -62,12 +63,25 @@ pub struct MigrationDoesNotApplyCleanly {
 impl crate::UserFacingError for MigrationDoesNotApplyCleanly {
     const ERROR_CODE: &'static str = "P3006";
 
+    fn error_details(&self) -> ErrorDetails {
+        use serde_json::json;
+
+        ErrorDetails {
+            name: "MigrationDoesNotApplyCleanly",
+            code: Self::ERROR_CODE,
+            fields: json![{
+                "migration_name": self.migration_name
+            }],
+        }
+    }
+
     fn message(&self) -> String {
         let error_code = match &self.inner_error.inner {
             crate::ErrorType::Known(crate::KnownError {
                 message: _,
                 meta: _,
                 error_code,
+                error_details: _,
             }) => format!("Error code: {}\n", &error_code),
             crate::ErrorType::Unknown(_) => String::new(),
         };
@@ -88,6 +102,17 @@ pub struct PreviewFeaturesBlocked {
 
 impl crate::UserFacingError for PreviewFeaturesBlocked {
     const ERROR_CODE: &'static str = "P3007";
+
+    fn error_details(&self) -> ErrorDetails {
+        use serde_json::json;
+        let blocked: Vec<_> = self.features.iter().map(|s| format!("`{}`", s)).collect();
+
+        ErrorDetails {
+            name: "PreviewFeaturesBlocked",
+            code: Self::ERROR_CODE,
+            fields: json!([{ "blocked": blocked }]),
+        }
+    }
 
     fn message(&self) -> String {
         let blocked: Vec<_> = self.features.iter().map(|s| format!("`{}`", s)).collect();
@@ -161,12 +186,23 @@ pub struct ShadowDbCreationError {
 impl crate::UserFacingError for ShadowDbCreationError {
     const ERROR_CODE: &'static str = "P3014";
 
+    fn error_details(&self) -> ErrorDetails {
+        use serde_json::json;
+
+        ErrorDetails {
+            name: "ShadowDbCreationError",
+            code: Self::ERROR_CODE,
+            fields: json!([]),
+        }
+    }
+
     fn message(&self) -> String {
         let error_code = match &self.inner_error.inner {
             crate::ErrorType::Known(crate::KnownError {
                 message: _,
                 meta: _,
                 error_code,
+                error_details: _,
             }) => format!("Error code: {}\n", &error_code),
             crate::ErrorType::Unknown(_) => String::new(),
         };
@@ -196,12 +232,23 @@ pub struct SoftResetFailed {
 impl crate::UserFacingError for SoftResetFailed {
     const ERROR_CODE: &'static str = "P3016";
 
+    fn error_details(&self) -> ErrorDetails {
+        use serde_json::json;
+
+        ErrorDetails {
+            name: "SoftResetFailed",
+            code: Self::ERROR_CODE,
+            fields: json!([]),
+        }
+    }
+
     fn message(&self) -> String {
         let error_code = match &self.inner_error.inner {
             crate::ErrorType::Known(crate::KnownError {
                 message: _,
                 meta: _,
                 error_code,
+                error_details: _,
             }) => format!("Error code: {}\n", &error_code),
             crate::ErrorType::Unknown(_) => String::new(),
         };

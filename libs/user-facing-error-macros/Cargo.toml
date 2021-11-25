@@ -13,3 +13,6 @@ proc-macro = true
 syn = "1.0.5"
 quote = "1.0.2"
 proc-macro2 = "1.0.6"
+serde_json = { version = "1.0", features = ["float_roundtrip"] }
+user-facing-error-parsing = { path = "../user-facing-error-parsing" }
+

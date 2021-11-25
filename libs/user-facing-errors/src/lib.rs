@@ -13,10 +13,33 @@ mod panic_hook;
 
 use serde::Serialize;
 
+#[derive(Debug, Serialize)]
+pub struct UserErrorType {
+    pub name: &'static str,
+    pub code: &'static str,
+}
+
+include!(concat!(env!("OUT_DIR"), "/user_error_list.rs"));
+
+// This isn't really needed but is added for clarity to make
+// what is happening a little more obvious. The error_list() is generated
+// in the build.rs.
+pub fn known_errors() -> Vec<UserErrorType> {
+    error_list()
+}
+
+#[derive(Debug, Serialize)]
+pub struct ErrorDetails {
+    name: &'static str,
+    code: &'static str,
+    fields: serde_json::Value,
+}
+
 pub trait UserFacingError: serde::Serialize {
     const ERROR_CODE: &'static str;
 
     fn message(&self) -> String;
+    fn error_details(&self) -> ErrorDetails;
 }
 
 #[derive(Serialize, Clone, PartialEq, Debug)]
@@ -24,6 +47,7 @@ pub struct KnownError {
     pub message: String,
     pub meta: serde_json::Value,
     pub error_code: &'static str,
+    pub error_details: serde_json::Value,
 }
 
 impl KnownError {
@@ -32,6 +56,8 @@ impl KnownError {
             message: inner.message(),
             meta: serde_json::to_value(&inner).expect("Failed to render user facing error metadata to JSON"),
             error_code: T::ERROR_CODE,
+            error_details: serde_json::to_value(inner.error_details())
+                .expect("Failed to render user error details to JSON"),
         }
     }
 }

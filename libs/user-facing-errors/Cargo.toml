@@ -22,3 +22,6 @@ optional = true
 [features]
 default = []
 sql = ["quaint"]
+
+[build-dependencies]
+user-facing-error-parsing = { path = "../user-facing-error-parsing" }

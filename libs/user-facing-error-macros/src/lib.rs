@@ -1,4 +1,5 @@
 extern crate proc_macro;
+use user_facing_error_parsing::UserErrorDeriveInput;
 
 #[proc_macro_derive(UserFacingError, attributes(user_facing))]
 pub fn derive_user_facing_error(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
@@ -18,9 +19,9 @@ pub fn derive_user_facing_error(input: proc_macro::TokenStream) -> proc_macro::T
         Err(err) => return err.into_compile_error().into(),
     };
 
-    let template_variables: Box<dyn Iterator<Item = _>> = match &data.fields {
-        syn::Fields::Named(named) => Box::new(named.named.iter().map(|field| field.ident.as_ref().unwrap())),
-        syn::Fields::Unit => Box::new(std::iter::empty()),
+    let field_idents = match &data.fields {
+        syn::Fields::Named(named) => named.named.iter().map(|field| field.ident.as_ref().unwrap()).collect(),
+        syn::Fields::Unit => Vec::new(),
         syn::Fields::Unnamed(unnamed) => {
             return syn::Error::new_spanned(unnamed, "The error fields must be named")
                 .to_compile_error()
@@ -28,9 +29,37 @@ pub fn derive_user_facing_error(input: proc_macro::TokenStream) -> proc_macro::T
         }
     };
 
+    let fields = field_idents.iter().map(|field| {
+        let key = format!("{}", field);
+        quote::quote! {
+           error_fields.insert(#key.to_string(), serde_json::to_value(&self.#field).unwrap());
+        }
+    });
+
+    let template_variables = field_idents.iter();
+    let error_name = format!("{}", ident);
+
     proc_macro::TokenStream::from(quote::quote! {
+
         impl crate::UserFacingError for #ident {
             const ERROR_CODE: &'static str = #code;
+
+            fn error_details(&self) -> ErrorDetails {
+                use std::collections::HashMap;
+                use serde_json::json;
+
+                let mut error_fields: HashMap<String, serde_json::Value> = HashMap::new();
+
+                #(
+                    #fields
+                )*
+
+                return ErrorDetails {
+                    name: #error_name,
+                    code: Self::ERROR_CODE,
+                    fields: json!(error_fields)
+                };
+            }
 
             fn message(&self) -> String {
                 format!(
@@ -42,72 +71,4 @@ pub fn derive_user_facing_error(input: proc_macro::TokenStream) -> proc_macro::T
             }
         }
     })
-}
-
-struct UserErrorDeriveInput<'a> {
-    /// The name of the struct.
-    ident: &'a syn::Ident,
-    /// The error code.
-    code: syn::LitStr,
-    /// The error message format string.
-    message: syn::LitStr,
-}
-
-impl<'a> UserErrorDeriveInput<'a> {
-    fn new(input: &'a syn::DeriveInput) -> Result<Self, syn::Error> {
-        let mut code = None;
-        let mut message = None;
-
-        for attr in &input.attrs {
-            if !attr
-                .path
-                .get_ident()
-                .map(|ident| ident == "user_facing")
-                .unwrap_or(false)
-            {
-                continue;
-            }
-
-            for namevalue in attr.parse_args_with(|stream: &'_ syn::parse::ParseBuffer| {
-                syn::punctuated::Punctuated::<syn::MetaNameValue, syn::Token![,]>::parse_terminated(stream)
-            })? {
-                let litstr = match namevalue.lit {
-                    syn::Lit::Str(litstr) => litstr,
-                    other => {
-                        return Err(syn::Error::new_spanned(
-                            other,
-                            "Expected attribute of the form `#[user_facing(code = \"...\", message = \"...\")]`",
-                        ))
-                    }
-                };
-
-                match namevalue.path.get_ident() {
-                    Some(ident) if ident == "code" => {
-                        code = Some(litstr);
-                    }
-                    Some(ident) if ident == "message" => {
-                        message = Some(litstr);
-                    }
-                    other => {
-                        return Err(syn::Error::new_spanned(
-                            other,
-                            "Expected attribute of the form `#[user_facing(code = \"...\", message = \"...\")]`",
-                        ))
-                    }
-                }
-            }
-        }
-
-        match (message, code) {
-            (Some(message), Some(code)) => Ok(UserErrorDeriveInput {
-                ident: &input.ident,
-                message,
-                code,
-            }),
-            _ => Err(syn::Error::new_spanned(
-                input,
-                "Expected attribute of the form `#[user_facing(code = \"...\", message = \"...\")]`",
-            )),
-        }
-    }
 }

@@ -1,9 +1,9 @@
+use crate::ErrorDetails;
 use serde::Serialize;
 use std::fmt;
 use user_facing_error_macros::*;
 
 #[derive(Debug, PartialEq, Eq, Serialize, Clone)]
-#[serde(untagged)]
 pub enum DatabaseConstraint {
     Fields(Vec<String>),
     Index(String),
@@ -297,4 +297,69 @@ pub struct InteractiveTransactionError {
 #[user_facing(code = "P2029", message = "Query parameter limit exceeded error: {message}.")]
 pub struct QueryParameterLimitExceeded {
     pub message: String,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::UserFacingError;
+    use serde_json::json;
+
+    #[test]
+    fn simple_error_details() {
+        let error = PoolTimeout {
+            connection_limit: 20,
+            timeout: 10,
+        };
+
+        let details = serde_json::to_value(error.error_details()).unwrap();
+        let expected = json!({
+            "name": "PoolTimeout",
+            "code": "P2024",
+            "fields": {
+                "connection_limit": 20,
+                "timeout": 10
+            }
+        });
+
+        assert_eq!(expected, details);
+    }
+
+    #[test]
+    fn unique_key_error_details() {
+        let constraint = DatabaseConstraint::Fields(vec!["email".to_string(), "name".to_string()]);
+        let error = UniqueKeyViolation { constraint };
+
+        let details = serde_json::to_value(error.error_details()).unwrap();
+
+        let expected = json!({
+            "name": "UniqueKeyViolation",
+            "code": "P2002",
+            "fields": {
+                "constraint": {
+                  "Fields": ["email", "name"]
+                }
+            }
+        });
+
+        assert_eq!(expected, details);
+    }
+
+    #[test]
+    fn foreign_key_error_details() {
+        let constraint = DatabaseConstraint::ForeignKey;
+        let error = UniqueKeyViolation { constraint };
+
+        let details = serde_json::to_value(error.error_details()).unwrap();
+
+        let expected = json!({
+            "name": "UniqueKeyViolation",
+            "code": "P2002",
+            "fields": {
+                "constraint": "ForeignKey"
+            }
+        });
+
+        assert_eq!(expected, details);
+    }
 }

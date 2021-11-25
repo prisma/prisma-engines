@@ -1,4 +1,4 @@
-use crate::UserFacingError;
+use crate::{ErrorDetails, UserFacingError};
 use serde::Serialize;
 use std::fmt::Display;
 use user_facing_error_macros::*;
@@ -88,6 +88,16 @@ pub enum DatabaseDoesNotExist {
 
 impl UserFacingError for DatabaseDoesNotExist {
     const ERROR_CODE: &'static str = "P1003";
+
+    fn error_details(&self) -> ErrorDetails {
+        use serde_json::json;
+
+        ErrorDetails {
+            name: "DatabaseDoesNotExist",
+            code: Self::ERROR_CODE,
+            fields: json!([]),
+        }
+    }
 
     fn message(&self) -> String {
         match self {

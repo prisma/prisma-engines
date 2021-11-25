@@ -1,3 +1,4 @@
+use crate::ErrorDetails;
 use serde::Serialize;
 use user_facing_error_macros::*;
 

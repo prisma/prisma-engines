@@ -5146,6 +5146,16 @@ version = "0.1.0"
 dependencies = [
  "proc-macro2",
  "quote",
+ "serde_json",
+ "syn",
+ "user-facing-error-parsing",
+]
+
+[[package]]
+name = "user-facing-error-parsing"
+version = "0.1.0"
+dependencies = [
+ "quote",
  "syn",
 ]
 
@@ -5160,6 +5170,7 @@ dependencies = [
  "serde_json",
  "tracing",
  "user-facing-error-macros",
+ "user-facing-error-parsing",
 ]
 
 [[package]]

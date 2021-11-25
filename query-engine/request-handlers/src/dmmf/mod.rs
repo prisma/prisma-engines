@@ -13,6 +13,7 @@ pub struct DataModelMetaFormat {
     pub data_model: serde_json::Value,
     pub schema: DmmfSchema,
     pub mappings: DmmfOperationMappings,
+    pub errors: Vec<user_facing_errors::UserErrorType>,
 }
 
 /// Model operations are serialized as an array of objects, each one
@@ -91,10 +92,12 @@ impl Serialize for DmmfModelOperations {
 pub fn render_dmmf(dml: &datamodel::Datamodel, query_schema: QuerySchemaRef) -> DataModelMetaFormat {
     let (schema, mappings) = DmmfQuerySchemaRenderer::render(query_schema);
     let datamodel_json = datamodel::json::dmmf::render_to_dmmf_value(&dml);
+    let errors = user_facing_errors::known_errors();
 
     DataModelMetaFormat {
         data_model: datamodel_json,
         schema,
         mappings,
+        errors,
     }
 }

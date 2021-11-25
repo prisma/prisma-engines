@@ -50,7 +50,14 @@ async fn connection_string_problems_give_a_nice_error() {
             "meta": {
                 "details": &details,
             },
-            "error_code": "P1013"
+            "error_code": "P1013",
+            "error_details": {
+                "name": "InvalidConnectionString",
+                "code": "P1013",
+                "fields": {
+                    "details": &details,
+                },
+            },
         });
 
         assert_eq!(expected, json_error);
@@ -86,6 +93,14 @@ async fn bad_connection_string_in_datamodel_returns_nice_error() {
                 "full_error": "\u{1b}[1;91merror\u{1b}[0m: \u{1b}[1mError validating datasource `db`: the URL must start with the protocol `postgresql://` or `postgres://`.\u{1b}[0m\n  \u{1b}[1;94m-->\u{1b}[0m  \u{1b}[4mschema.prisma:4\u{1b}[0m\n\u{1b}[1;94m   | \u{1b}[0m\n\u{1b}[1;94m 3 | \u{1b}[0m        provider = \"postgresql\"\n\u{1b}[1;94m 4 | \u{1b}[0m        url      = \u{1b}[1;91m\"sqlserver:/localhost:1433;database=prisma-demo;user=SA;password=Pr1sm4_Pr1sm4;trustServerCertificate=true;encrypt=true\"\u{1b}[0m\n\u{1b}[1;94m   | \u{1b}[0m\n",
             },
             "error_code": SchemaParserError::ERROR_CODE,
+            "error_details": {
+                "name": "SchemaParserError",
+                "code":
+                    "P1012",
+                "fields": {
+                    "full_error": "\u{1b}[1;91merror\u{1b}[0m: \u{1b}[1mError validating datasource `db`: the URL must start with the protocol `postgresql://` or `postgres://`.\u{1b}[0m\n  \u{1b}[1;94m-->\u{1b}[0m  \u{1b}[4mschema.prisma:4\u{1b}[0m\n\u{1b}[1;94m   | \u{1b}[0m\n\u{1b}[1;94m 3 | \u{1b}[0m        provider = \"postgresql\"\n\u{1b}[1;94m 4 | \u{1b}[0m        url      = \u{1b}[1;91m\"sqlserver:/localhost:1433;database=prisma-demo;user=SA;password=Pr1sm4_Pr1sm4;trustServerCertificate=true;encrypt=true\"\u{1b}[0m\n\u{1b}[1;94m   | \u{1b}[0m\n",
+                },
+            },
         }
     });
 
