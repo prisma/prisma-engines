@@ -10,9 +10,10 @@ use opentelemetry::{
     sdk::{propagation::TraceContextPropagator, trace::Config, Resource},
     KeyValue,
 };
-use opentelemetry_otlp::Uninstall;
+
+use opentelemetry_otlp::WithExportConfig;
 use registry::EventRegistry;
-use std::{future::Future, sync::Arc};
+use std::future::Future;
 use telemetry::WithTelemetry;
 use tracing_futures::WithSubscriber;
 use tracing_subscriber::{
@@ -32,7 +33,6 @@ enum Subscriber {
 #[derive(Clone)]
 pub struct ChannelLogger {
     subscriber: Subscriber,
-    guard: Option<Arc<Uninstall>>,
 }
 
 impl ChannelLogger {
@@ -51,7 +51,6 @@ impl ChannelLogger {
 
         Self {
             subscriber,
-            guard: None,
         }
     }
 
@@ -66,13 +65,16 @@ impl ChannelLogger {
         let resource = Resource::new(vec![KeyValue::new("service.name", "query-engine-node-api")]);
         let config = Config::default().with_resource(resource);
 
-        let mut builder = opentelemetry_otlp::new_pipeline().with_trace_config(config);
+        let mut builder = opentelemetry_otlp::new_pipeline().tracing().with_trace_config(config);
+        let mut exporter = opentelemetry_otlp::new_exporter().tonic();
 
         if let Some(endpoint) = endpoint {
-            builder = builder.with_endpoint(endpoint);
+            exporter = exporter.with_endpoint(endpoint);
         }
 
-        let (tracer, guard) = builder.install().unwrap();
+        builder = builder.with_exporter(exporter);
+
+        let tracer = builder.install_batch(opentelemetry::runtime::AsyncStd).unwrap();
 
         let telemetry_layer = tracing_opentelemetry::layer().with_tracer(tracer);
         let registry = EventRegistry::new().with(telemetry_layer).with(javascript_cb);
@@ -82,7 +84,6 @@ impl ChannelLogger {
 
         Self {
             subscriber,
-            guard: Some(Arc::new(guard)),
         }
     }
 
