@@ -132,6 +132,9 @@
 <span id="132">132</span>
 <span id="133">133</span>
 <span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
 </pre><pre class="rust"><code><span class="doccomment">//! SQL flavours implement behaviour specific to a given SQL implementation (PostgreSQL, SQLite...),</span>
 <span class="doccomment">//! in order to avoid cluttering the connector with conditionals. This is a private implementation</span>
 <span class="doccomment">//! detail of the SQL connector.</span>
@@ -213,8 +216,11 @@
     <span class="doccomment">/// schema we connect to exists.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">ensure_connection_validity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
 
-    <span class="doccomment">/// Perform the initialization required by connector-test-kit tests.</span>
+    <span class="doccomment">/// Perform the initialization required by connector-test-kit-rs tests.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">qe_setup</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">database_url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+
+    <span class="doccomment">/// Perform teardown required by connector-test-kit-rs tests.</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">qe_teardown</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">database_url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
 
     <span class="doccomment">/// Drop the database and recreate it empty.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;

@@ -518,6 +518,10 @@
 <span id="518">518</span>
 <span id="519">519</span>
 <span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::SqlFlavour</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">connection_wrapper</span>::{<span class="ident">connect</span>, <span class="ident">quaint_error_to_connector_error</span>, <span class="ident">Connection</span>},
@@ -900,6 +904,10 @@
         );
         <span class="ident">conn</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">query</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">qe_teardown</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_database_str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(())
     }
 

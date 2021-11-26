@@ -147,6 +147,11 @@
 <span id="147">147</span>
 <span id="148">148</span>
 <span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">mongodb</span>;
 <span class="kw">mod</span> <span class="ident">mysql</span>;
 <span class="kw">mod</span> <span class="ident">postgres</span>;
@@ -191,6 +196,11 @@
 
     <span class="doccomment">/// Must return `true` if the connector family is versioned (e.g. Postgres9, Postgres10, ...), false otherwise.</span>
     <span class="kw">fn</span> <span class="ident">is_versioned</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+
+    <span class="doccomment">/// Indicates whether or not the test setup needs to explicitly tear down test databases (via `qe_teardown`).</span>
+    <span class="kw">fn</span> <span class="ident">requires_teardown</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="bool-val">false</span>
+    }
 
     <span class="doccomment">/// Defines where relational constraints are handled:</span>
     <span class="doccomment">///   - &quot;prisma&quot; is handled in the Query Engine core</span>

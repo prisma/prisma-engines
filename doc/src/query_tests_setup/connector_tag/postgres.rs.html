@@ -196,6 +196,14 @@
 <span id="196">196</span>
 <span id="197">197</span>
 <span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">sql_datamodel_connector::SqlDatamodelConnectors</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
@@ -249,15 +257,19 @@
             <span class="comment">// Use the same database and schema name for CockroachDB - unfortunately CockroachDB</span>
             <span class="comment">// can&#39;t handle 1 schema per test in a database well at this point in time.</span>
             <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::Cockroach</span>) <span class="kw">if</span> <span class="ident">is_ci</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">format!</span>(<span class="string">&quot;postgresql://root@test-db-cockroach:5436/{0}?schema={0}&quot;</span>, <span class="ident">database</span>)
+                <span class="macro">format!</span>(
+                    <span class="string">&quot;postgresql://prisma@test-db-postgres-cockroach:26257/{0}?schema={0}&quot;</span>,
+                    <span class="ident">database</span>
+                )
             }
+
             <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::V9</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@127.0.0.1:5431/db?schema={}&quot;</span>, <span class="ident">database</span>),
             <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::V10</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@127.0.0.1:5432/db?schema={}&quot;</span>, <span class="ident">database</span>),
             <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::V11</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@127.0.0.1:5433/db?schema={}&quot;</span>, <span class="ident">database</span>),
             <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::V12</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@127.0.0.1:5434/db?schema={}&quot;</span>, <span class="ident">database</span>),
             <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::V13</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@127.0.0.1:5435/db?schema={}&quot;</span>, <span class="ident">database</span>),
             <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::V14</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@127.0.0.1:5437/db?schema={}&quot;</span>, <span class="ident">database</span>),
-            <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::Cockroach</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;postgresql://root@127.0.0.1:5436/{0}?schema={0}&quot;</span>, <span class="ident">database</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::Cockroach</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;postgresql://prisma@127.0.0.1:26257/{0}?schema={0}&quot;</span>, <span class="ident">database</span>),
             <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::PgBouncer</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(
                 <span class="string">&quot;postgresql://postgres:prisma@127.0.0.1:6432/db?schema={}&amp;pgbouncer=true&quot;</span>,
                 <span class="ident">database</span>
@@ -278,6 +290,10 @@
 
     <span class="kw">fn</span> <span class="ident">is_versioned</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="bool-val">true</span>
+    }
+
+    <span class="kw">fn</span> <span class="ident">requires_teardown</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">version</span>, <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::Cockroach</span>))
     }
 }
 

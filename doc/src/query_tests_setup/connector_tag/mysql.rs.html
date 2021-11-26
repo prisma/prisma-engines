@@ -142,6 +142,8 @@
 <span id="142">142</span>
 <span id="143">143</span>
 <span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">sql_datamodel_connector::SqlDatamodelConnectors</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
@@ -173,8 +175,10 @@
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">version</span> {
             <span class="prelude-val">Some</span>(<span class="ident">MySqlVersion::V5_6</span>) <span class="kw">if</span> <span class="ident">is_ci</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;mysql://root:prisma@test-db-mysql-5-6:3306/{}&quot;</span>, <span class="ident">database</span>),
             <span class="prelude-val">Some</span>(<span class="ident">MySqlVersion::V5_7</span>) <span class="kw">if</span> <span class="ident">is_ci</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;mysql://root:prisma@test-db-mysql-5-7:3306/{}&quot;</span>, <span class="ident">database</span>),
-            <span class="prelude-val">Some</span>(<span class="ident">MySqlVersion::V8</span>) <span class="kw">if</span> <span class="ident">is_ci</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;mysql://root:prisma@test-db-mysql-8-0:3306/{}&quot;</span>, <span class="ident">database</span>),
-            <span class="prelude-val">Some</span>(<span class="ident">MySqlVersion::MariaDb</span>) <span class="kw">if</span> <span class="ident">is_ci</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;mysql://root:prisma@test-db-mariadb:3306/{}&quot;</span>, <span class="ident">database</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">MySqlVersion::V8</span>) <span class="kw">if</span> <span class="ident">is_ci</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;mysql://root:prisma@test-db-mysql-8:3306/{}&quot;</span>, <span class="ident">database</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">MySqlVersion::MariaDb</span>) <span class="kw">if</span> <span class="ident">is_ci</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="macro">format!</span>(<span class="string">&quot;mysql://root:prisma@test-db-mysql-mariadb:3306/{}&quot;</span>, <span class="ident">database</span>)
+            }
             <span class="prelude-val">Some</span>(<span class="ident">MySqlVersion::V5_6</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;mysql://root:prisma@127.0.0.1:3309/{}&quot;</span>, <span class="ident">database</span>),
             <span class="prelude-val">Some</span>(<span class="ident">MySqlVersion::V5_7</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;mysql://root:prisma@127.0.0.1:3306/{}&quot;</span>, <span class="ident">database</span>),
             <span class="prelude-val">Some</span>(<span class="ident">MySqlVersion::V8</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;mysql://root:prisma@127.0.0.1:3307/{}&quot;</span>, <span class="ident">database</span>),

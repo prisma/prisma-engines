@@ -147,9 +147,6 @@
 <span id="147">147</span>
 <span id="148">148</span>
 <span id="149">149</span>
-<span id="150">150</span>
-<span id="151">151</span>
-<span id="152">152</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel_connector::Connector</span>;
 <span class="kw">use</span> <span class="ident">mongodb_datamodel_connector::MongoDbDatamodelConnector</span>;
 
@@ -188,10 +185,7 @@
                 <span class="ident">database</span>
             ),
             <span class="prelude-val">Some</span>(<span class="ident">MongoDbVersion::V4_4</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">format!</span>(
-                    <span class="string">&quot;mongodb://prisma:prisma@127.0.0.1:27017/{}?authSource=admin&amp;retryWrites=true&quot;</span>,
-                    <span class="ident">database</span>
-                )
+                <span class="macro">format!</span>(<span class="string">&quot;mongodb://127.0.0.1:27017/{}&quot;</span>, <span class="ident">database</span>)
             }
             <span class="prelude-val">Some</span>(<span class="ident">MongoDbVersion::V5</span>) <span class="kw">if</span> <span class="ident">is_ci</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(
                 <span class="string">&quot;mongodb://prisma:prisma@test-db-mongodb-5:27018/{}?authSource=admin&amp;retryWrites=true&quot;</span>,

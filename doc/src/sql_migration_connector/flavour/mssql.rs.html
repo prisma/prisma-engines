@@ -434,6 +434,10 @@
 <span id="434">434</span>
 <span id="435">435</span>
 <span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">connection_wrapper</span>::{<span class="ident">connect</span>, <span class="ident">Connection</span>},
     <span class="ident">SqlFlavour</span>, <span class="ident">SqlMigrationConnector</span>,
@@ -786,6 +790,10 @@
             .<span class="kw">await</span>
             .<span class="ident">unwrap</span>();
 
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">qe_teardown</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_database_str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(())
     }
 

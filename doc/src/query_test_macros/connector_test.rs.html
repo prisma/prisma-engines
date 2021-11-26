@@ -102,6 +102,11 @@
 <span id="102">102</span>
 <span id="103">103</span>
 <span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils::quote_connector</span>;
 <span class="kw">use</span> <span class="ident">darling::FromMeta</span>;
@@ -194,9 +199,14 @@
 
                 <span class="ident">query_tests_setup::run_with_tokio</span>(<span class="kw">async</span> <span class="kw">move</span> {
                     <span class="macro">tracing::debug!</span>(<span class="string">&quot;Used datamodel:\n {}&quot;</span>, <span class="ident">datamodel</span>.<span class="ident">yellow</span>());
+
+                    <span class="kw">let</span> <span class="ident">requires_teardown</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">requires_teardown</span>();
                     <span class="kw">let</span> <span class="ident">runner</span> <span class="op">=</span> <span class="ident">Runner::load</span>(<span class="ident">config</span>.<span class="ident">runner</span>(), <span class="ident">datamodel</span>.<span class="ident">clone</span>(), <span class="ident">connector</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+
                     <span class="ident">query_tests_setup::setup_project</span>(<span class="kw-2">&amp;</span><span class="ident">datamodel</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
                     #<span class="ident">runner_fn_ident</span>(<span class="ident">runner</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+
+                    <span class="kw">if</span> <span class="ident">requires_teardown</span> { <span class="ident">query_tests_setup::teardown_project</span>(<span class="kw-2">&amp;</span><span class="ident">datamodel</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>(); }
                 }.<span class="ident">with_subscriber</span>(<span class="ident">test_tracing_subscriber</span>(<span class="ident">std::env::var</span>(<span class="string">&quot;LOG_LEVEL&quot;</span>).<span class="ident">unwrap_or</span>(<span class="string">&quot;info&quot;</span>.<span class="ident">to_string</span>()))));
             }
         }
