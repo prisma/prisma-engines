@@ -333,6 +333,19 @@ impl SqlFlavour for PostgresFlavour {
         Ok(())
     }
 
+    async fn qe_teardown(&self, database_str: &str) -> ConnectorResult<()> {
+        let mut url = Url::parse(database_str).map_err(ConnectorError::url_parse_error)?;
+        strip_schema_param_from_url(&mut url);
+
+        let conn = create_postgres_admin_conn(url.clone()).await?;
+        let db_name = self.url.dbname();
+
+        let query = format!("DROP DATABASE \"{}\" CASCADE", db_name);
+        conn.raw_cmd(&query).await.ok();
+
+        Ok(())
+    }
+
     async fn reset(&self, connection: &Connection) -> ConnectorResult<()> {
         let schema_name = connection.connection_info().schema_name();
 

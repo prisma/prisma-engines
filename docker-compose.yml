@@ -1,11 +1,11 @@
 version: "3"
 services:
   cockroach:
-    image: otanatcockroach/cockroachdb-custom:v1
+    image: prismagraphql/build:cockroach-custom
     restart: always
     command: start-single-node --insecure
     ports:
-      - "5436:26257"
+      - "26257:26257"
     networks:
       - databases
 
@@ -310,9 +310,9 @@ services:
     # Jaeger supports OTEL out of the box
     image: jaegertracing/opentelemetry-all-in-one:latest
     ports:
-      - 13133:13133  # health check port
-      - 16686:16686  # UI viewer
-      - 4317:55680   # Otel endpoint
+      - 13133:13133 # health check port
+      - 16686:16686 # UI viewer
+      - 4317:55680 # Otel endpoint
 
 networks:
-  databases:
+  databases: null

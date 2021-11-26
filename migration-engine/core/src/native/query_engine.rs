@@ -10,8 +10,8 @@ use migration_connector::{ConnectorResult, DiffTarget, MigrationConnector};
 use mongodb_migration_connector::MongoDbMigrationConnector;
 use sql_migration_connector::SqlMigrationConnector;
 
-/// Database setup for connector-test-kit.
-pub async fn run(prisma_schema: &str) -> ConnectorResult<()> {
+/// Database setup for connector-test-kit-rs.
+pub async fn setup(prisma_schema: &str) -> ConnectorResult<()> {
     let (source, url, preview_features, _shadow_database_url) = super::parse_configuration(prisma_schema)?;
 
     match &source.active_provider {
@@ -41,6 +41,7 @@ pub async fn run(prisma_schema: &str) -> ConnectorResult<()> {
                     .unwrap();
             };
         }
+
         #[cfg(feature = "mongodb")]
         provider if provider == MONGODB_SOURCE_NAME => {
             let connector = MongoDbMigrationConnector::new(url, preview_features);
@@ -49,6 +50,33 @@ pub async fn run(prisma_schema: &str) -> ConnectorResult<()> {
             let (_, schema) = crate::parse_schema(prisma_schema).unwrap();
             connector.create_collections(&schema).await?;
         }
+
+        x => unimplemented!("Connector {} is not supported yet", x),
+    };
+
+    Ok(())
+}
+
+/// Database teardown for connector-test-kit-rs.
+pub async fn teardown(prisma_schema: &str) -> ConnectorResult<()> {
+    let (source, url, _, _) = super::parse_configuration(prisma_schema)?;
+
+    match &source.active_provider {
+        provider
+            if [
+                MYSQL_SOURCE_NAME,
+                POSTGRES_SOURCE_NAME,
+                SQLITE_SOURCE_NAME,
+                MSSQL_SOURCE_NAME,
+            ]
+            .contains(&provider.as_str()) =>
+        {
+            SqlMigrationConnector::qe_teardown(&url).await?;
+        }
+
+        #[cfg(feature = "mongodb")]
+        provider if provider == MONGODB_SOURCE_NAME => {}
+
         x => unimplemented!("Connector {} is not supported yet", x),
     };
 
