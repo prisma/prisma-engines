@@ -375,7 +375,7 @@ mod enum_lists {
         Ok(())
     }
 
-    #[connector_test(exclude(Cockroach))]
+    #[connector_test]
     async fn is_empty(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
 
