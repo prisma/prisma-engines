@@ -98,13 +98,15 @@
 <span id="98"> 98</span>
 <span id="99"> 99</span>
 <span id="100">100</span>
+<span id="101">101</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{
     <span class="ident">helpers</span>::{<span class="ident">parsing_catch_all</span>, <span class="ident">ToIdentifier</span>, <span class="ident">Token</span>, <span class="ident">TokenExtensions</span>},
     <span class="ident">parse_comments</span>::<span class="kw-2">*</span>,
     <span class="ident">parse_expression::parse_expression</span>,
-    <span class="ident">Diagnostics</span>, <span class="ident">ParserError</span>, <span class="ident">Rule</span>,
+    <span class="ident">Rule</span>,
 };
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>};
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse_source</span>(<span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">diagnostics</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Diagnostics</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SourceConfig</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Identifier</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
@@ -116,9 +118,9 @@
             <span class="ident">Rule::non_empty_identifier</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">current</span>.<span class="ident">to_id</span>()),
             <span class="ident">Rule::key_value</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">properties</span>.<span class="ident">push</span>(<span class="ident">parse_key_value</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>)),
             <span class="ident">Rule::comment_block</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">comment</span> <span class="op">=</span> <span class="ident">parse_comment_block</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>),
-            <span class="ident">Rule::BLOCK_LEVEL_CATCH_ALL</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">diagnostics</span>.<span class="ident">push</span>(<span class="ident">ParserError::new_validation_error</span>(
+            <span class="ident">Rule::BLOCK_LEVEL_CATCH_ALL</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(
                 <span class="string">&quot;This line is not a valid definition within a datasource.&quot;</span>.<span class="ident">to_owned</span>(),
-                <span class="ident">current</span>.<span class="ident">as_span</span>(),
+                <span class="ident">current</span>.<span class="ident">as_span</span>().<span class="ident">into</span>(),
             )),
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">parsing_catch_all</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>, <span class="string">&quot;source&quot;</span>),
         }
@@ -129,7 +131,7 @@
             <span class="ident">name</span>,
             <span class="ident">properties</span>,
             <span class="ident">documentation</span>: <span class="ident">comment</span>,
-            <span class="ident">span</span>: <span class="ident">Span::from_pest</span>(<span class="ident">token</span>.<span class="ident">as_span</span>()),
+            <span class="ident">span</span>: <span class="ident">Span::from</span>(<span class="ident">token</span>.<span class="ident">as_span</span>()),
         },
         <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(
             <span class="string">&quot;Encountered impossible source declaration during parsing, name is missing: {:?}&quot;</span>,
@@ -149,9 +151,9 @@
             <span class="ident">Rule::key_value</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">properties</span>.<span class="ident">push</span>(<span class="ident">parse_key_value</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>)),
             <span class="ident">Rule::doc_comment</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">comments</span>.<span class="ident">push</span>(<span class="ident">parse_doc_comment</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>)),
             <span class="ident">Rule::doc_comment_and_new_line</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">comments</span>.<span class="ident">push</span>(<span class="ident">parse_doc_comment</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>)),
-            <span class="ident">Rule::BLOCK_LEVEL_CATCH_ALL</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">diagnostics</span>.<span class="ident">push</span>(<span class="ident">ParserError::new_validation_error</span>(
+            <span class="ident">Rule::BLOCK_LEVEL_CATCH_ALL</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(
                 <span class="string">&quot;This line is not a valid definition within a generator.&quot;</span>.<span class="ident">to_owned</span>(),
-                <span class="ident">current</span>.<span class="ident">as_span</span>(),
+                <span class="ident">current</span>.<span class="ident">as_span</span>().<span class="ident">into</span>(),
             )),
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">parsing_catch_all</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>, <span class="string">&quot;generator&quot;</span>),
         }
@@ -162,7 +164,7 @@
             <span class="ident">name</span>,
             <span class="ident">properties</span>,
             <span class="ident">documentation</span>: <span class="ident">doc_comments_to_string</span>(<span class="kw-2">&amp;</span><span class="ident">comments</span>),
-            <span class="ident">span</span>: <span class="ident">Span::from_pest</span>(<span class="ident">token</span>.<span class="ident">as_span</span>()),
+            <span class="ident">span</span>: <span class="ident">Span::from</span>(<span class="ident">token</span>.<span class="ident">as_span</span>()),
         },
         <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(
             <span class="string">&quot;Encountered impossible generator declaration during parsing, name is missing: {:?}&quot;</span>,
@@ -190,7 +192,7 @@
         (<span class="prelude-val">Some</span>(<span class="ident">name</span>), <span class="prelude-val">Some</span>(<span class="ident">value</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Argument</span> {
             <span class="ident">name</span>,
             <span class="ident">value</span>,
-            <span class="ident">span</span>: <span class="ident">Span::from_pest</span>(<span class="ident">token</span>.<span class="ident">as_span</span>()),
+            <span class="ident">span</span>: <span class="ident">Span::from</span>(<span class="ident">token</span>.<span class="ident">as_span</span>()),
         },
         <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(
             <span class="string">&quot;Encountered impossible source property declaration during parsing: {:?}&quot;</span>,

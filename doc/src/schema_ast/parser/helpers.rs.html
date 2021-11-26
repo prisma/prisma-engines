@@ -85,7 +85,7 @@
     <span class="kw">fn</span> <span class="ident">to_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Identifier</span> {
         <span class="ident">Identifier</span> {
             <span class="ident">name</span>: <span class="ident">String::from</span>(<span class="self">self</span>.<span class="ident">as_str</span>()),
-            <span class="ident">span</span>: <span class="ident">Span::from_pest</span>(<span class="self">self</span>.<span class="ident">as_span</span>()),
+            <span class="ident">span</span>: <span class="ident">Span::from</span>(<span class="self">self</span>.<span class="ident">as_span</span>()),
         }
     }
 }

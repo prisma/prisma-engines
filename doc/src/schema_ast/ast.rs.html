@@ -181,7 +181,6 @@
 <span id="181">181</span>
 <span id="182">182</span>
 <span id="183">183</span>
-<span id="184">184</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">argument</span>;
 <span class="kw">mod</span> <span class="ident">attribute</span>;
 <span class="kw">mod</span> <span class="ident">comment</span>;
@@ -193,7 +192,6 @@
 <span class="kw">mod</span> <span class="ident">identifier</span>;
 <span class="kw">mod</span> <span class="ident">model</span>;
 <span class="kw">mod</span> <span class="ident">source_config</span>;
-<span class="kw">mod</span> <span class="ident">span</span>;
 <span class="kw">mod</span> <span class="ident">top</span>;
 <span class="kw">mod</span> <span class="ident">traits</span>;
 
@@ -201,6 +199,7 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">attribute::Attribute</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">comment::Comment</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">composite_type</span>::{<span class="ident">CompositeType</span>, <span class="ident">CompositeTypeId</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">diagnostics::Span</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">expression::Expression</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">field</span>::{<span class="ident">Field</span>, <span class="ident">FieldArity</span>, <span class="ident">FieldType</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">generator_config::GeneratorConfig</span>;
@@ -208,7 +207,6 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">model</span>::{<span class="ident">FieldId</span>, <span class="ident">Model</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">r#enum</span>::{<span class="ident">Enum</span>, <span class="ident">EnumValue</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">source_config::SourceConfig</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">span::Span</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">top::Top</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">traits</span>::{<span class="ident">WithAttributes</span>, <span class="ident">WithDocumentation</span>, <span class="ident">WithIdentifier</span>, <span class="ident">WithName</span>, <span class="ident">WithSpan</span>};
 

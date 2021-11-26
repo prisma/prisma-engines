@@ -164,7 +164,6 @@
 <span id="164">164</span>
 <span id="165">165</span>
 <span id="166">166</span>
-<span id="167">167</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{
     <span class="ident">helpers</span>::{<span class="ident">parsing_catch_all</span>, <span class="ident">TokenExtensions</span>},
     <span class="ident">parse_composite_type::parse_composite_type</span>,
@@ -172,14 +171,15 @@
     <span class="ident">parse_model::parse_model</span>,
     <span class="ident">parse_source_and_generator</span>::{<span class="ident">parse_generator</span>, <span class="ident">parse_source</span>},
     <span class="ident">parse_types::parse_type_alias</span>,
-    <span class="ident">Diagnostics</span>, <span class="ident">ParserError</span>, <span class="ident">PrismaDatamodelParser</span>, <span class="ident">Rule</span>,
+    <span class="ident">PrismaDatamodelParser</span>, <span class="ident">Rule</span>,
 };
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>};
 <span class="kw">use</span> <span class="ident">pest::Parser</span>;
 
 <span class="doccomment">/// Parses a Prisma V2 datamodel document into an internal AST representation.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_schema</span>(<span class="ident">datamodel_string</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SchemaAst</span>, <span class="ident">Diagnostics</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">diagnostics</span> <span class="op">=</span> <span class="ident">Diagnostics::new</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">diagnostics</span> <span class="op">=</span> <span class="ident">Diagnostics::default</span>();
     <span class="kw">let</span> <span class="ident">datamodel_result</span> <span class="op">=</span> <span class="ident">PrismaDatamodelParser::parse</span>(<span class="ident">Rule::schema</span>, <span class="ident">datamodel_string</span>);
 
     <span class="kw">match</span> <span class="ident">datamodel_result</span> {
@@ -208,25 +208,23 @@
                     <span class="ident">Rule::type_alias</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">top_level_definitions</span>.<span class="ident">push</span>(<span class="ident">Top::Type</span>(<span class="ident">parse_type_alias</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>))),
                     <span class="ident">Rule::comment_block</span> <span class="op">=</span><span class="op">&gt;</span> (),
                     <span class="ident">Rule::EOI</span> <span class="op">=</span><span class="op">&gt;</span> {}
-                    <span class="ident">Rule::CATCH_ALL</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">diagnostics</span>.<span class="ident">push</span>(<span class="ident">ParserError::new_validation_error</span>(
+                    <span class="ident">Rule::CATCH_ALL</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(
                         <span class="string">&quot;This line is invalid. It does not start with any known Prisma schema keyword.&quot;</span>.<span class="ident">to_owned</span>(),
-                        <span class="ident">current</span>.<span class="ident">as_span</span>(),
+                        <span class="ident">current</span>.<span class="ident">as_span</span>().<span class="ident">into</span>(),
                     )),
-                    <span class="ident">Rule::arbitrary_block</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">diagnostics</span>.<span class="ident">push</span>(<span class="ident">ParserError::new_validation_error</span>(
+                    <span class="ident">Rule::arbitrary_block</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(
                         <span class="string">&quot;This block is invalid. It does not start with any known Prisma schema keyword. Valid keywords include \&#39;model\&#39;, \&#39;enum\&#39;, \&#39;datasource\&#39; and \&#39;generator\&#39;.&quot;</span>.<span class="ident">to_owned</span>(),
-                        <span class="ident">current</span>.<span class="ident">as_span</span>(),
+                        <span class="ident">current</span>.<span class="ident">as_span</span>().<span class="ident">into</span>(),
                     )),
                     <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">parsing_catch_all</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>, <span class="string">&quot;datamodel&quot;</span>),
                 }
             }
 
-            <span class="kw">if</span> <span class="ident">diagnostics</span>.<span class="ident">is_empty</span>() {
-                <span class="prelude-val">Ok</span>(<span class="ident">SchemaAst</span> {
-                    <span class="ident">tops</span>: <span class="ident">top_level_definitions</span>,
-                })
-            } <span class="kw">else</span> {
-                <span class="prelude-val">Err</span>(<span class="ident">diagnostics</span>)
-            }
+            <span class="ident">diagnostics</span>.<span class="ident">to_result</span>()<span class="question-mark">?</span>;
+
+            <span class="prelude-val">Ok</span>(<span class="ident">SchemaAst</span> {
+                <span class="ident">tops</span>: <span class="ident">top_level_definitions</span>,
+            })
         }
         <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">location</span>: <span class="ident">pest::Span</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">err</span>.<span class="ident">location</span> {
@@ -239,7 +237,7 @@
                 <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Could not construct parsing error. This should never happend.&quot;</span>),
             };
 
-            <span class="ident">diagnostics</span>.<span class="ident">push</span>(<span class="ident">ParserError::new_parser_error</span>(<span class="ident">expected</span>, <span class="ident">location</span>));
+            <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_parser_error</span>(<span class="kw-2">&amp;</span><span class="ident">expected</span>, <span class="ident">location</span>.<span class="ident">into</span>()));
             <span class="prelude-val">Err</span>(<span class="ident">diagnostics</span>)
         }
     }
