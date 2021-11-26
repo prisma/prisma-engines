@@ -63,6 +63,18 @@ mod bytes_filter_spec {
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { bytes: { in: ["dGVzdA==", "dA=="] }}) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+        );
+
+        match_connector_result!(
+            &runner,
+            r#"query { findManyTestModel(where: { bytes: { not: { in: ["dGVzdA=="] }}}) { id }}"#,
+            [SqlServer, Postgres, MySql, Sqlite] => r#"{"data":{"findManyTestModel":[{"id":2}]}}"#,
+            [MongoDb] => r#"{"data":{"findManyTestModel":[{"id":2},{"id":3}]}}"# // Mongo selects `null` fields as well.
+        );
+
         Ok(())
     }
 
