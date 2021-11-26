@@ -121,7 +121,7 @@ BLOCK_LEVEL_CATCH_ALL = { !BLOCK_CLOSE ~ CATCH_ALL }
 // ######################################
 function = { non_empty_identifier ~ "(" ~ (expression ~ ("," ~ expression)*)? ~ ")" }
 field_with_args = {  non_empty_identifier ~ "(" ~ argument ~ ("," ~ argument)*  ~")"}
-array_expression = { "[" ~ expression ~ ( "," ~ expression )* ~ "]" }
+array_expression = { "[" ~ (expression ~ ( "," ~ expression )*)? ~ "]" }
 expression = { field_with_args | array_expression | function | numeric_literal | string_literal | boolean_literal | constant_literal }
 
 // ######################################
