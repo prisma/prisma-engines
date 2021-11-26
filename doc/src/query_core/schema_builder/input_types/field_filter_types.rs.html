@@ -654,11 +654,11 @@
             }
         }
 
-        <span class="ident">TypeIdentifier::Boolean</span> <span class="op">|</span> <span class="ident">TypeIdentifier::Xml</span> <span class="op">|</span> <span class="ident">TypeIdentifier::Bytes</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">TypeIdentifier::Boolean</span> <span class="op">|</span> <span class="ident">TypeIdentifier::Xml</span> <span class="op">=</span><span class="op">&gt;</span> {
             <span class="ident">equality_filters</span>(<span class="ident">mapped_scalar_type</span>.<span class="ident">clone</span>(), <span class="ident">nullable</span>).<span class="ident">collect</span>()
         }
 
-        <span class="ident">TypeIdentifier::Enum</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">equality_filters</span>(<span class="ident">mapped_scalar_type</span>.<span class="ident">clone</span>(), <span class="ident">nullable</span>)
+        <span class="ident">TypeIdentifier::Bytes</span> <span class="op">|</span> <span class="ident">TypeIdentifier::Enum</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">equality_filters</span>(<span class="ident">mapped_scalar_type</span>.<span class="ident">clone</span>(), <span class="ident">nullable</span>)
             .<span class="ident">chain</span>(<span class="ident">inclusion_filters</span>(<span class="ident">mapped_scalar_type</span>.<span class="ident">clone</span>(), <span class="ident">nullable</span>))
             .<span class="ident">collect</span>(),
 
