@@ -52,7 +52,6 @@ pub enum MongoCommand {
 }
 
 pub enum MongoOperation {
-    // Collection commands
     Find(Option<Document>, FindOptions),
     FindAndUpdate(Document, UpdateModifications, FindOneAndUpdateOptions),
     FindAndReplace(Document, Document, FindOneAndReplaceOptions),
