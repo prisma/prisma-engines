@@ -33,7 +33,7 @@ impl tracing_subscriber::fmt::MakeWriter<'_> for PrintWriter {
     type Writer = PrintWriter;
 
     fn make_writer(&self) -> Self::Writer {
-        todo!()
+        PrintWriter
     }
 }
 
