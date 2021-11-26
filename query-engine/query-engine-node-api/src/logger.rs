@@ -49,9 +49,7 @@ impl ChannelLogger {
 
         let subscriber = Subscriber::Normal(subscriber);
 
-        Self {
-            subscriber,
-        }
+        Self { subscriber }
     }
 
     /// Creates a new instance of a logger with the `trace` minimum level.
@@ -82,9 +80,7 @@ impl ChannelLogger {
 
         let subscriber = Subscriber::WithTelemetry(with_telemetry);
 
-        Self {
-            subscriber,
-        }
+        Self { subscriber }
     }
 
     /// Wraps a future to a logger, storing all events in the pipeline to

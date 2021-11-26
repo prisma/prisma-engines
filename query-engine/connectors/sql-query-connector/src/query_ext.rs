@@ -20,7 +20,7 @@ use std::panic::AssertUnwindSafe;
 use crate::sql_trace::trace_parent_to_string;
 
 use opentelemetry::trace::TraceContextExt;
-use tracing::{Span, span};
+use tracing::{span, Span};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 impl<'t> QueryExt for connector::Transaction<'t> {}
