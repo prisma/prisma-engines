@@ -6,7 +6,7 @@ use crate::{
 use migration_connector::{
     ConnectorResult, DatabaseMigrationStepApplier, DestructiveChangeDiagnostics, Migration, MigrationConnector,
 };
-use mongodb::bson;
+use mongodb::bson::{self, Bson, Document};
 
 #[async_trait::async_trait]
 impl DatabaseMigrationStepApplier for MongoDbMigrationConnector {
@@ -35,7 +35,12 @@ impl DatabaseMigrationStepApplier for MongoDbMigrationConnector {
                     let collection: mongodb::Collection<bson::Document> = db.collection(index.collection().name());
 
                     let mut index_model = mongodb::IndexModel::default();
-                    index_model.keys = index.keys().clone();
+
+                    index_model.keys = index.fields().fold(Document::new(), |mut acc, field| {
+                        acc.insert(field.name().to_string(), Bson::from(field.property));
+                        acc
+                    });
+
                     let mut index_options = mongodb::options::IndexOptions::default();
                     index_options.name = Some(index.name().to_owned());
                     index_options.unique = Some(index.is_unique());

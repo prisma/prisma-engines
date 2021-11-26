@@ -2,6 +2,7 @@ mod error;
 mod sampler;
 mod warnings;
 
+use enumflags2::BitFlags;
 pub use error::*;
 
 use datamodel::{common::preview_features::PreviewFeature, Datamodel};
@@ -12,6 +13,7 @@ use introspection_connector::{
     IntrospectionResult,
 };
 use mongodb::{Client, Database};
+use mongodb_schema_describer::{IndexData, IndexFieldProperty, MongoSchema};
 use url::Url;
 use user_facing_errors::{
     common::{InvalidConnectionString, UnsupportedFeatureError},
@@ -58,6 +60,37 @@ impl MongoDbIntrospectionConnector {
 
     fn database(&self) -> Database {
         self.connection.database(&self.database)
+    }
+
+    async fn describe(&self, preview_features: BitFlags<PreviewFeature>) -> ConnectorResult<MongoSchema> {
+        let mut schema = mongodb_schema_describer::describe(&self.connection, &self.database)
+            .await
+            .map_err(crate::Error::from)?;
+
+        if !preview_features.contains(PreviewFeature::FullTextIndex) {
+            #[allow(clippy::needless_collect)] // well, mr. clippy, maybe you should read about the borrow checker...
+            let kept_indexes: Vec<_> = schema.drain_indexes().filter(|i| !i.is_fulltext()).collect();
+
+            for index in kept_indexes.into_iter() {
+                let IndexData {
+                    name,
+                    r#type,
+                    fields,
+                    collection_id,
+                } = index;
+
+                // because this here is a mutable reference, so we must collect...
+                schema.push_index(collection_id, name, r#type, fields);
+            }
+        }
+
+        if !preview_features.contains(PreviewFeature::ExtendedIndexes) {
+            for field in schema.walk_indexes_mut().flat_map(|i| i.fields.iter_mut()) {
+                field.property = IndexFieldProperty::Ascending;
+            }
+        }
+
+        Ok(schema)
     }
 }
 
@@ -115,6 +148,8 @@ impl IntrospectionConnector for MongoDbIntrospectionConnector {
             return Err(error);
         }
 
-        Ok(sampler::sample(self.database(), ctx.composite_type_depth, ctx.preview_features).await?)
+        let schema = self.describe(ctx.preview_features).await?;
+
+        Ok(sampler::sample(self.database(), ctx.composite_type_depth, schema).await?)
     }
 }

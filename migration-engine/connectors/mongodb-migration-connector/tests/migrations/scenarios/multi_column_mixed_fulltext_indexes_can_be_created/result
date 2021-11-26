@@ -1,5 +1,5 @@
 [+] Collection `User`
-[+] Index `User_age_firstName_lastName_location_idx` on ({"age":-1,"firstName":"text","lastName":"text","location":1})
+[+] Fulltext index `User_age_firstName_lastName_location_idx` on ({"age":-1,"firstName":"text","lastName":"text","location":1})
 
 ------
 
