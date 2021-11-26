@@ -1,5 +1,5 @@
-use crate::ast::Span;
-use crate::diagnostics::helper::pretty_print;
+use crate::helper::pretty_print;
+use crate::Span;
 use thiserror::Error;
 
 /// Enum for different errors which can happen during parsing or validation.
@@ -503,33 +503,12 @@ impl DatamodelError {
             DatamodelError::CompositeTypeValidationError { span, .. } => *span,
         }
     }
+
     pub fn description(&self) -> String {
-        format!("{}", self)
+        self.to_string()
     }
 
     pub fn pretty_print(&self, f: &mut dyn std::io::Write, file_name: &str, text: &str) -> std::io::Result<()> {
         pretty_print(f, file_name, text, self.span(), self.description().as_str())
-    }
-}
-
-impl From<schema_ast::parser::ParserError> for DatamodelError {
-    fn from(err: schema_ast::parser::ParserError) -> Self {
-        match err {
-            schema_ast::parser::ParserError::ParserError(message, span) => {
-                DatamodelError::new_parser_error(&message, span)
-            }
-            schema_ast::parser::ParserError::ValidationError(message, span) => {
-                DatamodelError::new_validation_error(message, span)
-            }
-            schema_ast::parser::ParserError::LegacyParserError(message, span) => {
-                DatamodelError::new_legacy_parser_error(message, span)
-            }
-            schema_ast::parser::ParserError::EnumValidationError(message, enum_name, span) => {
-                DatamodelError::new_enum_validation_error(message, enum_name, span)
-            }
-            schema_ast::parser::ParserError::ModelValidationError(message, model_name, span) => {
-                DatamodelError::new_model_validation_error(&message, &model_name, span)
-            }
-        }
     }
 }

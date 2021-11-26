@@ -5,7 +5,7 @@ use crate::ast::*;
 
 pub fn parse_expression(token: &Token<'_>) -> Expression {
     let first_child = token.first_relevant_child();
-    let span = Span::from_pest(first_child.as_span());
+    let span = Span::from(first_child.as_span());
     match first_child.as_rule() {
         Rule::numeric_literal => Expression::NumericValue(first_child.as_str().to_string(), span),
         Rule::string_literal => Expression::StringValue(parse_string_literal(&first_child), span),
@@ -34,7 +34,7 @@ fn parse_field_with_args(token: &Token<'_>) -> Expression {
     }
 
     match name {
-        Some(name) => Expression::FieldWithArgs(name, arguments, Span::from_pest(token.as_span())),
+        Some(name) => Expression::FieldWithArgs(name, arguments, Span::from(token.as_span())),
         _ => unreachable!(
             "Encountered impossible constant literal during parsing: {:?}",
             token.as_str()
@@ -55,7 +55,7 @@ fn parse_function(token: &Token<'_>) -> Expression {
     }
 
     match name {
-        Some(name) => Expression::Function(name, arguments, Span::from_pest(token.as_span())),
+        Some(name) => Expression::Function(name, arguments, Span::from(token.as_span())),
         _ => unreachable!("Encountered impossible function during parsing: {:?}", token.as_str()),
     }
 }
@@ -70,7 +70,7 @@ fn parse_array(token: &Token<'_>) -> Expression {
         }
     }
 
-    Expression::Array(elements, Span::from_pest(token.as_span()))
+    Expression::Array(elements, Span::from(token.as_span()))
 }
 
 pub fn parse_arg_value(token: &Token<'_>) -> Expression {

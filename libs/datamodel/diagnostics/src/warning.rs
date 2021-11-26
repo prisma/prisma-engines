@@ -1,5 +1,5 @@
-use crate::ast::Span;
-use crate::diagnostics::helper::pretty_print;
+use crate::helper::pretty_print;
+use crate::Span;
 use thiserror::Error;
 
 /// Enum for different warnings which can happen during parsing or validation.

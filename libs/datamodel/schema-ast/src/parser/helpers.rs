@@ -24,7 +24,7 @@ impl ToIdentifier for pest::iterators::Pair<'_, Rule> {
     fn to_id(&self) -> Identifier {
         Identifier {
             name: String::from(self.as_str()),
-            span: Span::from_pest(self.as_span()),
+            span: Span::from(self.as_span()),
         }
     }
 }

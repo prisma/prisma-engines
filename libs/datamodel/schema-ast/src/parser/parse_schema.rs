@@ -5,14 +5,15 @@ use super::{
     parse_model::parse_model,
     parse_source_and_generator::{parse_generator, parse_source},
     parse_types::parse_type_alias,
-    Diagnostics, ParserError, PrismaDatamodelParser, Rule,
+    PrismaDatamodelParser, Rule,
 };
 use crate::ast::*;
+use diagnostics::{DatamodelError, Diagnostics};
 use pest::Parser;
 
 /// Parses a Prisma V2 datamodel document into an internal AST representation.
 pub fn parse_schema(datamodel_string: &str) -> Result<SchemaAst, Diagnostics> {
-    let mut diagnostics = Diagnostics::new();
+    let mut diagnostics = Diagnostics::default();
     let datamodel_result = PrismaDatamodelParser::parse(Rule::schema, datamodel_string);
 
     match datamodel_result {
@@ -41,25 +42,23 @@ pub fn parse_schema(datamodel_string: &str) -> Result<SchemaAst, Diagnostics> {
                     Rule::type_alias => top_level_definitions.push(Top::Type(parse_type_alias(&current))),
                     Rule::comment_block => (),
                     Rule::EOI => {}
-                    Rule::CATCH_ALL => diagnostics.push(ParserError::new_validation_error(
+                    Rule::CATCH_ALL => diagnostics.push_error(DatamodelError::new_validation_error(
                         "This line is invalid. It does not start with any known Prisma schema keyword.".to_owned(),
-                        current.as_span(),
+                        current.as_span().into(),
                     )),
-                    Rule::arbitrary_block => diagnostics.push(ParserError::new_validation_error(
+                    Rule::arbitrary_block => diagnostics.push_error(DatamodelError::new_validation_error(
                         "This block is invalid. It does not start with any known Prisma schema keyword. Valid keywords include \'model\', \'enum\', \'datasource\' and \'generator\'.".to_owned(),
-                        current.as_span(),
+                        current.as_span().into(),
                     )),
                     _ => parsing_catch_all(&current, "datamodel"),
                 }
             }
 
-            if diagnostics.is_empty() {
-                Ok(SchemaAst {
-                    tops: top_level_definitions,
-                })
-            } else {
-                Err(diagnostics)
-            }
+            diagnostics.to_result()?;
+
+            Ok(SchemaAst {
+                tops: top_level_definitions,
+            })
         }
         Err(err) => {
             let location: pest::Span<'_> = match err.location {
@@ -72,7 +71,7 @@ pub fn parse_schema(datamodel_string: &str) -> Result<SchemaAst, Diagnostics> {
                 _ => panic!("Could not construct parsing error. This should never happend."),
             };
 
-            diagnostics.push(ParserError::new_parser_error(expected, location));
+            diagnostics.push_error(DatamodelError::new_parser_error(&expected, location.into()));
             Err(diagnostics)
         }
     }

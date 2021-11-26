@@ -15,14 +15,6 @@ impl Span {
         Span { start: 0, end: 0 }
     }
 
-    /// Creates a new ast::Span from a pest::Span.
-    pub(crate) fn from_pest(s: pest::Span<'_>) -> Span {
-        Span {
-            start: s.start(),
-            end: s.end(),
-        }
-    }
-
     /// Adds an offset to a span.
     pub fn lift_span(&self, offset: usize) -> Span {
         Span {

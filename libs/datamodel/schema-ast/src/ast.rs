@@ -9,7 +9,6 @@ mod generator_config;
 mod identifier;
 mod model;
 mod source_config;
-mod span;
 mod top;
 mod traits;
 
@@ -17,6 +16,7 @@ pub use argument::Argument;
 pub use attribute::Attribute;
 pub use comment::Comment;
 pub use composite_type::{CompositeType, CompositeTypeId};
+pub use diagnostics::Span;
 pub use expression::Expression;
 pub use field::{Field, FieldArity, FieldType};
 pub use generator_config::GeneratorConfig;
@@ -24,7 +24,6 @@ pub use identifier::Identifier;
 pub use model::{FieldId, Model};
 pub use r#enum::{Enum, EnumValue};
 pub use source_config::SourceConfig;
-pub use span::Span;
 pub use top::Top;
 pub use traits::{WithAttributes, WithDocumentation, WithIdentifier, WithName, WithSpan};
 

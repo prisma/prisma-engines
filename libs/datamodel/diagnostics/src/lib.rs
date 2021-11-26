@@ -1,10 +1,12 @@
 mod collection;
 mod error;
 mod helper;
+mod span;
 mod validated;
-pub(crate) mod warning;
+mod warning;
 
 pub use collection::*;
 pub use error::DatamodelError;
+pub use span::Span;
 pub use validated::*;
 pub use warning::DatamodelWarning;
