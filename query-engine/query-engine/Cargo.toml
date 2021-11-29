@@ -40,12 +40,12 @@ tide-server-timing = "0.15.0"
 url = "2.1"
 
 tracing = "0.1"
-tracing-opentelemetry = "0.11"
-tracing-attributes = "0.1"
-tracing-subscriber = { version = "0.2", features = ["json"] }
-tracing-futures = "0.2.3"
-opentelemetry = { version = "0.12", features = ["async-std"] }
-opentelemetry-otlp = { version = "0.5", features = ["tls", "tls-roots"] }
+tracing-opentelemetry = "0.16"
+tracing-subscriber = { version = "0.3", features = ["json", "env-filter"] }
+tracing-futures = "0.2"
+opentelemetry = { version = "0.16", features = ["async-std", "rt-async-std"] }
+opentelemetry-otlp = { version = "0.9", features = ["tls", "tls-roots"] }
+
 rand = "0.8"
 tonic = { version = "0.4", default-features = false }
 

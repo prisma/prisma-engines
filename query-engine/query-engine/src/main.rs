@@ -46,8 +46,7 @@ async fn main() -> Result<(), AnyError> {
         logger.enable_telemetry(opts.open_telemetry);
         logger.telemetry_endpoint(&opts.open_telemetry_endpoint);
 
-        // The guard needs to be in scope for the whole lifetime of the service.
-        let _guard = logger.install().unwrap();
+        logger.install().unwrap();
 
         match CliCommand::from_opt(&opts)? {
             Some(cmd) => cmd.execute().await?,

@@ -26,13 +26,15 @@ connection-string = "0.1"
 url = "2"
 serde_json = { version = "1", features = ["preserve_order", "float_roundtrip"] }
 serde = "1"
+
 tracing = "0.1"
-tracing-subscriber = "0.2"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 tracing-futures = "0.2"
-tracing-opentelemetry = "0.11"
+tracing-opentelemetry = "0.16"
 datamodel-connector = { path = "../../libs/datamodel/connectors/datamodel-connector" }
-opentelemetry = "0.12"
-opentelemetry-otlp = { version = "0.5", features = ["tls", "tls-roots"] }
+opentelemetry = { version = "0.16", features = ["rt-async-std"] }
+opentelemetry-otlp = { version = "0.9", features = ["tls", "tls-roots"] }
+
 tokio = { version = "1", features = ["sync"] }
 
 [build-dependencies]

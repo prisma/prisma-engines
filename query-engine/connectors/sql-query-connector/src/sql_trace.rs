@@ -1,4 +1,4 @@
-use opentelemetry::trace::{SpanContext, TraceContextExt};
+use opentelemetry::trace::{SpanContext, TraceContextExt, TraceFlags};
 use quaint::ast::{Delete, Insert, Select, Update};
 use tracing::Span;
 use tracing_opentelemetry::OpenTelemetrySpanExt;
@@ -19,10 +19,11 @@ macro_rules! sql_trace {
     ($what:ty) => {
         impl SqlTraceComment for $what {
             fn append_trace(self, span: &Span) -> Self {
-                let span_ctx = span.context();
-                let otel_ctx = span_ctx.span().span_context();
+                let otel_ctx = span.context();
+                let span_ref = otel_ctx.span();
+                let otel_ctx = span_ref.span_context();
 
-                if otel_ctx.trace_flags() == 1 {
+                if otel_ctx.trace_flags() == TraceFlags::SAMPLED {
                     self.comment(trace_parent_to_string(otel_ctx))
                 } else {
                     self

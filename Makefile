@@ -205,4 +205,4 @@ use-local-query-engine:
 
 ## OpenTelemetry
 otel:
-	docker-compose up --remove-orphans otel
+	docker-compose up --remove-orphans -d otel

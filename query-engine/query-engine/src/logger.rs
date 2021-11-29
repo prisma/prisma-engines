@@ -3,7 +3,7 @@ use opentelemetry::{
     sdk::{propagation::TraceContextPropagator, trace::Config, Resource},
     KeyValue,
 };
-use opentelemetry_otlp::Uninstall;
+use opentelemetry_otlp::WithExportConfig;
 use tracing::{dispatcher::SetGlobalDefaultError, subscriber};
 use tracing_subscriber::{layer::SubscriberExt, registry::LookupSpan, EnvFilter, FmtSubscriber};
 
@@ -56,7 +56,7 @@ impl<'a> Logger<'a> {
     /// Install logger as a global. Can be called only once per application
     /// instance. The returned guard value needs to stay in scope for the whole
     /// lifetime of the service.
-    pub fn install(self) -> LoggerResult<Option<Uninstall>> {
+    pub fn install(self) -> LoggerResult<()> {
         let mut filter = EnvFilter::from_default_env()
             .add_directive("tide=error".parse().unwrap())
             .add_directive("tonic=error".parse().unwrap())
@@ -88,7 +88,7 @@ impl<'a> Logger<'a> {
         }
     }
 
-    fn finalize<T>(self, subscriber: T) -> LoggerResult<Option<Uninstall>>
+    fn finalize<T>(self, subscriber: T) -> LoggerResult<()>
     where
         T: SubscriberExt + Send + Sync + 'static + for<'span> LookupSpan<'span>,
     {
@@ -99,22 +99,27 @@ impl<'a> Logger<'a> {
             let resource = Resource::new(vec![KeyValue::new("service.name", self.service_name)]);
             let config = Config::default().with_resource(resource);
 
-            let mut builder = opentelemetry_otlp::new_pipeline().with_trace_config(config);
+            let mut builder = opentelemetry_otlp::new_pipeline().tracing().with_trace_config(config);
+            let mut exporter = opentelemetry_otlp::new_exporter().tonic();
 
             if let Some(endpoint) = self.telemetry_endpoint {
-                builder = builder.with_endpoint(endpoint);
+                exporter = exporter.with_endpoint(endpoint);
             }
 
-            let (tracer, guard) = builder.install().unwrap();
+            builder = builder.with_exporter(exporter);
+
+            // TODO: Use async batch exporter
+            let tracer = builder.install_batch(opentelemetry::runtime::AsyncStd).unwrap();
 
             let telemetry = tracing_opentelemetry::layer().with_tracer(tracer);
+
             subscriber::set_global_default(subscriber.with(telemetry))?;
 
-            Ok(Some(guard))
+            Ok(())
         } else {
             subscriber::set_global_default(subscriber)?;
 
-            Ok(None)
+            Ok(())
         }
     }
 }
