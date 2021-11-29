@@ -133,6 +133,12 @@ pub enum IndexType {
     Fulltext,
 }
 
+impl IndexType {
+    pub fn is_fulltext(self) -> bool {
+        matches!(self, IndexType::Fulltext)
+    }
+}
+
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum SortOrder {
     Asc,

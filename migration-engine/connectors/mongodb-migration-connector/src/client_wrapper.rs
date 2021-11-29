@@ -1,5 +1,5 @@
 use crate::schema::MongoSchema;
-use datamodel::common::preview_features::PreviewFeature;
+use datamodel::{common::preview_features::PreviewFeature, IndexType};
 use enumflags2::BitFlags;
 use futures::stream::TryStreamExt;
 use migration_connector::{ConnectorError, ConnectorResult};
@@ -63,22 +63,64 @@ impl Client {
             {
                 let options = index.options.unwrap();
                 let name = options.name.unwrap();
-                let is_unique = options.unique.unwrap_or(false); // 3-valued boolean where null means false
+
+                let tpe = match (options.unique, options.text_index_version.as_ref()) {
+                    (Some(_), _) => IndexType::Unique,
+                    (_, Some(_)) if preview_features.contains(PreviewFeature::FullTextIndex) => IndexType::Fulltext,
+                    (_, Some(_)) => continue,
+                    _ => IndexType::Normal,
+                };
 
                 if name == AUTOMATIC_ID_INDEX_NAME {
                     continue; // do not introspect or diff these
                 }
 
-                let path = if preview_features.contains(PreviewFeature::ExtendedIndexes) {
-                    index.keys
+                let path = if tpe.is_fulltext() {
+                    let is_fts = |k: &str| k == "_fts" || k == "_ftsx";
+
+                    // First we take all items that are not using the special fulltext keys,
+                    // stopping when we find the first one.
+                    let head = index
+                        .keys
+                        .iter()
+                        .take_while(|(k, _)| !is_fts(k))
+                        .map(|(k, v)| (k, v.clone()));
+
+                    // Then go through the weights, we have the fields presented as part of the
+                    // fulltext index here.
+                    let middle = options
+                        .weights
+                        .iter()
+                        .flat_map(|weights| weights.keys())
+                        .map(|k| (k, Bson::String("text".to_string())));
+
+                    // And in the end add whatever fields were left in the index keys that are not
+                    // special fulltext keys.
+                    let tail = index
+                        .keys
+                        .iter()
+                        .skip_while(|(k, _)| !is_fts(k))
+                        .skip_while(|(k, _)| is_fts(k))
+                        .map(|(k, v)| (k, v.clone()));
+
+                    head.chain(middle).chain(tail).fold(Document::new(), |mut acc, (k, v)| {
+                        acc.insert(k, v);
+                        acc
+                    })
                 } else {
-                    index.keys.iter().fold(Document::new(), |mut acc, (k, _)| {
+                    index.keys
+                };
+
+                let path = if preview_features.contains(PreviewFeature::ExtendedIndexes) {
+                    path
+                } else {
+                    path.iter().fold(Document::new(), |mut acc, (k, _)| {
                         acc.insert(k, Bson::Int32(1));
                         acc
                     })
                 };
 
-                schema.push_index(collection_id, name, is_unique, dbg!(path));
+                schema.push_index(collection_id, name, tpe, path);
             }
         }
 

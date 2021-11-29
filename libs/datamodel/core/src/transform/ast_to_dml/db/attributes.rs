@@ -783,11 +783,11 @@ fn visit_relation<'ast>(
                 relation_fields,
             }) => {
                 if !unresolvable_fields.is_empty() {
-                    ctx.push_error(DatamodelError::new_validation_error(&format!("The argument fields must refer only to existing fields. The following fields do not exist in this model: {}", unresolvable_fields.join(", ")), fields.span()))
+                    ctx.push_error(DatamodelError::new_validation_error(format!("The argument fields must refer only to existing fields. The following fields do not exist in this model: {}", unresolvable_fields.join(", ")), fields.span()))
                 }
 
                 if !relation_fields.is_empty() {
-                    ctx.push_error(DatamodelError::new_validation_error(&format!("The argument fields must refer only to scalar fields. But it is referencing the following relation fields: {}", relation_fields.iter().map(|(f, _)| f.name()).collect::<Vec<_>>().join(", ")), fields.span()));
+                    ctx.push_error(DatamodelError::new_validation_error(format!("The argument fields must refer only to scalar fields. But it is referencing the following relation fields: {}", relation_fields.iter().map(|(f, _)| f.name()).collect::<Vec<_>>().join(", ")), fields.span()));
                 }
 
                 Vec::new()
@@ -816,7 +816,7 @@ fn visit_relation<'ast>(
                         ctx.db.ast[relation_field.referenced_model].name(),
                         unknown_fields.join(", "),
                     );
-                    ctx.push_error(DatamodelError::new_validation_error(&msg, args.span()));
+                    ctx.push_error(DatamodelError::new_validation_error(msg, args.span()));
                 }
 
                 if !relation_fields.is_empty() {
@@ -825,7 +825,7 @@ fn visit_relation<'ast>(
                         ctx.db.ast[relation_field.referenced_model].name(),
                         relation_fields.iter().map(|(f, _)| f.name()).collect::<Vec<_>>().join(", "),
                     );
-                    ctx.push_error(DatamodelError::new_validation_error(&msg, args.span()));
+                    ctx.push_error(DatamodelError::new_validation_error(msg, args.span()));
                 }
 
                 Vec::new()

@@ -75,7 +75,6 @@
 
 pub mod ast;
 pub mod common;
-pub mod diagnostics;
 pub mod dml;
 pub mod json;
 pub mod walkers;
@@ -84,17 +83,22 @@ mod configuration;
 mod transform;
 
 pub use crate::dml::*;
+use ast::reformat::MissingField;
 pub use configuration::{Configuration, Datasource, Generator, StringFromEnvVar};
+pub use diagnostics;
 pub use transform::ast_to_dml::reserved_model_names;
 
-use crate::diagnostics::{Validated, ValidatedConfiguration, ValidatedDatamodel};
 use crate::{ast::SchemaAst, common::preview_features::PreviewFeature};
-use diagnostics::Diagnostics;
+use diagnostics::{Diagnostics, Validated};
 use enumflags2::BitFlags;
 use transform::{
     ast_to_dml::{DatasourceLoader, GeneratorLoader, ValidationPipeline},
     dml_to_ast::{self, GeneratorSerializer, LowerDmlToAst},
 };
+
+pub type ValidatedDatamodel = Validated<Datamodel>;
+pub type ValidatedConfiguration = Validated<Configuration>;
+pub type ValidatedMissingFields = Validated<Vec<MissingField>>;
 
 /// Parse and validate the whole schema
 pub fn parse_schema(schema_str: &str) -> Result<(Configuration, Datamodel), String> {

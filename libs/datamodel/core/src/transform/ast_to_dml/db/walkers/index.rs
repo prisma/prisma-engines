@@ -96,6 +96,10 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
         self.index_attribute.is_unique()
     }
 
+    pub(crate) fn is_fulltext(self) -> bool {
+        self.index_attribute.is_fulltext()
+    }
+
     pub(crate) fn model(self) -> ModelWalker<'ast, 'db> {
         ModelWalker {
             model_id: self.model_id,

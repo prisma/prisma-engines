@@ -1,4 +1,4 @@
-use datamodel::diagnostics::ValidatedConfiguration;
+use datamodel::ValidatedConfiguration;
 
 mod datasources;
 mod generators;

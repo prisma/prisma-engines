@@ -1,5 +1,5 @@
 use migration_engine_tests::test_api::*;
-use sql_schema_describer::{ColumnTypeFamily, DefaultKind};
+use sql_schema_describer::ColumnTypeFamily;
 
 const SCHEMA: &str = r#"
 model Cat {
@@ -365,24 +365,4 @@ fn duplicate_constraint_names_across_models_work_on_mysql(api: TestApi) {
      "#;
 
     api.schema_push_w_datasource(plain_dm).send().assert_green();
-}
-
-#[test_connector(tags(Mysql8))]
-fn binary_uuid_default_value(api: TestApi) {
-    let dm = r#"
-      model Test {
-        id   Bytes  @id @default(dbgenerated("uuid_to_bin(uuid())")) @db.Binary(16)
-      }
-    "#;
-
-    api.schema_push_w_datasource(dm)
-        .send()
-        .assert_green()
-        .assert_has_executed_steps();
-
-    api.assert_schema().assert_table("Test", |table| {
-        table.assert_column("id", |col| {
-            col.assert_default_kind(Some(DefaultKind::DbGenerated("(uuid_to_bin(uuid()))".into())))
-        })
-    });
 }

@@ -1,5 +1,5 @@
-use crate::ast::Span;
-use crate::diagnostics::helper::pretty_print;
+use crate::helper::pretty_print;
+use crate::Span;
 use thiserror::Error;
 
 /// Enum for different errors which can happen during parsing or validation.
@@ -314,10 +314,10 @@ impl DatamodelError {
         }
     }
 
-    pub fn new_enum_validation_error(message: &str, enum_name: &str, span: Span) -> DatamodelError {
+    pub fn new_enum_validation_error(message: String, enum_name: String, span: Span) -> DatamodelError {
         DatamodelError::EnumValidationError {
-            message: String::from(message),
-            r#enum_name: String::from(enum_name),
+            message,
+            enum_name,
             span,
         }
     }
@@ -355,11 +355,8 @@ impl DatamodelError {
         }
     }
 
-    pub fn new_validation_error(message: &str, span: Span) -> DatamodelError {
-        DatamodelError::ValidationError {
-            message: String::from(message),
-            span,
-        }
+    pub fn new_validation_error(message: String, span: Span) -> DatamodelError {
+        DatamodelError::ValidationError { message, span }
     }
 
     pub fn new_legacy_parser_error(message: &str, span: Span) -> DatamodelError {
@@ -506,8 +503,9 @@ impl DatamodelError {
             DatamodelError::CompositeTypeValidationError { span, .. } => *span,
         }
     }
+
     pub fn description(&self) -> String {
-        format!("{}", self)
+        self.to_string()
     }
 
     pub fn pretty_print(&self, f: &mut dyn std::io::Write, file_name: &str, text: &str) -> std::io::Result<()> {

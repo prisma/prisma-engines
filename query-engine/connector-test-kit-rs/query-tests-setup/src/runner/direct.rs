@@ -30,6 +30,7 @@ impl RunnerInterface for DirectRunner {
             true,
             data_source.capabilities(),
             preview_features,
+            data_source.referential_integrity(),
         ));
 
         Ok(Self {

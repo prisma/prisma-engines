@@ -678,3 +678,37 @@ fn default_inside_composite_type_field_errors() {
 
     expected.assert_eq(&error)
 }
+
+#[test]
+fn must_error_on_dbgenerated_default_on_non_native_type_on_mongodb() {
+    let schema = r#"
+        datasource db {
+            provider = "mongodb"
+            url = "mongodb://"
+        }
+
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["mongoDb"]
+        }
+
+        model User {
+            id Int @id @map("_id")
+            nickname String @default(dbgenerated())
+        }
+    "#;
+
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError validating field 'nickname': MongoDB `@default(dbgenerated())` fields must have a native type annotation.[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m            id Int @id @map("_id")
+        [1;94m14 | [0m            [1;91mnickname String @default(dbgenerated())[0m
+        [1;94m15 | [0m        }
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&error)
+}

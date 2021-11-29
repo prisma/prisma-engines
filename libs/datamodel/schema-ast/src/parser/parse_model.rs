@@ -1,44 +1,45 @@
 use super::{
     helpers::{parsing_catch_all, ToIdentifier, Token, TokenExtensions},
-    parse_comments::parse_comment_block,
+    parse_attribute::parse_attribute,
+    parse_comments::*,
     parse_field::parse_field,
     Rule,
 };
-use crate::ast;
-use crate::diagnostics::{DatamodelError, Diagnostics};
+use crate::ast::*;
+use diagnostics::{DatamodelError, Diagnostics};
 
-pub(crate) fn parse_composite_type(token: &Token<'_>, diagnostics: &mut Diagnostics) -> ast::CompositeType {
-    let mut name: Option<ast::Identifier> = None;
-    let mut fields: Vec<ast::Field> = vec![];
-    let mut comment: Option<ast::Comment> = None;
+pub(crate) fn parse_model(token: &Token<'_>, diagnostics: &mut Diagnostics) -> Model {
+    let mut name: Option<Identifier> = None;
+    let mut attributes: Vec<Attribute> = vec![];
+    let mut fields: Vec<Field> = vec![];
+    let mut comment: Option<Comment> = None;
 
     for current in token.relevant_children() {
         match current.as_rule() {
-            Rule::TYPE_KEYWORD => (),
+            Rule::MODEL_KEYWORD => (),
             Rule::non_empty_identifier => name = Some(current.to_id()),
-            Rule::block_level_attribute => diagnostics.push_error(DatamodelError::new_validation_error(
-                "Composite types cannot have block attributes.",
-                ast::Span::from_pest(current.as_span()),
-            )),
+            Rule::block_level_attribute => attributes.push(parse_attribute(&current)),
             Rule::field_declaration => match parse_field(&name.as_ref().unwrap().name, &current) {
                 Ok(field) => fields.push(field),
                 Err(err) => diagnostics.push_error(err),
             },
             Rule::comment_block => comment = parse_comment_block(&current),
             Rule::BLOCK_LEVEL_CATCH_ALL => diagnostics.push_error(DatamodelError::new_validation_error(
-                "This line is not a valid field or attribute definition.",
-                ast::Span::from_pest(current.as_span()),
+                "This line is not a valid field or attribute definition.".to_owned(),
+                current.as_span().into(),
             )),
-            _ => parsing_catch_all(&current, "composite type"),
+            _ => parsing_catch_all(&current, "model"),
         }
     }
 
     match name {
-        Some(name) => ast::CompositeType {
+        Some(name) => Model {
             name,
             fields,
+            attributes,
             documentation: comment,
-            span: ast::Span::from_pest(token.as_span()),
+            span: Span::from(token.as_span()),
+            commented_out: false,
         },
         _ => panic!(
             "Encountered impossible model declaration during parsing: {:?}",

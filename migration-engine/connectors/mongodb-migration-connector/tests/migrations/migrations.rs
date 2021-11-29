@@ -36,5 +36,10 @@ scenarios! {
   index_to_unique
   map_annotations
   single_field_uniques_are_created
+  single_column_fulltext_indexes_can_be_created
+  multi_column_fulltext_indexes_can_be_created
+  multi_column_mixed_fulltext_indexes_can_be_created
+  multi_column_mixed_fulltext_indexes_can_be_changed
+  pushing_without_preview_flag_should_not_touch_fts_indexes
   unique_to_index
 }

@@ -29,17 +29,16 @@ pub fn version(ctx: CallContext) -> napi::Result<JsUnknown> {
 #[js_function(1)]
 pub fn dmmf(ctx: CallContext) -> napi::Result<JsString> {
     let datamodel_string = ctx.get::<JsString>(0)?.into_utf8()?.into_owned()?;
-
     let datamodel = datamodel::parse_datamodel(&datamodel_string)
         .map_err(|errors| ApiError::conversion(errors, &datamodel_string))?;
-
     let config = datamodel::parse_configuration(&datamodel_string)
         .map_err(|errors| ApiError::conversion(errors, &datamodel_string))?;
+    let datasource = config.subject.datasources.first();
 
-    let capabilities = match config.subject.datasources.first() {
-        Some(datasource) => datasource.capabilities(),
-        None => ConnectorCapabilities::empty(),
-    };
+    let capabilities = datasource
+        .map(|ds| ds.capabilities())
+        .unwrap_or_else(ConnectorCapabilities::empty);
+    let referential_integrity = datasource.map(|ds| ds.referential_integrity()).unwrap_or_default();
 
     let internal_data_model = InternalDataModelBuilder::from(&datamodel.subject).build("".into());
 
@@ -49,6 +48,7 @@ pub fn dmmf(ctx: CallContext) -> napi::Result<JsString> {
         true,
         capabilities,
         config.subject.preview_features().iter().collect(),
+        referential_integrity,
     ));
 
     let dmmf = dmmf::render_dmmf(&datamodel.subject, query_schema);

@@ -5,6 +5,7 @@ use crate::{
 use async_trait::async_trait;
 use connector_interface::{filter::Filter, RecordFilter};
 use futures::future::FutureExt;
+use opentelemetry::trace::TraceFlags;
 use prisma_models::*;
 use quaint::{
     ast::*,
@@ -17,8 +18,9 @@ use serde_json::{Map, Value};
 use std::panic::AssertUnwindSafe;
 
 use crate::sql_trace::trace_parent_to_string;
+
 use opentelemetry::trace::TraceContextExt;
-use tracing::Span;
+use tracing::{span, Span};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 impl<'t> QueryExt for connector::Transaction<'t> {}
@@ -31,14 +33,15 @@ pub trait QueryExt: Queryable + Send + Sync {
     /// Filter and map the resulting types with the given identifiers.
     #[tracing::instrument(skip(self, q, idents))]
     async fn filter(&self, q: Query<'_>, idents: &[ColumnMetadata<'_>]) -> crate::Result<Vec<SqlRow>> {
-        let span = tracing::span!(tracing::Level::INFO, "filter read query");
+        let span = span!(tracing::Level::INFO, "filter read query");
 
-        let span_ctx = span.context();
-        let otel_ctx = span_ctx.span().span_context();
+        let otel_ctx = span.context();
+        let span_ref = otel_ctx.span();
+        let span_ctx = span_ref.span_context();
 
         let q = match q {
-            Query::Select(x) if otel_ctx.trace_flags() == 1 => {
-                Query::Select(Box::from(x.comment(trace_parent_to_string(otel_ctx))))
+            Query::Select(x) if span_ctx.trace_flags() == TraceFlags::SAMPLED => {
+                Query::Select(Box::from(x.comment(trace_parent_to_string(span_ctx))))
             }
             _ => q,
         };

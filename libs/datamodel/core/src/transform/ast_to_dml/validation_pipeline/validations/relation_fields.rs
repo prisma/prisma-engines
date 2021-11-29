@@ -161,7 +161,7 @@ pub(super) fn referential_actions(
                 .span_for_argument("relation", "onDelete")
                 .unwrap_or_else(|| field.ast_field().span);
 
-            diagnostics.push_error(DatamodelError::new_validation_error(&msg(on_delete), span));
+            diagnostics.push_error(DatamodelError::new_validation_error(msg(on_delete), span));
         }
     }
 
@@ -172,7 +172,7 @@ pub(super) fn referential_actions(
                 .span_for_argument("relation", "onUpdate")
                 .unwrap_or_else(|| field.ast_field().span);
 
-            diagnostics.push_error(DatamodelError::new_validation_error(&msg(on_update), span));
+            diagnostics.push_error(DatamodelError::new_validation_error(msg(on_update), span));
         }
     }
 }

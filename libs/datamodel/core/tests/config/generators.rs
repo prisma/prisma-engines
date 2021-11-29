@@ -382,3 +382,41 @@ fn env_in_preview_features_must_be_rejected() {
     expect_1.assert_eq(&datamodel::parse_schema(schema_1).map(drop).unwrap_err());
     expect_2.assert_eq(&datamodel::parse_schema(schema_2).map(drop).unwrap_err());
 }
+
+#[test]
+fn empty_preview_features_array_should_work() {
+    let schema = r#"
+        datasource db {
+            provider = "postgresql"
+            url = env("DBURL")
+        }
+
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = []
+        }
+    "#;
+
+    let (config, _) = datamodel::parse_schema(schema).unwrap();
+
+    assert!(config.preview_features().is_empty());
+}
+
+#[test]
+fn empty_preview_features_array_with_empty_space_should_work() {
+    let schema = r#"
+        datasource db {
+            provider = "postgresql"
+            url = env("DBURL")
+        }
+
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = [ ]
+        }
+    "#;
+
+    let (config, _) = datamodel::parse_schema(schema).unwrap();
+
+    assert!(config.preview_features().is_empty());
+}

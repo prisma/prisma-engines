@@ -2,7 +2,7 @@ use crate::{
     migration::{MongoDbMigration, MongoDbMigrationStep},
     schema::{CollectionId, IndexId, IndexWalker, MongoSchema},
 };
-use mongodb::bson;
+use mongodb::bson::{self, Bson};
 use std::collections::BTreeMap;
 
 pub(crate) fn diff(previous: MongoSchema, next: MongoSchema) -> MongoDbMigration {
@@ -113,8 +113,41 @@ impl<'a> DifferDatabase<'a> {
 }
 
 fn indexes_are_different(previous: IndexWalker<'_>, next: IndexWalker<'_>) -> bool {
-    // We don't compare names here because we assume it has been done earlier.
-    previous.is_unique() != next.is_unique() || !keys_match(previous.keys(), next.keys())
+    // sigh
+    if previous.is_fulltext() && next.is_fulltext() {
+        let is_fts = |v: &Bson| v.as_str() == Some("text");
+
+        let previous_heads: Vec<_> = previous.keys().iter().take_while(|(_, v)| !is_fts(v)).collect();
+        let next_heads: Vec<_> = next.keys().iter().take_while(|(_, v)| !is_fts(v)).collect();
+
+        // the middles will come in a wrong order from the database. We must be able to compare
+        // them as equal no matter the order, because the generated index is not per field, but to
+        // an abstract `$text` field that just holds data from the text columns.
+        let mut previous_middles: Vec<_> = previous.keys().iter().take_while(|(_, v)| is_fts(v)).collect();
+        previous_middles.sort_by(|left, right| left.0.cmp(right.0));
+
+        let mut next_middles: Vec<_> = next.keys().iter().take_while(|(_, v)| is_fts(v)).collect();
+        next_middles.sort_by(|left, right| left.0.cmp(right.0));
+
+        let previous_tails: Vec<_> = previous
+            .keys()
+            .iter()
+            .skip_while(|(_, v)| !is_fts(v))
+            .skip_while(|(_, v)| is_fts(v))
+            .collect();
+
+        let next_tails: Vec<_> = next
+            .keys()
+            .iter()
+            .skip_while(|(_, v)| !is_fts(v))
+            .skip_while(|(_, v)| is_fts(v))
+            .collect();
+
+        previous_heads != next_heads || previous_middles != next_middles || previous_tails != next_tails
+    } else {
+        // We don't compare names here because we assume it has been done earlier.
+        previous.r#type() != next.r#type() || !keys_match(previous.keys(), next.keys())
+    }
 }
 
 fn keys_match(previous: &bson::Document, next: &bson::Document) -> bool {

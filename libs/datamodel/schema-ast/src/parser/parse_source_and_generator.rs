@@ -5,9 +5,9 @@ use super::{
     Rule,
 };
 use crate::ast::*;
-use crate::diagnostics::{DatamodelError, Diagnostics};
+use diagnostics::{DatamodelError, Diagnostics};
 
-pub fn parse_source(token: &Token<'_>, diagnostics: &mut Diagnostics) -> SourceConfig {
+pub(crate) fn parse_source(token: &Token<'_>, diagnostics: &mut Diagnostics) -> SourceConfig {
     let mut name: Option<Identifier> = None;
     let mut properties: Vec<Argument> = vec![];
     let mut comment: Option<Comment> = None;
@@ -18,8 +18,8 @@ pub fn parse_source(token: &Token<'_>, diagnostics: &mut Diagnostics) -> SourceC
             Rule::key_value => properties.push(parse_key_value(&current)),
             Rule::comment_block => comment = parse_comment_block(&current),
             Rule::BLOCK_LEVEL_CATCH_ALL => diagnostics.push_error(DatamodelError::new_validation_error(
-                "This line is not a valid definition within a datasource.",
-                Span::from_pest(current.as_span()),
+                "This line is not a valid definition within a datasource.".to_owned(),
+                current.as_span().into(),
             )),
             _ => parsing_catch_all(&current, "source"),
         }
@@ -30,7 +30,7 @@ pub fn parse_source(token: &Token<'_>, diagnostics: &mut Diagnostics) -> SourceC
             name,
             properties,
             documentation: comment,
-            span: Span::from_pest(token.as_span()),
+            span: Span::from(token.as_span()),
         },
         _ => panic!(
             "Encountered impossible source declaration during parsing, name is missing: {:?}",
@@ -51,8 +51,8 @@ pub fn parse_generator(token: &Token<'_>, diagnostics: &mut Diagnostics) -> Gene
             Rule::doc_comment => comments.push(parse_doc_comment(&current)),
             Rule::doc_comment_and_new_line => comments.push(parse_doc_comment(&current)),
             Rule::BLOCK_LEVEL_CATCH_ALL => diagnostics.push_error(DatamodelError::new_validation_error(
-                "This line is not a valid definition within a generator.",
-                Span::from_pest(current.as_span()),
+                "This line is not a valid definition within a generator.".to_owned(),
+                current.as_span().into(),
             )),
             _ => parsing_catch_all(&current, "generator"),
         }
@@ -63,7 +63,7 @@ pub fn parse_generator(token: &Token<'_>, diagnostics: &mut Diagnostics) -> Gene
             name,
             properties,
             documentation: doc_comments_to_string(&comments),
-            span: Span::from_pest(token.as_span()),
+            span: Span::from(token.as_span()),
         },
         _ => panic!(
             "Encountered impossible generator declaration during parsing, name is missing: {:?}",
@@ -91,7 +91,7 @@ fn parse_key_value(token: &Token<'_>) -> Argument {
         (Some(name), Some(value)) => Argument {
             name,
             value,
-            span: Span::from_pest(token.as_span()),
+            span: Span::from(token.as_span()),
         },
         _ => panic!(
             "Encountered impossible source property declaration during parsing: {:?}",

@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schema), capabilities(FullTextSearchWithoutIndex))]
+#[test_suite(schema(schema), capabilities(FullTextSearchWithoutIndex), exclude(Cockroach))]
 mod order_by_relevance {
     use indoc::indoc;
     use query_engine_tests::{assert_error, run_query};
@@ -15,7 +15,7 @@ mod order_by_relevance {
                 fieldC    String?
                 relations Relation[]
               }
-              
+
               model Relation {
                 #id(id, Int, @id)
                 testModel   TestModel? @relation(fields: [testModelId], references: [id])

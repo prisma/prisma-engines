@@ -6,7 +6,7 @@ use super::{
     Rule,
 };
 use crate::ast::*;
-use crate::diagnostics::DatamodelError;
+use diagnostics::DatamodelError;
 
 pub fn parse_field(model_name: &str, token: &Token<'_>) -> Result<Field, DatamodelError> {
     let mut name: Option<Identifier> = None;
@@ -21,7 +21,7 @@ pub fn parse_field(model_name: &str, token: &Token<'_>) -> Result<Field, Datamod
             Rule::LEGACY_COLON => {
                 return Err(DatamodelError::new_legacy_parser_error(
                     "Field declarations don't require a `:`.",
-                    Span::from_pest(current.as_span()),
+                    current.as_span().into(),
                 ))
             }
             Rule::attribute => attributes.push(parse_attribute(&current)),
@@ -38,13 +38,13 @@ pub fn parse_field(model_name: &str, token: &Token<'_>) -> Result<Field, Datamod
             arity,
             attributes,
             documentation: doc_comments_to_string(&comments),
-            span: Span::from_pest(token.as_span()),
+            span: Span::from(token.as_span()),
             is_commented_out: false,
         }),
         _ => Err(DatamodelError::new_model_validation_error(
-            &"This field declaration is invalid. It is either missing a name or a type.".to_string(),
+            "This field declaration is invalid. It is either missing a name or a type.",
             model_name,
-            Span::from_pest(token.as_span()),
+            token.as_span().into(),
         )),
     }
 }

@@ -22,6 +22,7 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, r
         models::uses_sort_or_length_on_primary_without_preview_flag(db, model, diagnostics);
         models::primary_key_length_prefix_supported(db, model, diagnostics);
         models::primary_key_sort_order_supported(db, model, diagnostics);
+        models::only_one_fulltext_attribute_allowed(db, model, diagnostics);
 
         if let Some(pk) = model.primary_key() {
             for field_attribute in pk.scalar_field_attributes() {
@@ -34,6 +35,8 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, r
         for field in model.scalar_fields() {
             fields::validate_client_name(field.into(), &names, diagnostics);
             fields::has_a_unique_default_constraint_name(db, field, diagnostics);
+            fields::validate_native_type_arguments(field, diagnostics);
+            fields::validate_default(field, diagnostics);
         }
 
         for field in model.relation_fields() {
@@ -56,9 +59,12 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, r
             indexes::field_length_prefix_supported(db, index, diagnostics);
             indexes::index_algorithm_preview_feature(db, index, diagnostics);
             indexes::index_algorithm_is_supported(db, index, diagnostics);
+            indexes::hash_index_must_not_use_sort_param(db, index, diagnostics);
             indexes::fulltext_index_preview_feature_enabled(db, index, diagnostics);
             indexes::fulltext_index_supported(db, index, diagnostics);
-            indexes::fulltext_columns_should_not_use_arguments(db, index, diagnostics);
+            indexes::fulltext_columns_should_not_define_length(db, index, diagnostics);
+            indexes::fulltext_column_sort_is_supported(db, index, diagnostics);
+            indexes::fulltext_text_columns_should_be_bundled_together(db, index, diagnostics);
 
             for field_attribute in index.scalar_field_attributes() {
                 let span = index
@@ -82,11 +88,11 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, r
                     relations::cycles(relation, db, diagnostics);
                     relations::multiple_cascading_paths(relation, db, diagnostics);
                     relations::has_a_unique_constraint_name(db, relation, diagnostics);
-
-                    // These needs to run last to prevent error spam.
                     relations::references_unique_fields(relation, connector, diagnostics);
                     relations::referencing_fields_in_correct_order(relation, connector, diagnostics);
                 }
+
+                relations::referencing_scalar_field_types(relation, diagnostics);
 
                 // Only run these when you are not formatting the data model. These validations
                 // test against broken relations that we could fix with a code action. The flag is
