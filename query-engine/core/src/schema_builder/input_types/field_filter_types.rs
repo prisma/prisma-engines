@@ -181,11 +181,11 @@ fn full_scalar_filter_type(
             }
         }
 
-        TypeIdentifier::Boolean | TypeIdentifier::Xml | TypeIdentifier::Bytes => {
+        TypeIdentifier::Boolean | TypeIdentifier::Xml => {
             equality_filters(mapped_scalar_type.clone(), nullable).collect()
         }
 
-        TypeIdentifier::Enum(_) => equality_filters(mapped_scalar_type.clone(), nullable)
+        TypeIdentifier::Bytes | TypeIdentifier::Enum(_) => equality_filters(mapped_scalar_type.clone(), nullable)
             .chain(inclusion_filters(mapped_scalar_type.clone(), nullable))
             .collect(),
 

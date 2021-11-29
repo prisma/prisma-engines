@@ -134,6 +134,7 @@ fn format_should_enforce_order_of_block_attributes() {
           yearOfBirth Int
           @@map("blog")
           @@index([yearOfBirth])
+          @@fulltext([firstName, lastName, codeName])
           @@unique([codeName, yearOfBirth])
           @@id([firstName, lastName])
         }
@@ -143,6 +144,7 @@ fn format_should_enforce_order_of_block_attributes() {
           name  String
           posts Post[]
           @@id([id])
+          @@fulltext([name])
           @@index([id, name])
           @@unique([name])
           @@map("blog")
@@ -159,6 +161,7 @@ fn format_should_enforce_order_of_block_attributes() {
           @@id([firstName, lastName])
           @@unique([codeName, yearOfBirth])
           @@index([yearOfBirth])
+          @@fulltext([firstName, lastName, codeName])
           @@map("blog")
         }
 
@@ -170,6 +173,7 @@ fn format_should_enforce_order_of_block_attributes() {
           @@id([id])
           @@unique([name])
           @@index([id, name])
+          @@fulltext([name])
           @@map("blog")
         }
     "#]];
@@ -1082,6 +1086,80 @@ fn composite_types_are_not_reformatted_into_models() {
         id Int @id
       }
   "#]];
+
+    let result = Reformatter::new(input).reformat_to_string();
+    expected.assert_eq(&result);
+}
+
+#[test]
+fn reformatting_extended_indexes_works() {
+    let input = indoc! {r#"
+        generator client {
+          provider        = "prisma-client-js"
+          binaryTargets   = ["darwin"]
+          previewFeatures = ["extendedIndexes"]
+        }
+        
+        datasource db {
+          provider = "mysql"
+          url      = env("DATABASE_URL")
+        }
+        
+        model A {
+          id   Int    @id
+          name String @unique(length: 15, sort: Desc)
+          a    String
+          b    String
+          B    B[]    @relation("AtoB")
+        
+          @@unique([a, b], map: "compound")
+          @@index([a(sort: Desc, length: 100)], map: "A_a_idx")
+        }
+        
+        model B {
+          a   String
+          b   String
+          aId Int
+          A   A      @relation("AtoB", fields: [aId], references: [id])
+        
+          @@id([a, b])
+          @@index([aId], map: "B_aId_idx")
+        }
+    "#};
+
+    let expected = expect![[r#"
+        generator client {
+          provider        = "prisma-client-js"
+          binaryTargets   = ["darwin"]
+          previewFeatures = ["extendedIndexes"]
+        }
+
+        datasource db {
+          provider = "mysql"
+          url      = env("DATABASE_URL")
+        }
+
+        model A {
+          id   Int    @id
+          name String @unique(length: 15, sort: Desc)
+          a    String
+          b    String
+          B    B[]    @relation("AtoB")
+
+          @@unique([a, b], map: "compound")
+          @@index([a(sort: Desc, length: 100)], map: "A_a_idx")
+        }
+
+        model B {
+          a   String
+          b   String
+          aId Int
+          A   A      @relation("AtoB", fields: [aId], references: [id])
+
+          @@id([a, b])
+          @@index([aId], map: "B_aId_idx")
+        }
+    "#]];
 
     let result = Reformatter::new(input).reformat_to_string();
     expected.assert_eq(&result);

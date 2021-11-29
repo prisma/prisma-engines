@@ -1,0 +1,13 @@
+ generator js {
+   provider        = "prisma-client-js"
+   previewFeatures = ["extendedIndexes"]
+ }
+
+ model User {
+   id Int @id
+   firstName String
+   lastName String
+   age Int
+
+   @@index([firstName, lastName, age(sort: Desc)])
+ }

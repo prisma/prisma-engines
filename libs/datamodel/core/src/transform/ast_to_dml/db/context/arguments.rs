@@ -33,10 +33,12 @@ impl<'a> Arguments<'a> {
             if let Some(existing_argument) = self.args.insert(arg.name.name.as_str(), arg) {
                 if arg.is_unnamed() {
                     if unnamed_arguments.is_empty() {
-                        unnamed_arguments.push(existing_argument.value.render_to_string())
+                        let rendered = ast::Renderer::render_value_to_string(&existing_argument.value);
+                        unnamed_arguments.push(rendered)
                     }
 
-                    unnamed_arguments.push(arg.value.render_to_string())
+                    let rendered = ast::Renderer::render_value_to_string(&arg.value);
+                    unnamed_arguments.push(rendered)
                 } else {
                     errors.push_error(DatamodelError::new_duplicate_argument_error(&arg.name.name, arg.span));
                 }

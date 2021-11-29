@@ -68,7 +68,7 @@ impl<'a> ValueValidator<'a> {
             ScalarType::Json => self.as_str().map(String::from).map(PrismaValue::String),
             ScalarType::Bytes => self.as_str().and_then(|s| {
                 prisma_value::decode_bytes(s).map(PrismaValue::Bytes).map_err(|_| {
-                    DatamodelError::new_validation_error(&format!("Invalid base64 string '{}'.", s), self.span())
+                    DatamodelError::new_validation_error(format!("Invalid base64 string '{}'.", s), self.span())
                 })
             }),
 
@@ -295,7 +295,7 @@ impl<'a> ValueValidator<'a> {
                             args.iter().map(|arg| format!("{}", arg)).join(",")
                         );
 
-                        return Err(DatamodelError::new_validation_error(&msg, self.span()));
+                        return Err(DatamodelError::new_validation_error(msg, self.span()));
                     }
                 };
                 let generator = self.get_value_generator(name, prisma_args)?;

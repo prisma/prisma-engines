@@ -11,3 +11,5 @@ pub mod postgres;
 
 #[cfg(feature = "sqlite")]
 pub mod sqlite;
+
+pub use common::{IndexColumn, SortOrder};

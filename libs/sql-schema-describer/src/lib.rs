@@ -18,7 +18,7 @@ use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
-use std::fmt::Debug;
+use std::fmt::{self, Debug};
 use walkers::{EnumWalker, TableWalker, UserDefinedTypeWalker, ViewWalker};
 
 pub use error::{DescriberError, DescriberErrorKind, DescriberResult};
@@ -225,12 +225,14 @@ impl Table {
 }
 
 /// The type of an index.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, Copy)]
 pub enum IndexType {
     /// Unique type.
     Unique,
     /// Normal type.
     Normal,
+    /// Fulltext type.
+    Fulltext,
 }
 
 impl IndexType {
@@ -239,11 +241,47 @@ impl IndexType {
     }
 }
 
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, Copy)]
+pub enum SQLIndexAlgorithm {
+    BTree,
+    Hash,
+}
+
+impl AsRef<str> for SQLIndexAlgorithm {
+    fn as_ref(&self) -> &str {
+        match self {
+            Self::BTree => "BTREE",
+            Self::Hash => "HASH",
+        }
+    }
+}
+
+impl fmt::Display for SQLIndexAlgorithm {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_ref())
+    }
+}
+
 /// The sort order of an index.
 #[derive(Serialize, Deserialize, PartialEq, Debug, Copy, Clone)]
 pub enum SQLSortOrder {
     Asc,
     Desc,
+}
+
+impl AsRef<str> for SQLSortOrder {
+    fn as_ref(&self) -> &str {
+        match self {
+            SQLSortOrder::Asc => "ASC",
+            SQLSortOrder::Desc => "DESC",
+        }
+    }
+}
+
+impl fmt::Display for SQLSortOrder {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_ref())
+    }
 }
 
 #[derive(Default, Serialize, Deserialize, PartialEq, Debug, Clone)]
@@ -279,11 +317,17 @@ pub struct Index {
     pub columns: Vec<IndexColumn>,
     /// Type of index.
     pub tpe: IndexType,
+    /// BTree or Hash
+    pub algorithm: Option<SQLIndexAlgorithm>,
 }
 
 impl Index {
     pub fn is_unique(&self) -> bool {
         self.tpe == IndexType::Unique
+    }
+
+    pub fn is_fulltext(&self) -> bool {
+        self.tpe == IndexType::Fulltext
     }
 
     pub fn column_names(&self) -> impl ExactSizeIterator<Item = &str> + '_ {

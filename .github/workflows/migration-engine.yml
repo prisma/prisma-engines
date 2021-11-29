@@ -45,7 +45,6 @@ jobs:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
 
-
   test-linux:
     name: "Test ${{ matrix.database.name }} on Linux"
 
@@ -80,7 +79,7 @@ jobs:
           - name: postgres14
             url: "postgresql://postgres:prisma@localhost:5437"
           - name: cockroach
-            url: "postgresql://root@localhost:5436"
+            url: "postgresql://root@localhost:26257"
             is_cockroach: true
           - name: sqlite
             url: sqlite
@@ -220,8 +219,14 @@ jobs:
             target
           key: ${{ runner.os }}-cargo-${{ matrix.rust }}-${{ hashFiles('**/Cargo.lock') }}
 
+      - uses: MinoruSekine/setup-scoop@main
+
       - name: Install ${{ matrix.db.name }}
-        run: choco install ${{ matrix.db.name }}
+        run: |
+          scoop install sudo
+          scoop install ${{ matrix.db.name }}
+          sudo mysqld --install
+          sudo sc start MySQL
 
       - name: Run tests
         run: cargo test -p migration-engine-tests

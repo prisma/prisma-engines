@@ -6,8 +6,9 @@ mkShell {
   LIBCLANG_PATH="${pkgs.llvmPackages.libclang}/lib";
   PROTOC="${pkgs.protobuf}/bin/protoc";
   PROTOC_INCLUDE="${pkgs.protobuf}/include";
-  shellHook = '' '';
   buildInputs = with pkgs; [
+    mold # much faster linker
+
     gcc
     openssl
     pkg-config

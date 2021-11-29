@@ -2,7 +2,7 @@ use super::{differ_database::DifferDatabase, foreign_keys_match};
 use crate::pair::Pair;
 use sql_schema_describer::{
     walkers::{ColumnWalker, ForeignKeyWalker, IndexWalker, TableWalker},
-    PrimaryKey,
+    PrimaryKey, TableId,
 };
 
 pub(crate) struct TableDiffer<'a, 'b> {
@@ -153,14 +153,25 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
     pub(super) fn next(&self) -> &TableWalker<'schema> {
         self.tables.next()
     }
+
+    pub(super) fn table_ids(&self) -> Pair<TableId> {
+        self.tables.map(|t| t.table_id())
+    }
 }
 
 /// Compare two SQL indexes and return whether they only differ by name.
 fn indexes_match(first: &IndexWalker<'_>, second: &IndexWalker<'_>) -> bool {
-    let left_cols = first.column_names();
-    let right_cols = second.column_names();
+    let left_cols = first.columns();
+    let right_cols = second.columns();
 
     left_cols.len() == right_cols.len()
-        && left_cols.zip(right_cols).all(|(a, b)| a == b)
+        && left_cols.zip(right_cols).all(|(a, b)| {
+            let names_match = a.as_column().name() == b.as_column().name();
+            let lengths_match = a.length() == b.length();
+            let orders_match = a.sort_order() == b.sort_order();
+
+            names_match && lengths_match && orders_match
+        })
         && first.index_type() == second.index_type()
+        && first.algorithm() == second.algorithm()
 }

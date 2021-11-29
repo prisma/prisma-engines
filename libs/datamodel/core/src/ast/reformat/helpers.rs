@@ -1,5 +1,5 @@
-use crate::ast::parser::*;
 use crate::ast::renderer::LineWriteable;
+use schema_ast::parser::Rule;
 
 pub type Token<'a> = pest::iterators::Pair<'a, Rule>;
 

@@ -292,7 +292,16 @@ impl ModelAsserts for dml::Model {
     }
 
     fn assert_has_id_fields(&self, fields: &[&str]) -> &Self {
-        assert_eq!(self.primary_key.as_ref().unwrap().fields, fields);
+        assert_eq!(
+            self.primary_key
+                .as_ref()
+                .unwrap()
+                .fields
+                .iter()
+                .map(|f| &f.name)
+                .collect::<Vec<_>>(),
+            fields
+        );
         self
     }
 
@@ -446,5 +455,17 @@ pub(crate) const MSSQL_SOURCE: &str = r#"
     datasource db {
         provider = "sqlserver"
         url      = "sqlserver://localhost:1433"
+    }
+"#;
+
+pub(crate) const COCKROACHDB_SOURCE: &str = r#"
+    datasource db {
+        provider = "cockroachdb"
+        url      = "postgresql://localhost:5432"
+    }
+
+    generator js {
+        provider = "prisma-client-js"
+        previewFeatures = ["cockroachdb"]
     }
 "#;

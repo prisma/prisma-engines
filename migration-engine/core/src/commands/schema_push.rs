@@ -42,14 +42,18 @@ pub(crate) async fn schema_push(
         }
     };
 
+    let warnings = checks.warnings.into_iter().map(|warning| warning.description).collect();
+
+    let unexecutable = checks
+        .unexecutable_migrations
+        .into_iter()
+        .map(|unexecutable| unexecutable.description)
+        .collect();
+
     Ok(SchemaPushOutput {
         executed_steps,
-        warnings: checks.warnings.into_iter().map(|warning| warning.description).collect(),
-        unexecutable: checks
-            .unexecutable_migrations
-            .into_iter()
-            .map(|unexecutable| unexecutable.description)
-            .collect(),
+        warnings,
+        unexecutable,
     })
 }
 

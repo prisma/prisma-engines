@@ -200,8 +200,9 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
             }))
         }
 
-        (ErrorKind::PoolTimeout { max_open, .. }, _) => Some(KnownError::new(query_engine::PoolTimeout {
+        (ErrorKind::PoolTimeout { max_open, timeout, .. }, _) => Some(KnownError::new(query_engine::PoolTimeout {
             connection_limit: *max_open,
+            timeout: *timeout,
         })),
 
         (ErrorKind::DatabaseUrlIsInvalid(details), _connection_info) => {

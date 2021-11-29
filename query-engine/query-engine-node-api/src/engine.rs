@@ -1,5 +1,5 @@
 use crate::{error::ApiError, logger::ChannelLogger};
-use datamodel::{diagnostics::ValidatedConfiguration, Datamodel};
+use datamodel::{Datamodel, ValidatedConfiguration};
 use napi::threadsafe_function::ThreadsafeFunction;
 use opentelemetry::global;
 use prisma_models::InternalDataModelBuilder;
@@ -211,6 +211,7 @@ impl QueryEngine {
                             true, // enable raw queries
                             data_source.capabilities(),
                             preview_features,
+                            data_source.referential_integrity(),
                         );
 
                         Ok(ConnectedEngine {

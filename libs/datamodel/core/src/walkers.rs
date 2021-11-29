@@ -122,7 +122,7 @@ impl<'a> ModelWalker<'a> {
         let x = if let Some(pk) = &walker.get().primary_key {
             pk.fields
                 .iter()
-                .map(|field_name| walker.find_scalar_field(field_name).unwrap())
+                .map(|field| walker.find_scalar_field(&field.name).unwrap())
                 .map(move |field| ScalarFieldWalker {
                     datamodel,
                     model_idx,
@@ -379,10 +379,10 @@ pub struct IndexWalker<'a> {
 
 impl<'a> IndexWalker<'a> {
     pub fn fields<'b>(&'b self) -> impl Iterator<Item = ScalarFieldWalker<'a>> + 'b {
-        self.index.fields.iter().map(move |field_name| {
+        self.index.fields.iter().map(move |field| {
             self.model
                 .scalar_fields()
-                .find(|f| f.name() == field_name.as_str())
+                .find(|f| f.name() == field.name.as_str())
                 .expect("index on unknown model field")
         })
     }

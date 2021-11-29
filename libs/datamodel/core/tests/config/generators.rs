@@ -257,7 +257,7 @@ fn nice_error_for_unknown_generator_preview_feature() {
         .unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mThe preview feature "foo" is not known. Expected one of: filterJson, referentialIntegrity, mongoDb, interactiveTransactions, fullTextSearch, dataProxy, extendedIndexes[0m
+        [1;91merror[0m: [1mThe preview feature "foo" is not known. Expected one of: filterJson, referentialIntegrity, mongoDb, interactiveTransactions, fullTextSearch, fullTextIndex, dataProxy, extendedIndexes[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
         [1;94m 2 | [0m  provider = "prisma-client-js"
@@ -381,4 +381,42 @@ fn env_in_preview_features_must_be_rejected() {
 
     expect_1.assert_eq(&datamodel::parse_schema(schema_1).map(drop).unwrap_err());
     expect_2.assert_eq(&datamodel::parse_schema(schema_2).map(drop).unwrap_err());
+}
+
+#[test]
+fn empty_preview_features_array_should_work() {
+    let schema = r#"
+        datasource db {
+            provider = "postgresql"
+            url = env("DBURL")
+        }
+
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = []
+        }
+    "#;
+
+    let (config, _) = datamodel::parse_schema(schema).unwrap();
+
+    assert!(config.preview_features().is_empty());
+}
+
+#[test]
+fn empty_preview_features_array_with_empty_space_should_work() {
+    let schema = r#"
+        datasource db {
+            provider = "postgresql"
+            url = env("DBURL")
+        }
+
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = [ ]
+        }
+    "#;
+
+    let (config, _) = datamodel::parse_schema(schema).unwrap();
+
+    assert!(config.preview_features().is_empty());
 }

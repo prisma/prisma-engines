@@ -33,9 +33,9 @@ impl<'a, 'b> ValidationPipeline<'a> {
     /// This method will attempt to
     /// * Resolve all attributes
     /// * Recursively evaluate all functions
-    /// * Perform string interpolation
     /// * Resolve and check default values
     /// * Resolve and check all field types
+    /// * etc.
     pub(crate) fn validate(
         &self,
         ast_schema: &ast::SchemaAst,
@@ -43,26 +43,20 @@ impl<'a, 'b> ValidationPipeline<'a> {
     ) -> Result<ValidatedDatamodel, Diagnostics> {
         let diagnostics = Diagnostics::new();
 
-        // Phase 0 is parsing.
-        // Phase 1 is source block loading.
-
-        // Phase 2: Make sense of the AST.
+        // Make sense of the AST.
         let (db, mut diagnostics) = ParserDatabase::new(ast_schema, self.source, diagnostics, self.preview_features);
 
         // Early return so that the validator does not have to deal with invalid schemas
         diagnostics.to_result()?;
 
-        // Phase 3: Global validations after we have consistent data model.
         validations::validate(&db, &mut diagnostics, relation_transformation_enabled);
         diagnostics.to_result()?;
 
-        // Phase 4: Lift AST to DML. This can't fail.
         let schema = LiftAstToDml::new(&db).lift();
 
         // From now on we do not operate on the internal ast anymore, but DML.
         // Please try to avoid all new validations after this, if you can.
 
-        // Phase 5: Validation (deprecated, move stuff out from here if you can)
         self.validator.validate(db.ast(), &schema, &mut diagnostics);
         diagnostics.to_result()?;
 

@@ -548,6 +548,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                rawIndex.indisunique                        AS is_unique,
                rawIndex.indisprimary                       AS is_primary_key,
                tableInfos.relname                          AS table_name,
+               indexAccess.amname                          AS index_algo,
                rawIndex.indkeyidx,
                CASE rawIndex.sort_order & 1
                    WHEN 1 THEN 'DESC'
@@ -580,7 +581,9 @@ impl<'a> SqlSchemaDescriber<'a> {
             -- pg_attribute stores infos about columns: https://www.postgresql.org/docs/current/catalog-pg-attribute.html
             pg_attribute columnInfos,
             -- pg_namespace stores info about the schema
-            pg_namespace schemaInfo
+            pg_namespace schemaInfo,
+            -- index access methods: https://www.postgresql.org/docs/9.3/catalog-pg-am.html     
+            pg_am indexAccess
         WHERE
           -- find table info for index
             tableInfos.oid = rawIndex.indrelid
@@ -595,8 +598,9 @@ impl<'a> SqlSchemaDescriber<'a> {
           AND tableInfos.relnamespace = schemaInfo.oid
           AND schemaInfo.nspname = $1
           AND rawIndex.sort_order_colnum = columnInfos.attnum
+          AND indexAccess.oid = indexInfos.relam
         GROUP BY tableInfos.relname, indexInfos.relname, rawIndex.indisunique, rawIndex.indisprimary, columnInfos.attname,
-                 rawIndex.indkeyidx, column_order
+                 rawIndex.indkeyidx, column_order, index_algo
         ORDER BY rawIndex.indkeyidx;
         "#;
 
@@ -619,6 +623,12 @@ impl<'a> SqlSchemaDescriber<'a> {
                     misc
                 ),
             });
+
+            let algorithm = match row.get_string("index_algo").as_deref() {
+                Some("btree") => Some(SQLIndexAlgorithm::BTree),
+                Some("hash") => Some(SQLIndexAlgorithm::Hash),
+                _ => None,
+            };
 
             if is_primary_key {
                 let entry: &mut (Vec<_>, Option<PrimaryKey>) =
@@ -661,6 +671,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                             true => IndexType::Unique,
                             false => IndexType::Normal,
                         },
+                        algorithm,
                     })
                 }
             }

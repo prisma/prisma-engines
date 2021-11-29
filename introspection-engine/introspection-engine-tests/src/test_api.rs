@@ -243,13 +243,9 @@ impl TestApi {
     }
 
     pub fn configuration(&self) -> Configuration {
-        datamodel::parse_configuration(&format!(
-            "{}\n{}",
-            &self.datasource_block().to_string(),
-            &self.generator_block()
-        ))
-        .unwrap()
-        .subject
+        datamodel::parse_configuration(&format!("{}\n{}", &self.datasource_block(), &self.generator_block()))
+            .unwrap()
+            .subject
     }
 
     #[track_caller]

@@ -4,7 +4,7 @@ use query_engine_tests::*;
 #[test_suite(schema(schema))]
 mod update_many {
     use indoc::indoc;
-    use query_engine_tests::{assert_query_many, is_one_of, run_query, run_query_json, ConnectorTag};
+    use query_engine_tests::{is_one_of, run_query, run_query_json, ConnectorTag};
 
     fn schema() -> String {
         let schema = indoc! {
@@ -37,19 +37,17 @@ mod update_many {
           @r###"{"data":{"updateManyTestModel":{"count":1}}}"###
         );
 
-        assert_query_many!(
-            &runner,
-            r#"{
+        insta::assert_snapshot!(
+        run_query!(
+          &runner,
+          r#"{
             findManyTestModel(orderBy: { id: asc }) {
               optStr
               optInt
               optFloat
             }
-          }"#,
-            vec![
-                r#"{"data":{"findManyTestModel":[{"optStr":"str1new","optInt":1,"optFloat":null},{"optStr":"str2","optInt":null,"optFloat":null}]}}"#,
-                r#"{"data":{"findManyTestModel":[{"optStr":"str1new","optInt":1,"optFloat":0.0},{"optStr":"str2","optInt":null,"optFloat":null}]}}"#
-            ]
+          }"#),
+          @r###"{"data":{"findManyTestModel":[{"optStr":"str1new","optInt":1,"optFloat":null},{"optStr":"str2","optInt":null,"optFloat":null}]}}"###
         );
 
         Ok(())
@@ -73,19 +71,17 @@ mod update_many {
           @r###"{"data":{"updateManyTestModel":{"count":1}}}"###
         );
 
-        assert_query_many!(
+        insta::assert_snapshot!(
+          run_query!(
             &runner,
             r#"{
-            findManyTestModel(orderBy: { id: asc }) {
-              optStr
-              optInt
-              optFloat
-            }
-          }"#,
-            vec![
-                r#"{"data":{"findManyTestModel":[{"optStr":"str1new","optInt":null,"optFloat":null},{"optStr":"str2","optInt":null,"optFloat":null}]}}"#,
-                r#"{"data":{"findManyTestModel":[{"optStr":"str1new","optInt":null,"optFloat":0.0},{"optStr":"str2","optInt":null,"optFloat":null}]}}"#
-            ]
+              findManyTestModel(orderBy: { id: asc }) {
+                optStr
+                optInt
+                optFloat
+              }
+            }"#),
+          @r###"{"data":{"findManyTestModel":[{"optStr":"str1new","optInt":null,"optFloat":null},{"optStr":"str2","optInt":null,"optFloat":null}]}}"###
         );
 
         Ok(())
@@ -110,7 +106,8 @@ mod update_many {
           @r###"{"data":{"updateManyTestModel":{"count":3}}}"###
         );
 
-        assert_query_many!(
+        insta::assert_snapshot!(
+          run_query!(
             &runner,
             r#"{
               findManyTestModel {
@@ -118,11 +115,8 @@ mod update_many {
                 optInt
                 optFloat
               }
-            }"#,
-            vec![
-                r#"{"data":{"findManyTestModel":[{"optStr":"updated","optInt":null,"optFloat":null},{"optStr":"updated","optInt":1,"optFloat":null},{"optStr":"updated","optInt":2,"optFloat":1.55}]}}"#,
-                r#"{"data":{"findManyTestModel":[{"optStr":"updated","optInt":-1,"optFloat":0.0},{"optStr":"updated","optInt":1,"optFloat":0.0},{"optStr":"updated","optInt":2,"optFloat":1.55}]}}"#
-            ]
+            }"#),
+          @r###"{"data":{"findManyTestModel":[{"optStr":"updated","optInt":null,"optFloat":null},{"optStr":"updated","optInt":1,"optFloat":null},{"optStr":"updated","optInt":2,"optFloat":1.55}]}}"###
         );
 
         Ok(())

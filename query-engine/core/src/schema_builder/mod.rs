@@ -40,7 +40,7 @@ mod utils;
 use crate::schema::*;
 use cache::TypeRefCache;
 use datamodel::common::preview_features::PreviewFeature;
-use datamodel_connector::{ConnectorCapabilities, ConnectorCapability};
+use datamodel_connector::{ConnectorCapabilities, ConnectorCapability, ReferentialIntegrity};
 use prisma_models::{Field as ModelField, Index, InternalDataModelRef, ModelRef, RelationFieldRef, TypeIdentifier};
 use std::sync::Arc;
 
@@ -162,6 +162,7 @@ pub fn build(
     enable_raw_queries: bool,
     capabilities: ConnectorCapabilities,
     preview_features: Vec<PreviewFeature>,
+    referential_integrity: ReferentialIntegrity,
 ) -> QuerySchema {
     let mut ctx = BuilderContext::new(
         mode,
@@ -192,6 +193,7 @@ pub fn build(
         ctx.internal_data_model,
         ctx.capabilities.capabilities,
         preview_features,
+        referential_integrity,
     )
 }
 

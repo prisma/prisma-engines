@@ -1,6 +1,6 @@
 mod rpc;
 
-pub mod qe_setup;
+pub mod query_engine;
 
 pub use crate::api::GenericApi;
 pub use rpc::rpc_api;
@@ -67,7 +67,7 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Box<dyn api::GenericAp
             Ok(Box::new(connector))
         }
         #[cfg(feature = "mongodb")]
-        MONGODB_SOURCE_NAME => Ok(Box::new(MongoDbMigrationConnector::new(url))),
+        MONGODB_SOURCE_NAME => Ok(Box::new(MongoDbMigrationConnector::new(url, preview_features))),
         provider => Err(CoreError::from_msg(format!(
             "`{}` is not a supported connector.",
             provider

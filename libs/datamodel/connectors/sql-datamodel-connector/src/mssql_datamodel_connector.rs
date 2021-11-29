@@ -4,12 +4,8 @@ use datamodel_connector::{
     Connector, ConnectorCapability, ConstraintScope, ReferentialIntegrity,
 };
 use dml::{
-    field::{Field, FieldType},
-    model::Model,
-    native_type_constructor::NativeTypeConstructor,
-    native_type_instance::NativeTypeInstance,
-    relation_info::ReferentialAction,
-    scalars::ScalarType,
+    field::FieldType, model::Model, native_type_constructor::NativeTypeConstructor,
+    native_type_instance::NativeTypeInstance, relation_info::ReferentialAction, scalars::ScalarType,
 };
 use enumflags2::BitFlags;
 use native_types::{MsSqlType, MsSqlTypeParameter};
@@ -92,13 +88,13 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::AutoIncrementNonIndexedAllowed,
     ConnectorCapability::CompoundIds,
     ConnectorCapability::CreateMany,
-    ConnectorCapability::ForeignKeys,
     ConnectorCapability::NamedDefaultValues,
     ConnectorCapability::NamedForeignKeys,
     ConnectorCapability::NamedPrimaryKeys,
     ConnectorCapability::QueryRaw,
     ConnectorCapability::ReferenceCycleDetection,
     ConnectorCapability::UpdateableId,
+    ConnectorCapability::PrimaryKeySortOrderDefinition,
 ];
 
 pub struct MsSqlDatamodelConnector;
@@ -226,51 +222,57 @@ impl Connector for MsSqlDatamodelConnector {
         Cow::Borrowed(url)
     }
 
-    fn validate_field(&self, field: &Field, errors: &mut Vec<ConnectorError>) {
-        if let FieldType::Scalar(_, _, Some(native_type)) = field.field_type() {
-            let r#type: MsSqlType = native_type.deserialize_native_type();
-            let error = self.native_instance_error(native_type);
+    fn validate_native_type_arguments(
+        &self,
+        native_type: &NativeTypeInstance,
+        _scalar_type: &ScalarType,
+        errors: &mut Vec<ConnectorError>,
+    ) {
+        let r#type: MsSqlType = native_type.deserialize_native_type();
+        let error = self.native_instance_error(native_type);
 
-            match r#type {
-                Decimal(Some((precision, scale))) if scale > precision => {
-                    errors.push(error.new_scale_larger_than_precision_error());
-                }
-                Decimal(Some((prec, _))) if prec == 0 || prec > 38 => {
-                    errors.push(error.new_argument_m_out_of_range_error("Precision can range from 1 to 38."));
-                }
-                Decimal(Some((_, scale))) if scale > 38 => {
-                    errors.push(error.new_argument_m_out_of_range_error("Scale can range from 0 to 38."))
-                }
-                Float(Some(bits)) if bits == 0 || bits > 53 => {
-                    errors.push(error.new_argument_m_out_of_range_error("Bits can range from 1 to 53."))
-                }
-                NVarChar(Some(Number(p))) if p > 4000 => errors.push(error.new_argument_m_out_of_range_error(
-                    "Length can range from 1 to 4000. For larger sizes, use the `Max` variant.",
-                )),
-                VarChar(Some(Number(p))) | VarBinary(Some(Number(p))) if p > 8000 => {
-                    errors.push(error.new_argument_m_out_of_range_error(
-                        r#"Length can range from 1 to 8000. For larger sizes, use the `Max` variant."#,
-                    ))
-                }
-                NChar(Some(p)) if p > 4000 => {
-                    errors.push(error.new_argument_m_out_of_range_error("Length can range from 1 to 4000."))
-                }
-                Char(Some(p)) | Binary(Some(p)) if p > 8000 => {
-                    errors.push(error.new_argument_m_out_of_range_error("Length can range from 1 to 8000."))
-                }
-                _ => (),
+        match r#type {
+            Decimal(Some((precision, scale))) if scale > precision => {
+                errors.push(error.new_scale_larger_than_precision_error());
             }
+            Decimal(Some((prec, _))) if prec == 0 || prec > 38 => {
+                errors.push(error.new_argument_m_out_of_range_error("Precision can range from 1 to 38."));
+            }
+            Decimal(Some((_, scale))) if scale > 38 => {
+                errors.push(error.new_argument_m_out_of_range_error("Scale can range from 0 to 38."))
+            }
+            Float(Some(bits)) if bits == 0 || bits > 53 => {
+                errors.push(error.new_argument_m_out_of_range_error("Bits can range from 1 to 53."))
+            }
+            NVarChar(Some(Number(p))) if p > 4000 => errors.push(error.new_argument_m_out_of_range_error(
+                "Length can range from 1 to 4000. For larger sizes, use the `Max` variant.",
+            )),
+            VarChar(Some(Number(p))) | VarBinary(Some(Number(p))) if p > 8000 => {
+                errors.push(error.new_argument_m_out_of_range_error(
+                    r#"Length can range from 1 to 8000. For larger sizes, use the `Max` variant."#,
+                ))
+            }
+            NChar(Some(p)) if p > 4000 => {
+                errors.push(error.new_argument_m_out_of_range_error("Length can range from 1 to 4000."))
+            }
+            Char(Some(p)) | Binary(Some(p)) if p > 8000 => {
+                errors.push(error.new_argument_m_out_of_range_error("Length can range from 1 to 8000."))
+            }
+            _ => (),
         }
     }
 
     fn validate_model(&self, model: &Model, errors: &mut Vec<ConnectorError>) {
         for index_definition in model.indices.iter() {
-            let fields = index_definition.fields.iter().map(|f| model.find_field(f).unwrap());
+            let fields = index_definition
+                .fields
+                .iter()
+                .map(|f| model.find_field(&f.name).unwrap());
 
             for field in fields {
                 if let FieldType::Scalar(_, _, Some(native_type)) = field.field_type() {
                     let r#type: MsSqlType = native_type.deserialize_native_type();
-                    let error = self.native_instance_error(native_type);
+                    let error = self.native_instance_error(&native_type);
 
                     if heap_allocated_types().contains(&r#type) {
                         if index_definition.is_unique() {
@@ -286,7 +288,7 @@ impl Connector for MsSqlDatamodelConnector {
 
         if let Some(pk) = &model.primary_key {
             for id_field in pk.fields.iter() {
-                let field = model.find_field(id_field).unwrap();
+                let field = model.find_field(&id_field.name).unwrap();
 
                 if let FieldType::Scalar(scalar_type, _, native_type) = field.field_type() {
                     if let Some(native_type) = native_type {
@@ -294,7 +296,7 @@ impl Connector for MsSqlDatamodelConnector {
 
                         if heap_allocated_types().contains(&r#type) {
                             errors.push(
-                                self.native_instance_error(native_type)
+                                self.native_instance_error(&native_type)
                                     .new_incompatible_native_type_with_id(),
                             );
                             break;
@@ -412,8 +414,10 @@ impl Connector for MsSqlDatamodelConnector {
     }
 }
 
-static HEAP_ALLOCATED: Lazy<Vec<MsSqlType>> = Lazy::new(|| {
-    vec![
+/// A collection of types stored outside of the row to the heap, having
+/// certain properties such as not allowed in keys or normal indices.
+pub fn heap_allocated_types() -> &'static [MsSqlType] {
+    &[
         Text,
         NText,
         Image,
@@ -422,12 +426,6 @@ static HEAP_ALLOCATED: Lazy<Vec<MsSqlType>> = Lazy::new(|| {
         VarChar(Some(Max)),
         NVarChar(Some(Max)),
     ]
-});
-
-/// A collection of types stored outside of the row to the heap, having
-/// certain properties such as not allowed in keys or normal indices.
-pub fn heap_allocated_types() -> &'static [MsSqlType] {
-    &*HEAP_ALLOCATED
 }
 
 fn arg_vec_for_type_param(type_param: Option<MsSqlTypeParameter>) -> Vec<String> {

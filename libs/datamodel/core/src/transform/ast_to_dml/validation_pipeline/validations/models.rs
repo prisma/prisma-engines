@@ -1,5 +1,6 @@
 use std::borrow::Cow;
 
+use datamodel_connector::ConnectorCapability;
 use itertools::Itertools;
 
 use crate::{
@@ -89,19 +90,104 @@ pub(crate) fn uses_sort_or_length_on_primary_without_preview_flag(
     model: ModelWalker<'_, '_>,
     diagnostics: &mut Diagnostics,
 ) {
+    if db.preview_features.contains(PreviewFeature::ExtendedIndexes) {
+        return;
+    }
+
     if let Some(pk) = model.primary_key() {
-        if !db.preview_features.contains(PreviewFeature::ExtendedIndexes)
-            && pk
-                .attribute
-                .fields
-                .iter()
-                .any(|f| f.sort_order.is_some() || f.length.is_some())
+        if pk
+            .attribute
+            .fields
+            .iter()
+            .any(|f| f.sort_order.is_some() || f.length.is_some())
         {
             let message = "The sort and length args are not yet available";
-
             let span = pk.ast_attribute().span;
 
             diagnostics.push_error(DatamodelError::new_attribute_validation_error(message, "id", span));
+        }
+    }
+}
+
+/// The database must support the primary key length prefix for it to be allowed in the data model.
+pub(crate) fn primary_key_length_prefix_supported(
+    db: &ParserDatabase<'_>,
+    model: ModelWalker<'_, '_>,
+    diagnostics: &mut Diagnostics,
+) {
+    if db
+        .active_connector()
+        .has_capability(ConnectorCapability::IndexColumnLengthPrefixing)
+    {
+        return;
+    }
+
+    if let Some(pk) = model.primary_key() {
+        if pk.scalar_field_attributes().any(|f| f.length().is_some()) {
+            let message = "The length argument is not supported in the primary key with the current connector";
+            let span = pk.ast_attribute().span;
+
+            diagnostics.push_error(DatamodelError::new_attribute_validation_error(message, "id", span));
+        }
+    }
+}
+
+/// Not every database is allowing sort definition in the primary key.
+pub(crate) fn primary_key_sort_order_supported(
+    db: &ParserDatabase<'_>,
+    model: ModelWalker<'_, '_>,
+    diagnostics: &mut Diagnostics,
+) {
+    if db
+        .active_connector()
+        .has_capability(ConnectorCapability::PrimaryKeySortOrderDefinition)
+    {
+        return;
+    }
+
+    if let Some(pk) = model.primary_key() {
+        if pk.scalar_field_attributes().any(|f| f.sort_order().is_some()) {
+            let message = "The sort argument is not supported in the primary key with the current connector";
+            let span = pk.ast_attribute().span;
+
+            diagnostics.push_error(DatamodelError::new_attribute_validation_error(message, "id", span));
+        }
+    }
+}
+
+pub(crate) fn only_one_fulltext_attribute_allowed(
+    db: &ParserDatabase<'_>,
+    model: ModelWalker<'_, '_>,
+    diagnostics: &mut Diagnostics,
+) {
+    if !db.preview_features.contains(PreviewFeature::FullTextIndex) {
+        return;
+    }
+
+    if !db.active_connector().has_capability(ConnectorCapability::FullTextIndex) {
+        return;
+    }
+
+    if db
+        .active_connector()
+        .has_capability(ConnectorCapability::MultipleFullTextAttributesPerModel)
+    {
+        return;
+    }
+
+    let spans = model
+        .indexes()
+        .filter(|i| i.is_fulltext())
+        .map(|i| i.ast_attribute().map(|i| i.span).unwrap_or(model.ast_model().span))
+        .collect::<Vec<_>>();
+
+    if spans.len() > 1 {
+        for span in spans {
+            let message = "The current connector only allows one fulltext attribute per model";
+
+            diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+                message, "fulltext", span,
+            ));
         }
     }
 }

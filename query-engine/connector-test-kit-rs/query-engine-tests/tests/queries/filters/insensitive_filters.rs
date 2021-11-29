@@ -3,8 +3,6 @@ use query_engine_tests::*;
 
 #[test_suite(schema(schema), capabilities(InsensitiveFilters))]
 mod insensitive {
-    use query_engine_tests::assert_query_many;
-
     fn schema() -> String {
         let schema = indoc! {
             r#"model TestModel {
@@ -83,24 +81,20 @@ mod insensitive {
           @r###"{"data":{"findManyTestModel":[{"str":"æ"},{"str":"Æ"}]}}"###
         );
 
-        assert_query_many!(
-            &runner,
-            r#"query { findManyTestModel(where: { str: { gte: "aÆB", mode: insensitive } }) { str }}"#,
-            vec![
-                r#"{"data":{"findManyTestModel":[{"str":"æ"},{"str":"Æ"},{"str":"bar"},{"str":"aÆB"},{"str":"aæB"}]}}"#, // Mongo
-                r#"{"data":{"findManyTestModel":[{"str":"æ"},{"str":"Æ"},{"str":"bar"},{"str":"aÆB"},{"str":"AÆB"},{"str":"aæB"},{"str":"aB"}]}}"#, // Postgres
-                r#"{"data":{"findManyTestModel":[{"str":"æ"},{"str":"Æ"},{"str":"bar"},{"str":"aÆB"},{"str":"AÆB"},{"str":"aæB"}]}}"#, // Cockroach, https://github.com/cockroachdb/cockroach/issues/71313
-            ]
+        match_connector_result!(
+          &runner,
+          r#"query { findManyTestModel(where: { str: { gte: "aÆB", mode: insensitive } }) { str }}"#,
+          [MongoDb] => r#"{"data":{"findManyTestModel":[{"str":"æ"},{"str":"Æ"},{"str":"bar"},{"str":"aÆB"},{"str":"aæB"}]}}"#,
+          [Sqlite, SqlServer, MySql, Postgres] => r#"{"data":{"findManyTestModel":[{"str":"æ"},{"str":"Æ"},{"str":"bar"},{"str":"aÆB"},{"str":"AÆB"},{"str":"aæB"},{"str":"aB"}]}}"#, // Postgres
+          [Postgres] => r#"{"data":{"findManyTestModel":[{"str":"æ"},{"str":"Æ"},{"str":"bar"},{"str":"aÆB"},{"str":"AÆB"},{"str":"aæB"}]}}"# // Cockroach, https://github.com/cockroachdb/cockroach/issues/71313
         );
 
-        assert_query_many!(
-            &runner,
-            r#"query { findManyTestModel(where: { str: { lt: "aÆB", mode: insensitive } }) { str }}"#,
-            vec![
-                r#"{"data":{"findManyTestModel":[{"str":"A"},{"str":"AÆB"},{"str":"aB"}]}}"#, // Mongo
-                r#"{"data":{"findManyTestModel":[{"str":"A"}]}}"#,                             // Postgres
-                r#"{"data":{"findManyTestModel":[{"str":"A"},{"str":"aB"}]}}"#, // Cockroach, https://github.com/cockroachdb/cockroach/issues/71313
-            ]
+        match_connector_result!(
+          &runner,
+          r#"query { findManyTestModel(where: { str: { lt: "aÆB", mode: insensitive } }) { str }}"#,
+          [MongoDb] => r#"{"data":{"findManyTestModel":[{"str":"A"},{"str":"AÆB"},{"str":"aB"}]}}"#,
+          [Postgres, Sqlite, SqlServer, MySql] =>  r#"{"data":{"findManyTestModel":[{"str":"A"}]}}"#,                             // Postgres
+          [Postgres] =>  r#"{"data":{"findManyTestModel":[{"str":"A"},{"str":"aB"}]}}"# // Cockroach, https://github.com/cockroachdb/cockroach/issues/71313
         );
 
         Ok(())

@@ -5,7 +5,9 @@ use connector::Connector;
 use datamodel::{
     common::{
         preview_features::PreviewFeature,
-        provider_names::{MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME},
+        provider_names::{
+            COCKROACHDB_SOURCE_NAME, MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME,
+        },
     },
     Datasource,
 };
@@ -33,6 +35,7 @@ pub async fn load(
         MYSQL_SOURCE_NAME => mysql(source, url).await,
         POSTGRES_SOURCE_NAME => postgres(source, url).await,
         MSSQL_SOURCE_NAME => mssql(source, url).await,
+        COCKROACHDB_SOURCE_NAME => postgres(source, url).await,
 
         #[cfg(feature = "mongodb")]
         MONGODB_SOURCE_NAME => {

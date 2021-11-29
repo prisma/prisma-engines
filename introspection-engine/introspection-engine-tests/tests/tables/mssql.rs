@@ -1,3 +1,4 @@
+use indoc::formatdoc;
 use introspection_engine_tests::test_api::*;
 
 #[test_connector(tags(Mssql))]
@@ -69,6 +70,112 @@ async fn negative_default_values_should_work(api: &TestApi) -> TestResult {
           neg_float   Float?  @default(-2.1, map: "negfloat_def") @db.Real
           big_int     BigInt? @default(3, map: "bigint_def")
           neg_big_int BigInt? @default(-3, map: "neg_bigint_def")
+        }
+    "#]];
+
+    expectation.assert_eq(&api.introspect_dml().await?);
+
+    Ok(())
+}
+
+#[test_connector(tags(Mssql), preview_features("extendedIndexes"))]
+async fn a_table_with_descending_primary_key(api: &TestApi) -> TestResult {
+    let setup = formatdoc! {r#"
+       CREATE TABLE [{}].[A] (
+           id INTEGER IDENTITY,
+           CONSTRAINT [A_pkey] PRIMARY KEY (id DESC)
+       ) 
+   "#, api.schema_name()};
+
+    api.raw_cmd(&setup).await;
+
+    let expectation = expect![[r#"
+        model A {
+          id Int @id(sort: Desc) @default(autoincrement())
+        }
+    "#]];
+
+    expectation.assert_eq(&api.introspect_dml().await?);
+
+    Ok(())
+}
+
+#[test_connector(tags(Mssql), preview_features("extendedIndexes"))]
+async fn a_table_with_descending_unique(api: &TestApi) -> TestResult {
+    let setup = formatdoc! {r#"
+       CREATE TABLE [{}].[A] (
+           id INTEGER IDENTITY,
+           a  INTEGER NOT NULL,
+           CONSTRAINT [A_pkey] PRIMARY KEY (id),
+           CONSTRAINT [A_a_key] UNIQUE (a DESC)
+       ) 
+   "#, api.schema_name()};
+
+    api.raw_cmd(&setup).await;
+
+    let expectation = expect![[r#"
+        model A {
+          id Int @id @default(autoincrement())
+          a  Int @unique(sort: Desc)
+        }
+    "#]];
+
+    expectation.assert_eq(&api.introspect_dml().await?);
+
+    Ok(())
+}
+
+#[test_connector(tags(Mssql), preview_features("extendedIndexes"))]
+async fn a_table_with_descending_compound_unique(api: &TestApi) -> TestResult {
+    let setup = formatdoc! {r#"
+       CREATE TABLE [{}].[A] (
+           id INTEGER IDENTITY,
+           a  INTEGER NOT NULL,
+           b  INTEGER NOT NULL,
+           CONSTRAINT [A_pkey] PRIMARY KEY (id),
+           CONSTRAINT [A_a_b_key] UNIQUE (a ASC, b DESC)
+       ) 
+   "#, api.schema_name()};
+
+    api.raw_cmd(&setup).await;
+
+    let expectation = expect![[r#"
+        model A {
+          id Int @id @default(autoincrement())
+          a  Int
+          b  Int
+
+          @@unique([a, b(sort: Desc)])
+        }
+    "#]];
+
+    expectation.assert_eq(&api.introspect_dml().await?);
+
+    Ok(())
+}
+
+#[test_connector(tags(Mssql), preview_features("extendedIndexes"))]
+async fn a_table_with_descending_index(api: &TestApi) -> TestResult {
+    let setup = formatdoc! {r#"
+       CREATE TABLE [{schema_name}].[A] (
+           id INTEGER IDENTITY,
+           a  INTEGER NOT NULL,
+           b  INTEGER NOT NULL,
+           CONSTRAINT [A_pkey] PRIMARY KEY (id)
+       );
+
+       CREATE INDEX A_a_b_idx ON [{schema_name}].[A] (a ASC, b DESC);
+   "#, schema_name = api.schema_name()};
+
+    api.raw_cmd(&setup).await;
+
+    let expectation = expect![[r#"
+        model A {
+          id Int @id @default(autoincrement())
+          a  Int
+          b  Int
+
+          @@index([a, b(sort: Desc)])
         }
     "#]];
 

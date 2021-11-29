@@ -36,10 +36,7 @@ impl ConnectorTagInterface for MongoDbConnectorTag {
                 database
             ),
             Some(MongoDbVersion::V4_4) => {
-                format!(
-                    "mongodb://prisma:prisma@127.0.0.1:27017/{}?authSource=admin&retryWrites=true",
-                    database
-                )
+                format!("mongodb://127.0.0.1:27017/{}", database)
             }
             Some(MongoDbVersion::V5) if is_ci => format!(
                 "mongodb://prisma:prisma@test-db-mongodb-5:27018/{}?authSource=admin&retryWrites=true",

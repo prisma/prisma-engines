@@ -1,3 +1,5 @@
+use datamodel::IndexType;
+
 use super::{Collection, CollectionId, Index, IndexId, MongoSchema};
 
 impl MongoSchema {
@@ -45,8 +47,16 @@ impl<'a> IndexWalker<'a> {
         self.schema().walk_collection(self.get().collection_id)
     }
 
+    pub(crate) fn r#type(&self) -> IndexType {
+        self.get().tpe
+    }
+
     pub(crate) fn is_unique(&self) -> bool {
-        self.get().is_unique
+        matches!(self.r#type(), IndexType::Unique)
+    }
+
+    pub(crate) fn is_fulltext(&self) -> bool {
+        matches!(self.r#type(), IndexType::Fulltext)
     }
 
     pub(crate) fn name(&self) -> &'a str {

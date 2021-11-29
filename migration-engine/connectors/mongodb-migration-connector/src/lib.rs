@@ -13,6 +13,8 @@ mod schema;
 mod schema_calculator;
 
 use client_wrapper::Client;
+use datamodel::common::preview_features::PreviewFeature;
+use enumflags2::BitFlags;
 use migration::MongoDbMigration;
 use migration_connector::{ConnectorError, ConnectorResult, DiffTarget, Migration, MigrationConnector};
 use schema::MongoSchema;
@@ -22,12 +24,14 @@ use tokio::sync::OnceCell;
 pub struct MongoDbMigrationConnector {
     connection_string: String,
     client: OnceCell<Client>,
+    preview_features: BitFlags<PreviewFeature>,
 }
 
 impl MongoDbMigrationConnector {
-    pub fn new(connection_string: String) -> Self {
+    pub fn new(connection_string: String, preview_features: BitFlags<PreviewFeature>) -> Self {
         Self {
             connection_string,
+            preview_features,
             client: OnceCell::new(),
         }
     }
@@ -59,7 +63,7 @@ impl MongoDbMigrationConnector {
     async fn mongodb_schema_from_diff_target(&self, target: DiffTarget<'_>) -> ConnectorResult<MongoSchema> {
         match target {
             DiffTarget::Datamodel((_config, schema)) => Ok(schema_calculator::calculate(schema)),
-            DiffTarget::Database => self.client().await?.describe().await,
+            DiffTarget::Database => self.client().await?.describe(self.preview_features).await,
             DiffTarget::Migrations(_) => Err(unsupported_command_error()),
             DiffTarget::Empty => Ok(MongoSchema::default()),
         }

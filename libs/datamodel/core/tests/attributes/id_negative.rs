@@ -1,5 +1,5 @@
-use crate::attributes::{with_header, Provider};
 use crate::common::*;
+use crate::{with_header, Provider};
 use indoc::indoc;
 
 #[test]
@@ -542,6 +542,507 @@ fn id_does_not_allow_sort_or_index_unless_extended_indexes_are_on() {
         [1;94m   | [0m
         [1;94m20 | [0m     model Blog {
         [1;94m21 | [0m         title  String @[1;91mid(length:5)[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn mysql_does_not_allow_id_sort_argument() {
+    let dml = indoc! {r#"
+        model A {
+          id Int @id(sort: Desc)
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@id": The sort argument is not supported in the primary key with the current connector[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;94m   | [0m
+        [1;94m11 | [0mmodel A {
+        [1;94m12 | [0m  id Int @[1;91mid(sort: Desc)[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn mysql_does_not_allow_compound_id_sort_argument() {
+    let dml = indoc! {r#"
+        model A {
+          a String @test.VarChar(255)
+          b String @test.VarChar(255)
+
+          @@id([a(sort: Asc), b(sort: Desc)])
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@id": The sort argument is not supported in the primary key with the current connector[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m
+        [1;94m15 | [0m  @@[1;91mid([a(sort: Asc), b(sort: Desc)])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn postgresql_does_not_allow_id_sort_argument() {
+    let dml = indoc! {r#"
+        model A {
+          id Int @id(sort: Desc)
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@id": The sort argument is not supported in the primary key with the current connector[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;94m   | [0m
+        [1;94m11 | [0mmodel A {
+        [1;94m12 | [0m  id Int @[1;91mid(sort: Desc)[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn postgresql_does_not_allow_compound_id_sort_argument() {
+    let dml = indoc! {r#"
+        model A {
+          a String @test.VarChar(255)
+          b String @test.VarChar(255)
+
+          @@id([a(sort: Asc), b(sort: Desc)])
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@id": The sort argument is not supported in the primary key with the current connector[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m
+        [1;94m15 | [0m  @@[1;91mid([a(sort: Asc), b(sort: Desc)])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn sqlite_does_not_allow_id_sort_argument() {
+    let dml = indoc! {r#"
+        model A {
+          id Int @id(sort: Desc)
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@id": The sort argument is not supported in the primary key with the current connector[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;94m   | [0m
+        [1;94m11 | [0mmodel A {
+        [1;94m12 | [0m  id Int @[1;91mid(sort: Desc)[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn mongodb_does_not_allow_id_sort_argument() {
+    let dml = indoc! {r#"
+        model A {
+          id String @id(sort: Desc) @map("_id") @test.ObjectId
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mongo, &["extendedIndexes", "mongoDb"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@id": The sort argument is not supported in the primary key with the current connector[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;94m   | [0m
+        [1;94m11 | [0mmodel A {
+        [1;94m12 | [0m  id String @[1;91mid(sort: Desc)[0m @map("_id") @test.ObjectId
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn sqlite_does_not_allow_compound_id_sort_argument() {
+    let dml = indoc! {r#"
+        model A {
+          a String
+          b String
+
+          @@id([a(sort: Asc), b(sort: Desc)])
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Sqlite, &["extendedIndexes"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@id": The sort argument is not supported in the primary key with the current connector[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m
+        [1;94m15 | [0m  @@[1;91mid([a(sort: Asc), b(sort: Desc)])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn postgresql_does_not_allow_id_length_prefix() {
+    let dml = indoc! {r#"
+        model A {
+          id String @id(length: 10)
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@id": The length argument is not supported in the primary key with the current connector[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;94m   | [0m
+        [1;94m11 | [0mmodel A {
+        [1;94m12 | [0m  id String @[1;91mid(length: 10)[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn postgresql_does_not_allow_compound_id_length_prefix() {
+    let dml = indoc! {r#"
+        model A {
+          a String
+          b String
+
+          @@id([a(length: 10), b(length: 20)])
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@id": The length argument is not supported in the primary key with the current connector[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m
+        [1;94m15 | [0m  @@[1;91mid([a(length: 10), b(length: 20)])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn sqlserver_does_not_allow_id_length_prefix() {
+    let dml = indoc! {r#"
+        model A {
+          id String @id(length: 10)
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::SqlServer, &["extendedIndexes"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@id": The length argument is not supported in the primary key with the current connector[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;94m   | [0m
+        [1;94m11 | [0mmodel A {
+        [1;94m12 | [0m  id String @[1;91mid(length: 10)[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn sqlserver_does_not_allow_compound_id_length_prefix() {
+    let dml = indoc! {r#"
+        model A {
+          a String
+          b String
+
+          @@id([a(length: 10), b(length: 20)])
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::SqlServer, &["extendedIndexes"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@id": The length argument is not supported in the primary key with the current connector[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m
+        [1;94m15 | [0m  @@[1;91mid([a(length: 10), b(length: 20)])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn sqlite_does_not_allow_id_length_prefix() {
+    let dml = indoc! {r#"
+        model A {
+          id String @id(length: 10)
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Sqlite, &["extendedIndexes"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@id": The length argument is not supported in the primary key with the current connector[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;94m   | [0m
+        [1;94m11 | [0mmodel A {
+        [1;94m12 | [0m  id String @[1;91mid(length: 10)[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn mongodb_does_not_allow_id_length_prefix() {
+    let dml = indoc! {r#"
+        model A {
+          id String @id(length: 10) @map("_id") @test.ObjectId
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mongo, &["extendedIndexes", "mongoDb"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@id": The length argument is not supported in the primary key with the current connector[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;94m   | [0m
+        [1;94m11 | [0mmodel A {
+        [1;94m12 | [0m  id String @[1;91mid(length: 10)[0m @map("_id") @test.ObjectId
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn sqlite_does_not_allow_compound_id_length_prefix() {
+    let dml = indoc! {r#"
+        model A {
+          a String
+          b String
+
+          @@id([a(length: 10), b(length: 20)])
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Sqlite, &["extendedIndexes"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@id": The length argument is not supported in the primary key with the current connector[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m
+        [1;94m15 | [0m  @@[1;91mid([a(length: 10), b(length: 20)])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn length_argument_does_not_work_with_decimal() {
+    let dml = indoc! {r#"
+        model A {
+          id Decimal @id(length: 10)
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@id": The length argument is only allowed with field types `String` or `Bytes`.[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;94m   | [0m
+        [1;94m11 | [0mmodel A {
+        [1;94m12 | [0m  id Decimal @[1;91mid(length: 10)[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn length_argument_does_not_work_with_json() {
+    let dml = indoc! {r#"
+        model A {
+          id Json @id(length: 10)
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@id": The length argument is only allowed with field types `String` or `Bytes`.[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;94m   | [0m
+        [1;94m11 | [0mmodel A {
+        [1;94m12 | [0m  id Json @[1;91mid(length: 10)[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn length_argument_does_not_work_with_datetime() {
+    let dml = indoc! {r#"
+        model A {
+          id DateTime @id(length: 10)
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@id": The length argument is only allowed with field types `String` or `Bytes`.[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;94m   | [0m
+        [1;94m11 | [0mmodel A {
+        [1;94m12 | [0m  id DateTime @[1;91mid(length: 10)[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn length_argument_does_not_work_with_boolean() {
+    let dml = indoc! {r#"
+        model A {
+          id Boolean @id(length: 10)
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@id": The length argument is only allowed with field types `String` or `Bytes`.[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;94m   | [0m
+        [1;94m11 | [0mmodel A {
+        [1;94m12 | [0m  id Boolean @[1;91mid(length: 10)[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn length_argument_does_not_work_with_float() {
+    let dml = indoc! {r#"
+        model A {
+          id Float @id(length: 10)
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@id": The length argument is only allowed with field types `String` or `Bytes`.[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;94m   | [0m
+        [1;94m11 | [0mmodel A {
+        [1;94m12 | [0m  id Float @[1;91mid(length: 10)[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn length_argument_does_not_work_with_bigint() {
+    let dml = indoc! {r#"
+        model A {
+          id BigInt @id(length: 10)
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@id": The length argument is only allowed with field types `String` or `Bytes`.[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;94m   | [0m
+        [1;94m11 | [0mmodel A {
+        [1;94m12 | [0m  id BigInt @[1;91mid(length: 10)[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn length_argument_does_not_work_with_int() {
+    let dml = indoc! {r#"
+        model A {
+          id Int @id(length: 10)
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@id": The length argument is only allowed with field types `String` or `Bytes`.[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;94m   | [0m
+        [1;94m11 | [0mmodel A {
+        [1;94m12 | [0m  id Int @[1;91mid(length: 10)[0m
         [1;94m   | [0m
     "#]];
 
