@@ -244,6 +244,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: "prisma"
       MONGO_INITDB_ROOT_PASSWORD: "prisma"
       MONGO_PORT: 27016
+      INIT_WAIT_SEC: $INIT_WAIT_SEC
     networks:
       - databases
     ports:
@@ -255,6 +256,7 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: "prisma"
       MONGO_INITDB_ROOT_PASSWORD: "prisma"
+      INIT_WAIT_SEC: $INIT_WAIT_SEC
     ports:
       - "27017:27017"
     networks:
@@ -266,6 +268,7 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: "prisma"
       MONGO_INITDB_ROOT_PASSWORD: "prisma"
+      INIT_WAIT_SEC: $INIT_WAIT_SEC
     ports:
       - "27017:27017"
     networks:
@@ -278,6 +281,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: "prisma"
       MONGO_INITDB_ROOT_PASSWORD: "prisma"
       MONGO_PORT: 27018
+      INIT_WAIT_SEC: $INIT_WAIT_SEC
     ports:
       - "27018:27018"
     networks:
@@ -289,6 +293,7 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: "prisma"
       MONGO_INITDB_ROOT_PASSWORD: "prisma"
+      INIT_WAIT_SEC: $INIT_WAIT_SEC
     ports:
       - "27018:27017"
     networks:
@@ -306,9 +311,20 @@ services:
     networks:
       - databases
 
-  otel:
-    # Jaeger supports OTEL out of the box
-    image: jaegertracing/opentelemetry-all-in-one:latest
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    restart: always
+    ports:
+      - "16686:16686" # the trace viewer (http)
+    networks:
+      - telemetry
+
+  otel-agent:
+    image: otel/opentelemetry-collector-dev:latest
+    command: [ "--config=/etc/otel-agent-config.yaml" ]
+    restart: always
+    volumes:
+      - ./otel-agent-config.yaml:/etc/otel-agent-config.yaml
     ports:
       - 13133:13133 # health check port
       - 16686:16686 # UI viewer
@@ -316,3 +332,4 @@ services:
 
 networks:
   databases: null
+  telemetry: null
