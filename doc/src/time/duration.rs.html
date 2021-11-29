@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;time-0.2.27&#x2F;src&#x2F;duration.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>duration.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="https:&#x2F;&#x2F;avatars0.githubusercontent.com&#x2F;u&#x2F;55999857"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../time/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;avatars0.githubusercontent.com&#x2F;u&#x2F;55999857' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;time-0.3.5&#x2F;src&#x2F;duration.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>duration.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="https:&#x2F;&#x2F;avatars0.githubusercontent.com&#x2F;u&#x2F;55999857"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../time/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;avatars0.githubusercontent.com&#x2F;u&#x2F;55999857' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1001,604 +1001,422 @@
 <span id="1001">1001</span>
 <span id="1002">1002</span>
 <span id="1003">1003</span>
-<span id="1004">1004</span>
-<span id="1005">1005</span>
-<span id="1006">1006</span>
-<span id="1007">1007</span>
-<span id="1008">1008</span>
-<span id="1009">1009</span>
-<span id="1010">1010</span>
-<span id="1011">1011</span>
-<span id="1012">1012</span>
-<span id="1013">1013</span>
-<span id="1014">1014</span>
-<span id="1015">1015</span>
-<span id="1016">1016</span>
-<span id="1017">1017</span>
-<span id="1018">1018</span>
-<span id="1019">1019</span>
-<span id="1020">1020</span>
-<span id="1021">1021</span>
-<span id="1022">1022</span>
-<span id="1023">1023</span>
-<span id="1024">1024</span>
-<span id="1025">1025</span>
-<span id="1026">1026</span>
-<span id="1027">1027</span>
-<span id="1028">1028</span>
-<span id="1029">1029</span>
-<span id="1030">1030</span>
-<span id="1031">1031</span>
-<span id="1032">1032</span>
-<span id="1033">1033</span>
-<span id="1034">1034</span>
-<span id="1035">1035</span>
-<span id="1036">1036</span>
-<span id="1037">1037</span>
-<span id="1038">1038</span>
-<span id="1039">1039</span>
-<span id="1040">1040</span>
-<span id="1041">1041</span>
-<span id="1042">1042</span>
-<span id="1043">1043</span>
-<span id="1044">1044</span>
-<span id="1045">1045</span>
-<span id="1046">1046</span>
-<span id="1047">1047</span>
-<span id="1048">1048</span>
-<span id="1049">1049</span>
-<span id="1050">1050</span>
-<span id="1051">1051</span>
-<span id="1052">1052</span>
-<span id="1053">1053</span>
-<span id="1054">1054</span>
-<span id="1055">1055</span>
-<span id="1056">1056</span>
-<span id="1057">1057</span>
-<span id="1058">1058</span>
-<span id="1059">1059</span>
-<span id="1060">1060</span>
-<span id="1061">1061</span>
-<span id="1062">1062</span>
-<span id="1063">1063</span>
-<span id="1064">1064</span>
-<span id="1065">1065</span>
-<span id="1066">1066</span>
-<span id="1067">1067</span>
-<span id="1068">1068</span>
-<span id="1069">1069</span>
-<span id="1070">1070</span>
-<span id="1071">1071</span>
-<span id="1072">1072</span>
-<span id="1073">1073</span>
-<span id="1074">1074</span>
-<span id="1075">1075</span>
-<span id="1076">1076</span>
-<span id="1077">1077</span>
-<span id="1078">1078</span>
-<span id="1079">1079</span>
-<span id="1080">1080</span>
-<span id="1081">1081</span>
-<span id="1082">1082</span>
-<span id="1083">1083</span>
-<span id="1084">1084</span>
-<span id="1085">1085</span>
-<span id="1086">1086</span>
-<span id="1087">1087</span>
-<span id="1088">1088</span>
-<span id="1089">1089</span>
-<span id="1090">1090</span>
-<span id="1091">1091</span>
-<span id="1092">1092</span>
-<span id="1093">1093</span>
-<span id="1094">1094</span>
-<span id="1095">1095</span>
-<span id="1096">1096</span>
-<span id="1097">1097</span>
-<span id="1098">1098</span>
-<span id="1099">1099</span>
-<span id="1100">1100</span>
-<span id="1101">1101</span>
-<span id="1102">1102</span>
-<span id="1103">1103</span>
-<span id="1104">1104</span>
-<span id="1105">1105</span>
-<span id="1106">1106</span>
-<span id="1107">1107</span>
-<span id="1108">1108</span>
-<span id="1109">1109</span>
-<span id="1110">1110</span>
-<span id="1111">1111</span>
-<span id="1112">1112</span>
-<span id="1113">1113</span>
-<span id="1114">1114</span>
-<span id="1115">1115</span>
-<span id="1116">1116</span>
-<span id="1117">1117</span>
-<span id="1118">1118</span>
-<span id="1119">1119</span>
-<span id="1120">1120</span>
-<span id="1121">1121</span>
-<span id="1122">1122</span>
-<span id="1123">1123</span>
-<span id="1124">1124</span>
-<span id="1125">1125</span>
-<span id="1126">1126</span>
-<span id="1127">1127</span>
-<span id="1128">1128</span>
-<span id="1129">1129</span>
-<span id="1130">1130</span>
-<span id="1131">1131</span>
-<span id="1132">1132</span>
-<span id="1133">1133</span>
-<span id="1134">1134</span>
-<span id="1135">1135</span>
-<span id="1136">1136</span>
-<span id="1137">1137</span>
-<span id="1138">1138</span>
-<span id="1139">1139</span>
-<span id="1140">1140</span>
-<span id="1141">1141</span>
-<span id="1142">1142</span>
-<span id="1143">1143</span>
-<span id="1144">1144</span>
-<span id="1145">1145</span>
-<span id="1146">1146</span>
-<span id="1147">1147</span>
-<span id="1148">1148</span>
-<span id="1149">1149</span>
-<span id="1150">1150</span>
-<span id="1151">1151</span>
-<span id="1152">1152</span>
-<span id="1153">1153</span>
-<span id="1154">1154</span>
-<span id="1155">1155</span>
-<span id="1156">1156</span>
-<span id="1157">1157</span>
-<span id="1158">1158</span>
-<span id="1159">1159</span>
-<span id="1160">1160</span>
-<span id="1161">1161</span>
-<span id="1162">1162</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>;
+</pre><pre class="rust"><code><span class="doccomment">//! The [`Duration`] struct and its associated `impl`s.</span>
+
+<span class="kw">use</span> <span class="ident">core::cmp::Ordering</span>;
+<span class="kw">use</span> <span class="ident">core::convert</span>::{<span class="ident">TryFrom</span>, <span class="ident">TryInto</span>};
+<span class="kw">use</span> <span class="ident">core::fmt</span>;
+<span class="kw">use</span> <span class="ident">core::iter::Sum</span>;
+<span class="kw">use</span> <span class="ident">core::ops</span>::{<span class="ident">Add</span>, <span class="ident">Div</span>, <span class="ident">Mul</span>, <span class="ident">Neg</span>, <span class="ident">Sub</span>, <span class="ident">SubAssign</span>};
+<span class="kw">use</span> <span class="ident">core::time::Duration</span> <span class="kw">as</span> <span class="ident">StdDuration</span>;
+
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Instant</span>;
-<span class="kw">use</span> <span class="ident">const_fn::const_fn</span>;
-<span class="kw">use</span> <span class="ident">core</span>::{
-    <span class="ident">cmp::Ordering</span>,
-    <span class="ident">ops</span>::{<span class="ident">Add</span>, <span class="ident">AddAssign</span>, <span class="ident">Div</span>, <span class="ident">DivAssign</span>, <span class="ident">Mul</span>, <span class="ident">MulAssign</span>, <span class="ident">Neg</span>, <span class="ident">Sub</span>, <span class="ident">SubAssign</span>},
-    <span class="ident">time::Duration</span> <span class="kw">as</span> <span class="ident">StdDuration</span>,
-};
-<span class="kw">use</span> <span class="ident">standback::convert</span>::{<span class="ident">TryFrom</span>, <span class="ident">TryInto</span>};
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_imports</span>)]</span>
-<span class="kw">use</span> <span class="ident">standback::prelude</span>::<span class="kw-2">*</span>;
+
+<span class="doccomment">/// By explicitly inserting this enum where padding is expected, the compiler is able to better</span>
+<span class="doccomment">/// perform niche value optimization.</span>
+<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">Padding</span> {
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_docs_in_private_items</span>)]</span>
+    <span class="ident">Optimize</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Padding</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::Optimize</span>
+    }
+}
 
 <span class="doccomment">/// A span of time with nanosecond precision.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Each `Duration` is composed of a whole number of seconds and a fractional</span>
-<span class="doccomment">/// part represented in nanoseconds.</span>
+<span class="doccomment">/// Each `Duration` is composed of a whole number of seconds and a fractional part represented in</span>
+<span class="doccomment">/// nanoseconds.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// `Duration` implements many traits, including [`Add`], [`Sub`], [`Mul`], and</span>
-<span class="doccomment">/// [`Div`], among others.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This implementation allows for negative durations, unlike</span>
-<span class="doccomment">/// [`core::time::Duration`].</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>))]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(
-    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>,
-    <span class="ident">serde</span>(<span class="ident">from</span> <span class="op">=</span> <span class="string">&quot;crate::serde::Duration&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;crate::serde::Duration&quot;</span>)
-)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
+<span class="doccomment">/// This implementation allows for negative durations, unlike [`core::time::Duration`].</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Default</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Duration</span> {
     <span class="doccomment">/// Number of whole seconds.</span>
     <span class="ident">seconds</span>: <span class="ident">i64</span>,
-    <span class="doccomment">/// Number of nanoseconds within the second. The sign always matches the</span>
-    <span class="doccomment">/// `seconds` field.</span>
+    <span class="doccomment">/// Number of nanoseconds within the second. The sign always matches the `seconds` field.</span>
     <span class="ident">nanoseconds</span>: <span class="ident">i32</span>, <span class="comment">// always -10^9 &lt; nanoseconds &lt; 10^9</span>
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_docs_in_private_items</span>)]</span>
+    <span class="ident">padding</span>: <span class="ident">Padding</span>,
 }
 
-<span class="doccomment">/// The number of seconds in one minute.</span>
-<span class="kw">const</span> <span class="ident">SECONDS_PER_MINUTE</span>: <span class="ident">i64</span> <span class="op">=</span> <span class="number">60</span>;
-
-<span class="doccomment">/// The number of seconds in one hour.</span>
-<span class="kw">const</span> <span class="ident">SECONDS_PER_HOUR</span>: <span class="ident">i64</span> <span class="op">=</span> <span class="number">60</span> <span class="op">*</span> <span class="ident">SECONDS_PER_MINUTE</span>;
-
-<span class="doccomment">/// The number of seconds in one day.</span>
-<span class="kw">const</span> <span class="ident">SECONDS_PER_DAY</span>: <span class="ident">i64</span> <span class="op">=</span> <span class="number">24</span> <span class="op">*</span> <span class="ident">SECONDS_PER_HOUR</span>;
-
-<span class="doccomment">/// The number of seconds in one week.</span>
-<span class="kw">const</span> <span class="ident">SECONDS_PER_WEEK</span>: <span class="ident">i64</span> <span class="op">=</span> <span class="number">7</span> <span class="op">*</span> <span class="ident">SECONDS_PER_DAY</span>;
+<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Duration</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Duration&quot;</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;seconds&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">seconds</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;nanoseconds&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">nanoseconds</span>)
+            .<span class="ident">finish</span>()
+    }
+}
 
 <span class="kw">impl</span> <span class="ident">Duration</span> {
+    <span class="comment">// region: constants</span>
     <span class="doccomment">/// Equivalent to `0.seconds()`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{Duration, prelude::*};</span>
-    <span class="doccomment">/// assert_eq!(Duration::zero(), 0.seconds());</span>
+    <span class="doccomment">/// # use time::{Duration, ext::NumericalDuration};</span>
+    <span class="doccomment">/// assert_eq!(Duration::ZERO, 0.seconds());</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">zero</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::seconds</span>(<span class="number">0</span>)
-    }
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ZERO</span>: <span class="self">Self</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::seconds</span>(<span class="number">0</span>);
 
     <span class="doccomment">/// Equivalent to `1.nanoseconds()`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{Duration, prelude::*};</span>
-    <span class="doccomment">/// assert_eq!(Duration::nanosecond(), 1.nanoseconds());</span>
+    <span class="doccomment">/// # use time::{Duration, ext::NumericalDuration};</span>
+    <span class="doccomment">/// assert_eq!(Duration::NANOSECOND, 1.nanoseconds());</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">nanosecond</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::nanoseconds</span>(<span class="number">1</span>)
-    }
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">NANOSECOND</span>: <span class="self">Self</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::nanoseconds</span>(<span class="number">1</span>);
 
     <span class="doccomment">/// Equivalent to `1.microseconds()`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{Duration, prelude::*};</span>
-    <span class="doccomment">/// assert_eq!(Duration::microsecond(), 1.microseconds());</span>
+    <span class="doccomment">/// # use time::{Duration, ext::NumericalDuration};</span>
+    <span class="doccomment">/// assert_eq!(Duration::MICROSECOND, 1.microseconds());</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">microsecond</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::microseconds</span>(<span class="number">1</span>)
-    }
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MICROSECOND</span>: <span class="self">Self</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::microseconds</span>(<span class="number">1</span>);
 
     <span class="doccomment">/// Equivalent to `1.milliseconds()`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{Duration, prelude::*};</span>
-    <span class="doccomment">/// assert_eq!(Duration::millisecond(), 1.milliseconds());</span>
+    <span class="doccomment">/// # use time::{Duration, ext::NumericalDuration};</span>
+    <span class="doccomment">/// assert_eq!(Duration::MILLISECOND, 1.milliseconds());</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">millisecond</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::milliseconds</span>(<span class="number">1</span>)
-    }
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MILLISECOND</span>: <span class="self">Self</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::milliseconds</span>(<span class="number">1</span>);
 
     <span class="doccomment">/// Equivalent to `1.seconds()`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{Duration, prelude::*};</span>
-    <span class="doccomment">/// assert_eq!(Duration::second(), 1.seconds());</span>
+    <span class="doccomment">/// # use time::{Duration, ext::NumericalDuration};</span>
+    <span class="doccomment">/// assert_eq!(Duration::SECOND, 1.seconds());</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">second</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::seconds</span>(<span class="number">1</span>)
-    }
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SECOND</span>: <span class="self">Self</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::seconds</span>(<span class="number">1</span>);
 
     <span class="doccomment">/// Equivalent to `1.minutes()`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{Duration, prelude::*};</span>
-    <span class="doccomment">/// assert_eq!(Duration::minute(), 1.minutes());</span>
+    <span class="doccomment">/// # use time::{Duration, ext::NumericalDuration};</span>
+    <span class="doccomment">/// assert_eq!(Duration::MINUTE, 1.minutes());</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">minute</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::minutes</span>(<span class="number">1</span>)
-    }
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MINUTE</span>: <span class="self">Self</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::minutes</span>(<span class="number">1</span>);
 
     <span class="doccomment">/// Equivalent to `1.hours()`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{Duration, prelude::*};</span>
-    <span class="doccomment">/// assert_eq!(Duration::hour(), 1.hours());</span>
+    <span class="doccomment">/// # use time::{Duration, ext::NumericalDuration};</span>
+    <span class="doccomment">/// assert_eq!(Duration::HOUR, 1.hours());</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">hour</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::hours</span>(<span class="number">1</span>)
-    }
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">HOUR</span>: <span class="self">Self</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::hours</span>(<span class="number">1</span>);
 
     <span class="doccomment">/// Equivalent to `1.days()`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{Duration, prelude::*};</span>
-    <span class="doccomment">/// assert_eq!(Duration::day(), 1.days());</span>
+    <span class="doccomment">/// # use time::{Duration, ext::NumericalDuration};</span>
+    <span class="doccomment">/// assert_eq!(Duration::DAY, 1.days());</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">day</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::days</span>(<span class="number">1</span>)
-    }
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DAY</span>: <span class="self">Self</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::days</span>(<span class="number">1</span>);
 
     <span class="doccomment">/// Equivalent to `1.weeks()`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{Duration, prelude::*};</span>
-    <span class="doccomment">/// assert_eq!(Duration::week(), 1.weeks());</span>
+    <span class="doccomment">/// # use time::{Duration, ext::NumericalDuration};</span>
+    <span class="doccomment">/// assert_eq!(Duration::WEEK, 1.weeks());</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">week</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::weeks</span>(<span class="number">1</span>)
-    }
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">WEEK</span>: <span class="self">Self</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::weeks</span>(<span class="number">1</span>);
 
-    <span class="doccomment">/// The maximum possible duration. Adding any positive duration to this will</span>
-    <span class="doccomment">/// cause an overflow.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The value returned by this method may change at any time.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">max_value</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">i64::max_value</span>(), <span class="number">999_999_999</span>)
-    }
+    <span class="doccomment">/// The minimum possible duration. Adding any negative duration to this will cause an overflow.</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MIN</span>: <span class="self">Self</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new_unchecked</span>(<span class="ident">i64::MIN</span>, <span class="op">-</span><span class="number">999_999_999</span>);
 
-    <span class="doccomment">/// The minimum possible duration. Adding any negative duration to this will</span>
-    <span class="doccomment">/// cause an overflow.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The value returned by this method may change at any time.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">min_value</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">i64::min_value</span>(), <span class="op">-</span><span class="number">999_999_999</span>)
-    }
+    <span class="doccomment">/// The maximum possible duration. Adding any positive duration to this will cause an overflow.</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MAX</span>: <span class="self">Self</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new_unchecked</span>(<span class="ident">i64::MAX</span>, <span class="number">999_999_999</span>);
+    <span class="comment">// endregion constants</span>
 
+    <span class="comment">// region: is_{sign}</span>
     <span class="doccomment">/// Check if a duration is exactly zero.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::prelude::*;</span>
+    <span class="doccomment">/// # use time::ext::NumericalDuration;</span>
     <span class="doccomment">/// assert!(0.seconds().is_zero());</span>
     <span class="doccomment">/// assert!(!1.nanoseconds().is_zero());</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">is_zero</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        (<span class="self">self</span>.<span class="ident">seconds</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span>) <span class="op">&amp;</span> (<span class="self">self</span>.<span class="ident">nanoseconds</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span>)
+        <span class="self">self</span>.<span class="ident">seconds</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">nanoseconds</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span>
     }
 
     <span class="doccomment">/// Check if a duration is negative.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::prelude::*;</span>
+    <span class="doccomment">/// # use time::ext::NumericalDuration;</span>
     <span class="doccomment">/// assert!((-1).seconds().is_negative());</span>
     <span class="doccomment">/// assert!(!0.seconds().is_negative());</span>
     <span class="doccomment">/// assert!(!1.seconds().is_negative());</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">is_negative</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        (<span class="self">self</span>.<span class="ident">seconds</span> <span class="op">&lt;</span> <span class="number">0</span>) <span class="op">|</span> (<span class="self">self</span>.<span class="ident">nanoseconds</span> <span class="op">&lt;</span> <span class="number">0</span>)
+        <span class="self">self</span>.<span class="ident">seconds</span> <span class="op">&lt;</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">nanoseconds</span> <span class="op">&lt;</span> <span class="number">0</span>
     }
 
     <span class="doccomment">/// Check if a duration is positive.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{prelude::*};</span>
+    <span class="doccomment">/// # use time::ext::NumericalDuration;</span>
     <span class="doccomment">/// assert!(1.seconds().is_positive());</span>
     <span class="doccomment">/// assert!(!0.seconds().is_positive());</span>
     <span class="doccomment">/// assert!(!(-1).seconds().is_positive());</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">is_positive</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        (<span class="self">self</span>.<span class="ident">seconds</span> <span class="op">&gt;</span> <span class="number">0</span>) <span class="op">|</span> (<span class="self">self</span>.<span class="ident">nanoseconds</span> <span class="op">&gt;</span> <span class="number">0</span>)
+        <span class="self">self</span>.<span class="ident">seconds</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">nanoseconds</span> <span class="op">&gt;</span> <span class="number">0</span>
     }
+    <span class="comment">// endregion is_{sign}</span>
 
-    <span class="doccomment">/// Get the sign of the duration.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # #![allow(deprecated)]</span>
-    <span class="doccomment">/// # use time::{Sign, prelude::*};</span>
-    <span class="doccomment">/// assert_eq!(1.seconds().sign(), Sign::Positive);</span>
-    <span class="doccomment">/// assert_eq!((-1).seconds().sign(), Sign::Negative);</span>
-    <span class="doccomment">/// assert_eq!(0.seconds().sign(), Sign::Zero);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(
-        <span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.2.7&quot;</span>,
-        <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;To obtain the sign of a `Duration`, you should use the `is_positive`, \
-                `is_negative`, and `is_zero` methods.&quot;</span>
-    )]</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>, <span class="ident">clippy::missing_const_for_fn</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sign</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Sign</span> {
-        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Sign</span>::<span class="kw-2">*</span>;
-
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">nanoseconds</span> <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="ident">Positive</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">nanoseconds</span> <span class="op">&lt;</span> <span class="number">0</span> {
-            <span class="ident">Negative</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">seconds</span> <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="ident">Positive</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">seconds</span> <span class="op">&lt;</span> <span class="number">0</span> {
-            <span class="ident">Negative</span>
-        } <span class="kw">else</span> {
-            <span class="ident">Zero</span>
-        }
-    }
-
+    <span class="comment">// region: abs</span>
     <span class="doccomment">/// Get the absolute value of the duration.</span>
     <span class="doccomment">///</span>
+    <span class="doccomment">/// This method saturates the returned value if it would otherwise overflow.</span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::prelude::*;</span>
+    <span class="doccomment">/// # use time::ext::NumericalDuration;</span>
     <span class="doccomment">/// assert_eq!(1.seconds().abs(), 1.seconds());</span>
     <span class="doccomment">/// assert_eq!(0.seconds().abs(), 0.seconds());</span>
     <span class="doccomment">/// assert_eq!((-1).seconds().abs(), 1.seconds());</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function is `const fn` when using rustc &gt;= 1.39.</span>
-    <span class="attribute">#[<span class="ident">const_fn</span>(<span class="string">&quot;1.39&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">abs</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">seconds</span>: <span class="self">self</span>.<span class="ident">seconds</span>.<span class="ident">abs</span>(),
-            <span class="ident">nanoseconds</span>: <span class="self">self</span>.<span class="ident">nanoseconds</span>.<span class="ident">abs</span>(),
-        }
+        <span class="ident"><span class="self">Self</span>::new_unchecked</span>(<span class="self">self</span>.<span class="ident">seconds</span>.<span class="ident">saturating_abs</span>(), <span class="self">self</span>.<span class="ident">nanoseconds</span>.<span class="ident">abs</span>())
     }
 
-    <span class="doccomment">/// Convert the existing `Duration` to a `std::time::Duration` and its sign.</span>
-    <span class="comment">// This doesn&#39;t actually require the standard library, but is currently only</span>
-    <span class="comment">// used when it&#39;s enabled.</span>
+    <span class="doccomment">/// Convert the existing `Duration` to a `std::time::Duration` and its sign. This doesn&#39;t</span>
+    <span class="doccomment">/// actually require the standard library, but is currently only used when it&#39;s enabled.</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_const_for_fn</span>)]</span> <span class="comment">// false positive</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">abs_std</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdDuration</span> {
-        <span class="ident">StdDuration::new</span>(<span class="self">self</span>.<span class="ident">seconds</span>.<span class="ident">abs</span>() <span class="kw">as</span> <span class="ident">u64</span>, <span class="self">self</span>.<span class="ident">nanoseconds</span>.<span class="ident">abs</span>() <span class="kw">as</span> <span class="ident">u32</span>)
+        <span class="ident">StdDuration::new</span>(<span class="self">self</span>.<span class="ident">seconds</span>.<span class="ident">unsigned_abs</span>(), <span class="self">self</span>.<span class="ident">nanoseconds</span>.<span class="ident">unsigned_abs</span>())
+    }
+    <span class="comment">// endregion abs</span>
+
+    <span class="comment">// region: constructors</span>
+    <span class="doccomment">/// Create a new `Duration` without checking the validity of the components.</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new_unchecked</span>(<span class="ident">seconds</span>: <span class="ident">i64</span>, <span class="ident">nanoseconds</span>: <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">seconds</span>,
+            <span class="ident">nanoseconds</span>,
+            <span class="ident">padding</span>: <span class="ident">Padding::Optimize</span>,
+        }
     }
 
-    <span class="doccomment">/// Create a new `Duration` with the provided seconds and nanoseconds. If</span>
-    <span class="doccomment">/// nanoseconds is at least ±10&lt;sup&gt;9&lt;/sup&gt;, it will wrap to the number of</span>
-    <span class="doccomment">/// seconds.</span>
+    <span class="doccomment">/// Create a new `Duration` with the provided seconds and nanoseconds. If nanoseconds is at</span>
+    <span class="doccomment">/// least ±10&lt;sup&gt;9&lt;/sup&gt;, it will wrap to the number of seconds.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{Duration, prelude::*};</span>
+    <span class="doccomment">/// # use time::{Duration, ext::NumericalDuration};</span>
     <span class="doccomment">/// assert_eq!(Duration::new(1, 0), 1.seconds());</span>
     <span class="doccomment">/// assert_eq!(Duration::new(-1, 0), (-1).seconds());</span>
     <span class="doccomment">/// assert_eq!(Duration::new(1, 2_000_000_000), 3.seconds());</span>
     <span class="doccomment">/// ```</span>
-    <span class="comment">// FIXME This code is stupidly complex for the sole reason of maintaining</span>
-    <span class="comment">// back-compatibility with Rust 1.32.0. The equivalent code is commented out</span>
-    <span class="comment">// immediately below this function implementation. Thankfully, the compiler</span>
-    <span class="comment">// is able to do quite well at deduplicating the operations.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">seconds</span>: <span class="ident">i64</span>, <span class="ident">nanoseconds</span>: <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">seconds</span>: (<span class="ident">seconds</span> <span class="op">+</span> <span class="ident">nanoseconds</span> <span class="kw">as</span> <span class="ident">i64</span> <span class="op">/</span> <span class="number">1_000_000_000</span>)
-                <span class="op">+</span> (((((<span class="ident">seconds</span> <span class="op">+</span> <span class="ident">nanoseconds</span> <span class="kw">as</span> <span class="ident">i64</span> <span class="op">/</span> <span class="number">1_000_000_000</span>) <span class="op">&gt;</span> <span class="number">0</span>) <span class="kw">as</span> <span class="ident">i8</span>
-                    <span class="op">-</span> ((<span class="ident">seconds</span> <span class="op">+</span> <span class="ident">nanoseconds</span> <span class="kw">as</span> <span class="ident">i64</span> <span class="op">/</span> <span class="number">1_000_000_000</span>) <span class="op">&lt;</span> <span class="number">0</span>) <span class="kw">as</span> <span class="ident">i8</span>)
-                    <span class="op">=</span><span class="op">=</span> <span class="op">-</span><span class="number">1</span>)
-                    <span class="op">&amp;</span> ((((<span class="ident">nanoseconds</span> <span class="op">%</span> <span class="number">1_000_000_000</span>) <span class="op">&gt;</span> <span class="number">0</span>) <span class="kw">as</span> <span class="ident">i8</span>
-                        <span class="op">-</span> ((<span class="ident">nanoseconds</span> <span class="op">%</span> <span class="number">1_000_000_000</span>) <span class="op">&lt;</span> <span class="number">0</span>) <span class="kw">as</span> <span class="ident">i8</span>)
-                        <span class="op">=</span><span class="op">=</span> <span class="number">1</span>)) <span class="kw">as</span> <span class="ident">i64</span>
-                <span class="op">-</span> (((((<span class="ident">seconds</span> <span class="op">+</span> <span class="ident">nanoseconds</span> <span class="kw">as</span> <span class="ident">i64</span> <span class="op">/</span> <span class="number">1_000_000_000</span>) <span class="op">&gt;</span> <span class="number">0</span>) <span class="kw">as</span> <span class="ident">i8</span>
-                    <span class="op">-</span> ((<span class="ident">seconds</span> <span class="op">+</span> <span class="ident">nanoseconds</span> <span class="kw">as</span> <span class="ident">i64</span> <span class="op">/</span> <span class="number">1_000_000_000</span>) <span class="op">&lt;</span> <span class="number">0</span>) <span class="kw">as</span> <span class="ident">i8</span>)
-                    <span class="op">=</span><span class="op">=</span> <span class="number">1</span>)
-                    <span class="op">&amp;</span> ((((<span class="ident">nanoseconds</span> <span class="op">%</span> <span class="number">1_000_000_000</span>) <span class="op">&gt;</span> <span class="number">0</span>) <span class="kw">as</span> <span class="ident">i8</span>
-                        <span class="op">-</span> ((<span class="ident">nanoseconds</span> <span class="op">%</span> <span class="number">1_000_000_000</span>) <span class="op">&lt;</span> <span class="number">0</span>) <span class="kw">as</span> <span class="ident">i8</span>)
-                        <span class="op">=</span><span class="op">=</span> <span class="op">-</span><span class="number">1</span>)) <span class="kw">as</span> <span class="ident">i64</span>,
-            <span class="ident">nanoseconds</span>: (<span class="ident">nanoseconds</span> <span class="op">%</span> <span class="number">1_000_000_000</span>)
-                <span class="op">+</span> <span class="number">1_000_000_000</span>
-                    <span class="op">*</span> ((((((<span class="ident">seconds</span> <span class="op">+</span> <span class="ident">nanoseconds</span> <span class="kw">as</span> <span class="ident">i64</span> <span class="op">/</span> <span class="number">1_000_000_000</span>) <span class="op">&gt;</span> <span class="number">0</span>) <span class="kw">as</span> <span class="ident">i8</span>
-                        <span class="op">-</span> ((<span class="ident">seconds</span> <span class="op">+</span> <span class="ident">nanoseconds</span> <span class="kw">as</span> <span class="ident">i64</span> <span class="op">/</span> <span class="number">1_000_000_000</span>) <span class="op">&lt;</span> <span class="number">0</span>) <span class="kw">as</span> <span class="ident">i8</span>)
-                        <span class="op">=</span><span class="op">=</span> <span class="number">1</span>)
-                        <span class="op">&amp;</span> ((((<span class="ident">nanoseconds</span> <span class="op">%</span> <span class="number">1_000_000_000</span>) <span class="op">&gt;</span> <span class="number">0</span>) <span class="kw">as</span> <span class="ident">i8</span>
-                            <span class="op">-</span> ((<span class="ident">nanoseconds</span> <span class="op">%</span> <span class="number">1_000_000_000</span>) <span class="op">&lt;</span> <span class="number">0</span>) <span class="kw">as</span> <span class="ident">i8</span>)
-                            <span class="op">=</span><span class="op">=</span> <span class="op">-</span><span class="number">1</span>)) <span class="kw">as</span> <span class="ident">i32</span>
-                        <span class="op">-</span> (((((<span class="ident">seconds</span> <span class="op">+</span> <span class="ident">nanoseconds</span> <span class="kw">as</span> <span class="ident">i64</span> <span class="op">/</span> <span class="number">1_000_000_000</span>) <span class="op">&gt;</span> <span class="number">0</span>) <span class="kw">as</span> <span class="ident">i8</span>
-                            <span class="op">-</span> ((<span class="ident">seconds</span> <span class="op">+</span> <span class="ident">nanoseconds</span> <span class="kw">as</span> <span class="ident">i64</span> <span class="op">/</span> <span class="number">1_000_000_000</span>) <span class="op">&lt;</span> <span class="number">0</span>) <span class="kw">as</span> <span class="ident">i8</span>)
-                            <span class="op">=</span><span class="op">=</span> <span class="op">-</span><span class="number">1</span>)
-                            <span class="op">&amp;</span> ((((<span class="ident">nanoseconds</span> <span class="op">%</span> <span class="number">1_000_000_000</span>) <span class="op">&gt;</span> <span class="number">0</span>) <span class="kw">as</span> <span class="ident">i8</span>
-                                <span class="op">-</span> ((<span class="ident">nanoseconds</span> <span class="op">%</span> <span class="number">1_000_000_000</span>) <span class="op">&lt;</span> <span class="number">0</span>) <span class="kw">as</span> <span class="ident">i8</span>)
-                                <span class="op">=</span><span class="op">=</span> <span class="number">1</span>)) <span class="kw">as</span> <span class="ident">i32</span>),
-        }
-    }
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="kw-2">mut</span> <span class="ident">seconds</span>: <span class="ident">i64</span>, <span class="kw-2">mut</span> <span class="ident">nanoseconds</span>: <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="ident">seconds</span> <span class="op">+</span><span class="op">=</span> <span class="ident">nanoseconds</span> <span class="kw">as</span> <span class="ident">i64</span> <span class="op">/</span> <span class="number">1_000_000_000</span>;
+        <span class="ident">nanoseconds</span> <span class="op">%</span><span class="op">=</span> <span class="number">1_000_000_000</span>;
 
-    <span class="comment">// pub const fn new(mut seconds: i64, mut nanoseconds: i32) -&gt; Self {</span>
-    <span class="comment">//     seconds += nanoseconds as i64 / 1_000_000_000;</span>
-    <span class="comment">//     nanoseconds %= 1_000_000_000;</span>
-    <span class="comment">//</span>
-    <span class="comment">//     // Alternatively, we can use `(nano)seconds.signum()` once it is</span>
-    <span class="comment">//     // stabilized within `const fn`. The behavior is identical.</span>
-    <span class="comment">//     let seconds_sign = match seconds {</span>
-    <span class="comment">//         n if n &gt; 0 =&gt; 1,</span>
-    <span class="comment">//         0 =&gt; 0,</span>
-    <span class="comment">//         _ =&gt; -1,</span>
-    <span class="comment">//     };</span>
-    <span class="comment">//     let nanoseconds_sign = match nanoseconds {</span>
-    <span class="comment">//         n if n &gt; 0 =&gt; 1,</span>
-    <span class="comment">//         0 =&gt; 0,</span>
-    <span class="comment">//         _ =&gt; -1,</span>
-    <span class="comment">//     };</span>
-    <span class="comment">//</span>
-    <span class="comment">//     if seconds_sign == 1 &amp;&amp; nanoseconds_sign == -1 {</span>
-    <span class="comment">//         seconds -= 1;</span>
-    <span class="comment">//         nanoseconds += 1_000_000_000;</span>
-    <span class="comment">//     } else if seconds_sign == -1 &amp;&amp; nanoseconds_sign == 1 {</span>
-    <span class="comment">//         seconds += 1;</span>
-    <span class="comment">//         nanoseconds -= 1_000_000_000;</span>
-    <span class="comment">//     }</span>
-    <span class="comment">//</span>
-    <span class="comment">//     Self {</span>
-    <span class="comment">//         seconds,</span>
-    <span class="comment">//         nanoseconds,</span>
-    <span class="comment">//     }</span>
-    <span class="comment">// }</span>
+        <span class="kw">if</span> <span class="ident">seconds</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">nanoseconds</span> <span class="op">&lt;</span> <span class="number">0</span> {
+            <span class="ident">seconds</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+            <span class="ident">nanoseconds</span> <span class="op">+</span><span class="op">=</span> <span class="number">1_000_000_000</span>;
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">seconds</span> <span class="op">&lt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">nanoseconds</span> <span class="op">&gt;</span> <span class="number">0</span> {
+            <span class="ident">seconds</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+            <span class="ident">nanoseconds</span> <span class="op">-</span><span class="op">=</span> <span class="number">1_000_000_000</span>;
+        }
+
+        <span class="ident"><span class="self">Self</span>::new_unchecked</span>(<span class="ident">seconds</span>, <span class="ident">nanoseconds</span>)
+    }
 
     <span class="doccomment">/// Create a new `Duration` with the given number of weeks. Equivalent to</span>
     <span class="doccomment">/// `Duration::seconds(weeks * 604_800)`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{Duration, prelude::*};</span>
+    <span class="doccomment">/// # use time::{Duration, ext::NumericalDuration};</span>
     <span class="doccomment">/// assert_eq!(Duration::weeks(1), 604_800.seconds());</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">weeks</span>(<span class="ident">weeks</span>: <span class="ident">i64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::seconds</span>(<span class="ident">weeks</span> <span class="op">*</span> <span class="ident">SECONDS_PER_WEEK</span>)
-    }
-
-    <span class="doccomment">/// Get the number of whole weeks in the duration.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::prelude::*;</span>
-    <span class="doccomment">/// assert_eq!(1.weeks().whole_weeks(), 1);</span>
-    <span class="doccomment">/// assert_eq!((-1).weeks().whole_weeks(), -1);</span>
-    <span class="doccomment">/// assert_eq!(6.days().whole_weeks(), 0);</span>
-    <span class="doccomment">/// assert_eq!((-6).days().whole_weeks(), 0);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">whole_weeks</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i64</span> {
-        <span class="self">self</span>.<span class="ident">whole_seconds</span>() <span class="op">/</span> <span class="ident">SECONDS_PER_WEEK</span>
+        <span class="ident"><span class="self">Self</span>::seconds</span>(<span class="ident">weeks</span> <span class="op">*</span> <span class="number">604_800</span>)
     }
 
     <span class="doccomment">/// Create a new `Duration` with the given number of days. Equivalent to</span>
     <span class="doccomment">/// `Duration::seconds(days * 86_400)`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{Duration, prelude::*};</span>
+    <span class="doccomment">/// # use time::{Duration, ext::NumericalDuration};</span>
     <span class="doccomment">/// assert_eq!(Duration::days(1), 86_400.seconds());</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">days</span>(<span class="ident">days</span>: <span class="ident">i64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::seconds</span>(<span class="ident">days</span> <span class="op">*</span> <span class="ident">SECONDS_PER_DAY</span>)
-    }
-
-    <span class="doccomment">/// Get the number of whole days in the duration.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::prelude::*;</span>
-    <span class="doccomment">/// assert_eq!(1.days().whole_days(), 1);</span>
-    <span class="doccomment">/// assert_eq!((-1).days().whole_days(), -1);</span>
-    <span class="doccomment">/// assert_eq!(23.hours().whole_days(), 0);</span>
-    <span class="doccomment">/// assert_eq!((-23).hours().whole_days(), 0);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">whole_days</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i64</span> {
-        <span class="self">self</span>.<span class="ident">whole_seconds</span>() <span class="op">/</span> <span class="ident">SECONDS_PER_DAY</span>
+        <span class="ident"><span class="self">Self</span>::seconds</span>(<span class="ident">days</span> <span class="op">*</span> <span class="number">86_400</span>)
     }
 
     <span class="doccomment">/// Create a new `Duration` with the given number of hours. Equivalent to</span>
     <span class="doccomment">/// `Duration::seconds(hours * 3_600)`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{Duration, prelude::*};</span>
+    <span class="doccomment">/// # use time::{Duration, ext::NumericalDuration};</span>
     <span class="doccomment">/// assert_eq!(Duration::hours(1), 3_600.seconds());</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">hours</span>(<span class="ident">hours</span>: <span class="ident">i64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::seconds</span>(<span class="ident">hours</span> <span class="op">*</span> <span class="ident">SECONDS_PER_HOUR</span>)
-    }
-
-    <span class="doccomment">/// Get the number of whole hours in the duration.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::prelude::*;</span>
-    <span class="doccomment">/// assert_eq!(1.hours().whole_hours(), 1);</span>
-    <span class="doccomment">/// assert_eq!((-1).hours().whole_hours(), -1);</span>
-    <span class="doccomment">/// assert_eq!(59.minutes().whole_hours(), 0);</span>
-    <span class="doccomment">/// assert_eq!((-59).minutes().whole_hours(), 0);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">whole_hours</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i64</span> {
-        <span class="self">self</span>.<span class="ident">whole_seconds</span>() <span class="op">/</span> <span class="ident">SECONDS_PER_HOUR</span>
+        <span class="ident"><span class="self">Self</span>::seconds</span>(<span class="ident">hours</span> <span class="op">*</span> <span class="number">3_600</span>)
     }
 
     <span class="doccomment">/// Create a new `Duration` with the given number of minutes. Equivalent to</span>
     <span class="doccomment">/// `Duration::seconds(minutes * 60)`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{Duration, prelude::*};</span>
+    <span class="doccomment">/// # use time::{Duration, ext::NumericalDuration};</span>
     <span class="doccomment">/// assert_eq!(Duration::minutes(1), 60.seconds());</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">minutes</span>(<span class="ident">minutes</span>: <span class="ident">i64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::seconds</span>(<span class="ident">minutes</span> <span class="op">*</span> <span class="ident">SECONDS_PER_MINUTE</span>)
+        <span class="ident"><span class="self">Self</span>::seconds</span>(<span class="ident">minutes</span> <span class="op">*</span> <span class="number">60</span>)
+    }
+
+    <span class="doccomment">/// Create a new `Duration` with the given number of seconds.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::{Duration, ext::NumericalDuration};</span>
+    <span class="doccomment">/// assert_eq!(Duration::seconds(1), 1_000.milliseconds());</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">seconds</span>(<span class="ident">seconds</span>: <span class="ident">i64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::new_unchecked</span>(<span class="ident">seconds</span>, <span class="number">0</span>)
+    }
+
+    <span class="doccomment">/// Creates a new `Duration` from the specified number of seconds represented as `f64`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::{Duration, ext::NumericalDuration};</span>
+    <span class="doccomment">/// assert_eq!(Duration::seconds_f64(0.5), 0.5.seconds());</span>
+    <span class="doccomment">/// assert_eq!(Duration::seconds_f64(-0.5), -0.5.seconds());</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">seconds_f64</span>(<span class="ident">seconds</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::new_unchecked</span>(<span class="ident">seconds</span> <span class="kw">as</span> <span class="kw">_</span>, ((<span class="ident">seconds</span> <span class="op">%</span> <span class="number">1.</span>) <span class="op">*</span> <span class="number">1_000_000_000.</span>) <span class="kw">as</span> <span class="kw">_</span>)
+    }
+
+    <span class="doccomment">/// Creates a new `Duration` from the specified number of seconds represented as `f32`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::{Duration, ext::NumericalDuration};</span>
+    <span class="doccomment">/// assert_eq!(Duration::seconds_f32(0.5), 0.5.seconds());</span>
+    <span class="doccomment">/// assert_eq!(Duration::seconds_f32(-0.5), (-0.5).seconds());</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">seconds_f32</span>(<span class="ident">seconds</span>: <span class="ident">f32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::new_unchecked</span>(<span class="ident">seconds</span> <span class="kw">as</span> <span class="kw">_</span>, ((<span class="ident">seconds</span> <span class="op">%</span> <span class="number">1.</span>) <span class="op">*</span> <span class="number">1_000_000_000.</span>) <span class="kw">as</span> <span class="kw">_</span>)
+    }
+
+    <span class="doccomment">/// Create a new `Duration` with the given number of milliseconds.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::{Duration, ext::NumericalDuration};</span>
+    <span class="doccomment">/// assert_eq!(Duration::milliseconds(1), 1_000.microseconds());</span>
+    <span class="doccomment">/// assert_eq!(Duration::milliseconds(-1), (-1_000).microseconds());</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">milliseconds</span>(<span class="ident">milliseconds</span>: <span class="ident">i64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::new_unchecked</span>(
+            <span class="ident">milliseconds</span> <span class="op">/</span> <span class="number">1_000</span>,
+            ((<span class="ident">milliseconds</span> <span class="op">%</span> <span class="number">1_000</span>) <span class="op">*</span> <span class="number">1_000_000</span>) <span class="kw">as</span> <span class="kw">_</span>,
+        )
+    }
+
+    <span class="doccomment">/// Create a new `Duration` with the given number of microseconds.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::{Duration, ext::NumericalDuration};</span>
+    <span class="doccomment">/// assert_eq!(Duration::microseconds(1), 1_000.nanoseconds());</span>
+    <span class="doccomment">/// assert_eq!(Duration::microseconds(-1), (-1_000).nanoseconds());</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">microseconds</span>(<span class="ident">microseconds</span>: <span class="ident">i64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::new_unchecked</span>(
+            <span class="ident">microseconds</span> <span class="op">/</span> <span class="number">1_000_000</span>,
+            ((<span class="ident">microseconds</span> <span class="op">%</span> <span class="number">1_000_000</span>) <span class="op">*</span> <span class="number">1_000</span>) <span class="kw">as</span> <span class="kw">_</span>,
+        )
+    }
+
+    <span class="doccomment">/// Create a new `Duration` with the given number of nanoseconds.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::{Duration, ext::NumericalDuration};</span>
+    <span class="doccomment">/// assert_eq!(Duration::nanoseconds(1), 1.microseconds() / 1_000);</span>
+    <span class="doccomment">/// assert_eq!(Duration::nanoseconds(-1), (-1).microseconds() / 1_000);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">nanoseconds</span>(<span class="ident">nanoseconds</span>: <span class="ident">i64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::new_unchecked</span>(
+            <span class="ident">nanoseconds</span> <span class="op">/</span> <span class="number">1_000_000_000</span>,
+            (<span class="ident">nanoseconds</span> <span class="op">%</span> <span class="number">1_000_000_000</span>) <span class="kw">as</span> <span class="kw">_</span>,
+        )
+    }
+
+    <span class="doccomment">/// Create a new `Duration` with the given number of nanoseconds.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// As the input range cannot be fully mapped to the output, this should only be used where it&#39;s</span>
+    <span class="doccomment">/// known to result in a valid value.</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">nanoseconds_i128</span>(<span class="ident">nanoseconds</span>: <span class="ident">i128</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::new_unchecked</span>(
+            (<span class="ident">nanoseconds</span> <span class="op">/</span> <span class="number">1_000_000_000</span>) <span class="kw">as</span> <span class="kw">_</span>,
+            (<span class="ident">nanoseconds</span> <span class="op">%</span> <span class="number">1_000_000_000</span>) <span class="kw">as</span> <span class="kw">_</span>,
+        )
+    }
+    <span class="comment">// endregion constructors</span>
+
+    <span class="comment">// region: getters</span>
+    <span class="doccomment">/// Get the number of whole weeks in the duration.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::ext::NumericalDuration;</span>
+    <span class="doccomment">/// assert_eq!(1.weeks().whole_weeks(), 1);</span>
+    <span class="doccomment">/// assert_eq!((-1).weeks().whole_weeks(), -1);</span>
+    <span class="doccomment">/// assert_eq!(6.days().whole_weeks(), 0);</span>
+    <span class="doccomment">/// assert_eq!((-6).days().whole_weeks(), 0);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">whole_weeks</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i64</span> {
+        <span class="self">self</span>.<span class="ident">whole_seconds</span>() <span class="op">/</span> <span class="number">604_800</span>
+    }
+
+    <span class="doccomment">/// Get the number of whole days in the duration.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::ext::NumericalDuration;</span>
+    <span class="doccomment">/// assert_eq!(1.days().whole_days(), 1);</span>
+    <span class="doccomment">/// assert_eq!((-1).days().whole_days(), -1);</span>
+    <span class="doccomment">/// assert_eq!(23.hours().whole_days(), 0);</span>
+    <span class="doccomment">/// assert_eq!((-23).hours().whole_days(), 0);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">whole_days</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i64</span> {
+        <span class="self">self</span>.<span class="ident">whole_seconds</span>() <span class="op">/</span> <span class="number">86_400</span>
+    }
+
+    <span class="doccomment">/// Get the number of whole hours in the duration.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::ext::NumericalDuration;</span>
+    <span class="doccomment">/// assert_eq!(1.hours().whole_hours(), 1);</span>
+    <span class="doccomment">/// assert_eq!((-1).hours().whole_hours(), -1);</span>
+    <span class="doccomment">/// assert_eq!(59.minutes().whole_hours(), 0);</span>
+    <span class="doccomment">/// assert_eq!((-59).minutes().whole_hours(), 0);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">whole_hours</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i64</span> {
+        <span class="self">self</span>.<span class="ident">whole_seconds</span>() <span class="op">/</span> <span class="number">3_600</span>
     }
 
     <span class="doccomment">/// Get the number of whole minutes in the duration.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::prelude::*;</span>
+    <span class="doccomment">/// # use time::ext::NumericalDuration;</span>
     <span class="doccomment">/// assert_eq!(1.minutes().whole_minutes(), 1);</span>
     <span class="doccomment">/// assert_eq!((-1).minutes().whole_minutes(), -1);</span>
     <span class="doccomment">/// assert_eq!(59.seconds().whole_minutes(), 0);</span>
     <span class="doccomment">/// assert_eq!((-59).seconds().whole_minutes(), 0);</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">whole_minutes</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i64</span> {
-        <span class="self">self</span>.<span class="ident">whole_seconds</span>() <span class="op">/</span> <span class="ident">SECONDS_PER_MINUTE</span>
-    }
-
-    <span class="doccomment">/// Create a new `Duration` with the given number of seconds.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{Duration, prelude::*};</span>
-    <span class="doccomment">/// assert_eq!(Duration::seconds(1), 1_000.milliseconds());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">seconds</span>(<span class="ident">seconds</span>: <span class="ident">i64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">seconds</span>,
-            <span class="ident">nanoseconds</span>: <span class="number">0</span>,
-        }
+        <span class="self">self</span>.<span class="ident">whole_seconds</span>() <span class="op">/</span> <span class="number">60</span>
     }
 
     <span class="doccomment">/// Get the number of whole seconds in the duration.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::prelude::*;</span>
+    <span class="doccomment">/// # use time::ext::NumericalDuration;</span>
     <span class="doccomment">/// assert_eq!(1.seconds().whole_seconds(), 1);</span>
     <span class="doccomment">/// assert_eq!((-1).seconds().whole_seconds(), -1);</span>
     <span class="doccomment">/// assert_eq!(1.minutes().whole_seconds(), 60);</span>
@@ -1608,25 +1426,10 @@
         <span class="self">self</span>.<span class="ident">seconds</span>
     }
 
-    <span class="doccomment">/// Creates a new `Duration` from the specified number of seconds</span>
-    <span class="doccomment">/// represented as `f64`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{Duration, prelude::*};</span>
-    <span class="doccomment">/// assert_eq!(Duration::seconds_f64(0.5), 0.5.seconds());</span>
-    <span class="doccomment">/// assert_eq!(Duration::seconds_f64(-0.5), -0.5.seconds());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">seconds_f64</span>(<span class="ident">seconds</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">seconds</span>: <span class="ident">seconds</span> <span class="kw">as</span> <span class="ident">i64</span>,
-            <span class="ident">nanoseconds</span>: ((<span class="ident">seconds</span> <span class="op">%</span> <span class="number">1.</span>) <span class="op">*</span> <span class="number">1_000_000_000.</span>) <span class="kw">as</span> <span class="ident">i32</span>,
-        }
-    }
-
     <span class="doccomment">/// Get the number of fractional seconds in the duration.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::prelude::*;</span>
+    <span class="doccomment">/// # use time::ext::NumericalDuration;</span>
     <span class="doccomment">/// assert_eq!(1.5.seconds().as_seconds_f64(), 1.5);</span>
     <span class="doccomment">/// assert_eq!((-1.5).seconds().as_seconds_f64(), -1.5);</span>
     <span class="doccomment">/// ```</span>
@@ -1634,25 +1437,10 @@
         <span class="self">self</span>.<span class="ident">seconds</span> <span class="kw">as</span> <span class="ident">f64</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">nanoseconds</span> <span class="kw">as</span> <span class="ident">f64</span> <span class="op">/</span> <span class="number">1_000_000_000.</span>
     }
 
-    <span class="doccomment">/// Creates a new `Duration` from the specified number of seconds</span>
-    <span class="doccomment">/// represented as `f32`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{Duration, prelude::*};</span>
-    <span class="doccomment">/// assert_eq!(Duration::seconds_f32(0.5), 0.5.seconds());</span>
-    <span class="doccomment">/// assert_eq!(Duration::seconds_f32(-0.5), (-0.5).seconds());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">seconds_f32</span>(<span class="ident">seconds</span>: <span class="ident">f32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">seconds</span>: <span class="ident">seconds</span> <span class="kw">as</span> <span class="ident">i64</span>,
-            <span class="ident">nanoseconds</span>: ((<span class="ident">seconds</span> <span class="op">%</span> <span class="number">1.</span>) <span class="op">*</span> <span class="number">1_000_000_000.</span>) <span class="kw">as</span> <span class="ident">i32</span>,
-        }
-    }
-
     <span class="doccomment">/// Get the number of fractional seconds in the duration.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::prelude::*;</span>
+    <span class="doccomment">/// # use time::ext::NumericalDuration;</span>
     <span class="doccomment">/// assert_eq!(1.5.seconds().as_seconds_f32(), 1.5);</span>
     <span class="doccomment">/// assert_eq!((-1.5).seconds().as_seconds_f32(), -1.5);</span>
     <span class="doccomment">/// ```</span>
@@ -1660,24 +1448,10 @@
         <span class="self">self</span>.<span class="ident">seconds</span> <span class="kw">as</span> <span class="ident">f32</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">nanoseconds</span> <span class="kw">as</span> <span class="ident">f32</span> <span class="op">/</span> <span class="number">1_000_000_000.</span>
     }
 
-    <span class="doccomment">/// Create a new `Duration` with the given number of milliseconds.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{Duration, prelude::*};</span>
-    <span class="doccomment">/// assert_eq!(Duration::milliseconds(1), 1_000.microseconds());</span>
-    <span class="doccomment">/// assert_eq!(Duration::milliseconds(-1), (-1_000).microseconds());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">milliseconds</span>(<span class="ident">milliseconds</span>: <span class="ident">i64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">seconds</span>: <span class="ident">milliseconds</span> <span class="op">/</span> <span class="number">1_000</span>,
-            <span class="ident">nanoseconds</span>: ((<span class="ident">milliseconds</span> <span class="op">%</span> <span class="number">1_000</span>) <span class="op">*</span> <span class="number">1_000_000</span>) <span class="kw">as</span> <span class="ident">i32</span>,
-        }
-    }
-
     <span class="doccomment">/// Get the number of whole milliseconds in the duration.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::prelude::*;</span>
+    <span class="doccomment">/// # use time::ext::NumericalDuration;</span>
     <span class="doccomment">/// assert_eq!(1.seconds().whole_milliseconds(), 1_000);</span>
     <span class="doccomment">/// assert_eq!((-1).seconds().whole_milliseconds(), -1_000);</span>
     <span class="doccomment">/// assert_eq!(1.milliseconds().whole_milliseconds(), 1);</span>
@@ -1692,33 +1466,19 @@
     <span class="doccomment">/// Always in the range `-1_000..1_000`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::prelude::*;</span>
+    <span class="doccomment">/// # use time::ext::NumericalDuration;</span>
     <span class="doccomment">/// assert_eq!(1.4.seconds().subsec_milliseconds(), 400);</span>
     <span class="doccomment">/// assert_eq!((-1.4).seconds().subsec_milliseconds(), -400);</span>
     <span class="doccomment">/// ```</span>
     <span class="comment">// Allow the lint, as the value is guaranteed to be less than 1000.</span>
     <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">subsec_milliseconds</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i16</span> {
-        (<span class="self">self</span>.<span class="ident">nanoseconds</span> <span class="op">/</span> <span class="number">1_000_000</span>) <span class="kw">as</span> <span class="ident">i16</span>
-    }
-
-    <span class="doccomment">/// Create a new `Duration` with the given number of microseconds.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{Duration, prelude::*};</span>
-    <span class="doccomment">/// assert_eq!(Duration::microseconds(1), 1_000.nanoseconds());</span>
-    <span class="doccomment">/// assert_eq!(Duration::microseconds(-1), (-1_000).nanoseconds());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">microseconds</span>(<span class="ident">microseconds</span>: <span class="ident">i64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">seconds</span>: <span class="ident">microseconds</span> <span class="op">/</span> <span class="number">1_000_000</span>,
-            <span class="ident">nanoseconds</span>: ((<span class="ident">microseconds</span> <span class="op">%</span> <span class="number">1_000_000</span>) <span class="op">*</span> <span class="number">1_000</span>) <span class="kw">as</span> <span class="ident">i32</span>,
-        }
+        (<span class="self">self</span>.<span class="ident">nanoseconds</span> <span class="op">/</span> <span class="number">1_000_000</span>) <span class="kw">as</span> <span class="kw">_</span>
     }
 
     <span class="doccomment">/// Get the number of whole microseconds in the duration.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::prelude::*;</span>
+    <span class="doccomment">/// # use time::ext::NumericalDuration;</span>
     <span class="doccomment">/// assert_eq!(1.milliseconds().whole_microseconds(), 1_000);</span>
     <span class="doccomment">/// assert_eq!((-1).milliseconds().whole_microseconds(), -1_000);</span>
     <span class="doccomment">/// assert_eq!(1.microseconds().whole_microseconds(), 1);</span>
@@ -1733,7 +1493,7 @@
     <span class="doccomment">/// Always in the range `-1_000_000..1_000_000`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::prelude::*;</span>
+    <span class="doccomment">/// # use time::ext::NumericalDuration;</span>
     <span class="doccomment">/// assert_eq!(1.0004.seconds().subsec_microseconds(), 400);</span>
     <span class="doccomment">/// assert_eq!((-1.0004).seconds().subsec_microseconds(), -400);</span>
     <span class="doccomment">/// ```</span>
@@ -1741,35 +1501,10 @@
         <span class="self">self</span>.<span class="ident">nanoseconds</span> <span class="op">/</span> <span class="number">1_000</span>
     }
 
-    <span class="doccomment">/// Create a new `Duration` with the given number of nanoseconds.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{Duration, prelude::*};</span>
-    <span class="doccomment">/// assert_eq!(Duration::nanoseconds(1), 1.microseconds() / 1_000);</span>
-    <span class="doccomment">/// assert_eq!(Duration::nanoseconds(-1), (-1).microseconds() / 1_000);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">nanoseconds</span>(<span class="ident">nanoseconds</span>: <span class="ident">i64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">seconds</span>: <span class="ident">nanoseconds</span> <span class="op">/</span> <span class="number">1_000_000_000</span>,
-            <span class="ident">nanoseconds</span>: (<span class="ident">nanoseconds</span> <span class="op">%</span> <span class="number">1_000_000_000</span>) <span class="kw">as</span> <span class="ident">i32</span>,
-        }
-    }
-
-    <span class="doccomment">/// Create a new `Duration` with the given number of nanoseconds.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// As the input range cannot be fully mapped to the output, this should</span>
-    <span class="doccomment">/// only be used where it&#39;s known to result in a valid value.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">nanoseconds_i128</span>(<span class="ident">nanoseconds</span>: <span class="ident">i128</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">seconds</span>: (<span class="ident">nanoseconds</span> <span class="op">/</span> <span class="number">1_000_000_000</span>) <span class="kw">as</span> <span class="ident">i64</span>,
-            <span class="ident">nanoseconds</span>: (<span class="ident">nanoseconds</span> <span class="op">%</span> <span class="number">1_000_000_000</span>) <span class="kw">as</span> <span class="ident">i32</span>,
-        }
-    }
-
     <span class="doccomment">/// Get the number of nanoseconds in the duration.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::prelude::*;</span>
+    <span class="doccomment">/// # use time::ext::NumericalDuration;</span>
     <span class="doccomment">/// assert_eq!(1.microseconds().whole_nanoseconds(), 1_000);</span>
     <span class="doccomment">/// assert_eq!((-1).microseconds().whole_nanoseconds(), -1_000);</span>
     <span class="doccomment">/// assert_eq!(1.nanoseconds().whole_nanoseconds(), 1);</span>
@@ -1781,117 +1516,224 @@
 
     <span class="doccomment">/// Get the number of nanoseconds past the number of whole seconds.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The returned value will always be in the range</span>
-    <span class="doccomment">/// `-1_000_000_000..1_000_000_000`.</span>
+    <span class="doccomment">/// The returned value will always be in the range `-1_000_000_000..1_000_000_000`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::prelude::*;</span>
+    <span class="doccomment">/// # use time::ext::NumericalDuration;</span>
     <span class="doccomment">/// assert_eq!(1.000_000_400.seconds().subsec_nanoseconds(), 400);</span>
     <span class="doccomment">/// assert_eq!((-1.000_000_400).seconds().subsec_nanoseconds(), -400);</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">subsec_nanoseconds</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i32</span> {
         <span class="self">self</span>.<span class="ident">nanoseconds</span>
     }
+    <span class="comment">// endregion getters</span>
 
+    <span class="comment">// region: checked arithmetic</span>
     <span class="doccomment">/// Computes `self + rhs`, returning `None` if an overflow occurred.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{Duration, prelude::*};</span>
+    <span class="doccomment">/// # use time::{Duration, ext::NumericalDuration};</span>
     <span class="doccomment">/// assert_eq!(5.seconds().checked_add(5.seconds()), Some(10.seconds()));</span>
-    <span class="doccomment">/// assert_eq!(Duration::max_value().checked_add(1.nanoseconds()), None);</span>
+    <span class="doccomment">/// assert_eq!(Duration::MAX.checked_add(1.nanoseconds()), None);</span>
     <span class="doccomment">/// assert_eq!((-5).seconds().checked_add(5.seconds()), Some(0.seconds()));</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_add</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">seconds</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">seconds</span>.<span class="ident">checked_add</span>(<span class="ident">rhs</span>.<span class="ident">seconds</span>)<span class="question-mark">?</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">checked_add</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">seconds</span> <span class="op">=</span> <span class="macro">const_try_opt!</span>(<span class="self">self</span>.<span class="ident">seconds</span>.<span class="ident">checked_add</span>(<span class="ident">rhs</span>.<span class="ident">seconds</span>));
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nanoseconds</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">nanoseconds</span> <span class="op">+</span> <span class="ident">rhs</span>.<span class="ident">nanoseconds</span>;
 
         <span class="kw">if</span> <span class="ident">nanoseconds</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">1_000_000_000</span> <span class="op">|</span><span class="op">|</span> <span class="ident">seconds</span> <span class="op">&lt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">nanoseconds</span> <span class="op">&gt;</span> <span class="number">0</span> {
             <span class="ident">nanoseconds</span> <span class="op">-</span><span class="op">=</span> <span class="number">1_000_000_000</span>;
-            <span class="ident">seconds</span> <span class="op">=</span> <span class="ident">seconds</span>.<span class="ident">checked_add</span>(<span class="number">1</span>)<span class="question-mark">?</span>;
+            <span class="ident">seconds</span> <span class="op">=</span> <span class="macro">const_try_opt!</span>(<span class="ident">seconds</span>.<span class="ident">checked_add</span>(<span class="number">1</span>));
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">nanoseconds</span> <span class="op">&lt;</span><span class="op">=</span> <span class="op">-</span><span class="number">1_000_000_000</span> <span class="op">|</span><span class="op">|</span> <span class="ident">seconds</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">nanoseconds</span> <span class="op">&lt;</span> <span class="number">0</span> {
             <span class="ident">nanoseconds</span> <span class="op">+</span><span class="op">=</span> <span class="number">1_000_000_000</span>;
-            <span class="ident">seconds</span> <span class="op">=</span> <span class="ident">seconds</span>.<span class="ident">checked_sub</span>(<span class="number">1</span>)<span class="question-mark">?</span>;
+            <span class="ident">seconds</span> <span class="op">=</span> <span class="macro">const_try_opt!</span>(<span class="ident">seconds</span>.<span class="ident">checked_sub</span>(<span class="number">1</span>));
         }
 
-        <span class="comment">// Ensure that the signs match _unless_ one of them is zero.</span>
-        <span class="macro">debug_assert_ne!</span>(<span class="ident">seconds</span>.<span class="ident">signum</span>() <span class="op">*</span> <span class="ident">nanoseconds</span>.<span class="ident">signum</span>() <span class="kw">as</span> <span class="ident">i64</span>, <span class="op">-</span><span class="number">1</span>);
-        <span class="macro">debug_assert!</span>((<span class="op">-</span><span class="number">999_999_999</span>..<span class="number">1_000_000_000</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">nanoseconds</span>));
-
-        <span class="prelude-val">Some</span>(<span class="self">Self</span> {
-            <span class="ident">seconds</span>,
-            <span class="ident">nanoseconds</span>,
-        })
+        <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::new_unchecked</span>(<span class="ident">seconds</span>, <span class="ident">nanoseconds</span>))
     }
 
     <span class="doccomment">/// Computes `self - rhs`, returning `None` if an overflow occurred.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{Duration, prelude::*};</span>
-    <span class="doccomment">/// assert_eq!(5.seconds().checked_sub(5.seconds()), Some(Duration::zero()));</span>
-    <span class="doccomment">/// assert_eq!(Duration::min_value().checked_sub(1.nanoseconds()), None);</span>
+    <span class="doccomment">/// # use time::{Duration, ext::NumericalDuration};</span>
+    <span class="doccomment">/// assert_eq!(5.seconds().checked_sub(5.seconds()), Some(Duration::ZERO));</span>
+    <span class="doccomment">/// assert_eq!(Duration::MIN.checked_sub(1.nanoseconds()), None);</span>
     <span class="doccomment">/// assert_eq!(5.seconds().checked_sub(10.seconds()), Some((-5).seconds()));</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_sub</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">checked_add</span>(<span class="op">-</span><span class="ident">rhs</span>)
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">checked_sub</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">seconds</span> <span class="op">=</span> <span class="macro">const_try_opt!</span>(<span class="self">self</span>.<span class="ident">seconds</span>.<span class="ident">checked_sub</span>(<span class="ident">rhs</span>.<span class="ident">seconds</span>));
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nanoseconds</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">nanoseconds</span> <span class="op">-</span> <span class="ident">rhs</span>.<span class="ident">nanoseconds</span>;
+
+        <span class="kw">if</span> <span class="ident">nanoseconds</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">1_000_000_000</span> <span class="op">|</span><span class="op">|</span> <span class="ident">seconds</span> <span class="op">&lt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">nanoseconds</span> <span class="op">&gt;</span> <span class="number">0</span> {
+            <span class="ident">nanoseconds</span> <span class="op">-</span><span class="op">=</span> <span class="number">1_000_000_000</span>;
+            <span class="ident">seconds</span> <span class="op">=</span> <span class="macro">const_try_opt!</span>(<span class="ident">seconds</span>.<span class="ident">checked_add</span>(<span class="number">1</span>));
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">nanoseconds</span> <span class="op">&lt;</span><span class="op">=</span> <span class="op">-</span><span class="number">1_000_000_000</span> <span class="op">|</span><span class="op">|</span> <span class="ident">seconds</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">nanoseconds</span> <span class="op">&lt;</span> <span class="number">0</span> {
+            <span class="ident">nanoseconds</span> <span class="op">+</span><span class="op">=</span> <span class="number">1_000_000_000</span>;
+            <span class="ident">seconds</span> <span class="op">=</span> <span class="macro">const_try_opt!</span>(<span class="ident">seconds</span>.<span class="ident">checked_sub</span>(<span class="number">1</span>));
+        }
+
+        <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::new_unchecked</span>(<span class="ident">seconds</span>, <span class="ident">nanoseconds</span>))
     }
 
     <span class="doccomment">/// Computes `self * rhs`, returning `None` if an overflow occurred.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{Duration, prelude::*};</span>
+    <span class="doccomment">/// # use time::{Duration, ext::NumericalDuration};</span>
     <span class="doccomment">/// assert_eq!(5.seconds().checked_mul(2), Some(10.seconds()));</span>
     <span class="doccomment">/// assert_eq!(5.seconds().checked_mul(-2), Some((-10).seconds()));</span>
     <span class="doccomment">/// assert_eq!(5.seconds().checked_mul(0), Some(0.seconds()));</span>
-    <span class="doccomment">/// assert_eq!(Duration::max_value().checked_mul(2), None);</span>
-    <span class="doccomment">/// assert_eq!(Duration::min_value().checked_mul(2), None);</span>
+    <span class="doccomment">/// assert_eq!(Duration::MAX.checked_mul(2), None);</span>
+    <span class="doccomment">/// assert_eq!(Duration::MIN.checked_mul(2), None);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_mul</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">checked_mul</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="comment">// Multiply nanoseconds as i64, because it cannot overflow that way.</span>
         <span class="kw">let</span> <span class="ident">total_nanos</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">nanoseconds</span> <span class="kw">as</span> <span class="ident">i64</span> <span class="op">*</span> <span class="ident">rhs</span> <span class="kw">as</span> <span class="ident">i64</span>;
         <span class="kw">let</span> <span class="ident">extra_secs</span> <span class="op">=</span> <span class="ident">total_nanos</span> <span class="op">/</span> <span class="number">1_000_000_000</span>;
-        <span class="kw">let</span> <span class="ident">nanoseconds</span> <span class="op">=</span> (<span class="ident">total_nanos</span> <span class="op">%</span> <span class="number">1_000_000_000</span>) <span class="kw">as</span> <span class="ident">i32</span>;
-        <span class="kw">let</span> <span class="ident">seconds</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">seconds</span>
-            .<span class="ident">checked_mul</span>(<span class="ident">rhs</span> <span class="kw">as</span> <span class="ident">i64</span>)<span class="question-mark">?</span>
-            .<span class="ident">checked_add</span>(<span class="ident">extra_secs</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">nanoseconds</span> <span class="op">=</span> (<span class="ident">total_nanos</span> <span class="op">%</span> <span class="number">1_000_000_000</span>) <span class="kw">as</span> <span class="kw">_</span>;
+        <span class="kw">let</span> <span class="ident">seconds</span> <span class="op">=</span> <span class="macro">const_try_opt!</span>(
+            <span class="macro">const_try_opt!</span>(<span class="self">self</span>.<span class="ident">seconds</span>.<span class="ident">checked_mul</span>(<span class="ident">rhs</span> <span class="kw">as</span> <span class="kw">_</span>)).<span class="ident">checked_add</span>(<span class="ident">extra_secs</span>)
+        );
 
-        <span class="prelude-val">Some</span>(<span class="self">Self</span> {
-            <span class="ident">seconds</span>,
-            <span class="ident">nanoseconds</span>,
-        })
+        <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::new_unchecked</span>(<span class="ident">seconds</span>, <span class="ident">nanoseconds</span>))
     }
 
-    <span class="doccomment">/// Computes `self / rhs`, returning `None` if `rhs == 0`.</span>
+    <span class="doccomment">/// Computes `self / rhs`, returning `None` if `rhs == 0` or if the result would overflow.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::prelude::*;</span>
+    <span class="doccomment">/// # use time::ext::NumericalDuration;</span>
     <span class="doccomment">/// assert_eq!(10.seconds().checked_div(2), Some(5.seconds()));</span>
     <span class="doccomment">/// assert_eq!(10.seconds().checked_div(-2), Some((-5).seconds()));</span>
     <span class="doccomment">/// assert_eq!(1.seconds().checked_div(0), None);</span>
     <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_const_for_fn</span>)]</span> <span class="comment">// requires Rust 1.52</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_div</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">seconds</span> <span class="op">=</span> <span class="macro">const_try_opt!</span>(<span class="self">self</span>.<span class="ident">seconds</span>.<span class="ident">checked_div</span>(<span class="ident">rhs</span> <span class="kw">as</span> <span class="ident">i64</span>));
+        <span class="kw">let</span> <span class="ident">carry</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">seconds</span> <span class="op">-</span> <span class="ident">seconds</span> <span class="op">*</span> (<span class="ident">rhs</span> <span class="kw">as</span> <span class="ident">i64</span>);
+        <span class="kw">let</span> <span class="ident">extra_nanos</span> <span class="op">=</span> <span class="macro">const_try_opt!</span>((<span class="ident">carry</span> <span class="op">*</span> <span class="number">1_000_000_000</span>).<span class="ident">checked_div</span>(<span class="ident">rhs</span> <span class="kw">as</span> <span class="ident">i64</span>));
+        <span class="kw">let</span> <span class="ident">nanoseconds</span> <span class="op">=</span> <span class="macro">const_try_opt!</span>(<span class="self">self</span>.<span class="ident">nanoseconds</span>.<span class="ident">checked_div</span>(<span class="ident">rhs</span>)) <span class="op">+</span> (<span class="ident">extra_nanos</span> <span class="kw">as</span> <span class="ident">i32</span>);
+
+        <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::new_unchecked</span>(<span class="ident">seconds</span>, <span class="ident">nanoseconds</span>))
+    }
+    <span class="comment">// endregion checked arithmetic</span>
+
+    <span class="comment">// region: saturating arithmetic</span>
+    <span class="doccomment">/// Computes `self + rhs`, saturating if an overflow occurred.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This function is `const fn` when using rustc &gt;= 1.46.</span>
-    <span class="attribute">#[<span class="ident">const_fn</span>(<span class="string">&quot;1.46&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">checked_div</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">rhs</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::{Duration, ext::NumericalDuration};</span>
+    <span class="doccomment">/// assert_eq!(5.seconds().saturating_add(5.seconds()), 10.seconds());</span>
+    <span class="doccomment">/// assert_eq!(Duration::MAX.saturating_add(1.nanoseconds()), Duration::MAX);</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     Duration::MIN.saturating_add((-1).nanoseconds()),</span>
+    <span class="doccomment">///     Duration::MIN</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// assert_eq!((-5).seconds().saturating_add(5.seconds()), Duration::ZERO);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">saturating_add</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">seconds</span>, <span class="ident">overflow</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">seconds</span>.<span class="ident">overflowing_add</span>(<span class="ident">rhs</span>.<span class="ident">seconds</span>);
+        <span class="kw">if</span> <span class="ident">overflow</span> {
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">seconds</span> <span class="op">&gt;</span> <span class="number">0</span> {
+                <span class="kw">return</span> <span class="ident"><span class="self">Self</span>::MAX</span>;
+            }
+            <span class="kw">return</span> <span class="ident"><span class="self">Self</span>::MIN</span>;
+        }
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nanoseconds</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">nanoseconds</span> <span class="op">+</span> <span class="ident">rhs</span>.<span class="ident">nanoseconds</span>;
+
+        <span class="kw">if</span> <span class="ident">nanoseconds</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">1_000_000_000</span> <span class="op">|</span><span class="op">|</span> <span class="ident">seconds</span> <span class="op">&lt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">nanoseconds</span> <span class="op">&gt;</span> <span class="number">0</span> {
+            <span class="ident">nanoseconds</span> <span class="op">-</span><span class="op">=</span> <span class="number">1_000_000_000</span>;
+            <span class="ident">seconds</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">seconds</span>.<span class="ident">checked_add</span>(<span class="number">1</span>) {
+                <span class="prelude-val">Some</span>(<span class="ident">seconds</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">seconds</span>,
+                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident"><span class="self">Self</span>::MAX</span>,
+            };
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">nanoseconds</span> <span class="op">&lt;</span><span class="op">=</span> <span class="op">-</span><span class="number">1_000_000_000</span> <span class="op">|</span><span class="op">|</span> <span class="ident">seconds</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">nanoseconds</span> <span class="op">&lt;</span> <span class="number">0</span> {
+            <span class="ident">nanoseconds</span> <span class="op">+</span><span class="op">=</span> <span class="number">1_000_000_000</span>;
+            <span class="ident">seconds</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">seconds</span>.<span class="ident">checked_sub</span>(<span class="number">1</span>) {
+                <span class="prelude-val">Some</span>(<span class="ident">seconds</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">seconds</span>,
+                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident"><span class="self">Self</span>::MIN</span>,
+            };
         }
 
-        <span class="kw">let</span> <span class="ident">seconds</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">seconds</span> <span class="op">/</span> (<span class="ident">rhs</span> <span class="kw">as</span> <span class="ident">i64</span>);
-        <span class="kw">let</span> <span class="ident">carry</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">seconds</span> <span class="op">-</span> <span class="ident">seconds</span> <span class="op">*</span> (<span class="ident">rhs</span> <span class="kw">as</span> <span class="ident">i64</span>);
-        <span class="kw">let</span> <span class="ident">extra_nanos</span> <span class="op">=</span> <span class="ident">carry</span> <span class="op">*</span> <span class="number">1_000_000_000</span> <span class="op">/</span> (<span class="ident">rhs</span> <span class="kw">as</span> <span class="ident">i64</span>);
-        <span class="kw">let</span> <span class="ident">nanoseconds</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">nanoseconds</span> <span class="op">/</span> <span class="ident">rhs</span> <span class="op">+</span> (<span class="ident">extra_nanos</span> <span class="kw">as</span> <span class="ident">i32</span>);
-
-        <span class="prelude-val">Some</span>(<span class="self">Self</span> {
-            <span class="ident">seconds</span>,
-            <span class="ident">nanoseconds</span>,
-        })
+        <span class="ident"><span class="self">Self</span>::new_unchecked</span>(<span class="ident">seconds</span>, <span class="ident">nanoseconds</span>)
     }
 
-    <span class="doccomment">/// Runs a closure, returning the duration of time it took to run. The</span>
-    <span class="doccomment">/// return value of the closure is provided in the second part of the tuple.</span>
+    <span class="doccomment">/// Computes `self - rhs`, saturating if an overflow occurred.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::{Duration, ext::NumericalDuration};</span>
+    <span class="doccomment">/// assert_eq!(5.seconds().saturating_sub(5.seconds()), Duration::ZERO);</span>
+    <span class="doccomment">/// assert_eq!(Duration::MIN.saturating_sub(1.nanoseconds()), Duration::MIN);</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     Duration::MAX.saturating_sub((-1).nanoseconds()),</span>
+    <span class="doccomment">///     Duration::MAX</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// assert_eq!(5.seconds().saturating_sub(10.seconds()), (-5).seconds());</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">saturating_sub</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">seconds</span>, <span class="ident">overflow</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">seconds</span>.<span class="ident">overflowing_sub</span>(<span class="ident">rhs</span>.<span class="ident">seconds</span>);
+        <span class="kw">if</span> <span class="ident">overflow</span> {
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">seconds</span> <span class="op">&gt;</span> <span class="number">0</span> {
+                <span class="kw">return</span> <span class="ident"><span class="self">Self</span>::MAX</span>;
+            }
+            <span class="kw">return</span> <span class="ident"><span class="self">Self</span>::MIN</span>;
+        }
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nanoseconds</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">nanoseconds</span> <span class="op">-</span> <span class="ident">rhs</span>.<span class="ident">nanoseconds</span>;
+
+        <span class="kw">if</span> <span class="ident">nanoseconds</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">1_000_000_000</span> <span class="op">|</span><span class="op">|</span> <span class="ident">seconds</span> <span class="op">&lt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">nanoseconds</span> <span class="op">&gt;</span> <span class="number">0</span> {
+            <span class="ident">nanoseconds</span> <span class="op">-</span><span class="op">=</span> <span class="number">1_000_000_000</span>;
+            <span class="ident">seconds</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">seconds</span>.<span class="ident">checked_add</span>(<span class="number">1</span>) {
+                <span class="prelude-val">Some</span>(<span class="ident">seconds</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">seconds</span>,
+                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident"><span class="self">Self</span>::MAX</span>,
+            };
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">nanoseconds</span> <span class="op">&lt;</span><span class="op">=</span> <span class="op">-</span><span class="number">1_000_000_000</span> <span class="op">|</span><span class="op">|</span> <span class="ident">seconds</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">nanoseconds</span> <span class="op">&lt;</span> <span class="number">0</span> {
+            <span class="ident">nanoseconds</span> <span class="op">+</span><span class="op">=</span> <span class="number">1_000_000_000</span>;
+            <span class="ident">seconds</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">seconds</span>.<span class="ident">checked_sub</span>(<span class="number">1</span>) {
+                <span class="prelude-val">Some</span>(<span class="ident">seconds</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">seconds</span>,
+                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident"><span class="self">Self</span>::MIN</span>,
+            };
+        }
+
+        <span class="ident"><span class="self">Self</span>::new_unchecked</span>(<span class="ident">seconds</span>, <span class="ident">nanoseconds</span>)
+    }
+
+    <span class="doccomment">/// Computes `self * rhs`, saturating if an overflow occurred.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::{Duration, ext::NumericalDuration};</span>
+    <span class="doccomment">/// assert_eq!(5.seconds().saturating_mul(2), 10.seconds());</span>
+    <span class="doccomment">/// assert_eq!(5.seconds().saturating_mul(-2), (-10).seconds());</span>
+    <span class="doccomment">/// assert_eq!(5.seconds().saturating_mul(0), Duration::ZERO);</span>
+    <span class="doccomment">/// assert_eq!(Duration::MAX.saturating_mul(2), Duration::MAX);</span>
+    <span class="doccomment">/// assert_eq!(Duration::MIN.saturating_mul(2), Duration::MIN);</span>
+    <span class="doccomment">/// assert_eq!(Duration::MAX.saturating_mul(-2), Duration::MIN);</span>
+    <span class="doccomment">/// assert_eq!(Duration::MIN.saturating_mul(-2), Duration::MAX);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">saturating_mul</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="comment">// Multiply nanoseconds as i64, because it cannot overflow that way.</span>
+        <span class="kw">let</span> <span class="ident">total_nanos</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">nanoseconds</span> <span class="kw">as</span> <span class="ident">i64</span> <span class="op">*</span> <span class="ident">rhs</span> <span class="kw">as</span> <span class="ident">i64</span>;
+        <span class="kw">let</span> <span class="ident">extra_secs</span> <span class="op">=</span> <span class="ident">total_nanos</span> <span class="op">/</span> <span class="number">1_000_000_000</span>;
+        <span class="kw">let</span> <span class="ident">nanoseconds</span> <span class="op">=</span> (<span class="ident">total_nanos</span> <span class="op">%</span> <span class="number">1_000_000_000</span>) <span class="kw">as</span> <span class="kw">_</span>;
+        <span class="kw">let</span> (<span class="ident">seconds</span>, <span class="ident">overflow1</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">seconds</span>.<span class="ident">overflowing_mul</span>(<span class="ident">rhs</span> <span class="kw">as</span> <span class="kw">_</span>);
+        <span class="kw">if</span> <span class="ident">overflow1</span> {
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">seconds</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">rhs</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">seconds</span> <span class="op">&lt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">rhs</span> <span class="op">&lt;</span> <span class="number">0</span> {
+                <span class="kw">return</span> <span class="ident"><span class="self">Self</span>::MAX</span>;
+            }
+            <span class="kw">return</span> <span class="ident"><span class="self">Self</span>::MIN</span>;
+        }
+        <span class="kw">let</span> (<span class="ident">seconds</span>, <span class="ident">overflow2</span>) <span class="op">=</span> <span class="ident">seconds</span>.<span class="ident">overflowing_add</span>(<span class="ident">extra_secs</span>);
+        <span class="kw">if</span> <span class="ident">overflow2</span> {
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">seconds</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">rhs</span> <span class="op">&gt;</span> <span class="number">0</span> {
+                <span class="kw">return</span> <span class="ident"><span class="self">Self</span>::MAX</span>;
+            }
+            <span class="kw">return</span> <span class="ident"><span class="self">Self</span>::MIN</span>;
+        }
+
+        <span class="ident"><span class="self">Self</span>::new_unchecked</span>(<span class="ident">seconds</span>, <span class="ident">nanoseconds</span>)
+    }
+    <span class="comment">// endregion saturating arithmetic</span>
+
+    <span class="doccomment">/// Runs a closure, returning the duration of time it took to run. The return value of the</span>
+    <span class="doccomment">/// closure is provided in the second part of the tuple.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">__time_02_docs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">time_fn</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="self">Self</span>, <span class="ident">T</span>) {
         <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
         <span class="kw">let</span> <span class="ident">return_value</span> <span class="op">=</span> <span class="ident">f</span>();
@@ -1901,110 +1743,7 @@
     }
 }
 
-<span class="doccomment">/// Functions that have been renamed or had signatures changed since v0.1. As</span>
-<span class="doccomment">/// such, they are deprecated.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;deprecated&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_docs_in_private_items</span>, <span class="ident">clippy::missing_const_for_fn</span>)]</span>
-<span class="kw">impl</span> <span class="ident">Duration</span> {
-    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.2.0&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use the `whole_weeks` function&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num_weeks</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i64</span> {
-        <span class="self">self</span>.<span class="ident">whole_weeks</span>()
-    }
-
-    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.2.0&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use the `whole_days` function&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num_days</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i64</span> {
-        <span class="self">self</span>.<span class="ident">whole_days</span>()
-    }
-
-    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.2.0&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use the `whole_hours` function&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num_hours</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i64</span> {
-        <span class="self">self</span>.<span class="ident">whole_hours</span>()
-    }
-
-    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.2.0&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use the `whole_minutes` function&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num_minutes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i64</span> {
-        <span class="self">self</span>.<span class="ident">whole_minutes</span>()
-    }
-
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_const_for_fn</span>)]</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.2.0&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use the `whole_seconds` function&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num_seconds</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i64</span> {
-        <span class="self">self</span>.<span class="ident">whole_seconds</span>()
-    }
-
-    <span class="doccomment">/// [`Duration::whole_milliseconds`] returns an `i128`, rather than</span>
-    <span class="doccomment">/// panicking on overflow. To avoid panicking, this method currently limits</span>
-    <span class="doccomment">/// the value to the range `i64::min_value()..=i64::max_value()`.</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(
-        <span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.2.0&quot;</span>,
-        <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use the `whole_milliseconds` function. The value is clamped between \
-                `i64::min_value()` and `i64::max_value()`.&quot;</span>
-    )]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num_milliseconds</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i64</span> {
-        <span class="kw">let</span> <span class="ident">millis</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">whole_milliseconds</span>();
-
-        <span class="kw">if</span> <span class="ident">millis</span> <span class="op">&gt;</span> <span class="ident">i64::max_value</span>() <span class="kw">as</span> <span class="ident">i128</span> {
-            <span class="kw">return</span> <span class="ident">i64::max_value</span>();
-        }
-
-        <span class="kw">if</span> <span class="ident">millis</span> <span class="op">&lt;</span> <span class="ident">i64::min_value</span>() <span class="kw">as</span> <span class="ident">i128</span> {
-            <span class="kw">return</span> <span class="ident">i64::min_value</span>();
-        }
-
-        <span class="ident">millis</span> <span class="kw">as</span> <span class="ident">i64</span>
-    }
-
-    <span class="doccomment">/// [`Duration::whole_microseconds`] returns an `i128` rather than returning</span>
-    <span class="doccomment">/// `None` on `i64` overflow.</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.2.0&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use the `whole_microseconds` function&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num_microseconds</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">micros</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">whole_microseconds</span>();
-
-        <span class="kw">if</span> <span class="ident">micros</span>.<span class="ident">abs</span>() <span class="op">&gt;</span> <span class="ident">i64::max_value</span>() <span class="kw">as</span> <span class="ident">i128</span> {
-            <span class="prelude-val">None</span>
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">micros</span> <span class="kw">as</span> <span class="ident">i64</span>)
-        }
-    }
-
-    <span class="doccomment">/// [`Duration::whole_nanoseconds`] returns an `i128` rather than returning</span>
-    <span class="doccomment">/// `None` on `i64` overflow.</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.2.0&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use the `whole_nanoseconds` function&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num_nanoseconds</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">nanos</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">whole_nanoseconds</span>();
-
-        <span class="kw">if</span> <span class="ident">nanos</span>.<span class="ident">abs</span>() <span class="op">&gt;</span> <span class="ident">i64::max_value</span>() <span class="kw">as</span> <span class="ident">i128</span> {
-            <span class="prelude-val">None</span>
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">nanos</span> <span class="kw">as</span> <span class="ident">i64</span>)
-        }
-    }
-
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.2.0&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use the `time_fn` function&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">span</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnOnce</span>()<span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::time_fn</span>(<span class="ident">f</span>).<span class="number">0</span>
-    }
-
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(
-        <span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.2.0&quot;</span>,
-        <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use `Duration::try_from(value)` or `value.try_into()`&quot;</span>
-    )]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_std</span>(<span class="ident">std</span>: <span class="ident">StdDuration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::ConversionRange</span><span class="op">&gt;</span> {
-        <span class="ident">std</span>.<span class="ident">try_into</span>()
-    }
-
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(
-        <span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.2.0&quot;</span>,
-        <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use `std::time::Duration::try_from(value)` or `value.try_into()`&quot;</span>
-    )]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_std</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">StdDuration</span>, <span class="ident">error::ConversionRange</span><span class="op">&gt;</span> {
-        (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">try_into</span>()
-    }
-}
-
+<span class="comment">// region: trait impls</span>
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">StdDuration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Duration</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">error::ConversionRange</span>;
 
@@ -2014,10 +1753,7 @@
                 .<span class="ident">as_secs</span>()
                 .<span class="ident">try_into</span>()
                 .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">error::ConversionRange</span>)<span class="question-mark">?</span>,
-            <span class="ident">original</span>
-                .<span class="ident">subsec_nanos</span>()
-                .<span class="ident">try_into</span>()
-                .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">error::ConversionRange</span>)<span class="question-mark">?</span>,
+            <span class="ident">original</span>.<span class="ident">subsec_nanos</span>() <span class="kw">as</span> <span class="kw">_</span>,
         ))
     }
 }
@@ -2065,23 +1801,13 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">AddAssign</span> <span class="kw">for</span> <span class="ident">Duration</span> {
-    <span class="kw">fn</span> <span class="ident">add_assign</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span> <span class="op">+</span> <span class="ident">rhs</span>;
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">AddAssign</span><span class="op">&lt;</span><span class="ident">StdDuration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Duration</span> {
-    <span class="kw">fn</span> <span class="ident">add_assign</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">StdDuration</span>) {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span> <span class="op">+</span> <span class="ident">rhs</span>;
-    }
-}
+<span class="macro">impl_add_assign!</span>(<span class="ident">Duration</span>: <span class="ident">Duration</span>, <span class="ident">StdDuration</span>);
 
 <span class="kw">impl</span> <span class="ident">Neg</span> <span class="kw">for</span> <span class="ident">Duration</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
 
     <span class="kw">fn</span> <span class="ident">neg</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="op">-</span><span class="number">1</span> <span class="op">*</span> <span class="self">self</span>
+        <span class="ident"><span class="self">Self</span>::new_unchecked</span>(<span class="op">-</span><span class="self">self</span>.<span class="ident">seconds</span>, <span class="op">-</span><span class="self">self</span>.<span class="ident">nanoseconds</span>)
     }
 }
 
@@ -2113,17 +1839,7 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">SubAssign</span> <span class="kw">for</span> <span class="ident">Duration</span> {
-    <span class="kw">fn</span> <span class="ident">sub_assign</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span> <span class="op">-</span> <span class="ident">rhs</span>;
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">SubAssign</span><span class="op">&lt;</span><span class="ident">StdDuration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Duration</span> {
-    <span class="kw">fn</span> <span class="ident">sub_assign</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">StdDuration</span>) {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span> <span class="op">-</span> <span class="ident">rhs</span>;
-    }
-}
+<span class="macro">impl_sub_assign!</span>(<span class="ident">Duration</span>: <span class="ident">Duration</span>, <span class="ident">StdDuration</span>);
 
 <span class="kw">impl</span> <span class="ident">SubAssign</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StdDuration</span> {
     <span class="kw">fn</span> <span class="ident">sub_assign</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">Duration</span>) {
@@ -2134,50 +1850,37 @@
     }
 }
 
+<span class="doccomment">/// Implement `Mul` (reflexively) and `Div` for `Duration` for various types.</span>
 <span class="macro">macro_rules!</span> <span class="ident">duration_mul_div_int</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="kw">type</span>:<span class="macro-nonterminal">ty</span>),<span class="op">+</span>) <span class="op">=</span><span class="op">&gt;</span> {
-        $(
-            <span class="kw">impl</span> <span class="ident">Mul</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="kw">type</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">Duration</span> {
-                <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
+    ($(<span class="macro-nonterminal">$</span><span class="kw">type</span>:<span class="macro-nonterminal">ty</span>),<span class="op">+</span>) <span class="op">=</span><span class="op">&gt;</span> {$(
+        <span class="kw">impl</span> <span class="ident">Mul</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="kw">type</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">Duration</span> {
+            <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
 
-                <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="macro-nonterminal">$</span><span class="kw">type</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">Self::Output</span> {
-                    <span class="ident"><span class="self">Self</span>::nanoseconds_i128</span>(
-                        <span class="self">self</span>.<span class="ident">whole_nanoseconds</span>()
-                            .<span class="ident">checked_mul</span>(<span class="ident">rhs</span> <span class="kw">as</span> <span class="ident">i128</span>)
-                            .<span class="ident">expect</span>(<span class="string">&quot;overflow when multiplying duration&quot;</span>)
-                    )
-                }
+            <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="macro-nonterminal">$</span><span class="kw">type</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">Self::Output</span> {
+                <span class="ident"><span class="self">Self</span>::nanoseconds_i128</span>(
+                    <span class="self">self</span>.<span class="ident">whole_nanoseconds</span>()
+                        .<span class="ident">checked_mul</span>(<span class="ident">rhs</span> <span class="kw">as</span> <span class="kw">_</span>)
+                        .<span class="ident">expect</span>(<span class="string">&quot;overflow when multiplying duration&quot;</span>)
+                )
             }
+        }
 
-            <span class="kw">impl</span> <span class="ident">MulAssign</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="kw">type</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">Duration</span> {
-                <span class="kw">fn</span> <span class="ident">mul_assign</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="macro-nonterminal">$</span><span class="kw">type</span>) {
-                    <span class="kw-2">*</span><span class="macro-nonterminal">self</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span> <span class="op">*</span> <span class="ident">rhs</span>;
-                }
+        <span class="kw">impl</span> <span class="ident">Mul</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="kw">type</span> {
+            <span class="kw">type</span> <span class="macro-nonterminal">Output</span> <span class="op">=</span> <span class="ident">Duration</span>;
+
+            <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Output</span> {
+                <span class="ident">rhs</span> <span class="op">*</span> <span class="self">self</span>
             }
+        }
 
-            <span class="kw">impl</span> <span class="ident">Mul</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="kw">type</span> {
-                <span class="kw">type</span> <span class="macro-nonterminal">Output</span> <span class="op">=</span> <span class="ident">Duration</span>;
+        <span class="kw">impl</span> <span class="ident">Div</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="kw">type</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">Duration</span> {
+            <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
 
-                <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Output</span> {
-                    <span class="ident">rhs</span> <span class="op">*</span> <span class="self">self</span>
-                }
+            <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="macro-nonterminal">$</span><span class="kw">type</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">Self::Output</span> {
+                <span class="ident"><span class="self">Self</span>::nanoseconds_i128</span>(<span class="self">self</span>.<span class="ident">whole_nanoseconds</span>() <span class="op">/</span> <span class="ident">rhs</span> <span class="kw">as</span> <span class="ident">i128</span>)
             }
-
-            <span class="kw">impl</span> <span class="ident">Div</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="kw">type</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">Duration</span> {
-                <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
-
-                <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="macro-nonterminal">$</span><span class="kw">type</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">Self::Output</span> {
-                    <span class="ident"><span class="self">Self</span>::nanoseconds_i128</span>(<span class="self">self</span>.<span class="ident">whole_nanoseconds</span>() <span class="op">/</span> <span class="ident">rhs</span> <span class="kw">as</span> <span class="ident">i128</span>)
-                }
-            }
-
-            <span class="kw">impl</span> <span class="ident">DivAssign</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="kw">type</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">Duration</span> {
-                <span class="kw">fn</span> <span class="ident">div_assign</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="macro-nonterminal">$</span><span class="kw">type</span>) {
-                    <span class="kw-2">*</span><span class="macro-nonterminal">self</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span> <span class="op">/</span> <span class="ident">rhs</span>;
-                }
-            }
-        )<span class="op">+</span>
-    };
+        }
+    )<span class="op">+</span>};
 }
 <span class="macro">duration_mul_div_int!</span>[<span class="ident">i8</span>, <span class="ident">i16</span>, <span class="ident">i32</span>, <span class="ident">u8</span>, <span class="ident">u16</span>, <span class="ident">u32</span>];
 
@@ -2186,12 +1889,6 @@
 
     <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">f32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Output</span> {
         <span class="ident"><span class="self">Self</span>::seconds_f32</span>(<span class="self">self</span>.<span class="ident">as_seconds_f32</span>() <span class="op">*</span> <span class="ident">rhs</span>)
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">MulAssign</span><span class="op">&lt;</span><span class="ident">f32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Duration</span> {
-    <span class="kw">fn</span> <span class="ident">mul_assign</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">f32</span>) {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span> <span class="op">*</span> <span class="ident">rhs</span>;
     }
 }
 
@@ -2211,12 +1908,6 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">MulAssign</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Duration</span> {
-    <span class="kw">fn</span> <span class="ident">mul_assign</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">f64</span>) {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span> <span class="op">*</span> <span class="ident">rhs</span>;
-    }
-}
-
 <span class="kw">impl</span> <span class="ident">Mul</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">f64</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Duration</span>;
 
@@ -2225,17 +1916,13 @@
     }
 }
 
+<span class="macro">impl_mul_assign!</span>(<span class="ident">Duration</span>: <span class="ident">i8</span>, <span class="ident">i16</span>, <span class="ident">i32</span>, <span class="ident">u8</span>, <span class="ident">u16</span>, <span class="ident">u32</span>, <span class="ident">f32</span>, <span class="ident">f64</span>);
+
 <span class="kw">impl</span> <span class="ident">Div</span><span class="op">&lt;</span><span class="ident">f32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Duration</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
 
     <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">f32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Output</span> {
         <span class="ident"><span class="self">Self</span>::seconds_f32</span>(<span class="self">self</span>.<span class="ident">as_seconds_f32</span>() <span class="op">/</span> <span class="ident">rhs</span>)
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">DivAssign</span><span class="op">&lt;</span><span class="ident">f32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Duration</span> {
-    <span class="kw">fn</span> <span class="ident">div_assign</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">f32</span>) {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span> <span class="op">/</span> <span class="ident">rhs</span>;
     }
 }
 
@@ -2247,13 +1934,9 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">DivAssign</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Duration</span> {
-    <span class="kw">fn</span> <span class="ident">div_assign</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">f64</span>) {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span> <span class="op">/</span> <span class="ident">rhs</span>;
-    }
-}
+<span class="macro">impl_div_assign!</span>(<span class="ident">Duration</span>: <span class="ident">i8</span>, <span class="ident">i16</span>, <span class="ident">i32</span>, <span class="ident">u8</span>, <span class="ident">u16</span>, <span class="ident">u32</span>, <span class="ident">f32</span>, <span class="ident">f64</span>);
 
-<span class="kw">impl</span> <span class="ident">Div</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Duration</span> {
+<span class="kw">impl</span> <span class="ident">Div</span> <span class="kw">for</span> <span class="ident">Duration</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span>;
 
     <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Output</span> {
@@ -2289,22 +1972,16 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialOrd</span> <span class="kw">for</span> <span class="ident">Duration</span> {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">cmp</span>(<span class="ident">rhs</span>))
-    }
-}
-
 <span class="kw">impl</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">StdDuration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Duration</span> {
     <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="ident">StdDuration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">rhs</span>.<span class="ident">as_secs</span>() <span class="op">&gt;</span> <span class="ident">i64::max_value</span>() <span class="kw">as</span> <span class="ident">u64</span> {
+        <span class="kw">if</span> <span class="ident">rhs</span>.<span class="ident">as_secs</span>() <span class="op">&gt;</span> <span class="ident">i64::MAX</span> <span class="kw">as</span> <span class="kw">_</span> {
             <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">Ordering::Less</span>);
         }
 
         <span class="prelude-val">Some</span>(
             <span class="self">self</span>.<span class="ident">seconds</span>
-                .<span class="ident">cmp</span>(<span class="kw-2">&amp;</span>(<span class="ident">rhs</span>.<span class="ident">as_secs</span>() <span class="kw">as</span> <span class="ident">i64</span>))
-                .<span class="ident">then_with</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">nanoseconds</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span>(<span class="ident">rhs</span>.<span class="ident">subsec_nanos</span>() <span class="kw">as</span> <span class="ident">i32</span>))),
+                .<span class="ident">cmp</span>(<span class="kw-2">&amp;</span>(<span class="ident">rhs</span>.<span class="ident">as_secs</span>() <span class="kw">as</span> <span class="kw">_</span>))
+                .<span class="ident">then_with</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">nanoseconds</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span>(<span class="ident">rhs</span>.<span class="ident">subsec_nanos</span>() <span class="kw">as</span> <span class="kw">_</span>))),
         )
     }
 }
@@ -2315,13 +1992,18 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">Duration</span> {
-    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ordering</span> {
-        <span class="self">self</span>.<span class="ident">seconds</span>
-            .<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">rhs</span>.<span class="ident">seconds</span>)
-            .<span class="ident">then_with</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">nanoseconds</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">rhs</span>.<span class="ident">nanoseconds</span>))
+<span class="kw">impl</span> <span class="ident">Sum</span> <span class="kw">for</span> <span class="ident">Duration</span> {
+    <span class="kw">fn</span> <span class="ident">sum</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">iter</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="ident">iter</span>.<span class="ident">reduce</span>(<span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> <span class="ident">a</span> <span class="op">+</span> <span class="ident">b</span>).<span class="ident">unwrap_or_default</span>()
     }
 }
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Sum</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">Self</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Duration</span> {
+    <span class="kw">fn</span> <span class="ident">sum</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">iter</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="ident">iter</span>.<span class="ident">copied</span>().<span class="ident">sum</span>()
+    }
+}
+<span class="comment">// endregion trait impls</span>
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="time" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>

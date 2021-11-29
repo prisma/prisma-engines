@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;time-0.2.27&#x2F;src&#x2F;lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="https:&#x2F;&#x2F;avatars0.githubusercontent.com&#x2F;u&#x2F;55999857"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../time/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;avatars0.githubusercontent.com&#x2F;u&#x2F;55999857' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;time-0.3.5&#x2F;src&#x2F;lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="https:&#x2F;&#x2F;avatars0.githubusercontent.com&#x2F;u&#x2F;55999857"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../time/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;avatars0.githubusercontent.com&#x2F;u&#x2F;55999857' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -333,334 +333,84 @@
 <span id="333">333</span>
 <span id="334">334</span>
 <span id="335">335</span>
-<span id="336">336</span>
-<span id="337">337</span>
-<span id="338">338</span>
-<span id="339">339</span>
-<span id="340">340</span>
-<span id="341">341</span>
-<span id="342">342</span>
-<span id="343">343</span>
-<span id="344">344</span>
-<span id="345">345</span>
-<span id="346">346</span>
-<span id="347">347</span>
-<span id="348">348</span>
-<span id="349">349</span>
-<span id="350">350</span>
-<span id="351">351</span>
-<span id="352">352</span>
-<span id="353">353</span>
-<span id="354">354</span>
-<span id="355">355</span>
-<span id="356">356</span>
-<span id="357">357</span>
-<span id="358">358</span>
-<span id="359">359</span>
-<span id="360">360</span>
-<span id="361">361</span>
-<span id="362">362</span>
-<span id="363">363</span>
-<span id="364">364</span>
-<span id="365">365</span>
-<span id="366">366</span>
-<span id="367">367</span>
-<span id="368">368</span>
-<span id="369">369</span>
-<span id="370">370</span>
-<span id="371">371</span>
-<span id="372">372</span>
-<span id="373">373</span>
-<span id="374">374</span>
-<span id="375">375</span>
-<span id="376">376</span>
-<span id="377">377</span>
-<span id="378">378</span>
-<span id="379">379</span>
-<span id="380">380</span>
-<span id="381">381</span>
-<span id="382">382</span>
-<span id="383">383</span>
-<span id="384">384</span>
-<span id="385">385</span>
-<span id="386">386</span>
-<span id="387">387</span>
-<span id="388">388</span>
-<span id="389">389</span>
-<span id="390">390</span>
-<span id="391">391</span>
-<span id="392">392</span>
-<span id="393">393</span>
-<span id="394">394</span>
-<span id="395">395</span>
-<span id="396">396</span>
-<span id="397">397</span>
-<span id="398">398</span>
-<span id="399">399</span>
-<span id="400">400</span>
-<span id="401">401</span>
-<span id="402">402</span>
-<span id="403">403</span>
-<span id="404">404</span>
-<span id="405">405</span>
-<span id="406">406</span>
-<span id="407">407</span>
-<span id="408">408</span>
-<span id="409">409</span>
-<span id="410">410</span>
-<span id="411">411</span>
-<span id="412">412</span>
-<span id="413">413</span>
-<span id="414">414</span>
-<span id="415">415</span>
-<span id="416">416</span>
-<span id="417">417</span>
-<span id="418">418</span>
-<span id="419">419</span>
-<span id="420">420</span>
-<span id="421">421</span>
-<span id="422">422</span>
-<span id="423">423</span>
-<span id="424">424</span>
-<span id="425">425</span>
-<span id="426">426</span>
-<span id="427">427</span>
-<span id="428">428</span>
-<span id="429">429</span>
-<span id="430">430</span>
-<span id="431">431</span>
-<span id="432">432</span>
-<span id="433">433</span>
-<span id="434">434</span>
-<span id="435">435</span>
-<span id="436">436</span>
-<span id="437">437</span>
-<span id="438">438</span>
-<span id="439">439</span>
-<span id="440">440</span>
-<span id="441">441</span>
-<span id="442">442</span>
-<span id="443">443</span>
-<span id="444">444</span>
-<span id="445">445</span>
-<span id="446">446</span>
-<span id="447">447</span>
-<span id="448">448</span>
-<span id="449">449</span>
-<span id="450">450</span>
-<span id="451">451</span>
-<span id="452">452</span>
-<span id="453">453</span>
-<span id="454">454</span>
-<span id="455">455</span>
-<span id="456">456</span>
-<span id="457">457</span>
-<span id="458">458</span>
-<span id="459">459</span>
-<span id="460">460</span>
-<span id="461">461</span>
-<span id="462">462</span>
-<span id="463">463</span>
-<span id="464">464</span>
-<span id="465">465</span>
-<span id="466">466</span>
-<span id="467">467</span>
-<span id="468">468</span>
-<span id="469">469</span>
-<span id="470">470</span>
-<span id="471">471</span>
-<span id="472">472</span>
-<span id="473">473</span>
-<span id="474">474</span>
-<span id="475">475</span>
-<span id="476">476</span>
-<span id="477">477</span>
-<span id="478">478</span>
-<span id="479">479</span>
-<span id="480">480</span>
-<span id="481">481</span>
-<span id="482">482</span>
-<span id="483">483</span>
-<span id="484">484</span>
-<span id="485">485</span>
-<span id="486">486</span>
-<span id="487">487</span>
-<span id="488">488</span>
-<span id="489">489</span>
-<span id="490">490</span>
-<span id="491">491</span>
-<span id="492">492</span>
-<span id="493">493</span>
-<span id="494">494</span>
-<span id="495">495</span>
-<span id="496">496</span>
-<span id="497">497</span>
-<span id="498">498</span>
-<span id="499">499</span>
-<span id="500">500</span>
-<span id="501">501</span>
-<span id="502">502</span>
-<span id="503">503</span>
-<span id="504">504</span>
-<span id="505">505</span>
-<span id="506">506</span>
-<span id="507">507</span>
-<span id="508">508</span>
-<span id="509">509</span>
-<span id="510">510</span>
-<span id="511">511</span>
-<span id="512">512</span>
-<span id="513">513</span>
-<span id="514">514</span>
-<span id="515">515</span>
-<span id="516">516</span>
-<span id="517">517</span>
-<span id="518">518</span>
-<span id="519">519</span>
-<span id="520">520</span>
-<span id="521">521</span>
-<span id="522">522</span>
-<span id="523">523</span>
-<span id="524">524</span>
-<span id="525">525</span>
-<span id="526">526</span>
-<span id="527">527</span>
-<span id="528">528</span>
-<span id="529">529</span>
-<span id="530">530</span>
-<span id="531">531</span>
-<span id="532">532</span>
-<span id="533">533</span>
-<span id="534">534</span>
-<span id="535">535</span>
-<span id="536">536</span>
-<span id="537">537</span>
-<span id="538">538</span>
-<span id="539">539</span>
-<span id="540">540</span>
-<span id="541">541</span>
-<span id="542">542</span>
-<span id="543">543</span>
-<span id="544">544</span>
-<span id="545">545</span>
-<span id="546">546</span>
-<span id="547">547</span>
-<span id="548">548</span>
-<span id="549">549</span>
-<span id="550">550</span>
-<span id="551">551</span>
-<span id="552">552</span>
-<span id="553">553</span>
-</pre><pre class="rust"><code><span class="doccomment">//! [![GitHub time-rs/time](https://img.shields.io/badge/GitHub-time--rs%2Ftime-9b88bb?logo=github&amp;style=for-the-badge)](https://github.com/time-rs/time)</span>
-<span class="doccomment">//! ![license MIT or Apache-2.0](https://img.shields.io/badge/license-MIT%20or%20Apache--2.0-779a6b?style=for-the-badge)</span>
-<span class="doccomment">//! [![minimum rustc 1.32.0](https://img.shields.io/badge/minimum%20rustc-1.32.0-c18170?logo=rust&amp;style=for-the-badge)](https://www.whatrustisit.com)</span>
+</pre><pre class="rust"><code><span class="doccomment">//! # Feature flags</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! # Feature flags</span>
+<span class="doccomment">//! This crate exposes a number of features. These can be enabled or disabled as shown</span>
+<span class="doccomment">//! [in Cargo&#39;s documentation](https://doc.rust-lang.org/cargo/reference/features.html). Features</span>
+<span class="doccomment">//! are _disabled_ by default unless otherwise noted.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! This crate exposes a number of features. These can be enabled or disabled as</span>
-<span class="doccomment">//! shown [in Cargo&#39;s documentation](https://doc.rust-lang.org/cargo/reference/features.html).</span>
-<span class="doccomment">//! Features are _disabled_ by default unless otherwise noted.</span>
+<span class="doccomment">//! Reliance on a given feature is always indicated alongside the item definition.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! Reliance on a given feature is always indicated alongside the item</span>
-<span class="doccomment">//! definition.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - `std` (_enabled by default_)</span>
+<span class="doccomment">//! - `std` (_enabled by default, implicitly enables `alloc`_)</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//!   This enables a number of features that depend on the standard library.</span>
-<span class="doccomment">//!   [`Instant`] is the primary item that requires this feature, though some</span>
-<span class="doccomment">//!   others methods may rely on [`Instant`] internally.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//!   This crate currently requires a global allocator be present even if this</span>
-<span class="doccomment">//!   feature is disabled.</span>
+<span class="doccomment">//! - `alloc` (_enabled by default via `std`_)</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!   Enables a number of features that require the ability to dynamically allocate memory.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! - `macros`</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!   Enables macros that provide compile-time verification of values and intuitive syntax.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! - `formatting` (_implicitly enables `std`_)</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!   Enables formatting of most structs.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! - `parsing`</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!   Enables parsing of most structs.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! - `local-offset` (_implicitly enables `std`_)</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!   This feature enables a number of methods that allow obtaining the system&#39;s UTC offset.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! - `large-dates`</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!   By default, only years within the ±9999 range (inclusive) are supported. If you need support</span>
+<span class="doccomment">//!   for years outside this range, consider enabling this feature; the supported range will be</span>
+<span class="doccomment">//!   increased to ±999,999.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!   Note that enabling this feature has some costs, as it means forgoing some optimizations.</span>
+<span class="doccomment">//!   Ambiguities may be introduced when parsing that would not otherwise exist.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!   If you are using this feature, **please leave a comment**</span>
+<span class="doccomment">//!   [on this discussion](https://github.com/time-rs/time/discussions/306) with your use case. If</span>
+<span class="doccomment">//!   there is not sufficient demand for this feature, it will be dropped in a future release.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! - `serde`</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//!   Enables [serde](https://docs.rs/serde) support for all types.</span>
 <span class="doccomment">//!</span>
+<span class="doccomment">//! - `serde-human-readable` (_implicitly enables `serde`, `formatting`, and `parsing`_)</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!   Allows serde representations to use a human-readable format. This is determined by the</span>
+<span class="doccomment">//!   serializer, not the user. If this feature is not enabled or if the serializer requests a</span>
+<span class="doccomment">//!   non-human-readable format, a format optimized for binary representation will be used.</span>
+<span class="doccomment">//!</span>
 <span class="doccomment">//! - `rand`</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//!   Enables [rand](https://docs.rs/rand) support for all types.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! - `deprecated` (_enabled by default_)</span>
+<span class="doccomment">//! - `quickcheck` (_implicitly enables `alloc`_)</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//!   Allows using certain deprecated functions from time 0.1.</span>
+<span class="doccomment">//!   Enables [quickcheck](https://docs.rs/quickcheck) support for all types except [`Instant`].</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! - `panicking-api`</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!   Non-panicking APIs are provided, and should generally be preferred.</span>
-<span class="doccomment">//!   However, there are some situations where avoiding `.unwrap()` may be</span>
-<span class="doccomment">//!   desired. Generally speaking, macros should be used in these situations.</span>
-<span class="doccomment">//!   Library authors should avoid using this feature.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Formatting</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Time&#39;s formatting behavior is based on `strftime` in C, though it is</span>
-<span class="doccomment">//! explicitly _not_ compatible. Specifiers may be missing, added, or have</span>
-<span class="doccomment">//! different behavior than in C. As such, you should use the table below, which</span>
-<span class="doccomment">//! is an up-to-date reference on what each specifier does.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! &lt;style&gt;</span>
-<span class="doccomment">//! summary, details:not([open]) { cursor: pointer; }</span>
-<span class="doccomment">//! summary { display: list-item; }</span>
-<span class="doccomment">//! summary::marker { content: &#39;▶ &#39;; }</span>
-<span class="doccomment">//! details[open] summary::marker { content: &#39;▼ &#39;; }</span>
-<span class="doccomment">//! &lt;/style&gt;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! &lt;details&gt;</span>
-<span class="doccomment">//! &lt;summary&gt;Specifiers&lt;/summary&gt;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! | Specifier | Replaced by                                                            | Example                    |</span>
-<span class="doccomment">//! |-----------|------------------------------------------------------------------------|----------------------------|</span>
-<span class="doccomment">//! | `%a`      | Abbreviated weekday name                                               | `Thu`                      |</span>
-<span class="doccomment">//! | `%A`      | Full weekday name                                                      | `Thursday`                 |</span>
-<span class="doccomment">//! | `%b`      | Abbreviated month name                                                 | `Aug`                      |</span>
-<span class="doccomment">//! | `%B`      | Full month name                                                        | `August`                   |</span>
-<span class="doccomment">//! | `%c`      | Date and time representation, equivalent to `%a %b %-d %-H:%M:%S %-Y`  | `Thu Aug 23 14:55:02 2001` |</span>
-<span class="doccomment">//! | `%C`      | Year divided by 100 and truncated to integer (`00`-`999`)              | `20`                       |</span>
-<span class="doccomment">//! | `%d`      | Day of the month, zero-padded (`01`-`31`)                              | `23`                       |</span>
-<span class="doccomment">//! | `%D`      | Short MM/DD/YY date, equivalent to `%-m/%d/%y`                         | `8/23/01`                  |</span>
-<span class="doccomment">//! | `%F`      | Short YYYY-MM-DD date, equivalent to `%-Y-%m-%d`                       | `2001-08-23`               |</span>
-<span class="doccomment">//! | `%g`      | Week-based year, last two digits (`00`-`99`)                           | `01`                       |</span>
-<span class="doccomment">//! | `%G`      | Week-based year                                                        | `2001`                     |</span>
-<span class="doccomment">//! | `%H`      | Hour in 24h format (`00`-`23`)                                         | `14`                       |</span>
-<span class="doccomment">//! | `%I`      | Hour in 12h format (`01`-`12`)                                         | `02`                       |</span>
-<span class="doccomment">//! | `%j`      | Day of the year (`001`-`366`)                                          | `235`                      |</span>
-<span class="doccomment">//! | `%m`      | Month as a decimal number (`01`-`12`)                                  | `08`                       |</span>
-<span class="doccomment">//! | `%M`      | Minute (`00`-`59`)                                                     | `55`                       |</span>
-<span class="doccomment">//! | `%N`      | Subsecond nanoseconds. Always 9 digits                                 | `012345678`                |</span>
-<span class="doccomment">//! | `%p`      | `am` or `pm` designation                                               | `pm`                       |</span>
-<span class="doccomment">//! | `%P`      | `AM` or `PM` designation                                               | `PM`                       |</span>
-<span class="doccomment">//! | `%r`      | 12-hour clock time, equivalent to `%-I:%M:%S %p`                       | `2:55:02 pm`               |</span>
-<span class="doccomment">//! | `%R`      | 24-hour HH:MM time, equivalent to `%-H:%M`                             | `14:55`                    |</span>
-<span class="doccomment">//! | `%S`      | Second (`00`-`59`)                                                     | `02`                       |</span>
-<span class="doccomment">//! | `%T`      | 24-hour clock time with seconds, equivalent to `%-H:%M:%S`             | `14:55:02`                 |</span>
-<span class="doccomment">//! | `%u`      | ISO 8601 weekday as number with Monday as 1 (`1`-`7`)                  | `4`                        |</span>
-<span class="doccomment">//! | `%U`      | Week number with the first Sunday as the start of week one (`00`-`53`) | `33`                       |</span>
-<span class="doccomment">//! | `%V`      | ISO 8601 week number (`01`-`53`)                                       | `34`                       |</span>
-<span class="doccomment">//! | `%w`      | Weekday as a decimal number with Sunday as 0 (`0`-`6`)                 | `4`                        |</span>
-<span class="doccomment">//! | `%W`      | Week number with the first Monday as the start of week one (`00`-`53`) | `34`                       |</span>
-<span class="doccomment">//! | `%y`      | Year, last two digits (`00`-`99`)                                      | `01`                       |</span>
-<span class="doccomment">//! | `%Y`      | Full year, including `+` if ≥10,000                                    | `2001`                     |</span>
-<span class="doccomment">//! | `%z`      | ISO 8601 offset from UTC in timezone (+HHMM)                           | `+0100`                    |</span>
-<span class="doccomment">//! | `%%`      | Literal `%`                                                            | `%`                        |</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! &lt;/details&gt;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Modifiers</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! All specifiers that are strictly numerical have modifiers for formatting.</span>
-<span class="doccomment">//! Adding a modifier to a non-supporting specifier is a no-op.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! &lt;!-- rust-lang/rust#65613 --&gt;</span>
-<span class="doccomment">//! &lt;style&gt;.docblock code { white-space: pre-wrap; }&lt;/style&gt;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! | Modifier         | Behavior        | Example       |</span>
-<span class="doccomment">//! |------------------|-----------------|---------------|</span>
-<span class="doccomment">//! | `-` (dash)       | No padding      | `%-d` =&gt; `5`  |</span>
-<span class="doccomment">//! | `_` (underscore) | Pad with spaces | `%_d` =&gt; ` 5` |</span>
-<span class="doccomment">//! | `0`              | Pad with zeros  | `%0d` =&gt; `05` |</span>
+<span class="doccomment">//! One pseudo-feature flag that is only available to end users is the `unsound_local_offset` cfg.</span>
+<span class="doccomment">//! As the name indicates, using the feature is unsound, and [may cause unexpected segmentation</span>
+<span class="doccomment">//! faults](https://github.com/time-rs/time/issues/293). Unlike other flags, this is deliberately</span>
+<span class="doccomment">//! only available to end users; this is to ensure that a user doesn&#39;t have unsound behavior without</span>
+<span class="doccomment">//! knowing it. To enable this behavior, you must use `RUSTFLAGS=&quot;--cfg unsound_local_offset&quot; cargo</span>
+<span class="doccomment">//! build` or similar. Note: This flag is _not tested anywhere_, including in the regular test of</span>
+<span class="doccomment">//! the powerset of all feature flags. Use at your own risk. Without this flag, any method that</span>
+<span class="doccomment">//! requires the local offset will return the `Err` variant.</span>
 
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">__time_02_docs</span>, <span class="ident">feature</span>(<span class="ident">doc_cfg</span>))]</span>
+<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_playground_url</span> <span class="op">=</span> <span class="string">&quot;https://play.rust-lang.org&quot;</span>)]</span>
+<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">__time_03_docs</span>, <span class="ident">feature</span>(<span class="ident">doc_cfg</span>, <span class="ident">doc_auto_cfg</span>, <span class="ident">doc_notable_trait</span>))]</span>
+<span class="attribute">#![<span class="ident">cfg_attr</span>(
+    <span class="ident">__time_03_docs</span>,
+    <span class="ident">deny</span>(<span class="ident">rustdoc::broken_intra_doc_links</span>, <span class="ident">rustdoc::private_intra_doc_links</span>)
+)]</span>
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>), <span class="ident">no_std</span>)]</span>
 <span class="attribute">#![<span class="ident">deny</span>(
     <span class="ident">anonymous_parameters</span>,
@@ -675,6 +425,7 @@
     <span class="ident">trivial_numeric_casts</span>,
     <span class="ident">unreachable_pub</span>,
     <span class="ident">unsafe_code</span>,
+    <span class="comment">// unsafe_op_in_unsafe_fn, // requires Rust 1.51</span>
     <span class="ident">unused_extern_crates</span>
 )]</span>
 <span class="attribute">#![<span class="ident">warn</span>(
@@ -683,145 +434,160 @@
     <span class="ident">clippy::get_unwrap</span>,
     <span class="ident">clippy::missing_docs_in_private_items</span>,
     <span class="ident">clippy::nursery</span>,
-    <span class="ident">clippy::pedantic</span>,
     <span class="ident">clippy::print_stdout</span>,
     <span class="ident">clippy::todo</span>,
     <span class="ident">clippy::unimplemented</span>,
+    <span class="ident">clippy::unwrap_in_result</span>,
     <span class="ident">clippy::unwrap_used</span>,
     <span class="ident">clippy::use_debug</span>,
+    <span class="ident">deprecated_in_future</span>,
     <span class="ident">missing_copy_implementations</span>,
     <span class="ident">missing_debug_implementations</span>,
-    <span class="ident">single_use_lifetimes</span>,
     <span class="ident">unused_qualifications</span>,
     <span class="ident">variant_size_differences</span>
 )]</span>
-<span class="attribute">#![<span class="ident">allow</span>(
-    <span class="ident">clippy::cast_lossless</span>,
-    <span class="ident">clippy::cast_possible_truncation</span>,
-    <span class="ident">clippy::cast_possible_wrap</span>,
-    <span class="ident">clippy::cast_precision_loss</span>,
-    <span class="ident">clippy::cast_sign_loss</span>,
-    <span class="ident">clippy::enum_glob_use</span>,
-    <span class="ident">clippy::inline_always</span>,
-    <span class="ident">clippy::map_err_ignore</span>,
-    <span class="ident">clippy::missing_errors_doc</span>,
-    <span class="ident">clippy::missing_panics_doc</span>,
-    <span class="ident">clippy::module_name_repetitions</span>,
-    <span class="ident">clippy::must_use_candidate</span>,
-    <span class="ident">clippy::redundant_pub_crate</span>,
-    <span class="ident">clippy::suspicious_arithmetic_impl</span>,
-    <span class="ident">clippy::suspicious_op_assign_impl</span>,
-    <span class="ident">clippy::use_self</span>,
-    <span class="ident">clippy::wildcard_imports</span>,
-    <span class="ident">clippy::zero_prefixed_literal</span>,
-    <span class="ident">unstable_name_collisions</span>
-)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(
-    <span class="ident">test</span>,
-    <span class="ident">allow</span>(
-        <span class="ident">clippy::cognitive_complexity</span>,
-        <span class="ident">clippy::similar_names</span>,
-        <span class="ident">clippy::too_many_lines</span>,
-    )
-)]</span>
+<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::redundant_pub_crate</span>)]</span>
 <span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_favicon_url</span> <span class="op">=</span> <span class="string">&quot;https://avatars0.githubusercontent.com/u/55999857&quot;</span>)]</span>
 <span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_logo_url</span> <span class="op">=</span> <span class="string">&quot;https://avatars0.githubusercontent.com/u/55999857&quot;</span>)]</span>
 <span class="attribute">#![<span class="ident">doc</span>(<span class="ident">test</span>(<span class="ident">attr</span>(<span class="ident">deny</span>(<span class="ident">warnings</span>))))]</span>
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_extern_crates</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">alloc</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;panicking-api&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">__time_02_docs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;panicking-api&quot;</span>)))]</span>
-<span class="macro">macro_rules!</span> <span class="ident">format_conditional</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">conditional</span>:<span class="ident">ident</span>) <span class="op">=</span><span class="op">&gt;</span> {{
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
-        <span class="kw">use</span> <span class="ident">alloc::format</span>;
-
-        <span class="macro">format!</span>(<span class="macro">concat!</span>(<span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">conditional</span>), <span class="string">&quot;={}&quot;</span>), <span class="macro-nonterminal">$</span><span class="macro-nonterminal">conditional</span>)
-    }};
-
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_conditional</span>:<span class="ident">ident</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">conditional</span>:<span class="ident">ident</span>),<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {{
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
-        <span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">format</span>, <span class="ident">string::String</span>};
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">String::new</span>();
-        <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="macro">format_conditional!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_conditional</span>));
-        $(<span class="ident">s</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="macro">concat!</span>(<span class="string">&quot;, &quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">conditional</span>), <span class="string">&quot;={}&quot;</span>), <span class="macro-nonterminal">$</span><span class="macro-nonterminal">conditional</span>));)<span class="op">*</span>
-        <span class="ident">s</span>
-    }}
+<span class="comment">// region: macros</span>
+<span class="doccomment">/// Helper macro for easily implementing `OpAssign`.</span>
+<span class="macro">macro_rules!</span> <span class="ident">__impl_assign</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">sym</span>:<span class="ident">tt</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">op</span>:<span class="ident">ident</span> <span class="macro-nonterminal">$</span><span class="kw">fn</span>:<span class="macro-nonterminal">ident</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">target</span>:<span class="ident">ty</span> : $($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>),<span class="op">+</span>) <span class="op">=</span><span class="op">&gt;</span> {$(
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_qualifications</span>)]</span>
+        $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span>
+        <span class="kw">impl</span> <span class="ident">core::ops</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">op</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">target</span> {
+            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro-nonterminal">self</span>, <span class="ident">rhs</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>) {
+                <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sym</span> <span class="ident">rhs</span>;
+            }
+        }
+    )<span class="op">+</span>};
 }
 
-<span class="doccomment">/// Panic if the value is not in range.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;panicking-api&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">__time_02_docs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;panicking-api&quot;</span>)))]</span>
-<span class="macro">macro_rules!</span> <span class="ident">assert_value_in_range</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">ident</span> <span class="kw">in</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start</span>:<span class="ident">expr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">end</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {{
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_imports</span>)]</span>
-        <span class="kw">use</span> <span class="ident">standback::prelude</span>::<span class="kw-2">*</span>;
+<span class="doccomment">/// Implement `AddAssign` for the provided types.</span>
+<span class="macro">macro_rules!</span> <span class="ident">impl_add_assign</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">target</span>:<span class="ident">ty</span> : $($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="macro">__impl_assign!</span>(<span class="op">+</span> <span class="ident">AddAssign</span> <span class="ident">add_assign</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">target</span> : $($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>),<span class="op">+</span>);
+    };
+}
 
-        <span class="kw">if</span> <span class="op">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">start</span>..<span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">end</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>) {
-            <span class="macro">panic!</span>(
-                <span class="macro">concat!</span>(<span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>), <span class="string">&quot; must be in the range {}..={} (was {})&quot;</span>),
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start</span>,
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">end</span>,
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>,
-            );
+<span class="doccomment">/// Implement `SubAssign` for the provided types.</span>
+<span class="macro">macro_rules!</span> <span class="ident">impl_sub_assign</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">target</span>:<span class="ident">ty</span> : $($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="macro">__impl_assign!</span>(<span class="op">-</span> <span class="ident">SubAssign</span> <span class="ident">sub_assign</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">target</span> : $($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>),<span class="op">+</span>);
+    };
+}
+
+<span class="doccomment">/// Implement `MulAssign` for the provided types.</span>
+<span class="macro">macro_rules!</span> <span class="ident">impl_mul_assign</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">target</span>:<span class="ident">ty</span> : $($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="macro">__impl_assign!</span>(<span class="op">*</span> <span class="ident">MulAssign</span> <span class="ident">mul_assign</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">target</span> : $($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>),<span class="op">+</span>);
+    };
+}
+
+<span class="doccomment">/// Implement `DivAssign` for the provided types.</span>
+<span class="macro">macro_rules!</span> <span class="ident">impl_div_assign</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">target</span>:<span class="ident">ty</span> : $($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="macro">__impl_assign!</span>(<span class="op">/</span> <span class="ident">DivAssign</span> <span class="ident">div_assign</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">target</span> : $($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>),<span class="op">+</span>);
+    };
+}
+
+<span class="doccomment">/// Division of integers, rounding the resulting value towards negative infinity.</span>
+<span class="macro">macro_rules!</span> <span class="ident">div_floor</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {{
+        <span class="kw">let</span> <span class="ident">_a</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>;
+        <span class="kw">let</span> <span class="ident">_b</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>;
+
+        <span class="kw">let</span> (<span class="ident">_quotient</span>, <span class="ident">_remainder</span>) <span class="op">=</span> (<span class="ident">_a</span> <span class="op">/</span> <span class="ident">_b</span>, <span class="ident">_a</span> <span class="op">%</span> <span class="ident">_b</span>);
+
+        <span class="kw">if</span> (<span class="ident">_remainder</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">_b</span> <span class="op">&lt;</span> <span class="number">0</span>) <span class="op">|</span><span class="op">|</span> (<span class="ident">_remainder</span> <span class="op">&lt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">_b</span> <span class="op">&gt;</span> <span class="number">0</span>) {
+            <span class="ident">_quotient</span> <span class="op">-</span> <span class="number">1</span>
+        } <span class="kw">else</span> {
+            <span class="ident">_quotient</span>
         }
     }};
+}
 
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">ident</span> <span class="kw">in</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start</span>:<span class="ident">expr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">end</span>:<span class="ident">expr</span>, <span class="ident">given</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">conditional</span>:<span class="ident">ident</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span>) <span class="op">=</span><span class="op">&gt;</span> {{
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_imports</span>)]</span>
-        <span class="kw">use</span> <span class="ident">standback::prelude</span>::<span class="kw-2">*</span>;
-
-        <span class="kw">if</span> <span class="op">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">start</span>..<span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">end</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>) {
-            <span class="macro">panic!</span>(
-                <span class="macro">concat!</span>(<span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>), <span class="string">&quot; must be in the range {}..={} given{} (was {})&quot;</span>),
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start</span>,
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">end</span>,
-                <span class="kw-2">&amp;</span><span class="macro">format_conditional!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">conditional</span>),<span class="op">+</span>),
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>,
-            );
+<span class="doccomment">/// Euclidean remainder. Useful for `const` contexts.</span>
+<span class="macro">macro_rules!</span> <span class="ident">rem_euclid</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {{
+        <span class="kw">let</span> <span class="ident">_a</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>;
+        <span class="kw">let</span> <span class="ident">_b</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>;
+        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">_a</span> <span class="op">%</span> <span class="ident">_b</span>;
+        <span class="kw">if</span> <span class="ident">r</span> <span class="op">&lt;</span> <span class="number">0</span> {
+            <span class="kw">if</span> <span class="ident">_b</span> <span class="op">&lt;</span> <span class="number">0</span> { <span class="ident">r</span> <span class="op">-</span> <span class="ident">_b</span> } <span class="kw">else</span> { <span class="ident">r</span> <span class="op">+</span> <span class="ident">_b</span> }
+        } <span class="kw">else</span> {
+            <span class="ident">r</span>
         }
     }};
+}
+
+<span class="doccomment">/// Cascade an out-of-bounds value.</span>
+<span class="macro">macro_rules!</span> <span class="ident">cascade</span> {
+    (@<span class="ident">ordinal</span> <span class="ident">ordinal</span>) <span class="op">=</span><span class="op">&gt;</span> {};
+    (@<span class="ident">year</span> <span class="ident">year</span>) <span class="op">=</span><span class="op">&gt;</span> {};
+
+    <span class="comment">// Cascade an out-of-bounds value from &quot;from&quot; to &quot;to&quot;.</span>
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">from</span>:<span class="ident">ident</span> <span class="kw">in</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">min</span>:<span class="ident">literal</span>.. <span class="macro-nonterminal">$</span><span class="macro-nonterminal">max</span>:<span class="ident">literal</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">to</span>:<span class="ident">tt</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_comparisons</span>, <span class="ident">unused_assignments</span>)]</span>
+        <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">from</span> <span class="op">&gt;</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">max</span> {
+            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">from</span> <span class="op">-</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">max</span> <span class="op">-</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">min</span>;
+            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">to</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">from</span> <span class="op">&lt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">min</span> {
+            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">from</span> <span class="op">+</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">max</span> <span class="op">-</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">min</span>;
+            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">to</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+        }
+    };
+
+    <span class="comment">// Special case the ordinal-to-year cascade, as it has different behavior.</span>
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ordinal</span>:<span class="ident">ident</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">year</span>:<span class="ident">ident</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="comment">// We need to actually capture the idents. Without this, macro hygiene causes errors.</span>
+        <span class="macro">cascade!</span>(@<span class="ident">ordinal</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ordinal</span>);
+        <span class="macro">cascade!</span>(@<span class="ident">year</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">year</span>);
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_assignments</span>)]</span>
+        <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ordinal</span> <span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::util::days_in_year</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">year</span>) {
+            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">year</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ordinal</span> <span class="op">=</span> <span class="number">1</span>;
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ordinal</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">year</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ordinal</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::util::days_in_year</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">year</span>);
+        }
+    };
 }
 
 <span class="doccomment">/// Returns `Err(error::ComponentRange)` if the value is not in range.</span>
 <span class="macro">macro_rules!</span> <span class="ident">ensure_value_in_range</span> {
     (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">ident</span> <span class="kw">in</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start</span>:<span class="ident">expr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">end</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {{
-        <span class="attribute">#![<span class="ident">allow</span>(
-            <span class="ident">trivial_numeric_casts</span>,
-            <span class="ident">unused_comparisons</span>,
-            <span class="ident">clippy::manual_range_contains</span>
-        )]</span>
-        <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span> <span class="op">&lt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start</span> <span class="op">|</span><span class="op">|</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span> <span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">end</span> {
+        <span class="kw">let</span> <span class="ident">_start</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start</span>;
+        <span class="kw">let</span> <span class="ident">_end</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">end</span>;
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">trivial_numeric_casts</span>, <span class="ident">unused_comparisons</span>)]</span>
+        <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span> <span class="op">&lt;</span> <span class="ident">_start</span> <span class="op">|</span><span class="op">|</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span> <span class="op">&gt;</span> <span class="ident">_end</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::error::ComponentRange</span> {
                 <span class="ident">name</span>: <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>),
-                <span class="ident">minimum</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start</span> <span class="kw">as</span> <span class="ident">i64</span>,
-                <span class="ident">maximum</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">end</span> <span class="kw">as</span> <span class="ident">i64</span>,
-                <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span> <span class="kw">as</span> <span class="ident">i64</span>,
+                <span class="ident">minimum</span>: <span class="ident">_start</span> <span class="kw">as</span> <span class="kw">_</span>,
+                <span class="ident">maximum</span>: <span class="ident">_end</span> <span class="kw">as</span> <span class="kw">_</span>,
+                <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span> <span class="kw">as</span> <span class="kw">_</span>,
                 <span class="ident">conditional_range</span>: <span class="bool-val">false</span>,
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">__time_02_supports_non_exhaustive</span>))]</span>
-                <span class="ident">__non_exhaustive</span>: (),
             });
         }
     }};
 
     (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">ident</span> <span class="ident">conditionally</span> <span class="kw">in</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start</span>:<span class="ident">expr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">end</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {{
-        <span class="attribute">#![<span class="ident">allow</span>(
-            <span class="ident">trivial_numeric_casts</span>,
-            <span class="ident">unused_comparisons</span>,
-            <span class="ident">clippy::manual_range_contains</span>
-        )]</span>
-        <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span> <span class="op">&lt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start</span> <span class="op">|</span><span class="op">|</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span> <span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">end</span> {
+        <span class="kw">let</span> <span class="ident">_start</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start</span>;
+        <span class="kw">let</span> <span class="ident">_end</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">end</span>;
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">trivial_numeric_casts</span>, <span class="ident">unused_comparisons</span>)]</span>
+        <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span> <span class="op">&lt;</span> <span class="ident">_start</span> <span class="op">|</span><span class="op">|</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span> <span class="op">&gt;</span> <span class="ident">_end</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::error::ComponentRange</span> {
                 <span class="ident">name</span>: <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>),
-                <span class="ident">minimum</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start</span> <span class="kw">as</span> <span class="ident">i64</span>,
-                <span class="ident">maximum</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">end</span> <span class="kw">as</span> <span class="ident">i64</span>,
-                <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span> <span class="kw">as</span> <span class="ident">i64</span>,
+                <span class="ident">minimum</span>: <span class="ident">_start</span> <span class="kw">as</span> <span class="kw">_</span>,
+                <span class="ident">maximum</span>: <span class="ident">_end</span> <span class="kw">as</span> <span class="kw">_</span>,
+                <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span> <span class="kw">as</span> <span class="kw">_</span>,
                 <span class="ident">conditional_range</span>: <span class="bool-val">true</span>,
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">__time_02_supports_non_exhaustive</span>))]</span>
-                <span class="ident">__non_exhaustive</span>: (),
             });
         }
     }};
@@ -829,8 +595,8 @@
 
 <span class="doccomment">/// Try to unwrap an expression, returning if not possible.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// This is similar to the `?` operator, but does not perform `.into()`. Because</span>
-<span class="doccomment">/// of this, it is usable in `const` contexts.</span>
+<span class="doccomment">/// This is similar to the `?` operator, but does not perform `.into()`. Because of this, it is</span>
+<span class="doccomment">/// usable in `const` contexts.</span>
 <span class="macro">macro_rules!</span> <span class="ident">const_try</span> {
     (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span> {
@@ -840,270 +606,68 @@
     };
 }
 
-<span class="doccomment">/// The `Date` struct and its associated `impl`s.</span>
+<span class="doccomment">/// Try to unwrap an expression, returning if not possible.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This is similar to the `?` operator, but is usable in `const` contexts.</span>
+<span class="macro">macro_rules!</span> <span class="ident">const_try_opt</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">value</span>,
+            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>,
+        }
+    };
+}
+<span class="comment">// endregion macros</span>
+
 <span class="kw">mod</span> <span class="ident">date</span>;
-<span class="doccomment">/// The `Duration` struct and its associated `impl`s.</span>
 <span class="kw">mod</span> <span class="ident">duration</span>;
-<span class="doccomment">/// Various error types returned by methods in the time crate.</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">error</span>;
-<span class="doccomment">/// Extension traits.</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">ext</span>;
-<span class="kw">mod</span> <span class="ident">format</span>;
-<span class="doccomment">/// The `Instant` struct and its associated `impl`s.</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;formatting&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parsing&quot;</span>))]</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">format_description</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;formatting&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">formatting</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
 <span class="kw">mod</span> <span class="ident">instant</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">internals</span>;
-<span class="doccomment">/// The `OffsetDateTime` struct and its associated `impl`s.</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;macros&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">macros</span>;
+<span class="kw">mod</span> <span class="ident">month</span>;
 <span class="kw">mod</span> <span class="ident">offset_date_time</span>;
-<span class="doccomment">/// The `PrimitiveDateTime` struct and its associated `impl`s.</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parsing&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">parsing</span>;
 <span class="kw">mod</span> <span class="ident">primitive_date_time</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quickcheck&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">__time_03_docs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quickcheck&quot;</span>)))]</span>
+<span class="kw">mod</span> <span class="ident">quickcheck</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rand&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">__time_03_docs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rand&quot;</span>)))]</span>
 <span class="kw">mod</span> <span class="ident">rand</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">__time_03_docs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)))]</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_copy_implementations</span>, <span class="ident">missing_debug_implementations</span>)]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">serde</span>;
-<span class="doccomment">/// The `Sign` struct and its associated `impl`s.</span>
-<span class="kw">mod</span> <span class="ident">sign</span>;
-<span class="doccomment">/// The `Time` struct and its associated `impl`s.</span>
-<span class="kw">mod</span> <span class="ident">time_mod</span>;
-<span class="doccomment">/// The `UtcOffset` struct and its associated `impl`s.</span>
+<span class="kw">mod</span> <span class="ident">sys</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">tests</span>;
+<span class="kw">mod</span> <span class="ident">time</span>;
 <span class="kw">mod</span> <span class="ident">utc_offset</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">util</span>;
-<span class="doccomment">/// Days of the week.</span>
 <span class="kw">mod</span> <span class="ident">weekday</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">date::Date</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">duration::Duration</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">error::Error</span>;
-<span class="attribute">#[<span class="ident">deprecated</span>(
-    <span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.2.23&quot;</span>,
-    <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Errors have been moved to the `error` module.&quot;</span>
-)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">error</span>::{
-    <span class="ident">ComponentRange</span> <span class="kw">as</span> <span class="ident">ComponentRangeError</span>, <span class="ident">ConversionRange</span> <span class="kw">as</span> <span class="ident">ConversionRangeError</span>,
-    <span class="ident">IndeterminateOffset</span> <span class="kw">as</span> <span class="ident">IndeterminateOffsetError</span>, <span class="ident">Parse</span> <span class="kw">as</span> <span class="ident">ParseError</span>,
-};
-<span class="attribute">#[<span class="ident">deprecated</span>(
-    <span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.2.23&quot;</span>,
-    <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Extension traits have been moved to the `ext` module.&quot;</span>
-)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">ext</span>::{<span class="ident">NumericalDuration</span>, <span class="ident">NumericalStdDuration</span>, <span class="ident">NumericalStdDurationShort</span>};
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">format::DeferredFormat</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">format::Format</span>;
-<span class="kw">use</span> <span class="ident">format::ParseResult</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::date::Date</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::duration::Duration</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::Error</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">instant::Instant</span>;
-<span class="attribute">#[<span class="ident">deprecated</span>(
-    <span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.2.23&quot;</span>,
-    <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Macros have been moved to the `macros` module.&quot;</span>
-)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">macros</span>::{<span class="ident">date</span>, <span class="ident">offset</span>, <span class="ident">time</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">offset_date_time::OffsetDateTime</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">primitive_date_time::PrimitiveDateTime</span>;
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">sign::Sign</span>;
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_imports</span>)]</span>
-<span class="kw">use</span> <span class="ident">standback::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">time_mod::Time</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">utc_offset::UtcOffset</span>;
-<span class="attribute">#[<span class="ident">deprecated</span>(
-    <span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.2.23&quot;</span>,
-    <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;This function has been moved to the `util` module.&quot;</span>
-)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">util</span>::{<span class="ident">days_in_year</span>, <span class="ident">is_leap_year</span>, <span class="ident">validate_format_string</span>, <span class="ident">weeks_in_year</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">weekday::Weekday</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::instant::Instant</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::month::Month</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::offset_date_time::OffsetDateTime</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::primitive_date_time::PrimitiveDateTime</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::time::Time</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utc_offset::UtcOffset</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::weekday::Weekday</span>;
 
-<span class="doccomment">/// An alias for `Result` with a generic error from the time crate.</span>
+<span class="doccomment">/// An alias for [`std::result::Result`] with a generic error from the time crate.</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">core::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
-
-<span class="doccomment">/// A collection of imports that are widely useful.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Unlike the standard library, this must be explicitly imported:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// # #[allow(unused_imports)]</span>
-<span class="doccomment">/// use time::prelude::*;</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The prelude may grow in minor releases. Any removals will only occur in</span>
-<span class="doccomment">/// major releases.</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">prelude</span> {
-    <span class="comment">// Rename traits to `_` if possible to avoid any potential name conflicts.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">__time_02_use_trait_as_underscore</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ext</span>::{<span class="ident">NumericalDuration</span>, <span class="ident">NumericalStdDuration</span>};
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">__time_02_use_trait_as_underscore</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ext</span>::{<span class="ident">NumericalDuration</span> <span class="kw">as</span> <span class="kw">_</span>, <span class="ident">NumericalStdDuration</span> <span class="kw">as</span> <span class="kw">_</span>};
-    <span class="comment">// We need to re-export from the macros crate again (and not just do</span>
-    <span class="comment">// `crate::foo`) because of the way name resolution works in Rust. It&#39;s not</span>
-    <span class="comment">// currently possible to import _only_ the macro, so doing `use crate::time`</span>
-    <span class="comment">// also pulls in the `time` _crate_ (due to `extern crate self as time`).</span>
-    <span class="comment">//</span>
-    <span class="comment">// As a side note, doing `use crate::time` causes a stack overflow in</span>
-    <span class="comment">// rustc &lt;= 1.37.0.</span>
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">time_macros</span>::{<span class="ident">date</span>, <span class="ident">offset</span>, <span class="ident">time</span>};
-}
-
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_docs_in_private_items</span>)]</span>
-<span class="kw">mod</span> <span class="ident">private</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-
-    <span class="macro">macro_rules!</span> <span class="ident">parsable</span> {
-        ($(<span class="macro-nonterminal">$</span><span class="kw">type</span>:<span class="macro-nonterminal">ty</span>),<span class="op">*</span> $(,)<span class="question-mark">?</span>) <span class="op">=</span><span class="op">&gt;</span> {
-            $(
-                <span class="kw">impl</span> <span class="ident">Parsable</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="kw">type</span> {
-                    <span class="kw">fn</span> <span class="macro-nonterminal">parse</span>(<span class="ident">s</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">format</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-                        <span class="ident"><span class="self">Self</span>::parse</span>(<span class="ident">s</span>, <span class="ident">format</span>)
-                    }
-                }
-            )<span class="op">*</span>
-        };
-    }
-
-    <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Parsable</span>: <span class="ident">Sized</span> {
-        <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">s</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">format</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
-    }
-
-    <span class="macro">parsable!</span>[<span class="ident">Time</span>, <span class="ident">Date</span>, <span class="ident">UtcOffset</span>, <span class="ident">PrimitiveDateTime</span>, <span class="ident">OffsetDateTime</span>];
-}
-
-<span class="doccomment">/// Parse any parsable type from the time crate.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is identical to calling `T::parse(s, format)`, but allows the use of</span>
-<span class="doccomment">/// type inference where possible.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// use time::Time;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[derive(Debug)]</span>
-<span class="doccomment">/// struct Foo(Time);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// fn main() -&gt; time::Result&lt;()&gt; {</span>
-<span class="doccomment">///     // We don&#39;t need to tell the compiler what type we need!</span>
-<span class="doccomment">///     let foo = Foo(time::parse(&quot;14:55:02&quot;, &quot;%T&quot;)?);</span>
-<span class="doccomment">///     println!(&quot;{:?}&quot;, foo);</span>
-<span class="doccomment">///     Ok(())</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">private::Parsable</span><span class="op">&gt;</span>(<span class="ident">s</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">format</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">private::Parsable::parse</span>(<span class="ident">s</span>, <span class="ident">format</span>)
-}
-
-<span class="doccomment">/// Macros to statically construct values that are known to be valid.</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">macros</span> {
-
-    <span class="doccomment">/// Construct a [`Date`](crate::Date) with a statically known value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The resulting expression can be used in `const` or `static` declarations.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Three formats are supported: year-week-weekday, year-ordinal, and</span>
-    <span class="doccomment">/// year-month-day.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{Date, macros::date, Weekday::*};</span>
-    <span class="doccomment">/// # fn main() -&gt; time::Result&lt;()&gt; {</span>
-    <span class="doccomment">/// assert_eq!(date!(2020-W01-3), Date::try_from_iso_ywd(2020, 1, Wednesday)?);</span>
-    <span class="doccomment">/// assert_eq!(date!(2020-001), Date::try_from_yo(2020, 1)?);</span>
-    <span class="doccomment">/// assert_eq!(date!(2020-01-01), Date::try_from_ymd(2020, 1, 1)?);</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">time_macros::date</span>;
-    <span class="doccomment">/// Construct a [`UtcOffset`](crate::UtcOffset) with a statically known value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The resulting expression can be used in `const` or `static` declarations.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A sign and the hour must be provided; minutes and seconds default to zero.</span>
-    <span class="doccomment">/// `UTC` (both uppercase and lowercase) is also allowed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{macros::offset, UtcOffset};</span>
-    <span class="doccomment">/// assert_eq!(offset!(UTC), UtcOffset::hours(0));</span>
-    <span class="doccomment">/// assert_eq!(offset!(utc), UtcOffset::hours(0));</span>
-    <span class="doccomment">/// assert_eq!(offset!(+0), UtcOffset::hours(0));</span>
-    <span class="doccomment">/// assert_eq!(offset!(+1), UtcOffset::hours(1));</span>
-    <span class="doccomment">/// assert_eq!(offset!(-1), UtcOffset::hours(-1));</span>
-    <span class="doccomment">/// assert_eq!(offset!(+1:30), UtcOffset::minutes(90));</span>
-    <span class="doccomment">/// assert_eq!(offset!(-1:30), UtcOffset::minutes(-90));</span>
-    <span class="doccomment">/// assert_eq!(offset!(+1:30:59), UtcOffset::seconds(5459));</span>
-    <span class="doccomment">/// assert_eq!(offset!(-1:30:59), UtcOffset::seconds(-5459));</span>
-    <span class="doccomment">/// assert_eq!(offset!(+23:59:59), UtcOffset::seconds(86_399));</span>
-    <span class="doccomment">/// assert_eq!(offset!(-23:59:59), UtcOffset::seconds(-86_399));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">time_macros::offset</span>;
-    <span class="doccomment">/// Construct a [`Time`](crate::Time) with a statically known value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The resulting expression can be used in `const` or `static` declarations.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Hours and minutes must be provided, while seconds defaults to zero. AM/PM is</span>
-    <span class="doccomment">/// allowed (either uppercase or lowercase). Any number of subsecond digits may</span>
-    <span class="doccomment">/// be provided (though any past nine will be discarded).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// All components are validated at compile-time. An error will be raised if any</span>
-    <span class="doccomment">/// value is invalid.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{Time, macros::time};</span>
-    <span class="doccomment">/// # fn main() -&gt; time::Result&lt;()&gt; {</span>
-    <span class="doccomment">/// assert_eq!(time!(0:00), Time::try_from_hms(0, 0, 0)?);</span>
-    <span class="doccomment">/// assert_eq!(time!(1:02:03), Time::try_from_hms(1, 2, 3)?);</span>
-    <span class="doccomment">/// assert_eq!(time!(1:02:03.004_005_006), Time::try_from_hms_nano(1, 2, 3, 4_005_006)?);</span>
-    <span class="doccomment">/// assert_eq!(time!(12:00 am), Time::try_from_hms(0, 0, 0)?);</span>
-    <span class="doccomment">/// assert_eq!(time!(1:02:03 am), Time::try_from_hms(1, 2, 3)?);</span>
-    <span class="doccomment">/// assert_eq!(time!(1:02:03.004_005_006 am), Time::try_from_hms_nano(1, 2, 3, 4_005_006)?);</span>
-    <span class="doccomment">/// assert_eq!(time!(12:00 pm), Time::try_from_hms(12, 0, 0)?);</span>
-    <span class="doccomment">/// assert_eq!(time!(1:02:03 pm), Time::try_from_hms(13, 2, 3)?);</span>
-    <span class="doccomment">/// assert_eq!(time!(1:02:03.004_005_006 pm), Time::try_from_hms_nano(13, 2, 3, 4_005_006)?);</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">time_macros::time</span>;
-}
-
-<span class="comment">// For some back-compatibility, we&#39;re also implementing some deprecated types</span>
-<span class="comment">// and methods. They will be removed completely in 0.3.</span>
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;deprecated&quot;</span>))]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_docs_in_private_items</span>)]</span>
-<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.2.0&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use `Instant`&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">PreciseTime</span> <span class="op">=</span> <span class="ident">Instant</span>;
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;deprecated&quot;</span>))]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_docs_in_private_items</span>)]</span>
-<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.2.0&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use `Instant`&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">SteadyTime</span> <span class="op">=</span> <span class="ident">Instant</span>;
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;deprecated&quot;</span>))]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_docs_in_private_items</span>)]</span>
-<span class="attribute">#[<span class="ident">deprecated</span>(
-    <span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.2.0&quot;</span>,
-    <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use `OffsetDateTime::now() - OffsetDateTime::unix_epoch()` to get a `Duration` since \
-            a known epoch.&quot;</span>
-)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">precise_time_ns</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
-    <span class="kw">use</span> <span class="ident">standback::convert::TryInto</span>;
-    <span class="kw">use</span> <span class="ident">std::time::SystemTime</span>;
-
-    (<span class="ident">SystemTime::now</span>().<span class="ident">duration_since</span>(<span class="ident">SystemTime::UNIX_EPOCH</span>))
-        .<span class="ident">expect</span>(<span class="string">&quot;System clock was before 1970.&quot;</span>)
-        .<span class="ident">as_nanos</span>()
-        .<span class="ident">try_into</span>()
-        .<span class="ident">expect</span>(<span class="string">&quot;This function will be removed long before this is an issue.&quot;</span>)
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;deprecated&quot;</span>))]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_docs_in_private_items</span>)]</span>
-<span class="attribute">#[<span class="ident">deprecated</span>(
-    <span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.2.0&quot;</span>,
-    <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use `OffsetDateTime::now() - OffsetDateTime::unix_epoch()` to get a `Duration` since \
-            a known epoch.&quot;</span>
-)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">precise_time_s</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> {
-    <span class="kw">use</span> <span class="ident">std::time::SystemTime</span>;
-
-    (<span class="ident">SystemTime::now</span>().<span class="ident">duration_since</span>(<span class="ident">SystemTime::UNIX_EPOCH</span>))
-        .<span class="ident">expect</span>(<span class="string">&quot;System clock was before 1970.&quot;</span>)
-        .<span class="ident">as_secs_f64</span>()
-}
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="time" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>

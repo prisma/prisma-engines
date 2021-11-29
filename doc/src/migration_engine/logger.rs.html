@@ -40,7 +40,7 @@
     <span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident">FmtSubscriber::builder</span>()
         .<span class="ident">with_env_filter</span>(<span class="ident">EnvFilter::from_default_env</span>())
         .<span class="ident">json</span>()
-        .<span class="ident">with_timer</span>(<span class="ident">tracing_subscriber::fmt::time::ChronoUtc::rfc3339</span>())
+        .<span class="ident">with_timer</span>(<span class="ident">tracing_subscriber::fmt::time::UtcTime::rfc_3339</span>())
         .<span class="ident">with_writer</span>(<span class="ident">std::io::stderr</span>)
         .<span class="ident">finish</span>()
         .<span class="ident">with</span>(<span class="ident">ErrorLayer::default</span>());

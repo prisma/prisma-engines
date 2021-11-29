@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["BoxBody","A type erased http body."]],"trait":[["Body","A trait alias for [`http_body::Body`]."]]});
+initSidebarItems({"fn":[["empty_body","Create an empty `BoxBody`"]],"type":[["BoxBody","A type erased HTTP body used for tonic services."]]});

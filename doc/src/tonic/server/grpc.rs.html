@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;tonic-0.4.3&#x2F;src&#x2F;server&#x2F;grpc.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>grpc.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../tonic/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;tokio-rs&#x2F;website&#x2F;master&#x2F;public&#x2F;img&#x2F;icons&#x2F;tonic.svg' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;tonic-0.5.2&#x2F;src&#x2F;server&#x2F;grpc.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>grpc.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../tonic/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;tokio-rs&#x2F;website&#x2F;master&#x2F;public&#x2F;img&#x2F;icons&#x2F;tonic.svg' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -231,10 +231,254 @@
 <span id="231">231</span>
 <span id="232">232</span>
 <span id="233">233</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::codec::compression</span>::{
+    <span class="ident">CompressionEncoding</span>, <span class="ident">EnabledCompressionEncodings</span>, <span class="ident">SingleMessageCompressionOverride</span>,
+};
+<span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">body::BoxBody</span>,
     <span class="ident">codec</span>::{<span class="ident">encode_server</span>, <span class="ident">Codec</span>, <span class="ident">Streaming</span>},
-    <span class="ident">interceptor::Interceptor</span>,
     <span class="ident">server</span>::{<span class="ident">ClientStreamingService</span>, <span class="ident">ServerStreamingService</span>, <span class="ident">StreamingService</span>, <span class="ident">UnaryService</span>},
     <span class="ident">Code</span>, <span class="ident">Request</span>, <span class="ident">Status</span>,
 };
@@ -243,12 +487,11 @@
 <span class="kw">use</span> <span class="ident">http_body::Body</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 
-<span class="comment">// A try! type macro for intercepting requests</span>
 <span class="macro">macro_rules!</span> <span class="ident">t</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">expr</span> : <span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">expr</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">request</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">request</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">res</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">res</span>,
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">result</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">result</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">value</span>,
+            <span class="prelude-val">Err</span>(<span class="ident">status</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">status</span>.<span class="ident">to_http</span>(),
         }
     };
 }
@@ -264,7 +507,12 @@
 <span class="doccomment">/// implements some [`Body`].</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Grpc</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="ident">codec</span>: <span class="ident">T</span>,
-    <span class="ident">interceptor</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Interceptor</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Which compression encodings does the server accept for requests?</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+    <span class="ident">accept_compression_encodings</span>: <span class="ident">EnabledCompressionEncodings</span>,
+    <span class="doccomment">/// Which compression encodings might the server use for responses.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+    <span class="ident">send_compression_encodings</span>: <span class="ident">EnabledCompressionEncodings</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Grpc</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
@@ -276,17 +524,119 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">codec</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">codec</span>,
-            <span class="ident">interceptor</span>: <span class="prelude-val">None</span>,
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+            <span class="ident">accept_compression_encodings</span>: <span class="ident">EnabledCompressionEncodings::default</span>(),
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+            <span class="ident">send_compression_encodings</span>: <span class="ident">EnabledCompressionEncodings::default</span>(),
         }
     }
 
-    <span class="doccomment">/// Creates a new gRPC server with the provided [`Codec`] and will apply the provided</span>
-    <span class="doccomment">/// interceptor on each inbound request.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_interceptor</span>(<span class="ident">codec</span>: <span class="ident">T</span>, <span class="ident">interceptor</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Interceptor</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">codec</span>,
-            <span class="ident">interceptor</span>: <span class="prelude-val">Some</span>(<span class="ident">interceptor</span>.<span class="ident">into</span>()),
+    <span class="doccomment">/// Enable accepting `gzip` compressed requests.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If a request with an unsupported encoding is received the server will respond with</span>
+    <span class="doccomment">/// [`Code::UnUnimplemented`](crate::Code).</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Example</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The most common way of using this is through a server generated by tonic-build:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # struct Svc;</span>
+    <span class="doccomment">/// # struct ExampleServer&lt;T&gt;(T);</span>
+    <span class="doccomment">/// # impl&lt;T&gt; ExampleServer&lt;T&gt; {</span>
+    <span class="doccomment">/// #     fn new(svc: T) -&gt; Self { Self(svc) }</span>
+    <span class="doccomment">/// #     fn accept_gzip(self) -&gt; Self { self }</span>
+    <span class="doccomment">/// # }</span>
+    <span class="doccomment">/// # #[tonic::async_trait]</span>
+    <span class="doccomment">/// # trait Example {}</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// #[tonic::async_trait]</span>
+    <span class="doccomment">/// impl Example for Svc {</span>
+    <span class="doccomment">///     // ...</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let service = ExampleServer::new(Svc).accept_gzip();</span>
+    <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)))]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">accept_gzip</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">accept_compression_encodings</span>.<span class="ident">enable_gzip</span>();
+        <span class="self">self</span>
+    }
+
+    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>))]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">accept_gzip</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="macro">panic!</span>(<span class="string">&quot;`accept_gzip` called on a server but the `compression` feature is not enabled on tonic&quot;</span>);
+    }
+
+    <span class="doccomment">/// Enable sending `gzip` compressed responses.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Requires the client to also support receiving compressed responses.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Example</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The most common way of using this is through a server generated by tonic-build:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # struct Svc;</span>
+    <span class="doccomment">/// # struct ExampleServer&lt;T&gt;(T);</span>
+    <span class="doccomment">/// # impl&lt;T&gt; ExampleServer&lt;T&gt; {</span>
+    <span class="doccomment">/// #     fn new(svc: T) -&gt; Self { Self(svc) }</span>
+    <span class="doccomment">/// #     fn send_gzip(self) -&gt; Self { self }</span>
+    <span class="doccomment">/// # }</span>
+    <span class="doccomment">/// # #[tonic::async_trait]</span>
+    <span class="doccomment">/// # trait Example {}</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// #[tonic::async_trait]</span>
+    <span class="doccomment">/// impl Example for Svc {</span>
+    <span class="doccomment">///     // ...</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let service = ExampleServer::new(Svc).send_gzip();</span>
+    <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)))]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_gzip</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">send_compression_encodings</span>.<span class="ident">enable_gzip</span>();
+        <span class="self">self</span>
+    }
+
+    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>))]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_gzip</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="macro">panic!</span>(
+            <span class="string">&quot;`send_gzip` called on a server but the `compression` feature is not enabled on tonic&quot;</span>
+        );
+    }
+
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">apply_compression_config</span>(
+        <span class="self">self</span>,
+        <span class="ident">accept_encodings</span>: <span class="ident">EnabledCompressionEncodings</span>,
+        <span class="ident">send_encodings</span>: <span class="ident">EnabledCompressionEncodings</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>;
+
+        <span class="kw">let</span> <span class="ident">EnabledCompressionEncodings</span> { <span class="ident">gzip</span>: <span class="ident">accept_gzip</span> } <span class="op">=</span> <span class="ident">accept_encodings</span>;
+        <span class="kw">if</span> <span class="ident">accept_gzip</span> {
+            <span class="ident">this</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">accept_gzip</span>();
         }
+
+        <span class="kw">let</span> <span class="ident">EnabledCompressionEncodings</span> { <span class="ident">gzip</span>: <span class="ident">send_gzip</span> } <span class="op">=</span> <span class="ident">send_encodings</span>;
+        <span class="kw">if</span> <span class="ident">send_gzip</span> {
+            <span class="ident">this</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">send_gzip</span>();
+        }
+
+        <span class="ident">this</span>
+    }
+
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>))]</span>
+    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_variables</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">apply_compression_config</span>(<span class="self">self</span>, <span class="ident">accept_encodings</span>: (), <span class="ident">send_encodings</span>: ()) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="self">self</span>
     }
 
     <span class="doccomment">/// Handle a single unary gRPC request.</span>
@@ -300,24 +650,41 @@
         <span class="ident">B</span>: <span class="ident">Body</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
         <span class="ident">B::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
     {
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+        <span class="kw">let</span> <span class="ident">accept_encoding</span> <span class="op">=</span> <span class="ident">CompressionEncoding::from_accept_encoding_header</span>(
+            <span class="ident">req</span>.<span class="ident">headers</span>(),
+            <span class="self">self</span>.<span class="ident">send_compression_encodings</span>,
+        );
+
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">map_request_unary</span>(<span class="ident">req</span>).<span class="kw">await</span> {
             <span class="prelude-val">Ok</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="prelude-val">Err</span>(<span class="ident">status</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">return</span> <span class="self">self</span>
-                    .<span class="ident">map_response</span>::<span class="op">&lt;</span><span class="ident">stream::Once</span><span class="op">&lt;</span><span class="ident">future::Ready</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T::Encode</span>, <span class="ident">Status</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="prelude-val">Err</span>(
-                        <span class="ident">status</span>,
-                    ));
+                    .<span class="ident">map_response</span>::<span class="op">&lt;</span><span class="ident">stream::Once</span><span class="op">&lt;</span><span class="ident">future::Ready</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T::Encode</span>, <span class="ident">Status</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+                        <span class="prelude-val">Err</span>(<span class="ident">status</span>),
+                        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+                        <span class="ident">accept_encoding</span>,
+                        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+                        <span class="ident">SingleMessageCompressionOverride::default</span>(),
+                    );
             }
         };
-
-        <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="macro">t!</span>(<span class="self">self</span>.<span class="ident">intercept_request</span>(<span class="ident">request</span>));
 
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">service</span>
             .<span class="ident">call</span>(<span class="ident">request</span>)
             .<span class="kw">await</span>
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">stream::once</span>(<span class="ident">future::ok</span>(<span class="ident">m</span>))));
 
-        <span class="self">self</span>.<span class="ident">map_response</span>(<span class="ident">response</span>)
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+        <span class="kw">let</span> <span class="ident">compression_override</span> <span class="op">=</span> <span class="ident">compression_override_from_response</span>(<span class="kw-2">&amp;</span><span class="ident">response</span>);
+
+        <span class="self">self</span>.<span class="ident">map_response</span>(
+            <span class="ident">response</span>,
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+            <span class="ident">accept_encoding</span>,
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+            <span class="ident">compression_override</span>,
+        )
     }
 
     <span class="doccomment">/// Handle a server side streaming request.</span>
@@ -332,18 +699,36 @@
         <span class="ident">B</span>: <span class="ident">Body</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
         <span class="ident">B::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
     {
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+        <span class="kw">let</span> <span class="ident">accept_encoding</span> <span class="op">=</span> <span class="ident">CompressionEncoding::from_accept_encoding_header</span>(
+            <span class="ident">req</span>.<span class="ident">headers</span>(),
+            <span class="self">self</span>.<span class="ident">send_compression_encodings</span>,
+        );
+
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">map_request_unary</span>(<span class="ident">req</span>).<span class="kw">await</span> {
             <span class="prelude-val">Ok</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="prelude-val">Err</span>(<span class="ident">status</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">return</span> <span class="self">self</span>.<span class="ident">map_response</span>::<span class="op">&lt;</span><span class="ident">S::ResponseStream</span><span class="op">&gt;</span>(<span class="prelude-val">Err</span>(<span class="ident">status</span>));
+                <span class="kw">return</span> <span class="self">self</span>.<span class="ident">map_response</span>::<span class="op">&lt;</span><span class="ident">S::ResponseStream</span><span class="op">&gt;</span>(
+                    <span class="prelude-val">Err</span>(<span class="ident">status</span>),
+                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+                    <span class="ident">accept_encoding</span>,
+                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+                    <span class="ident">SingleMessageCompressionOverride::default</span>(),
+                );
             }
         };
 
-        <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="macro">t!</span>(<span class="self">self</span>.<span class="ident">intercept_request</span>(<span class="ident">request</span>));
-
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">service</span>.<span class="ident">call</span>(<span class="ident">request</span>).<span class="kw">await</span>;
 
-        <span class="self">self</span>.<span class="ident">map_response</span>(<span class="ident">response</span>)
+        <span class="self">self</span>.<span class="ident">map_response</span>(
+            <span class="ident">response</span>,
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+            <span class="ident">accept_encoding</span>,
+            <span class="comment">// disabling compression of individual stream items must be done on</span>
+            <span class="comment">// the items themselves</span>
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+            <span class="ident">SingleMessageCompressionOverride::default</span>(),
+        )
     }
 
     <span class="doccomment">/// Handle a client side streaming gRPC request.</span>
@@ -357,13 +742,29 @@
         <span class="ident">B</span>: <span class="ident">Body</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
         <span class="ident">B::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
-        <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">map_request_streaming</span>(<span class="ident">req</span>);
-        <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="macro">t!</span>(<span class="self">self</span>.<span class="ident">intercept_request</span>(<span class="ident">request</span>));
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+        <span class="kw">let</span> <span class="ident">accept_encoding</span> <span class="op">=</span> <span class="ident">CompressionEncoding::from_accept_encoding_header</span>(
+            <span class="ident">req</span>.<span class="ident">headers</span>(),
+            <span class="self">self</span>.<span class="ident">send_compression_encodings</span>,
+        );
+
+        <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="macro">t!</span>(<span class="self">self</span>.<span class="ident">map_request_streaming</span>(<span class="ident">req</span>));
+
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">service</span>
             .<span class="ident">call</span>(<span class="ident">request</span>)
             .<span class="kw">await</span>
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">stream::once</span>(<span class="ident">future::ok</span>(<span class="ident">m</span>))));
-        <span class="self">self</span>.<span class="ident">map_response</span>(<span class="ident">response</span>)
+
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+        <span class="kw">let</span> <span class="ident">compression_override</span> <span class="op">=</span> <span class="ident">compression_override_from_response</span>(<span class="kw-2">&amp;</span><span class="ident">response</span>);
+
+        <span class="self">self</span>.<span class="ident">map_response</span>(
+            <span class="ident">response</span>,
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+            <span class="ident">accept_encoding</span>,
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+            <span class="ident">compression_override</span>,
+        )
     }
 
     <span class="doccomment">/// Handle a bi-directional streaming gRPC request.</span>
@@ -378,10 +779,23 @@
         <span class="ident">B</span>: <span class="ident">Body</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
         <span class="ident">B::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
     {
-        <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">map_request_streaming</span>(<span class="ident">req</span>);
-        <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="macro">t!</span>(<span class="self">self</span>.<span class="ident">intercept_request</span>(<span class="ident">request</span>));
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+        <span class="kw">let</span> <span class="ident">accept_encoding</span> <span class="op">=</span> <span class="ident">CompressionEncoding::from_accept_encoding_header</span>(
+            <span class="ident">req</span>.<span class="ident">headers</span>(),
+            <span class="self">self</span>.<span class="ident">send_compression_encodings</span>,
+        );
+
+        <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="macro">t!</span>(<span class="self">self</span>.<span class="ident">map_request_streaming</span>(<span class="ident">req</span>));
+
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">service</span>.<span class="ident">call</span>(<span class="ident">request</span>).<span class="kw">await</span>;
-        <span class="self">self</span>.<span class="ident">map_response</span>(<span class="ident">response</span>)
+
+        <span class="self">self</span>.<span class="ident">map_response</span>(
+            <span class="ident">response</span>,
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+            <span class="ident">accept_encoding</span>,
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+            <span class="ident">SingleMessageCompressionOverride::default</span>(),
+        )
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">map_request_unary</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(
@@ -392,7 +806,16 @@
         <span class="ident">B</span>: <span class="ident">Body</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
         <span class="ident">B::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
     {
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+        <span class="kw">let</span> <span class="ident">request_compression_encoding</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">request_encoding_if_supported</span>(<span class="kw-2">&amp;</span><span class="ident">request</span>)<span class="question-mark">?</span>;
+
         <span class="kw">let</span> (<span class="ident">parts</span>, <span class="ident">body</span>) <span class="op">=</span> <span class="ident">request</span>.<span class="ident">into_parts</span>();
+
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+        <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span>
+            <span class="ident">Streaming::new_request</span>(<span class="self">self</span>.<span class="ident">codec</span>.<span class="ident">decoder</span>(), <span class="ident">body</span>, <span class="ident">request_compression_encoding</span>);
+
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>))]</span>
         <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">Streaming::new_request</span>(<span class="self">self</span>.<span class="ident">codec</span>.<span class="ident">decoder</span>(), <span class="ident">body</span>);
 
         <span class="macro">futures_util::pin_mut!</span>(<span class="ident">stream</span>);
@@ -414,55 +837,114 @@
     <span class="kw">fn</span> <span class="ident">map_request_streaming</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">request</span>: <span class="ident">http::Request</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Streaming</span><span class="op">&lt;</span><span class="ident">T::Decode</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Streaming</span><span class="op">&lt;</span><span class="ident">T::Decode</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Status</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">B</span>: <span class="ident">Body</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
         <span class="ident">B::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
     {
-        <span class="ident">Request::from_http</span>(<span class="ident">request</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">body</span><span class="op">|</span> <span class="ident">Streaming::new_request</span>(<span class="self">self</span>.<span class="ident">codec</span>.<span class="ident">decoder</span>(), <span class="ident">body</span>)))
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+        <span class="kw">let</span> <span class="ident">encoding</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">request_encoding_if_supported</span>(<span class="kw-2">&amp;</span><span class="ident">request</span>)<span class="question-mark">?</span>;
+
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+        <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span>
+            <span class="ident">request</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">body</span><span class="op">|</span> <span class="ident">Streaming::new_request</span>(<span class="self">self</span>.<span class="ident">codec</span>.<span class="ident">decoder</span>(), <span class="ident">body</span>, <span class="ident">encoding</span>));
+
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>))]</span>
+        <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">request</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">body</span><span class="op">|</span> <span class="ident">Streaming::new_request</span>(<span class="self">self</span>.<span class="ident">codec</span>.<span class="ident">decoder</span>(), <span class="ident">body</span>));
+
+        <span class="prelude-val">Ok</span>(<span class="ident">Request::from_http</span>(<span class="ident">request</span>))
     }
 
     <span class="kw">fn</span> <span class="ident">map_response</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">response</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Response</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>, <span class="ident">Status</span><span class="op">&gt;</span>,
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span> <span class="ident">accept_encoding</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CompressionEncoding</span><span class="op">&gt;</span>,
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span> <span class="ident">compression_override</span>: <span class="ident">SingleMessageCompressionOverride</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">http::Response</span><span class="op">&lt;</span><span class="ident">BoxBody</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">B</span>: <span class="ident">TryStream</span><span class="op">&lt;</span><span class="prelude-val">Ok</span> <span class="op">=</span> <span class="ident">T::Encode</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Status</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
-        <span class="kw">match</span> <span class="ident">response</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">parts</span>, <span class="ident">body</span>) <span class="op">=</span> <span class="ident">r</span>.<span class="ident">into_http</span>().<span class="ident">into_parts</span>();
+        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">response</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="prelude-val">Err</span>(<span class="ident">status</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">status</span>.<span class="ident">to_http</span>(),
+        };
 
-                <span class="comment">// Set the content type</span>
-                <span class="ident">parts</span>.<span class="ident">headers</span>.<span class="ident">insert</span>(
-                    <span class="ident">http::header::CONTENT_TYPE</span>,
-                    <span class="ident">http::header::HeaderValue::from_static</span>(<span class="string">&quot;application/grpc&quot;</span>),
-                );
+        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">parts</span>, <span class="ident">body</span>) <span class="op">=</span> <span class="ident">response</span>.<span class="ident">into_http</span>().<span class="ident">into_parts</span>();
 
-                <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">encode_server</span>(<span class="self">self</span>.<span class="ident">codec</span>.<span class="ident">encoder</span>(), <span class="ident">body</span>.<span class="ident">into_stream</span>());
+        <span class="comment">// Set the content type</span>
+        <span class="ident">parts</span>.<span class="ident">headers</span>.<span class="ident">insert</span>(
+            <span class="ident">http::header::CONTENT_TYPE</span>,
+            <span class="ident">http::header::HeaderValue::from_static</span>(<span class="string">&quot;application/grpc&quot;</span>),
+        );
 
-                <span class="ident">http::Response::from_parts</span>(<span class="ident">parts</span>, <span class="ident">BoxBody::new</span>(<span class="ident">body</span>))
-            }
-            <span class="prelude-val">Err</span>(<span class="ident">status</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">status</span>.<span class="ident">to_http</span>(),
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">encoding</span>) <span class="op">=</span> <span class="ident">accept_encoding</span> {
+            <span class="comment">// Set the content encoding</span>
+            <span class="ident">parts</span>.<span class="ident">headers</span>.<span class="ident">insert</span>(
+                <span class="ident"><span class="kw">crate</span>::codec::compression::ENCODING_HEADER</span>,
+                <span class="ident">encoding</span>.<span class="ident">into_header_value</span>(),
+            );
         }
+
+        <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">encode_server</span>(
+            <span class="self">self</span>.<span class="ident">codec</span>.<span class="ident">encoder</span>(),
+            <span class="ident">body</span>.<span class="ident">into_stream</span>(),
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+            <span class="ident">accept_encoding</span>,
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+            <span class="ident">compression_override</span>,
+        );
+
+        <span class="ident">http::Response::from_parts</span>(<span class="ident">parts</span>, <span class="ident">BoxBody::new</span>(<span class="ident">body</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">intercept_request</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>, <span class="ident">http::Response</span><span class="op">&lt;</span><span class="ident">BoxBody</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">interceptor</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">interceptor</span> {
-            <span class="kw">match</span> <span class="ident">interceptor</span>.<span class="ident">call</span>(<span class="ident">req</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">req</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">req</span>),
-                <span class="prelude-val">Err</span>(<span class="ident">status</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">status</span>.<span class="ident">to_http</span>()),
-            }
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">req</span>)
-        }
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+    <span class="kw">fn</span> <span class="ident">request_encoding_if_supported</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">request</span>: <span class="kw-2">&amp;</span><span class="ident">http::Request</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CompressionEncoding</span><span class="op">&gt;</span>, <span class="ident">Status</span><span class="op">&gt;</span> {
+        <span class="ident">CompressionEncoding::from_encoding_header</span>(
+            <span class="ident">request</span>.<span class="ident">headers</span>(),
+            <span class="self">self</span>.<span class="ident">accept_compression_encodings</span>,
+        )
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">fmt::Debug</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Grpc</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Grpc&quot;</span>).<span class="ident">field</span>(<span class="string">&quot;codec&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">codec</span>).<span class="ident">finish</span>()
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Grpc&quot;</span>);
+
+        <span class="ident">f</span>.<span class="ident">field</span>(<span class="string">&quot;codec&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">codec</span>);
+
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+        <span class="ident">f</span>.<span class="ident">field</span>(
+            <span class="string">&quot;accept_compression_encodings&quot;</span>,
+            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">accept_compression_encodings</span>,
+        );
+
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+        <span class="ident">f</span>.<span class="ident">field</span>(
+            <span class="string">&quot;send_compression_encodings&quot;</span>,
+            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">send_compression_encodings</span>,
+        );
+
+        <span class="ident">f</span>.<span class="ident">finish</span>()
     }
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+<span class="kw">fn</span> <span class="ident">compression_override_from_response</span><span class="op">&lt;</span><span class="ident">B</span>, <span class="ident">E</span><span class="op">&gt;</span>(
+    <span class="ident">res</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Response</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>, <span class="ident">E</span><span class="op">&gt;</span>,
+) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SingleMessageCompressionOverride</span> {
+    <span class="ident">res</span>.<span class="ident">as_ref</span>()
+        .<span class="ident">ok</span>()
+        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">response</span><span class="op">|</span> {
+            <span class="ident">response</span>
+                .<span class="ident">extensions</span>()
+                .<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident">SingleMessageCompressionOverride</span><span class="op">&gt;</span>()
+                .<span class="ident">copied</span>()
+        })
+        .<span class="ident">unwrap_or_default</span>()
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tonic" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>

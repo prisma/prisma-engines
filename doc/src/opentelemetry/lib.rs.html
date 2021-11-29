@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;opentelemetry-0.12.0&#x2F;src&#x2F;lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../opentelemetry/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;open-telemetry&#x2F;opentelemetry-rust&#x2F;master&#x2F;assets&#x2F;logo.svg' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;opentelemetry-0.16.0&#x2F;src&#x2F;lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../opentelemetry/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;open-telemetry&#x2F;opentelemetry-rust&#x2F;main&#x2F;assets&#x2F;logo.svg' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -205,9 +205,70 @@
 <span id="205">205</span>
 <span id="206">206</span>
 <span id="207">207</span>
-</pre><pre class="rust"><code><span class="doccomment">//! The Rust [OpenTelemetry](https://opentelemetry.io/) implementation.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! OpenTelemetry provides a single set of APIs, libraries, agents, and collector</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+</pre><pre class="rust"><code><span class="doccomment">//! OpenTelemetry provides a single set of APIs, libraries, agents, and collector</span>
 <span class="doccomment">//! services to capture distributed traces and metrics from your application. You</span>
 <span class="doccomment">//! can analyze them using [Prometheus], [Jaeger], and other observability tools.</span>
 <span class="doccomment">//!</span>
@@ -217,28 +278,95 @@
 <span class="doccomment">//! [Jaeger]: https://www.jaegertracing.io</span>
 <span class="doccomment">//! [msrv]: #supported-rust-versions</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! ## Getting Started</span>
+<span class="doccomment">//! # Getting Started</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```no_run</span>
 <span class="doccomment">//! # #[cfg(feature = &quot;trace&quot;)]</span>
 <span class="doccomment">//! # {</span>
-<span class="doccomment">//! use opentelemetry::{sdk::export::trace::stdout, trace::Tracer};</span>
+<span class="doccomment">//! use opentelemetry::{global, sdk::export::trace::stdout, trace::Tracer};</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error + Send + Sync + &#39;static&gt;&gt; {</span>
-<span class="doccomment">//!     // Create a new instrumentation pipeline</span>
-<span class="doccomment">//!     let (tracer, _uninstall) = stdout::new_pipeline().install();</span>
+<span class="doccomment">//! fn main() {</span>
+<span class="doccomment">//!     // Create a new trace pipeline that prints to stdout</span>
+<span class="doccomment">//!     let tracer = stdout::new_pipeline().install_simple();</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//!     tracer.in_span(&quot;doing_work&quot;, |cx| {</span>
 <span class="doccomment">//!         // Traced app logic here...</span>
 <span class="doccomment">//!     });</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//!     Ok(())</span>
+<span class="doccomment">//!     // Shutdown trace pipeline</span>
+<span class="doccomment">//!     global::shutdown_tracer_provider();</span>
 <span class="doccomment">//! }</span>
-<span class="doccomment">//! }</span>
+<span class="doccomment">//! # }</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! See the [examples](https://github.com/open-telemetry/opentelemetry-rust/tree/master/examples)</span>
-<span class="doccomment">//! directory for different integration patterns.</span>
+<span class="doccomment">//! See the [examples] directory for different integration patterns.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! [examples]: https://github.com/open-telemetry/opentelemetry-rust/tree/main/examples</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Traces</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The [`trace`] module includes types for tracking the progression of a single</span>
+<span class="doccomment">//! request while it is handled by services that make up an application. A trace</span>
+<span class="doccomment">//! is a tree of [`Span`]s which are objects that represent the work being done</span>
+<span class="doccomment">//! by individual services or components involved in a request as it flows</span>
+<span class="doccomment">//! through a system.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ### Creating and exporting spans</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//! # #[cfg(feature = &quot;trace&quot;)]</span>
+<span class="doccomment">//! # {</span>
+<span class="doccomment">//! use opentelemetry::{global, trace::{Span, Tracer}, KeyValue};</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // get a tracer from a provider</span>
+<span class="doccomment">//! let tracer = global::tracer(&quot;my_service&quot;);</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // start a new span</span>
+<span class="doccomment">//! let mut span = tracer.start(&quot;my_span&quot;);</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // set some attributes</span>
+<span class="doccomment">//! span.set_attribute(KeyValue::new(&quot;http.client_ip&quot;, &quot;83.164.160.102&quot;));</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // perform some more work...</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // end or drop the span to export</span>
+<span class="doccomment">//! span.end();</span>
+<span class="doccomment">//! # }</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! See the [`trace`] module docs for more information on creating and managing</span>
+<span class="doccomment">//! spans.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! [`Span`]: crate::trace::Span</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Metrics</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Note: the metrics specification is **still in progress** and **subject to major</span>
+<span class="doccomment">//! changes**.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The [`metrics`] module includes types for recording measurements about a</span>
+<span class="doccomment">//! service at runtime.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ### Creating instruments and recording measurements</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//! # #[cfg(feature = &quot;metrics&quot;)]</span>
+<span class="doccomment">//! # {</span>
+<span class="doccomment">//! use opentelemetry::{global, KeyValue};</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // get a meter from a provider</span>
+<span class="doccomment">//! let meter = global::meter(&quot;my_service&quot;);</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // create an instrument</span>
+<span class="doccomment">//! let counter = meter.u64_counter(&quot;my_counter&quot;).init();</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // record a measurement</span>
+<span class="doccomment">//! counter.add(1, &amp;[KeyValue::new(&quot;http.client_ip&quot;, &quot;83.164.160.102&quot;)]);</span>
+<span class="doccomment">//! # }</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! See the [`metrics`] module docs for more information on creating and</span>
+<span class="doccomment">//! managing instruments.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ## Crate Feature Flags</span>
 <span class="doccomment">//!</span>
@@ -251,28 +379,13 @@
 <span class="doccomment">//! Support for recording and exporting telemetry asynchronously can be added</span>
 <span class="doccomment">//! via the following flags:</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! * `tokio-support`: Spawn telemetry tasks using [tokio]&#39;s runtime.</span>
-<span class="doccomment">//! * `async-std`: Spawn telemetry tasks using [async-std]&#39;s runtime.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The following flags enable propagating information in other crate</span>
-<span class="doccomment">//! ecosystems:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! * `http`: Propagate information via [http] header maps.</span>
-<span class="doccomment">//! * `tonic`: Propagate information via [tonic]&#39;s metadata.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Finally the following flags can be used by exporter authors:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! * `reqwest`: Implementation of [`HttpClient`] for [reqwest].</span>
-<span class="doccomment">//! * `surf`: Implementation of [`HttpClient`] for [surf]`.</span>
+<span class="doccomment">//! * `rt-tokio`: Spawn telemetry tasks using [tokio]&#39;s multi-thread runtime.</span>
+<span class="doccomment">//! * `rt-tokio-current-thread`: Spawn telemetry tasks on a separate runtime so that the main runtime won&#39;t be blocked.</span>
+<span class="doccomment">//! * `rt-async-std`: Spawn telemetry tasks using [async-std]&#39;s runtime.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! [tokio]: https://crates.io/crates/tokio</span>
 <span class="doccomment">//! [async-std]: https://crates.io/crates/async-std</span>
 <span class="doccomment">//! [serde]: https://crates.io/crates/serde</span>
-<span class="doccomment">//! [http]: https://crates.io/crates/http</span>
-<span class="doccomment">//! [tonic]: https://crates.io/crates/tonic</span>
-<span class="doccomment">//! [`HttpClient`]: crate::sdk::export::trace::HttpClient</span>
-<span class="doccomment">//! [reqwest]: https://crates.io/crates/reqwest</span>
-<span class="doccomment">//! [surf]: https://crates.io/crates/surf</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ## Related Crates</span>
 <span class="doccomment">//!</span>
@@ -285,6 +398,8 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! In particular, the following crates are likely to be of interest:</span>
 <span class="doccomment">//!</span>
+<span class="doccomment">//! - [`opentelemetry-http`] provides an interface for injecting and extracting</span>
+<span class="doccomment">//!   trace information from [`http`] headers.</span>
 <span class="doccomment">//! - [`opentelemetry-jaeger`] provides a pipeline and exporter for sending</span>
 <span class="doccomment">//!   trace information to [`Jaeger`].</span>
 <span class="doccomment">//! - [`opentelemetry-otlp`] exporter for sending trace and metric data in the</span>
@@ -293,10 +408,14 @@
 <span class="doccomment">//!   metrics information to [`Prometheus`].</span>
 <span class="doccomment">//! - [`opentelemetry-zipkin`] provides a pipeline and exporter for sending</span>
 <span class="doccomment">//!   trace information to [`Zipkin`].</span>
-<span class="doccomment">//! - [`opentelemetry-contrib`] provides additional exporters to vendors like</span>
-<span class="doccomment">//!   [`Datadog`].</span>
+<span class="doccomment">//! - [`opentelemetry-datadog`] provides additional exporters to [`Datadog`].</span>
+<span class="doccomment">//! - [`opentelemetry-aws`] provides unofficial propagators for AWS X-ray.</span>
+<span class="doccomment">//! - [`opentelemetry-contrib`] provides additional exporters and propagators that are</span>
+<span class="doccomment">//!   experimental.</span>
 <span class="doccomment">//! - [`opentelemetry-semantic-conventions`] provides standard names and</span>
 <span class="doccomment">//!   semantic otel conventions.</span>
+<span class="doccomment">//! - [`opentelemetry-stackdriver`] provides an exporter for Google&#39;s [Cloud Trace]</span>
+<span class="doccomment">//!   (which used to be called StackDriver).</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Additionally, there are also several third-party crates which are not</span>
 <span class="doccomment">//! maintained by the `opentelemetry` project. These include:</span>
@@ -309,8 +428,6 @@
 <span class="doccomment">//!   Application Insights] exporter.</span>
 <span class="doccomment">//! - [`opentelemetry-tide`] provides integration for the [`Tide`] web server</span>
 <span class="doccomment">//!   and ecosystem.</span>
-<span class="doccomment">//! - [`opentelemetry-stackdriver`] provides an exporter for Google&#39;s [Cloud Trace]</span>
-<span class="doccomment">//!   (which used to be called StackDriver).</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! If you&#39;re the maintainer of an `opentelemetry` ecosystem crate not listed</span>
 <span class="doccomment">//! above, please let us know! We&#39;d love to add your project to the list!</span>
@@ -319,11 +436,15 @@
 <span class="doccomment">//! [`opentelemetry-jaeger`]: https://crates.io/crates/opentelemetry-jaeger</span>
 <span class="doccomment">//! [`Jaeger`]: https://www.jaegertracing.io</span>
 <span class="doccomment">//! [`opentelemetry-otlp`]: https://crates.io/crates/opentelemetry-otlp</span>
+<span class="doccomment">//! [`opentelemetry-http`]: https://crates.io/crates/opentelemetry-http</span>
 <span class="doccomment">//! [`opentelemetry-prometheus`]: https://crates.io/crates/opentelemetry-prometheus</span>
+<span class="doccomment">//! [`opentelemetry-aws`]: https://crates.io/crates/opentelemetry-aws</span>
 <span class="doccomment">//! [`Prometheus`]: https://prometheus.io</span>
 <span class="doccomment">//! [`opentelemetry-zipkin`]: https://crates.io/crates/opentelemetry-zipkin</span>
+<span class="doccomment">//! [`http`]: https://crates.io/crates/http</span>
 <span class="doccomment">//! [`Zipkin`]: https://zipkin.io</span>
 <span class="doccomment">//! [`opentelemetry-contrib`]: https://crates.io/crates/opentelemetry-contrib</span>
+<span class="doccomment">//! [`opentelemetry-datadog`]: https://crates.io/crates/opentelemetry-datadog</span>
 <span class="doccomment">//! [`Datadog`]: https://www.datadoghq.com</span>
 <span class="doccomment">//! [`opentelemetry-semantic-conventions`]: https://crates.io/crates/opentelemetry-semantic-conventions</span>
 <span class="doccomment">//!</span>
@@ -361,9 +482,9 @@
     <span class="ident">unused</span>
 )]</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::needless_doctest_main</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">feature</span>(<span class="ident">doc_cfg</span>), <span class="ident">deny</span>(<span class="ident">broken_intra_doc_links</span>))]</span>
+<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">feature</span>(<span class="ident">doc_cfg</span>), <span class="ident">deny</span>(<span class="ident">rustdoc::broken_intra_doc_links</span>))]</span>
 <span class="attribute">#![<span class="ident">doc</span>(
-    <span class="ident">html_logo_url</span> <span class="op">=</span> <span class="string">&quot;https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/master/assets/logo.svg&quot;</span>
+    <span class="ident">html_logo_url</span> <span class="op">=</span> <span class="string">&quot;https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg&quot;</span>
 )]</span>
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">test</span>, <span class="ident">deny</span>(<span class="ident">warnings</span>))]</span>
 
@@ -371,22 +492,27 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">sdk</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;testing&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
+<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">testing</span>;
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">baggage</span>;
 
 <span class="kw">mod</span> <span class="ident">context</span>;
+
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">context</span>::{<span class="ident">Context</span>, <span class="ident">ContextGuard</span>};
 
-<span class="kw">mod</span> <span class="ident">core</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{<span class="ident">Array</span>, <span class="ident">Key</span>, <span class="ident">KeyValue</span>, <span class="ident">Unit</span>, <span class="ident">Value</span>};
+<span class="kw">mod</span> <span class="ident">common</span>;
 
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">common</span>::{<span class="ident">Array</span>, <span class="ident">Key</span>, <span class="ident">KeyValue</span>, <span class="ident">Value</span>};
+
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">runtime</span>;
+
+<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">util</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;metrics&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;metrics&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">labels</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">attributes</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;metrics&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;metrics&quot;</span>)))]</span>

@@ -39,7 +39,8 @@
 <span id="39">39</span>
 <span id="40">40</span>
 <span id="41">41</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">opentelemetry::trace</span>::{<span class="ident">SpanContext</span>, <span class="ident">TraceContextExt</span>};
+<span id="42">42</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">opentelemetry::trace</span>::{<span class="ident">SpanContext</span>, <span class="ident">TraceContextExt</span>, <span class="ident">TraceFlags</span>};
 <span class="kw">use</span> <span class="ident">quaint::ast</span>::{<span class="ident">Delete</span>, <span class="ident">Insert</span>, <span class="ident">Select</span>, <span class="ident">Update</span>};
 <span class="kw">use</span> <span class="ident">tracing::Span</span>;
 <span class="kw">use</span> <span class="ident">tracing_opentelemetry::OpenTelemetrySpanExt</span>;
@@ -60,10 +61,11 @@
     (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">what</span>:<span class="ident">ty</span>) <span class="op">=</span><span class="op">&gt;</span> {
         <span class="kw">impl</span> <span class="ident">SqlTraceComment</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">what</span> {
             <span class="kw">fn</span> <span class="ident">append_trace</span>(<span class="self">self</span>, <span class="ident">span</span>: <span class="kw-2">&amp;</span><span class="ident">Span</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-                <span class="kw">let</span> <span class="ident">span_ctx</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">context</span>();
-                <span class="kw">let</span> <span class="ident">otel_ctx</span> <span class="op">=</span> <span class="ident">span_ctx</span>.<span class="ident">span</span>().<span class="ident">span_context</span>();
+                <span class="kw">let</span> <span class="ident">otel_ctx</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">context</span>();
+                <span class="kw">let</span> <span class="ident">span_ref</span> <span class="op">=</span> <span class="ident">otel_ctx</span>.<span class="ident">span</span>();
+                <span class="kw">let</span> <span class="ident">otel_ctx</span> <span class="op">=</span> <span class="ident">span_ref</span>.<span class="ident">span_context</span>();
 
-                <span class="kw">if</span> <span class="ident">otel_ctx</span>.<span class="ident">trace_flags</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span> {
+                <span class="kw">if</span> <span class="ident">otel_ctx</span>.<span class="ident">trace_flags</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">TraceFlags::SAMPLED</span> {
                     <span class="self">self</span>.<span class="ident">comment</span>(<span class="ident">trace_parent_to_string</span>(<span class="ident">otel_ctx</span>))
                 } <span class="kw">else</span> {
                     <span class="self">self</span>

@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["EnvResourceDetector","Resource detector implements ResourceDetector and is used to extract general SDK configuration from environment."]]});

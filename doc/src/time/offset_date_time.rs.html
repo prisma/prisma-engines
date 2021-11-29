@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;time-0.2.27&#x2F;src&#x2F;offset_date_time.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>offset_date_time.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="https:&#x2F;&#x2F;avatars0.githubusercontent.com&#x2F;u&#x2F;55999857"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../time/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;avatars0.githubusercontent.com&#x2F;u&#x2F;55999857' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;time-0.3.5&#x2F;src&#x2F;offset_date_time.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>offset_date_time.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="https:&#x2F;&#x2F;avatars0.githubusercontent.com&#x2F;u&#x2F;55999857"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../time/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;avatars0.githubusercontent.com&#x2F;u&#x2F;55999857' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1056,252 +1056,100 @@
 <span id="1056">1056</span>
 <span id="1057">1057</span>
 <span id="1058">1058</span>
-<span id="1059">1059</span>
-<span id="1060">1060</span>
-<span id="1061">1061</span>
-<span id="1062">1062</span>
-<span id="1063">1063</span>
-<span id="1064">1064</span>
-<span id="1065">1065</span>
-<span id="1066">1066</span>
-<span id="1067">1067</span>
-<span id="1068">1068</span>
-<span id="1069">1069</span>
-<span id="1070">1070</span>
-<span id="1071">1071</span>
-<span id="1072">1072</span>
-<span id="1073">1073</span>
-<span id="1074">1074</span>
-<span id="1075">1075</span>
-<span id="1076">1076</span>
-<span id="1077">1077</span>
-<span id="1078">1078</span>
-<span id="1079">1079</span>
-<span id="1080">1080</span>
-<span id="1081">1081</span>
-<span id="1082">1082</span>
-<span id="1083">1083</span>
-<span id="1084">1084</span>
-<span id="1085">1085</span>
-<span id="1086">1086</span>
-<span id="1087">1087</span>
-<span id="1088">1088</span>
-<span id="1089">1089</span>
-<span id="1090">1090</span>
-<span id="1091">1091</span>
-<span id="1092">1092</span>
-<span id="1093">1093</span>
-<span id="1094">1094</span>
-<span id="1095">1095</span>
-<span id="1096">1096</span>
-<span id="1097">1097</span>
-<span id="1098">1098</span>
-<span id="1099">1099</span>
-<span id="1100">1100</span>
-<span id="1101">1101</span>
-<span id="1102">1102</span>
-<span id="1103">1103</span>
-<span id="1104">1104</span>
-<span id="1105">1105</span>
-<span id="1106">1106</span>
-<span id="1107">1107</span>
-<span id="1108">1108</span>
-<span id="1109">1109</span>
-<span id="1110">1110</span>
-<span id="1111">1111</span>
-<span id="1112">1112</span>
-<span id="1113">1113</span>
-<span id="1114">1114</span>
-<span id="1115">1115</span>
-<span id="1116">1116</span>
-<span id="1117">1117</span>
-<span id="1118">1118</span>
-<span id="1119">1119</span>
-<span id="1120">1120</span>
-<span id="1121">1121</span>
-<span id="1122">1122</span>
-<span id="1123">1123</span>
-<span id="1124">1124</span>
-<span id="1125">1125</span>
-<span id="1126">1126</span>
-<span id="1127">1127</span>
-<span id="1128">1128</span>
-<span id="1129">1129</span>
-<span id="1130">1130</span>
-<span id="1131">1131</span>
-<span id="1132">1132</span>
-<span id="1133">1133</span>
-<span id="1134">1134</span>
-<span id="1135">1135</span>
-<span id="1136">1136</span>
-<span id="1137">1137</span>
-<span id="1138">1138</span>
-</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">format::parse</span>::{<span class="ident">parse</span>, <span class="ident">ParsedItems</span>},
-    <span class="ident">internals</span>, <span class="ident">Date</span>, <span class="ident">DeferredFormat</span>, <span class="ident">Duration</span>, <span class="ident">Format</span>, <span class="ident">ParseResult</span>, <span class="ident">PrimitiveDateTime</span>, <span class="ident">Time</span>,
-    <span class="ident">UtcOffset</span>, <span class="ident">Weekday</span>,
-};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">alloc::string</span>::{<span class="ident">String</span>, <span class="ident">ToString</span>};
+</pre><pre class="rust"><code><span class="doccomment">//! The [`OffsetDateTime`] struct and its associated `impl`s.</span>
+
+<span class="kw">use</span> <span class="ident">core::cmp::Ordering</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">core::convert::From</span>;
-<span class="kw">use</span> <span class="ident">core</span>::{
-    <span class="ident">cmp::Ordering</span>,
-    <span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Display</span>},
-    <span class="ident">hash</span>::{<span class="ident">Hash</span>, <span class="ident">Hasher</span>},
-    <span class="ident">ops</span>::{<span class="ident">Add</span>, <span class="ident">AddAssign</span>, <span class="ident">Sub</span>, <span class="ident">SubAssign</span>},
-    <span class="ident">time::Duration</span> <span class="kw">as</span> <span class="ident">StdDuration</span>,
-};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">standback::convert::TryFrom</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">standback::convert::TryInto</span>;
+<span class="kw">use</span> <span class="ident">core::fmt</span>;
+<span class="kw">use</span> <span class="ident">core::hash</span>::{<span class="ident">Hash</span>, <span class="ident">Hasher</span>};
+<span class="kw">use</span> <span class="ident">core::ops</span>::{<span class="ident">Add</span>, <span class="ident">Sub</span>};
+<span class="kw">use</span> <span class="ident">core::time::Duration</span> <span class="kw">as</span> <span class="ident">StdDuration</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;formatting&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident">std::io</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::time::SystemTime</span>;
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;formatting&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::formatting::Formattable</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parsing&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parsing::Parsable</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error</span>, <span class="ident">Date</span>, <span class="ident">Duration</span>, <span class="ident">Month</span>, <span class="ident">PrimitiveDateTime</span>, <span class="ident">Time</span>, <span class="ident">UtcOffset</span>, <span class="ident">Weekday</span>};
+
+<span class="doccomment">/// The Julian day of the Unix epoch.</span>
+<span class="kw">const</span> <span class="ident">UNIX_EPOCH_JULIAN_DAY</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="ident">Date::__from_ordinal_date_unchecked</span>(<span class="number">1970</span>, <span class="number">1</span>).<span class="ident">to_julian_day</span>();
 
 <span class="doccomment">/// A [`PrimitiveDateTime`] with a [`UtcOffset`].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// All comparisons are performed using the UTC time.</span>
-<span class="comment">// Internally, an `OffsetDateTime` is a thin wrapper around a</span>
-<span class="comment">// [`PrimitiveDateTime`] coupled with a [`UtcOffset`]. This offset is added to</span>
-<span class="comment">// the date, time, or datetime as necessary for presentation or returning from a</span>
-<span class="comment">// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">serde</span>(<span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;crate::serde::PrimitiveDateTime&quot;</span>))]</span>
+<span class="comment">// Internally, an `OffsetDateTime` is a thin wrapper around a [`PrimitiveDateTime`] coupled with a</span>
+<span class="comment">// [`UtcOffset`]. This offset is added to the date, time, or datetime as necessary for presentation</span>
+<span class="comment">// or returning from a function.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OffsetDateTime</span> {
-    <span class="doccomment">/// The `PrimitiveDateTime`, which is _always_ UTC.</span>
-    <span class="ident">utc_datetime</span>: <span class="ident">PrimitiveDateTime</span>,
-    <span class="doccomment">/// The `UtcOffset`, which will be added to the `PrimitiveDateTime` as necessary.</span>
-    <span class="ident">offset</span>: <span class="ident">UtcOffset</span>,
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">serde::Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OffsetDateTime</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">serde::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    {
-        <span class="ident"><span class="kw">crate</span>::serde::PrimitiveDateTime::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>
-            .<span class="ident">try_into</span>()
-            .<span class="ident">map_err</span>(<span class="ident">serde::de::Error::custom</span>)
-    }
+    <span class="doccomment">/// The [`PrimitiveDateTime`], which is _always_ UTC.</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">utc_datetime</span>: <span class="ident">PrimitiveDateTime</span>,
+    <span class="doccomment">/// The [`UtcOffset`], which will be added to the [`PrimitiveDateTime`] as necessary.</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">offset</span>: <span class="ident">UtcOffset</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">OffsetDateTime</span> {
-    <span class="doccomment">/// Create a new `OffsetDateTime` from the provided `PrimitiveDateTime` and</span>
-    <span class="doccomment">/// `UtcOffset`. The `PrimitiveDateTime` is assumed to be in the provided</span>
-    <span class="doccomment">/// offset.</span>
-    <span class="comment">// TODO Should this be made public?</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_assuming_offset</span>(<span class="ident">utc_datetime</span>: <span class="ident">PrimitiveDateTime</span>, <span class="ident">offset</span>: <span class="ident">UtcOffset</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">utc_datetime</span>: <span class="ident">utc_datetime</span> <span class="op">-</span> <span class="ident">offset</span>.<span class="ident">as_duration</span>(),
-            <span class="ident">offset</span>,
-        }
-    }
-
-    <span class="doccomment">/// Create a new `OffsetDateTime` from the provided `PrimitiveDateTime` and</span>
-    <span class="doccomment">/// `UtcOffset`. The `PrimitiveDateTime` is assumed to be in UTC.</span>
-    <span class="comment">// TODO Should this be made public?</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new_assuming_utc</span>(<span class="ident">utc_datetime</span>: <span class="ident">PrimitiveDateTime</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">utc_datetime</span>,
-            <span class="ident">offset</span>: <span class="ident">UtcOffset::UTC</span>,
-        }
-    }
-
-    <span class="doccomment">/// Create a new `OffsetDateTime` with the current date and time in UTC.</span>
+    <span class="doccomment">/// Midnight, 1 January, 1970 (UTC).</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # #![allow(deprecated)]</span>
-    <span class="doccomment">/// # use time::{OffsetDateTime, offset};</span>
-    <span class="doccomment">/// assert!(OffsetDateTime::now().year() &gt;= 2019);</span>
-    <span class="doccomment">/// assert_eq!(OffsetDateTime::now().offset(), offset!(UTC));</span>
+    <span class="doccomment">/// # use time::{OffsetDateTime, macros::datetime};</span>
+    <span class="doccomment">/// assert_eq!(OffsetDateTime::UNIX_EPOCH, datetime!(1970-01-01 0:00 UTC),);</span>
     <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(
-        <span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.2.11&quot;</span>,
-        <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;This function returns a value with an offset of UTC, which is not apparent from \
-                its name alone. You should use `OffsetDateTime::now_utc()` instead.&quot;</span>
-    )]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">__time_02_docs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">now</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident">SystemTime::now</span>().<span class="ident">into</span>()
-    }
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">UNIX_EPOCH</span>: <span class="self">Self</span> <span class="op">=</span> <span class="ident">Date::__from_ordinal_date_unchecked</span>(<span class="number">1970</span>, <span class="number">1</span>)
+        .<span class="ident">midnight</span>()
+        .<span class="ident">assume_utc</span>();
 
+    <span class="comment">// region: now</span>
     <span class="doccomment">/// Create a new `OffsetDateTime` with the current date and time in UTC.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{OffsetDateTime, offset};</span>
+    <span class="doccomment">/// # use time::{OffsetDateTime, macros::offset};</span>
     <span class="doccomment">/// assert!(OffsetDateTime::now_utc().year() &gt;= 2019);</span>
     <span class="doccomment">/// assert_eq!(OffsetDateTime::now_utc().offset(), offset!(UTC));</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">__time_02_docs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)))]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">__time_03_docs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">now_utc</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="ident">SystemTime::now</span>().<span class="ident">into</span>()
     }
 
-    <span class="doccomment">/// Create a new `OffsetDateTime` with the current date and time in the</span>
-    <span class="doccomment">/// local offset.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # #![allow(deprecated)]</span>
-    <span class="doccomment">/// # use time::OffsetDateTime;</span>
-    <span class="doccomment">/// assert!(OffsetDateTime::now_local().year() &gt;= 2019);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">__time_02_docs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)))]</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(
-        <span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.2.23&quot;</span>,
-        <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;UTC is returned if the local offset cannot be determined&quot;</span>
-    )]</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">now_local</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::now_utc</span>();
-        <span class="ident">t</span>.<span class="ident">to_offset</span>(<span class="ident">UtcOffset::local_offset_at</span>(<span class="ident">t</span>))
-    }
-
-    <span class="doccomment">/// Attempt to create a new `OffsetDateTime` with the current date and time</span>
-    <span class="doccomment">/// in the local offset. If the offset cannot be determined, an error is</span>
-    <span class="doccomment">/// returned.</span>
+    <span class="doccomment">/// Attempt to create a new `OffsetDateTime` with the current date and time in the local offset.</span>
+    <span class="doccomment">/// If the offset cannot be determined, an error is returned.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
     <span class="doccomment">/// # use time::OffsetDateTime;</span>
-    <span class="doccomment">/// let now = OffsetDateTime::try_now_local();</span>
     <span class="doccomment">/// # if false {</span>
-    <span class="doccomment">/// assert!(now.is_ok());</span>
+    <span class="doccomment">/// assert!(OffsetDateTime::now_local().is_ok());</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">__time_02_docs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_now_local</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::IndeterminateOffset</span><span class="op">&gt;</span> {
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;local-offset&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">__time_03_docs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;local-offset&quot;</span>)))]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">now_local</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::IndeterminateOffset</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::now_utc</span>();
-        <span class="prelude-val">Ok</span>(<span class="ident">t</span>.<span class="ident">to_offset</span>(<span class="ident">UtcOffset::try_local_offset_at</span>(<span class="ident">t</span>)<span class="question-mark">?</span>))
+        <span class="prelude-val">Ok</span>(<span class="ident">t</span>.<span class="ident">to_offset</span>(<span class="ident">UtcOffset::local_offset_at</span>(<span class="ident">t</span>)<span class="question-mark">?</span>))
     }
+    <span class="comment">// endregion now</span>
 
-    <span class="doccomment">/// Convert the `OffsetDateTime` from the current `UtcOffset` to the</span>
-    <span class="doccomment">/// provided `UtcOffset`.</span>
+    <span class="doccomment">/// Convert the `OffsetDateTime` from the current [`UtcOffset`] to the provided [`UtcOffset`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{date, offset};</span>
+    <span class="doccomment">/// # use time::macros::{datetime, offset};</span>
     <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2000-01-01)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_utc()</span>
+    <span class="doccomment">///     datetime!(2000-01-01 0:00 UTC)</span>
     <span class="doccomment">///         .to_offset(offset!(-1))</span>
     <span class="doccomment">///         .year(),</span>
     <span class="doccomment">///     1999,</span>
     <span class="doccomment">/// );</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// // Let&#39;s see what time Sydney&#39;s new year&#39;s celebration is in New York</span>
-    <span class="doccomment">/// // and Los Angeles.</span>
+    <span class="doccomment">/// // Let&#39;s see what time Sydney&#39;s new year&#39;s celebration is in New York // and Los Angeles.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// // Construct midnight on new year&#39;s in Sydney. This is equivalent to</span>
-    <span class="doccomment">/// // 13:00 UTC.</span>
-    <span class="doccomment">/// let sydney = date!(2000-01-01).midnight().assume_offset(offset!(+11));</span>
+    <span class="doccomment">/// // Construct midnight on new year&#39;s in Sydney.</span>
+    <span class="doccomment">/// let sydney = datetime!(2000-01-01 0:00 +11);</span>
     <span class="doccomment">/// let new_york = sydney.to_offset(offset!(-5));</span>
     <span class="doccomment">/// let los_angeles = sydney.to_offset(offset!(-8));</span>
     <span class="doccomment">/// assert_eq!(sydney.hour(), 0);</span>
@@ -1315,98 +1163,99 @@
         }
     }
 
-    <span class="doccomment">/// Midnight, 1 January, 1970 (UTC).</span>
+    <span class="comment">// region: constructors</span>
+    <span class="doccomment">/// Create an `OffsetDateTime` from the provided Unix timestamp. Calling `.offset()` on the</span>
+    <span class="doccomment">/// resulting value is guaranteed to return UTC.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{date, OffsetDateTime};</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     OffsetDateTime::unix_epoch(),</span>
-    <span class="doccomment">///     date!(1970-01-01)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_utc(),</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">unix_epoch</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident">internals::Date::from_yo_unchecked</span>(<span class="number">1970</span>, <span class="number">1</span>)
-            .<span class="ident">midnight</span>()
-            .<span class="ident">assume_utc</span>()
-    }
-
-    <span class="doccomment">/// Create an `OffsetDateTime` from the provided [Unix timestamp](https://en.wikipedia.org/wiki/Unix_time).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{date, OffsetDateTime};</span>
+    <span class="doccomment">/// # use time::{OffsetDateTime, macros::datetime};</span>
     <span class="doccomment">/// assert_eq!(</span>
     <span class="doccomment">///     OffsetDateTime::from_unix_timestamp(0),</span>
-    <span class="doccomment">///     OffsetDateTime::unix_epoch(),</span>
+    <span class="doccomment">///     Ok(OffsetDateTime::UNIX_EPOCH),</span>
     <span class="doccomment">/// );</span>
     <span class="doccomment">/// assert_eq!(</span>
     <span class="doccomment">///     OffsetDateTime::from_unix_timestamp(1_546_300_800),</span>
-    <span class="doccomment">///     date!(2019-01-01)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_utc(),</span>
+    <span class="doccomment">///     Ok(datetime!(2019-01-01 0:00 UTC)),</span>
     <span class="doccomment">/// );</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// If you have a timestamp-nanosecond pair, you can use something along the</span>
-    <span class="doccomment">/// lines of the following:</span>
+    <span class="doccomment">/// If you have a timestamp-nanosecond pair, you can use something along the lines of the</span>
+    <span class="doccomment">/// following:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
     <span class="doccomment">/// # use time::{Duration, OffsetDateTime, ext::NumericalDuration};</span>
     <span class="doccomment">/// let (timestamp, nanos) = (1, 500_000_000);</span>
     <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     OffsetDateTime::from_unix_timestamp(timestamp) + Duration::nanoseconds(nanos),</span>
-    <span class="doccomment">///     OffsetDateTime::unix_epoch() + 1.5.seconds()</span>
+    <span class="doccomment">///     OffsetDateTime::from_unix_timestamp(timestamp)? + Duration::nanoseconds(nanos),</span>
+    <span class="doccomment">///     OffsetDateTime::UNIX_EPOCH + 1.5.seconds()</span>
     <span class="doccomment">/// );</span>
+    <span class="doccomment">/// # Ok::&lt;_, time::Error&gt;(())</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_unix_timestamp</span>(<span class="ident">timestamp</span>: <span class="ident">i64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident">OffsetDateTime::unix_epoch</span>() <span class="op">+</span> <span class="ident">Duration::seconds</span>(<span class="ident">timestamp</span>)
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from_unix_timestamp</span>(<span class="ident">timestamp</span>: <span class="ident">i64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::ComponentRange</span><span class="op">&gt;</span> {
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_docs_in_private_items</span>)]</span>
+        <span class="kw">const</span> <span class="ident">MIN_TIMESTAMP</span>: <span class="ident">i64</span> <span class="op">=</span> <span class="ident">Date::MIN</span>.<span class="ident">midnight</span>().<span class="ident">assume_utc</span>().<span class="ident">unix_timestamp</span>();
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_docs_in_private_items</span>)]</span>
+        <span class="kw">const</span> <span class="ident">MAX_TIMESTAMP</span>: <span class="ident">i64</span> <span class="op">=</span> <span class="ident">Date::MAX</span>
+            .<span class="ident">with_time</span>(<span class="ident">Time::__from_hms_nanos_unchecked</span>(<span class="number">23</span>, <span class="number">59</span>, <span class="number">59</span>, <span class="number">999_999_999</span>))
+            .<span class="ident">assume_utc</span>()
+            .<span class="ident">unix_timestamp</span>();
+
+        <span class="macro">ensure_value_in_range!</span>(<span class="ident">timestamp</span> <span class="kw">in</span> <span class="ident">MIN_TIMESTAMP</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">MAX_TIMESTAMP</span>);
+
+        <span class="comment">// Use the unchecked method here, as the input validity has already been verified.</span>
+        <span class="kw">let</span> <span class="ident">date</span> <span class="op">=</span> <span class="ident">Date::from_julian_day_unchecked</span>(
+            <span class="ident">UNIX_EPOCH_JULIAN_DAY</span> <span class="op">+</span> <span class="macro">div_floor!</span>(<span class="ident">timestamp</span>, <span class="number">86_400</span>) <span class="kw">as</span> <span class="ident">i32</span>,
+        );
+
+        <span class="kw">let</span> <span class="ident">seconds_within_day</span> <span class="op">=</span> <span class="macro">rem_euclid!</span>(<span class="ident">timestamp</span>, <span class="number">86_400</span>);
+        <span class="kw">let</span> <span class="ident">time</span> <span class="op">=</span> <span class="ident">Time::__from_hms_nanos_unchecked</span>(
+            (<span class="ident">seconds_within_day</span> <span class="op">/</span> <span class="number">3_600</span>) <span class="kw">as</span> <span class="kw">_</span>,
+            ((<span class="ident">seconds_within_day</span> <span class="op">%</span> <span class="number">3_600</span>) <span class="op">/</span> <span class="number">60</span>) <span class="kw">as</span> <span class="kw">_</span>,
+            (<span class="ident">seconds_within_day</span> <span class="op">%</span> <span class="number">60</span>) <span class="kw">as</span> <span class="kw">_</span>,
+            <span class="number">0</span>,
+        );
+
+        <span class="prelude-val">Ok</span>(<span class="ident">PrimitiveDateTime::new</span>(<span class="ident">date</span>, <span class="ident">time</span>).<span class="ident">assume_utc</span>())
     }
 
-    <span class="doccomment">/// Construct an `OffsetDateTime` from the provided Unix timestamp (in</span>
-    <span class="doccomment">/// nanoseconds).</span>
+    <span class="doccomment">/// Construct an `OffsetDateTime` from the provided Unix timestamp (in nanoseconds). Calling</span>
+    <span class="doccomment">/// `.offset()` on the resulting value is guaranteed to return UTC.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{date, OffsetDateTime};</span>
+    <span class="doccomment">/// # use time::{OffsetDateTime, macros::datetime};</span>
     <span class="doccomment">/// assert_eq!(</span>
     <span class="doccomment">///     OffsetDateTime::from_unix_timestamp_nanos(0),</span>
-    <span class="doccomment">///     OffsetDateTime::unix_epoch(),</span>
+    <span class="doccomment">///     Ok(OffsetDateTime::UNIX_EPOCH),</span>
     <span class="doccomment">/// );</span>
     <span class="doccomment">/// assert_eq!(</span>
     <span class="doccomment">///     OffsetDateTime::from_unix_timestamp_nanos(1_546_300_800_000_000_000),</span>
-    <span class="doccomment">///     date!(2019-01-01)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_utc(),</span>
+    <span class="doccomment">///     Ok(datetime!(2019-01-01 0:00 UTC)),</span>
     <span class="doccomment">/// );</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that the range of timestamps possible here is far larger than the</span>
-    <span class="doccomment">/// valid range of dates storable in this crate. It is the _user&#39;s</span>
-    <span class="doccomment">/// responsibility_ to ensure the timestamp provided as a parameter is</span>
-    <span class="doccomment">/// valid. No behavior is guaranteed if this parameter would not result in a</span>
-    <span class="doccomment">/// valid value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_unix_timestamp_nanos</span>(<span class="ident">timestamp</span>: <span class="ident">i128</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident">OffsetDateTime::unix_epoch</span>() <span class="op">+</span> <span class="ident">Duration::nanoseconds_i128</span>(<span class="ident">timestamp</span>)
-    }
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from_unix_timestamp_nanos</span>(<span class="ident">timestamp</span>: <span class="ident">i128</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::ComponentRange</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">datetime</span> <span class="op">=</span> <span class="macro">const_try!</span>(<span class="ident"><span class="self">Self</span>::from_unix_timestamp</span>(
+            <span class="macro">div_floor!</span>(<span class="ident">timestamp</span>, <span class="number">1_000_000_000</span>) <span class="kw">as</span> <span class="ident">i64</span>
+        ));
 
-    <span class="doccomment">/// Get the `UtcOffset`.</span>
+        <span class="prelude-val">Ok</span>(<span class="ident">datetime</span>
+            .<span class="ident">utc_datetime</span>
+            .<span class="ident">replace_time</span>(<span class="ident">Time::__from_hms_nanos_unchecked</span>(
+                <span class="ident">datetime</span>.<span class="ident">utc_datetime</span>.<span class="ident">hour</span>(),
+                <span class="ident">datetime</span>.<span class="ident">utc_datetime</span>.<span class="ident">minute</span>(),
+                <span class="ident">datetime</span>.<span class="ident">utc_datetime</span>.<span class="ident">second</span>(),
+                <span class="macro">rem_euclid!</span>(<span class="ident">timestamp</span>, <span class="number">1_000_000_000</span>) <span class="kw">as</span> <span class="ident">u32</span>,
+            ))
+            .<span class="ident">assume_utc</span>())
+    }
+    <span class="comment">// endregion constructors</span>
+
+    <span class="comment">// region: getters</span>
+    <span class="doccomment">/// Get the [`UtcOffset`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{date, offset};</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019-01-01)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_utc()</span>
-    <span class="doccomment">///         .offset(),</span>
-    <span class="doccomment">///     offset!(UTC),</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019-01-01)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_offset(offset!(+1))</span>
-    <span class="doccomment">///         .offset(),</span>
-    <span class="doccomment">///     offset!(+1),</span>
-    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// # use time::macros::{datetime, offset};</span>
+    <span class="doccomment">/// assert_eq!(datetime!(2019-01-01 0:00 UTC).offset(), offset!(UTC));</span>
+    <span class="doccomment">/// assert_eq!(datetime!(2019-01-01 0:00 +1).offset(), offset!(+1));</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">offset</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UtcOffset</span> {
         <span class="self">self</span>.<span class="ident">offset</span>
@@ -1415,275 +1264,148 @@
     <span class="doccomment">/// Get the [Unix timestamp](https://en.wikipedia.org/wiki/Unix_time).</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{date, offset};</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(1970-01-01)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_utc()</span>
-    <span class="doccomment">///         .unix_timestamp(),</span>
-    <span class="doccomment">///     0,</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(1970-01-01)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_utc()</span>
-    <span class="doccomment">///         .to_offset(offset!(-1))</span>
-    <span class="doccomment">///         .unix_timestamp(),</span>
-    <span class="doccomment">///     0,</span>
-    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// # use time::macros::datetime;</span>
+    <span class="doccomment">/// assert_eq!(datetime!(1970-01-01 0:00 UTC).unix_timestamp(), 0);</span>
+    <span class="doccomment">/// assert_eq!(datetime!(1970-01-01 0:00 -1).unix_timestamp(), 3_600);</span>
     <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_const_for_fn</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unix_timestamp</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i64</span> {
-        <span class="kw">let</span> <span class="ident">days</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">date</span>.<span class="ident">julian_day</span>()
-            <span class="op">-</span> <span class="ident">internals::Date::from_yo_unchecked</span>(<span class="number">1970</span>, <span class="number">1</span>).<span class="ident">julian_day</span>())
-            <span class="op">*</span> <span class="number">86_400</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">unix_timestamp</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i64</span> {
+        <span class="kw">let</span> <span class="ident">days</span> <span class="op">=</span>
+            (<span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">to_julian_day</span>() <span class="kw">as</span> <span class="ident">i64</span> <span class="op">-</span> <span class="ident">UNIX_EPOCH_JULIAN_DAY</span> <span class="kw">as</span> <span class="ident">i64</span>) <span class="op">*</span> <span class="number">86_400</span>;
         <span class="kw">let</span> <span class="ident">hours</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">hour</span>() <span class="kw">as</span> <span class="ident">i64</span> <span class="op">*</span> <span class="number">3_600</span>;
         <span class="kw">let</span> <span class="ident">minutes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">minute</span>() <span class="kw">as</span> <span class="ident">i64</span> <span class="op">*</span> <span class="number">60</span>;
         <span class="kw">let</span> <span class="ident">seconds</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">second</span>() <span class="kw">as</span> <span class="ident">i64</span>;
         <span class="ident">days</span> <span class="op">+</span> <span class="ident">hours</span> <span class="op">+</span> <span class="ident">minutes</span> <span class="op">+</span> <span class="ident">seconds</span>
     }
 
-    <span class="doccomment">/// Get the [Unix timestamp](https://en.wikipedia.org/wiki/Unix_time).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # #![allow(deprecated)]</span>
-    <span class="doccomment">/// # use time::{date, offset};</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(1970-01-01)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_utc()</span>
-    <span class="doccomment">///         .timestamp(),</span>
-    <span class="doccomment">///     0,</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(1970-01-01)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_utc()</span>
-    <span class="doccomment">///         .to_offset(offset!(-1))</span>
-    <span class="doccomment">///         .timestamp(),</span>
-    <span class="doccomment">///     0,</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(
-        <span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.2.23&quot;</span>,
-        <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use `OffsetDateTime::unix_timestamp` instead&quot;</span>
-    )]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">timestamp</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i64</span> {
-        <span class="self">self</span>.<span class="ident">unix_timestamp</span>()
-    }
-
     <span class="doccomment">/// Get the Unix timestamp in nanoseconds.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use time::{date, offset, time};</span>
+    <span class="doccomment">/// use time::macros::datetime;</span>
+    <span class="doccomment">/// assert_eq!(datetime!(1970-01-01 0:00 UTC).unix_timestamp_nanos(), 0);</span>
     <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(1970-01-01)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_utc()</span>
-    <span class="doccomment">///         .unix_timestamp_nanos(),</span>
-    <span class="doccomment">///     0,</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(1970-01-01)</span>
-    <span class="doccomment">///         .with_time(time!(1:00))</span>
-    <span class="doccomment">///         .assume_utc()</span>
-    <span class="doccomment">///         .to_offset(offset!(-1))</span>
-    <span class="doccomment">///         .unix_timestamp_nanos(),</span>
+    <span class="doccomment">///     datetime!(1970-01-01 0:00 -1).unix_timestamp_nanos(),</span>
     <span class="doccomment">///     3_600_000_000_000,</span>
     <span class="doccomment">/// );</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unix_timestamp_nanos</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i128</span> {
-        (<span class="self">self</span> <span class="op">-</span> <span class="ident"><span class="self">Self</span>::unix_epoch</span>()).<span class="ident">whole_nanoseconds</span>()
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">unix_timestamp_nanos</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i128</span> {
+        <span class="self">self</span>.<span class="ident">unix_timestamp</span>() <span class="kw">as</span> <span class="ident">i128</span> <span class="op">*</span> <span class="number">1_000_000_000</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">nanosecond</span>() <span class="kw">as</span> <span class="ident">i128</span>
     }
 
-    <span class="doccomment">/// Get the Unix timestamp in nanoseconds.</span>
+    <span class="doccomment">/// Get the [`Date`] in the stored offset.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # #![allow(deprecated)]</span>
-    <span class="doccomment">/// use time::{date, offset, time};</span>
+    <span class="doccomment">/// # use time::macros::{date, datetime, offset};</span>
+    <span class="doccomment">/// assert_eq!(datetime!(2019-01-01 0:00 UTC).date(), date!(2019-01-01));</span>
     <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(1970-01-01)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_utc()</span>
-    <span class="doccomment">///         .unix_timestamp_nanos(),</span>
-    <span class="doccomment">///     0,</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(1970-01-01)</span>
-    <span class="doccomment">///         .with_time(time!(1:00))</span>
-    <span class="doccomment">///         .assume_utc()</span>
-    <span class="doccomment">///         .to_offset(offset!(-1))</span>
-    <span class="doccomment">///         .unix_timestamp_nanos(),</span>
-    <span class="doccomment">///     3_600_000_000_000,</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(
-        <span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.2.23&quot;</span>,
-        <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use `OffsetDateTime::unix_timestamp_nanos` instead&quot;</span>
-    )]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">timestamp_nanos</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i128</span> {
-        <span class="self">self</span>.<span class="ident">unix_timestamp_nanos</span>()
-    }
-
-    <span class="doccomment">/// Get the `Date` in the stored offset.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{date, offset};</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019-01-01)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_utc()</span>
-    <span class="doccomment">///         .date(),</span>
-    <span class="doccomment">///     date!(2019-01-01),</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019-01-01)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_utc()</span>
+    <span class="doccomment">///     datetime!(2019-01-01 0:00 UTC)</span>
     <span class="doccomment">///         .to_offset(offset!(-1))</span>
     <span class="doccomment">///         .date(),</span>
     <span class="doccomment">///     date!(2018-12-31),</span>
     <span class="doccomment">/// );</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">date</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Date</span> {
-        (<span class="self">self</span>.<span class="ident">utc_datetime</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">offset</span>.<span class="ident">as_duration</span>()).<span class="ident">date</span>()
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">date</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Date</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">second</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">second</span>() <span class="kw">as</span> <span class="ident">i8</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">offset</span>.<span class="ident">seconds_past_minute</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">minute</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">minute</span>() <span class="kw">as</span> <span class="ident">i8</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">offset</span>.<span class="ident">minutes_past_hour</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hour</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">hour</span>() <span class="kw">as</span> <span class="ident">i8</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">offset</span>.<span class="ident">whole_hours</span>();
+        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">year</span>, <span class="kw-2">mut</span> <span class="ident">ordinal</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">date</span>.<span class="ident">to_ordinal_date</span>();
+
+        <span class="macro">cascade!</span>(<span class="ident">second</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">60</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">minute</span>);
+        <span class="macro">cascade!</span>(<span class="ident">minute</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">60</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">hour</span>);
+        <span class="macro">cascade!</span>(<span class="ident">hour</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">24</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ordinal</span>);
+        <span class="macro">cascade!</span>(<span class="ident">ordinal</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">year</span>);
+
+        <span class="ident">Date::__from_ordinal_date_unchecked</span>(<span class="ident">year</span>, <span class="ident">ordinal</span>)
     }
 
-    <span class="doccomment">/// Get the `Time` in the stored offset.</span>
+    <span class="doccomment">/// Get the [`Time`] in the stored offset.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{date, offset, time};</span>
+    <span class="doccomment">/// # use time::macros::{datetime, offset, time};</span>
+    <span class="doccomment">/// assert_eq!(datetime!(2019-01-01 0:00 UTC).time(), time!(0:00));</span>
     <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019-01-01)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_utc()</span>
-    <span class="doccomment">///         .time(),</span>
-    <span class="doccomment">///     time!(0:00)</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019-01-01)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_utc()</span>
+    <span class="doccomment">///     datetime!(2019-01-01 0:00 UTC)</span>
     <span class="doccomment">///         .to_offset(offset!(-1))</span>
     <span class="doccomment">///         .time(),</span>
     <span class="doccomment">///     time!(23:00)</span>
     <span class="doccomment">/// );</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">time</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Time</span> {
-        (<span class="self">self</span>.<span class="ident">utc_datetime</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">offset</span>.<span class="ident">as_duration</span>()).<span class="ident">time</span>()
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">time</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Time</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">second</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">second</span>() <span class="kw">as</span> <span class="ident">i8</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">offset</span>.<span class="ident">seconds_past_minute</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">minute</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">minute</span>() <span class="kw">as</span> <span class="ident">i8</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">offset</span>.<span class="ident">minutes_past_hour</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hour</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">hour</span>() <span class="kw">as</span> <span class="ident">i8</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">offset</span>.<span class="ident">whole_hours</span>();
+
+        <span class="macro">cascade!</span>(<span class="ident">second</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">60</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">minute</span>);
+        <span class="macro">cascade!</span>(<span class="ident">minute</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">60</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">hour</span>);
+
+        <span class="ident">Time::__from_hms_nanos_unchecked</span>(
+            <span class="macro">rem_euclid!</span>(<span class="ident">hour</span>, <span class="number">24</span>) <span class="kw">as</span> <span class="kw">_</span>,
+            <span class="ident">minute</span> <span class="kw">as</span> <span class="kw">_</span>,
+            <span class="ident">second</span> <span class="kw">as</span> <span class="kw">_</span>,
+            <span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">nanosecond</span>(),
+        )
     }
 
+    <span class="comment">// region: date getters</span>
     <span class="doccomment">/// Get the year of the date in the stored offset.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{date, offset, time};</span>
+    <span class="doccomment">/// # use time::macros::{datetime, offset};</span>
+    <span class="doccomment">/// assert_eq!(datetime!(2019-01-01 0:00 UTC).year(), 2019);</span>
     <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019-01-01)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_utc()</span>
-    <span class="doccomment">///         .year(),</span>
-    <span class="doccomment">///     2019,</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019-12-31)</span>
-    <span class="doccomment">///         .with_time(time!(23:00))</span>
-    <span class="doccomment">///         .assume_utc()</span>
+    <span class="doccomment">///     datetime!(2019-12-31 23:00 UTC)</span>
     <span class="doccomment">///         .to_offset(offset!(+1))</span>
     <span class="doccomment">///         .year(),</span>
     <span class="doccomment">///     2020,</span>
     <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2020-01-01)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_utc()</span>
-    <span class="doccomment">///         .year(),</span>
-    <span class="doccomment">///     2020,</span>
-    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// assert_eq!(datetime!(2020-01-01 0:00 UTC).year(), 2020);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">year</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i32</span> {
-        <span class="self">self</span>.<span class="ident">date</span>().<span class="ident">year</span>()
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">year</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i32</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">second</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">second</span>() <span class="kw">as</span> <span class="ident">i8</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">offset</span>.<span class="ident">seconds_past_minute</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">minute</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">minute</span>() <span class="kw">as</span> <span class="ident">i8</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">offset</span>.<span class="ident">minutes_past_hour</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hour</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">hour</span>() <span class="kw">as</span> <span class="ident">i8</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">offset</span>.<span class="ident">whole_hours</span>();
+        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">year</span>, <span class="kw-2">mut</span> <span class="ident">ordinal</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">date</span>.<span class="ident">to_ordinal_date</span>();
+
+        <span class="macro">cascade!</span>(<span class="ident">second</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">60</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">minute</span>);
+        <span class="macro">cascade!</span>(<span class="ident">minute</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">60</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">hour</span>);
+        <span class="macro">cascade!</span>(<span class="ident">hour</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">24</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ordinal</span>);
+        <span class="macro">cascade!</span>(<span class="ident">ordinal</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">year</span>);
+
+        <span class="ident">year</span>
     }
 
-    <span class="doccomment">/// Get the month of the date in the stored offset. If fetching both the</span>
-    <span class="doccomment">/// month and day, it is more efficient to use</span>
-    <span class="doccomment">/// [`OffsetDateTime::month_day`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The returned value will always be in the range `1..=12`.</span>
+    <span class="doccomment">/// Get the month of the date in the stored offset.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{date, offset, time};</span>
+    <span class="doccomment">/// # use time::Month;</span>
+    <span class="doccomment">/// # use time::macros::{datetime, offset};</span>
+    <span class="doccomment">/// assert_eq!(datetime!(2019-01-01 0:00 UTC).month(), Month::January);</span>
     <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019-01-01)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_utc()</span>
-    <span class="doccomment">///         .month(),</span>
-    <span class="doccomment">///     1,</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019-12-31)</span>
-    <span class="doccomment">///         .with_time(time!(23:00))</span>
-    <span class="doccomment">///         .assume_utc()</span>
+    <span class="doccomment">///     datetime!(2019-12-31 23:00 UTC)</span>
     <span class="doccomment">///         .to_offset(offset!(+1))</span>
     <span class="doccomment">///         .month(),</span>
-    <span class="doccomment">///     1,</span>
+    <span class="doccomment">///     Month::January,</span>
     <span class="doccomment">/// );</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">month</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">month</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Month</span> {
         <span class="self">self</span>.<span class="ident">date</span>().<span class="ident">month</span>()
     }
 
-    <span class="doccomment">/// Get the day of the date in the stored offset. If fetching both the month</span>
-    <span class="doccomment">/// and day, it is more efficient to use [`OffsetDateTime::month_day`].</span>
+    <span class="doccomment">/// Get the day of the date in the stored offset.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The returned value will always be in the range `1..=31`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{date, offset, time};</span>
+    <span class="doccomment">/// # use time::macros::{datetime, offset};</span>
+    <span class="doccomment">/// assert_eq!(datetime!(2019-01-01 0:00 UTC).day(), 1);</span>
     <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019-01-01)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_utc()</span>
-    <span class="doccomment">///         .day(),</span>
-    <span class="doccomment">///     1,</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019-12-31)</span>
-    <span class="doccomment">///         .with_time(time!(23:00))</span>
-    <span class="doccomment">///         .assume_utc()</span>
+    <span class="doccomment">///     datetime!(2019-12-31 23:00 UTC)</span>
     <span class="doccomment">///         .to_offset(offset!(+1))</span>
     <span class="doccomment">///         .day(),</span>
     <span class="doccomment">///     1,</span>
     <span class="doccomment">/// );</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">day</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">day</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
         <span class="self">self</span>.<span class="ident">date</span>().<span class="ident">day</span>()
-    }
-
-    <span class="doccomment">/// Get the month and day of the date in the stored offset.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The month component will always be in the range `1..=12`;</span>
-    <span class="doccomment">/// the day component in `1..=31`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{date, offset, time};</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019-01-01)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_utc()</span>
-    <span class="doccomment">///         .month_day(),</span>
-    <span class="doccomment">///     (1, 1),</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019-12-31)</span>
-    <span class="doccomment">///         .with_time(time!(23:00))</span>
-    <span class="doccomment">///         .assume_utc()</span>
-    <span class="doccomment">///         .to_offset(offset!(+1))</span>
-    <span class="doccomment">///         .month_day(),</span>
-    <span class="doccomment">///     (1, 1),</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">month_day</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">u8</span>, <span class="ident">u8</span>) {
-        <span class="self">self</span>.<span class="ident">date</span>().<span class="ident">month_day</span>()
     }
 
     <span class="doccomment">/// Get the day of the year of the date in the stored offset.</span>
@@ -1691,69 +1413,27 @@
     <span class="doccomment">/// The returned value will always be in the range `1..=366`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{date, offset, time};</span>
+    <span class="doccomment">/// # use time::macros::{datetime, offset};</span>
+    <span class="doccomment">/// assert_eq!(datetime!(2019-01-01 0:00 UTC).ordinal(), 1);</span>
     <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019-01-01)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_utc()</span>
-    <span class="doccomment">///         .ordinal(),</span>
-    <span class="doccomment">///     1,</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019-12-31)</span>
-    <span class="doccomment">///         .with_time(time!(23:00))</span>
-    <span class="doccomment">///         .assume_utc()</span>
+    <span class="doccomment">///     datetime!(2019-12-31 23:00 UTC)</span>
     <span class="doccomment">///         .to_offset(offset!(+1))</span>
     <span class="doccomment">///         .ordinal(),</span>
     <span class="doccomment">///     1,</span>
     <span class="doccomment">/// );</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ordinal</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u16</span> {
-        <span class="self">self</span>.<span class="ident">date</span>().<span class="ident">ordinal</span>()
-    }
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">ordinal</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u16</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">second</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">second</span>() <span class="kw">as</span> <span class="ident">i8</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">offset</span>.<span class="ident">seconds_past_minute</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">minute</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">minute</span>() <span class="kw">as</span> <span class="ident">i8</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">offset</span>.<span class="ident">minutes_past_hour</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hour</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">hour</span>() <span class="kw">as</span> <span class="ident">i8</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">offset</span>.<span class="ident">whole_hours</span>();
+        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">year</span>, <span class="kw-2">mut</span> <span class="ident">ordinal</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">date</span>.<span class="ident">to_ordinal_date</span>();
 
-    <span class="doccomment">/// Get the ISO 8601 year and week number in the stored offset.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::date;</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019-01-01)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_utc()</span>
-    <span class="doccomment">///         .iso_year_week(),</span>
-    <span class="doccomment">///     (2019, 1),</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019-10-04)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_utc()</span>
-    <span class="doccomment">///         .iso_year_week(),</span>
-    <span class="doccomment">///     (2019, 40),</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2020-01-01)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_utc()</span>
-    <span class="doccomment">///         .iso_year_week(),</span>
-    <span class="doccomment">///     (2020, 1),</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2020-12-31)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_utc()</span>
-    <span class="doccomment">///         .iso_year_week(),</span>
-    <span class="doccomment">///     (2020, 53),</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2021-01-01)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_utc()</span>
-    <span class="doccomment">///         .iso_year_week(),</span>
-    <span class="doccomment">///     (2020, 53),</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iso_year_week</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">i32</span>, <span class="ident">u8</span>) {
-        <span class="self">self</span>.<span class="ident">date</span>().<span class="ident">iso_year_week</span>()
+        <span class="macro">cascade!</span>(<span class="ident">second</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">60</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">minute</span>);
+        <span class="macro">cascade!</span>(<span class="ident">minute</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">60</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">hour</span>);
+        <span class="macro">cascade!</span>(<span class="ident">hour</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">24</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ordinal</span>);
+        <span class="macro">cascade!</span>(<span class="ident">ordinal</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">year</span>);
+
+        <span class="ident">ordinal</span>
     }
 
     <span class="doccomment">/// Get the ISO week number of the date in the stored offset.</span>
@@ -1761,71 +1441,191 @@
     <span class="doccomment">/// The returned value will always be in the range `1..=53`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::date;</span>
+    <span class="doccomment">/// # use time::macros::datetime;</span>
+    <span class="doccomment">/// assert_eq!(datetime!(2019-01-01 0:00 UTC).iso_week(), 1);</span>
+    <span class="doccomment">/// assert_eq!(datetime!(2020-01-01 0:00 UTC).iso_week(), 1);</span>
+    <span class="doccomment">/// assert_eq!(datetime!(2020-12-31 0:00 UTC).iso_week(), 53);</span>
+    <span class="doccomment">/// assert_eq!(datetime!(2021-01-01 0:00 UTC).iso_week(), 53);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">iso_week</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+        <span class="self">self</span>.<span class="ident">date</span>().<span class="ident">iso_week</span>()
+    }
+
+    <span class="doccomment">/// Get the week number where week 1 begins on the first Sunday.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The returned value will always be in the range `0..=53`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::macros::datetime;</span>
+    <span class="doccomment">/// assert_eq!(datetime!(2019-01-01 0:00 UTC).sunday_based_week(), 0);</span>
+    <span class="doccomment">/// assert_eq!(datetime!(2020-01-01 0:00 UTC).sunday_based_week(), 0);</span>
+    <span class="doccomment">/// assert_eq!(datetime!(2020-12-31 0:00 UTC).sunday_based_week(), 52);</span>
+    <span class="doccomment">/// assert_eq!(datetime!(2021-01-01 0:00 UTC).sunday_based_week(), 0);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">sunday_based_week</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+        <span class="self">self</span>.<span class="ident">date</span>().<span class="ident">sunday_based_week</span>()
+    }
+
+    <span class="doccomment">/// Get the week number where week 1 begins on the first Monday.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The returned value will always be in the range `0..=53`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::macros::datetime;</span>
+    <span class="doccomment">/// assert_eq!(datetime!(2019-01-01 0:00 UTC).monday_based_week(), 0);</span>
+    <span class="doccomment">/// assert_eq!(datetime!(2020-01-01 0:00 UTC).monday_based_week(), 0);</span>
+    <span class="doccomment">/// assert_eq!(datetime!(2020-12-31 0:00 UTC).monday_based_week(), 52);</span>
+    <span class="doccomment">/// assert_eq!(datetime!(2021-01-01 0:00 UTC).monday_based_week(), 0);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">monday_based_week</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+        <span class="self">self</span>.<span class="ident">date</span>().<span class="ident">monday_based_week</span>()
+    }
+
+    <span class="doccomment">/// Get the year, month, and day.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::{macros::datetime, Month};</span>
     <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019-01-01)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_utc()</span>
-    <span class="doccomment">///         .week(),</span>
-    <span class="doccomment">///     1,</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2020-01-01)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_utc()</span>
-    <span class="doccomment">///         .week(),</span>
-    <span class="doccomment">///     1,</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2020-12-31)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_utc()</span>
-    <span class="doccomment">///         .week(),</span>
-    <span class="doccomment">///     53,</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2021-01-01)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_utc()</span>
-    <span class="doccomment">///         .week(),</span>
-    <span class="doccomment">///     53,</span>
+    <span class="doccomment">///     datetime!(2019-01-01 0:00 UTC).to_calendar_date(),</span>
+    <span class="doccomment">///     (2019, Month::January, 1)</span>
     <span class="doccomment">/// );</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">week</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="ident">date</span>().<span class="ident">week</span>()
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">to_calendar_date</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">i32</span>, <span class="ident">Month</span>, <span class="ident">u8</span>) {
+        <span class="self">self</span>.<span class="ident">date</span>().<span class="ident">to_calendar_date</span>()
+    }
+
+    <span class="doccomment">/// Get the year and ordinal day number.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::macros::datetime;</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     datetime!(2019-01-01 0:00 UTC).to_ordinal_date(),</span>
+    <span class="doccomment">///     (2019, 1)</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">to_ordinal_date</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">i32</span>, <span class="ident">u16</span>) {
+        <span class="self">self</span>.<span class="ident">date</span>().<span class="ident">to_ordinal_date</span>()
+    }
+
+    <span class="doccomment">/// Get the ISO 8601 year, week number, and weekday.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::{Weekday::*, macros::datetime};</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     datetime!(2019-01-01 0:00 UTC).to_iso_week_date(),</span>
+    <span class="doccomment">///     (2019, 1, Tuesday)</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     datetime!(2019-10-04 0:00 UTC).to_iso_week_date(),</span>
+    <span class="doccomment">///     (2019, 40, Friday)</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     datetime!(2020-01-01 0:00 UTC).to_iso_week_date(),</span>
+    <span class="doccomment">///     (2020, 1, Wednesday)</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     datetime!(2020-12-31 0:00 UTC).to_iso_week_date(),</span>
+    <span class="doccomment">///     (2020, 53, Thursday)</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     datetime!(2021-01-01 0:00 UTC).to_iso_week_date(),</span>
+    <span class="doccomment">///     (2020, 53, Friday)</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">to_iso_week_date</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">i32</span>, <span class="ident">u8</span>, <span class="ident">Weekday</span>) {
+        <span class="self">self</span>.<span class="ident">date</span>().<span class="ident">to_iso_week_date</span>()
     }
 
     <span class="doccomment">/// Get the weekday of the date in the stored offset.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This current uses [Zeller&#39;s congruence](https://en.wikipedia.org/wiki/Zeller%27s_congruence)</span>
-    <span class="doccomment">/// internally.</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::{Weekday::*, macros::datetime};</span>
+    <span class="doccomment">/// assert_eq!(datetime!(2019-01-01 0:00 UTC).weekday(), Tuesday);</span>
+    <span class="doccomment">/// assert_eq!(datetime!(2019-02-01 0:00 UTC).weekday(), Friday);</span>
+    <span class="doccomment">/// assert_eq!(datetime!(2019-03-01 0:00 UTC).weekday(), Friday);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">weekday</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Weekday</span> {
+        <span class="self">self</span>.<span class="ident">date</span>().<span class="ident">weekday</span>()
+    }
+
+    <span class="doccomment">/// Get the Julian day for the date. The time is not taken into account for this calculation.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The algorithm to perform this conversion is derived from one provided by Peter Baum; it is</span>
+    <span class="doccomment">/// freely available [here](https://www.researchgate.net/publication/316558298_Date_Algorithms).</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{date, Weekday::*};</span>
+    <span class="doccomment">/// # use time::macros::datetime;</span>
+    <span class="doccomment">/// assert_eq!(datetime!(-4713-11-24 0:00 UTC).to_julian_day(), 0);</span>
+    <span class="doccomment">/// assert_eq!(datetime!(2000-01-01 0:00 UTC).to_julian_day(), 2_451_545);</span>
+    <span class="doccomment">/// assert_eq!(datetime!(2019-01-01 0:00 UTC).to_julian_day(), 2_458_485);</span>
+    <span class="doccomment">/// assert_eq!(datetime!(2019-12-31 0:00 UTC).to_julian_day(), 2_458_849);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">to_julian_day</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i32</span> {
+        <span class="self">self</span>.<span class="ident">date</span>().<span class="ident">to_julian_day</span>()
+    }
+    <span class="comment">// endregion date getters</span>
+
+    <span class="comment">// region: time getters</span>
+    <span class="doccomment">/// Get the clock hour, minute, and second.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::macros::datetime;</span>
+    <span class="doccomment">/// assert_eq!(datetime!(2020-01-01 0:00:00 UTC).to_hms(), (0, 0, 0));</span>
+    <span class="doccomment">/// assert_eq!(datetime!(2020-01-01 23:59:59 UTC).to_hms(), (23, 59, 59));</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">to_hms</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">u8</span>, <span class="ident">u8</span>, <span class="ident">u8</span>) {
+        <span class="self">self</span>.<span class="ident">time</span>().<span class="ident">as_hms</span>()
+    }
+
+    <span class="doccomment">/// Get the clock hour, minute, second, and millisecond.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::macros::datetime;</span>
     <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019-01-01)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_utc()</span>
-    <span class="doccomment">///         .weekday(),</span>
-    <span class="doccomment">///     Tuesday,</span>
+    <span class="doccomment">///     datetime!(2020-01-01 0:00:00 UTC).to_hms_milli(),</span>
+    <span class="doccomment">///     (0, 0, 0, 0)</span>
     <span class="doccomment">/// );</span>
     <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019-02-01)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_utc()</span>
-    <span class="doccomment">///         .weekday(),</span>
-    <span class="doccomment">///     Friday,</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019-03-01)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_utc()</span>
-    <span class="doccomment">///         .weekday(),</span>
-    <span class="doccomment">///     Friday,</span>
+    <span class="doccomment">///     datetime!(2020-01-01 23:59:59.999 UTC).to_hms_milli(),</span>
+    <span class="doccomment">///     (23, 59, 59, 999)</span>
     <span class="doccomment">/// );</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">weekday</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Weekday</span> {
-        <span class="self">self</span>.<span class="ident">date</span>().<span class="ident">weekday</span>()
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">to_hms_milli</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">u8</span>, <span class="ident">u8</span>, <span class="ident">u8</span>, <span class="ident">u16</span>) {
+        <span class="self">self</span>.<span class="ident">time</span>().<span class="ident">as_hms_milli</span>()
+    }
+
+    <span class="doccomment">/// Get the clock hour, minute, second, and microsecond.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::macros::datetime;</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     datetime!(2020-01-01 0:00:00 UTC).to_hms_micro(),</span>
+    <span class="doccomment">///     (0, 0, 0, 0)</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     datetime!(2020-01-01 23:59:59.999_999 UTC).to_hms_micro(),</span>
+    <span class="doccomment">///     (23, 59, 59, 999_999)</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">to_hms_micro</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">u8</span>, <span class="ident">u8</span>, <span class="ident">u8</span>, <span class="ident">u32</span>) {
+        <span class="self">self</span>.<span class="ident">time</span>().<span class="ident">as_hms_micro</span>()
+    }
+
+    <span class="doccomment">/// Get the clock hour, minute, second, and nanosecond.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::macros::datetime;</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     datetime!(2020-01-01 0:00:00 UTC).to_hms_nano(),</span>
+    <span class="doccomment">///     (0, 0, 0, 0)</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     datetime!(2020-01-01 23:59:59.999_999_999 UTC).to_hms_nano(),</span>
+    <span class="doccomment">///     (23, 59, 59, 999_999_999)</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">to_hms_nano</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">u8</span>, <span class="ident">u8</span>, <span class="ident">u8</span>, <span class="ident">u32</span>) {
+        <span class="self">self</span>.<span class="ident">time</span>().<span class="ident">as_hms_nano</span>()
     }
 
     <span class="doccomment">/// Get the clock hour in the stored offset.</span>
@@ -1833,25 +1633,23 @@
     <span class="doccomment">/// The returned value will always be in the range `0..24`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{date, time, offset};</span>
+    <span class="doccomment">/// # use time::macros::{datetime, offset};</span>
+    <span class="doccomment">/// assert_eq!(datetime!(2019-01-01 0:00 UTC).hour(), 0);</span>
     <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019-01-01)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_utc()</span>
-    <span class="doccomment">///         .hour(),</span>
-    <span class="doccomment">///     0,</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019-01-01)</span>
-    <span class="doccomment">///         .with_time(time!(23:59:59))</span>
-    <span class="doccomment">///         .assume_utc()</span>
+    <span class="doccomment">///     datetime!(2019-01-01 23:59:59 UTC)</span>
     <span class="doccomment">///         .to_offset(offset!(-2))</span>
     <span class="doccomment">///         .hour(),</span>
     <span class="doccomment">///     21,</span>
     <span class="doccomment">/// );</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hour</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="ident">time</span>().<span class="ident">hour</span>()
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">hour</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">second</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">second</span>() <span class="kw">as</span> <span class="ident">i8</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">offset</span>.<span class="ident">seconds_past_minute</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">minute</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">minute</span>() <span class="kw">as</span> <span class="ident">i8</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">offset</span>.<span class="ident">minutes_past_hour</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hour</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">hour</span>() <span class="kw">as</span> <span class="ident">i8</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">offset</span>.<span class="ident">whole_hours</span>();
+
+        <span class="macro">cascade!</span>(<span class="ident">second</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">60</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">minute</span>);
+        <span class="macro">cascade!</span>(<span class="ident">minute</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">60</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">hour</span>);
+        <span class="macro">rem_euclid!</span>(<span class="ident">hour</span>, <span class="number">24</span>) <span class="kw">as</span> <span class="kw">_</span>
     }
 
     <span class="doccomment">/// Get the minute within the hour in the stored offset.</span>
@@ -1859,25 +1657,21 @@
     <span class="doccomment">/// The returned value will always be in the range `0..60`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{date, offset, time};</span>
+    <span class="doccomment">/// # use time::macros::{datetime, offset};</span>
+    <span class="doccomment">/// assert_eq!(datetime!(2019-01-01 0:00 UTC).minute(), 0);</span>
     <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019-01-01)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_utc()</span>
-    <span class="doccomment">///         .minute(),</span>
-    <span class="doccomment">///     0,</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019-01-01)</span>
-    <span class="doccomment">///         .with_time(time!(23:59:59))</span>
-    <span class="doccomment">///         .assume_utc()</span>
+    <span class="doccomment">///     datetime!(2019-01-01 23:59:59 UTC)</span>
     <span class="doccomment">///         .to_offset(offset!(+0:30))</span>
     <span class="doccomment">///         .minute(),</span>
     <span class="doccomment">///     29,</span>
     <span class="doccomment">/// );</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">minute</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="ident">time</span>().<span class="ident">minute</span>()
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">minute</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">second</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">second</span>() <span class="kw">as</span> <span class="ident">i8</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">offset</span>.<span class="ident">seconds_past_minute</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">minute</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">minute</span>() <span class="kw">as</span> <span class="ident">i8</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">offset</span>.<span class="ident">minutes_past_hour</span>();
+
+        <span class="macro">cascade!</span>(<span class="ident">second</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">60</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">minute</span>);
+        <span class="macro">rem_euclid!</span>(<span class="ident">minute</span>, <span class="number">60</span>) <span class="kw">as</span> <span class="kw">_</span>
     }
 
     <span class="doccomment">/// Get the second within the minute in the stored offset.</span>
@@ -1885,50 +1679,34 @@
     <span class="doccomment">/// The returned value will always be in the range `0..60`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{date, offset, time};</span>
+    <span class="doccomment">/// # use time::macros::{datetime, offset};</span>
+    <span class="doccomment">/// assert_eq!(datetime!(2019-01-01 0:00 UTC).second(), 0);</span>
     <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019-01-01)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_utc()</span>
-    <span class="doccomment">///         .second(),</span>
-    <span class="doccomment">///     0,</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019-01-01)</span>
-    <span class="doccomment">///         .with_time(time!(23:59:59))</span>
-    <span class="doccomment">///         .assume_utc()</span>
+    <span class="doccomment">///     datetime!(2019-01-01 23:59:59 UTC)</span>
     <span class="doccomment">///         .to_offset(offset!(+0:00:30))</span>
     <span class="doccomment">///         .second(),</span>
     <span class="doccomment">///     29,</span>
     <span class="doccomment">/// );</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">second</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="ident">time</span>().<span class="ident">second</span>()
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">second</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+        <span class="kw">let</span> <span class="ident">second</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">second</span>() <span class="kw">as</span> <span class="ident">i8</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">offset</span>.<span class="ident">seconds_past_minute</span>();
+        <span class="macro">rem_euclid!</span>(<span class="ident">second</span>, <span class="number">60</span>) <span class="kw">as</span> <span class="kw">_</span>
     }
+
+    <span class="comment">// Because a `UtcOffset` is limited in resolution to one second, any subsecond value will not</span>
+    <span class="comment">// change when adjusting for the offset.</span>
 
     <span class="doccomment">/// Get the milliseconds within the second in the stored offset.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The returned value will always be in the range `0..1_000`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{date, time};</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019-01-01)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_utc()</span>
-    <span class="doccomment">///         .millisecond(),</span>
-    <span class="doccomment">///     0,</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019-01-01)</span>
-    <span class="doccomment">///         .with_time(time!(23:59:59.999))</span>
-    <span class="doccomment">///         .assume_utc()</span>
-    <span class="doccomment">///         .millisecond(),</span>
-    <span class="doccomment">///     999,</span>
-    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// # use time::macros::datetime;</span>
+    <span class="doccomment">/// assert_eq!(datetime!(2019-01-01 0:00 UTC).millisecond(), 0);</span>
+    <span class="doccomment">/// assert_eq!(datetime!(2019-01-01 23:59:59.999 UTC).millisecond(), 999);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">millisecond</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u16</span> {
-        <span class="self">self</span>.<span class="ident">time</span>().<span class="ident">millisecond</span>()
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">millisecond</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u16</span> {
+        <span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">millisecond</span>()
     }
 
     <span class="doccomment">/// Get the microseconds within the second in the stored offset.</span>
@@ -1936,24 +1714,15 @@
     <span class="doccomment">/// The returned value will always be in the range `0..1_000_000`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{date, time};</span>
+    <span class="doccomment">/// # use time::macros::datetime;</span>
+    <span class="doccomment">/// assert_eq!(datetime!(2019-01-01 0:00 UTC).microsecond(), 0);</span>
     <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019-01-01)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_utc()</span>
-    <span class="doccomment">///         .microsecond(),</span>
-    <span class="doccomment">///     0,</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019-01-01)</span>
-    <span class="doccomment">///         .with_time(time!(23:59:59.999_999))</span>
-    <span class="doccomment">///         .assume_utc()</span>
-    <span class="doccomment">///         .microsecond(),</span>
+    <span class="doccomment">///     datetime!(2019-01-01 23:59:59.999_999 UTC).microsecond(),</span>
     <span class="doccomment">///     999_999,</span>
     <span class="doccomment">/// );</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">microsecond</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">time</span>().<span class="ident">microsecond</span>()
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">microsecond</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+        <span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">microsecond</span>()
     }
 
     <span class="doccomment">/// Get the nanoseconds within the second in the stored offset.</span>
@@ -1961,100 +1730,224 @@
     <span class="doccomment">/// The returned value will always be in the range `0..1_000_000_000`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{date, time};</span>
+    <span class="doccomment">/// # use time::macros::datetime;</span>
+    <span class="doccomment">/// assert_eq!(datetime!(2019-01-01 0:00 UTC).nanosecond(), 0);</span>
     <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019-01-01)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_utc()</span>
-    <span class="doccomment">///         .nanosecond(),</span>
-    <span class="doccomment">///     0,</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019-01-01)</span>
-    <span class="doccomment">///         .with_time(time!(23:59:59.999_999_999))</span>
-    <span class="doccomment">///         .assume_utc()</span>
-    <span class="doccomment">///         .nanosecond(),</span>
+    <span class="doccomment">///     datetime!(2019-01-01 23:59:59.999_999_999 UTC).nanosecond(),</span>
     <span class="doccomment">///     999_999_999,</span>
     <span class="doccomment">/// );</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nanosecond</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">time</span>().<span class="ident">nanosecond</span>()
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">nanosecond</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+        <span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">nanosecond</span>()
     }
+    <span class="comment">// endregion time getters</span>
+    <span class="comment">// endregion getters</span>
+
+    <span class="comment">// region: checked arithmetic</span>
+    <span class="doccomment">/// Computes `self + duration`, returning `None` if an overflow occurred.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use time::{Date, ext::NumericalDuration};</span>
+    <span class="doccomment">/// # use time::macros::{datetime, offset};</span>
+    <span class="doccomment">/// let datetime = Date::MIN.midnight().assume_offset(offset!(+10:00));</span>
+    <span class="doccomment">/// assert_eq!(datetime.checked_add((-2).days()), None);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let datetime = Date::MAX.midnight().assume_offset(offset!(+10:00));</span>
+    <span class="doccomment">/// assert_eq!(datetime.checked_add(2.days()), None);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     datetime!(2019 - 11 - 25 15:30 +10:00).checked_add(27.hours()),</span>
+    <span class="doccomment">///     Some(datetime!(2019 - 11 - 26 18:30 +10:00))</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">checked_add</span>(<span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">offset_datetime</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">utc_to_offset</span>(<span class="self">self</span>.<span class="ident">offset</span>);
+        <span class="prelude-val">Some</span>(<span class="macro">const_try_opt!</span>(<span class="ident">offset_datetime</span>.<span class="ident">checked_add</span>(<span class="ident">duration</span>)).<span class="ident">assume_offset</span>(<span class="self">self</span>.<span class="ident">offset</span>))
+    }
+
+    <span class="doccomment">/// Computes `self - duration`, returning `None` if an overflow occurred.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use time::{Date, ext::NumericalDuration};</span>
+    <span class="doccomment">/// # use time::macros::{datetime, offset};</span>
+    <span class="doccomment">/// let datetime = Date::MIN.midnight().assume_offset(offset!(+10:00));</span>
+    <span class="doccomment">/// assert_eq!(datetime.checked_sub(2.days()), None);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let datetime = Date::MAX.midnight().assume_offset(offset!(+10:00));</span>
+    <span class="doccomment">/// assert_eq!(datetime.checked_sub((-2).days()), None);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     datetime!(2019 - 11 - 25 15:30 +10:00).checked_sub(27.hours()),</span>
+    <span class="doccomment">///     Some(datetime!(2019 - 11 - 24 12:30 +10:00))</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">checked_sub</span>(<span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">offset_datetime</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">utc_to_offset</span>(<span class="self">self</span>.<span class="ident">offset</span>);
+        <span class="prelude-val">Some</span>(<span class="macro">const_try_opt!</span>(<span class="ident">offset_datetime</span>.<span class="ident">checked_sub</span>(<span class="ident">duration</span>)).<span class="ident">assume_offset</span>(<span class="self">self</span>.<span class="ident">offset</span>))
+    }
+
+    <span class="comment">// endregion: checked arithmetic</span>
 }
 
-<span class="doccomment">/// Methods that allow formatting the `OffsetDateTime`.</span>
+<span class="comment">// region: replacement</span>
+<span class="doccomment">/// Methods that replace part of the `OffsetDateTime`.</span>
 <span class="kw">impl</span> <span class="ident">OffsetDateTime</span> {
-    <span class="doccomment">/// Format the `OffsetDateTime` using the provided string.</span>
+    <span class="doccomment">/// Replace the time, which is assumed to be in the stored offset. The date and offset</span>
+    <span class="doccomment">/// components are unchanged.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{date};</span>
+    <span class="doccomment">/// # use time::macros::{datetime, time};</span>
     <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019-01-02)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_utc()</span>
-    <span class="doccomment">///         .format(&quot;%F %r %z&quot;),</span>
-    <span class="doccomment">///     &quot;2019-01-02 12:00:00 am +0000&quot;,</span>
+    <span class="doccomment">///     datetime!(2020-01-01 5:00 UTC).replace_time(time!(12:00)),</span>
+    <span class="doccomment">///     datetime!(2020-01-01 12:00 UTC)</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     datetime!(2020-01-01 12:00 -5).replace_time(time!(7:00)),</span>
+    <span class="doccomment">///     datetime!(2020-01-01 7:00 -5)</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     datetime!(2020-01-01 0:00 +1).replace_time(time!(12:00)),</span>
+    <span class="doccomment">///     datetime!(2020-01-01 12:00 +1)</span>
     <span class="doccomment">/// );</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">format</span>(<span class="self">self</span>, <span class="ident">format</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Format</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
-        <span class="self">self</span>.<span class="ident">lazy_format</span>(<span class="ident">format</span>).<span class="ident">to_string</span>()
+    <span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;This method does not mutate the original `OffsetDateTime`.&quot;</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">replace_time</span>(<span class="self">self</span>, <span class="ident">time</span>: <span class="ident">Time</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">utc_datetime</span>
+            .<span class="ident">utc_to_offset</span>(<span class="self">self</span>.<span class="ident">offset</span>)
+            .<span class="ident">replace_time</span>(<span class="ident">time</span>)
+            .<span class="ident">assume_offset</span>(<span class="self">self</span>.<span class="ident">offset</span>)
     }
 
-    <span class="doccomment">/// Format the `OffsetDateTime` using the provided string.</span>
+    <span class="doccomment">/// Replace the date, which is assumed to be in the stored offset. The time and offset</span>
+    <span class="doccomment">/// components are unchanged.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::date;</span>
+    <span class="doccomment">/// # use time::macros::{datetime, date};</span>
     <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019-01-02)</span>
-    <span class="doccomment">///         .midnight()</span>
-    <span class="doccomment">///         .assume_utc()</span>
-    <span class="doccomment">///         .lazy_format(&quot;%F %r %z&quot;)</span>
-    <span class="doccomment">///         .to_string(),</span>
-    <span class="doccomment">///     &quot;2019-01-02 12:00:00 am +0000&quot;,</span>
+    <span class="doccomment">///     datetime!(2020-01-01 12:00 UTC).replace_date(date!(2020-01-30)),</span>
+    <span class="doccomment">///     datetime!(2020-01-30 12:00 UTC)</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     datetime!(2020-01-01 0:00 +1).replace_date(date!(2020-01-30)),</span>
+    <span class="doccomment">///     datetime!(2020-01-30 0:00 +1)</span>
     <span class="doccomment">/// );</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lazy_format</span>(<span class="self">self</span>, <span class="ident">format</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Format</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Display</span> {
-        <span class="ident">DeferredFormat::new</span>(<span class="ident">format</span>)
-            .<span class="ident">with_date</span>(<span class="self">self</span>.<span class="ident">date</span>())
-            .<span class="ident">with_time</span>(<span class="self">self</span>.<span class="ident">time</span>())
-            .<span class="ident">with_offset</span>(<span class="self">self</span>.<span class="ident">offset</span>())
-            .<span class="ident">clone</span>()
+    <span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;This method does not mutate the original `OffsetDateTime`.&quot;</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">replace_date</span>(<span class="self">self</span>, <span class="ident">date</span>: <span class="ident">Date</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">utc_datetime</span>
+            .<span class="ident">utc_to_offset</span>(<span class="self">self</span>.<span class="ident">offset</span>)
+            .<span class="ident">replace_date</span>(<span class="ident">date</span>)
+            .<span class="ident">assume_offset</span>(<span class="self">self</span>.<span class="ident">offset</span>)
     }
 
-    <span class="doccomment">/// Attempt to parse an `OffsetDateTime` using the provided string.</span>
+    <span class="doccomment">/// Replace the date and time, which are assumed to be in the stored offset. The offset</span>
+    <span class="doccomment">/// component remains unchanged.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{date, OffsetDateTime, time};</span>
+    <span class="doccomment">/// # use time::macros::datetime;</span>
     <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     OffsetDateTime::parse(&quot;2019-01-02 00:00:00 +0000&quot;, &quot;%F %T %z&quot;),</span>
-    <span class="doccomment">///     Ok(date!(2019-01-02).midnight().assume_utc()),</span>
+    <span class="doccomment">///     datetime!(2020-01-01 12:00 UTC).replace_date_time(datetime!(2020-01-30 16:00)),</span>
+    <span class="doccomment">///     datetime!(2020-01-30 16:00 UTC)</span>
     <span class="doccomment">/// );</span>
     <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     OffsetDateTime::parse(&quot;2019-002 23:59:59 +0000&quot;, &quot;%Y-%j %T %z&quot;),</span>
-    <span class="doccomment">///     Ok(date!(2019-002).with_time(time!(23:59:59)).assume_utc()),</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     OffsetDateTime::parse(&quot;2019-W01-3 12:00:00 pm +0000&quot;, &quot;%G-W%V-%u %r %z&quot;),</span>
-    <span class="doccomment">///     Ok(date!(2019-W01-3).with_time(time!(12:00)).assume_utc()),</span>
+    <span class="doccomment">///     datetime!(2020-01-01 12:00 +1).replace_date_time(datetime!(2020-01-30 0:00)),</span>
+    <span class="doccomment">///     datetime!(2020-01-30 0:00 +1)</span>
     <span class="doccomment">/// );</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">s</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">format</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Format</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="self">Self</span>::try_from_parsed_items</span>(<span class="ident">parse</span>(<span class="ident">s</span>.<span class="ident">as_ref</span>(), <span class="kw-2">&amp;</span><span class="ident">format</span>.<span class="ident">into</span>())<span class="question-mark">?</span>)
+    <span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;This method does not mutate the original `OffsetDateTime`.&quot;</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">replace_date_time</span>(<span class="self">self</span>, <span class="ident">date_time</span>: <span class="ident">PrimitiveDateTime</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="ident">date_time</span>.<span class="ident">assume_offset</span>(<span class="self">self</span>.<span class="ident">offset</span>)
     }
 
-    <span class="doccomment">/// Given the items already parsed, attempt to create an `OffsetDateTime`.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">try_from_parsed_items</span>(<span class="ident">items</span>: <span class="ident">ParsedItems</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">UtcOffset::try_from_parsed_items</span>(<span class="ident">items</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">PrimitiveDateTime::try_from_parsed_items</span>(<span class="ident">items</span>)<span class="question-mark">?</span>.<span class="ident">assume_offset</span>(<span class="ident">offset</span>))
+    <span class="doccomment">/// Replace the offset. The date and time components remain unchanged.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::macros::{datetime, offset};</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     datetime!(2020-01-01 0:00 UTC).replace_offset(offset!(-5)),</span>
+    <span class="doccomment">///     datetime!(2020-01-01 0:00 -5)</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;This method does not mutate the original `OffsetDateTime`.&quot;</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">replace_offset</span>(<span class="self">self</span>, <span class="ident">offset</span>: <span class="ident">UtcOffset</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">assume_offset</span>(<span class="ident">offset</span>)
+    }
+}
+<span class="comment">// endregion replacement</span>
+
+<span class="comment">// region: formatting &amp; parsing</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;formatting&quot;</span>)]</span>
+<span class="kw">impl</span> <span class="ident">OffsetDateTime</span> {
+    <span class="doccomment">/// Format the `OffsetDateTime` using the provided [format</span>
+    <span class="doccomment">/// description](crate::format_description).</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">format_into</span>(
+        <span class="self">self</span>,
+        <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">impl</span> <span class="ident">io::Write</span>,
+        <span class="ident">format</span>: <span class="kw-2">&amp;</span>(<span class="kw">impl</span> <span class="ident">Formattable</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>),
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">error::Format</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">local</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">utc_to_offset</span>(<span class="self">self</span>.<span class="ident">offset</span>);
+        <span class="ident">format</span>.<span class="ident">format_into</span>(
+            <span class="ident">output</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">local</span>.<span class="ident">date</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">local</span>.<span class="ident">time</span>),
+            <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">offset</span>),
+        )
+    }
+
+    <span class="doccomment">/// Format the `OffsetDateTime` using the provided [format</span>
+    <span class="doccomment">/// description](crate::format_description).</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::{format_description, macros::datetime};</span>
+    <span class="doccomment">/// let format = format_description::parse(</span>
+    <span class="doccomment">///     &quot;[year]-[month]-[day] [hour]:[minute]:[second] [offset_hour \</span>
+    <span class="doccomment">///          sign:mandatory]:[offset_minute]:[offset_second]&quot;,</span>
+    <span class="doccomment">/// )?;</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     datetime!(2020-01-02 03:04:05 +06:07:08).format(&amp;format)?,</span>
+    <span class="doccomment">///     &quot;2020-01-02 03:04:05 +06:07:08&quot;</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// # Ok::&lt;_, time::Error&gt;(())</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">format</span>(<span class="self">self</span>, <span class="ident">format</span>: <span class="kw-2">&amp;</span>(<span class="kw">impl</span> <span class="ident">Formattable</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>)) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">error::Format</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">local</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">utc_to_offset</span>(<span class="self">self</span>.<span class="ident">offset</span>);
+        <span class="ident">format</span>.<span class="ident">format</span>(<span class="prelude-val">Some</span>(<span class="ident">local</span>.<span class="ident">date</span>), <span class="prelude-val">Some</span>(<span class="ident">local</span>.<span class="ident">time</span>), <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">offset</span>))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">OffsetDateTime</span> {
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parsing&quot;</span>)]</span>
+<span class="kw">impl</span> <span class="ident">OffsetDateTime</span> {
+    <span class="doccomment">/// Parse an `OffsetDateTime` from the input using the provided [format</span>
+    <span class="doccomment">/// description](crate::format_description).</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::{format_description, macros::datetime, OffsetDateTime};</span>
+    <span class="doccomment">/// let format = format_description::parse(</span>
+    <span class="doccomment">///     &quot;[year]-[month]-[day] [hour]:[minute]:[second] [offset_hour \</span>
+    <span class="doccomment">///          sign:mandatory]:[offset_minute]:[offset_second]&quot;,</span>
+    <span class="doccomment">/// )?;</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     OffsetDateTime::parse(&quot;2020-01-02 03:04:05 +06:07:08&quot;, &amp;format)?,</span>
+    <span class="doccomment">///     datetime!(2020-01-02 03:04:05 +06:07:08)</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// # Ok::&lt;_, time::Error&gt;(())</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(
+        <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">description</span>: <span class="kw-2">&amp;</span>(<span class="kw">impl</span> <span class="ident">Parsable</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>),
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::Parse</span><span class="op">&gt;</span> {
+        <span class="ident">description</span>.<span class="ident">parse_offset_date_time</span>(<span class="ident">input</span>.<span class="ident">as_bytes</span>())
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">OffsetDateTime</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{} {} {}&quot;</span>, <span class="self">self</span>.<span class="ident">date</span>(), <span class="self">self</span>.<span class="ident">time</span>(), <span class="self">self</span>.<span class="ident">offset</span>())
+        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{} {} {}&quot;</span>, <span class="self">self</span>.<span class="ident">date</span>(), <span class="self">self</span>.<span class="ident">time</span>(), <span class="self">self</span>.<span class="ident">offset</span>)
     }
 }
+<span class="comment">// endregion formatting &amp; parsing</span>
 
+<span class="comment">// region: trait impls</span>
 <span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">OffsetDateTime</span> {
     <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="ident">rhs</span>.<span class="ident">utc_datetime</span>)
@@ -2075,82 +1968,43 @@
 
 <span class="kw">impl</span> <span class="ident">Hash</span> <span class="kw">for</span> <span class="ident">OffsetDateTime</span> {
     <span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">Hasher</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">hasher</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">H</span>) {
-        <span class="comment">// We need to distinguish this from a `PrimitiveDateTime`, which would</span>
-        <span class="comment">// otherwise conflict.</span>
+        <span class="comment">// We need to distinguish this from a `PrimitiveDateTime`, which would otherwise conflict.</span>
         <span class="ident">hasher</span>.<span class="ident">write</span>(<span class="string">b&quot;OffsetDateTime&quot;</span>);
         <span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">hash</span>(<span class="ident">hasher</span>);
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Add</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OffsetDateTime</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Add</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OffsetDateTime</span>
+<span class="kw">where</span>
+    <span class="ident">PrimitiveDateTime</span>: <span class="ident">Add</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">PrimitiveDateTime</span><span class="op">&gt;</span>,
+{
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
 
-    <span class="kw">fn</span> <span class="ident">add</span>(<span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="self">Self</span> {
-            <span class="ident">utc_datetime</span>: <span class="self">self</span>.<span class="ident">utc_datetime</span> <span class="op">+</span> <span class="ident">duration</span>,
-            <span class="ident">offset</span>: <span class="self">self</span>.<span class="ident">offset</span>,
-        }
+    <span class="kw">fn</span> <span class="ident">add</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Output</span> {
+        (<span class="self">self</span>.<span class="ident">utc_datetime</span> <span class="op">+</span> <span class="ident">rhs</span>)
+            .<span class="ident">assume_utc</span>()
+            .<span class="ident">to_offset</span>(<span class="self">self</span>.<span class="ident">offset</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Add</span><span class="op">&lt;</span><span class="ident">StdDuration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OffsetDateTime</span> {
+<span class="macro">impl_add_assign!</span>(<span class="ident">OffsetDateTime</span>: <span class="ident">Duration</span>, <span class="ident">StdDuration</span>);
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OffsetDateTime</span>
+<span class="kw">where</span>
+    <span class="ident">PrimitiveDateTime</span>: <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">PrimitiveDateTime</span><span class="op">&gt;</span>,
+{
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
 
-    <span class="kw">fn</span> <span class="ident">add</span>(<span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">StdDuration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="self">Self</span> {
-            <span class="ident">utc_datetime</span>: <span class="self">self</span>.<span class="ident">utc_datetime</span> <span class="op">+</span> <span class="ident">duration</span>,
-            <span class="ident">offset</span>: <span class="self">self</span>.<span class="ident">offset</span>,
-        }
+    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Output</span> {
+        (<span class="self">self</span>.<span class="ident">utc_datetime</span> <span class="op">-</span> <span class="ident">rhs</span>)
+            .<span class="ident">assume_utc</span>()
+            .<span class="ident">to_offset</span>(<span class="self">self</span>.<span class="ident">offset</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">AddAssign</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OffsetDateTime</span> {
-    <span class="kw">fn</span> <span class="ident">add_assign</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span> <span class="op">+</span> <span class="ident">duration</span>;
-    }
-}
+<span class="macro">impl_sub_assign!</span>(<span class="ident">OffsetDateTime</span>: <span class="ident">Duration</span>, <span class="ident">StdDuration</span>);
 
-<span class="kw">impl</span> <span class="ident">AddAssign</span><span class="op">&lt;</span><span class="ident">StdDuration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OffsetDateTime</span> {
-    <span class="kw">fn</span> <span class="ident">add_assign</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">StdDuration</span>) {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span> <span class="op">+</span> <span class="ident">duration</span>;
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OffsetDateTime</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
-
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="self">Self</span> {
-            <span class="ident">utc_datetime</span>: <span class="self">self</span>.<span class="ident">utc_datetime</span> <span class="op">-</span> <span class="ident">duration</span>,
-            <span class="ident">offset</span>: <span class="self">self</span>.<span class="ident">offset</span>,
-        }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">StdDuration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OffsetDateTime</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
-
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">StdDuration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="self">Self</span> {
-            <span class="ident">utc_datetime</span>: <span class="self">self</span>.<span class="ident">utc_datetime</span> <span class="op">-</span> <span class="ident">duration</span>,
-            <span class="ident">offset</span>: <span class="self">self</span>.<span class="ident">offset</span>,
-        }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">SubAssign</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OffsetDateTime</span> {
-    <span class="kw">fn</span> <span class="ident">sub_assign</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span> <span class="op">-</span> <span class="ident">duration</span>;
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">SubAssign</span><span class="op">&lt;</span><span class="ident">StdDuration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OffsetDateTime</span> {
-    <span class="kw">fn</span> <span class="ident">sub_assign</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">StdDuration</span>) {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span> <span class="op">-</span> <span class="ident">duration</span>;
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">OffsetDateTime</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OffsetDateTime</span> {
+<span class="kw">impl</span> <span class="ident">Sub</span> <span class="kw">for</span> <span class="ident">OffsetDateTime</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Duration</span>;
 
     <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Output</span> {
@@ -2168,18 +2022,13 @@
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">duration</span>.<span class="ident">is_positive</span>() {
             <span class="self">self</span> <span class="op">+</span> <span class="ident">duration</span>.<span class="ident">abs_std</span>()
         } <span class="kw">else</span> {
-            <span class="comment">// duration.is_negative()</span>
+            <span class="macro">debug_assert!</span>(<span class="ident">duration</span>.<span class="ident">is_negative</span>());
             <span class="self">self</span> <span class="op">-</span> <span class="ident">duration</span>.<span class="ident">abs_std</span>()
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">AddAssign</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SystemTime</span> {
-    <span class="kw">fn</span> <span class="ident">add_assign</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span> <span class="op">+</span> <span class="ident">duration</span>;
-    }
-}
+<span class="macro">impl_add_assign!</span>(<span class="ident">SystemTime</span>: <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span> <span class="ident">Duration</span>);
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SystemTime</span> {
@@ -2190,12 +2039,7 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">SubAssign</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SystemTime</span> {
-    <span class="kw">fn</span> <span class="ident">sub_assign</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span> <span class="op">-</span> <span class="ident">duration</span>;
-    }
-}
+<span class="macro">impl_sub_assign!</span>(<span class="ident">SystemTime</span>: <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span> <span class="ident">Duration</span>);
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">SystemTime</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OffsetDateTime</span> {
@@ -2245,35 +2089,31 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SystemTime</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OffsetDateTime</span> {
-    <span class="comment">// There is definitely some way to have this conversion be infallible, but</span>
-    <span class="comment">// it won&#39;t be an issue for over 500 years.</span>
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">system_time</span>: <span class="ident">SystemTime</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">duration</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">system_time</span>.<span class="ident">duration_since</span>(<span class="ident">SystemTime::UNIX_EPOCH</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">duration</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Duration::try_from</span>(<span class="ident">duration</span>)
-                .<span class="ident">expect</span>(<span class="string">&quot;overflow converting `std::time::Duration` to `time::Duration`&quot;</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="op">-</span><span class="ident">Duration::try_from</span>(<span class="ident">err</span>.<span class="ident">duration</span>())
-                .<span class="ident">expect</span>(<span class="string">&quot;overflow converting `std::time::Duration` to `time::Duration`&quot;</span>),
-        };
-
-        <span class="ident"><span class="self">Self</span>::unix_epoch</span>() <span class="op">+</span> <span class="ident">duration</span>
+        <span class="kw">match</span> <span class="ident">system_time</span>.<span class="ident">duration_since</span>(<span class="ident">SystemTime::UNIX_EPOCH</span>) {
+            <span class="prelude-val">Ok</span>(<span class="ident">duration</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::UNIX_EPOCH</span> <span class="op">+</span> <span class="ident">duration</span>,
+            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::UNIX_EPOCH</span> <span class="op">-</span> <span class="ident">err</span>.<span class="ident">duration</span>(),
+        }
     }
 }
 
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::fallible_impl_from</span>)]</span> <span class="comment">// caused by `debug_assert!`</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">OffsetDateTime</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SystemTime</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">datetime</span>: <span class="ident">OffsetDateTime</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">duration</span> <span class="op">=</span> <span class="ident">datetime</span> <span class="op">-</span> <span class="ident">OffsetDateTime::unix_epoch</span>();
+        <span class="kw">let</span> <span class="ident">duration</span> <span class="op">=</span> <span class="ident">datetime</span> <span class="op">-</span> <span class="ident">OffsetDateTime::UNIX_EPOCH</span>;
 
         <span class="kw">if</span> <span class="ident">duration</span>.<span class="ident">is_zero</span>() {
             <span class="ident"><span class="self">Self</span>::UNIX_EPOCH</span>
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">duration</span>.<span class="ident">is_positive</span>() {
             <span class="ident"><span class="self">Self</span>::UNIX_EPOCH</span> <span class="op">+</span> <span class="ident">duration</span>.<span class="ident">abs_std</span>()
         } <span class="kw">else</span> {
-            <span class="comment">// duration.is_negative()</span>
+            <span class="macro">debug_assert!</span>(<span class="ident">duration</span>.<span class="ident">is_negative</span>());
             <span class="ident"><span class="self">Self</span>::UNIX_EPOCH</span> <span class="op">-</span> <span class="ident">duration</span>.<span class="ident">abs_std</span>()
         }
     }
 }
+<span class="comment">// endregion trait impls</span>
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="time" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>

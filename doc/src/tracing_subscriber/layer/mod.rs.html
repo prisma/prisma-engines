@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;tracing-subscriber-0.2.24&#x2F;src&#x2F;layer&#x2F;mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../tracing_subscriber/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;tokio-rs&#x2F;tracing&#x2F;master&#x2F;assets&#x2F;logo-type.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;tracing-subscriber-0.3.2&#x2F;src&#x2F;layer&#x2F;mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../tracing_subscriber/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;tokio-rs&#x2F;tracing&#x2F;master&#x2F;assets&#x2F;logo-type.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1230,6 +1230,59 @@
 <span id="1230">1230</span>
 <span id="1231">1231</span>
 <span id="1232">1232</span>
+<span id="1233">1233</span>
+<span id="1234">1234</span>
+<span id="1235">1235</span>
+<span id="1236">1236</span>
+<span id="1237">1237</span>
+<span id="1238">1238</span>
+<span id="1239">1239</span>
+<span id="1240">1240</span>
+<span id="1241">1241</span>
+<span id="1242">1242</span>
+<span id="1243">1243</span>
+<span id="1244">1244</span>
+<span id="1245">1245</span>
+<span id="1246">1246</span>
+<span id="1247">1247</span>
+<span id="1248">1248</span>
+<span id="1249">1249</span>
+<span id="1250">1250</span>
+<span id="1251">1251</span>
+<span id="1252">1252</span>
+<span id="1253">1253</span>
+<span id="1254">1254</span>
+<span id="1255">1255</span>
+<span id="1256">1256</span>
+<span id="1257">1257</span>
+<span id="1258">1258</span>
+<span id="1259">1259</span>
+<span id="1260">1260</span>
+<span id="1261">1261</span>
+<span id="1262">1262</span>
+<span id="1263">1263</span>
+<span id="1264">1264</span>
+<span id="1265">1265</span>
+<span id="1266">1266</span>
+<span id="1267">1267</span>
+<span id="1268">1268</span>
+<span id="1269">1269</span>
+<span id="1270">1270</span>
+<span id="1271">1271</span>
+<span id="1272">1272</span>
+<span id="1273">1273</span>
+<span id="1274">1274</span>
+<span id="1275">1275</span>
+<span id="1276">1276</span>
+<span id="1277">1277</span>
+<span id="1278">1278</span>
+<span id="1279">1279</span>
+<span id="1280">1280</span>
+<span id="1281">1281</span>
+<span id="1282">1282</span>
+<span id="1283">1283</span>
+<span id="1284">1284</span>
+<span id="1285">1285</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The [`Layer`] trait, a composable abstraction for building [`Subscriber`]s.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The [`Subscriber`] trait in `tracing-core` represents the _complete_ set of</span>
@@ -1238,7 +1291,7 @@
 <span class="doccomment">//! complete strategy for collecting traces; but it _also_ means that the</span>
 <span class="doccomment">//! `Subscriber` trait cannot easily be composed with other `Subscriber`s.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! In particular, [`Subscriber`]&#39;s are responsible for generating [span IDs] and</span>
+<span class="doccomment">//! In particular, [`Subscriber`]s are responsible for generating [span IDs] and</span>
 <span class="doccomment">//! assigning them to spans. Since these IDs must uniquely identify a span</span>
 <span class="doccomment">//! within the context of the current trace, this means that there may only be</span>
 <span class="doccomment">//! a single `Subscriber` for a given thread at any point in time &amp;mdash;</span>
@@ -1625,6 +1678,84 @@
 <span class="doccomment">//! # Ok(()) }</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
+<span class="doccomment">//! ## Runtime Configuration With Layers</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! In some cases, a particular [`Layer`] may be enabled or disabled based on</span>
+<span class="doccomment">//! runtime configuration. This can introduce challenges, because the type of a</span>
+<span class="doccomment">//! layered [`Subscriber`] depends on which layers are added to it: if an `if`</span>
+<span class="doccomment">//! or `match` expression adds some [`Layer`]s in one branch and other layers</span>
+<span class="doccomment">//! in another, the [`Subscriber`] values returned by those branches will have</span>
+<span class="doccomment">//! different types. For example, the following _will not_ work:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```compile_fail</span>
+<span class="doccomment">//! # fn docs() -&gt; Result&lt;(), Box&lt;dyn std::error::Error + &#39;static&gt;&gt; {</span>
+<span class="doccomment">//! # struct Config {</span>
+<span class="doccomment">//! #    is_prod: bool,</span>
+<span class="doccomment">//! #    path: &amp;&#39;static str,</span>
+<span class="doccomment">//! # }</span>
+<span class="doccomment">//! # let cfg = Config { is_prod: false, path: &quot;debug.log&quot; };</span>
+<span class="doccomment">//! use std::{fs::File, sync::Arc};</span>
+<span class="doccomment">//! use tracing_subscriber::{Registry, prelude::*};</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! let stdout_log = tracing_subscriber::fmt::layer().pretty();</span>
+<span class="doccomment">//! let subscriber = Registry::default().with(stdout_log);</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // The compile error will occur here because the if and else</span>
+<span class="doccomment">//! // branches have different (and therefore incompatible) types.</span>
+<span class="doccomment">//! let subscriber = if cfg.is_prod {</span>
+<span class="doccomment">//!     let file = File::create(cfg.path)?;</span>
+<span class="doccomment">//!     let layer = tracing_subscriber::fmt::layer()</span>
+<span class="doccomment">//!         .json()</span>
+<span class="doccomment">//!         .with_writer(Arc::new(file));</span>
+<span class="doccomment">//!     subscriber.with(layer)</span>
+<span class="doccomment">//! } else {</span>
+<span class="doccomment">//!     subscriber</span>
+<span class="doccomment">//! };</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! tracing::subscriber::set_global_default(subscriber)</span>
+<span class="doccomment">//!     .expect(&quot;Unable to set global subscriber&quot;);</span>
+<span class="doccomment">//! # Ok(()) }</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! However, a [`Layer`] wrapped in an [`Option`] [also implements the `Layer`</span>
+<span class="doccomment">//! trait][option-impl]. This allows individual layers to be enabled or disabled at</span>
+<span class="doccomment">//! runtime while always producing a [`Subscriber`] of the same type. For</span>
+<span class="doccomment">//! example:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//! # fn docs() -&gt; Result&lt;(), Box&lt;dyn std::error::Error + &#39;static&gt;&gt; {</span>
+<span class="doccomment">//! # struct Config {</span>
+<span class="doccomment">//! #    is_prod: bool,</span>
+<span class="doccomment">//! #    path: &amp;&#39;static str,</span>
+<span class="doccomment">//! # }</span>
+<span class="doccomment">//! # let cfg = Config { is_prod: false, path: &quot;debug.log&quot; };</span>
+<span class="doccomment">//! use std::{fs::File, sync::Arc};</span>
+<span class="doccomment">//! use tracing_subscriber::{Registry, prelude::*};</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! let stdout_log = tracing_subscriber::fmt::layer().pretty();</span>
+<span class="doccomment">//! let subscriber = Registry::default().with(stdout_log);</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // if `cfg.is_prod` is true, also log JSON-formatted logs to a file.</span>
+<span class="doccomment">//! let json_log = if cfg.is_prod {</span>
+<span class="doccomment">//!     let file = File::create(cfg.path)?;</span>
+<span class="doccomment">//!     let json_log = tracing_subscriber::fmt::layer()</span>
+<span class="doccomment">//!         .json()</span>
+<span class="doccomment">//!         .with_writer(Arc::new(file));</span>
+<span class="doccomment">//!     Some(json_log)</span>
+<span class="doccomment">//! } else {   </span>
+<span class="doccomment">//!     None</span>
+<span class="doccomment">//! };</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // If `cfg.is_prod` is false, then `json` will be `None`, and this layer</span>
+<span class="doccomment">//! // will do nothing. However, the subscriber will still have the same type</span>
+<span class="doccomment">//! // regardless of whether the `Option`&#39;s value is `None` or `Some`.</span>
+<span class="doccomment">//! let subscriber = subscriber.with(json_log);</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! tracing::subscriber::set_global_default(subscriber)</span>
+<span class="doccomment">//!    .expect(&quot;Unable to set global subscriber&quot;);</span>
+<span class="doccomment">//! # Ok(()) }</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
 <span class="doccomment">//! [`Subscriber`]: https://docs.rs/tracing-core/latest/tracing_core/subscriber/trait.Subscriber.html</span>
 <span class="doccomment">//! [span IDs]: https://docs.rs/tracing-core/latest/tracing_core/span/struct.Id.html</span>
 <span class="doccomment">//! [the current span]: Context::current_span</span>
@@ -1634,6 +1765,7 @@
 <span class="doccomment">//! [`Layer::register_callsite`]: Layer::register_callsite</span>
 <span class="doccomment">//! [`Layer::enabled`]: Layer::enabled</span>
 <span class="doccomment">//! [`Interest::never()`]: https://docs.rs/tracing-core/latest/tracing_core/subscriber/struct.Interest.html#method.never</span>
+<span class="doccomment">//! [option-impl]: crate::layer::Layer#impl-Layer&lt;S&gt;-for-Option&lt;L&gt;</span>
 <span class="doccomment">//! [`Filtered`]: crate::filter::Filtered</span>
 <span class="doccomment">//! [`filter`]: crate::filter</span>
 <span class="doccomment">//! [`Targets`]: crate::filter::Targets</span>
@@ -1646,17 +1778,21 @@
 <span class="doccomment">//! [`LevelFilter`]: crate::filter::LevelFilter</span>
 <span class="doccomment">//! [feat]: crate#feature-flags</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::filter</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">any::TypeId</span>,
-    <span class="ident">ops</span>::{<span class="ident">Deref</span>, <span class="ident">DerefMut</span>},
-    <span class="ident">sync::Arc</span>,
-};
+
 <span class="kw">use</span> <span class="ident">tracing_core</span>::{
     <span class="ident">metadata::Metadata</span>,
     <span class="ident">span</span>,
     <span class="ident">subscriber</span>::{<span class="ident">Interest</span>, <span class="ident">Subscriber</span>},
     <span class="ident">Event</span>, <span class="ident">LevelFilter</span>,
 };
+
+<span class="kw">use</span> <span class="ident">core::any::TypeId</span>;
+
+<span class="macro">feature!</span> {
+    <span class="attribute">#![<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>]</span>
+    <span class="kw">use</span> <span class="ident">alloc::boxed::Box</span>;
+    <span class="kw">use</span> <span class="ident">core::ops</span>::{<span class="ident">Deref</span>, <span class="ident">DerefMut</span>};
+}
 
 <span class="kw">mod</span> <span class="ident">context</span>;
 <span class="kw">mod</span> <span class="ident">layered</span>;
@@ -1799,7 +1935,7 @@
 
     <span class="doccomment">/// Notifies this layer that a new span was constructed with the given</span>
     <span class="doccomment">/// `Attributes` and `Id`.</span>
-    <span class="kw">fn</span> <span class="ident">new_span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">attrs</span>: <span class="kw-2">&amp;</span><span class="ident">span::Attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">on_new_span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">attrs</span>: <span class="kw-2">&amp;</span><span class="ident">span::Attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> (<span class="ident">attrs</span>, <span class="ident">id</span>, <span class="ident">ctx</span>);
     }
 
@@ -2007,8 +2143,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Filtered`]: crate::filter::Filtered</span>
     <span class="doccomment">/// [plf]: #per-layer-filtering</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>)))]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))))]</span>
     <span class="kw">fn</span> <span class="ident">with_filter</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">filter::Filtered</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">F</span>, <span class="ident">S</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="self">Self</span>: <span class="ident">Sized</span>,
@@ -2027,181 +2163,182 @@
     }
 }
 
-<span class="doccomment">/// A per-[`Layer`] filter that determines whether a span or event is enabled</span>
-<span class="doccomment">/// for an individual layer.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See [the module-level documentation][plf] for details on using [`Filter`]s.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [plf]: crate::layer#per-layer-filtering</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">notable_trait</span>))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Filter</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns `true` if this layer is interested in a span or event with the</span>
-    <span class="doccomment">/// given [`Metadata`] in the current [`Context`], similarly to</span>
-    <span class="doccomment">/// [`Subscriber::enabled`].</span>
+<span class="macro">feature!</span> {
+    <span class="attribute">#![<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
+    <span class="doccomment">/// A per-[`Layer`] filter that determines whether a span or event is enabled</span>
+    <span class="doccomment">/// for an individual layer.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// If this returns `false`, the span or event will be disabled _for the</span>
-    <span class="doccomment">/// wrapped [`Layer`]_. Unlike [`Layer::enabled`], the span or event will</span>
-    <span class="doccomment">/// still be recorded if any _other_ layers choose to enable it. However,</span>
-    <span class="doccomment">/// the layer [filtered] by this filter will skip recording that span or</span>
-    <span class="doccomment">/// event.</span>
+    <span class="doccomment">/// See [the module-level documentation][plf] for details on using [`Filter`]s.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// If all layers indicate that they do not wish to see this span or event,</span>
-    <span class="doccomment">/// it will be disabled.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`metadata`]: tracing_core::Metadata</span>
-    <span class="doccomment">/// [`Subscriber::enabled`]: tracing_core::Subscriber::enabled</span>
-    <span class="doccomment">/// [filtered]: crate::filter::Filtered</span>
-    <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+    <span class="doccomment">/// [plf]: crate::layer#per-layer-filtering</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">notable_trait</span>))]</span>
+    <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Filter</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
+        <span class="doccomment">/// Returns `true` if this layer is interested in a span or event with the</span>
+        <span class="doccomment">/// given [`Metadata`] in the current [`Context`], similarly to</span>
+        <span class="doccomment">/// [`Subscriber::enabled`].</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// If this returns `false`, the span or event will be disabled _for the</span>
+        <span class="doccomment">/// wrapped [`Layer`]_. Unlike [`Layer::enabled`], the span or event will</span>
+        <span class="doccomment">/// still be recorded if any _other_ layers choose to enable it. However,</span>
+        <span class="doccomment">/// the layer [filtered] by this filter will skip recording that span or</span>
+        <span class="doccomment">/// event.</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// If all layers indicate that they do not wish to see this span or event,</span>
+        <span class="doccomment">/// it will be disabled.</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// [`metadata`]: tracing_core::Metadata</span>
+        <span class="doccomment">/// [`Subscriber::enabled`]: tracing_core::Subscriber::enabled</span>
+        <span class="doccomment">/// [filtered]: crate::filter::Filtered</span>
+        <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
 
-    <span class="doccomment">/// Returns an [`Interest`] indicating whether this layer will [always],</span>
-    <span class="doccomment">/// [sometimes], or [never] be interested in the given [`Metadata`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// When a given callsite will [always] or [never] be enabled, the results</span>
-    <span class="doccomment">/// of evaluating the filter may be cached for improved performance.</span>
-    <span class="doccomment">/// Therefore, if a filter is capable of determining that it will always or</span>
-    <span class="doccomment">/// never enable a particular callsite, providing an implementation of this</span>
-    <span class="doccomment">/// function is recommended.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// &lt;pre class=&quot;ignore&quot; style=&quot;white-space:normal;font:inherit;&quot;&gt;</span>
-    <span class="doccomment">/// &lt;strong&gt;Note&lt;/strong&gt;: If a &lt;code&gt;Filter&lt;/code&gt; will perform</span>
-    <span class="doccomment">/// &lt;em&gt;dynamic filtering&lt;/em&gt; that depends on the current context in which</span>
-    <span class="doccomment">/// a span or event was observered (e.g. only enabling an event when it</span>
-    <span class="doccomment">/// occurs within a particular span), it &lt;strong&gt;must&lt;/strong&gt; return</span>
-    <span class="doccomment">/// &lt;code&gt;Interest::sometimes()&lt;/code&gt; from this method. If it returns</span>
-    <span class="doccomment">/// &lt;code&gt;Interest::always()&lt;/code&gt; or &lt;code&gt;Interest::never()&lt;/code&gt;, the</span>
-    <span class="doccomment">/// &lt;code&gt;enabled&lt;/code&gt; method may not be called when a particular instance</span>
-    <span class="doccomment">/// of that span or event is recorded.</span>
-    <span class="doccomment">/// &lt;/pre&gt;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method is broadly similar to [`Subscriber::register_callsite`];</span>
-    <span class="doccomment">/// however, since the returned value represents only the interest of</span>
-    <span class="doccomment">/// *this* layer, the resulting behavior is somewhat different.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If a [`Subscriber`] returns [`Interest::always()`][always] or</span>
-    <span class="doccomment">/// [`Interest::never()`][never] for a given [`Metadata`], its [`enabled`]</span>
-    <span class="doccomment">/// method is then *guaranteed* to never be called for that callsite. On the</span>
-    <span class="doccomment">/// other hand, when a `Filter` returns [`Interest::always()`][always] or</span>
-    <span class="doccomment">/// [`Interest::never()`][never] for a callsite, _other_ [`Layer`]s may have</span>
-    <span class="doccomment">/// differing interests in that callsite. If this is the case, the callsite</span>
-    <span class="doccomment">/// will recieve [`Interest::sometimes()`][sometimes], and the [`enabled`]</span>
-    <span class="doccomment">/// method will still be called for that callsite when it records a span or</span>
-    <span class="doccomment">/// event.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returning [`Interest::always()`][always] or [`Interest::never()`][never] from</span>
-    <span class="doccomment">/// `Filter::callsite_enabled` will permanently enable or disable a</span>
-    <span class="doccomment">/// callsite (without requiring subsequent calls to [`enabled`]) if and only</span>
-    <span class="doccomment">/// if the following is true:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - all [`Layer`]s that comprise the subscriber include `Filter`s</span>
-    <span class="doccomment">///   (this includes a tree of [`Layered`] layers that share the same</span>
-    <span class="doccomment">///   `Filter`)</span>
-    <span class="doccomment">/// - all those `Filter`s return the same [`Interest`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For example, if a [`Subscriber`] consists of two [`Filtered`] layers,</span>
-    <span class="doccomment">/// and both of those layers return [`Interest::never()`][never], that</span>
-    <span class="doccomment">/// callsite *will* never be enabled, and the [`enabled`] methods of those</span>
-    <span class="doccomment">/// [`Filter`]s will not be called.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Default Implementation</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The default implementation of this method assumes that the</span>
-    <span class="doccomment">/// `Filter`&#39;s [`enabled`] method _may_ perform dynamic filtering, and</span>
-    <span class="doccomment">/// returns [`Interest::sometimes()`][sometimes], to ensure that [`enabled`]</span>
-    <span class="doccomment">/// is called to determine whether a particular _instance_ of the callsite</span>
-    <span class="doccomment">/// is enabled in the current context. If this is *not* the case, and the</span>
-    <span class="doccomment">/// `Filter`&#39;s [`enabled`] method will always return the same result</span>
-    <span class="doccomment">/// for a particular [`Metadata`], this method can be overridden as</span>
-    <span class="doccomment">/// follows:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use tracing_subscriber::layer;</span>
-    <span class="doccomment">/// use tracing_core::{Metadata, subscriber::Interest};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// struct MyFilter {</span>
-    <span class="doccomment">///     // ...</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// impl MyFilter {</span>
-    <span class="doccomment">///     // The actual logic for determining whether a `Metadata` is enabled</span>
-    <span class="doccomment">///     // must be factored out from the `enabled` method, so that it can be</span>
-    <span class="doccomment">///     // called without a `Context` (which is not provided to the</span>
-    <span class="doccomment">///     // `callsite_enabled` method).</span>
-    <span class="doccomment">///     fn is_enabled(&amp;self, metadata: &amp;Metadata&lt;&#39;_&gt;) -&gt; bool {</span>
-    <span class="doccomment">///         // ...</span>
-    <span class="doccomment">///         # drop(metadata); true</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// impl&lt;S&gt; layer::Filter&lt;S&gt; for MyFilter {</span>
-    <span class="doccomment">///     fn enabled(&amp;self, metadata: &amp;Metadata&lt;&#39;_&gt;, _: &amp;layer::Context&lt;&#39;_, S&gt;) -&gt; bool {</span>
-    <span class="doccomment">///         // Even though we are implementing `callsite_enabled`, we must still provide a</span>
-    <span class="doccomment">///         // working implementation of `enabled`, as returning `Interest::always()` or</span>
-    <span class="doccomment">///         // `Interest::never()` will *allow* caching, but will not *guarantee* it.</span>
-    <span class="doccomment">///         // Other filters may still return `Interest::sometimes()`, so we may be</span>
-    <span class="doccomment">///         // asked again in `enabled`.</span>
-    <span class="doccomment">///         self.is_enabled(metadata)</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     fn callsite_enabled(&amp;self, metadata: &amp;&#39;static Metadata&lt;&#39;static&gt;) -&gt; Interest {</span>
-    <span class="doccomment">///         // The result of `self.enabled(metadata, ...)` will always be</span>
-    <span class="doccomment">///         // the same for any given `Metadata`, so we can convert it into</span>
-    <span class="doccomment">///         // an `Interest`:</span>
-    <span class="doccomment">///         if self.is_enabled(metadata) {</span>
-    <span class="doccomment">///             Interest::always()</span>
-    <span class="doccomment">///         } else {</span>
-    <span class="doccomment">///             Interest::never()</span>
-    <span class="doccomment">///         }</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Metadata`]: tracing_core::Metadata</span>
-    <span class="doccomment">/// [`Interest`]: tracing_core::Interest</span>
-    <span class="doccomment">/// [always]: tracing_core::Interest::always</span>
-    <span class="doccomment">/// [sometimes]: tracing_core::Interest::sometimes</span>
-    <span class="doccomment">/// [never]: tracing_core::Interest::never</span>
-    <span class="doccomment">/// [`Subscriber::register_callsite`]: tracing_core::Subscriber::register_callsite</span>
-    <span class="doccomment">/// [`Subscriber`]: tracing_core::Subscriber</span>
-    <span class="doccomment">/// [`enabled`]: Filter::enabled</span>
-    <span class="doccomment">/// [`Filtered`]: crate::filter::Filtered</span>
-    <span class="kw">fn</span> <span class="ident">callsite_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Interest</span> {
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">meta</span>;
-        <span class="ident">Interest::sometimes</span>()
-    }
+        <span class="doccomment">/// Returns an [`Interest`] indicating whether this layer will [always],</span>
+        <span class="doccomment">/// [sometimes], or [never] be interested in the given [`Metadata`].</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// When a given callsite will [always] or [never] be enabled, the results</span>
+        <span class="doccomment">/// of evaluating the filter may be cached for improved performance.</span>
+        <span class="doccomment">/// Therefore, if a filter is capable of determining that it will always or</span>
+        <span class="doccomment">/// never enable a particular callsite, providing an implementation of this</span>
+        <span class="doccomment">/// function is recommended.</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// &lt;pre class=&quot;ignore&quot; style=&quot;white-space:normal;font:inherit;&quot;&gt;</span>
+        <span class="doccomment">/// &lt;strong&gt;Note&lt;/strong&gt;: If a &lt;code&gt;Filter&lt;/code&gt; will perform</span>
+        <span class="doccomment">/// &lt;em&gt;dynamic filtering&lt;/em&gt; that depends on the current context in which</span>
+        <span class="doccomment">/// a span or event was observered (e.g. only enabling an event when it</span>
+        <span class="doccomment">/// occurs within a particular span), it &lt;strong&gt;must&lt;/strong&gt; return</span>
+        <span class="doccomment">/// &lt;code&gt;Interest::sometimes()&lt;/code&gt; from this method. If it returns</span>
+        <span class="doccomment">/// &lt;code&gt;Interest::always()&lt;/code&gt; or &lt;code&gt;Interest::never()&lt;/code&gt;, the</span>
+        <span class="doccomment">/// &lt;code&gt;enabled&lt;/code&gt; method may not be called when a particular instance</span>
+        <span class="doccomment">/// of that span or event is recorded.</span>
+        <span class="doccomment">/// &lt;/pre&gt;</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// This method is broadly similar to [`Subscriber::register_callsite`];</span>
+        <span class="doccomment">/// however, since the returned value represents only the interest of</span>
+        <span class="doccomment">/// *this* layer, the resulting behavior is somewhat different.</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// If a [`Subscriber`] returns [`Interest::always()`][always] or</span>
+        <span class="doccomment">/// [`Interest::never()`][never] for a given [`Metadata`], its [`enabled`]</span>
+        <span class="doccomment">/// method is then *guaranteed* to never be called for that callsite. On the</span>
+        <span class="doccomment">/// other hand, when a `Filter` returns [`Interest::always()`][always] or</span>
+        <span class="doccomment">/// [`Interest::never()`][never] for a callsite, _other_ [`Layer`]s may have</span>
+        <span class="doccomment">/// differing interests in that callsite. If this is the case, the callsite</span>
+        <span class="doccomment">/// will recieve [`Interest::sometimes()`][sometimes], and the [`enabled`]</span>
+        <span class="doccomment">/// method will still be called for that callsite when it records a span or</span>
+        <span class="doccomment">/// event.</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// Returning [`Interest::always()`][always] or [`Interest::never()`][never] from</span>
+        <span class="doccomment">/// `Filter::callsite_enabled` will permanently enable or disable a</span>
+        <span class="doccomment">/// callsite (without requiring subsequent calls to [`enabled`]) if and only</span>
+        <span class="doccomment">/// if the following is true:</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// - all [`Layer`]s that comprise the subscriber include `Filter`s</span>
+        <span class="doccomment">///   (this includes a tree of [`Layered`] layers that share the same</span>
+        <span class="doccomment">///   `Filter`)</span>
+        <span class="doccomment">/// - all those `Filter`s return the same [`Interest`].</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// For example, if a [`Subscriber`] consists of two [`Filtered`] layers,</span>
+        <span class="doccomment">/// and both of those layers return [`Interest::never()`][never], that</span>
+        <span class="doccomment">/// callsite *will* never be enabled, and the [`enabled`] methods of those</span>
+        <span class="doccomment">/// [`Filter`]s will not be called.</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// ## Default Implementation</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// The default implementation of this method assumes that the</span>
+        <span class="doccomment">/// `Filter`&#39;s [`enabled`] method _may_ perform dynamic filtering, and</span>
+        <span class="doccomment">/// returns [`Interest::sometimes()`][sometimes], to ensure that [`enabled`]</span>
+        <span class="doccomment">/// is called to determine whether a particular _instance_ of the callsite</span>
+        <span class="doccomment">/// is enabled in the current context. If this is *not* the case, and the</span>
+        <span class="doccomment">/// `Filter`&#39;s [`enabled`] method will always return the same result</span>
+        <span class="doccomment">/// for a particular [`Metadata`], this method can be overridden as</span>
+        <span class="doccomment">/// follows:</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// ```</span>
+        <span class="doccomment">/// use tracing_subscriber::layer;</span>
+        <span class="doccomment">/// use tracing_core::{Metadata, subscriber::Interest};</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// struct MyFilter {</span>
+        <span class="doccomment">///     // ...</span>
+        <span class="doccomment">/// }</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// impl MyFilter {</span>
+        <span class="doccomment">///     // The actual logic for determining whether a `Metadata` is enabled</span>
+        <span class="doccomment">///     // must be factored out from the `enabled` method, so that it can be</span>
+        <span class="doccomment">///     // called without a `Context` (which is not provided to the</span>
+        <span class="doccomment">///     // `callsite_enabled` method).</span>
+        <span class="doccomment">///     fn is_enabled(&amp;self, metadata: &amp;Metadata&lt;&#39;_&gt;) -&gt; bool {</span>
+        <span class="doccomment">///         // ...</span>
+        <span class="doccomment">///         # drop(metadata); true</span>
+        <span class="doccomment">///     }</span>
+        <span class="doccomment">/// }</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// impl&lt;S&gt; layer::Filter&lt;S&gt; for MyFilter {</span>
+        <span class="doccomment">///     fn enabled(&amp;self, metadata: &amp;Metadata&lt;&#39;_&gt;, _: &amp;layer::Context&lt;&#39;_, S&gt;) -&gt; bool {</span>
+        <span class="doccomment">///         // Even though we are implementing `callsite_enabled`, we must still provide a</span>
+        <span class="doccomment">///         // working implementation of `enabled`, as returning `Interest::always()` or</span>
+        <span class="doccomment">///         // `Interest::never()` will *allow* caching, but will not *guarantee* it.</span>
+        <span class="doccomment">///         // Other filters may still return `Interest::sometimes()`, so we may be</span>
+        <span class="doccomment">///         // asked again in `enabled`.</span>
+        <span class="doccomment">///         self.is_enabled(metadata)</span>
+        <span class="doccomment">///     }</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">///     fn callsite_enabled(&amp;self, metadata: &amp;&#39;static Metadata&lt;&#39;static&gt;) -&gt; Interest {</span>
+        <span class="doccomment">///         // The result of `self.enabled(metadata, ...)` will always be</span>
+        <span class="doccomment">///         // the same for any given `Metadata`, so we can convert it into</span>
+        <span class="doccomment">///         // an `Interest`:</span>
+        <span class="doccomment">///         if self.is_enabled(metadata) {</span>
+        <span class="doccomment">///             Interest::always()</span>
+        <span class="doccomment">///         } else {</span>
+        <span class="doccomment">///             Interest::never()</span>
+        <span class="doccomment">///         }</span>
+        <span class="doccomment">///     }</span>
+        <span class="doccomment">/// }</span>
+        <span class="doccomment">/// ```</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// [`Metadata`]: tracing_core::Metadata</span>
+        <span class="doccomment">/// [`Interest`]: tracing_core::Interest</span>
+        <span class="doccomment">/// [always]: tracing_core::Interest::always</span>
+        <span class="doccomment">/// [sometimes]: tracing_core::Interest::sometimes</span>
+        <span class="doccomment">/// [never]: tracing_core::Interest::never</span>
+        <span class="doccomment">/// [`Subscriber::register_callsite`]: tracing_core::Subscriber::register_callsite</span>
+        <span class="doccomment">/// [`Subscriber`]: tracing_core::Subscriber</span>
+        <span class="doccomment">/// [`enabled`]: Filter::enabled</span>
+        <span class="doccomment">/// [`Filtered`]: crate::filter::Filtered</span>
+        <span class="kw">fn</span> <span class="ident">callsite_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Interest</span> {
+            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">meta</span>;
+            <span class="ident">Interest::sometimes</span>()
+        }
 
-    <span class="doccomment">/// Returns an optional hint of the highest [verbosity level][level] that</span>
-    <span class="doccomment">/// this `Filter` will enable.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If this method returns a [`LevelFilter`], it will be used as a hint to</span>
-    <span class="doccomment">/// determine the most verbose level that will be enabled. This will allow</span>
-    <span class="doccomment">/// spans and events which are more verbose than that level to be skipped</span>
-    <span class="doccomment">/// more efficiently. An implementation of this method is optional, but</span>
-    <span class="doccomment">/// strongly encouraged.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the maximum level the `Filter` will enable can change over the</span>
-    <span class="doccomment">/// course of its lifetime, it is free to return a different value from</span>
-    <span class="doccomment">/// multiple invocations of this method. However, note that changes in the</span>
-    <span class="doccomment">/// maximum level will **only** be reflected after the callsite [`Interest`]</span>
-    <span class="doccomment">/// cache is rebuilt, by calling the</span>
-    <span class="doccomment">/// [`tracing_core::callsite::rebuild_interest_cache`][rebuild] function.</span>
-    <span class="doccomment">/// Therefore, if the `Filter will change the value returned by this</span>
-    <span class="doccomment">/// method, it is responsible for ensuring that</span>
-    <span class="doccomment">/// [`rebuild_interest_cache`][rebuild] is called after the value of the max</span>
-    <span class="doccomment">/// level changes.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Default Implementation</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// By default, this method returns `None`, indicating that the maximum</span>
-    <span class="doccomment">/// level is unknown.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [level]: tracing_core::metadata::Level</span>
-    <span class="doccomment">/// [`LevelFilter`]: crate::filter::LevelFilter</span>
-    <span class="doccomment">/// [`Interest`]: tracing_core::subscriber::Interest</span>
-    <span class="doccomment">/// [rebuild]: tracing_core::callsite::rebuild_interest_cache</span>
-    <span class="kw">fn</span> <span class="ident">max_level_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span> {
-        <span class="prelude-val">None</span>
+        <span class="doccomment">/// Returns an optional hint of the highest [verbosity level][level] that</span>
+        <span class="doccomment">/// this `Filter` will enable.</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// If this method returns a [`LevelFilter`], it will be used as a hint to</span>
+        <span class="doccomment">/// determine the most verbose level that will be enabled. This will allow</span>
+        <span class="doccomment">/// spans and events which are more verbose than that level to be skipped</span>
+        <span class="doccomment">/// more efficiently. An implementation of this method is optional, but</span>
+        <span class="doccomment">/// strongly encouraged.</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// If the maximum level the `Filter` will enable can change over the</span>
+        <span class="doccomment">/// course of its lifetime, it is free to return a different value from</span>
+        <span class="doccomment">/// multiple invocations of this method. However, note that changes in the</span>
+        <span class="doccomment">/// maximum level will **only** be reflected after the callsite [`Interest`]</span>
+        <span class="doccomment">/// cache is rebuilt, by calling the</span>
+        <span class="doccomment">/// [`tracing_core::callsite::rebuild_interest_cache`][rebuild] function.</span>
+        <span class="doccomment">/// Therefore, if the `Filter will change the value returned by this</span>
+        <span class="doccomment">/// method, it is responsible for ensuring that</span>
+        <span class="doccomment">/// [`rebuild_interest_cache`][rebuild] is called after the value of the max</span>
+        <span class="doccomment">/// level changes.</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// ## Default Implementation</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// By default, this method returns `None`, indicating that the maximum</span>
+        <span class="doccomment">/// level is unknown.</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// [level]: tracing_core::metadata::Level</span>
+        <span class="doccomment">/// [`LevelFilter`]: crate::filter::LevelFilter</span>
+        <span class="doccomment">/// [`Interest`]: tracing_core::subscriber::Interest</span>
+        <span class="doccomment">/// [rebuild]: tracing_core::callsite::rebuild_interest_cache</span>
+        <span class="kw">fn</span> <span class="ident">max_level_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span> {
+            <span class="prelude-val">None</span>
+        }
     }
 }
 
@@ -2216,6 +2353,7 @@
         <span class="ident">layer</span>.<span class="ident">with_subscriber</span>(<span class="self">self</span>)
     }
 }
+
 <span class="doccomment">/// A layer that does nothing.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Identity</span> {
@@ -2236,9 +2374,9 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">new_span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">attrs</span>: <span class="kw-2">&amp;</span><span class="ident">span::Attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">on_new_span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">attrs</span>: <span class="kw-2">&amp;</span><span class="ident">span::Attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">inner</span>) <span class="op">=</span> <span class="self">self</span> {
-            <span class="ident">inner</span>.<span class="ident">new_span</span>(<span class="ident">attrs</span>, <span class="ident">id</span>, <span class="ident">ctx</span>)
+            <span class="ident">inner</span>.<span class="ident">on_new_span</span>(<span class="ident">attrs</span>, <span class="ident">id</span>, <span class="ident">ctx</span>)
         }
     }
 
@@ -2326,125 +2464,93 @@
     }
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">layer_impl_body</span> {
-    () <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">new_span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">attrs</span>: <span class="kw-2">&amp;</span><span class="ident">span::Attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-            <span class="self">self</span>.<span class="ident">deref</span>().<span class="ident">new_span</span>(<span class="ident">attrs</span>, <span class="ident">id</span>, <span class="ident">ctx</span>)
-        }
+<span class="macro">feature!</span> {
+    <span class="attribute">#![<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">register_callsite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Interest</span> {
-            <span class="self">self</span>.<span class="ident">deref</span>().<span class="ident">register_callsite</span>(<span class="ident">metadata</span>)
-        }
+    <span class="macro">macro_rules!</span> <span class="ident">layer_impl_body</span> {
+        () <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="attribute">#[<span class="ident">inline</span>]</span>
+            <span class="kw">fn</span> <span class="ident">on_layer</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">subscriber</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">S</span>) {
+                <span class="self">self</span>.<span class="ident">deref_mut</span>().<span class="ident">on_layer</span>(<span class="ident">subscriber</span>);
+            }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-            <span class="self">self</span>.<span class="ident">deref</span>().<span class="ident">enabled</span>(<span class="ident">metadata</span>, <span class="ident">ctx</span>)
-        }
+            <span class="attribute">#[<span class="ident">inline</span>]</span>
+            <span class="kw">fn</span> <span class="ident">on_new_span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">attrs</span>: <span class="kw-2">&amp;</span><span class="ident">span::Attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
+                <span class="self">self</span>.<span class="ident">deref</span>().<span class="ident">on_new_span</span>(<span class="ident">attrs</span>, <span class="ident">id</span>, <span class="ident">ctx</span>)
+            }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">max_level_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span> {
-            <span class="self">self</span>.<span class="ident">deref</span>().<span class="ident">max_level_hint</span>()
-        }
+            <span class="attribute">#[<span class="ident">inline</span>]</span>
+            <span class="kw">fn</span> <span class="ident">register_callsite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Interest</span> {
+                <span class="self">self</span>.<span class="ident">deref</span>().<span class="ident">register_callsite</span>(<span class="ident">metadata</span>)
+            }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">on_record</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">span</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">values</span>: <span class="kw-2">&amp;</span><span class="ident">span::Record</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-            <span class="self">self</span>.<span class="ident">deref</span>().<span class="ident">on_record</span>(<span class="ident">span</span>, <span class="ident">values</span>, <span class="ident">ctx</span>)
-        }
+            <span class="attribute">#[<span class="ident">inline</span>]</span>
+            <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+                <span class="self">self</span>.<span class="ident">deref</span>().<span class="ident">enabled</span>(<span class="ident">metadata</span>, <span class="ident">ctx</span>)
+            }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">on_follows_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">span</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">follows</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-            <span class="self">self</span>.<span class="ident">deref</span>().<span class="ident">on_follows_from</span>(<span class="ident">span</span>, <span class="ident">follows</span>, <span class="ident">ctx</span>)
-        }
+            <span class="attribute">#[<span class="ident">inline</span>]</span>
+            <span class="kw">fn</span> <span class="ident">max_level_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span> {
+                <span class="self">self</span>.<span class="ident">deref</span>().<span class="ident">max_level_hint</span>()
+            }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">on_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">Event</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-            <span class="self">self</span>.<span class="ident">deref</span>().<span class="ident">on_event</span>(<span class="ident">event</span>, <span class="ident">ctx</span>)
-        }
+            <span class="attribute">#[<span class="ident">inline</span>]</span>
+            <span class="kw">fn</span> <span class="ident">on_record</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">span</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">values</span>: <span class="kw-2">&amp;</span><span class="ident">span::Record</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
+                <span class="self">self</span>.<span class="ident">deref</span>().<span class="ident">on_record</span>(<span class="ident">span</span>, <span class="ident">values</span>, <span class="ident">ctx</span>)
+            }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">on_enter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-            <span class="self">self</span>.<span class="ident">deref</span>().<span class="ident">on_enter</span>(<span class="ident">id</span>, <span class="ident">ctx</span>)
-        }
+            <span class="attribute">#[<span class="ident">inline</span>]</span>
+            <span class="kw">fn</span> <span class="ident">on_follows_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">span</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">follows</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
+                <span class="self">self</span>.<span class="ident">deref</span>().<span class="ident">on_follows_from</span>(<span class="ident">span</span>, <span class="ident">follows</span>, <span class="ident">ctx</span>)
+            }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">on_exit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-            <span class="self">self</span>.<span class="ident">deref</span>().<span class="ident">on_exit</span>(<span class="ident">id</span>, <span class="ident">ctx</span>)
-        }
+            <span class="attribute">#[<span class="ident">inline</span>]</span>
+            <span class="kw">fn</span> <span class="ident">on_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">Event</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
+                <span class="self">self</span>.<span class="ident">deref</span>().<span class="ident">on_event</span>(<span class="ident">event</span>, <span class="ident">ctx</span>)
+            }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">on_close</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-            <span class="self">self</span>.<span class="ident">deref</span>().<span class="ident">on_close</span>(<span class="ident">id</span>, <span class="ident">ctx</span>)
-        }
+            <span class="attribute">#[<span class="ident">inline</span>]</span>
+            <span class="kw">fn</span> <span class="ident">on_enter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
+                <span class="self">self</span>.<span class="ident">deref</span>().<span class="ident">on_enter</span>(<span class="ident">id</span>, <span class="ident">ctx</span>)
+            }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">on_id_change</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">old</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">new</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-            <span class="self">self</span>.<span class="ident">deref</span>().<span class="ident">on_id_change</span>(<span class="ident">old</span>, <span class="ident">new</span>, <span class="ident">ctx</span>)
-        }
+            <span class="attribute">#[<span class="ident">inline</span>]</span>
+            <span class="kw">fn</span> <span class="ident">on_exit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
+                <span class="self">self</span>.<span class="ident">deref</span>().<span class="ident">on_exit</span>(<span class="ident">id</span>, <span class="ident">ctx</span>)
+            }
 
-        <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">downcast_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">TypeId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">*</span><span class="kw">const</span> ()<span class="op">&gt;</span> {
-            <span class="self">self</span>.<span class="ident">deref</span>().<span class="ident">downcast_raw</span>(<span class="ident">id</span>)
-        }
-    };
-}
+            <span class="attribute">#[<span class="ident">inline</span>]</span>
+            <span class="kw">fn</span> <span class="ident">on_close</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
+                <span class="self">self</span>.<span class="ident">deref</span>().<span class="ident">on_close</span>(<span class="ident">id</span>, <span class="ident">ctx</span>)
+            }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">L</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
-    <span class="ident">S</span>: <span class="ident">Subscriber</span>,
-{
-    <span class="kw">fn</span> <span class="ident">on_layer</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">subscriber</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">S</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">inner</span>) <span class="op">=</span> <span class="ident">Arc::get_mut</span>(<span class="self">self</span>) {
-            <span class="comment">// XXX(eliza): this may behave weird if another `Arc` clone of this</span>
-            <span class="comment">// layer is layered onto a _different_ subscriber...but there&#39;s no</span>
-            <span class="comment">// good solution for that...</span>
-            <span class="ident">inner</span>.<span class="ident">on_layer</span>(<span class="ident">subscriber</span>);
-        }
+            <span class="attribute">#[<span class="ident">inline</span>]</span>
+            <span class="kw">fn</span> <span class="ident">on_id_change</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">old</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">new</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
+                <span class="self">self</span>.<span class="ident">deref</span>().<span class="ident">on_id_change</span>(<span class="ident">old</span>, <span class="ident">new</span>, <span class="ident">ctx</span>)
+            }
+
+            <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+            <span class="attribute">#[<span class="ident">inline</span>]</span>
+            <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">downcast_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">TypeId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">*</span><span class="kw">const</span> ()<span class="op">&gt;</span> {
+                <span class="self">self</span>.<span class="ident">deref</span>().<span class="ident">downcast_raw</span>(<span class="ident">id</span>)
+            }
+        };
     }
 
-    <span class="macro">layer_impl_body!</span> {}
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">Subscriber</span>,
-{
-    <span class="kw">fn</span> <span class="ident">on_layer</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">subscriber</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">S</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">inner</span>) <span class="op">=</span> <span class="ident">Arc::get_mut</span>(<span class="self">self</span>) {
-            <span class="comment">// XXX(eliza): this may behave weird if another `Arc` clone of this</span>
-            <span class="comment">// layer is layered onto a _different_ subscriber...but there&#39;s no</span>
-            <span class="comment">// good solution for that...</span>
-            <span class="ident">inner</span>.<span class="ident">on_layer</span>(<span class="ident">subscriber</span>);
-        }
+    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">L</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
+        <span class="ident">S</span>: <span class="ident">Subscriber</span>,
+    {
+        <span class="macro">layer_impl_body!</span> {}
     }
 
-    <span class="macro">layer_impl_body!</span> {}
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">L</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
-    <span class="ident">S</span>: <span class="ident">Subscriber</span>,
-{
-    <span class="kw">fn</span> <span class="ident">on_layer</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">subscriber</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">S</span>) {
-        <span class="self">self</span>.<span class="ident">deref_mut</span>().<span class="ident">on_layer</span>(<span class="ident">subscriber</span>);
+    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">S</span>: <span class="ident">Subscriber</span>,
+    {
+        <span class="macro">layer_impl_body!</span> {}
     }
-
-    <span class="macro">layer_impl_body!</span> {}
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">Subscriber</span>,
-{
-    <span class="kw">fn</span> <span class="ident">on_layer</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">subscriber</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">S</span>) {
-        <span class="self">self</span>.<span class="ident">deref_mut</span>().<span class="ident">on_layer</span>(<span class="ident">subscriber</span>);
-    }
-
-    <span class="macro">layer_impl_body!</span> {}
 }
 
 <span class="comment">// === impl SubscriberExt ===</span>

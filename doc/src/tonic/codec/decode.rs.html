@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;tonic-0.4.3&#x2F;src&#x2F;codec&#x2F;decode.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>decode.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../tonic/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;tokio-rs&#x2F;website&#x2F;master&#x2F;public&#x2F;img&#x2F;icons&#x2F;tonic.svg' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;tonic-0.5.2&#x2F;src&#x2F;codec&#x2F;decode.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>decode.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../tonic/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;tokio-rs&#x2F;website&#x2F;master&#x2F;public&#x2F;img&#x2F;icons&#x2F;tonic.svg' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -281,7 +281,95 @@
 <span id="281">281</span>
 <span id="282">282</span>
 <span id="283">283</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">DecodeBuf</span>, <span class="ident">Decoder</span>};
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::compression</span>::{<span class="ident">decompress</span>, <span class="ident">CompressionEncoding</span>};
+<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">DecodeBuf</span>, <span class="ident">Decoder</span>, <span class="ident">HEADER_SIZE</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">body::BoxBody</span>, <span class="ident">metadata::MetadataMap</span>, <span class="ident">Code</span>, <span class="ident">Status</span>};
 <span class="kw">use</span> <span class="ident">bytes</span>::{<span class="ident">Buf</span>, <span class="ident">BufMut</span>, <span class="ident">BytesMut</span>};
 <span class="kw">use</span> <span class="ident">futures_core::Stream</span>;
@@ -308,6 +396,10 @@
     <span class="ident">direction</span>: <span class="ident">Direction</span>,
     <span class="ident">buf</span>: <span class="ident">BytesMut</span>,
     <span class="ident">trailers</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MetadataMap</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+    <span class="ident">decompress_buf</span>: <span class="ident">BytesMut</span>,
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+    <span class="ident">encoding</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CompressionEncoding</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Unpin</span> <span class="kw">for</span> <span class="ident">Streaming</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
@@ -326,13 +418,24 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Streaming</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_response</span><span class="op">&lt;</span><span class="ident">B</span>, <span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">decoder</span>: <span class="ident">D</span>, <span class="ident">body</span>: <span class="ident">B</span>, <span class="ident">status_code</span>: <span class="ident">StatusCode</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_response</span><span class="op">&lt;</span><span class="ident">B</span>, <span class="ident">D</span><span class="op">&gt;</span>(
+        <span class="ident">decoder</span>: <span class="ident">D</span>,
+        <span class="ident">body</span>: <span class="ident">B</span>,
+        <span class="ident">status_code</span>: <span class="ident">StatusCode</span>,
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span> <span class="ident">encoding</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CompressionEncoding</span><span class="op">&gt;</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">B</span>: <span class="ident">Body</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
         <span class="ident">B::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>,
         <span class="ident">D</span>: <span class="ident">Decoder</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Status</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">decoder</span>, <span class="ident">body</span>, <span class="ident">Direction::Response</span>(<span class="ident">status_code</span>))
+        <span class="ident"><span class="self">Self</span>::new</span>(
+            <span class="ident">decoder</span>,
+            <span class="ident">body</span>,
+            <span class="ident">Direction::Response</span>(<span class="ident">status_code</span>),
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+            <span class="ident">encoding</span>,
+        )
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_empty</span><span class="op">&lt;</span><span class="ident">B</span>, <span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">decoder</span>: <span class="ident">D</span>, <span class="ident">body</span>: <span class="ident">B</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
@@ -341,20 +444,41 @@
         <span class="ident">B::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>,
         <span class="ident">D</span>: <span class="ident">Decoder</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Status</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">decoder</span>, <span class="ident">body</span>, <span class="ident">Direction::EmptyResponse</span>)
+        <span class="ident"><span class="self">Self</span>::new</span>(
+            <span class="ident">decoder</span>,
+            <span class="ident">body</span>,
+            <span class="ident">Direction::EmptyResponse</span>,
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+            <span class="prelude-val">None</span>,
+        )
     }
 
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_request</span><span class="op">&lt;</span><span class="ident">B</span>, <span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">decoder</span>: <span class="ident">D</span>, <span class="ident">body</span>: <span class="ident">B</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_request</span><span class="op">&lt;</span><span class="ident">B</span>, <span class="ident">D</span><span class="op">&gt;</span>(
+        <span class="ident">decoder</span>: <span class="ident">D</span>,
+        <span class="ident">body</span>: <span class="ident">B</span>,
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span> <span class="ident">encoding</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CompressionEncoding</span><span class="op">&gt;</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">B</span>: <span class="ident">Body</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
         <span class="ident">B::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>,
         <span class="ident">D</span>: <span class="ident">Decoder</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Status</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">decoder</span>, <span class="ident">body</span>, <span class="ident">Direction::Request</span>)
+        <span class="ident"><span class="self">Self</span>::new</span>(
+            <span class="ident">decoder</span>,
+            <span class="ident">body</span>,
+            <span class="ident">Direction::Request</span>,
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+            <span class="ident">encoding</span>,
+        )
     }
 
-    <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">B</span>, <span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">decoder</span>: <span class="ident">D</span>, <span class="ident">body</span>: <span class="ident">B</span>, <span class="ident">direction</span>: <span class="ident">Direction</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">B</span>, <span class="ident">D</span><span class="op">&gt;</span>(
+        <span class="ident">decoder</span>: <span class="ident">D</span>,
+        <span class="ident">body</span>: <span class="ident">B</span>,
+        <span class="ident">direction</span>: <span class="ident">Direction</span>,
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span> <span class="ident">encoding</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CompressionEncoding</span><span class="op">&gt;</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">B</span>: <span class="ident">Body</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
         <span class="ident">B::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>,
@@ -362,11 +486,18 @@
     {
         <span class="self">Self</span> {
             <span class="ident">decoder</span>: <span class="ident">Box::new</span>(<span class="ident">decoder</span>),
-            <span class="ident">body</span>: <span class="ident">BoxBody::map_from</span>(<span class="ident">body</span>),
+            <span class="ident">body</span>: <span class="ident">body</span>
+                .<span class="ident">map_data</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">buf</span><span class="op">|</span> <span class="ident">buf</span>.<span class="ident">copy_to_bytes</span>(<span class="ident">buf</span>.<span class="ident">remaining</span>()))
+                .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">Status::map_error</span>(<span class="ident">err</span>.<span class="ident">into</span>()))
+                .<span class="ident">boxed</span>(),
             <span class="ident">state</span>: <span class="ident">State::ReadHeader</span>,
             <span class="ident">direction</span>,
             <span class="ident">buf</span>: <span class="ident">BytesMut::with_capacity</span>(<span class="ident">BUFFER_SIZE</span>),
             <span class="ident">trailers</span>: <span class="prelude-val">None</span>,
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+            <span class="ident">decompress_buf</span>: <span class="ident">BytesMut::new</span>(),
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+            <span class="ident">encoding</span>,
         }
     }
 }
@@ -429,35 +560,38 @@
         <span class="comment">// them manually.</span>
         <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">future::poll_fn</span>(<span class="op">|</span><span class="ident">cx</span><span class="op">|</span> <span class="ident">Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">body</span>).<span class="ident">poll_trailers</span>(<span class="ident">cx</span>))
             .<span class="kw">await</span>
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">Status::from_error</span>(<span class="kw-2">&amp;</span><span class="ident">e</span>))<span class="question-mark">?</span>;
+            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">Status::from_error</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)));
 
-        <span class="prelude-val">Ok</span>(<span class="ident">map</span>.<span class="ident">map</span>(<span class="ident">MetadataMap::from_headers</span>))
+        <span class="ident">map</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">map</span>(<span class="ident">MetadataMap::from_headers</span>))
     }
 
     <span class="kw">fn</span> <span class="ident">decode_chunk</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">Status</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">State::ReadHeader</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span> {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">remaining</span>() <span class="op">&lt;</span> <span class="number">5</span> {
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">remaining</span>() <span class="op">&lt;</span> <span class="ident">HEADER_SIZE</span> {
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
             }
 
             <span class="kw">let</span> <span class="ident">is_compressed</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">get_u8</span>() {
                 <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
                 <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="macro">trace!</span>(<span class="string">&quot;message compressed, compression not supported yet&quot;</span>);
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Status::new</span>(
-                        <span class="ident">Code::Unimplemented</span>,
-                        <span class="string">&quot;Message compressed, compression not supported yet.&quot;</span>.<span class="ident">to_string</span>(),
-                    ));
+                    <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>) {
+                        <span class="bool-val">true</span>
+                    } <span class="kw">else</span> {
+                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Status::new</span>(
+                            <span class="ident">Code::Unimplemented</span>,
+                            <span class="string">&quot;Message compressed, compression support not enabled.&quot;</span>.<span class="ident">to_string</span>(),
+                        ));
+                    }
                 }
                 <span class="ident">f</span> <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="macro">trace!</span>(<span class="string">&quot;unexpected compression flag&quot;</span>);
                     <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Direction::Response</span>(<span class="ident">status</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">direction</span> {
                         <span class="macro">format!</span>(
-                            <span class="string">&quot;Unexpected compression flag: {}, while receiving response with status: {}&quot;</span>,
+                            <span class="string">&quot;protocol error: received message with invalid compression flag: {} (valid flags are 0 and 1) while receiving response with status: {}&quot;</span>,
                             <span class="ident">f</span>, <span class="ident">status</span>
                         )
                     } <span class="kw">else</span> {
-                        <span class="macro">format!</span>(<span class="string">&quot;Unexpected compression flag: {}, while sending request&quot;</span>, <span class="ident">f</span>)
+                        <span class="macro">format!</span>(<span class="string">&quot;protocol error: received message with invalid compression flag: {} (valid flags are 0 and 1), while sending request&quot;</span>, <span class="ident">f</span>)
                     };
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Status::new</span>(<span class="ident">Code::Internal</span>, <span class="ident">message</span>));
                 }
@@ -471,17 +605,51 @@
             }
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">State::ReadBody</span> { <span class="ident">len</span>, .. } <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">state</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">State::ReadBody</span> { <span class="ident">len</span>, <span class="ident">compression</span> } <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">state</span> {
             <span class="comment">// if we haven&#39;t read enough of the message then return and keep</span>
             <span class="comment">// reading</span>
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">remaining</span>() <span class="op">&lt;</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="kw-2">*</span><span class="ident">len</span> {
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
             }
 
-            <span class="kw">return</span> <span class="kw">match</span> <span class="self">self</span>
-                .<span class="ident">decoder</span>
-                .<span class="ident">decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">DecodeBuf::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">buf</span>, <span class="kw-2">*</span><span class="ident">len</span>))
-            {
+            <span class="kw">let</span> <span class="ident">decoding_result</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">compression</span> {
+                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
+                {
+                    <span class="self">self</span>.<span class="ident">decompress_buf</span>.<span class="ident">clear</span>();
+
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="ident">decompress</span>(
+                        <span class="self">self</span>.<span class="ident">encoding</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
+                            <span class="macro">unreachable!</span>(<span class="string">&quot;message was compressed but `Streaming.encoding` was `None`. This is a bug in Tonic. Please file an issue&quot;</span>)
+                        }),
+                        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">buf</span>,
+                        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">decompress_buf</span>,
+                        <span class="kw-2">*</span><span class="ident">len</span>,
+                    ) {
+                        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Direction::Response</span>(<span class="ident">status</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">direction</span> {
+                            <span class="macro">format!</span>(
+                                <span class="string">&quot;Error decompressing: {}, while receiving response with status: {}&quot;</span>,
+                                <span class="ident">err</span>, <span class="ident">status</span>
+                            )
+                        } <span class="kw">else</span> {
+                            <span class="macro">format!</span>(<span class="string">&quot;Error decompressing: {}, while sending request&quot;</span>, <span class="ident">err</span>)
+                        };
+                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Status::new</span>(<span class="ident">Code::Internal</span>, <span class="ident">message</span>));
+                    }
+                    <span class="kw">let</span> <span class="ident">decompressed_len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">decompress_buf</span>.<span class="ident">len</span>();
+                    <span class="self">self</span>.<span class="ident">decoder</span>.<span class="ident">decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">DecodeBuf::new</span>(
+                        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">decompress_buf</span>,
+                        <span class="ident">decompressed_len</span>,
+                    ))
+                }
+
+                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>))]</span>
+                <span class="macro">unreachable!</span>(<span class="string">&quot;should not take this branch if compression is disabled&quot;</span>)
+            } <span class="kw">else</span> {
+                <span class="self">self</span>.<span class="ident">decoder</span>
+                    .<span class="ident">decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">DecodeBuf::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">buf</span>, <span class="kw-2">*</span><span class="ident">len</span>))
+            };
+
+            <span class="kw">return</span> <span class="kw">match</span> <span class="ident">decoding_result</span> {
                 <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">msg</span>)) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State::ReadHeader</span>;
                     <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">msg</span>))
@@ -512,7 +680,7 @@
                 <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="kw">let</span> <span class="ident">err</span>: <span class="ident"><span class="kw">crate</span>::Error</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">into</span>();
                     <span class="macro">debug!</span>(<span class="string">&quot;decoder inner stream error: {:?}&quot;</span>, <span class="ident">err</span>);
-                    <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="ident">Status::from_error</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">err</span>);
+                    <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="ident">Status::from_error</span>(<span class="ident">err</span>);
                     <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">status</span>)));
                 }
                 <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
@@ -538,7 +706,11 @@
             <span class="kw">match</span> <span class="macro">ready!</span>(<span class="ident">Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">body</span>).<span class="ident">poll_trailers</span>(<span class="ident">cx</span>)) {
                 <span class="prelude-val">Ok</span>(<span class="ident">trailer</span>) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::status::infer_grpc_status</span>(<span class="ident">trailer</span>.<span class="ident">as_ref</span>(), <span class="ident">status</span>) {
-                        <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)).<span class="ident">into</span>();
+                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="ident">e</span> {
+                            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)).<span class="ident">into</span>();
+                        } <span class="kw">else</span> {
+                            <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>);
+                        }
                     } <span class="kw">else</span> {
                         <span class="self">self</span>.<span class="ident">trailers</span> <span class="op">=</span> <span class="ident">trailer</span>.<span class="ident">map</span>(<span class="ident">MetadataMap::from_headers</span>);
                     }
@@ -546,7 +718,7 @@
                 <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="kw">let</span> <span class="ident">err</span>: <span class="ident"><span class="kw">crate</span>::Error</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">into</span>();
                     <span class="macro">debug!</span>(<span class="string">&quot;decoder inner trailers error: {:?}&quot;</span>, <span class="ident">err</span>);
-                    <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="ident">Status::from_error</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">err</span>);
+                    <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="ident">Status::from_error</span>(<span class="ident">err</span>);
                     <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">status</span>)).<span class="ident">into</span>();
                 }
             }

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;opentelemetry-0.12.0&#x2F;src&#x2F;sdk&#x2F;export&#x2F;trace&#x2F;stdout.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>stdout.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script src="../../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../../opentelemetry/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;open-telemetry&#x2F;opentelemetry-rust&#x2F;master&#x2F;assets&#x2F;logo.svg' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;opentelemetry-0.16.0&#x2F;src&#x2F;sdk&#x2F;export&#x2F;trace&#x2F;stdout.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>stdout.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script src="../../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../../opentelemetry/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;open-telemetry&#x2F;opentelemetry-rust&#x2F;main&#x2F;assets&#x2F;logo.svg' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -161,14 +161,13 @@
 <span id="161">161</span>
 <span id="162">162</span>
 <span id="163">163</span>
-<span id="164">164</span>
 </pre><pre class="rust"><code><span class="doccomment">//! # Stdout Span Exporter</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The stdout [`SpanExporter`] writes debug printed [`Span`]s to its configured</span>
 <span class="doccomment">//! [`Write`] instance. By default it will write to [`Stdout`].</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! [`SpanExporter`]: ../trait.SpanExporter.html</span>
-<span class="doccomment">//! [`Span`]: ../../../api/trace/span/trait.Span.html</span>
+<span class="doccomment">//! [`SpanExporter`]: super::SpanExporter</span>
+<span class="doccomment">//! [`Span`]: crate::trace::Span</span>
 <span class="doccomment">//! [`Write`]: std::io::Write</span>
 <span class="doccomment">//! [`Stdout`]: std::io::Stdout</span>
 <span class="doccomment">//!</span>
@@ -177,15 +176,18 @@
 <span class="doccomment">//! ```no_run</span>
 <span class="doccomment">//! use opentelemetry::trace::Tracer;</span>
 <span class="doccomment">//! use opentelemetry::sdk::export::trace::stdout;</span>
+<span class="doccomment">//! use opentelemetry::global::shutdown_tracer_provider;</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! fn main() {</span>
-<span class="doccomment">//!     let (tracer, _uninstall) = stdout::new_pipeline()</span>
+<span class="doccomment">//!     let tracer = stdout::new_pipeline()</span>
 <span class="doccomment">//!         .with_pretty_print(true)</span>
-<span class="doccomment">//!         .install();</span>
+<span class="doccomment">//!         .install_simple();</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//!     tracer.in_span(&quot;doing_work&quot;, |cx| {</span>
 <span class="doccomment">//!         // Traced app logic here...</span>
 <span class="doccomment">//!     });</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!     shutdown_tracer_provider(); // sending remaining spans</span>
 <span class="doccomment">//! }</span>
 <span class="doccomment">//! ```</span>
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -252,24 +254,25 @@
     <span class="ident">W</span>: <span class="ident">Write</span> <span class="op">+</span> <span class="ident">Debug</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 {
     <span class="doccomment">/// Install the stdout exporter pipeline with the recommended defaults.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">install</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">sdk::trace::Tracer</span>, <span class="ident">Uninstall</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">install_simple</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sdk::trace::Tracer</span> {
         <span class="kw">let</span> <span class="ident">exporter</span> <span class="op">=</span> <span class="ident">Exporter::new</span>(<span class="self">self</span>.<span class="ident">writer</span>, <span class="self">self</span>.<span class="ident">pretty_print</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">provider_builder</span> <span class="op">=</span> <span class="ident">sdk::trace::TracerProvider::builder</span>().<span class="ident">with_exporter</span>(<span class="ident">exporter</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">provider_builder</span> <span class="op">=</span>
+            <span class="ident">sdk::trace::TracerProvider::builder</span>().<span class="ident">with_simple_exporter</span>(<span class="ident">exporter</span>);
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">config</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">trace_config</span>.<span class="ident">take</span>() {
             <span class="ident">provider_builder</span> <span class="op">=</span> <span class="ident">provider_builder</span>.<span class="ident">with_config</span>(<span class="ident">config</span>);
         }
         <span class="kw">let</span> <span class="ident">provider</span> <span class="op">=</span> <span class="ident">provider_builder</span>.<span class="ident">build</span>();
-        <span class="kw">let</span> <span class="ident">tracer</span> <span class="op">=</span> <span class="ident">provider</span>.<span class="ident">get_tracer</span>(<span class="string">&quot;opentelemetry&quot;</span>, <span class="prelude-val">Some</span>(<span class="macro">env!</span>(<span class="string">&quot;CARGO_PKG_VERSION&quot;</span>)));
-        <span class="kw">let</span> <span class="ident">provider_guard</span> <span class="op">=</span> <span class="ident">global::set_tracer_provider</span>(<span class="ident">provider</span>);
+        <span class="kw">let</span> <span class="ident">tracer</span> <span class="op">=</span> <span class="ident">provider</span>.<span class="ident">tracer</span>(<span class="string">&quot;opentelemetry&quot;</span>, <span class="prelude-val">Some</span>(<span class="macro">env!</span>(<span class="string">&quot;CARGO_PKG_VERSION&quot;</span>)));
+        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">global::set_tracer_provider</span>(<span class="ident">provider</span>);
 
-        (<span class="ident">tracer</span>, <span class="ident">Uninstall</span>(<span class="ident">provider_guard</span>))
+        <span class="ident">tracer</span>
     }
 }
 
 <span class="doccomment">/// A [`SpanExporter`] that writes to [`Stdout`] or other configured [`Write`].</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`SpanExporter`]: ../trait.SpanExporter.html</span>
+<span class="doccomment">/// [`SpanExporter`]: super::SpanExporter</span>
 <span class="doccomment">/// [`Write`]: std::io::Write</span>
 <span class="doccomment">/// [`Stdout`]: std::io::Stdout</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
@@ -310,11 +313,6 @@
         <span class="prelude-val">Ok</span>(())
     }
 }
-
-<span class="doccomment">/// Uninstalls the stdout pipeline on drop.</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Uninstall</span>(<span class="ident">global::TracerProviderGuard</span>);
 
 <span class="doccomment">/// Stdout exporter&#39;s error</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">thiserror::Error</span>, <span class="ident">Debug</span>)]</span>

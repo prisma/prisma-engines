@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;tracing-subscriber-0.2.24&#x2F;src&#x2F;fmt&#x2F;format&#x2F;json.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>json.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../tracing_subscriber/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;tokio-rs&#x2F;tracing&#x2F;master&#x2F;assets&#x2F;logo-type.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;tracing-subscriber-0.3.2&#x2F;src&#x2F;fmt&#x2F;format&#x2F;json.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>json.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../tracing_subscriber/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;tokio-rs&#x2F;tracing&#x2F;master&#x2F;assets&#x2F;logo-type.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -748,76 +748,13 @@
 <span id="748">748</span>
 <span id="749">749</span>
 <span id="750">750</span>
-<span id="751">751</span>
-<span id="752">752</span>
-<span id="753">753</span>
-<span id="754">754</span>
-<span id="755">755</span>
-<span id="756">756</span>
-<span id="757">757</span>
-<span id="758">758</span>
-<span id="759">759</span>
-<span id="760">760</span>
-<span id="761">761</span>
-<span id="762">762</span>
-<span id="763">763</span>
-<span id="764">764</span>
-<span id="765">765</span>
-<span id="766">766</span>
-<span id="767">767</span>
-<span id="768">768</span>
-<span id="769">769</span>
-<span id="770">770</span>
-<span id="771">771</span>
-<span id="772">772</span>
-<span id="773">773</span>
-<span id="774">774</span>
-<span id="775">775</span>
-<span id="776">776</span>
-<span id="777">777</span>
-<span id="778">778</span>
-<span id="779">779</span>
-<span id="780">780</span>
-<span id="781">781</span>
-<span id="782">782</span>
-<span id="783">783</span>
-<span id="784">784</span>
-<span id="785">785</span>
-<span id="786">786</span>
-<span id="787">787</span>
-<span id="788">788</span>
-<span id="789">789</span>
-<span id="790">790</span>
-<span id="791">791</span>
-<span id="792">792</span>
-<span id="793">793</span>
-<span id="794">794</span>
-<span id="795">795</span>
-<span id="796">796</span>
-<span id="797">797</span>
-<span id="798">798</span>
-<span id="799">799</span>
-<span id="800">800</span>
-<span id="801">801</span>
-<span id="802">802</span>
-<span id="803">803</span>
-<span id="804">804</span>
-<span id="805">805</span>
-<span id="806">806</span>
-<span id="807">807</span>
-<span id="808">808</span>
-<span id="809">809</span>
-<span id="810">810</span>
-<span id="811">811</span>
-<span id="812">812</span>
-<span id="813">813</span>
-<span id="814">814</span>
-<span id="815">815</span>
-<span id="816">816</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Format</span>, <span class="ident">FormatEvent</span>, <span class="ident">FormatFields</span>, <span class="ident">FormatTime</span>};
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Format</span>, <span class="ident">FormatEvent</span>, <span class="ident">FormatFields</span>, <span class="ident">FormatTime</span>, <span class="ident">Writer</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">field</span>::{<span class="ident">RecordFields</span>, <span class="ident">VisitOutput</span>},
-    <span class="ident">fmt::fmt_layer</span>::{<span class="ident">FmtContext</span>, <span class="ident">FormattedFields</span>},
+    <span class="ident">fmt</span>::{
+        <span class="ident">fmt_layer</span>::{<span class="ident">FmtContext</span>, <span class="ident">FormattedFields</span>},
+        <span class="ident">writer::WriteAdaptor</span>,
+    },
     <span class="ident">registry::LookupSpan</span>,
 };
 <span class="kw">use</span> <span class="ident">serde::ser</span>::{<span class="ident">SerializeMap</span>, <span class="ident">Serializer</span> <span class="kw">as</span> <span class="kw">_</span>};
@@ -825,7 +762,6 @@
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">collections::BTreeMap</span>,
     <span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Write</span>},
-    <span class="ident">io</span>,
 };
 <span class="kw">use</span> <span class="ident">tracing_core</span>::{
     <span class="ident">field</span>::{<span class="self">self</span>, <span class="ident">Field</span>},
@@ -1002,14 +938,14 @@
     <span class="kw">fn</span> <span class="ident">format_event</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">FmtContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span>, <span class="ident">N</span><span class="op">&gt;</span>,
-        <span class="ident">writer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">fmt::Write</span>,
+        <span class="kw-2">mut</span> <span class="ident">writer</span>: <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
         <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">Event</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">Subscriber</span> <span class="op">+</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">LookupSpan</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">timestamp</span> <span class="op">=</span> <span class="ident">String::new</span>();
-        <span class="self">self</span>.<span class="ident">timer</span>.<span class="ident">format_time</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">timestamp</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">timer</span>.<span class="ident">format_time</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Writer::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">timestamp</span>))<span class="question-mark">?</span>;
 
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tracing-log&quot;</span>)]</span>
         <span class="kw">let</span> <span class="ident">normalized_meta</span> <span class="op">=</span> <span class="ident">event</span>.<span class="ident">normalized_metadata</span>();
@@ -1019,7 +955,7 @@
         <span class="kw">let</span> <span class="ident">meta</span> <span class="op">=</span> <span class="ident">event</span>.<span class="ident">metadata</span>();
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">visit</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">serializer</span> <span class="op">=</span> <span class="ident">Serializer::new</span>(<span class="ident">WriteAdaptor::new</span>(<span class="ident">writer</span>));
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">serializer</span> <span class="op">=</span> <span class="ident">Serializer::new</span>(<span class="ident">WriteAdaptor::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writer</span>));
 
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">serializer</span> <span class="op">=</span> <span class="ident">serializer</span>.<span class="ident">serialize_map</span>(<span class="prelude-val">None</span>)<span class="question-mark">?</span>;
 
@@ -1137,12 +1073,8 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">FormatFields</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">JsonFields</span> {
     <span class="doccomment">/// Format the provided `fields` to the provided `writer`, returning a result.</span>
-    <span class="kw">fn</span> <span class="ident">format_fields</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">RecordFields</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">writer</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">fmt::Write</span>,
-        <span class="ident">fields</span>: <span class="ident">R</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">JsonVisitor::new</span>(<span class="ident">writer</span>);
+    <span class="kw">fn</span> <span class="ident">format_fields</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">RecordFields</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">writer</span>: <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">fields</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">JsonVisitor::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writer</span>);
         <span class="ident">fields</span>.<span class="ident">record</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">v</span>);
         <span class="ident">v</span>.<span class="ident">finish</span>()
     }
@@ -1152,37 +1084,43 @@
     <span class="doccomment">/// By default, this appends a space to the current set of fields if it is</span>
     <span class="doccomment">/// non-empty, and then calls `self.format_fields`. If different behavior is</span>
     <span class="doccomment">/// required, the default implementation of this method can be overridden.</span>
-    <span class="kw">fn</span> <span class="ident">add_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">current</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">String</span>, <span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="ident">Record</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">current</span>.<span class="ident">is_empty</span>() {
-            <span class="comment">// If fields were previously recorded on this span, we need to parse</span>
-            <span class="comment">// the current set of fields as JSON, add the new fields, and</span>
-            <span class="comment">// re-serialize them. Otherwise, if we just appended the new fields</span>
-            <span class="comment">// to a previously serialized JSON object, we would end up with</span>
-            <span class="comment">// malformed JSON.</span>
-            <span class="comment">//</span>
-            <span class="comment">// XXX(eliza): this is far from efficient, but unfortunately, it is</span>
-            <span class="comment">// necessary as long as the JSON formatter is implemented on top of</span>
-            <span class="comment">// an interface that stores all formatted fields as strings.</span>
-            <span class="comment">//</span>
-            <span class="comment">// We should consider reimplementing the JSON formatter as a</span>
-            <span class="comment">// separate layer, rather than a formatter for the `fmt` layer —</span>
-            <span class="comment">// then, we could store fields as JSON values, and add to them</span>
-            <span class="comment">// without having to parse and re-serialize.</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new</span> <span class="op">=</span> <span class="ident">String::new</span>();
-            <span class="kw">let</span> <span class="ident">map</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> <span class="ident">str</span>, <span class="ident">serde_json::Value</span><span class="op">&gt;</span> <span class="op">=</span>
-                <span class="ident">serde_json::from_str</span>(<span class="ident">current</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">fmt::Error</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">JsonVisitor::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">new</span>);
-            <span class="ident">v</span>.<span class="ident">values</span> <span class="op">=</span> <span class="ident">map</span>;
-            <span class="ident">fields</span>.<span class="ident">record</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">v</span>);
-            <span class="ident">v</span>.<span class="ident">finish</span>()<span class="question-mark">?</span>;
-            <span class="kw-2">*</span><span class="ident">current</span> <span class="op">=</span> <span class="ident">new</span>;
-        } <span class="kw">else</span> {
+    <span class="kw">fn</span> <span class="ident">add_fields</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">current</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">FormattedFields</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>,
+        <span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="ident">Record</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+        <span class="kw">if</span> <span class="ident">current</span>.<span class="ident">is_empty</span>() {
             <span class="comment">// If there are no previously recorded fields, we can just reuse the</span>
             <span class="comment">// existing string.</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">JsonVisitor::new</span>(<span class="ident">current</span>);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writer</span> <span class="op">=</span> <span class="ident">current</span>.<span class="ident">as_writer</span>();
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">JsonVisitor::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writer</span>);
             <span class="ident">fields</span>.<span class="ident">record</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">v</span>);
             <span class="ident">v</span>.<span class="ident">finish</span>()<span class="question-mark">?</span>;
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
         }
+
+        <span class="comment">// If fields were previously recorded on this span, we need to parse</span>
+        <span class="comment">// the current set of fields as JSON, add the new fields, and</span>
+        <span class="comment">// re-serialize them. Otherwise, if we just appended the new fields</span>
+        <span class="comment">// to a previously serialized JSON object, we would end up with</span>
+        <span class="comment">// malformed JSON.</span>
+        <span class="comment">//</span>
+        <span class="comment">// XXX(eliza): this is far from efficient, but unfortunately, it is</span>
+        <span class="comment">// necessary as long as the JSON formatter is implemented on top of</span>
+        <span class="comment">// an interface that stores all formatted fields as strings.</span>
+        <span class="comment">//</span>
+        <span class="comment">// We should consider reimplementing the JSON formatter as a</span>
+        <span class="comment">// separate layer, rather than a formatter for the `fmt` layer —</span>
+        <span class="comment">// then, we could store fields as JSON values, and add to them</span>
+        <span class="comment">// without having to parse and re-serialize.</span>
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new</span> <span class="op">=</span> <span class="ident">String::new</span>();
+        <span class="kw">let</span> <span class="ident">map</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> <span class="ident">str</span>, <span class="ident">serde_json::Value</span><span class="op">&gt;</span> <span class="op">=</span>
+            <span class="ident">serde_json::from_str</span>(<span class="ident">current</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">fmt::Error</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">JsonVisitor::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">new</span>);
+        <span class="ident">v</span>.<span class="ident">values</span> <span class="op">=</span> <span class="ident">map</span>;
+        <span class="ident">fields</span>.<span class="ident">record</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">v</span>);
+        <span class="ident">v</span>.<span class="ident">finish</span>()<span class="question-mark">?</span>;
+        <span class="ident">current</span>.<span class="ident">fields</span> <span class="op">=</span> <span class="ident">new</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
@@ -1293,55 +1231,17 @@
         };
     }
 }
-
-<span class="doccomment">/// A bridge between `fmt::Write` and `io::Write`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is needed because tracing-subscriber&#39;s FormatEvent expects a fmt::Write</span>
-<span class="doccomment">/// while serde_json&#39;s Serializer expects an io::Write.</span>
-<span class="kw">struct</span> <span class="ident">WriteAdaptor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">fmt_write</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">fmt::Write</span>,
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">WriteAdaptor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">fmt_write</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">fmt::Write</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">fmt_write</span> }
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">io::Write</span> <span class="kw">for</span> <span class="ident">WriteAdaptor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span>
-            <span class="ident">std::str::from_utf8</span>(<span class="ident">buf</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::InvalidData</span>, <span class="ident">e</span>))<span class="question-mark">?</span>;
-
-        <span class="self">self</span>.<span class="ident">fmt_write</span>
-            .<span class="ident">write_str</span>(<span class="ident">s</span>)
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::Other</span>, <span class="ident">e</span>))<span class="question-mark">?</span>;
-
-        <span class="prelude-val">Ok</span>(<span class="ident">s</span>.<span class="ident">as_bytes</span>().<span class="ident">len</span>())
-    }
-
-    <span class="kw">fn</span> <span class="ident">flush</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(())
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">WriteAdaptor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">pad</span>(<span class="string">&quot;WriteAdaptor { .. }&quot;</span>)
-    }
-}
-
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">test</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::fmt</span>::{<span class="ident">format::FmtSpan</span>, <span class="ident">test::MockMakeWriter</span>, <span class="ident">time::FormatTime</span>, <span class="ident">SubscriberBuilder</span>};
-    <span class="kw">use</span> <span class="ident">lazy_static::lazy_static</span>;
-    <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">sync::Mutex</span>};
     <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="self">self</span>, <span class="ident">subscriber::with_default</span>};
+
+    <span class="kw">use</span> <span class="ident">std::fmt</span>;
 
     <span class="kw">struct</span> <span class="ident">MockTime</span>;
     <span class="kw">impl</span> <span class="ident">FormatTime</span> <span class="kw">for</span> <span class="ident">MockTime</span> {
-        <span class="kw">fn</span> <span class="ident">format_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">w</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">fmt::Write</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+        <span class="kw">fn</span> <span class="ident">format_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">w</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
             <span class="macro">write!</span>(<span class="ident">w</span>, <span class="string">&quot;fake time&quot;</span>)
         }
     }
@@ -1352,17 +1252,13 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">json</span>() {
-        <span class="macro">lazy_static!</span> {
-            <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">BUF</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Mutex::new</span>(<span class="ident">Vec::new</span>());
-        }
-
         <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span>
         <span class="string">&quot;{\&quot;timestamp\&quot;:\&quot;fake time\&quot;,\&quot;level\&quot;:\&quot;INFO\&quot;,\&quot;span\&quot;:{\&quot;answer\&quot;:42,\&quot;name\&quot;:\&quot;json_span\&quot;,\&quot;number\&quot;:3},\&quot;spans\&quot;:[{\&quot;answer\&quot;:42,\&quot;name\&quot;:\&quot;json_span\&quot;,\&quot;number\&quot;:3}],\&quot;target\&quot;:\&quot;tracing_subscriber::fmt::format::json::test\&quot;,\&quot;fields\&quot;:{\&quot;message\&quot;:\&quot;some json test\&quot;}}\n&quot;</span>;
         <span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident">subscriber</span>()
             .<span class="ident">flatten_event</span>(<span class="bool-val">false</span>)
             .<span class="ident">with_current_span</span>(<span class="bool-val">true</span>)
             .<span class="ident">with_span_list</span>(<span class="bool-val">true</span>);
-        <span class="ident">test_json</span>(<span class="ident">expected</span>, <span class="ident">subscriber</span>, <span class="kw-2">&amp;</span><span class="ident">BUF</span>, <span class="op">|</span><span class="op">|</span> {
+        <span class="ident">test_json</span>(<span class="ident">expected</span>, <span class="ident">subscriber</span>, <span class="op">|</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::span!</span>(<span class="ident">tracing::Level::INFO</span>, <span class="string">&quot;json_span&quot;</span>, <span class="ident">answer</span> <span class="op">=</span> <span class="number">42</span>, <span class="ident">number</span> <span class="op">=</span> <span class="number">3</span>);
             <span class="kw">let</span> <span class="ident">_guard</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">enter</span>();
             <span class="macro">tracing::info!</span>(<span class="string">&quot;some json test&quot;</span>);
@@ -1371,17 +1267,14 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">json_flattened_event</span>() {
-        <span class="macro">lazy_static!</span> {
-            <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">BUF</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Mutex::new</span>(<span class="ident">Vec::new</span>());
-        }
-
         <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span>
         <span class="string">&quot;{\&quot;timestamp\&quot;:\&quot;fake time\&quot;,\&quot;level\&quot;:\&quot;INFO\&quot;,\&quot;span\&quot;:{\&quot;answer\&quot;:42,\&quot;name\&quot;:\&quot;json_span\&quot;,\&quot;number\&quot;:3},\&quot;spans\&quot;:[{\&quot;answer\&quot;:42,\&quot;name\&quot;:\&quot;json_span\&quot;,\&quot;number\&quot;:3}],\&quot;target\&quot;:\&quot;tracing_subscriber::fmt::format::json::test\&quot;,\&quot;message\&quot;:\&quot;some json test\&quot;}\n&quot;</span>;
+
         <span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident">subscriber</span>()
             .<span class="ident">flatten_event</span>(<span class="bool-val">true</span>)
             .<span class="ident">with_current_span</span>(<span class="bool-val">true</span>)
             .<span class="ident">with_span_list</span>(<span class="bool-val">true</span>);
-        <span class="ident">test_json</span>(<span class="ident">expected</span>, <span class="ident">subscriber</span>, <span class="kw-2">&amp;</span><span class="ident">BUF</span>, <span class="op">|</span><span class="op">|</span> {
+        <span class="ident">test_json</span>(<span class="ident">expected</span>, <span class="ident">subscriber</span>, <span class="op">|</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::span!</span>(<span class="ident">tracing::Level::INFO</span>, <span class="string">&quot;json_span&quot;</span>, <span class="ident">answer</span> <span class="op">=</span> <span class="number">42</span>, <span class="ident">number</span> <span class="op">=</span> <span class="number">3</span>);
             <span class="kw">let</span> <span class="ident">_guard</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">enter</span>();
             <span class="macro">tracing::info!</span>(<span class="string">&quot;some json test&quot;</span>);
@@ -1390,17 +1283,13 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">json_disabled_current_span_event</span>() {
-        <span class="macro">lazy_static!</span> {
-            <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">BUF</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Mutex::new</span>(<span class="ident">Vec::new</span>());
-        }
-
         <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span>
         <span class="string">&quot;{\&quot;timestamp\&quot;:\&quot;fake time\&quot;,\&quot;level\&quot;:\&quot;INFO\&quot;,\&quot;spans\&quot;:[{\&quot;answer\&quot;:42,\&quot;name\&quot;:\&quot;json_span\&quot;,\&quot;number\&quot;:3}],\&quot;target\&quot;:\&quot;tracing_subscriber::fmt::format::json::test\&quot;,\&quot;fields\&quot;:{\&quot;message\&quot;:\&quot;some json test\&quot;}}\n&quot;</span>;
         <span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident">subscriber</span>()
             .<span class="ident">flatten_event</span>(<span class="bool-val">false</span>)
             .<span class="ident">with_current_span</span>(<span class="bool-val">false</span>)
             .<span class="ident">with_span_list</span>(<span class="bool-val">true</span>);
-        <span class="ident">test_json</span>(<span class="ident">expected</span>, <span class="ident">subscriber</span>, <span class="kw-2">&amp;</span><span class="ident">BUF</span>, <span class="op">|</span><span class="op">|</span> {
+        <span class="ident">test_json</span>(<span class="ident">expected</span>, <span class="ident">subscriber</span>, <span class="op">|</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::span!</span>(<span class="ident">tracing::Level::INFO</span>, <span class="string">&quot;json_span&quot;</span>, <span class="ident">answer</span> <span class="op">=</span> <span class="number">42</span>, <span class="ident">number</span> <span class="op">=</span> <span class="number">3</span>);
             <span class="kw">let</span> <span class="ident">_guard</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">enter</span>();
             <span class="macro">tracing::info!</span>(<span class="string">&quot;some json test&quot;</span>);
@@ -1409,17 +1298,13 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">json_disabled_span_list_event</span>() {
-        <span class="macro">lazy_static!</span> {
-            <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">BUF</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Mutex::new</span>(<span class="ident">Vec::new</span>());
-        }
-
         <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span>
         <span class="string">&quot;{\&quot;timestamp\&quot;:\&quot;fake time\&quot;,\&quot;level\&quot;:\&quot;INFO\&quot;,\&quot;span\&quot;:{\&quot;answer\&quot;:42,\&quot;name\&quot;:\&quot;json_span\&quot;,\&quot;number\&quot;:3},\&quot;target\&quot;:\&quot;tracing_subscriber::fmt::format::json::test\&quot;,\&quot;fields\&quot;:{\&quot;message\&quot;:\&quot;some json test\&quot;}}\n&quot;</span>;
         <span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident">subscriber</span>()
             .<span class="ident">flatten_event</span>(<span class="bool-val">false</span>)
             .<span class="ident">with_current_span</span>(<span class="bool-val">true</span>)
             .<span class="ident">with_span_list</span>(<span class="bool-val">false</span>);
-        <span class="ident">test_json</span>(<span class="ident">expected</span>, <span class="ident">subscriber</span>, <span class="kw-2">&amp;</span><span class="ident">BUF</span>, <span class="op">|</span><span class="op">|</span> {
+        <span class="ident">test_json</span>(<span class="ident">expected</span>, <span class="ident">subscriber</span>, <span class="op">|</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::span!</span>(<span class="ident">tracing::Level::INFO</span>, <span class="string">&quot;json_span&quot;</span>, <span class="ident">answer</span> <span class="op">=</span> <span class="number">42</span>, <span class="ident">number</span> <span class="op">=</span> <span class="number">3</span>);
             <span class="kw">let</span> <span class="ident">_guard</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">enter</span>();
             <span class="macro">tracing::info!</span>(<span class="string">&quot;some json test&quot;</span>);
@@ -1428,17 +1313,13 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">json_nested_span</span>() {
-        <span class="macro">lazy_static!</span> {
-            <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">BUF</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Mutex::new</span>(<span class="ident">Vec::new</span>());
-        }
-
         <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span>
         <span class="string">&quot;{\&quot;timestamp\&quot;:\&quot;fake time\&quot;,\&quot;level\&quot;:\&quot;INFO\&quot;,\&quot;span\&quot;:{\&quot;answer\&quot;:43,\&quot;name\&quot;:\&quot;nested_json_span\&quot;,\&quot;number\&quot;:4},\&quot;spans\&quot;:[{\&quot;answer\&quot;:42,\&quot;name\&quot;:\&quot;json_span\&quot;,\&quot;number\&quot;:3},{\&quot;answer\&quot;:43,\&quot;name\&quot;:\&quot;nested_json_span\&quot;,\&quot;number\&quot;:4}],\&quot;target\&quot;:\&quot;tracing_subscriber::fmt::format::json::test\&quot;,\&quot;fields\&quot;:{\&quot;message\&quot;:\&quot;some json test\&quot;}}\n&quot;</span>;
         <span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident">subscriber</span>()
             .<span class="ident">flatten_event</span>(<span class="bool-val">false</span>)
             .<span class="ident">with_current_span</span>(<span class="bool-val">true</span>)
             .<span class="ident">with_span_list</span>(<span class="bool-val">true</span>);
-        <span class="ident">test_json</span>(<span class="ident">expected</span>, <span class="ident">subscriber</span>, <span class="kw-2">&amp;</span><span class="ident">BUF</span>, <span class="op">|</span><span class="op">|</span> {
+        <span class="ident">test_json</span>(<span class="ident">expected</span>, <span class="ident">subscriber</span>, <span class="op">|</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::span!</span>(<span class="ident">tracing::Level::INFO</span>, <span class="string">&quot;json_span&quot;</span>, <span class="ident">answer</span> <span class="op">=</span> <span class="number">42</span>, <span class="ident">number</span> <span class="op">=</span> <span class="number">3</span>);
             <span class="kw">let</span> <span class="ident">_guard</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">enter</span>();
             <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::span!</span>(
@@ -1454,17 +1335,13 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">json_no_span</span>() {
-        <span class="macro">lazy_static!</span> {
-            <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">BUF</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Mutex::new</span>(<span class="ident">Vec::new</span>());
-        }
-
         <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span>
         <span class="string">&quot;{\&quot;timestamp\&quot;:\&quot;fake time\&quot;,\&quot;level\&quot;:\&quot;INFO\&quot;,\&quot;target\&quot;:\&quot;tracing_subscriber::fmt::format::json::test\&quot;,\&quot;fields\&quot;:{\&quot;message\&quot;:\&quot;some json test\&quot;}}\n&quot;</span>;
         <span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident">subscriber</span>()
             .<span class="ident">flatten_event</span>(<span class="bool-val">false</span>)
             .<span class="ident">with_current_span</span>(<span class="bool-val">true</span>)
             .<span class="ident">with_span_list</span>(<span class="bool-val">true</span>);
-        <span class="ident">test_json</span>(<span class="ident">expected</span>, <span class="ident">subscriber</span>, <span class="kw-2">&amp;</span><span class="ident">BUF</span>, <span class="op">|</span><span class="op">|</span> {
+        <span class="ident">test_json</span>(<span class="ident">expected</span>, <span class="ident">subscriber</span>, <span class="op">|</span><span class="op">|</span> {
             <span class="macro">tracing::info!</span>(<span class="string">&quot;some json test&quot;</span>);
         });
     }
@@ -1473,17 +1350,17 @@
     <span class="kw">fn</span> <span class="ident">record_works</span>() {
         <span class="comment">// This test reproduces issue #707, where using `Span::record` causes</span>
         <span class="comment">// any events inside the span to be ignored.</span>
-        <span class="macro">lazy_static!</span> {
-            <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">BUF</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Mutex::new</span>(<span class="ident">Vec::new</span>());
-        }
 
-        <span class="kw">let</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="ident">MockMakeWriter::new</span>(<span class="kw-2">&amp;</span><span class="ident">BUF</span>);
-        <span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::fmt</span>().<span class="ident">json</span>().<span class="ident">with_writer</span>(<span class="ident">buffer</span>.<span class="ident">clone</span>()).<span class="ident">finish</span>();
+        <span class="kw">let</span> <span class="ident">make_writer</span> <span class="op">=</span> <span class="ident">MockMakeWriter::default</span>();
+        <span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::fmt</span>()
+            .<span class="ident">json</span>()
+            .<span class="ident">with_writer</span>(<span class="ident">make_writer</span>.<span class="ident">clone</span>())
+            .<span class="ident">finish</span>();
 
         <span class="ident">with_default</span>(<span class="ident">subscriber</span>, <span class="op">|</span><span class="op">|</span> {
             <span class="macro">tracing::info!</span>(<span class="string">&quot;an event outside the root span&quot;</span>);
             <span class="macro">assert_eq!</span>(
-                <span class="ident">parse_as_json</span>(<span class="kw-2">&amp;</span><span class="ident">buffer</span>)[<span class="string">&quot;fields&quot;</span>][<span class="string">&quot;message&quot;</span>],
+                <span class="ident">parse_as_json</span>(<span class="kw-2">&amp;</span><span class="ident">make_writer</span>)[<span class="string">&quot;fields&quot;</span>][<span class="string">&quot;message&quot;</span>],
                 <span class="string">&quot;an event outside the root span&quot;</span>
             );
 
@@ -1493,7 +1370,7 @@
 
             <span class="macro">tracing::info!</span>(<span class="string">&quot;an event inside the root span&quot;</span>);
             <span class="macro">assert_eq!</span>(
-                <span class="ident">parse_as_json</span>(<span class="kw-2">&amp;</span><span class="ident">buffer</span>)[<span class="string">&quot;fields&quot;</span>][<span class="string">&quot;message&quot;</span>],
+                <span class="ident">parse_as_json</span>(<span class="kw-2">&amp;</span><span class="ident">make_writer</span>)[<span class="string">&quot;fields&quot;</span>][<span class="string">&quot;message&quot;</span>],
                 <span class="string">&quot;an event inside the root span&quot;</span>
             );
         });
@@ -1501,11 +1378,7 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">json_span_event_show_correct_context</span>() {
-        <span class="macro">lazy_static!</span> {
-            <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">BUF</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Mutex::new</span>(<span class="ident">Vec::new</span>());
-        }
-
-        <span class="kw">let</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="ident">MockMakeWriter::new</span>(<span class="kw-2">&amp;</span><span class="ident">BUF</span>);
+        <span class="kw">let</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="ident">MockMakeWriter::default</span>();
         <span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident">subscriber</span>()
             .<span class="ident">with_writer</span>(<span class="ident">buffer</span>.<span class="ident">clone</span>())
             .<span class="ident">flatten_event</span>(<span class="bool-val">false</span>)
@@ -1564,11 +1437,7 @@
     <span class="kw">fn</span> <span class="ident">json_span_event_with_no_fields</span>() {
         <span class="comment">// Check span events serialize correctly.</span>
         <span class="comment">// Discussion: https://github.com/tokio-rs/tracing/issues/829#issuecomment-661984255</span>
-        <span class="macro">lazy_static!</span> {
-            <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">BUF</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Mutex::new</span>(<span class="ident">Vec::new</span>());
-        }
-
-        <span class="kw">let</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="ident">MockMakeWriter::new</span>(<span class="kw-2">&amp;</span><span class="ident">BUF</span>);
+        <span class="kw">let</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="ident">MockMakeWriter::default</span>();
         <span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident">subscriber</span>()
             .<span class="ident">with_writer</span>(<span class="ident">buffer</span>.<span class="ident">clone</span>())
             .<span class="ident">flatten_event</span>(<span class="bool-val">false</span>)
@@ -1592,7 +1461,7 @@
         });
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_as_json</span>(<span class="ident">buffer</span>: <span class="kw-2">&amp;</span><span class="ident">MockMakeWriter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">serde_json::Value</span> {
+    <span class="kw">fn</span> <span class="ident">parse_as_json</span>(<span class="ident">buffer</span>: <span class="kw-2">&amp;</span><span class="ident">MockMakeWriter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">serde_json::Value</span> {
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">String::from_utf8</span>(<span class="ident">buffer</span>.<span class="ident">buf</span>().<span class="ident">to_vec</span>()).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">json</span> <span class="op">=</span> <span class="ident">buf</span>
             .<span class="ident">lines</span>()
@@ -1610,10 +1479,9 @@
     <span class="kw">fn</span> <span class="ident">test_json</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
         <span class="ident">expected</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">builder</span>: <span class="ident"><span class="kw">crate</span>::fmt::SubscriberBuilder</span><span class="op">&lt;</span><span class="ident">JsonFields</span>, <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">Json</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">producer</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>,
     ) {
-        <span class="kw">let</span> <span class="ident">make_writer</span> <span class="op">=</span> <span class="ident">MockMakeWriter::new</span>(<span class="ident">buf</span>);
+        <span class="kw">let</span> <span class="ident">make_writer</span> <span class="op">=</span> <span class="ident">MockMakeWriter::default</span>();
         <span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident">builder</span>
             .<span class="ident">with_writer</span>(<span class="ident">make_writer</span>.<span class="ident">clone</span>())
             .<span class="ident">with_timer</span>(<span class="ident">MockTime</span>)
