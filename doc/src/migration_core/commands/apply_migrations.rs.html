@@ -142,13 +142,32 @@
 <span id="142">142</span>
 <span id="143">143</span>
 <span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">CoreError</span>, <span class="ident">CoreResult</span>};
 <span class="kw">use</span> <span class="ident">migration_connector</span>::{
     <span class="ident">migrations_directory</span>::{<span class="ident">error_on_changed_provider</span>, <span class="ident">list_migrations</span>, <span class="ident">MigrationDirectory</span>},
     <span class="ident">ConnectorError</span>, <span class="ident">MigrationRecord</span>, <span class="ident">PersistenceNotInitializedError</span>,
 };
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">std::path::Path</span>;
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">path::Path</span>, <span class="ident">time::Instant</span>};
 <span class="kw">use</span> <span class="ident">user_facing_errors::migration_engine::FoundFailedMigrations</span>;
 
 <span class="doccomment">/// The input to the `ApplyMigrations` command.</span>
@@ -174,6 +193,7 @@
 <span class="kw">where</span>
     <span class="ident">C</span>: <span class="ident">migration_connector::MigrationConnector</span>,
 {
+    <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
     <span class="kw">let</span> <span class="ident">applier</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">database_migration_step_applier</span>();
     <span class="kw">let</span> <span class="ident">migration_persistence</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">migration_persistence</span>();
 
@@ -203,7 +223,11 @@
         })
         .<span class="ident">collect</span>();
 
+    <span class="kw">let</span> <span class="ident">analysis_duration_ms</span> <span class="op">=</span> <span class="ident">Instant::now</span>().<span class="ident">duration_since</span>(<span class="ident">start</span>).<span class="ident">as_millis</span>() <span class="kw">as</span> <span class="ident">u64</span>;
+    <span class="macro">tracing::info!</span>(<span class="ident">analysis_duration_ms</span>, <span class="string">&quot;Analysis run in {}ms&quot;</span>, <span class="ident">analysis_duration_ms</span>,);
+
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">applied_migration_names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">unapplied_migrations</span>.<span class="ident">len</span>());
+    <span class="kw">let</span> <span class="ident">apply_migrations_start</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
 
     <span class="kw">for</span> <span class="ident">unapplied_migration</span> <span class="kw">in</span> <span class="ident">unapplied_migrations</span> {
         <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::info_span!</span>(
@@ -211,6 +235,7 @@
             <span class="ident">migration_name</span> <span class="op">=</span> <span class="ident">unapplied_migration</span>.<span class="ident">migration_name</span>(),
         );
         <span class="kw">let</span> <span class="ident">_span</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">enter</span>();
+        <span class="kw">let</span> <span class="ident">migration_apply_start</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
 
         <span class="kw">let</span> <span class="ident">script</span> <span class="op">=</span> <span class="ident">unapplied_migration</span>
             .<span class="ident">read_migration_script</span>()
@@ -235,6 +260,12 @@
                 <span class="ident">migration_persistence</span>.<span class="ident">record_successful_step</span>(<span class="kw-2">&amp;</span><span class="ident">migration_id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
                 <span class="ident">migration_persistence</span>.<span class="ident">record_migration_finished</span>(<span class="kw-2">&amp;</span><span class="ident">migration_id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
                 <span class="ident">applied_migration_names</span>.<span class="ident">push</span>(<span class="ident">unapplied_migration</span>.<span class="ident">migration_name</span>().<span class="ident">to_owned</span>());
+                <span class="kw">let</span> <span class="ident">migration_duration_ms</span> <span class="op">=</span> <span class="ident">Instant::now</span>().<span class="ident">duration_since</span>(<span class="ident">migration_apply_start</span>).<span class="ident">as_millis</span>() <span class="kw">as</span> <span class="ident">u64</span>;
+                <span class="macro">tracing::info!</span>(
+                    <span class="ident">migration_duration_ms</span> <span class="op">=</span> <span class="ident">migration_duration_ms</span>,
+                    <span class="string">&quot;Migration executed in {}ms&quot;</span>,
+                    <span class="ident">migration_duration_ms</span>
+                );
             }
             <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="macro">tracing::debug!</span>(<span class="string">&quot;Failed to apply the script.&quot;</span>);
@@ -247,6 +278,13 @@
             }
         }
     }
+
+    <span class="kw">let</span> <span class="ident">apply_migrations_ms</span> <span class="op">=</span> <span class="ident">Instant::now</span>().<span class="ident">duration_since</span>(<span class="ident">apply_migrations_start</span>).<span class="ident">as_millis</span>() <span class="kw">as</span> <span class="ident">u64</span>;
+    <span class="macro">tracing::info!</span>(
+        <span class="ident">apply_migrations_duration_ms</span> <span class="op">=</span> <span class="ident">apply_migrations_ms</span>,
+        <span class="string">&quot;All the migrations executed in {}ms&quot;</span>,
+        <span class="ident">apply_migrations_ms</span>
+    );
 
     <span class="prelude-val">Ok</span>(<span class="ident">ApplyMigrationsOutput</span> {
         <span class="ident">applied_migration_names</span>,
