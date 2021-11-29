@@ -208,11 +208,15 @@ pub(super) fn cycles<'ast, 'db>(
         return;
     }
 
+    let mut visited = HashSet::new();
+
     // poor man's tail-recursion ;)
     let mut next_relations = vec![(relation, Rc::new(VisitedRelation::root(relation)))];
     let parent_model = relation.referencing_model();
 
     while let Some((next_relation, visited_relations)) = next_relations.pop() {
+        visited.insert(next_relation.referencing_field());
+
         let related_model = next_relation.referenced_model();
 
         let on_delete = next_relation.on_delete();
@@ -226,6 +230,7 @@ pub(super) fn cycles<'ast, 'db>(
             if model == related_model {
                 let msg = "A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes.";
                 diagnostics.push_error(cascade_error_with_default_values(relation, msg));
+
                 return;
             }
 
@@ -239,7 +244,11 @@ pub(super) fn cycles<'ast, 'db>(
                 return;
             }
 
-            for relation in related_model.complete_inline_relations_from() {
+            let relations = related_model
+                .complete_inline_relations_from()
+                .filter(|r| !visited.contains(&r.referencing_field()));
+
+            for relation in relations {
                 next_relations.push((relation, Rc::new(visited_relations.link_next(relation))));
             }
         }
