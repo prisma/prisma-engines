@@ -3,15 +3,6 @@ use std::convert::TryFrom;
 
 /// Represents a set of results.
 #[derive(Default, Debug, Clone, PartialEq, Eq, Hash)]
-// Name candidates:
-// - ReturnValues
-// - PrismaValues
-// - Values
-// - ResultValues
-// - SelectionResult << This would remove SelectedField and reuse the SelectedField concept.
-//
-// My hope: Generalizing the return value container will allow us to move a lot of
-// hacks into the normal return value stream instead of handling that differently.
 pub struct SelectionResult {
     pub pairs: Vec<(SelectedField, PrismaValue)>,
 }
@@ -42,14 +33,6 @@ impl SelectionResult {
             }
         })
     }
-
-    // pub fn model(&self) -> Option<ModelRef> {
-    //     self.fields().next().and_then(|field| field.container.as_model())
-    // }
-
-    // pub fn fields(&self) -> impl Iterator<Item = Field> + '_ {
-    //     self.pairs.iter().map(|p| p.0.clone())
-    // }
 
     pub fn values(&self) -> impl Iterator<Item = PrismaValue> + '_ {
         self.pairs.iter().map(|p| p.1.clone())
