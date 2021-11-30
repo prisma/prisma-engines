@@ -1066,35 +1066,3 @@ fn validate_db_name(
     }
 }
 
-/// Fill in the generated Prisma constraint names for DEFAULT constraints.
-pub(super) fn fill_in_default_constraint_names(ctx: &mut Context<'_>) {
-    if !ctx.db.active_connector().supports_named_default_values() {
-        return;
-    }
-
-    let mut names: Vec<(ast::ModelId, ast::FieldId, String)> = Vec::new();
-
-    for ((model_id, field_id), field_attributes) in &ctx.db.types.scalar_fields {
-        if field_attributes.default.is_none() {
-            continue;
-        }
-
-        if field_attributes.default.as_ref().and_then(|d| d.db_name()).is_some() {
-            continue;
-        }
-
-        let model_name = ctx.db.walk_model(*model_id).final_database_name();
-        let field_name = field_attributes
-            .mapped_name
-            .unwrap_or(&ctx.db.ast[*model_id][*field_id].name.name);
-
-        let generated_name = ConstraintNames::default_name(model_name, field_name, ctx.db.active_connector());
-
-        names.push((*model_id, *field_id, generated_name))
-    }
-
-    for (model_id, field_id, generated_name) in names {
-        let field_attributes = ctx.db.types.scalar_fields.get_mut(&(model_id, field_id)).unwrap();
-        field_attributes.default.as_mut().unwrap().set_db_name(generated_name)
-    }
-}

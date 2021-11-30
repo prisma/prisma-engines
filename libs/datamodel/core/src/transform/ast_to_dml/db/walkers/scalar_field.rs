@@ -1,13 +1,12 @@
 use std::borrow::Cow;
 
-use dml::{default_value::DefaultValue, model::SortOrder, native_type_instance::NativeTypeInstance};
-
 use super::ModelWalker;
 use crate::{
     ast,
     common::constraint_names::ConstraintNames,
     transform::ast_to_dml::db::{types::FieldWithArgs, ParserDatabase, ScalarField, ScalarFieldType},
 };
+use dml::{default_value::DefaultValue, model::SortOrder, native_type_instance::NativeTypeInstance};
 
 #[derive(Copy, Clone)]
 pub(crate) struct ScalarFieldWalker<'ast, 'db> {

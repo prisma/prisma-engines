@@ -98,13 +98,12 @@ impl<'ast> ParserDatabase<'ast> {
         // information from previous steps, not from other attributes.
         attributes::resolve_attributes(&mut ctx);
 
-        // Fourth step: global validations
-        attributes::fill_in_default_constraint_names(&mut ctx);
-
-        // Fifth step: relation inference
+        // Fourth step: relation inference
         relations::infer_relations(&mut ctx);
 
-        // Sixth step: infering implicit indices
+        // The next steps move to the later validation step.
+
+        // Sixth step: infer implicit indices
         indexes::infer_implicit_indexes(&mut ctx);
 
         // Seventh seal: chess with the devil
