@@ -1,4 +1,3 @@
-mod autoincrement;
 mod id;
 mod map;
 mod native_types;
@@ -148,7 +147,6 @@ fn resolve_model_attributes<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::
 
     // Model-global validations
     id::validate_id_field_arities(model_id, &model_attributes, ctx);
-    autoincrement::validate_auto_increment(model_id, &model_attributes, ctx);
 
     ctx.db.types.model_attributes.insert(model_id, model_attributes);
 }
@@ -438,6 +436,7 @@ fn visit_field_default<'ast>(
                             }
 
                             field_data.default = Some(default);
+                            field_data.default_attribute = Some(args.attribute());
                         } else {
                             ctx.push_error(args.new_attribute_validation_error(
                                 "The defined default value is not a valid value of the enum specified for the field.",
@@ -454,6 +453,7 @@ fn visit_field_default<'ast>(
                                 }
 
                                 field_data.default = Some(default);
+                                field_data.default_attribute = Some(args.attribute());
                             }
                             Ok(_) | Err(_) => ctx.push_error(args.new_attribute_validation_error(&err.to_string())),
                         };
@@ -474,6 +474,7 @@ fn visit_field_default<'ast>(
                         }
 
                         field_data.default = Some(default);
+                        field_data.default_attribute = Some(args.attribute());
                     }
                     Err(err) => ctx.push_error(args.new_attribute_validation_error(&err.to_string())),
                 }
@@ -485,7 +486,8 @@ fn visit_field_default<'ast>(
             ScalarFieldType::Unsupported => {
                 match value.as_value_generator() {
                     Ok(generator) if generator.is_dbgenerated() => {
-                        field_data.default = Some(dml::DefaultValue::new_expression(generator))
+                        field_data.default = Some(dml::DefaultValue::new_expression(generator));
+                        field_data.default_attribute = Some(args.attribute());
                     }
                     Ok(_) => ctx.push_error(args.new_attribute_validation_error(
                         "Only @default(dbgenerated()) can be used for Unsupported types.",

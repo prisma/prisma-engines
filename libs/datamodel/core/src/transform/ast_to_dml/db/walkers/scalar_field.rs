@@ -39,8 +39,16 @@ impl<'ast, 'db> ScalarFieldWalker<'ast, 'db> {
         self.ast_field().name()
     }
 
+    pub(crate) fn default_attribute(self) -> Option<&'ast ast::Attribute> {
+        self.scalar_field.default_attribute
+    }
+
     pub(crate) fn final_database_name(self) -> &'ast str {
         self.attributes().mapped_name.unwrap_or_else(|| self.name())
+    }
+
+    pub(crate) fn is_autoincrement(&self) -> bool {
+        matches!(&self.scalar_field.default.as_ref().map(|d| d.kind()), Some(crate::dml::DefaultKind::Expression(expr)) if expr.is_autoincrement())
     }
 
     pub(crate) fn is_optional(self) -> bool {

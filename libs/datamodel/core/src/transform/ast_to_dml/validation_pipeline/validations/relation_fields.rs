@@ -182,7 +182,10 @@ pub(crate) fn map(field: RelationFieldWalker<'_, '_>, diagnostics: &mut Diagnost
         diagnostics.push_error(DatamodelError::new_attribute_validation_error(
             "Your provider does not support named foreign keys.",
             "relation",
-            field.ast_field().span_for_attribute("relation").unwrap_or_else(ast::Span::empty),
+            field
+                .ast_field()
+                .span_for_attribute("relation")
+                .unwrap_or_else(ast::Span::empty),
         ))
     }
 }

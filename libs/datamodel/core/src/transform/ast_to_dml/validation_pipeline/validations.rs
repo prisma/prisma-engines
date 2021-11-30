@@ -1,3 +1,4 @@
+mod autoincrement;
 mod composite_types;
 mod fields;
 mod indexes;
@@ -28,6 +29,7 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, r
         models::primary_key_length_prefix_supported(db, model, diagnostics);
         models::primary_key_sort_order_supported(db, model, diagnostics);
         models::only_one_fulltext_attribute_allowed(db, model, diagnostics);
+        autoincrement::validate_auto_increment(model, connector, diagnostics);
 
         if let Some(pk) = model.primary_key() {
             for field_attribute in pk.scalar_field_attributes() {

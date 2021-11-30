@@ -1,11 +1,3 @@
-use datamodel_connector::{
-    connector_error::{ConnectorError, ErrorKind},
-    Connector, ConnectorCapability,
-};
-use diagnostics::Span;
-use dml::scalars::ScalarType;
-use itertools::Itertools;
-
 use super::names::{NameTaken, Names};
 use crate::{
     ast,
@@ -15,6 +7,12 @@ use crate::{
         ConstraintName, ParserDatabase,
     },
 };
+use datamodel_connector::{
+    connector_error::{ConnectorError, ErrorKind},
+    Connector, ConnectorCapability,
+};
+use dml::scalars::ScalarType;
+use itertools::Itertools;
 
 pub(super) fn validate_client_name(field: FieldWalker<'_, '_>, names: &Names<'_>, diagnostics: &mut Diagnostics) {
     let model = field.model();
@@ -198,7 +196,6 @@ pub(super) fn validate_native_type_arguments(field: ScalarFieldWalker<'_, '_>, d
         }
         Err(connector_error) => {
             diagnostics.push_error(DatamodelError::new_connector_error(&connector_error.to_string(), span));
-            return;
         }
     };
 }
@@ -217,7 +214,7 @@ pub(super) fn validate_default(
         diagnostics.push_error(DatamodelError::new_attribute_validation_error(
             "You defined a database name for the default value of a field on the model. This is not supported by the provider.",
             "default",
-            field.ast_field().span_for_attribute("default").unwrap_or(Span::empty()),
+            field.default_attribute().unwrap().span,
         ));
     }
 

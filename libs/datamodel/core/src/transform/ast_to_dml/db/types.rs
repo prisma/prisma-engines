@@ -103,16 +103,11 @@ pub(crate) struct ScalarField<'ast> {
     pub(crate) is_ignored: bool,
     pub(crate) is_updated_at: bool,
     pub(crate) default: Option<dml::default_value::DefaultValue>,
+    pub(crate) default_attribute: Option<&'ast ast::Attribute>,
     /// @map
     pub(crate) mapped_name: Option<&'ast str>,
     /// Native type name and arguments
     pub(crate) native_type: Option<(&'ast str, Vec<String>, ast::Span)>,
-}
-
-impl ScalarField<'_> {
-    pub(crate) fn is_autoincrement(&self) -> bool {
-        matches!(&self.default.as_ref().map(|d| d.kind()), Some(crate::dml::DefaultKind::Expression(expr)) if expr.is_autoincrement())
-    }
 }
 
 #[derive(Debug)]
@@ -159,28 +154,6 @@ pub(crate) struct ModelAttributes<'ast> {
     pub(super) implicit_indexes: Vec<IndexAttribute<'static>>,
     /// @@map
     pub(crate) mapped_name: Option<&'ast str>,
-}
-
-impl ModelAttributes<'_> {
-    /// Whether the field is the whole primary key. Will match `@id` and `@@id([fieldName])`.
-    pub(super) fn field_is_single_pk(&self, field: ast::FieldId) -> bool {
-        self.primary_key
-            .as_ref()
-            .filter(|pk| pk.fields.iter().map(|f| f.field_id).collect::<Vec<_>>() == [field])
-            .is_some()
-    }
-
-    /// Whether MySQL would consider the field indexed for autoincrement purposes.
-    pub(super) fn field_is_indexed_for_autoincrement(&self, field_id: ast::FieldId) -> bool {
-        self.ast_indexes
-            .iter()
-            .any(|(_, idx)| idx.fields.get(0).map(|f| f.field_id) == Some(field_id))
-            || self
-                .primary_key
-                .as_ref()
-                .filter(|pk| pk.fields.get(0).map(|f| f.field_id) == Some(field_id))
-                .is_some()
-    }
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -270,6 +243,7 @@ fn visit_model<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::Model, ctx: &
                     is_ignored: false,
                     is_updated_at: false,
                     default: None,
+                    default_attribute: None,
                     mapped_name: None,
                     native_type: None,
                 };
