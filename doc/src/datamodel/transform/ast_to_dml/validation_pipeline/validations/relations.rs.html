@@ -477,6 +477,15 @@
 <span id="477">477</span>
 <span id="478">478</span>
 <span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
 </pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod</span> <span class="ident">many_to_many</span>;
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod</span> <span class="ident">one_to_many</span>;
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod</span> <span class="ident">one_to_one</span>;
@@ -687,11 +696,15 @@
         <span class="kw">return</span>;
     }
 
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">visited</span> <span class="op">=</span> <span class="ident">HashSet::new</span>();
+
     <span class="comment">// poor man&#39;s tail-recursion ;)</span>
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">next_relations</span> <span class="op">=</span> <span class="macro">vec!</span>[(<span class="ident">relation</span>, <span class="ident">Rc::new</span>(<span class="ident">VisitedRelation::root</span>(<span class="ident">relation</span>)))];
     <span class="kw">let</span> <span class="ident">parent_model</span> <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">referencing_model</span>();
 
     <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">next_relation</span>, <span class="ident">visited_relations</span>)) <span class="op">=</span> <span class="ident">next_relations</span>.<span class="ident">pop</span>() {
+        <span class="ident">visited</span>.<span class="ident">insert</span>(<span class="ident">next_relation</span>.<span class="ident">referencing_field</span>());
+
         <span class="kw">let</span> <span class="ident">related_model</span> <span class="op">=</span> <span class="ident">next_relation</span>.<span class="ident">referenced_model</span>();
 
         <span class="kw">let</span> <span class="ident">on_delete</span> <span class="op">=</span> <span class="ident">next_relation</span>.<span class="ident">on_delete</span>();
@@ -705,6 +718,7 @@
             <span class="kw">if</span> <span class="ident">model</span> <span class="op">=</span><span class="op">=</span> <span class="ident">related_model</span> {
                 <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes.&quot;</span>;
                 <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">cascade_error_with_default_values</span>(<span class="ident">relation</span>, <span class="ident">msg</span>));
+
                 <span class="kw">return</span>;
             }
 
@@ -718,7 +732,11 @@
                 <span class="kw">return</span>;
             }
 
-            <span class="kw">for</span> <span class="ident">relation</span> <span class="kw">in</span> <span class="ident">related_model</span>.<span class="ident">complete_inline_relations_from</span>() {
+            <span class="kw">let</span> <span class="ident">relations</span> <span class="op">=</span> <span class="ident">related_model</span>
+                .<span class="ident">complete_inline_relations_from</span>()
+                .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="op">!</span><span class="ident">visited</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">r</span>.<span class="ident">referencing_field</span>()));
+
+            <span class="kw">for</span> <span class="ident">relation</span> <span class="kw">in</span> <span class="ident">relations</span> {
                 <span class="ident">next_relations</span>.<span class="ident">push</span>((<span class="ident">relation</span>, <span class="ident">Rc::new</span>(<span class="ident">visited_relations</span>.<span class="ident">link_next</span>(<span class="ident">relation</span>))));
             }
         }
