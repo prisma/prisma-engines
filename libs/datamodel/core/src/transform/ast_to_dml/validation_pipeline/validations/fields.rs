@@ -6,6 +6,7 @@ use crate::{
         walkers::{FieldWalker, ScalarFieldAttributeWalker, ScalarFieldWalker},
         ConstraintName, ParserDatabase, ScalarFieldType,
     },
+    Datasource,
 };
 use datamodel_connector::{
     connector_error::{ConnectorError, ErrorKind},
@@ -263,5 +264,52 @@ pub(super) fn validate_scalar_field_connector_specific(
             field.name(),
             field.ast_field().span,
         ));
+    }
+}
+
+pub(super) fn validate_unsupported_field_type(
+    field: ScalarFieldWalker<'_, '_>,
+    source: &Datasource,
+    diagnostics: &mut Diagnostics,
+) {
+    use once_cell::sync::Lazy;
+    use regex::Regex;
+
+    static TYPE_REGEX: Lazy<Regex> = Lazy::new(|| {
+        Regex::new(r#"(?x)
+    ^                           # beginning of the string
+    (?P<prefix>[^(]+)           # a required prefix that is any character until the first opening brace
+    (?:\((?P<params>.*?)\))?    # (optional) an opening parenthesis, a closing parenthesis and captured params in-between
+    (?P<suffix>.+)?             # (optional) captured suffix after the params until the end of the string
+    $                           # end of the string
+    "#).unwrap()
+    });
+
+    let connector = source.active_connector;
+    let (unsupported_lit, _) = if let ScalarFieldType::Unsupported = field.scalar_field.r#type {
+        field.ast_field().field_type.as_unsupported().unwrap()
+    } else {
+        return;
+    };
+
+    if let Some(captures) = TYPE_REGEX.captures(unsupported_lit) {
+        let prefix = captures.name("prefix").unwrap().as_str().trim();
+
+        let params = captures.name("params");
+        let args = match params {
+            None => vec![],
+            Some(params) => params.as_str().split(',').map(|s| s.trim().to_string()).collect(),
+        };
+
+        if let Ok(native_type) = connector.parse_native_type(prefix, args) {
+            let prisma_type = connector.scalar_type_for_native_type(native_type.serialized_native_type.clone());
+
+            let msg = format!(
+                        "The type `Unsupported(\"{}\")` you specified in the type definition for the field `{}` is supported as a native type by Prisma. Please use the native type notation `{} @{}.{}` for full support.",
+                        unsupported_lit, field.name(), prisma_type.to_string(), &source.name, native_type.render()
+                    );
+
+            diagnostics.push_error(DatamodelError::new_validation_error(msg, field.ast_field().span));
+        }
     }
 }

@@ -2,8 +2,6 @@ use super::{context::Context, walkers::CompositeTypeFieldWalker};
 use crate::ast::FieldId;
 use crate::{ast, diagnostics::DatamodelError, transform::ast_to_dml::db::walkers::CompositeTypeWalker, SortOrder};
 use itertools::Itertools;
-use once_cell::sync::Lazy;
-use regex::Regex;
 use std::{
     borrow::Cow,
     collections::{BTreeMap, HashMap},
@@ -247,10 +245,6 @@ fn visit_model<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::Model, ctx: &
                     mapped_name: None,
                     native_type: None,
                 };
-
-                if matches!(scalar_field_type, ScalarFieldType::Unsupported) {
-                    validate_unsupported_field_type(ast_field, ast_field.field_type.as_unsupported().unwrap().0, ctx);
-                }
 
                 ctx.db.types.scalar_fields.insert((model_id, field_id), field_data);
             }
@@ -515,42 +509,5 @@ fn field_type<'ast>(field: &'ast ast::Field, ctx: &mut Context<'ast>) -> Result<
         Some((_, ast::Top::Generator(_))) | Some((_, ast::Top::Source(_))) => unreachable!(),
         None => Err(supported),
         _ => unreachable!(),
-    }
-}
-
-fn validate_unsupported_field_type(ast_field: &ast::Field, unsupported_lit: &str, ctx: &mut Context<'_>) {
-    static TYPE_REGEX: Lazy<Regex> = Lazy::new(|| {
-        Regex::new(r#"(?x)
-    ^                           # beginning of the string
-    (?P<prefix>[^(]+)           # a required prefix that is any character until the first opening brace
-    (?:\((?P<params>.*?)\))?    # (optional) an opening parenthesis, a closing parenthesis and captured params in-between
-    (?P<suffix>.+)?             # (optional) captured suffix after the params until the end of the string
-    $                           # end of the string
-    "#).unwrap()
-    });
-
-    if let Some(source) = ctx.db.datasource() {
-        let connector = &source.active_connector;
-
-        if let Some(captures) = TYPE_REGEX.captures(unsupported_lit) {
-            let prefix = captures.name("prefix").unwrap().as_str().trim();
-
-            let params = captures.name("params");
-            let args = match params {
-                None => vec![],
-                Some(params) => params.as_str().split(',').map(|s| s.trim().to_string()).collect(),
-            };
-
-            if let Ok(native_type) = connector.parse_native_type(prefix, args) {
-                let prisma_type = connector.scalar_type_for_native_type(native_type.serialized_native_type.clone());
-
-                let msg = format!(
-                        "The type `Unsupported(\"{}\")` you specified in the type definition for the field `{}` is supported as a native type by Prisma. Please use the native type notation `{} @{}.{}` for full support.",
-                        unsupported_lit, ast_field.name.name, prisma_type.to_string(), &source.name, native_type.render()
-                    );
-
-                ctx.push_error(DatamodelError::new_validation_error(msg, ast_field.span));
-            }
-        }
     }
 }

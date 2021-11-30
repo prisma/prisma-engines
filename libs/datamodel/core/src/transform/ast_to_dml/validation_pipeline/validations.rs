@@ -47,6 +47,10 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, r
             fields::has_a_unique_default_constraint_name(db, field, diagnostics);
             fields::validate_native_type_arguments(field, diagnostics);
             fields::validate_default(field, connector, diagnostics);
+
+            if let Some(source) = db.datasource() {
+                fields::validate_unsupported_field_type(field, source, diagnostics)
+            }
         }
 
         for field in model.relation_fields() {
