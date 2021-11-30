@@ -1,7 +1,5 @@
 use std::borrow::Cow;
-
 use crate::common::constraint_names::ConstraintNames;
-
 use super::{
     context::Context,
     types::{IndexAttribute, IndexType},

@@ -1,3 +1,4 @@
+mod composite_types;
 mod fields;
 mod indexes;
 mod models;
@@ -13,8 +14,12 @@ use crate::{
 };
 
 pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, relation_transformation_enabled: bool) {
-    let names = Names::new(db);
     let connector = db.active_connector();
+    let names = Names::new(db);
+
+    for composite_type in db.walk_composite_types() {
+        composite_types::composite_types_support(composite_type, connector, diagnostics);
+    }
 
     for model in db.walk_models() {
         models::has_a_strict_unique_criteria(model, diagnostics);
