@@ -100,9 +100,7 @@ impl<'ast> ParserDatabase<'ast> {
         // Fourth step: relation inference
         relations::infer_relations(&mut ctx);
 
-        // The next steps move to the later validation step.
-
-        // Sixth step: infer implicit indices
+        // Fifth step: infer implicit indices
         indexes::infer_implicit_indexes(&mut ctx);
 
         ctx.finish()

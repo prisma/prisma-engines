@@ -3,7 +3,6 @@ use crate::ast::FieldId;
 use crate::{ast, diagnostics::DatamodelError, transform::ast_to_dml::db::walkers::CompositeTypeWalker, SortOrder};
 use itertools::Itertools;
 use std::{
-    borrow::Cow,
     collections::{BTreeMap, HashMap},
     fmt,
     rc::Rc,
@@ -191,7 +190,7 @@ pub(crate) struct IndexAttribute<'ast> {
     pub(crate) fields: Vec<FieldWithArgs>,
     pub(crate) source_field: Option<ast::FieldId>,
     pub(crate) name: Option<&'ast str>,
-    pub(crate) db_name: Option<Cow<'ast, str>>,
+    pub(crate) db_name: Option<&'ast str>,
     pub(crate) algorithm: Option<IndexAlgorithm>,
 }
 

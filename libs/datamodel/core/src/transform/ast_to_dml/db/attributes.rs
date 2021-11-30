@@ -20,7 +20,6 @@ use crate::{
     transform::ast_to_dml::db::types::IndexAlgorithm,
 };
 use prisma_value::PrismaValue;
-use std::borrow::Cow;
 
 pub(super) fn resolve_attributes(ctx: &mut Context<'_>) {
     for top in ctx.db.ast.iter_tops() {
@@ -277,7 +276,7 @@ fn visit_field_unique<'ast>(
                 length,
             }],
             source_field: Some(field_id),
-            db_name: db_name.map(Cow::from),
+            db_name,
             ..Default::default()
         },
     ))
@@ -552,7 +551,7 @@ fn model_fulltext<'ast>(
     };
 
     validate_db_name(ast_model, args, db_name, "@@fulltext", ctx);
-    index_attribute.db_name = db_name.map(Cow::from);
+    index_attribute.db_name = db_name;
 
     data.ast_indexes.push((args.attribute(), index_attribute));
 }
@@ -608,8 +607,8 @@ fn model_index<'ast>(
             None
         }
         // backwards compatibility, accept name arg on normal indexes and use it as map arg.
-        (Some(name), None) => Some(Cow::from(name)),
-        (None, Some(map)) => Some(Cow::from(map)),
+        (Some(name), None) => Some(name),
+        (None, Some(map)) => Some(map),
         (None, None) => None,
     };
 
@@ -683,7 +682,7 @@ fn model_unique<'ast>(
     };
 
     index_attribute.name = name;
-    index_attribute.db_name = db_name.map(Cow::from);
+    index_attribute.db_name = db_name;
 
     data.ast_indexes.push((args.attribute(), index_attribute));
 }

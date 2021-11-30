@@ -1,13 +1,11 @@
-use crate::ast::Span;
-use crate::transform::ast_to_dml::db::IndexAlgorithm;
+use super::constraint_namespace::ConstraintName;
 use crate::{
+    ast::Span,
     common::preview_features::PreviewFeature,
     diagnostics::{DatamodelError, Diagnostics},
-    transform::ast_to_dml::db::{walkers::IndexWalker, ParserDatabase},
+    transform::ast_to_dml::db::{walkers::IndexWalker, IndexAlgorithm, ParserDatabase},
 };
 use datamodel_connector::ConnectorCapability;
-
-use super::constraint_namespace::ConstraintName;
 
 /// Different databases validate index and unique constraint names in a certain namespace.
 /// Validates index and unique constraint names against the database requirements.

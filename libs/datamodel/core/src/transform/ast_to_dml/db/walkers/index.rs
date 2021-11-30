@@ -19,7 +19,7 @@ pub(crate) struct IndexWalker<'ast, 'db> {
 impl<'ast, 'db> IndexWalker<'ast, 'db> {
     pub(crate) fn final_database_name(self) -> Cow<'ast, str> {
         if let Some(mapped_name) = self.index_attribute.db_name.as_ref() {
-            return mapped_name.clone(); // :( :( :(
+            return Cow::from(*mapped_name);
         }
 
         let model = self.db.walk_model(self.model_id);
