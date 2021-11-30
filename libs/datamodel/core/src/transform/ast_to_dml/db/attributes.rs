@@ -306,12 +306,6 @@ fn default_value_constraint_name<'ast>(
 
     validate_db_name(ast_model, args, db_name.as_deref(), "@default", ctx);
 
-    if db_name.is_some() && !ctx.db.active_connector().supports_named_default_values() {
-        ctx.push_error(args.new_attribute_validation_error(
-            "You defined a database name for the default value of a field on the model. This is not supported by the provider.",
-        ));
-    }
-
     db_name
 }
 

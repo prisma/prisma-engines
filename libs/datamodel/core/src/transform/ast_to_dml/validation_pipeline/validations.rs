@@ -41,7 +41,7 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, r
             fields::validate_client_name(field.into(), &names, diagnostics);
             fields::has_a_unique_default_constraint_name(db, field, diagnostics);
             fields::validate_native_type_arguments(field, diagnostics);
-            fields::validate_default(field, diagnostics);
+            fields::validate_default(field, connector, diagnostics);
         }
 
         for field in model.relation_fields() {

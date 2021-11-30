@@ -1,4 +1,5 @@
-use datamodel_connector::ConnectorCapability;
+use datamodel_connector::{Connector, ConnectorCapability};
+use diagnostics::Span;
 use dml::scalars::ScalarType;
 
 use super::names::{NameTaken, Names};
@@ -128,13 +129,30 @@ pub(super) fn validate_native_type_arguments(field: ScalarFieldWalker<'_, '_>, d
     }
 }
 
-pub(super) fn validate_default(field: ScalarFieldWalker<'_, '_>, diagnostics: &mut Diagnostics) {
-    let connector = field.db.active_connector();
+pub(super) fn validate_default(
+    field: ScalarFieldWalker<'_, '_>,
+    connector: &dyn Connector,
+    diagnostics: &mut Diagnostics,
+) {
+    // Named defaults.
+
+    let default = field.default_value().map(|d| d.default());
+    let has_db_name = default.map(|d| d.db_name().is_some()).unwrap_or_default();
+
+    if has_db_name && !connector.supports_named_default_values() {
+        diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+            "You defined a database name for the default value of a field on the model. This is not supported by the provider.",
+            "default",
+            field.ast_field().span_for_attribute("default").unwrap_or(Span::empty()),
+        ));
+    }
+
+    // Connector-specific validations.
+
     let (scalar_type, native_type) = match (field.scalar_type(), field.native_type_instance()) {
         (Some(scalar_type), native_type) => (scalar_type, native_type),
         _ => return,
     };
-    let default = field.default_value().map(|d| d.default());
 
     let mut errors = Vec::new();
     connector.validate_field_default(field.name(), &scalar_type, native_type.as_ref(), default, &mut errors);
