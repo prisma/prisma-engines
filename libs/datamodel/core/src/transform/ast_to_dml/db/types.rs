@@ -248,25 +248,6 @@ fn visit_model<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::Model, ctx: &
                     native_type: None,
                 };
 
-                if matches!(scalar_field_type, ScalarFieldType::BuiltInScalar(t) if t.is_json())
-                    && !ctx.db.active_connector().supports_json()
-                {
-                    ctx.push_error(DatamodelError::new_field_validation_error(
-                        &format!("Field `{}` in model `{}` can't be of type Json. The current connector does not support the Json type.", &ast_field.name.name, &ast_model.name.name),
-                        &ast_model.name.name,
-                        &ast_field.name.name,
-                        ast_field.span,
-                    ));
-                }
-
-                if ast_field.arity.is_list() && !ctx.db.active_connector().supports_scalar_lists() {
-                    ctx.push_error(DatamodelError::new_scalar_list_fields_are_not_supported(
-                        &ast_model.name.name,
-                        &ast_field.name.name,
-                        ast_field.span,
-                    ));
-                }
-
                 if matches!(scalar_field_type, ScalarFieldType::Unsupported) {
                     validate_unsupported_field_type(ast_field, ast_field.field_type.as_unsupported().unwrap().0, ctx);
                 }
@@ -482,16 +463,6 @@ fn visit_composite_type<'ast>(ct_id: ast::CompositeTypeId, ct: &'ast ast::Compos
 }
 
 fn visit_enum<'ast>(enm: &'ast ast::Enum, ctx: &mut Context<'ast>) {
-    if !ctx.db.active_connector().supports_enums() {
-        ctx.push_error(DatamodelError::new_validation_error(
-            format!(
-                "You defined the enum `{}`. But the current connector does not support enums.",
-                &enm.name.name
-            ),
-            enm.span,
-        ));
-    }
-
     if enm.values.is_empty() {
         ctx.push_error(DatamodelError::new_validation_error(
             "An enum must have at least one value.".to_owned(),

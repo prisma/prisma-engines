@@ -4,7 +4,7 @@ use crate::{
     diagnostics::{DatamodelError, Diagnostics},
     transform::ast_to_dml::db::{
         walkers::{FieldWalker, ScalarFieldAttributeWalker, ScalarFieldWalker},
-        ConstraintName, ParserDatabase,
+        ConstraintName, ParserDatabase, ScalarFieldType,
     },
 };
 use datamodel_connector::{
@@ -234,5 +234,34 @@ pub(super) fn validate_default(
             message: error.to_string(),
             span: field.ast_field().span,
         });
+    }
+}
+
+pub(super) fn validate_scalar_field_connector_specific(
+    field: ScalarFieldWalker<'_, '_>,
+    connector: &dyn Connector,
+    diagnostics: &mut Diagnostics,
+) {
+    if matches!(field.scalar_field.r#type, ScalarFieldType::BuiltInScalar(t) if t.is_json())
+        && !connector.supports_json()
+    {
+        diagnostics.push_error(DatamodelError::new_field_validation_error(
+            &format!(
+                "Field `{}` in model `{}` can't be of type Json. The current connector does not support the Json type.",
+                field.name(),
+                field.model().name()
+            ),
+            field.model().name(),
+            field.name(),
+            field.ast_field().span,
+        ));
+    }
+
+    if field.ast_field().arity.is_list() && !connector.supports_scalar_lists() {
+        diagnostics.push_error(DatamodelError::new_scalar_list_fields_are_not_supported(
+            field.model().name(),
+            field.name(),
+            field.ast_field().span,
+        ));
     }
 }

@@ -13,6 +13,7 @@ use crate::{
     diagnostics::Diagnostics,
     transform::ast_to_dml::db::{walkers::RefinedRelationWalker, ParserDatabase},
 };
+use diagnostics::DatamodelError;
 
 pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, relation_transformation_enabled: bool) {
     let connector = db.active_connector();
@@ -41,6 +42,7 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, r
         }
 
         for field in model.scalar_fields() {
+            fields::validate_scalar_field_connector_specific(field, connector, diagnostics);
             fields::validate_client_name(field.into(), &names, diagnostics);
             fields::has_a_unique_default_constraint_name(db, field, diagnostics);
             fields::validate_native_type_arguments(field, diagnostics);
@@ -84,6 +86,18 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, r
                 let attribute = (index.attribute_name(), span);
                 fields::validate_length_used_with_correct_types(db, field_attribute, attribute, diagnostics);
             }
+        }
+    }
+
+    if !connector.supports_enums() {
+        for r#enum in db.ast().iter_tops().filter_map(|(_, top)| top.as_enum()) {
+            diagnostics.push_error(DatamodelError::new_validation_error(
+                format!(
+                    "You defined the enum `{}`. But the current connector does not support enums.",
+                    &r#enum.name.name
+                ),
+                r#enum.span,
+            ));
         }
     }
 
