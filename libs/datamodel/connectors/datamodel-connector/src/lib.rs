@@ -67,11 +67,10 @@ pub trait Connector: Send + Sync {
         self.referential_actions(integrity).contains(action)
     }
 
-    fn validate_field_default(
+    fn validate_field_default_without_native_type(
         &self,
         _field_name: &str,
         _scalar_type: &ScalarType,
-        _native_type: Option<&NativeTypeInstance>,
         _default: Option<&dml::default_value::DefaultValue>,
         _errors: &mut Vec<ConnectorError>,
     ) {

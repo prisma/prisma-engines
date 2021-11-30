@@ -1,6 +1,10 @@
-use datamodel_connector::{Connector, ConnectorCapability};
+use datamodel_connector::{
+    connector_error::{ConnectorError, ErrorKind},
+    Connector, ConnectorCapability,
+};
 use diagnostics::Span;
 use dml::scalars::ScalarType;
+use itertools::Itertools;
 
 use super::names::{NameTaken, Names};
 use crate::{
@@ -113,20 +117,90 @@ pub(crate) fn validate_length_used_with_correct_types(
 
 pub(super) fn validate_native_type_arguments(field: ScalarFieldWalker<'_, '_>, diagnostics: &mut Diagnostics) {
     let connector = field.db.active_connector();
-    let (scalar_type, native_type) = match (field.scalar_type(), field.native_type_instance()) {
-        (Some(scalar_type), Some(native_type)) => (scalar_type, native_type),
+    let connector_name = field
+        .db
+        .datasource()
+        .map(|ds| ds.active_provider.clone())
+        .unwrap_or_else(|| "Default".to_owned());
+    let (scalar_type, (type_name, args, span)) = match (field.scalar_type(), field.raw_native_type()) {
+        (Some(scalar_type), Some(raw)) => (scalar_type, raw),
         _ => return,
     };
 
-    let mut errors = Vec::new();
-    connector.validate_native_type_arguments(&native_type, &scalar_type, &mut errors);
+    let constructor = if let Some(cons) = connector.find_native_type_constructor(type_name) {
+        cons
+    } else {
+        diagnostics.push_error(DatamodelError::new_connector_error(
+            &ConnectorError::from_kind(ErrorKind::NativeTypeNameUnknown {
+                native_type: type_name.to_owned(),
+                connector_name,
+            })
+            .to_string(),
+            span,
+        ));
+        return;
+    };
 
-    for error in errors {
-        diagnostics.push_error(DatamodelError::ConnectorError {
-            message: error.to_string(),
-            span: field.ast_field().span,
-        });
+    let number_of_args = args.len();
+
+    if number_of_args < constructor._number_of_args
+        || ((number_of_args > constructor._number_of_args) && constructor._number_of_optional_args == 0)
+    {
+        diagnostics.push_error(DatamodelError::new_argument_count_missmatch_error(
+            type_name,
+            constructor._number_of_args,
+            number_of_args,
+            span,
+        ));
+        return;
     }
+
+    if number_of_args > constructor._number_of_args + constructor._number_of_optional_args
+        && constructor._number_of_optional_args > 0
+    {
+        diagnostics.push_error(DatamodelError::new_connector_error(
+            &ConnectorError::from_kind(ErrorKind::OptionalArgumentCountMismatchError {
+                native_type: type_name.to_owned(),
+                optional_count: constructor._number_of_optional_args,
+                given_count: number_of_args,
+            })
+            .to_string(),
+            span,
+        ));
+        return;
+    }
+
+    // check for compatibility with scalar type
+    if !constructor.prisma_types.contains(&scalar_type) {
+        diagnostics.push_error(DatamodelError::new_connector_error(
+            &ConnectorError::from_kind(ErrorKind::IncompatibleNativeType {
+                native_type: type_name.to_owned(),
+                field_type: scalar_type.to_string(),
+                expected_types: constructor.prisma_types.iter().map(|s| s.to_string()).join(" or "),
+            })
+            .to_string(),
+            span,
+        ));
+        return;
+    }
+
+    match connector.parse_native_type(type_name, args.to_owned()) {
+        Ok(native_type) => {
+            let mut errors = Vec::new();
+            connector.validate_native_type_arguments(&native_type, &scalar_type, &mut errors);
+
+            for error in errors {
+                diagnostics.push_error(DatamodelError::ConnectorError {
+                    message: error.to_string(),
+                    span: field.ast_field().span,
+                });
+            }
+        }
+        Err(connector_error) => {
+            diagnostics.push_error(DatamodelError::new_connector_error(&connector_error.to_string(), span));
+            return;
+        }
+    };
 }
 
 pub(super) fn validate_default(
@@ -149,13 +223,14 @@ pub(super) fn validate_default(
 
     // Connector-specific validations.
 
-    let (scalar_type, native_type) = match (field.scalar_type(), field.native_type_instance()) {
-        (Some(scalar_type), native_type) => (scalar_type, native_type),
-        _ => return,
+    let scalar_type = if let Some(scalar_type) = field.scalar_type() {
+        scalar_type
+    } else {
+        return;
     };
 
     let mut errors = Vec::new();
-    connector.validate_field_default(field.name(), &scalar_type, native_type.as_ref(), default, &mut errors);
+    connector.validate_field_default_without_native_type(field.name(), &scalar_type, default, &mut errors);
 
     for error in errors {
         diagnostics.push_error(DatamodelError::ConnectorError {

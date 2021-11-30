@@ -6,7 +6,8 @@ use crate::{
     common::constraint_names::ConstraintNames,
     transform::ast_to_dml::db::{types::FieldWithArgs, ParserDatabase, ScalarField, ScalarFieldType},
 };
-use dml::{default_value::DefaultValue, model::SortOrder, native_type_instance::NativeTypeInstance};
+use diagnostics::Span;
+use dml::{default_value::DefaultValue, model::SortOrder};
 
 #[derive(Copy, Clone)]
 pub(crate) struct ScalarFieldWalker<'ast, 'db> {
@@ -58,13 +59,11 @@ impl<'ast, 'db> ScalarFieldWalker<'ast, 'db> {
         }
     }
 
-    pub(crate) fn native_type_instance(self) -> Option<NativeTypeInstance> {
-        self.scalar_field.native_type.as_ref().map(|(name, args)| {
-            self.db
-                .active_connector()
-                .parse_native_type(name, args.clone())
-                .unwrap()
-        })
+    pub(crate) fn raw_native_type(self) -> Option<(&'ast str, &'db [String], Span)> {
+        self.attributes()
+            .native_type
+            .as_ref()
+            .map(move |(name, args, span)| (*name, args.as_slice(), *span))
     }
 
     pub(crate) fn is_unsupported(self) -> bool {

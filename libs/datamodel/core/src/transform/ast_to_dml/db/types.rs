@@ -106,7 +106,7 @@ pub(crate) struct ScalarField<'ast> {
     /// @map
     pub(crate) mapped_name: Option<&'ast str>,
     /// Native type name and arguments
-    pub(crate) native_type: Option<(&'ast str, Vec<String>)>,
+    pub(crate) native_type: Option<(&'ast str, Vec<String>, ast::Span)>,
 }
 
 impl ScalarField<'_> {

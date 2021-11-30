@@ -208,10 +208,10 @@ fn visit_scalar_field_attributes<'ast>(
             visit_field_default(args, scalar_field_data, model_id, field_id, ctx);
         });
 
-        if let ScalarFieldType::BuiltInScalar(scalar_type) = scalar_field_data.r#type {
+        if let ScalarFieldType::BuiltInScalar(_scalar_type) = scalar_field_data.r#type {
             // native type attributes
-            attributes.visit_datasource_scoped(ctx, |type_name, args, ctx| {
-                native_types::visit_native_type_attribute(type_name, args, scalar_type, scalar_field_data, ctx)
+            attributes.visit_datasource_scoped(ctx, |type_name, args, _ctx| {
+                native_types::visit_native_type_attribute(type_name, args, scalar_field_data)
             });
         }
 
@@ -1065,4 +1065,3 @@ fn validate_db_name(
         ctx.push_error(err);
     }
 }
-

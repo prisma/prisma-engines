@@ -47,18 +47,13 @@ impl Connector for MongoDbDatamodelConnector {
         referential_integrity.allowed_referential_actions(BitFlags::empty())
     }
 
-    fn validate_field_default(
+    fn validate_field_default_without_native_type(
         &self,
         field_name: &str,
         _scalar_type: &ScalarType,
-        native_type: Option<&NativeTypeInstance>,
         default: Option<&dml::default_value::DefaultValue>,
         errors: &mut Vec<ConnectorError>,
     ) {
-        if native_type.is_some() {
-            return;
-        }
-
         if !matches!(default.map(|d| d.kind()), Some(dml::default_value::DefaultKind::Expression(expr)) if expr.is_dbgenerated())
         {
             return;

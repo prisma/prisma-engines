@@ -418,7 +418,7 @@ impl<'a> LiftAstToDml<'a> {
                 self.lift_scalar_field_type(alias, scalar_field_type, scalar_field_data)
             }
             db::ScalarFieldType::BuiltInScalar(scalar_type) => {
-                let native_type = scalar_field_data.native_type.as_ref().map(|(name, args)| {
+                let native_type = scalar_field_data.native_type.as_ref().map(|(name, args, _)| {
                     self.db
                         .active_connector()
                         .parse_native_type(name, args.clone())
