@@ -1,20 +1,20 @@
 extern crate proc_macro;
 use syn::{Attribute, ItemStruct};
 
-/* This parses the list of files, looks for all structs and generates a vector of error types:
-   pub fn error_list() -> Vec<UserErrorType> {
-        Vec::from([
-            UserErrorType {
-                name: "InputValueTooLong",
-                code: "P2000"
-            },
-            UserErrorType {
-                name: "RecordNotFound",
-                code: "P2001"
-            },
-        ])
-    }
-*/
+/// This parses the list of files, looks for all structs and generates a vector of error types:
+///   pub fn error_list() -> Vec<UserErrorType> {
+///        Vec::from([
+///             UserErrorType {
+///                 name: "InputValueTooLong",
+///                 code: "P2000"
+///             },
+///             UserErrorType {
+///                 name: "RecordNotFound",
+///                 code: "P2001"
+///             },
+///         ])
+///     }
+///
 pub fn parse_files(srcs: Vec<String>) -> String {
     let errors: Vec<_> = vec![];
 

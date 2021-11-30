@@ -35,7 +35,15 @@ fn authentication_failure_must_return_a_known_error_on_postgres(api: TestApi) {
             "database_user": user,
             "database_host": host,
         },
-        "error_code": "P1000"
+        "error_code": "P1000",
+        "error_details": {
+            "name": "IncorrectDatabaseCredentials",
+            "code": "P1000",
+            "fields": {
+                "database_user": "postgres",
+                "database_host": "localhost",
+            },
+        },
     });
 
     assert_eq!(json_error, expected);
@@ -70,7 +78,15 @@ fn authentication_failure_must_return_a_known_error_on_mysql(api: TestApi) {
             "database_user": user,
             "database_host": host,
         },
-        "error_code": "P1000"
+        "error_code": "P1000",
+        "error_details": {
+            "name": "IncorrectDatabaseCredentials",
+            "code": "P1000",
+            "fields": {
+                "database_user": user,
+                "database_host": host,
+            },
+        },
     });
 
     assert_eq!(json_error, expected);
@@ -105,7 +121,15 @@ fn unreachable_database_must_return_a_proper_error_on_mysql(api: TestApi) {
             "database_host": host,
             "database_port": port,
         },
-        "error_code": "P1001"
+        "error_code": "P1001",
+        "error_details": {
+            "name": "DatabaseNotReachable",
+            "code": "P1001",
+            "fields": {
+                "database_host": host,
+                "database_port": port
+            },
+        },
     });
 
     assert_eq!(json_error, expected);
@@ -140,7 +164,15 @@ fn unreachable_database_must_return_a_proper_error_on_postgres(api: TestApi) {
             "database_host": host,
             "database_port": port,
         },
-        "error_code": "P1001"
+        "error_code": "P1001",
+        "error_details": {
+            "name": "DatabaseNotReachable",
+            "code": "P1001",
+            "fields": {
+                "database_port": 8787,
+                "database_host": "localhost",
+            },
+        },
     });
 
     assert_eq!(json_error, expected);
@@ -174,7 +206,12 @@ fn database_does_not_exist_must_return_a_proper_error(api: TestApi) {
             "database_host": url.host().unwrap().to_string(),
             "database_port": url.port().unwrap(),
         },
-        "error_code": "P1003"
+        "error_code": "P1003",
+        "error_details": {
+            "name": "DatabaseDoesNotExist",
+            "code": "P1003",
+            "fields": [],
+        },
     });
 
     assert_eq!(json_error, expected);
@@ -211,6 +248,13 @@ fn bad_datasource_url_and_provider_combinations_must_return_a_proper_error(api: 
             "full_error": err_message,
         },
         "error_code": "P1012",
+        "error_details": {
+            "name": "SchemaParserError",
+            "code": "P1012",
+            "fields": {
+                "full_error": err_message,
+            },
+        },
     });
 
     assert_eq!(json_error, expected);
@@ -246,6 +290,13 @@ fn connections_to_system_databases_must_be_rejected(api: TestApi) {
                 "database_name": name,
             },
             "error_code": "P3004",
+            "error_details": {
+                "name": "MigrateSystemDatabase",
+                "code": "P3004",
+                "fields": {
+                    "database_name": name,
+                },
+            }
         });
 
         assert_eq!(json_error, expected);
@@ -269,6 +320,13 @@ fn datamodel_parser_errors_must_return_a_known_error(api: TestApi) {
         error_code: "P1012",
         message: expected_msg.into(),
         meta: serde_json::json!({ "full_error": expected_msg }),
+        error_details: serde_json::json!({
+            "name": "SchemaParserError",
+            "code": "P1012",
+            "fields": {
+                "full_error": "\u{1b}[1;91merror\u{1b}[0m: \u{1b}[1mType \"Post\" is neither a built-in type, nor refers to another model, custom type, or enum.\u{1b}[0m\n  \u{1b}[1;94m-->\u{1b}[0m  \u{1b}[4mschema.prisma:10\u{1b}[0m\n\u{1b}[1;94m   | \u{1b}[0m\n\u{1b}[1;94m 9 | \u{1b}[0m            id Float @id\n\u{1b}[1;94m10 | \u{1b}[0m            post \u{1b}[1;91mPost\u{1b}[0m[]\n\u{1b}[1;94m   | \u{1b}[0m\n",
+            } ,
+        }),
     });
 
     assert_eq!(error, expected_error);
@@ -317,11 +375,43 @@ fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: TestApi
     };
 
     let expected_target = if api.is_vitess() {
-        serde_json::Value::Null
+        json!("CannotParse")
     } else if api.is_mysql() || api.is_mssql() {
-        json!("Fruit_name_key")
+        json!({ "Index": "Fruit_name_key"})
     } else {
-        json!(["name"])
+        json!({"Fields":["name"]})
+    };
+
+    let error_details = if api.is_vitess() {
+        json!({
+            "name": "UniqueKeyViolation",
+            "code": "P2002",
+            "fields": {
+                "constraint": "CannotParse",
+            }
+        })
+    } else if api.is_mysql() || api.is_mssql() || api.is_mariadb() {
+        json!({
+            "name": "UniqueKeyViolation",
+            "code": "P2002",
+            "fields": {
+                "constraint": {
+                    "Index": "Fruit_name_key",
+                },
+            },
+        })
+    } else {
+        json!({
+            "name": "UniqueKeyViolation",
+            "code": "P2002",
+            "fields": {
+                "constraint": {
+                    "Fields": [
+                            "name",
+                    ],
+                },
+            },
+        })
     };
 
     let expected_json = json!({
@@ -331,6 +421,7 @@ fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: TestApi
             "target": expected_target,
         },
         "error_code": "P2002",
+        "error_details": error_details
     });
 
     assert_eq!(json_error, expected_json);
@@ -414,7 +505,14 @@ async fn connection_string_problems_give_a_nice_error() {
             "meta": {
                 "details": &details,
             },
-            "error_code": "P1013"
+            "error_code": "P1013",
+            "error_details": {
+                "name": "InvalidConnectionString",
+                "code": "P1013",
+                "fields": {
+                    "details": &details
+                }
+            }
         });
 
         assert_eq!(expected, json_error);

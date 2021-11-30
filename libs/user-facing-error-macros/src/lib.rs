@@ -54,11 +54,11 @@ pub fn derive_user_facing_error(input: proc_macro::TokenStream) -> proc_macro::T
                     #fields
                 )*
 
-                return ErrorDetails {
+                ErrorDetails {
                     name: #error_name,
                     code: Self::ERROR_CODE,
                     fields: json!(error_fields)
-                };
+                }
             }
 
             fn message(&self) -> String {

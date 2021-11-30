@@ -22,7 +22,14 @@ fn connection_string_problems_give_a_nice_error() {
           "meta": {
             "details": "invalid port number in database URL. Please refer to the documentation in https://www.prisma.io/docs/reference/database-reference/connection-urls for constructing a correct connection string. In some cases, certain characters must be escaped. Please check the string for any illegal characters."
           },
-          "error_code": "P1013"
+          "error_code": "P1013",
+          "error_details": {
+            "name": "InvalidConnectionString",
+            "code": "P1013",
+            "fields": {
+              "details": "invalid port number in database URL. Please refer to the documentation in https://www.prisma.io/docs/reference/database-reference/connection-urls for constructing a correct connection string. In some cases, certain characters must be escaped. Please check the string for any illegal characters."
+            }
+          }
         }"#]];
 
     expected.assert_eq(&json_error);
@@ -66,7 +73,14 @@ fn using_without_preview_feature_enabled() {
           "meta": {
             "message": "Preview feature not enabled: MongoDB introspection connector (experimental feature, needs to be enabled)"
           },
-          "error_code": "P1019"
+          "error_code": "P1019",
+          "error_details": {
+            "name": "UnsupportedFeatureError",
+            "code": "P1019",
+            "fields": {
+              "message": "Preview feature not enabled: MongoDB introspection connector (experimental feature, needs to be enabled)"
+            }
+          }
         }"#]];
 
     expected.assert_eq(&json_error);

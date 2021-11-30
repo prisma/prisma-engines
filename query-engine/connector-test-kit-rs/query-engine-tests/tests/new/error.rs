@@ -8,7 +8,7 @@ mod errors {
     fn schema() -> String {
         let schema = indoc! {
             r#"model Album {
-                    id Int @id @unique
+                    #id(id, Int, @id, @unique)
                     Title String
                 }
             "#

@@ -34,6 +34,14 @@ fn database_access_denied_must_return_a_proper_error_in_rpc(api: TestApi) {
             "database_name": "access_denied_test",
         },
         "error_code": "P1010",
+        "error_details": {
+            "name": "DatabaseAccessDenied",
+            "code": "P1010",
+            "fields": {
+                "database_user": "jeanyves",
+                "database_name": "access_denied_test"
+            }
+        }
     });
 
     assert_eq!(json_error, expected);
