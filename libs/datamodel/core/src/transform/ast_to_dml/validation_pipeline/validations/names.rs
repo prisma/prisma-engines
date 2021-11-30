@@ -1,3 +1,4 @@
+use super::constraint_namespace::ConstraintNamespace;
 use std::collections::{HashMap, HashSet};
 
 use crate::{
@@ -19,6 +20,7 @@ pub(super) struct Names<'ast> {
     index_names: HashMap<ModelId, HashSet<&'ast str>>,
     unique_names: HashMap<ModelId, HashSet<&'ast str>>,
     primary_key_names: HashMap<ModelId, &'ast str>,
+    pub(super) constraint_namespace: ConstraintNamespace<'ast>,
 }
 
 impl<'ast> Names<'ast> {
@@ -59,6 +61,7 @@ impl<'ast> Names<'ast> {
             index_names,
             unique_names,
             primary_key_names,
+            constraint_namespace: infer_namespaces(db),
         }
     }
 
@@ -94,4 +97,46 @@ impl<'ast> Names<'ast> {
 
         result
     }
+}
+
+/// Generate namespaces per database requirements, and add the names to it from the constraints
+/// part of the namespace.
+fn infer_namespaces<'ast>(db: &ParserDatabase<'ast>) -> ConstraintNamespace<'ast> {
+    use datamodel_connector::ConstraintScope;
+
+    let mut namespaces = ConstraintNamespace::default();
+
+    for scope in db.active_connector().constraint_violation_scopes() {
+        match scope {
+            ConstraintScope::GlobalKeyIndex => {
+                namespaces.add_global_indexes(db, *scope);
+            }
+            ConstraintScope::GlobalForeignKey => {
+                namespaces.add_global_relations(db, *scope);
+            }
+            ConstraintScope::GlobalPrimaryKeyKeyIndex => {
+                namespaces.add_global_primary_keys(db, *scope);
+                namespaces.add_global_indexes(db, *scope);
+            }
+            ConstraintScope::GlobalPrimaryKeyForeignKeyDefault => {
+                namespaces.add_global_primary_keys(db, *scope);
+                namespaces.add_global_relations(db, *scope);
+                namespaces.add_global_default_constraints(db, *scope);
+            }
+            ConstraintScope::ModelKeyIndex => {
+                namespaces.add_local_indexes(db, *scope);
+            }
+            ConstraintScope::ModelPrimaryKeyKeyIndex => {
+                namespaces.add_local_primary_keys(db, *scope);
+                namespaces.add_local_indexes(db, *scope);
+            }
+            ConstraintScope::ModelPrimaryKeyKeyIndexForeignKey => {
+                namespaces.add_local_primary_keys(db, *scope);
+                namespaces.add_local_indexes(db, *scope);
+                namespaces.add_local_relations(db, *scope);
+            }
+        }
+    }
+
+    namespaces
 }

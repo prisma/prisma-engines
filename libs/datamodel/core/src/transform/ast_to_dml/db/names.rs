@@ -1,14 +1,9 @@
-pub(super) mod constraint_namespace;
-
-use self::constraint_namespace::ConstraintNamespace;
-
 use super::Context;
 use crate::{
     ast::{self, Argument, TopId, WithAttributes, WithIdentifier},
     diagnostics::DatamodelError,
     reserved_model_names::{validate_enum_name, validate_model_name},
 };
-use datamodel_connector::ConstraintScope;
 use dml::scalars::ScalarType;
 use std::{
     collections::{BTreeMap, HashMap, HashSet},
@@ -26,7 +21,6 @@ pub(super) struct Names<'ast> {
     pub(super) datasources: HashMap<&'ast str, TopId>,
     pub(super) model_fields: BTreeMap<(ast::ModelId, &'ast str), ast::FieldId>,
     pub(super) composite_type_fields: HashMap<(ast::CompositeTypeId, &'ast str), ast::FieldId>,
-    pub(super) constraint_namespace: ConstraintNamespace<'ast>,
 }
 
 /// `resolve_names()` is responsible for populating `ParserDatabase.names` and
@@ -126,46 +120,6 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
     }
 
     ctx.db.names = names;
-}
-
-/// Generate namespaces per database requirements, and add the names to it from the constraints
-/// part of the namespace.
-pub(super) fn infer_namespaces(ctx: &mut Context<'_>) {
-    let mut namespaces = ConstraintNamespace::default();
-
-    for scope in ctx.db.active_connector().constraint_violation_scopes() {
-        match scope {
-            ConstraintScope::GlobalKeyIndex => {
-                namespaces.add_global_indexes(ctx, *scope);
-            }
-            ConstraintScope::GlobalForeignKey => {
-                namespaces.add_global_relations(ctx, *scope);
-            }
-            ConstraintScope::GlobalPrimaryKeyKeyIndex => {
-                namespaces.add_global_primary_keys(ctx, *scope);
-                namespaces.add_global_indexes(ctx, *scope);
-            }
-            ConstraintScope::GlobalPrimaryKeyForeignKeyDefault => {
-                namespaces.add_global_primary_keys(ctx, *scope);
-                namespaces.add_global_relations(ctx, *scope);
-                namespaces.add_global_default_constraints(ctx, *scope);
-            }
-            ConstraintScope::ModelKeyIndex => {
-                namespaces.add_local_indexes(ctx, *scope);
-            }
-            ConstraintScope::ModelPrimaryKeyKeyIndex => {
-                namespaces.add_local_primary_keys(ctx, *scope);
-                namespaces.add_local_indexes(ctx, *scope);
-            }
-            ConstraintScope::ModelPrimaryKeyKeyIndexForeignKey => {
-                namespaces.add_local_primary_keys(ctx, *scope);
-                namespaces.add_local_indexes(ctx, *scope);
-                namespaces.add_local_relations(ctx, *scope);
-            }
-        }
-    }
-
-    ctx.db.names.constraint_namespace = namespaces;
 }
 
 fn insert_name<'ast>(

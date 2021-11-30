@@ -1,5 +1,6 @@
 mod autoincrement;
 mod composite_types;
+mod constraint_namespace;
 mod fields;
 mod indexes;
 mod models;
@@ -25,7 +26,7 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, r
 
     for model in db.walk_models() {
         models::has_a_strict_unique_criteria(model, diagnostics);
-        models::has_a_unique_primary_key_name(db, model, diagnostics);
+        models::has_a_unique_primary_key_name(model, &names, diagnostics);
         models::uses_sort_or_length_on_primary_without_preview_flag(db, model, diagnostics);
         models::primary_key_connector_specific(model, connector, diagnostics);
         models::primary_key_length_prefix_supported(db, model, diagnostics);
@@ -44,7 +45,7 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, r
         for field in model.scalar_fields() {
             fields::validate_scalar_field_connector_specific(field, connector, diagnostics);
             fields::validate_client_name(field.into(), &names, diagnostics);
-            fields::has_a_unique_default_constraint_name(db, field, diagnostics);
+            fields::has_a_unique_default_constraint_name(field, &names, diagnostics);
             fields::validate_native_type_arguments(field, diagnostics);
             fields::validate_default(field, connector, diagnostics);
 
@@ -69,7 +70,7 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, r
         }
 
         for index in model.indexes() {
-            indexes::has_a_unique_constraint_name(db, index, diagnostics);
+            indexes::has_a_unique_constraint_name(index, &names, diagnostics);
             indexes::uses_length_or_sort_without_preview_flag(db, index, diagnostics);
             indexes::field_length_prefix_supported(db, index, diagnostics);
             indexes::index_algorithm_preview_feature(db, index, diagnostics);
@@ -114,7 +115,7 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, r
                     relations::same_length_in_referencing_and_referenced(relation, diagnostics);
                     relations::cycles(relation, db, diagnostics);
                     relations::multiple_cascading_paths(relation, db, diagnostics);
-                    relations::has_a_unique_constraint_name(db, relation, diagnostics);
+                    relations::has_a_unique_constraint_name(&names, relation, diagnostics);
                     relations::references_unique_fields(relation, connector, diagnostics);
                     relations::referencing_fields_in_correct_order(relation, connector, diagnostics);
                 }

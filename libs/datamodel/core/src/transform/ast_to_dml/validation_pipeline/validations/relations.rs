@@ -10,7 +10,7 @@ use crate::{
     diagnostics::{DatamodelError, Diagnostics},
     transform::ast_to_dml::db::{
         walkers::{CompleteInlineRelationWalker, InlineRelationWalker, ReferencingFields},
-        ConstraintName, ParserDatabase, ScalarFieldType,
+        ParserDatabase, ScalarFieldType,
     },
 };
 use datamodel_connector::{Connector, ConnectorCapability};
@@ -21,6 +21,8 @@ use std::{
 };
 use visited_relation::*;
 
+use super::constraint_namespace::ConstraintName;
+
 const PRISMA_FORMAT_HINT: &str = "You can run `prisma format` to fix this automatically.";
 const RELATION_ATTRIBUTE_NAME: &str = "relation";
 const RELATION_ATTRIBUTE_NAME_WITH_AT: &str = "@relation";
@@ -28,8 +30,8 @@ const STATE_ERROR: &str = "Failed lookup of model, field or optional property du
 
 /// Depending on the database, a constraint name might need to be unique in a certain namespace.
 /// Validates per database that we do not use a name that is already in use.
-pub(crate) fn has_a_unique_constraint_name(
-    db: &ParserDatabase<'_>,
+pub(super) fn has_a_unique_constraint_name(
+    names: &super::Names<'_>,
     relation: CompleteInlineRelationWalker<'_, '_>,
     diagnostics: &mut Diagnostics,
 ) {
@@ -41,7 +43,10 @@ pub(crate) fn has_a_unique_constraint_name(
     let field = relation.referencing_field();
     let model = relation.referencing_model();
 
-    for violation in db.scope_violations(model.model_id(), ConstraintName::Relation(name.as_ref())) {
+    for violation in names
+        .constraint_namespace
+        .scope_violations(model.model_id(), ConstraintName::Relation(name.as_ref()))
+    {
         let span = field
             .ast_field()
             .span_for_argument("relation", "map")

@@ -1,10 +1,13 @@
-use super::names::{NameTaken, Names};
+use super::{
+    constraint_namespace::ConstraintName,
+    names::{NameTaken, Names},
+};
 use crate::{
     ast,
     diagnostics::{DatamodelError, Diagnostics},
     transform::ast_to_dml::db::{
         walkers::{FieldWalker, ScalarFieldAttributeWalker, ScalarFieldWalker},
-        ConstraintName, ParserDatabase, ScalarFieldType,
+        ParserDatabase, ScalarFieldType,
     },
     Datasource,
 };
@@ -53,9 +56,9 @@ pub(super) fn validate_client_name(field: FieldWalker<'_, '_>, names: &Names<'_>
 
 /// Some databases use constraints for default values, with a name that can be unique in a certain
 /// namespace. Validates the field default constraint against name clases.
-pub(crate) fn has_a_unique_default_constraint_name(
-    db: &ParserDatabase<'_>,
+pub(super) fn has_a_unique_default_constraint_name(
     field: ScalarFieldWalker<'_, '_>,
+    names: &Names<'_>,
     diagnostics: &mut Diagnostics,
 ) {
     let name = match field.default_value().map(|w| w.constraint_name()) {
@@ -63,7 +66,10 @@ pub(crate) fn has_a_unique_default_constraint_name(
         None => return,
     };
 
-    for violation in db.scope_violations(field.model().model_id(), ConstraintName::Default(name.as_ref())) {
+    for violation in names
+        .constraint_namespace
+        .scope_violations(field.model().model_id(), ConstraintName::Default(name.as_ref()))
+    {
         let message = format!(
             "The given constraint name `{}` has to be unique in the following namespace: {}. Please provide a different name using the `map` argument.",
             name,

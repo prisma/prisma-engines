@@ -12,13 +12,12 @@ mod types;
 pub(crate) mod walkers;
 
 // We should strive to make these private and expose that data through walkers.
-pub(crate) use names::constraint_namespace::ConstraintName;
 pub(crate) use types::{IndexAlgorithm, IndexType, RelationField, ScalarField, ScalarFieldType};
 
 use self::{context::Context, relations::Relations, types::Types};
 use crate::PreviewFeature;
 use crate::{ast, diagnostics::Diagnostics, Datasource};
-use datamodel_connector::{Connector, ConstraintScope, EmptyDatamodelConnector, ReferentialIntegrity};
+use datamodel_connector::{Connector, EmptyDatamodelConnector, ReferentialIntegrity};
 use enumflags2::BitFlags;
 use names::Names;
 
@@ -106,20 +105,7 @@ impl<'ast> ParserDatabase<'ast> {
         // Sixth step: infer implicit indices
         indexes::infer_implicit_indexes(&mut ctx);
 
-        // Seventh seal: chess with the devil
-        names::infer_namespaces(&mut ctx);
-
         ctx.finish()
-    }
-
-    /// Gives an iterator of scopes which the given constraint name violates, globally or in the
-    /// given model.
-    pub(crate) fn scope_violations(
-        &self,
-        model_id: ast::ModelId,
-        name: ConstraintName<'ast>,
-    ) -> impl Iterator<Item = &'ast ConstraintScope> + '_ {
-        self.names.constraint_namespace.scope_violations(model_id, name)
     }
 
     pub(super) fn alias_scalar_field_type(&self, alias_id: &ast::AliasId) -> &ScalarFieldType {

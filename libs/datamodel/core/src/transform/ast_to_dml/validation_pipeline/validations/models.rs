@@ -6,7 +6,7 @@ use itertools::Itertools;
 use crate::{
     common::preview_features::PreviewFeature,
     diagnostics::{DatamodelError, Diagnostics},
-    transform::ast_to_dml::db::{walkers::ModelWalker, ConstraintName, ParserDatabase},
+    transform::ast_to_dml::db::{walkers::ModelWalker, ParserDatabase},
 };
 
 /// A model must have either a primary key, or a unique criteria
@@ -55,9 +55,9 @@ pub(super) fn has_a_strict_unique_criteria(model: ModelWalker<'_, '_>, diagnosti
 
 /// A primary key name can be unique in different namespaces, depending on a database. Validates
 /// model's primary key against the database requirements.
-pub(crate) fn has_a_unique_primary_key_name(
-    db: &ParserDatabase<'_>,
+pub(super) fn has_a_unique_primary_key_name(
     model: ModelWalker<'_, '_>,
+    names: &super::Names<'_>,
     diagnostics: &mut Diagnostics,
 ) {
     let (pk, name) = match model
@@ -68,7 +68,10 @@ pub(crate) fn has_a_unique_primary_key_name(
         None => return,
     };
 
-    for violation in db.scope_violations(model.model_id(), ConstraintName::PrimaryKey(name.as_ref())) {
+    for violation in names.constraint_namespace.scope_violations(
+        model.model_id(),
+        super::constraint_namespace::ConstraintName::PrimaryKey(name.as_ref()),
+    ) {
         let message = format!(
             "The given constraint name `{}` has to be unique in the following namespace: {}. Please provide a different name using the `map` argument.",
             name,

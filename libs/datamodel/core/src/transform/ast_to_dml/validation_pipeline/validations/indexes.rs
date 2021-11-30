@@ -1,24 +1,28 @@
-use datamodel_connector::ConnectorCapability;
-
 use crate::ast::Span;
 use crate::transform::ast_to_dml::db::IndexAlgorithm;
 use crate::{
     common::preview_features::PreviewFeature,
     diagnostics::{DatamodelError, Diagnostics},
-    transform::ast_to_dml::db::{walkers::IndexWalker, ConstraintName, ParserDatabase},
+    transform::ast_to_dml::db::{walkers::IndexWalker, ParserDatabase},
 };
+use datamodel_connector::ConnectorCapability;
+
+use super::constraint_namespace::ConstraintName;
 
 /// Different databases validate index and unique constraint names in a certain namespace.
 /// Validates index and unique constraint names against the database requirements.
-pub(crate) fn has_a_unique_constraint_name(
-    db: &ParserDatabase<'_>,
+pub(super) fn has_a_unique_constraint_name(
     index: IndexWalker<'_, '_>,
+    names: &super::Names<'_>,
     diagnostics: &mut Diagnostics,
 ) {
     let name = index.final_database_name();
     let model = index.model();
 
-    for violation in db.scope_violations(model.model_id(), ConstraintName::Index(name.as_ref())) {
+    for violation in names
+        .constraint_namespace
+        .scope_violations(model.model_id(), ConstraintName::Index(name.as_ref()))
+    {
         let message = format!(
             "The given constraint name `{}` has to be unique in the following namespace: {}. Please provide a different name using the `map` argument.",
             name,
