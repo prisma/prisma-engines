@@ -1,6 +1,6 @@
 use std::borrow::Cow;
 
-use datamodel_connector::ConnectorCapability;
+use datamodel_connector::{Connector, ConnectorCapability};
 use itertools::Itertools;
 
 use crate::{
@@ -189,5 +189,34 @@ pub(crate) fn only_one_fulltext_attribute_allowed(
                 message, "fulltext", span,
             ));
         }
+    }
+}
+
+/// Does the connector support named and compound primary keys at all?
+pub(crate) fn primary_key_connector_specific(
+    model: ModelWalker<'_, '_>,
+    connector: &dyn Connector,
+    diagnostics: &mut Diagnostics,
+) {
+    let primary_key = if let Some(pk) = model.primary_key() {
+        pk
+    } else {
+        return;
+    };
+
+    if primary_key.db_name().is_some() && !connector.supports_named_primary_keys() {
+        diagnostics.push_error(DatamodelError::new_model_validation_error(
+            "You defined a database name for the primary key on the model. This is not supported by the provider.",
+            model.name(),
+            model.ast_model().span,
+        ));
+    }
+
+    if primary_key.fields().len() > 1 && !connector.supports_compound_ids() {
+        return diagnostics.push_error(DatamodelError::new_model_validation_error(
+            "The current connector does not support compound ids.",
+            model.name(),
+            primary_key.ast_attribute().span,
+        ));
     }
 }

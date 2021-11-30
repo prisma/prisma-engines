@@ -24,14 +24,6 @@ pub(super) fn model<'ast>(
         Err(err) => return ctx.push_error(err),
     };
 
-    if !ctx.db.active_connector().supports_compound_ids() {
-        return ctx.push_error(DatamodelError::new_model_validation_error(
-            "The current connector does not support compound ids.",
-            ctx.db.ast[model_id].name(),
-            args.span(),
-        ));
-    }
-
     let resolved_fields = match resolve_field_array_with_args(&fields, args.span(), model_id, ctx) {
         Ok(fields) => fields,
         Err(FieldResolutionError::AlreadyDealtWith) => return,
@@ -220,12 +212,5 @@ fn primary_key_constraint_name<'ast>(
 
     super::validate_db_name(ast_model, args, db_name.as_deref(), attribute, ctx);
 
-    if db_name.is_some() && !ctx.db.active_connector().supports_named_primary_keys() {
-        ctx.push_error(DatamodelError::new_model_validation_error(
-            "You defined a database name for the primary key on the model. This is not supported by the provider.",
-            &ast_model.name.name,
-            ast_model.span,
-        ));
-    }
     db_name
 }

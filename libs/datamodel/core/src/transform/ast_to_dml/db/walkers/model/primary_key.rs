@@ -24,6 +24,10 @@ impl<'ast, 'db> PrimaryKeyWalker<'ast, 'db> {
         self.attribute.source_attribute
     }
 
+    pub(crate) fn db_name(self) -> Option<&'ast str> {
+        self.attribute.db_name
+    }
+
     pub(crate) fn final_database_name(self) -> Option<Cow<'ast, str>> {
         if !self.db.active_connector().supports_named_primary_keys() {
             return None;

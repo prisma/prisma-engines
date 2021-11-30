@@ -26,6 +26,7 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, r
         models::has_a_strict_unique_criteria(model, diagnostics);
         models::has_a_unique_primary_key_name(db, model, diagnostics);
         models::uses_sort_or_length_on_primary_without_preview_flag(db, model, diagnostics);
+        models::primary_key_connector_specific(model, connector, diagnostics);
         models::primary_key_length_prefix_supported(db, model, diagnostics);
         models::primary_key_sort_order_supported(db, model, diagnostics);
         models::only_one_fulltext_attribute_allowed(db, model, diagnostics);
