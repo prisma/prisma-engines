@@ -56,6 +56,7 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, r
 
             relation_fields::ignored_related_model(field, diagnostics);
             relation_fields::referential_actions(field, db, diagnostics);
+            relation_fields::map(field, diagnostics);
         }
 
         for index in model.indexes() {

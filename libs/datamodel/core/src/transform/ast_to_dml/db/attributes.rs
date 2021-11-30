@@ -3,8 +3,6 @@ mod id;
 mod map;
 mod native_types;
 
-use std::borrow::Cow;
-
 use super::{
     context::{Arguments, Context},
     types::{EnumAttributes, IndexAttribute, IndexType, ModelAttributes, RelationField, ScalarField, ScalarFieldType},
@@ -23,6 +21,7 @@ use crate::{
     transform::ast_to_dml::db::types::IndexAlgorithm,
 };
 use prisma_value::PrismaValue;
+use std::borrow::Cow;
 
 pub(super) fn resolve_attributes(ctx: &mut Context<'_>) {
     for top in ctx.db.ast.iter_tops() {
@@ -866,14 +865,7 @@ fn visit_relation<'ast>(
                 ctx.push_error(args.new_attribute_validation_error("The `map` argument cannot be an empty string."));
                 None
             }
-            Some(Ok(name)) => {
-                if !ctx.db.active_connector().supports_named_foreign_keys() {
-                    ctx.push_error(
-                        args.new_attribute_validation_error("Your provider does not support named foreign keys."),
-                    )
-                }
-                Some(name)
-            }
+            Some(Ok(name)) => Some(name),
             Some(Err(err)) => {
                 ctx.push_error(err);
                 None
