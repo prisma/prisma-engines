@@ -11,6 +11,13 @@ impl<'a> TryFrom<Value<'a>> for PrismaValue {
         let val = match pv {
             Value::Integer(i) => i.map(PrismaValue::Int).unwrap_or(PrismaValue::Null),
 
+            Value::UnsignedInteger(Some(u)) => match i64::try_from(u) {
+                Ok(i) => PrismaValue::Int(i),
+                Err(_) => return Err(crate::ConversionFailure { from: "u64", to: "i64" }),
+            },
+
+            Value::UnsignedInteger(None) => PrismaValue::Null,
+
             Value::Float(Some(f)) => match f {
                 f if f.is_nan() => {
                     return Err(crate::ConversionFailure {
