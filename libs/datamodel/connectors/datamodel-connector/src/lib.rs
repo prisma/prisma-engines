@@ -1,11 +1,11 @@
 #![deny(rust_2018_idioms, unsafe_code)]
 
-pub mod connector_error;
 pub mod helper;
 
 mod empty_connector;
 mod referential_integrity;
 
+pub use diagnostics::connector_error;
 pub use empty_connector::EmptyDatamodelConnector;
 pub use referential_integrity::ReferentialIntegrity;
 

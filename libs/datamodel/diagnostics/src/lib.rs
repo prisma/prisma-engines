@@ -1,3 +1,5 @@
+pub mod connector_error;
+
 mod collection;
 mod error;
 mod helper;

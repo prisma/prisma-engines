@@ -1,5 +1,5 @@
 use super::*;
-use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
+use diagnostics::connector_error::{ConnectorError, ErrorKind};
 
 #[derive(Default)]
 pub(crate) struct Attributes<'ast> {

@@ -6,18 +6,16 @@ use super::{
     context::{Arguments, Context},
     types::{EnumAttributes, IndexAttribute, IndexType, ModelAttributes, RelationField, ScalarField, ScalarFieldType},
 };
-use crate::transform::ast_to_dml::db::types::FieldWithArgs;
 use crate::{
     ast::{self, WithName},
     common::constraint_names::ConstraintNames,
     diagnostics::DatamodelError,
     dml,
-    transform::helpers::ValueValidator,
+    transform::{
+        ast_to_dml::db::types::{FieldWithArgs, IndexAlgorithm},
+        helpers::ValueValidator,
+    },
     SortOrder,
-};
-use crate::{
-    ast::{FieldId, Model},
-    transform::ast_to_dml::db::types::IndexAlgorithm,
 };
 use prisma_value::PrismaValue;
 
@@ -219,8 +217,8 @@ fn visit_scalar_field_attributes<'ast>(
 }
 
 fn visit_field_unique<'ast>(
-    field_id: FieldId,
-    ast_model: &'ast Model,
+    field_id: ast::FieldId,
+    ast_model: &'ast ast::Model,
     model_attributes: &mut ModelAttributes<'ast>,
     args: &mut Arguments<'ast>,
     ctx: &mut Context<'ast>,
