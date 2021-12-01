@@ -234,7 +234,9 @@ pub(super) fn validate_default(
     };
 
     let mut errors = Vec::new();
-    connector.validate_field_default_without_native_type(field.name(), &scalar_type, default, &mut errors);
+    if field.raw_native_type().is_none() {
+        connector.validate_field_default_without_native_type(field.name(), &scalar_type, default, &mut errors);
+    }
 
     for error in errors {
         diagnostics.push_error(DatamodelError::ConnectorError {
