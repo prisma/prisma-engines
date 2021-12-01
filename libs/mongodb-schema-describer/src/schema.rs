@@ -63,9 +63,9 @@ pub struct IndexData {
 #[derive(Debug, Default, Clone)]
 /// All the possible information we should scrape out from a MongoDB database.
 pub struct MongoSchema {
-    pub(crate) collections: Vec<CollectionData>,
-    pub(crate) indexes: Vec<IndexData>,
-    pub(crate) collection_indexes: BTreeMap<CollectionId, Vec<IndexId>>,
+    collections: Vec<CollectionData>,
+    indexes: Vec<IndexData>,
+    pub(super) collection_indexes: BTreeMap<CollectionId, Vec<IndexId>>,
 }
 
 impl MongoSchema {
@@ -105,11 +105,6 @@ impl MongoSchema {
         })
     }
 
-    /// A mutable iterator over all indexes in the schema.
-    pub fn walk_indexes_mut(&mut self) -> impl ExactSizeIterator<Item = &'_ mut IndexData> + '_ {
-        self.indexes.iter_mut()
-    }
-
     /// Walk a collection.
     ///
     /// ## Panics
@@ -128,10 +123,35 @@ impl MongoSchema {
         IndexWalker { id, schema: self }
     }
 
-    /// Drain all indexes from the schema.
-    pub fn drain_indexes(&mut self) -> impl Iterator<Item = IndexData> + '_ {
+    /// Remove all indexes that are of fulltext type. We basically
+    /// need this until the feature is GA.
+    ///
+    /// Only call this if you do not hold `IndexId`s anywhere.
+    pub fn remove_fulltext_indexes(&mut self) {
         self.collection_indexes.clear();
-        self.indexes.drain(0..)
+
+        #[allow(clippy::needless_collect)] // well, mr. clippy, maybe you should read about the borrow checker...
+        let indexes: Vec<_> = self.indexes.drain(0..).filter(|i| !i.is_fulltext()).collect();
+
+        for index in indexes.into_iter() {
+            let IndexData {
+                name,
+                r#type,
+                fields,
+                collection_id,
+            } = index;
+
+            // because this here is a mutable reference, so we must collect...
+            self.push_index(collection_id, name, r#type, fields);
+        }
+    }
+
+    /// Make all index attributes of type `Asc`. We basically need
+    /// this until the `extendedIndexes` is GA.
+    pub fn normalize_index_attributes(&mut self) {
+        for field in self.indexes.iter_mut().flat_map(|i| i.fields.iter_mut()) {
+            field.property = IndexFieldProperty::Ascending;
+        }
     }
 }
 

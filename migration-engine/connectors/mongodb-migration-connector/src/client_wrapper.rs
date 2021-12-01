@@ -5,7 +5,7 @@ use mongodb::{
     error::Error as MongoError,
     options::{ClientOptions, WriteConcern},
 };
-use mongodb_schema_describer::{IndexData, IndexFieldProperty, MongoSchema};
+use mongodb_schema_describer::MongoSchema;
 use url::Url;
 
 /// Abstraction over a mongodb connection (exposed for tests).
@@ -43,26 +43,11 @@ impl Client {
             .map_err(mongo_error_to_connector_error)?;
 
         if !self.preview_features.contains(PreviewFeature::FullTextIndex) {
-            #[allow(clippy::needless_collect)] // well, mr. clippy, maybe you should read about the borrow checker...
-            let kept_indexes: Vec<_> = schema.drain_indexes().filter(|i| !i.is_fulltext()).collect();
-
-            for index in kept_indexes.into_iter() {
-                let IndexData {
-                    name,
-                    r#type,
-                    fields,
-                    collection_id,
-                } = index;
-
-                // because this here is a mutable reference, so we must collect...
-                schema.push_index(collection_id, name, r#type, fields);
-            }
+            schema.remove_fulltext_indexes();
         }
 
         if !self.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-            for field in schema.walk_indexes_mut().flat_map(|i| i.fields.iter_mut()) {
-                field.property = IndexFieldProperty::Ascending;
-            }
+            schema.normalize_index_attributes();
         }
 
         Ok(schema)

@@ -13,7 +13,7 @@ use introspection_connector::{
     IntrospectionResult,
 };
 use mongodb::{Client, Database};
-use mongodb_schema_describer::{IndexData, IndexFieldProperty, MongoSchema};
+use mongodb_schema_describer::MongoSchema;
 use url::Url;
 use user_facing_errors::{
     common::{InvalidConnectionString, UnsupportedFeatureError},
@@ -68,26 +68,11 @@ impl MongoDbIntrospectionConnector {
             .map_err(crate::Error::from)?;
 
         if !preview_features.contains(PreviewFeature::FullTextIndex) {
-            #[allow(clippy::needless_collect)] // well, mr. clippy, maybe you should read about the borrow checker...
-            let kept_indexes: Vec<_> = schema.drain_indexes().filter(|i| !i.is_fulltext()).collect();
-
-            for index in kept_indexes.into_iter() {
-                let IndexData {
-                    name,
-                    r#type,
-                    fields,
-                    collection_id,
-                } = index;
-
-                // because this here is a mutable reference, so we must collect...
-                schema.push_index(collection_id, name, r#type, fields);
-            }
+            schema.remove_fulltext_indexes();
         }
 
         if !preview_features.contains(PreviewFeature::ExtendedIndexes) {
-            for field in schema.walk_indexes_mut().flat_map(|i| i.fields.iter_mut()) {
-                field.property = IndexFieldProperty::Ascending;
-            }
+            schema.normalize_index_attributes();
         }
 
         Ok(schema)
