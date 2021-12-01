@@ -352,7 +352,11 @@ impl<'a> LiftAstToDml<'a> {
             field.is_ignored = attributes.is_ignored;
             field.is_updated_at = attributes.is_updated_at;
             field.database_name = attributes.mapped_name.map(String::from);
-            field.default_value = attributes.default.clone();
+            field.default_value = scalar_field.default_value().map(|d| dml::DefaultValue {
+                kind: d.default().kind().clone(),
+                db_name: Some(d.constraint_name().into())
+                    .filter(|_| self.db.active_connector().supports_named_default_values()),
+            });
 
             field_ids_for_sorting.insert((&ast_model.name.name, &ast_field.name.name), field_id);
             model.add_field(dml::Field::ScalarField(field));
