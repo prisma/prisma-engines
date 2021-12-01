@@ -9,7 +9,6 @@ mod differ;
 mod migration;
 mod migration_persistence;
 mod migration_step_applier;
-mod schema;
 mod schema_calculator;
 
 use client_wrapper::Client;
@@ -17,7 +16,7 @@ use datamodel::common::preview_features::PreviewFeature;
 use enumflags2::BitFlags;
 use migration::MongoDbMigration;
 use migration_connector::{ConnectorError, ConnectorResult, DiffTarget, Migration, MigrationConnector};
-use schema::MongoSchema;
+use mongodb_schema_describer::MongoSchema;
 use tokio::sync::OnceCell;
 
 /// The top-level MongoDB migration connector.
@@ -39,7 +38,9 @@ impl MongoDbMigrationConnector {
     async fn client(&self) -> ConnectorResult<&Client> {
         let client: &Client = self
             .client
-            .get_or_try_init(move || Box::pin(async move { Client::connect(&self.connection_string).await }))
+            .get_or_try_init(move || {
+                Box::pin(async move { Client::connect(&self.connection_string, self.preview_features).await })
+            })
             .await?;
 
         Ok(client)
@@ -63,7 +64,7 @@ impl MongoDbMigrationConnector {
     async fn mongodb_schema_from_diff_target(&self, target: DiffTarget<'_>) -> ConnectorResult<MongoSchema> {
         match target {
             DiffTarget::Datamodel((_config, schema)) => Ok(schema_calculator::calculate(schema)),
-            DiffTarget::Database => self.client().await?.describe(self.preview_features).await,
+            DiffTarget::Database => self.client().await?.describe().await,
             DiffTarget::Migrations(_) => Err(unsupported_command_error()),
             DiffTarget::Empty => Ok(MongoSchema::default()),
         }

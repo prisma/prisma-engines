@@ -34,6 +34,7 @@ members = [
   "libs/prisma-value",
   "libs/sql-ddl",
   "libs/sql-schema-describer",
+  "libs/mongodb-schema-describer",
   "libs/test-cli",
   "libs/user-facing-errors",
 ]

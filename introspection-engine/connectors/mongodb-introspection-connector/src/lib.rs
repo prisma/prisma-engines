@@ -2,6 +2,7 @@ mod error;
 mod sampler;
 mod warnings;
 
+use enumflags2::BitFlags;
 pub use error::*;
 
 use datamodel::{common::preview_features::PreviewFeature, Datamodel};
@@ -12,6 +13,7 @@ use introspection_connector::{
     IntrospectionResult,
 };
 use mongodb::{Client, Database};
+use mongodb_schema_describer::MongoSchema;
 use url::Url;
 use user_facing_errors::{
     common::{InvalidConnectionString, UnsupportedFeatureError},
@@ -58,6 +60,22 @@ impl MongoDbIntrospectionConnector {
 
     fn database(&self) -> Database {
         self.connection.database(&self.database)
+    }
+
+    async fn describe(&self, preview_features: BitFlags<PreviewFeature>) -> ConnectorResult<MongoSchema> {
+        let mut schema = mongodb_schema_describer::describe(&self.connection, &self.database)
+            .await
+            .map_err(crate::Error::from)?;
+
+        if !preview_features.contains(PreviewFeature::FullTextIndex) {
+            schema.remove_fulltext_indexes();
+        }
+
+        if !preview_features.contains(PreviewFeature::ExtendedIndexes) {
+            schema.normalize_index_attributes();
+        }
+
+        Ok(schema)
     }
 }
 
@@ -115,6 +133,8 @@ impl IntrospectionConnector for MongoDbIntrospectionConnector {
             return Err(error);
         }
 
-        Ok(sampler::sample(self.database(), ctx.composite_type_depth, ctx.preview_features).await?)
+        let schema = self.describe(ctx.preview_features).await?;
+
+        Ok(sampler::sample(self.database(), ctx.composite_type_depth, schema).await?)
     }
 }

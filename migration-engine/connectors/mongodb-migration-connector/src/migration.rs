@@ -1,4 +1,4 @@
-use crate::schema::*;
+use mongodb_schema_describer::{CollectionId, IndexId, IndexType, MongoSchema};
 
 #[derive(Debug)]
 pub(crate) struct MongoDbMigration {
@@ -21,11 +21,18 @@ impl MongoDbMigration {
                 MongoDbMigrationStep::CreateIndex(index_id) => {
                     let index = self.next.walk_index(*index_id);
                     out.push_str("[+] ");
-                    out.push_str(if index.is_unique() { "Unique index `" } else { "Index `" });
+                    match index.r#type() {
+                        IndexType::Normal => out.push_str("Index `"),
+                        IndexType::Unique => out.push_str("Unique index `"),
+                        IndexType::Fulltext => out.push_str("Fulltext index `"),
+                    }
                     out.push_str(index.name());
-                    out.push_str("` on (");
-                    out.push_str(&serde_json::to_string(index.keys()).unwrap());
-                    out.push_str(")\n");
+                    out.push_str("` on ({");
+
+                    let fields = index.fields().map(ToString::to_string).collect::<Vec<_>>().join(",");
+
+                    out.push_str(&fields);
+                    out.push_str("})\n");
                 }
                 MongoDbMigrationStep::DropIndex(index_id) => {
                     let index = self.previous.walk_index(*index_id);
