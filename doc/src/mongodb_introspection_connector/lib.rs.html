@@ -118,10 +118,31 @@
 <span id="118">118</span>
 <span id="119">119</span>
 <span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">error</span>;
 <span class="kw">mod</span> <span class="ident">sampler</span>;
 <span class="kw">mod</span> <span class="ident">warnings</span>;
 
+<span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">error</span>::<span class="kw-2">*</span>;
 
 <span class="kw">use</span> <span class="ident">datamodel</span>::{<span class="ident">common::preview_features::PreviewFeature</span>, <span class="ident">Datamodel</span>};
@@ -132,6 +153,7 @@
     <span class="ident">IntrospectionResult</span>,
 };
 <span class="kw">use</span> <span class="ident">mongodb</span>::{<span class="ident">Client</span>, <span class="ident">Database</span>};
+<span class="kw">use</span> <span class="ident">mongodb_schema_describer::MongoSchema</span>;
 <span class="kw">use</span> <span class="ident">url::Url</span>;
 <span class="kw">use</span> <span class="ident">user_facing_errors</span>::{
     <span class="ident">common</span>::{<span class="ident">InvalidConnectionString</span>, <span class="ident">UnsupportedFeatureError</span>},
@@ -178,6 +200,22 @@
 
     <span class="kw">fn</span> <span class="ident">database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Database</span> {
         <span class="self">self</span>.<span class="ident">connection</span>.<span class="ident">database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">database</span>)
+    }
+
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">describe</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">MongoSchema</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">mongodb_schema_describer::describe</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">connection</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">database</span>)
+            .<span class="kw">await</span>
+            .<span class="ident">map_err</span>(<span class="ident"><span class="kw">crate</span>::Error::from</span>)<span class="question-mark">?</span>;
+
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::FullTextIndex</span>) {
+            <span class="ident">schema</span>.<span class="ident">remove_fulltext_indexes</span>();
+        }
+
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::ExtendedIndexes</span>) {
+            <span class="ident">schema</span>.<span class="ident">normalize_index_attributes</span>();
+        }
+
+        <span class="prelude-val">Ok</span>(<span class="ident">schema</span>)
     }
 }
 
@@ -235,7 +273,9 @@
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error</span>);
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">sampler::sample</span>(<span class="self">self</span>.<span class="ident">database</span>(), <span class="ident">ctx</span>.<span class="ident">composite_type_depth</span>, <span class="ident">ctx</span>.<span class="ident">preview_features</span>).<span class="kw">await</span><span class="question-mark">?</span>)
+        <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">describe</span>(<span class="ident">ctx</span>.<span class="ident">preview_features</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(<span class="ident">sampler::sample</span>(<span class="self">self</span>.<span class="ident">database</span>(), <span class="ident">ctx</span>.<span class="ident">composite_type_depth</span>, <span class="ident">schema</span>).<span class="kw">await</span><span class="question-mark">?</span>)
     }
 }
 </code></pre></div>

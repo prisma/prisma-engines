@@ -67,6 +67,11 @@
 <span id="67">67</span>
 <span id="68">68</span>
 <span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">client_wrapper::mongo_error_to_connector_error</span>,
     <span class="ident">migration</span>::{<span class="ident">MongoDbMigration</span>, <span class="ident">MongoDbMigrationStep</span>},
@@ -75,7 +80,7 @@
 <span class="kw">use</span> <span class="ident">migration_connector</span>::{
     <span class="ident">ConnectorResult</span>, <span class="ident">DatabaseMigrationStepApplier</span>, <span class="ident">DestructiveChangeDiagnostics</span>, <span class="ident">Migration</span>, <span class="ident">MigrationConnector</span>,
 };
-<span class="kw">use</span> <span class="ident">mongodb::bson</span>;
+<span class="kw">use</span> <span class="ident">mongodb::bson</span>::{<span class="self">self</span>, <span class="ident">Bson</span>, <span class="ident">Document</span>};
 
 <span class="attribute">#[<span class="ident">async_trait::async_trait</span>]</span>
 <span class="kw">impl</span> <span class="ident">DatabaseMigrationStepApplier</span> <span class="kw">for</span> <span class="ident">MongoDbMigrationConnector</span> {
@@ -104,7 +109,12 @@
                     <span class="kw">let</span> <span class="ident">collection</span>: <span class="ident">mongodb::Collection</span><span class="op">&lt;</span><span class="ident">bson::Document</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">collection</span>(<span class="ident">index</span>.<span class="ident">collection</span>().<span class="ident">name</span>());
 
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">index_model</span> <span class="op">=</span> <span class="ident">mongodb::IndexModel::default</span>();
-                    <span class="ident">index_model</span>.<span class="ident">keys</span> <span class="op">=</span> <span class="ident">index</span>.<span class="ident">keys</span>().<span class="ident">clone</span>();
+
+                    <span class="ident">index_model</span>.<span class="ident">keys</span> <span class="op">=</span> <span class="ident">index</span>.<span class="ident">fields</span>().<span class="ident">fold</span>(<span class="ident">Document::new</span>(), <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">acc</span>, <span class="ident">field</span><span class="op">|</span> {
+                        <span class="ident">acc</span>.<span class="ident">insert</span>(<span class="ident">field</span>.<span class="ident">name</span>().<span class="ident">to_string</span>(), <span class="ident">Bson::from</span>(<span class="ident">field</span>.<span class="ident">property</span>));
+                        <span class="ident">acc</span>
+                    });
+
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">index_options</span> <span class="op">=</span> <span class="ident">mongodb::options::IndexOptions::default</span>();
                     <span class="ident">index_options</span>.<span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">index</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>());
                     <span class="ident">index_options</span>.<span class="ident">unique</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">index</span>.<span class="ident">is_unique</span>());

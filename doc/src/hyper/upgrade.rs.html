@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;hyper-0.14.14&#x2F;src&#x2F;upgrade.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>upgrade.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../hyper/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;hyper-0.14.15&#x2F;src&#x2F;upgrade.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>upgrade.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../hyper/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -339,7 +339,82 @@
 <span id="339">339</span>
 <span id="340">340</span>
 <span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
 </pre><pre class="rust"><code><span class="doccomment">//! HTTP Upgrades</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! This module deals with managing [HTTP Upgrades][mdn] in hyper. Since</span>
+<span class="doccomment">//! several concepts in HTTP allow for first talking HTTP, and then converting</span>
+<span class="doccomment">//! to a different protocol, this module conflates them into a single API.</span>
+<span class="doccomment">//! Those include:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! - HTTP/1.1 Upgrades</span>
+<span class="doccomment">//! - HTTP `CONNECT`</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! You are responsible for any other pre-requisites to establish an upgrade,</span>
+<span class="doccomment">//! such as sending the appropriate headers, methods, and status codes. You can</span>
+<span class="doccomment">//! then use [`on`][] to grab a `Future` which will resolve to the upgraded</span>
+<span class="doccomment">//! connection object, or an error if the upgrade fails.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! [mdn]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Protocol_upgrade_mechanism</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Client</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Sending an HTTP ugprade from the [`client`](super::client) involves setting</span>
+<span class="doccomment">//! either the appropriate method, if wanting to `CONNECT`, or headers such as</span>
+<span class="doccomment">//! `Upgrade` and `Connection`, on the `http::Request`. Once receiving the</span>
+<span class="doccomment">//! `http::Response` back, you must check for the specific information that the</span>
+<span class="doccomment">//! upgrade is agreed upon by the server (such as a `101` status code), and then</span>
+<span class="doccomment">//! get the `Future` from the `Response`.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Server</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Receiving upgrade requests in a server requires you to check the relevant</span>
+<span class="doccomment">//! headers in a `Request`, and if an upgrade should be done, you then send the</span>
+<span class="doccomment">//! corresponding headers in a response. To then wait for hyper to finish the</span>
+<span class="doccomment">//! upgrade, you call `on()` with the `Request`, and then can spawn a task</span>
+<span class="doccomment">//! awaiting it.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Example</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! See [this example][example] showing how upgrades work with both</span>
 <span class="doccomment">//! Clients and Servers.</span>
@@ -401,6 +476,13 @@
 }
 
 <span class="doccomment">/// Gets a pending HTTP upgrade from this message.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This can be called on the following types:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// - `http::Request&lt;B&gt;`</span>
+<span class="doccomment">/// - `http::Response&lt;B&gt;`</span>
+<span class="doccomment">/// - `&amp;mut http::Request&lt;B&gt;`</span>
+<span class="doccomment">/// - `&amp;mut http::Response&lt;B&gt;`</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">sealed::CanUpgrade</span><span class="op">&gt;</span>(<span class="ident">msg</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OnUpgrade</span> {
     <span class="ident">msg</span>.<span class="ident">on_upgrade</span>()
 }
@@ -599,7 +681,7 @@
         <span class="kw">fn</span> <span class="ident">on_upgrade</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OnUpgrade</span>;
     }
 
-    <span class="kw">impl</span> <span class="ident">CanUpgrade</span> <span class="kw">for</span> <span class="ident">http::Request</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Body</span><span class="op">&gt;</span> {
+    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> <span class="ident">CanUpgrade</span> <span class="kw">for</span> <span class="ident">http::Request</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
         <span class="kw">fn</span> <span class="ident">on_upgrade</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OnUpgrade</span> {
             <span class="self">self</span>.<span class="ident">extensions_mut</span>()
                 .<span class="ident">remove</span>::<span class="op">&lt;</span><span class="ident">OnUpgrade</span><span class="op">&gt;</span>()
@@ -607,7 +689,7 @@
         }
     }
 
-    <span class="kw">impl</span> <span class="ident">CanUpgrade</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> <span class="kw-2">mut</span> <span class="ident">http::Request</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Body</span><span class="op">&gt;</span> {
+    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> <span class="ident">CanUpgrade</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> <span class="kw-2">mut</span> <span class="ident">http::Request</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
         <span class="kw">fn</span> <span class="ident">on_upgrade</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OnUpgrade</span> {
             <span class="self">self</span>.<span class="ident">extensions_mut</span>()
                 .<span class="ident">remove</span>::<span class="op">&lt;</span><span class="ident">OnUpgrade</span><span class="op">&gt;</span>()
@@ -615,7 +697,7 @@
         }
     }
 
-    <span class="kw">impl</span> <span class="ident">CanUpgrade</span> <span class="kw">for</span> <span class="ident">http::Response</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Body</span><span class="op">&gt;</span> {
+    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> <span class="ident">CanUpgrade</span> <span class="kw">for</span> <span class="ident">http::Response</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
         <span class="kw">fn</span> <span class="ident">on_upgrade</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OnUpgrade</span> {
             <span class="self">self</span>.<span class="ident">extensions_mut</span>()
                 .<span class="ident">remove</span>::<span class="op">&lt;</span><span class="ident">OnUpgrade</span><span class="op">&gt;</span>()
@@ -623,7 +705,7 @@
         }
     }
 
-    <span class="kw">impl</span> <span class="ident">CanUpgrade</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> <span class="kw-2">mut</span> <span class="ident">http::Response</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Body</span><span class="op">&gt;</span> {
+    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> <span class="ident">CanUpgrade</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> <span class="kw-2">mut</span> <span class="ident">http::Response</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
         <span class="kw">fn</span> <span class="ident">on_upgrade</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OnUpgrade</span> {
             <span class="self">self</span>.<span class="ident">extensions_mut</span>()
                 .<span class="ident">remove</span>::<span class="op">&lt;</span><span class="ident">OnUpgrade</span><span class="op">&gt;</span>()
