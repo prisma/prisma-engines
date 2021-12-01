@@ -191,11 +191,13 @@ impl ConstraintNames {
         name: Option<&str>,
         attribute: &str,
         connector: &dyn Connector,
+        double_at: bool,
     ) -> Option<DatamodelError> {
         if let Some(name) = name {
             if name.len() > connector.constraint_name_length() {
+                let ats = if double_at { "@@" } else { "@" };
                 return Some(DatamodelError::new_model_validation_error(
-                    &format!("The constraint name '{}' specified in the `map` argument for the `{}` constraint is too long for your chosen provider. The maximum allowed length is {} bytes.", name, attribute, connector.constraint_name_length()),
+                    &format!("The constraint name '{}' specified in the `map` argument for the `{}{}` constraint is too long for your chosen provider. The maximum allowed length is {} bytes.", name, ats, attribute, connector.constraint_name_length()),
                     object_name,
                     span,
                 ));

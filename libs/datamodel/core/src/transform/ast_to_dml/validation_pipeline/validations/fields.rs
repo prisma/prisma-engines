@@ -1,5 +1,6 @@
 use super::{
     constraint_namespace::ConstraintName,
+    database_name::validate_db_name,
     names::{NameTaken, Names},
 };
 use crate::{
@@ -223,6 +224,17 @@ pub(super) fn validate_default(
             "default",
             field.default_attribute().unwrap().span,
         ));
+    }
+
+    if has_db_name {
+        validate_db_name(
+            field.model().name(),
+            field.default_attribute().unwrap(),
+            default.and_then(|d| d.db_name()),
+            connector,
+            diagnostics,
+            false,
+        );
     }
 
     // Connector-specific validations.

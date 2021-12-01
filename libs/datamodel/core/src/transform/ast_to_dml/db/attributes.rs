@@ -211,14 +211,13 @@ fn visit_scalar_field_attributes<'ast>(
 
         // @unique
         attributes.visit_optional_single("unique", ctx, |args, ctx| {
-            visit_field_unique(field_id, ast_model, model_attributes, args, ctx)
+            visit_field_unique(field_id, model_attributes, args, ctx)
         });
     });
 }
 
 fn visit_field_unique<'ast>(
     field_id: ast::FieldId,
-    ast_model: &'ast ast::Model,
     model_attributes: &mut ModelAttributes<'ast>,
     args: &mut Arguments<'ast>,
     ctx: &mut Context<'ast>,
@@ -235,8 +234,6 @@ fn visit_field_unique<'ast>(
         }
         None => None,
     };
-
-    validate_db_name(ast_model, args, db_name, "@unique", ctx);
 
     let length = match args.optional_arg("length").map(|length| length.as_int()) {
         Some(Ok(length)) => Some(length as u32),
@@ -280,11 +277,7 @@ fn visit_field_unique<'ast>(
     ))
 }
 
-fn default_value_constraint_name<'ast>(
-    args: &mut Arguments<'ast>,
-    ast_model: &'ast ast::Model,
-    ctx: &mut Context<'ast>,
-) -> Option<String> {
+fn default_value_constraint_name<'ast>(args: &mut Arguments<'ast>, ctx: &mut Context<'ast>) -> Option<String> {
     let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
         Some(Ok("")) => {
             ctx.push_error(args.new_attribute_validation_error("The `map` argument cannot be an empty string."));
@@ -297,8 +290,6 @@ fn default_value_constraint_name<'ast>(
         }
         None => None,
     };
-
-    validate_db_name(ast_model, args, db_name.as_deref(), "@default", ctx);
 
     db_name
 }
@@ -428,7 +419,7 @@ fn visit_field_default<'ast>(
                         if ctx.db.ast[enum_id].values.iter().any(|v| v.name() == value) {
                             let mut default = dml::DefaultValue::new_single(PrismaValue::Enum(value.to_owned()));
 
-                            if let Some(name) = default_value_constraint_name(args, ast_model, ctx) {
+                            if let Some(name) = default_value_constraint_name(args, ctx) {
                                 default.set_db_name(name);
                             }
 
@@ -445,7 +436,7 @@ fn visit_field_default<'ast>(
                             Ok(generator) if generator.is_dbgenerated() => {
                                 let mut default = dml::DefaultValue::new_expression(generator);
 
-                                if let Some(name) = default_value_constraint_name(args, ast_model, ctx) {
+                                if let Some(name) = default_value_constraint_name(args, ctx) {
                                     default.set_db_name(name);
                                 }
 
@@ -466,7 +457,7 @@ fn visit_field_default<'ast>(
                             ))
                         }
 
-                        if let Some(name) = default_value_constraint_name(args, ast_model, ctx) {
+                        if let Some(name) = default_value_constraint_name(args, ctx) {
                             default.set_db_name(name);
                         }
 
@@ -533,8 +524,6 @@ fn model_fulltext<'ast>(
     };
 
     common_index_validations(args, &mut index_attribute, model_id, ctx);
-    let ast_model = &ctx.db.ast[model_id];
-
     let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
         Some(Ok("")) => {
             ctx.push_error(args.new_attribute_validation_error("The `map` argument cannot be an empty string."));
@@ -548,7 +537,6 @@ fn model_fulltext<'ast>(
         None => None,
     };
 
-    validate_db_name(ast_model, args, db_name, "@@fulltext", ctx);
     index_attribute.db_name = db_name;
 
     data.ast_indexes.push((args.attribute(), index_attribute));
@@ -567,8 +555,6 @@ fn model_index<'ast>(
     };
 
     common_index_validations(args, &mut index_attribute, model_id, ctx);
-    let ast_model = &ctx.db.ast[model_id];
-
     let name = get_name_argument(args, ctx);
 
     let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
@@ -583,8 +569,6 @@ fn model_index<'ast>(
         }
         None => None,
     };
-
-    validate_db_name(ast_model, args, db_name, "@@index", ctx);
 
     // We do not want to break existing datamodels for client purposes that
     // use the old `@@index([field], name: "onlydbname")` This would
@@ -669,8 +653,6 @@ fn model_unique<'ast>(
             }
             None => None,
         };
-
-        validate_db_name(ast_model, args, db_name, "@@unique", ctx);
 
         if let Some(err) = ConstraintNames::is_client_name_valid(args.span(), &ast_model.name.name, name, "@@unique") {
             ctx.push_error(err);
@@ -857,8 +839,6 @@ fn visit_relation<'ast>(
     }
 
     let fk_name = {
-        let ast_model = &ctx.db.ast[model_id];
-
         let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
             Some(Ok("")) => {
                 ctx.push_error(args.new_attribute_validation_error("The `map` argument cannot be an empty string."));
@@ -871,8 +851,6 @@ fn visit_relation<'ast>(
             }
             None => None,
         };
-
-        validate_db_name(ast_model, args, db_name, "@relation", ctx);
 
         db_name
     };
@@ -1037,22 +1015,4 @@ fn get_name_argument<'ast>(args: &mut Arguments<'ast>, ctx: &mut Context<'ast>) 
     }
 
     None
-}
-
-fn validate_db_name(
-    ast_model: &ast::Model,
-    args: &mut Arguments<'_>,
-    db_name: Option<&str>,
-    attribute: &str,
-    ctx: &mut Context<'_>,
-) {
-    if let Some(err) = ConstraintNames::is_db_name_too_long(
-        args.span(),
-        ast_model.name(),
-        db_name,
-        attribute,
-        ctx.db.active_connector(),
-    ) {
-        ctx.push_error(err);
-    }
 }

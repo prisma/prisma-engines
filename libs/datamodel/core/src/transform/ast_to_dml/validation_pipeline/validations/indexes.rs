@@ -1,11 +1,11 @@
-use super::constraint_namespace::ConstraintName;
+use super::{constraint_namespace::ConstraintName, database_name::validate_db_name};
 use crate::{
     ast::Span,
     common::preview_features::PreviewFeature,
     diagnostics::{DatamodelError, Diagnostics},
     transform::ast_to_dml::db::{walkers::IndexWalker, IndexAlgorithm, ParserDatabase},
 };
-use datamodel_connector::ConnectorCapability;
+use datamodel_connector::{Connector, ConnectorCapability};
 
 /// Different databases validate index and unique constraint names in a certain namespace.
 /// Validates index and unique constraint names against the database requirements.
@@ -356,6 +356,23 @@ pub(crate) fn hash_index_must_not_use_sort_param(
             .unwrap_or_else(|| index.model().ast_model().span);
 
         diagnostics.push_error(DatamodelError::new_attribute_validation_error(message, "index", span));
+    }
+}
+
+pub(super) fn has_valid_mapped_name(
+    index: IndexWalker<'_, '_>,
+    connector: &dyn Connector,
+    diagnostics: &mut Diagnostics,
+) {
+    if let Some(ast_attribute) = index.ast_attribute() {
+        validate_db_name(
+            index.model().name(),
+            ast_attribute,
+            index.database_name(),
+            connector,
+            diagnostics,
+            !index.is_defined_on_field(),
+        )
     }
 }
 

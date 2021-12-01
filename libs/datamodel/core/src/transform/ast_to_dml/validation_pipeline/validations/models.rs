@@ -9,6 +9,8 @@ use crate::{
     transform::ast_to_dml::db::{walkers::ModelWalker, ParserDatabase},
 };
 
+use super::database_name::validate_db_name;
+
 /// A model must have either a primary key, or a unique criteria
 /// with no optional, commented-out or unsupported fields.
 pub(super) fn has_a_strict_unique_criteria(model: ModelWalker<'_, '_>, diagnostics: &mut Diagnostics) {
@@ -58,6 +60,7 @@ pub(super) fn has_a_strict_unique_criteria(model: ModelWalker<'_, '_>, diagnosti
 pub(super) fn has_a_unique_primary_key_name(
     model: ModelWalker<'_, '_>,
     names: &super::Names<'_>,
+    connector: &dyn Connector,
     diagnostics: &mut Diagnostics,
 ) {
     let (pk, name) = match model
@@ -67,6 +70,15 @@ pub(super) fn has_a_unique_primary_key_name(
         Some((pk, name)) => (pk, name),
         None => return,
     };
+
+    validate_db_name(
+        model.name(),
+        pk.ast_attribute(),
+        Some(&name),
+        connector,
+        diagnostics,
+        !pk.is_defined_on_field(),
+    );
 
     for violation in names.constraint_namespace.scope_violations(
         model.model_id(),

@@ -1,6 +1,7 @@
 mod autoincrement;
 mod composite_types;
 mod constraint_namespace;
+mod database_name;
 mod fields;
 mod indexes;
 mod models;
@@ -26,7 +27,7 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, r
 
     for model in db.walk_models() {
         models::has_a_strict_unique_criteria(model, diagnostics);
-        models::has_a_unique_primary_key_name(model, &names, diagnostics);
+        models::has_a_unique_primary_key_name(model, &names, connector, diagnostics);
         models::uses_sort_or_length_on_primary_without_preview_flag(db, model, diagnostics);
         models::primary_key_connector_specific(model, connector, diagnostics);
         models::primary_key_length_prefix_supported(db, model, diagnostics);
@@ -81,6 +82,7 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, r
             indexes::fulltext_columns_should_not_define_length(db, index, diagnostics);
             indexes::fulltext_column_sort_is_supported(db, index, diagnostics);
             indexes::fulltext_text_columns_should_be_bundled_together(db, index, diagnostics);
+            indexes::has_valid_mapped_name(index, connector, diagnostics);
 
             for field_attribute in index.scalar_field_attributes() {
                 let span = index

@@ -6,7 +6,7 @@ use crate::{
 use itertools::Itertools;
 use std::fmt;
 
-use super::names::Names;
+use super::{database_name::validate_db_name, names::Names};
 
 struct Fields<'ast, 'db> {
     fields: &'ast [ast::FieldId],
@@ -178,7 +178,11 @@ pub(super) fn referential_actions(
 }
 
 pub(crate) fn map(field: RelationFieldWalker<'_, '_>, diagnostics: &mut Diagnostics) {
-    if field.attributes().fk_name.is_some() && !field.db.active_connector().supports_named_foreign_keys() {
+    if field.attributes().fk_name.is_none() {
+        return;
+    }
+
+    if !field.db.active_connector().supports_named_foreign_keys() {
         diagnostics.push_error(DatamodelError::new_attribute_validation_error(
             "Your provider does not support named foreign keys.",
             "relation",
@@ -186,6 +190,23 @@ pub(crate) fn map(field: RelationFieldWalker<'_, '_>, diagnostics: &mut Diagnost
                 .ast_field()
                 .span_for_attribute("relation")
                 .unwrap_or_else(ast::Span::empty),
-        ))
+        ));
+        return;
+    }
+
+    if let Some(relation_attr) = field
+        .ast_field()
+        .attributes
+        .iter()
+        .find(|attr| attr.name() == "relation")
+    {
+        validate_db_name(
+            field.model().name(),
+            relation_attr,
+            field.attributes().fk_name,
+            field.db.active_connector(),
+            diagnostics,
+            false,
+        );
     }
 }
