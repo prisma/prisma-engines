@@ -1,4 +1,3 @@
-use dml::native_type_instance::NativeTypeInstance;
 use std::{error::Error as StdError, fmt::Display};
 use thiserror::Error;
 
@@ -26,11 +25,8 @@ pub struct ConnectorErrorFactory {
 }
 
 impl ConnectorErrorFactory {
-    pub fn new(tpe: NativeTypeInstance, connector: String) -> Self {
-        ConnectorErrorFactory {
-            native_type: tpe.render(),
-            connector,
-        }
+    pub fn new(native_type: String, connector: String) -> Self {
+        ConnectorErrorFactory { native_type, connector }
     }
 
     pub fn new_scale_larger_than_precision_error(self) -> ConnectorError {

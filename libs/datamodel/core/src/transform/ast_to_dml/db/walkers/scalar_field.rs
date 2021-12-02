@@ -1,13 +1,14 @@
 use std::borrow::Cow;
 
-use dml::{default_value::DefaultValue, model::SortOrder, native_type_instance::NativeTypeInstance};
-
 use super::ModelWalker;
 use crate::{
     ast,
     common::constraint_names::ConstraintNames,
     transform::ast_to_dml::db::{types::FieldWithArgs, ParserDatabase, ScalarField, ScalarFieldType},
 };
+use datamodel_connector::Connector;
+use diagnostics::Span;
+use dml::{default_value::DefaultValue, model::SortOrder};
 
 #[derive(Copy, Clone)]
 pub(crate) struct ScalarFieldWalker<'ast, 'db> {
@@ -39,8 +40,16 @@ impl<'ast, 'db> ScalarFieldWalker<'ast, 'db> {
         self.ast_field().name()
     }
 
+    pub(crate) fn default_attribute(self) -> Option<&'ast ast::Attribute> {
+        self.scalar_field.default_attribute
+    }
+
     pub(crate) fn final_database_name(self) -> &'ast str {
         self.attributes().mapped_name.unwrap_or_else(|| self.name())
+    }
+
+    pub(crate) fn is_autoincrement(&self) -> bool {
+        matches!(&self.scalar_field.default.as_ref().map(|d| d.kind()), Some(crate::dml::DefaultKind::Expression(expr)) if expr.is_autoincrement())
     }
 
     pub(crate) fn is_optional(self) -> bool {
@@ -59,13 +68,14 @@ impl<'ast, 'db> ScalarFieldWalker<'ast, 'db> {
         }
     }
 
-    pub(crate) fn native_type_instance(self) -> Option<NativeTypeInstance> {
-        self.scalar_field.native_type.as_ref().map(|(name, args)| {
-            self.db
-                .active_connector()
-                .parse_native_type(name, args.clone())
-                .unwrap()
-        })
+    /// (attribute scope, native type name, arguments, span)
+    ///
+    /// For example: `@db.Text` would translate to ("db", "Text", &[], <the span>)
+    pub(crate) fn raw_native_type(self) -> Option<(&'ast str, &'ast str, &'db [String], Span)> {
+        self.attributes()
+            .native_type
+            .as_ref()
+            .map(move |(datasource_name, name, args, span)| (*datasource_name, *name, args.as_slice(), *span))
     }
 
     pub(crate) fn is_unsupported(self) -> bool {
@@ -103,12 +113,12 @@ pub(crate) struct DefaultValueWalker<'ast, 'db> {
 }
 
 impl<'ast, 'db> DefaultValueWalker<'ast, 'db> {
-    pub(crate) fn constraint_name(self) -> Cow<'db, str> {
+    pub(crate) fn constraint_name(self, connector: &dyn Connector) -> Cow<'db, str> {
         self.default.db_name().map(Cow::from).unwrap_or_else(|| {
             let name = ConstraintNames::default_name(
                 self.field().model().final_database_name(),
                 self.field().final_database_name(),
-                self.db.active_connector(),
+                connector,
             );
 
             Cow::from(name)

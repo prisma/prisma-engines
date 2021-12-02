@@ -1,3 +1,5 @@
+use datamodel_connector::Connector;
+
 use crate::{
     ast,
     common::constraint_names::ConstraintNames,
@@ -17,9 +19,13 @@ pub(crate) struct IndexWalker<'ast, 'db> {
 }
 
 impl<'ast, 'db> IndexWalker<'ast, 'db> {
-    pub(crate) fn final_database_name(self) -> Cow<'ast, str> {
-        if let Some(mapped_name) = self.index_attribute.db_name.as_ref() {
-            return mapped_name.clone(); // :( :( :(
+    pub(crate) fn database_name(self) -> Option<&'ast str> {
+        self.index_attribute.db_name
+    }
+
+    pub(crate) fn final_database_name(self, connector: &dyn Connector) -> Cow<'ast, str> {
+        if let Some(mapped_name) = self.database_name() {
+            return Cow::from(mapped_name);
         }
 
         let model = self.db.walk_model(self.model_id);
@@ -36,9 +42,9 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
             .collect();
 
         if self.index_attribute.is_unique() {
-            ConstraintNames::unique_index_name(model_db_name, &field_db_names, self.db.active_connector()).into()
+            ConstraintNames::unique_index_name(model_db_name, &field_db_names, connector).into()
         } else {
-            ConstraintNames::non_unique_index_name(model_db_name, &field_db_names, self.db.active_connector()).into()
+            ConstraintNames::non_unique_index_name(model_db_name, &field_db_names, connector).into()
         }
     }
 
@@ -90,6 +96,11 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
         fields: impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>>,
     ) -> bool {
         self.index_attribute.fields.len() == fields.len() && self.fields().zip(fields).all(|(a, b)| a == b)
+    }
+
+    /// Whether the index is defined on a single field (otherwise: on the model).
+    pub fn is_defined_on_field(self) -> bool {
+        self.index_attribute.source_field.is_some()
     }
 
     pub(crate) fn is_unique(self) -> bool {

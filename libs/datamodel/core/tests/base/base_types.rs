@@ -94,6 +94,8 @@ fn scalar_list_types_are_not_supported_by_default() {
         model Category {
           id   Int    @id
           name String
+          postId Int
+          post   Post @relation(fields: [postId], references: [id])
         }
     "#};
 

@@ -1,11 +1,11 @@
 use super::*;
 use crate::{
-    diagnostics::{DatamodelError, Diagnostics},
-    transform::ast_to_dml::db::walkers::InlineRelationWalker,
+    diagnostics::DatamodelError,
+    transform::ast_to_dml::{db::walkers::InlineRelationWalker, validation_pipeline::context::Context},
 };
 
 /// A relation should have the explicit and back-relation side defined.
-pub(crate) fn both_sides_are_defined(relation: InlineRelationWalker<'_, '_>, diagnostics: &mut Diagnostics) {
+pub(crate) fn both_sides_are_defined(relation: InlineRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
     if relation.back_relation_field().is_some() {
         return;
     }
@@ -19,7 +19,7 @@ pub(crate) fn both_sides_are_defined(relation: InlineRelationWalker<'_, '_>, dia
         field.related_model().name(),
     );
 
-    diagnostics.push_error(DatamodelError::new_field_validation_error(
+    ctx.push_error(DatamodelError::new_field_validation_error(
         &message,
         field.model().name(),
         field.name(),
@@ -28,7 +28,7 @@ pub(crate) fn both_sides_are_defined(relation: InlineRelationWalker<'_, '_>, dia
 }
 
 /// The forward side must define `fields` and `references` in the `@relation` attribute.
-pub(crate) fn fields_and_references_are_defined(relation: InlineRelationWalker<'_, '_>, diagnostics: &mut Diagnostics) {
+pub(crate) fn fields_and_references_are_defined(relation: InlineRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
     let (forward, back) = match (relation.forward_relation_field(), relation.back_relation_field()) {
         (Some(forward), Some(back)) => (forward, back),
         _ => return,
@@ -40,7 +40,7 @@ pub(crate) fn fields_and_references_are_defined(relation: InlineRelationWalker<'
             forward.name(), forward.model().name(), back.name(), &back.model().name(), RELATION_ATTRIBUTE_NAME_WITH_AT
         );
 
-        diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
             &message,
             RELATION_ATTRIBUTE_NAME,
             forward.ast_field().span,
@@ -53,7 +53,7 @@ pub(crate) fn fields_and_references_are_defined(relation: InlineRelationWalker<'
                 back.name(), back.model().name(), forward.name(), forward.model().name(), RELATION_ATTRIBUTE_NAME_WITH_AT
             );
 
-        diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
             &message,
             RELATION_ATTRIBUTE_NAME,
             back.ast_field().span,
@@ -68,7 +68,7 @@ pub(crate) fn fields_and_references_are_defined(relation: InlineRelationWalker<'
             forward.name(), forward.model().name(), back.name(), back.model().name(), RELATION_ATTRIBUTE_NAME_WITH_AT
         );
 
-        diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
             &message,
             RELATION_ATTRIBUTE_NAME,
             forward.ast_field().span,
@@ -81,7 +81,7 @@ pub(crate) fn fields_and_references_are_defined(relation: InlineRelationWalker<'
             back.name(), back.model().name(), forward.name(), forward.model().name(), RELATION_ATTRIBUTE_NAME_WITH_AT
         );
 
-        diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
             &message,
             RELATION_ATTRIBUTE_NAME,
             back.ast_field().span,
@@ -92,7 +92,7 @@ pub(crate) fn fields_and_references_are_defined(relation: InlineRelationWalker<'
 /// `fields` and `references` should only be defined in the forward side of the relation.
 pub(crate) fn fields_and_references_defined_on_one_side_only(
     relation: InlineRelationWalker<'_, '_>,
-    diagnostics: &mut Diagnostics,
+    ctx: &mut Context<'_>,
 ) {
     let (forward, back) = match (relation.forward_relation_field(), relation.back_relation_field()) {
         (Some(forward), Some(back)) => (forward, back),
@@ -107,13 +107,13 @@ pub(crate) fn fields_and_references_defined_on_one_side_only(
             forward.name(), forward.model().name(), back.name(), back.model().name(), RELATION_ATTRIBUTE_NAME_WITH_AT
         );
 
-        diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
             &message,
             RELATION_ATTRIBUTE_NAME,
             forward.ast_field().span,
         ));
 
-        diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
             &message,
             RELATION_ATTRIBUTE_NAME,
             back.ast_field().span,
@@ -127,13 +127,13 @@ pub(crate) fn fields_and_references_defined_on_one_side_only(
             forward.name(), forward.model().name(), back.name(), back.model().name(), RELATION_ATTRIBUTE_NAME_WITH_AT
         );
 
-        diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
             &message,
             RELATION_ATTRIBUTE_NAME,
             forward.ast_field().span,
         ));
 
-        diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
             &message,
             RELATION_ATTRIBUTE_NAME,
             back.ast_field().span,
@@ -142,7 +142,7 @@ pub(crate) fn fields_and_references_defined_on_one_side_only(
 }
 
 /// Referential actions must be defined in the forward side.
-pub(crate) fn referential_actions(relation: InlineRelationWalker<'_, '_>, diagnostics: &mut Diagnostics) {
+pub(crate) fn referential_actions(relation: InlineRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
     let (forward, back) = match (relation.forward_relation_field(), relation.back_relation_field()) {
         (Some(forward), Some(back)) => (forward, back),
         _ => return,
@@ -157,7 +157,7 @@ pub(crate) fn referential_actions(relation: InlineRelationWalker<'_, '_>, diagno
             back.name(), back.model().name(), forward.name(), forward.model().name(), RELATION_ATTRIBUTE_NAME_WITH_AT
         );
 
-        diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
             &message,
             RELATION_ATTRIBUTE_NAME,
             back.ast_field().span,
@@ -168,7 +168,7 @@ pub(crate) fn referential_actions(relation: InlineRelationWalker<'_, '_>, diagno
             forward.name(), forward.model().name(), back.name(), back.model().name(), RELATION_ATTRIBUTE_NAME_WITH_AT
         );
 
-        diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
             &message,
             RELATION_ATTRIBUTE_NAME,
             forward.ast_field().span,
@@ -179,7 +179,7 @@ pub(crate) fn referential_actions(relation: InlineRelationWalker<'_, '_>, diagno
             back.name(), back.model().name(), RELATION_ATTRIBUTE_NAME_WITH_AT, forward.name(), forward.model().name()
         );
 
-        diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
             message,
             RELATION_ATTRIBUTE_NAME,
             back.ast_field().span,
@@ -189,9 +189,9 @@ pub(crate) fn referential_actions(relation: InlineRelationWalker<'_, '_>, diagno
 
 /// Validation of some crazy things, such as definining `fields` and `references` on different
 /// sides in the relation.
-pub(crate) fn fields_references_mixups(relation: InlineRelationWalker<'_, '_>, diagnostics: &mut Diagnostics) {
+pub(crate) fn fields_references_mixups(relation: InlineRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
     let (forward, back) = match (relation.forward_relation_field(), relation.back_relation_field()) {
-        (Some(forward), Some(back)) if diagnostics.errors().is_empty() => (forward, back),
+        (Some(forward), Some(back)) if ctx.diagnostics.errors().is_empty() => (forward, back),
         _ => return,
     };
 
@@ -203,13 +203,13 @@ pub(crate) fn fields_references_mixups(relation: InlineRelationWalker<'_, '_>, d
             forward.name(), forward.model().name(), RELATION_ATTRIBUTE_NAME_WITH_AT, back.name(), back.model().name(),
         );
 
-        diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
             &message,
             RELATION_ATTRIBUTE_NAME,
             forward.ast_field().span,
         ));
 
-        diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
             &message,
             RELATION_ATTRIBUTE_NAME,
             back.ast_field().span,
@@ -224,7 +224,7 @@ pub(crate) fn fields_references_mixups(relation: InlineRelationWalker<'_, '_>, d
             forward.name(), forward.model().name(), RELATION_ATTRIBUTE_NAME_WITH_AT, back.name(), back.model().name(),
         );
 
-        diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
             &message,
             RELATION_ATTRIBUTE_NAME,
             forward.ast_field().span,
@@ -233,9 +233,9 @@ pub(crate) fn fields_references_mixups(relation: InlineRelationWalker<'_, '_>, d
 }
 
 /// The back-relation side cannot be required.
-pub(crate) fn back_relation_arity_is_optional(relation: InlineRelationWalker<'_, '_>, diagnostics: &mut Diagnostics) {
+pub(crate) fn back_relation_arity_is_optional(relation: InlineRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
     let (forward, back) = match (relation.forward_relation_field(), relation.back_relation_field()) {
-        (Some(forward), Some(back)) if diagnostics.errors().is_empty() => (forward, back),
+        (Some(forward), Some(back)) if ctx.diagnostics.errors().is_empty() => (forward, back),
         _ => return,
     };
 
@@ -245,7 +245,7 @@ pub(crate) fn back_relation_arity_is_optional(relation: InlineRelationWalker<'_,
             back.name(), back.model().name(), forward.model().name(), forward.model().name(),
         );
 
-        diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
             &message,
             RELATION_ATTRIBUTE_NAME,
             back.ast_field().span,

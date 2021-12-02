@@ -1,7 +1,3 @@
-use std::borrow::Cow;
-
-use crate::common::constraint_names::ConstraintNames;
-
 use super::{
     context::Context,
     types::{IndexAttribute, IndexType},
@@ -49,13 +45,6 @@ pub(super) fn infer_implicit_indexes(ctx: &mut Context<'_>) {
             continue;
         }
 
-        let column_names = referencing_fields()
-            .map(|f| f.final_database_name())
-            .collect::<Vec<_>>();
-
-        let db_name =
-            ConstraintNames::unique_index_name(model.final_database_name(), &column_names, ctx.db.active_connector());
-
         let source_field = {
             let mut fields = referencing_fields();
 
@@ -78,7 +67,7 @@ pub(super) fn infer_implicit_indexes(ctx: &mut Context<'_>) {
                     })
                     .collect(),
                 source_field,
-                db_name: Some(Cow::from(db_name)),
+                db_name: None,
                 ..Default::default()
             },
         ));

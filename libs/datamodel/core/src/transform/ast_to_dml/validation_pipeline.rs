@@ -1,9 +1,11 @@
+mod context;
 mod validations;
 
 use super::{db::ParserDatabase, lift::LiftAstToDml, validate::Validator};
 use crate::{
     ast, common::preview_features::PreviewFeature, configuration, diagnostics::Diagnostics, ValidatedDatamodel,
 };
+use datamodel_connector::EmptyDatamodelConnector;
 use enumflags2::BitFlags;
 
 /// Is responsible for loading and validating the Datamodel defined in an AST.
@@ -42,17 +44,31 @@ impl<'a, 'b> ValidationPipeline<'a> {
         relation_transformation_enabled: bool,
     ) -> Result<ValidatedDatamodel, Diagnostics> {
         let diagnostics = Diagnostics::new();
+        let connector = self
+            .source
+            .map(|s| s.active_connector)
+            .unwrap_or(&EmptyDatamodelConnector);
+        let referential_integrity = self.source.map(|s| s.referential_integrity()).unwrap_or_default();
 
         // Make sense of the AST.
-        let (db, mut diagnostics) = ParserDatabase::new(ast_schema, self.source, diagnostics, self.preview_features);
+        let (db, mut diagnostics) = ParserDatabase::new(ast_schema, diagnostics);
 
         // Early return so that the validator does not have to deal with invalid schemas
         diagnostics.to_result()?;
 
-        validations::validate(&db, &mut diagnostics, relation_transformation_enabled);
+        let mut context = context::Context {
+            db: &db,
+            datasource: self.source,
+            preview_features: self.preview_features,
+            connector,
+            referential_integrity,
+            diagnostics: &mut diagnostics,
+        };
+
+        validations::validate(&mut context, relation_transformation_enabled);
         diagnostics.to_result()?;
 
-        let schema = LiftAstToDml::new(&db).lift();
+        let schema = LiftAstToDml::new(&db, connector, referential_integrity).lift();
 
         // From now on we do not operate on the internal ast anymore, but DML.
         // Please try to avoid all new validations after this, if you can.

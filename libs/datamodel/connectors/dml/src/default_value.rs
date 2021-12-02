@@ -5,8 +5,8 @@ use std::fmt;
 /// Represents a default specified on a field.
 #[derive(Clone, PartialEq)]
 pub struct DefaultValue {
-    kind: DefaultKind,
-    db_name: Option<String>,
+    pub kind: DefaultKind,
+    pub db_name: Option<String>,
 }
 
 /// Represents a default specified on a field.

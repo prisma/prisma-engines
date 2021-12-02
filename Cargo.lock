@@ -972,10 +972,10 @@ dependencies = [
 name = "datamodel-connector"
 version = "0.1.0"
 dependencies = [
+ "diagnostics",
  "dml",
  "enumflags2",
  "serde_json",
- "thiserror",
  "url",
 ]
 

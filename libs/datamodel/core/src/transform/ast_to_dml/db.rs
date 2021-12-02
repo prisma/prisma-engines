@@ -12,14 +12,10 @@ mod types;
 pub(crate) mod walkers;
 
 // We should strive to make these private and expose that data through walkers.
-pub(crate) use names::constraint_namespace::ConstraintName;
 pub(crate) use types::{IndexAlgorithm, IndexType, RelationField, ScalarField, ScalarFieldType};
 
 use self::{context::Context, relations::Relations, types::Types};
-use crate::PreviewFeature;
-use crate::{ast, diagnostics::Diagnostics, Datasource};
-use datamodel_connector::{Connector, ConstraintScope, EmptyDatamodelConnector, ReferentialIntegrity};
-use enumflags2::BitFlags;
+use crate::{ast, diagnostics::Diagnostics};
 use names::Names;
 
 /// ParserDatabase is a container for a Schema AST, together with information
@@ -51,28 +47,19 @@ use names::Names;
 /// lifetime management simple.
 pub(crate) struct ParserDatabase<'ast> {
     ast: &'ast ast::SchemaAst,
-    datasource: Option<&'ast Datasource>,
     names: Names<'ast>,
     types: Types<'ast>,
     relations: Relations<'ast>,
-    pub(crate) preview_features: BitFlags<PreviewFeature>,
 }
 
 impl<'ast> ParserDatabase<'ast> {
     /// See the docs on [ParserDatabase](/struct.ParserDatabase.html).
-    pub(super) fn new(
-        ast: &'ast ast::SchemaAst,
-        datasource: Option<&'ast Datasource>,
-        diagnostics: Diagnostics,
-        preview_features: BitFlags<PreviewFeature>,
-    ) -> (Self, Diagnostics) {
+    pub(super) fn new(ast: &'ast ast::SchemaAst, diagnostics: Diagnostics) -> (Self, Diagnostics) {
         let db = ParserDatabase {
             ast,
-            datasource,
             names: Names::default(),
             types: Types::default(),
             relations: Relations::default(),
-            preview_features,
         };
 
         let mut ctx = Context::new(db, diagnostics);
@@ -98,29 +85,13 @@ impl<'ast> ParserDatabase<'ast> {
         // information from previous steps, not from other attributes.
         attributes::resolve_attributes(&mut ctx);
 
-        // Fourth step: global validations
-        attributes::fill_in_default_constraint_names(&mut ctx);
-
-        // Fifth step: relation inference
+        // Fourth step: relation inference
         relations::infer_relations(&mut ctx);
 
-        // Sixth step: infering implicit indices
+        // Fifth step: infer implicit indices
         indexes::infer_implicit_indexes(&mut ctx);
 
-        // Seventh seal: chess with the devil
-        names::infer_namespaces(&mut ctx);
-
         ctx.finish()
-    }
-
-    /// Gives an iterator of scopes which the given constraint name violates, globally or in the
-    /// given model.
-    pub(crate) fn scope_violations(
-        &self,
-        model_id: ast::ModelId,
-        name: ConstraintName<'ast>,
-    ) -> impl Iterator<Item = &'ast ConstraintScope> + '_ {
-        self.names.constraint_namespace.scope_violations(model_id, name)
     }
 
     pub(super) fn alias_scalar_field_type(&self, alias_id: &ast::AliasId) -> &ScalarFieldType {
@@ -129,16 +100,6 @@ impl<'ast> ParserDatabase<'ast> {
 
     pub(super) fn ast(&self) -> &'ast ast::SchemaAst {
         self.ast
-    }
-
-    pub(super) fn datasource(&self) -> Option<&'ast Datasource> {
-        self.datasource
-    }
-
-    pub(crate) fn active_referential_integrity(&self) -> ReferentialIntegrity {
-        self.datasource()
-            .map(|ds| ds.referential_integrity())
-            .unwrap_or(ReferentialIntegrity::ForeignKeys)
     }
 
     pub(crate) fn find_model_field(&self, model_id: ast::ModelId, field_name: &str) -> Option<ast::FieldId> {
@@ -154,11 +115,5 @@ impl<'ast> ParserDatabase<'ast> {
             .mapped_values
             .get(&value_idx)
             .cloned()
-    }
-
-    pub(super) fn active_connector(&self) -> &dyn Connector {
-        self.datasource
-            .map(|datasource| datasource.active_connector)
-            .unwrap_or(&EmptyDatamodelConnector)
     }
 }
