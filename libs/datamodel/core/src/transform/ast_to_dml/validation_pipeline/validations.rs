@@ -9,90 +9,76 @@ mod names;
 mod relation_fields;
 mod relations;
 
-use self::names::Names;
-use crate::{
-    ast,
-    diagnostics::Diagnostics,
-    transform::ast_to_dml::db::{walkers::RefinedRelationWalker, ParserDatabase},
-    Datasource, PreviewFeature,
-};
-use datamodel_connector::Connector;
+use super::context::Context;
+use crate::{ast, transform::ast_to_dml::db::walkers::RefinedRelationWalker};
 use diagnostics::DatamodelError;
-use enumflags2::BitFlags;
+use names::Names;
 
-pub(super) fn validate(
-    db: &ParserDatabase<'_>,
-    connector: &dyn Connector,
-    preview_features: BitFlags<PreviewFeature>,
-    datasource: Option<&Datasource>,
-    diagnostics: &mut Diagnostics,
-    relation_transformation_enabled: bool,
-) {
+pub(super) fn validate(ctx: &mut Context<'_>, relation_transformation_enabled: bool) {
+    let db = ctx.db;
+    let connector = ctx.connector;
+
     let names = Names::new(db, connector);
-    let referential_integrity = datasource.map(|ds| ds.referential_integrity()).unwrap_or_default();
 
     for composite_type in db.walk_composite_types() {
-        composite_types::composite_types_support(composite_type, connector, diagnostics);
+        composite_types::composite_types_support(composite_type, ctx);
     }
 
     for model in db.walk_models() {
-        models::has_a_strict_unique_criteria(model, diagnostics);
-        models::has_a_unique_primary_key_name(model, &names, connector, diagnostics);
-        models::uses_sort_or_length_on_primary_without_preview_flag(model, preview_features, diagnostics);
-        models::primary_key_connector_specific(model, connector, diagnostics);
-        models::primary_key_length_prefix_supported(model, connector, diagnostics);
-        models::primary_key_sort_order_supported(model, connector, diagnostics);
-        models::only_one_fulltext_attribute_allowed(model, connector, preview_features, diagnostics);
-        autoincrement::validate_auto_increment(model, connector, diagnostics);
+        models::has_a_strict_unique_criteria(model, ctx);
+        models::has_a_unique_primary_key_name(model, &names, ctx);
+        models::uses_sort_or_length_on_primary_without_preview_flag(model, ctx);
+        models::primary_key_connector_specific(model, ctx);
+        models::primary_key_length_prefix_supported(model, ctx);
+        models::primary_key_sort_order_supported(model, ctx);
+        models::only_one_fulltext_attribute_allowed(model, ctx);
+        autoincrement::validate_auto_increment(model, ctx);
 
         if let Some(pk) = model.primary_key() {
             for field_attribute in pk.scalar_field_attributes() {
                 let span = pk.ast_attribute().span;
                 let attribute = ("id", span);
-                fields::validate_length_used_with_correct_types(field_attribute, attribute, connector, diagnostics);
+                fields::validate_length_used_with_correct_types(field_attribute, attribute, ctx);
             }
         }
 
         for field in model.scalar_fields() {
-            fields::validate_scalar_field_connector_specific(field, connector, diagnostics);
-            fields::validate_client_name(field.into(), &names, diagnostics);
-            fields::has_a_unique_default_constraint_name(field, &names, connector, diagnostics);
-            fields::validate_native_type_arguments(field, connector, datasource, diagnostics);
-            fields::validate_default(field, connector, diagnostics);
-
-            if let Some(source) = datasource {
-                fields::validate_unsupported_field_type(field, source, diagnostics)
-            }
+            fields::validate_scalar_field_connector_specific(field, ctx);
+            fields::validate_client_name(field.into(), &names, ctx);
+            fields::has_a_unique_default_constraint_name(field, &names, ctx);
+            fields::validate_native_type_arguments(field, ctx);
+            fields::validate_default(field, ctx);
+            fields::validate_unsupported_field_type(field, ctx)
         }
 
         for field in model.relation_fields() {
             // We don't want to spam, so with ambiguous relations we should exit
             // immediately if any errors.
             if let Err(error) = relation_fields::ambiguity(field, &names) {
-                diagnostics.push_error(error);
+                ctx.push_error(error);
                 return;
             }
 
-            fields::validate_client_name(field.into(), &names, diagnostics);
+            fields::validate_client_name(field.into(), &names, ctx);
 
-            relation_fields::ignored_related_model(field, diagnostics);
-            relation_fields::referential_actions(field, connector, referential_integrity, diagnostics);
-            relation_fields::map(field, connector, diagnostics);
+            relation_fields::ignored_related_model(field, ctx);
+            relation_fields::referential_actions(field, ctx);
+            relation_fields::map(field, ctx);
         }
 
         for index in model.indexes() {
-            indexes::has_a_unique_constraint_name(index, &names, connector, diagnostics);
-            indexes::uses_length_or_sort_without_preview_flag(index, preview_features, diagnostics);
-            indexes::field_length_prefix_supported(index, connector, diagnostics);
-            indexes::index_algorithm_preview_feature(index, preview_features, diagnostics);
-            indexes::index_algorithm_is_supported(index, connector, diagnostics);
-            indexes::hash_index_must_not_use_sort_param(index, connector, preview_features, diagnostics);
-            indexes::fulltext_index_preview_feature_enabled(index, preview_features, diagnostics);
-            indexes::fulltext_index_supported(index, connector, diagnostics);
-            indexes::fulltext_columns_should_not_define_length(index, connector, preview_features, diagnostics);
-            indexes::fulltext_column_sort_is_supported(index, connector, preview_features, diagnostics);
-            indexes::fulltext_text_columns_should_be_bundled_together(index, connector, preview_features, diagnostics);
-            indexes::has_valid_mapped_name(index, connector, diagnostics);
+            indexes::has_a_unique_constraint_name(index, &names, ctx);
+            indexes::uses_length_or_sort_without_preview_flag(index, ctx);
+            indexes::field_length_prefix_supported(index, ctx);
+            indexes::index_algorithm_preview_feature(index, ctx);
+            indexes::index_algorithm_is_supported(index, ctx);
+            indexes::hash_index_must_not_use_sort_param(index, ctx);
+            indexes::fulltext_index_preview_feature_enabled(index, ctx);
+            indexes::fulltext_index_supported(index, ctx);
+            indexes::fulltext_columns_should_not_define_length(index, ctx);
+            indexes::fulltext_column_sort_is_supported(index, ctx);
+            indexes::fulltext_text_columns_should_be_bundled_together(index, ctx);
+            indexes::has_valid_mapped_name(index, ctx);
 
             for field_attribute in index.scalar_field_attributes() {
                 let span = index
@@ -101,14 +87,14 @@ pub(super) fn validate(
                     .unwrap_or_else(ast::Span::empty);
 
                 let attribute = (index.attribute_name(), span);
-                fields::validate_length_used_with_correct_types(field_attribute, attribute, connector, diagnostics);
+                fields::validate_length_used_with_correct_types(field_attribute, attribute, ctx);
             }
         }
     }
 
     if !connector.supports_enums() {
         for r#enum in db.ast().iter_tops().filter_map(|(_, top)| top.as_enum()) {
-            diagnostics.push_error(DatamodelError::new_validation_error(
+            ctx.push_error(DatamodelError::new_validation_error(
                 format!(
                     "You defined the enum `{}`. But the current connector does not support enums.",
                     &r#enum.name.name
@@ -123,45 +109,39 @@ pub(super) fn validate(
             // 1:1, 1:n
             RefinedRelationWalker::Inline(relation) => {
                 if let Some(relation) = relation.as_complete() {
-                    relations::field_arity(relation, diagnostics);
-                    relations::same_length_in_referencing_and_referenced(relation, diagnostics);
-                    relations::cycles(relation, connector, referential_integrity, diagnostics);
-                    relations::multiple_cascading_paths(
-                        relation,
-                        connector,
-                        referential_integrity,
-                        datasource,
-                        diagnostics,
-                    );
-                    relations::has_a_unique_constraint_name(&names, relation, connector, diagnostics);
-                    relations::references_unique_fields(relation, connector, diagnostics);
-                    relations::referencing_fields_in_correct_order(relation, connector, diagnostics);
+                    relations::field_arity(relation, ctx);
+                    relations::same_length_in_referencing_and_referenced(relation, ctx);
+                    relations::cycles(relation, ctx);
+                    relations::multiple_cascading_paths(relation, ctx);
+                    relations::has_a_unique_constraint_name(&names, relation, ctx);
+                    relations::references_unique_fields(relation, ctx);
+                    relations::referencing_fields_in_correct_order(relation, ctx);
                 }
 
-                relations::referencing_scalar_field_types(relation, datasource, diagnostics);
+                relations::referencing_scalar_field_types(relation, ctx);
 
                 // Only run these when you are not formatting the data model. These validations
                 // test against broken relations that we could fix with a code action. The flag is
                 // set when prisma-fmt calls this code.
                 if !relation_transformation_enabled {
                     if relation.is_one_to_one() {
-                        relations::one_to_one::both_sides_are_defined(relation, diagnostics);
-                        relations::one_to_one::fields_and_references_are_defined(relation, diagnostics);
-                        relations::one_to_one::fields_and_references_defined_on_one_side_only(relation, diagnostics);
-                        relations::one_to_one::referential_actions(relation, diagnostics);
+                        relations::one_to_one::both_sides_are_defined(relation, ctx);
+                        relations::one_to_one::fields_and_references_are_defined(relation, ctx);
+                        relations::one_to_one::fields_and_references_defined_on_one_side_only(relation, ctx);
+                        relations::one_to_one::referential_actions(relation, ctx);
 
                         // Run these validations last to prevent validation spam.
-                        relations::one_to_one::fields_references_mixups(relation, diagnostics);
-                        relations::one_to_one::back_relation_arity_is_optional(relation, diagnostics);
+                        relations::one_to_one::fields_references_mixups(relation, ctx);
+                        relations::one_to_one::back_relation_arity_is_optional(relation, ctx);
                     } else {
-                        relations::one_to_many::both_sides_are_defined(relation, diagnostics);
-                        relations::one_to_many::fields_and_references_are_defined(relation, diagnostics);
-                        relations::one_to_many::referential_actions(relation, diagnostics);
+                        relations::one_to_many::both_sides_are_defined(relation, ctx);
+                        relations::one_to_many::fields_and_references_are_defined(relation, ctx);
+                        relations::one_to_many::referential_actions(relation, ctx);
                     }
                 }
             }
             RefinedRelationWalker::ImplicitManyToMany(relation) => {
-                relations::many_to_many::validate_singular_id(relation, diagnostics);
+                relations::many_to_many::validate_singular_id(relation, ctx);
             }
         }
     }

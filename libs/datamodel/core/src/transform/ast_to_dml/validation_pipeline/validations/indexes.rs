@@ -2,21 +2,22 @@ use super::{constraint_namespace::ConstraintName, database_name::validate_db_nam
 use crate::{
     ast::Span,
     common::preview_features::PreviewFeature,
-    diagnostics::{DatamodelError, Diagnostics},
-    transform::ast_to_dml::db::{walkers::IndexWalker, IndexAlgorithm},
+    diagnostics::DatamodelError,
+    transform::ast_to_dml::{
+        db::{walkers::IndexWalker, IndexAlgorithm},
+        validation_pipeline::context::Context,
+    },
 };
-use datamodel_connector::{Connector, ConnectorCapability};
-use enumflags2::BitFlags;
+use datamodel_connector::ConnectorCapability;
 
 /// Different databases validate index and unique constraint names in a certain namespace.
 /// Validates index and unique constraint names against the database requirements.
 pub(super) fn has_a_unique_constraint_name(
     index: IndexWalker<'_, '_>,
     names: &super::Names<'_>,
-    connector: &dyn Connector,
-    diagnostics: &mut Diagnostics,
+    ctx: &mut Context<'_>,
 ) {
-    let name = index.final_database_name(connector);
+    let name = index.final_database_name(ctx.connector);
     let model = index.model();
 
     for violation in names
@@ -37,7 +38,7 @@ pub(super) fn has_a_unique_constraint_name(
             })
             .unwrap_or_else(|| model.ast_model().span);
 
-        diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
             &message,
             index.attribute_name(),
             span,
@@ -46,12 +47,8 @@ pub(super) fn has_a_unique_constraint_name(
 }
 
 /// sort and length are not yet allowed
-pub(crate) fn uses_length_or_sort_without_preview_flag(
-    index: IndexWalker<'_, '_>,
-    preview_features: BitFlags<PreviewFeature>,
-    diagnostics: &mut Diagnostics,
-) {
-    if preview_features.contains(PreviewFeature::ExtendedIndexes) {
+pub(crate) fn uses_length_or_sort_without_preview_flag(index: IndexWalker<'_, '_>, ctx: &mut Context<'_>) {
+    if ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
         return;
     }
 
@@ -61,7 +58,7 @@ pub(crate) fn uses_length_or_sort_without_preview_flag(
     {
         let message = "You must enable `extendedIndexes` preview feature to use sort or length parameters.";
 
-        diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
             message,
             index.attribute_name(),
             index.ast_attribute().map(|i| i.span).unwrap_or_else(Span::empty),
@@ -70,12 +67,11 @@ pub(crate) fn uses_length_or_sort_without_preview_flag(
 }
 
 /// The database must support the index length prefix for it to be allowed in the data model.
-pub(crate) fn field_length_prefix_supported(
-    index: IndexWalker<'_, '_>,
-    connector: &dyn Connector,
-    diagnostics: &mut Diagnostics,
-) {
-    if connector.has_capability(ConnectorCapability::IndexColumnLengthPrefixing) {
+pub(crate) fn field_length_prefix_supported(index: IndexWalker<'_, '_>, ctx: &mut Context<'_>) {
+    if ctx
+        .connector
+        .has_capability(ConnectorCapability::IndexColumnLengthPrefixing)
+    {
         return;
     }
 
@@ -83,7 +79,7 @@ pub(crate) fn field_length_prefix_supported(
         let message = "The length argument is not supported in an index definition with the current connector";
         let span = index.ast_attribute().map(|i| i.span).unwrap_or_else(Span::empty);
 
-        diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
             message,
             index.attribute_name(),
             span,
@@ -92,12 +88,8 @@ pub(crate) fn field_length_prefix_supported(
 }
 
 /// Is `Hash` supported as `type`
-pub(crate) fn index_algorithm_is_supported(
-    index: IndexWalker<'_, '_>,
-    connector: &dyn Connector,
-    diagnostics: &mut Diagnostics,
-) {
-    if connector.has_capability(ConnectorCapability::UsingHashIndex) {
+pub(crate) fn index_algorithm_is_supported(index: IndexWalker<'_, '_>, ctx: &mut Context<'_>) {
+    if ctx.connector.has_capability(ConnectorCapability::UsingHashIndex) {
         return;
     }
 
@@ -108,17 +100,13 @@ pub(crate) fn index_algorithm_is_supported(
             .and_then(|i| i.span_for_argument("type"))
             .unwrap_or_else(Span::empty);
 
-        diagnostics.push_error(DatamodelError::new_attribute_validation_error(message, "index", span));
+        ctx.push_error(DatamodelError::new_attribute_validation_error(message, "index", span));
     }
 }
 
 /// `@@fulltext` attribute is not available without `fullTextIndex` preview feature.
-pub(crate) fn fulltext_index_preview_feature_enabled(
-    index: IndexWalker<'_, '_>,
-    preview_features: BitFlags<PreviewFeature>,
-    diagnostics: &mut Diagnostics,
-) {
-    if preview_features.contains(PreviewFeature::FullTextIndex) {
+pub(crate) fn fulltext_index_preview_feature_enabled(index: IndexWalker<'_, '_>, ctx: &mut Context<'_>) {
+    if ctx.preview_features.contains(PreviewFeature::FullTextIndex) {
         return;
     }
 
@@ -130,19 +118,15 @@ pub(crate) fn fulltext_index_preview_feature_enabled(
             .map(|i| i.span)
             .unwrap_or_else(|| index.model().ast_model().span);
 
-        diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
             message, "fulltext", span,
         ));
     }
 }
 
 /// `@@fulltext` should only be available if we support it in the database.
-pub(crate) fn fulltext_index_supported(
-    index: IndexWalker<'_, '_>,
-    connector: &dyn Connector,
-    diagnostics: &mut Diagnostics,
-) {
-    if connector.has_capability(ConnectorCapability::FullTextIndex) {
+pub(crate) fn fulltext_index_supported(index: IndexWalker<'_, '_>, ctx: &mut Context<'_>) {
+    if ctx.connector.has_capability(ConnectorCapability::FullTextIndex) {
         return;
     }
 
@@ -154,19 +138,15 @@ pub(crate) fn fulltext_index_supported(
             .map(|i| i.span)
             .unwrap_or_else(|| index.model().ast_model().span);
 
-        diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
             message, "fulltext", span,
         ));
     }
 }
 
 /// Defining the `type` must be with `extendedIndexes` preview feature.
-pub(crate) fn index_algorithm_preview_feature(
-    index: IndexWalker<'_, '_>,
-    preview_features: BitFlags<PreviewFeature>,
-    diagnostics: &mut Diagnostics,
-) {
-    if preview_features.contains(PreviewFeature::ExtendedIndexes) {
+pub(crate) fn index_algorithm_preview_feature(index: IndexWalker<'_, '_>, ctx: &mut Context<'_>) {
+    if ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
         return;
     }
 
@@ -178,22 +158,17 @@ pub(crate) fn index_algorithm_preview_feature(
             .and_then(|i| i.span_for_argument("type"))
             .unwrap_or_else(Span::empty);
 
-        diagnostics.push_error(DatamodelError::new_attribute_validation_error(message, "index", span));
+        ctx.push_error(DatamodelError::new_attribute_validation_error(message, "index", span));
     }
 }
 
 /// `@@fulltext` index columns should not define `length` argument.
-pub(crate) fn fulltext_columns_should_not_define_length(
-    index: IndexWalker<'_, '_>,
-    connector: &dyn Connector,
-    preview_features: BitFlags<PreviewFeature>,
-    diagnostics: &mut Diagnostics,
-) {
-    if !preview_features.contains(PreviewFeature::FullTextIndex) {
+pub(crate) fn fulltext_columns_should_not_define_length(index: IndexWalker<'_, '_>, ctx: &mut Context<'_>) {
+    if !ctx.preview_features.contains(PreviewFeature::FullTextIndex) {
         return;
     }
 
-    if !connector.has_capability(ConnectorCapability::FullTextIndex) {
+    if !ctx.connector.has_capability(ConnectorCapability::FullTextIndex) {
         return;
     }
 
@@ -208,7 +183,7 @@ pub(crate) fn fulltext_columns_should_not_define_length(
             .map(|i| i.span)
             .unwrap_or_else(|| index.model().ast_model().span);
 
-        diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
             message,
             index.attribute_name(),
             span,
@@ -217,17 +192,12 @@ pub(crate) fn fulltext_columns_should_not_define_length(
 }
 
 /// Only MongoDB supports sort order in a fulltext index.
-pub(crate) fn fulltext_column_sort_is_supported(
-    index: IndexWalker<'_, '_>,
-    connector: &dyn Connector,
-    preview_features: BitFlags<PreviewFeature>,
-    diagnostics: &mut Diagnostics,
-) {
-    if !preview_features.contains(PreviewFeature::FullTextIndex) {
+pub(crate) fn fulltext_column_sort_is_supported(index: IndexWalker<'_, '_>, ctx: &mut Context<'_>) {
+    if !ctx.preview_features.contains(PreviewFeature::FullTextIndex) {
         return;
     }
 
-    if !connector.has_capability(ConnectorCapability::FullTextIndex) {
+    if !ctx.connector.has_capability(ConnectorCapability::FullTextIndex) {
         return;
     }
 
@@ -235,7 +205,10 @@ pub(crate) fn fulltext_column_sort_is_supported(
         return;
     }
 
-    if connector.has_capability(ConnectorCapability::SortOrderInFullTextIndex) {
+    if ctx
+        .connector
+        .has_capability(ConnectorCapability::SortOrderInFullTextIndex)
+    {
         return;
     }
 
@@ -246,7 +219,7 @@ pub(crate) fn fulltext_column_sort_is_supported(
             .map(|i| i.span)
             .unwrap_or_else(|| index.model().ast_model().span);
 
-        diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
             message,
             index.attribute_name(),
             span,
@@ -259,17 +232,12 @@ pub(crate) fn fulltext_column_sort_is_supported(
 /// ```ignore
 /// @@fulltext([a(sort: Asc), b, c(sort: Asc), d])
 /// ```
-pub(crate) fn fulltext_text_columns_should_be_bundled_together(
-    index: IndexWalker<'_, '_>,
-    connector: &dyn Connector,
-    preview_features: BitFlags<PreviewFeature>,
-    diagnostics: &mut Diagnostics,
-) {
-    if !preview_features.contains(PreviewFeature::FullTextIndex) {
+pub(crate) fn fulltext_text_columns_should_be_bundled_together(index: IndexWalker<'_, '_>, ctx: &mut Context<'_>) {
+    if !ctx.preview_features.contains(PreviewFeature::FullTextIndex) {
         return;
     }
 
-    if !connector.has_capability(ConnectorCapability::FullTextIndex) {
+    if !ctx.connector.has_capability(ConnectorCapability::FullTextIndex) {
         return;
     }
 
@@ -277,7 +245,10 @@ pub(crate) fn fulltext_text_columns_should_be_bundled_together(
         return;
     }
 
-    if !connector.has_capability(ConnectorCapability::SortOrderInFullTextIndex) {
+    if !ctx
+        .connector
+        .has_capability(ConnectorCapability::SortOrderInFullTextIndex)
+    {
         return;
     }
 
@@ -309,7 +280,7 @@ pub(crate) fn fulltext_text_columns_should_be_bundled_together(
                     .map(|i| i.span)
                     .unwrap_or_else(|| index.model().ast_model().span);
 
-                diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+                ctx.push_error(DatamodelError::new_attribute_validation_error(
                     message, "fulltext", span,
                 ));
 
@@ -320,17 +291,12 @@ pub(crate) fn fulltext_text_columns_should_be_bundled_together(
 }
 
 /// The ordering is only possible with `BTree` access method.
-pub(crate) fn hash_index_must_not_use_sort_param(
-    index: IndexWalker<'_, '_>,
-    connector: &dyn Connector,
-    preview_features: BitFlags<PreviewFeature>,
-    diagnostics: &mut Diagnostics,
-) {
-    if !preview_features.contains(PreviewFeature::ExtendedIndexes) {
+pub(crate) fn hash_index_must_not_use_sort_param(index: IndexWalker<'_, '_>, ctx: &mut Context<'_>) {
+    if !ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
         return;
     }
 
-    if !connector.has_capability(ConnectorCapability::UsingHashIndex) {
+    if !ctx.connector.has_capability(ConnectorCapability::UsingHashIndex) {
         return;
     }
 
@@ -346,22 +312,17 @@ pub(crate) fn hash_index_must_not_use_sort_param(
             .map(|i| i.span)
             .unwrap_or_else(|| index.model().ast_model().span);
 
-        diagnostics.push_error(DatamodelError::new_attribute_validation_error(message, "index", span));
+        ctx.push_error(DatamodelError::new_attribute_validation_error(message, "index", span));
     }
 }
 
-pub(super) fn has_valid_mapped_name(
-    index: IndexWalker<'_, '_>,
-    connector: &dyn Connector,
-    diagnostics: &mut Diagnostics,
-) {
+pub(super) fn has_valid_mapped_name(index: IndexWalker<'_, '_>, ctx: &mut Context<'_>) {
     if let Some(ast_attribute) = index.ast_attribute() {
         validate_db_name(
             index.model().name(),
             ast_attribute,
             index.database_name(),
-            connector,
-            diagnostics,
+            ctx,
             !index.is_defined_on_field(),
         )
     }

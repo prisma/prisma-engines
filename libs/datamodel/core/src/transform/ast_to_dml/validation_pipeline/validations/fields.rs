@@ -5,21 +5,23 @@ use super::{
 };
 use crate::{
     ast,
-    diagnostics::{DatamodelError, Diagnostics},
-    transform::ast_to_dml::db::{
-        walkers::{FieldWalker, ScalarFieldAttributeWalker, ScalarFieldWalker},
-        ScalarFieldType,
+    diagnostics::DatamodelError,
+    transform::ast_to_dml::{
+        db::{
+            walkers::{FieldWalker, ScalarFieldAttributeWalker, ScalarFieldWalker},
+            ScalarFieldType,
+        },
+        validation_pipeline::context::Context,
     },
-    Datasource,
 };
 use datamodel_connector::{
     connector_error::{ConnectorError, ErrorKind},
-    Connector, ConnectorCapability,
+    ConnectorCapability,
 };
 use dml::scalars::ScalarType;
 use itertools::Itertools;
 
-pub(super) fn validate_client_name(field: FieldWalker<'_, '_>, names: &Names<'_>, diagnostics: &mut Diagnostics) {
+pub(super) fn validate_client_name(field: FieldWalker<'_, '_>, names: &Names<'_>, ctx: &mut Context<'_>) {
     let model = field.model();
 
     for taken in names.name_taken(model.model_id(), field.name()).into_iter() {
@@ -31,7 +33,7 @@ pub(super) fn validate_client_name(field: FieldWalker<'_, '_>, names: &Names<'_>
                 );
 
                 let error = DatamodelError::new_model_validation_error(&message, model.name(), model.ast_model().span);
-                diagnostics.push_error(error);
+                ctx.push_error(error);
             }
             NameTaken::Unique => {
                 let message = format!(
@@ -40,7 +42,7 @@ pub(super) fn validate_client_name(field: FieldWalker<'_, '_>, names: &Names<'_>
                 );
 
                 let error = DatamodelError::new_model_validation_error(&message, model.name(), model.ast_model().span);
-                diagnostics.push_error(error);
+                ctx.push_error(error);
             }
             NameTaken::PrimaryKey => {
                 let message = format!(
@@ -49,7 +51,7 @@ pub(super) fn validate_client_name(field: FieldWalker<'_, '_>, names: &Names<'_>
                 );
 
                 let error = DatamodelError::new_model_validation_error(&message, model.name(), model.ast_model().span);
-                diagnostics.push_error(error);
+                ctx.push_error(error);
             }
         }
     }
@@ -60,10 +62,9 @@ pub(super) fn validate_client_name(field: FieldWalker<'_, '_>, names: &Names<'_>
 pub(super) fn has_a_unique_default_constraint_name(
     field: ScalarFieldWalker<'_, '_>,
     names: &Names<'_>,
-    connector: &dyn Connector,
-    diagnostics: &mut Diagnostics,
+    ctx: &mut Context<'_>,
 ) {
-    let name = match field.default_value().map(|w| w.constraint_name(connector)) {
+    let name = match field.default_value().map(|w| w.constraint_name(ctx.connector)) {
         Some(name) => name,
         None => return,
     };
@@ -83,7 +84,7 @@ pub(super) fn has_a_unique_default_constraint_name(
             .span_for_argument("default", "map")
             .unwrap_or(field.ast_field().span);
 
-        diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
             &message, "default", span,
         ));
     }
@@ -93,10 +94,12 @@ pub(super) fn has_a_unique_default_constraint_name(
 pub(crate) fn validate_length_used_with_correct_types(
     attr: ScalarFieldAttributeWalker<'_, '_>,
     attribute: (&str, ast::Span),
-    connector: &dyn Connector,
-    diagnostics: &mut Diagnostics,
+    ctx: &mut Context<'_>,
 ) {
-    if !connector.has_capability(ConnectorCapability::IndexColumnLengthPrefixing) {
+    if !ctx
+        .connector
+        .has_capability(ConnectorCapability::IndexColumnLengthPrefixing)
+    {
         return;
     }
 
@@ -112,20 +115,16 @@ pub(crate) fn validate_length_used_with_correct_types(
 
     let message = "The length argument is only allowed with field types `String` or `Bytes`.";
 
-    diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+    ctx.push_error(DatamodelError::new_attribute_validation_error(
         message,
         attribute.0,
         attribute.1,
     ));
 }
 
-pub(super) fn validate_native_type_arguments(
-    field: ScalarFieldWalker<'_, '_>,
-    connector: &dyn Connector,
-    datasource: Option<&Datasource>,
-    diagnostics: &mut Diagnostics,
-) {
-    let connector_name = datasource
+pub(super) fn validate_native_type_arguments(field: ScalarFieldWalker<'_, '_>, ctx: &mut Context<'_>) {
+    let connector_name = ctx
+        .datasource
         .map(|ds| ds.active_provider.clone())
         .unwrap_or_else(|| "Default".to_owned());
     let (scalar_type, (attr_scope, type_name, args, span)) = match (field.scalar_type(), field.raw_native_type()) {
@@ -134,9 +133,9 @@ pub(super) fn validate_native_type_arguments(
     };
 
     // Validate that the attribute is scoped with the right datasource name.
-    if let Some(datasource) = datasource {
+    if let Some(datasource) = ctx.datasource {
         if datasource.name != attr_scope {
-            diagnostics.push_error(DatamodelError::new_connector_error(
+            ctx.push_error(DatamodelError::new_connector_error(
                 &ConnectorError::from_kind(ErrorKind::InvalidPrefixForNativeTypes {
                     given_prefix: attr_scope.to_owned(),
                     expected_prefix: datasource.name.clone(),
@@ -148,10 +147,10 @@ pub(super) fn validate_native_type_arguments(
         }
     }
 
-    let constructor = if let Some(cons) = connector.find_native_type_constructor(type_name) {
+    let constructor = if let Some(cons) = ctx.connector.find_native_type_constructor(type_name) {
         cons
     } else {
-        diagnostics.push_error(DatamodelError::new_connector_error(
+        ctx.push_error(DatamodelError::new_connector_error(
             &ConnectorError::from_kind(ErrorKind::NativeTypeNameUnknown {
                 native_type: type_name.to_owned(),
                 connector_name,
@@ -167,7 +166,7 @@ pub(super) fn validate_native_type_arguments(
     if number_of_args < constructor._number_of_args
         || ((number_of_args > constructor._number_of_args) && constructor._number_of_optional_args == 0)
     {
-        diagnostics.push_error(DatamodelError::new_argument_count_missmatch_error(
+        ctx.push_error(DatamodelError::new_argument_count_missmatch_error(
             type_name,
             constructor._number_of_args,
             number_of_args,
@@ -179,7 +178,7 @@ pub(super) fn validate_native_type_arguments(
     if number_of_args > constructor._number_of_args + constructor._number_of_optional_args
         && constructor._number_of_optional_args > 0
     {
-        diagnostics.push_error(DatamodelError::new_connector_error(
+        ctx.push_error(DatamodelError::new_connector_error(
             &ConnectorError::from_kind(ErrorKind::OptionalArgumentCountMismatchError {
                 native_type: type_name.to_owned(),
                 optional_count: constructor._number_of_optional_args,
@@ -193,7 +192,7 @@ pub(super) fn validate_native_type_arguments(
 
     // check for compatibility with scalar type
     if !constructor.prisma_types.contains(&scalar_type) {
-        diagnostics.push_error(DatamodelError::new_connector_error(
+        ctx.push_error(DatamodelError::new_connector_error(
             &ConnectorError::from_kind(ErrorKind::IncompatibleNativeType {
                 native_type: type_name.to_owned(),
                 field_type: scalar_type.to_string(),
@@ -205,36 +204,33 @@ pub(super) fn validate_native_type_arguments(
         return;
     }
 
-    match connector.parse_native_type(type_name, args.to_owned()) {
+    match ctx.connector.parse_native_type(type_name, args.to_owned()) {
         Ok(native_type) => {
             let mut errors = Vec::new();
-            connector.validate_native_type_arguments(&native_type, &scalar_type, &mut errors);
+            ctx.connector
+                .validate_native_type_arguments(&native_type, &scalar_type, &mut errors);
 
             for error in errors {
-                diagnostics.push_error(DatamodelError::ConnectorError {
+                ctx.push_error(DatamodelError::ConnectorError {
                     message: error.to_string(),
                     span: field.ast_field().span,
                 });
             }
         }
         Err(connector_error) => {
-            diagnostics.push_error(DatamodelError::new_connector_error(&connector_error.to_string(), span));
+            ctx.push_error(DatamodelError::new_connector_error(&connector_error.to_string(), span));
         }
     };
 }
 
-pub(super) fn validate_default(
-    field: ScalarFieldWalker<'_, '_>,
-    connector: &dyn Connector,
-    diagnostics: &mut Diagnostics,
-) {
+pub(super) fn validate_default(field: ScalarFieldWalker<'_, '_>, ctx: &mut Context<'_>) {
     // Named defaults.
 
     let default = field.default_value().map(|d| d.default());
     let has_db_name = default.map(|d| d.db_name().is_some()).unwrap_or_default();
 
-    if has_db_name && !connector.supports_named_default_values() {
-        diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+    if has_db_name && !ctx.connector.supports_named_default_values() {
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
             "You defined a database name for the default value of a field on the model. This is not supported by the provider.",
             "default",
             field.default_attribute().unwrap().span,
@@ -246,8 +242,7 @@ pub(super) fn validate_default(
             field.model().name(),
             field.default_attribute().unwrap(),
             default.and_then(|d| d.db_name()),
-            connector,
-            diagnostics,
+            ctx,
             false,
         );
     }
@@ -262,26 +257,23 @@ pub(super) fn validate_default(
 
     let mut errors = Vec::new();
     if field.raw_native_type().is_none() {
-        connector.validate_field_default_without_native_type(field.name(), &scalar_type, default, &mut errors);
+        ctx.connector
+            .validate_field_default_without_native_type(field.name(), &scalar_type, default, &mut errors);
     }
 
     for error in errors {
-        diagnostics.push_error(DatamodelError::ConnectorError {
+        ctx.push_error(DatamodelError::ConnectorError {
             message: error.to_string(),
             span: field.ast_field().span,
         });
     }
 }
 
-pub(super) fn validate_scalar_field_connector_specific(
-    field: ScalarFieldWalker<'_, '_>,
-    connector: &dyn Connector,
-    diagnostics: &mut Diagnostics,
-) {
+pub(super) fn validate_scalar_field_connector_specific(field: ScalarFieldWalker<'_, '_>, ctx: &mut Context<'_>) {
     if matches!(field.scalar_field.r#type, ScalarFieldType::BuiltInScalar(t) if t.is_json())
-        && !connector.supports_json()
+        && !ctx.connector.supports_json()
     {
-        diagnostics.push_error(DatamodelError::new_field_validation_error(
+        ctx.push_error(DatamodelError::new_field_validation_error(
             &format!(
                 "Field `{}` in model `{}` can't be of type Json. The current connector does not support the Json type.",
                 field.name(),
@@ -293,8 +285,8 @@ pub(super) fn validate_scalar_field_connector_specific(
         ));
     }
 
-    if field.ast_field().arity.is_list() && !connector.supports_scalar_lists() {
-        diagnostics.push_error(DatamodelError::new_scalar_list_fields_are_not_supported(
+    if field.ast_field().arity.is_list() && !ctx.connector.supports_scalar_lists() {
+        ctx.push_error(DatamodelError::new_scalar_list_fields_are_not_supported(
             field.model().name(),
             field.name(),
             field.ast_field().span,
@@ -302,13 +294,11 @@ pub(super) fn validate_scalar_field_connector_specific(
     }
 }
 
-pub(super) fn validate_unsupported_field_type(
-    field: ScalarFieldWalker<'_, '_>,
-    source: &Datasource,
-    diagnostics: &mut Diagnostics,
-) {
+pub(super) fn validate_unsupported_field_type(field: ScalarFieldWalker<'_, '_>, ctx: &mut Context<'_>) {
     use once_cell::sync::Lazy;
     use regex::Regex;
+
+    let source = if let Some(s) = ctx.datasource { s } else { return };
 
     static TYPE_REGEX: Lazy<Regex> = Lazy::new(|| {
         Regex::new(r#"(?x)
@@ -344,7 +334,7 @@ pub(super) fn validate_unsupported_field_type(
                         unsupported_lit, field.name(), prisma_type.to_string(), &source.name, native_type.render()
                     );
 
-            diagnostics.push_error(DatamodelError::new_validation_error(msg, field.ast_field().span));
+            ctx.push_error(DatamodelError::new_validation_error(msg, field.ast_field().span));
         }
     }
 }

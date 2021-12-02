@@ -7,12 +7,14 @@ mod visited_relation;
 use crate::{
     ast,
     common::provider_names::MONGODB_SOURCE_NAME,
-    diagnostics::{DatamodelError, Diagnostics},
-    transform::ast_to_dml::db::{
-        walkers::{CompleteInlineRelationWalker, InlineRelationWalker, ReferencingFields},
-        ParserDatabase, ScalarFieldType,
+    diagnostics::DatamodelError,
+    transform::ast_to_dml::{
+        db::{
+            walkers::{CompleteInlineRelationWalker, InlineRelationWalker, ReferencingFields},
+            ParserDatabase, ScalarFieldType,
+        },
+        validation_pipeline::context::Context,
     },
-    Datasource,
 };
 use datamodel_connector::{Connector, ConnectorCapability, ReferentialIntegrity};
 use itertools::Itertools;
@@ -34,10 +36,9 @@ const STATE_ERROR: &str = "Failed lookup of model, field or optional property du
 pub(super) fn has_a_unique_constraint_name(
     names: &super::Names<'_>,
     relation: CompleteInlineRelationWalker<'_, '_>,
-    connector: &dyn Connector,
-    diagnostics: &mut Diagnostics,
+    ctx: &mut Context<'_>,
 ) {
-    let name = match relation.foreign_key_name(connector) {
+    let name = match relation.foreign_key_name(ctx.connector) {
         Some(name) => name,
         None => return,
     };
@@ -60,7 +61,7 @@ pub(super) fn has_a_unique_constraint_name(
             violation.description(model.name())
         );
 
-        diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
             &message,
             RELATION_ATTRIBUTE_NAME,
             span,
@@ -69,7 +70,7 @@ pub(super) fn has_a_unique_constraint_name(
 }
 
 /// Required relational fields should point to required scalar fields.
-pub(super) fn field_arity(relation: CompleteInlineRelationWalker<'_, '_>, diagnostics: &mut Diagnostics) {
+pub(super) fn field_arity(relation: CompleteInlineRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
     if !relation.referencing_field().ast_field().arity.is_required() {
         return;
     }
@@ -78,7 +79,7 @@ pub(super) fn field_arity(relation: CompleteInlineRelationWalker<'_, '_>, diagno
         return;
     }
 
-    diagnostics.push_error(DatamodelError::new_validation_error(
+    ctx.push_error(DatamodelError::new_validation_error(
         format!(
             "The relation field `{}` uses the scalar fields {}. At least one of those fields is optional. Hence the relation field must be optional as well.",
             relation.referencing_field().name(),
@@ -91,7 +92,7 @@ pub(super) fn field_arity(relation: CompleteInlineRelationWalker<'_, '_>, diagno
 /// The `fields` and `references` arguments should hold the same number of fields.
 pub(super) fn same_length_in_referencing_and_referenced(
     relation: CompleteInlineRelationWalker<'_, '_>,
-    diagnostics: &mut Diagnostics,
+    ctx: &mut Context<'_>,
 ) {
     if relation.referenced_fields().len() == 0 || relation.referencing_fields().len() == 0 {
         return;
@@ -104,23 +105,19 @@ pub(super) fn same_length_in_referencing_and_referenced(
     let ast_field = relation.referencing_field().ast_field();
     let span = ast_field.span_for_attribute("relation").unwrap_or(ast_field.span);
 
-    diagnostics.push_error(DatamodelError::new_validation_error(
+    ctx.push_error(DatamodelError::new_validation_error(
         "You must specify the same number of fields in `fields` and `references`.".to_owned(),
         span,
     ));
 }
 
 /// Some connectors expect us to refer only unique fields from the foreign key.
-pub(super) fn references_unique_fields(
-    relation: CompleteInlineRelationWalker<'_, '_>,
-    connector: &dyn Connector,
-    diagnostics: &mut Diagnostics,
-) {
-    if relation.referenced_fields().len() == 0 || !diagnostics.errors().is_empty() {
+pub(super) fn references_unique_fields(relation: CompleteInlineRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
+    if relation.referenced_fields().len() == 0 || !ctx.diagnostics.errors().is_empty() {
         return;
     }
 
-    if connector.supports_relations_over_non_unique_criteria() {
+    if ctx.connector.supports_relations_over_non_unique_criteria() {
         return;
     }
 
@@ -138,7 +135,7 @@ pub(super) fn references_unique_fields(
         return;
     }
 
-    diagnostics.push_error(DatamodelError::new_validation_error(
+    ctx.push_error(DatamodelError::new_validation_error(
         format!(
             "The argument `references` must refer to a unique criteria in the related model `{}`. But it is referencing the following fields that are not a unique criteria: {}",
             relation.referenced_model().name(),
@@ -151,14 +148,13 @@ pub(super) fn references_unique_fields(
 /// Some connectors want the fields and references in the same order.
 pub(super) fn referencing_fields_in_correct_order(
     relation: CompleteInlineRelationWalker<'_, '_>,
-    connector: &dyn Connector,
-    diagnostics: &mut Diagnostics,
+    ctx: &mut Context<'_>,
 ) {
-    if relation.referenced_fields().len() == 0 || !diagnostics.errors().is_empty() {
+    if relation.referenced_fields().len() == 0 || !ctx.diagnostics.errors().is_empty() {
         return;
     }
 
-    if connector.allows_relation_fields_in_arbitrary_order() || relation.referenced_fields().len() == 1 {
+    if ctx.connector.allows_relation_fields_in_arbitrary_order() || relation.referenced_fields().len() == 1 {
         return;
     }
 
@@ -177,7 +173,7 @@ pub(super) fn referencing_fields_in_correct_order(
         return;
     }
 
-    diagnostics.push_error(DatamodelError::new_validation_error(
+    ctx.push_error(DatamodelError::new_validation_error(
         format!(
             "The argument `references` must refer to a unique criteria in the related model `{}` using the same order of fields. Please check the ordering in the following fields: `{}`.",
             relation.referenced_model().name(),
@@ -199,13 +195,12 @@ pub(super) fn referencing_fields_in_correct_order(
 /// We count them from forward-relations, e.g. from the side that defines the
 /// foreign key. Many to many relations we skip. The user must set one of the
 /// relation links to NoAction for both referential actions.
-pub(super) fn cycles<'ast, 'db>(
-    relation: CompleteInlineRelationWalker<'ast, 'db>,
-    connector: &dyn Connector,
-    referential_integrity: ReferentialIntegrity,
-    diagnostics: &mut Diagnostics,
-) {
-    if !connector.has_capability(ConnectorCapability::ReferenceCycleDetection) || referential_integrity.is_prisma() {
+pub(super) fn cycles<'ast, 'db>(relation: CompleteInlineRelationWalker<'ast, 'db>, ctx: &mut Context<'_>) {
+    if !ctx
+        .connector
+        .has_capability(ConnectorCapability::ReferenceCycleDetection)
+        || ctx.referential_integrity.is_prisma()
+    {
         return;
     }
 
@@ -220,7 +215,7 @@ pub(super) fn cycles<'ast, 'db>(
 
         let related_model = next_relation.referenced_model();
 
-        let on_delete = next_relation.on_delete(connector, referential_integrity);
+        let on_delete = next_relation.on_delete(ctx.connector, ctx.referential_integrity);
         let on_update = next_relation.on_update();
 
         // a cycle has a meaning only if every relation in it triggers
@@ -230,10 +225,10 @@ pub(super) fn cycles<'ast, 'db>(
 
             if model == related_model {
                 let msg = "A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes.";
-                diagnostics.push_error(cascade_error_with_default_values(
+                ctx.push_error(cascade_error_with_default_values(
                     relation,
-                    connector,
-                    referential_integrity,
+                    ctx.connector,
+                    ctx.referential_integrity,
                     msg,
                 ));
 
@@ -246,10 +241,10 @@ pub(super) fn cycles<'ast, 'db>(
                     visited_relations
                 );
 
-                diagnostics.push_error(cascade_error_with_default_values(
+                ctx.push_error(cascade_error_with_default_values(
                     relation,
-                    connector,
-                    referential_integrity,
+                    ctx.connector,
+                    ctx.referential_integrity,
                     &msg,
                 ));
                 return;
@@ -278,23 +273,17 @@ pub(super) fn cycles<'ast, 'db>(
 ///
 /// The user must set one of these relations to use NoAction for onUpdate and
 /// onDelete.
-pub(super) fn multiple_cascading_paths(
-    relation: CompleteInlineRelationWalker<'_, '_>,
-    connector: &dyn Connector,
-    referential_integrity: ReferentialIntegrity,
-    datasource: Option<&Datasource>,
-    diagnostics: &mut Diagnostics,
-) {
-    if !connector.has_capability(ConnectorCapability::ReferenceCycleDetection)
-        || datasource
-            .map(|ds| ds.referential_integrity().is_prisma())
-            .unwrap_or(false)
+pub(super) fn multiple_cascading_paths(relation: CompleteInlineRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
+    if !ctx
+        .connector
+        .has_capability(ConnectorCapability::ReferenceCycleDetection)
+        || ctx.referential_integrity.is_prisma()
     {
         return;
     }
 
     if !relation
-        .on_delete(connector, referential_integrity)
+        .on_delete(ctx.connector, ctx.referential_integrity)
         .triggers_modification()
         && !relation.on_update().triggers_modification()
     {
@@ -317,7 +306,7 @@ pub(super) fn multiple_cascading_paths(
         .complete_inline_relations_from()
         .filter(|relation| {
             relation
-                .on_delete(connector, referential_integrity)
+                .on_delete(ctx.connector, ctx.referential_integrity)
                 .triggers_modification()
                 || relation.on_update().triggers_modification()
         })
@@ -400,10 +389,10 @@ pub(super) fn multiple_cascading_paths(
             relation.referencing_model().name()
         );
 
-        diagnostics.push_error(cascade_error_with_default_values(
+        ctx.push_error(cascade_error_with_default_values(
             relation,
-            connector,
-            referential_integrity,
+            ctx.connector,
+            ctx.referential_integrity,
             &msg,
         ));
     } else if reachable.len() > 1 {
@@ -413,10 +402,10 @@ pub(super) fn multiple_cascading_paths(
             relation.referencing_model().name()
         );
 
-        diagnostics.push_error(cascade_error_with_default_values(
+        ctx.push_error(cascade_error_with_default_values(
             relation,
-            connector,
-            referential_integrity,
+            ctx.connector,
+            ctx.referential_integrity,
             &msg,
         ));
     }
@@ -465,13 +454,10 @@ fn cascade_error_with_default_values(
 }
 
 /// The types of the referencing and referenced scalar fields in a relation must be compatible.
-pub(super) fn referencing_scalar_field_types(
-    relation: InlineRelationWalker<'_, '_>,
-    datasource: Option<&Datasource>,
-    diagnostics: &mut Diagnostics,
-) {
+pub(super) fn referencing_scalar_field_types(relation: InlineRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
     // see https://github.com/prisma/prisma/issues/10105
-    if datasource
+    if ctx
+        .datasource
         .as_ref()
         .map(|source| source.provider == MONGODB_SOURCE_NAME)
         .unwrap_or(false)
@@ -490,7 +476,7 @@ pub(super) fn referencing_scalar_field_types(
             referenced.scalar_field.r#type,
             relation.db(),
         ) {
-            diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+            ctx.push_error(DatamodelError::new_attribute_validation_error(
                 &format!(
                     "The type of the field `{}` in the model `{}` is not matching the type of the referenced field `{}` in model `{}`.",
                     referencing.name(),

@@ -1,3 +1,4 @@
+mod context;
 mod validations;
 
 use super::{db::ParserDatabase, lift::LiftAstToDml, validate::Validator};
@@ -55,14 +56,16 @@ impl<'a, 'b> ValidationPipeline<'a> {
         // Early return so that the validator does not have to deal with invalid schemas
         diagnostics.to_result()?;
 
-        validations::validate(
-            &db,
+        let mut context = context::Context {
+            db: &db,
+            datasource: self.source,
+            preview_features: self.preview_features,
             connector,
-            self.preview_features,
-            self.source,
-            &mut diagnostics,
-            relation_transformation_enabled,
-        );
+            referential_integrity,
+            diagnostics: &mut diagnostics,
+        };
+
+        validations::validate(&mut context, relation_transformation_enabled);
         diagnostics.to_result()?;
 
         let schema = LiftAstToDml::new(&db, connector, referential_integrity).lift();

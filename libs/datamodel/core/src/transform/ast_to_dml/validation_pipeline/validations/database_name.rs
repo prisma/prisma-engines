@@ -1,12 +1,12 @@
-use crate::{ast, common::constraint_names::ConstraintNames, Diagnostics};
-use datamodel_connector::Connector;
+use crate::{
+    ast, common::constraint_names::ConstraintNames, transform::ast_to_dml::validation_pipeline::context::Context,
+};
 
 pub(super) fn validate_db_name(
     model_name: &str,
     attribute: &ast::Attribute,
     db_name: Option<&str>,
-    connector: &dyn Connector,
-    diagnostics: &mut Diagnostics,
+    ctx: &mut Context<'_>,
     // How many @ in the error message?
     double_at: bool,
 ) {
@@ -15,9 +15,9 @@ pub(super) fn validate_db_name(
         model_name,
         db_name,
         &attribute.name.name,
-        connector,
+        ctx.connector,
         double_at,
     ) {
-        diagnostics.push_error(err);
+        ctx.push_error(err);
     }
 }
