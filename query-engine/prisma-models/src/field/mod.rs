@@ -28,6 +28,14 @@ impl Field {
         }
     }
 
+    pub fn db_name(&self) -> &str {
+        match self {
+            Field::Scalar(ref sf) => &sf.db_name(),
+            Field::Relation(ref rf) => &rf.name,
+            Field::Composite(ref cf) => &cf.db_name(),
+        }
+    }
+
     pub fn is_scalar(&self) -> bool {
         match self {
             Field::Scalar(_) => true,

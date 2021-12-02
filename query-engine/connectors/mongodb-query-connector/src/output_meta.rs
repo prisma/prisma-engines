@@ -1,10 +1,10 @@
 use connector_interface::{AggregationSelection, RelAggregationSelection};
 use datamodel::FieldArity;
+use indexmap::IndexMap;
 use prisma_models::{FieldSelection, PrismaValue, ScalarFieldRef, SelectedField, TypeIdentifier};
-use std::collections::HashMap;
 
 /// Maps field db field names to their meta information.
-pub type OutputMetaMapping = HashMap<String, OutputMeta>;
+pub type OutputMetaMapping = IndexMap<String, OutputMeta>;
 
 /// `OutputMeta` contains information that is required to process the output of
 /// Mongo queries. With this information, we can correctly parse information and
@@ -35,7 +35,7 @@ impl ScalarOutputMeta {
 #[derive(Debug, Clone)]
 pub struct CompositeOutputMeta {
     pub list: bool,
-    pub inner: HashMap<String, OutputMeta>,
+    pub inner: OutputMetaMapping,
 }
 
 impl CompositeOutputMeta {
