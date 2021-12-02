@@ -49,12 +49,18 @@ impl<'a, 'b> ValidationPipeline<'a> {
             .unwrap_or(&EmptyDatamodelConnector);
 
         // Make sense of the AST.
-        let (db, mut diagnostics) = ParserDatabase::new(ast_schema, self.source, diagnostics, self.preview_features);
+        let (db, mut diagnostics) = ParserDatabase::new(ast_schema, self.source, diagnostics);
 
         // Early return so that the validator does not have to deal with invalid schemas
         diagnostics.to_result()?;
 
-        validations::validate(&db, connector, &mut diagnostics, relation_transformation_enabled);
+        validations::validate(
+            &db,
+            connector,
+            self.preview_features,
+            &mut diagnostics,
+            relation_transformation_enabled,
+        );
         diagnostics.to_result()?;
 
         let schema = LiftAstToDml::new(&db, connector).lift();

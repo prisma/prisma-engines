@@ -15,10 +15,8 @@ pub(crate) mod walkers;
 pub(crate) use types::{IndexAlgorithm, IndexType, RelationField, ScalarField, ScalarFieldType};
 
 use self::{context::Context, relations::Relations, types::Types};
-use crate::PreviewFeature;
 use crate::{ast, diagnostics::Diagnostics, Datasource};
 use datamodel_connector::ReferentialIntegrity;
-use enumflags2::BitFlags;
 use names::Names;
 
 /// ParserDatabase is a container for a Schema AST, together with information
@@ -54,7 +52,6 @@ pub(crate) struct ParserDatabase<'ast> {
     names: Names<'ast>,
     types: Types<'ast>,
     relations: Relations<'ast>,
-    pub(crate) preview_features: BitFlags<PreviewFeature>,
 }
 
 impl<'ast> ParserDatabase<'ast> {
@@ -63,7 +60,6 @@ impl<'ast> ParserDatabase<'ast> {
         ast: &'ast ast::SchemaAst,
         datasource: Option<&'ast Datasource>,
         diagnostics: Diagnostics,
-        preview_features: BitFlags<PreviewFeature>,
     ) -> (Self, Diagnostics) {
         let db = ParserDatabase {
             ast,
@@ -71,7 +67,6 @@ impl<'ast> ParserDatabase<'ast> {
             names: Names::default(),
             types: Types::default(),
             relations: Relations::default(),
-            preview_features,
         };
 
         let mut ctx = Context::new(db, diagnostics);

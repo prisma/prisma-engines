@@ -14,13 +14,16 @@ use crate::{
     ast,
     diagnostics::Diagnostics,
     transform::ast_to_dml::db::{walkers::RefinedRelationWalker, ParserDatabase},
+    PreviewFeature,
 };
 use datamodel_connector::Connector;
 use diagnostics::DatamodelError;
+use enumflags2::BitFlags;
 
 pub(super) fn validate(
     db: &ParserDatabase<'_>,
     connector: &dyn Connector,
+    preview_features: BitFlags<PreviewFeature>,
     diagnostics: &mut Diagnostics,
     relation_transformation_enabled: bool,
 ) {
@@ -33,11 +36,11 @@ pub(super) fn validate(
     for model in db.walk_models() {
         models::has_a_strict_unique_criteria(model, diagnostics);
         models::has_a_unique_primary_key_name(model, &names, connector, diagnostics);
-        models::uses_sort_or_length_on_primary_without_preview_flag(db, model, diagnostics);
+        models::uses_sort_or_length_on_primary_without_preview_flag(model, preview_features, diagnostics);
         models::primary_key_connector_specific(model, connector, diagnostics);
         models::primary_key_length_prefix_supported(model, connector, diagnostics);
         models::primary_key_sort_order_supported(model, connector, diagnostics);
-        models::only_one_fulltext_attribute_allowed(db, model, connector, diagnostics);
+        models::only_one_fulltext_attribute_allowed(model, connector, preview_features, diagnostics);
         autoincrement::validate_auto_increment(model, connector, diagnostics);
 
         if let Some(pk) = model.primary_key() {
@@ -77,16 +80,16 @@ pub(super) fn validate(
 
         for index in model.indexes() {
             indexes::has_a_unique_constraint_name(index, &names, connector, diagnostics);
-            indexes::uses_length_or_sort_without_preview_flag(db, index, diagnostics);
+            indexes::uses_length_or_sort_without_preview_flag(index, preview_features, diagnostics);
             indexes::field_length_prefix_supported(index, connector, diagnostics);
-            indexes::index_algorithm_preview_feature(db, index, diagnostics);
+            indexes::index_algorithm_preview_feature(index, preview_features, diagnostics);
             indexes::index_algorithm_is_supported(index, connector, diagnostics);
-            indexes::hash_index_must_not_use_sort_param(db, index, connector, diagnostics);
-            indexes::fulltext_index_preview_feature_enabled(db, index, diagnostics);
+            indexes::hash_index_must_not_use_sort_param(index, connector, preview_features, diagnostics);
+            indexes::fulltext_index_preview_feature_enabled(index, preview_features, diagnostics);
             indexes::fulltext_index_supported(index, connector, diagnostics);
-            indexes::fulltext_columns_should_not_define_length(db, index, connector, diagnostics);
-            indexes::fulltext_column_sort_is_supported(db, index, connector, diagnostics);
-            indexes::fulltext_text_columns_should_be_bundled_together(db, index, connector, diagnostics);
+            indexes::fulltext_columns_should_not_define_length(index, connector, preview_features, diagnostics);
+            indexes::fulltext_column_sort_is_supported(index, connector, preview_features, diagnostics);
+            indexes::fulltext_text_columns_should_be_bundled_together(index, connector, preview_features, diagnostics);
             indexes::has_valid_mapped_name(index, connector, diagnostics);
 
             for field_attribute in index.scalar_field_attributes() {

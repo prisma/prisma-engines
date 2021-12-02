@@ -1,15 +1,13 @@
-use std::borrow::Cow;
-
-use datamodel_connector::{Connector, ConnectorCapability};
-use itertools::Itertools;
-
+use super::database_name::validate_db_name;
 use crate::{
     common::preview_features::PreviewFeature,
     diagnostics::{DatamodelError, Diagnostics},
-    transform::ast_to_dml::db::{walkers::ModelWalker, ParserDatabase},
+    transform::ast_to_dml::db::walkers::ModelWalker,
 };
-
-use super::database_name::validate_db_name;
+use datamodel_connector::{Connector, ConnectorCapability};
+use enumflags2::BitFlags;
+use itertools::Itertools;
+use std::borrow::Cow;
 
 /// A model must have either a primary key, or a unique criteria
 /// with no optional, commented-out or unsupported fields.
@@ -101,11 +99,11 @@ pub(super) fn has_a_unique_primary_key_name(
 
 /// uses sort or length on id without preview flag
 pub(crate) fn uses_sort_or_length_on_primary_without_preview_flag(
-    db: &ParserDatabase<'_>,
     model: ModelWalker<'_, '_>,
+    preview_features: BitFlags<PreviewFeature>,
     diagnostics: &mut Diagnostics,
 ) {
-    if db.preview_features.contains(PreviewFeature::ExtendedIndexes) {
+    if preview_features.contains(PreviewFeature::ExtendedIndexes) {
         return;
     }
 
@@ -165,12 +163,12 @@ pub(crate) fn primary_key_sort_order_supported(
 }
 
 pub(crate) fn only_one_fulltext_attribute_allowed(
-    db: &ParserDatabase<'_>,
     model: ModelWalker<'_, '_>,
     connector: &dyn Connector,
+    preview_features: BitFlags<PreviewFeature>,
     diagnostics: &mut Diagnostics,
 ) {
-    if !db.preview_features.contains(PreviewFeature::FullTextIndex) {
+    if !preview_features.contains(PreviewFeature::FullTextIndex) {
         return;
     }
 

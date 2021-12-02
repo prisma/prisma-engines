@@ -3,9 +3,10 @@ use crate::{
     ast::Span,
     common::preview_features::PreviewFeature,
     diagnostics::{DatamodelError, Diagnostics},
-    transform::ast_to_dml::db::{walkers::IndexWalker, IndexAlgorithm, ParserDatabase},
+    transform::ast_to_dml::db::{walkers::IndexWalker, IndexAlgorithm},
 };
 use datamodel_connector::{Connector, ConnectorCapability};
+use enumflags2::BitFlags;
 
 /// Different databases validate index and unique constraint names in a certain namespace.
 /// Validates index and unique constraint names against the database requirements.
@@ -46,11 +47,11 @@ pub(super) fn has_a_unique_constraint_name(
 
 /// sort and length are not yet allowed
 pub(crate) fn uses_length_or_sort_without_preview_flag(
-    db: &ParserDatabase<'_>,
     index: IndexWalker<'_, '_>,
+    preview_features: BitFlags<PreviewFeature>,
     diagnostics: &mut Diagnostics,
 ) {
-    if db.preview_features.contains(PreviewFeature::ExtendedIndexes) {
+    if preview_features.contains(PreviewFeature::ExtendedIndexes) {
         return;
     }
 
@@ -113,11 +114,11 @@ pub(crate) fn index_algorithm_is_supported(
 
 /// `@@fulltext` attribute is not available without `fullTextIndex` preview feature.
 pub(crate) fn fulltext_index_preview_feature_enabled(
-    db: &ParserDatabase<'_>,
     index: IndexWalker<'_, '_>,
+    preview_features: BitFlags<PreviewFeature>,
     diagnostics: &mut Diagnostics,
 ) {
-    if db.preview_features.contains(PreviewFeature::FullTextIndex) {
+    if preview_features.contains(PreviewFeature::FullTextIndex) {
         return;
     }
 
@@ -161,11 +162,11 @@ pub(crate) fn fulltext_index_supported(
 
 /// Defining the `type` must be with `extendedIndexes` preview feature.
 pub(crate) fn index_algorithm_preview_feature(
-    db: &ParserDatabase<'_>,
     index: IndexWalker<'_, '_>,
+    preview_features: BitFlags<PreviewFeature>,
     diagnostics: &mut Diagnostics,
 ) {
-    if db.preview_features.contains(PreviewFeature::ExtendedIndexes) {
+    if preview_features.contains(PreviewFeature::ExtendedIndexes) {
         return;
     }
 
@@ -183,12 +184,12 @@ pub(crate) fn index_algorithm_preview_feature(
 
 /// `@@fulltext` index columns should not define `length` argument.
 pub(crate) fn fulltext_columns_should_not_define_length(
-    db: &ParserDatabase<'_>,
     index: IndexWalker<'_, '_>,
     connector: &dyn Connector,
+    preview_features: BitFlags<PreviewFeature>,
     diagnostics: &mut Diagnostics,
 ) {
-    if !db.preview_features.contains(PreviewFeature::FullTextIndex) {
+    if !preview_features.contains(PreviewFeature::FullTextIndex) {
         return;
     }
 
@@ -217,12 +218,12 @@ pub(crate) fn fulltext_columns_should_not_define_length(
 
 /// Only MongoDB supports sort order in a fulltext index.
 pub(crate) fn fulltext_column_sort_is_supported(
-    db: &ParserDatabase<'_>,
     index: IndexWalker<'_, '_>,
     connector: &dyn Connector,
+    preview_features: BitFlags<PreviewFeature>,
     diagnostics: &mut Diagnostics,
 ) {
-    if !db.preview_features.contains(PreviewFeature::FullTextIndex) {
+    if !preview_features.contains(PreviewFeature::FullTextIndex) {
         return;
     }
 
@@ -259,12 +260,12 @@ pub(crate) fn fulltext_column_sort_is_supported(
 /// @@fulltext([a(sort: Asc), b, c(sort: Asc), d])
 /// ```
 pub(crate) fn fulltext_text_columns_should_be_bundled_together(
-    db: &ParserDatabase<'_>,
     index: IndexWalker<'_, '_>,
     connector: &dyn Connector,
+    preview_features: BitFlags<PreviewFeature>,
     diagnostics: &mut Diagnostics,
 ) {
-    if !db.preview_features.contains(PreviewFeature::FullTextIndex) {
+    if !preview_features.contains(PreviewFeature::FullTextIndex) {
         return;
     }
 
@@ -320,12 +321,12 @@ pub(crate) fn fulltext_text_columns_should_be_bundled_together(
 
 /// The ordering is only possible with `BTree` access method.
 pub(crate) fn hash_index_must_not_use_sort_param(
-    db: &ParserDatabase<'_>,
     index: IndexWalker<'_, '_>,
     connector: &dyn Connector,
+    preview_features: BitFlags<PreviewFeature>,
     diagnostics: &mut Diagnostics,
 ) {
-    if !db.preview_features.contains(PreviewFeature::ExtendedIndexes) {
+    if !preview_features.contains(PreviewFeature::ExtendedIndexes) {
         return;
     }
 
