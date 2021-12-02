@@ -1,4 +1,7 @@
-use crate::{output_meta::OutputMeta, IntoBson, MongoError};
+use crate::{
+    output_meta::{CompositeOutputMeta, OutputMeta, ScalarOutputMeta},
+    IntoBson, MongoError,
+};
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::{TimeZone, Utc};
 use itertools::Itertools;
@@ -7,6 +10,7 @@ use native_types::MongoDbType;
 use prisma_models::{PrismaValue, ScalarFieldRef, SelectedField, TypeIdentifier};
 use serde_json::Value;
 use std::{convert::TryFrom, fmt::Display};
+use tracing::trace;
 
 /// Transforms a `PrismaValue` of a specific field into the BSON mapping as prescribed by the native types
 /// or as defined by the default `TypeIdentifier` to BSON mapping.
@@ -204,6 +208,13 @@ impl IntoBson for (&TypeIdentifier, PrismaValue) {
 
 // Parsing of values coming from MongoDB back to the connector / core.
 pub fn value_from_bson(bson: Bson, meta: &OutputMeta) -> crate::Result<PrismaValue> {
+    match meta {
+        OutputMeta::Scalar(scalar_meta) => read_scalar_value(bson, scalar_meta),
+        OutputMeta::Composite(composite_meta) => read_composite_value(bson, composite_meta),
+    }
+}
+
+fn read_scalar_value(bson: Bson, meta: &ScalarOutputMeta) -> crate::Result<PrismaValue> {
     let val = match (&meta.ident, bson) {
         // We expect a list to be returned.
         (type_identifier, bson) if meta.list => match bson {
@@ -211,7 +222,7 @@ pub fn value_from_bson(bson: Bson, meta: &OutputMeta) -> crate::Result<PrismaVal
 
             Bson::Array(list) => PrismaValue::List(
                 list.into_iter()
-                    .map(|list_val| value_from_bson(list_val, &meta.strip_list()))
+                    .map(|list_val| value_from_bson(list_val, &meta.strip_list().into()))
                     .collect::<crate::Result<Vec<_>>>()?,
             ),
 
@@ -290,6 +301,56 @@ pub fn value_from_bson(bson: Bson, meta: &OutputMeta) -> crate::Result<PrismaVal
                 from: bson.to_string(),
                 to: format!("{:?}", ident),
             })
+        }
+    };
+
+    Ok(val)
+}
+
+fn read_composite_value(bson: Bson, meta: &CompositeOutputMeta) -> crate::Result<PrismaValue> {
+    let val = if meta.list {
+        match bson {
+            Bson::Null => PrismaValue::List(Vec::new()),
+
+            Bson::Array(list) => PrismaValue::List(
+                list.into_iter()
+                    .map(|list_val| value_from_bson(list_val, &meta.strip_list().into()))
+                    .collect::<crate::Result<Vec<_>>>()?,
+            ),
+
+            _ => {
+                return Err(MongoError::ConversionError {
+                    from: format!("{}", bson),
+                    to: format!("List"),
+                });
+            }
+        }
+    } else {
+        // Null catch-all.
+        match bson {
+            Bson::Null => PrismaValue::Null,
+            Bson::Document(doc) => {
+                let mut pairs = Vec::with_capacity(doc.len());
+                for (field, bson) in doc {
+                    match meta.inner.get(&field) {
+                        Some(meta) => {
+                            let value = value_from_bson(bson, meta)?;
+                            pairs.push((field, value))
+                        }
+                        None => {
+                            trace!("Warning: Found extra field '{}', skipping.", field);
+                        }
+                    }
+                }
+
+                PrismaValue::Object(pairs)
+            }
+            _ => {
+                return Err(MongoError::UnhandledError(format!(
+                    "Invalid data: Expected document but received: {:?}",
+                    bson
+                )))
+            }
         }
     };
 
