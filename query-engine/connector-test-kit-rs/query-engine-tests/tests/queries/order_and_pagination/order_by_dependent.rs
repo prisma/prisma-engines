@@ -245,7 +245,7 @@ mod order_by_dependent {
               }
             }
           }"#,
-          MySql(Some(MySqlVersion::MariaDb)) | MongoDb(_) | Sqlite => vec![r#"{"data":{"findManyModelA":[{"id":3,"b":null},{"id":4,"b":null},{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}}]}}"#],
+          MongoDb(_) | Sqlite => vec![r#"{"data":{"findManyModelA":[{"id":3,"b":null},{"id":4,"b":null},{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}}]}}"#],
           MySql(_) => vec![
             r#"{"data":{"findManyModelA":[{"id":4,"b":null},{"id":3,"b":null},{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}}]}}"#,
             r#"{"data":{"findManyModelA":[{"id":3,"b":null},{"id":4,"b":null},{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}}]}}"#,
@@ -277,8 +277,7 @@ mod order_by_dependent {
                 }
               }
             }"#,
-            // MariaDb
-            MongoDb(_) | Sqlite | MySql(Some(MySqlVersion::MariaDb)) => vec![r#"{"data":{"findManyModelA":[{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":3,"b":null},{"id":4,"b":null}]}}"#],
+            MongoDb(_) | Sqlite => vec![r#"{"data":{"findManyModelA":[{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":3,"b":null},{"id":4,"b":null}]}}"#],
             MySql(_) => vec![
               r#"{"data":{"findManyModelA":[{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":4,"b":null},{"id":3,"b":null}]}}"#,
               r#"{"data":{"findManyModelA":[{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":3,"b":null},{"id":4,"b":null}]}}"#,
