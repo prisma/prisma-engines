@@ -104,7 +104,11 @@ pub(crate) struct ScalarField<'ast> {
     /// @map
     pub(crate) mapped_name: Option<&'ast str>,
     /// Native type name and arguments
-    pub(crate) native_type: Option<(&'ast str, Vec<String>, ast::Span)>,
+    ///
+    /// (attribute scope, native type name, arguments, span)
+    ///
+    /// For example: `@db.Text` would translate to ("db", "Text", &[], <the span>)
+    pub(crate) native_type: Option<(&'ast str, &'ast str, Vec<String>, ast::Span)>,
 }
 
 #[derive(Debug)]

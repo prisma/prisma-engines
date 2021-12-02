@@ -122,17 +122,31 @@ pub(crate) fn validate_length_used_with_correct_types(
 pub(super) fn validate_native_type_arguments(
     field: ScalarFieldWalker<'_, '_>,
     connector: &dyn Connector,
+    datasource: Option<&Datasource>,
     diagnostics: &mut Diagnostics,
 ) {
-    let connector_name = field
-        .db
-        .datasource()
+    let connector_name = datasource
         .map(|ds| ds.active_provider.clone())
         .unwrap_or_else(|| "Default".to_owned());
-    let (scalar_type, (type_name, args, span)) = match (field.scalar_type(), field.raw_native_type()) {
+    let (scalar_type, (attr_scope, type_name, args, span)) = match (field.scalar_type(), field.raw_native_type()) {
         (Some(scalar_type), Some(raw)) => (scalar_type, raw),
         _ => return,
     };
+
+    // Validate that the attribute is scoped with the right datasource name.
+    if let Some(datasource) = datasource {
+        if datasource.name != attr_scope {
+            diagnostics.push_error(DatamodelError::new_connector_error(
+                &ConnectorError::from_kind(ErrorKind::InvalidPrefixForNativeTypes {
+                    given_prefix: attr_scope.to_owned(),
+                    expected_prefix: datasource.name.clone(),
+                    suggestion: [datasource.name.as_str(), type_name].join("."),
+                })
+                .to_string(),
+                span,
+            ));
+        }
+    }
 
     let constructor = if let Some(cons) = connector.find_native_type_constructor(type_name) {
         cons

@@ -4,6 +4,7 @@ use crate::{
 };
 
 pub(super) fn visit_native_type_attribute<'ast>(
+    datasource_name: &'ast str,
     type_name: &'ast str,
     attr: &'ast ast::Attribute,
     scalar_field: &mut ScalarField<'ast>,
@@ -11,5 +12,5 @@ pub(super) fn visit_native_type_attribute<'ast>(
     let args = &attr.arguments;
     let args: Vec<String> = args.iter().map(|arg| ValueValidator::new(&arg.value).raw()).collect();
 
-    scalar_field.native_type = Some((type_name, args, attr.span))
+    scalar_field.native_type = Some((datasource_name, type_name, args, attr.span))
 }

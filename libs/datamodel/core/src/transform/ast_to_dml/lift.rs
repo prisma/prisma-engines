@@ -438,7 +438,7 @@ impl<'a> LiftAstToDml<'a> {
                 let native_type = scalar_field_data
                     .native_type
                     .as_ref()
-                    .map(|(name, args, _)| self.connector.parse_native_type(name, args.clone()).unwrap());
+                    .map(|(_, name, args, _)| self.connector.parse_native_type(name, args.clone()).unwrap());
                 dml::FieldType::Scalar(scalar_type.to_owned(), None, native_type)
             }
         }

@@ -34,11 +34,7 @@ impl<'ast, 'db> PrimaryKeyWalker<'ast, 'db> {
         }
 
         Some(self.attribute.db_name.map(Cow::Borrowed).unwrap_or_else(|| {
-            ConstraintNames::primary_key_name(
-                self.db.walk_model(self.model_id).final_database_name(),
-                connector,
-            )
-            .into()
+            ConstraintNames::primary_key_name(self.db.walk_model(self.model_id).final_database_name(), connector).into()
         }))
     }
 

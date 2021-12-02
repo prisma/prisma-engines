@@ -57,10 +57,10 @@ pub(super) fn validate(
             fields::validate_scalar_field_connector_specific(field, connector, diagnostics);
             fields::validate_client_name(field.into(), &names, diagnostics);
             fields::has_a_unique_default_constraint_name(field, &names, connector, diagnostics);
-            fields::validate_native_type_arguments(field, connector, diagnostics);
+            fields::validate_native_type_arguments(field, connector, datasource, diagnostics);
             fields::validate_default(field, connector, diagnostics);
 
-            if let Some(source) = db.datasource() {
+            if let Some(source) = datasource {
                 fields::validate_unsupported_field_type(field, source, diagnostics)
             }
         }
@@ -126,13 +126,19 @@ pub(super) fn validate(
                     relations::field_arity(relation, diagnostics);
                     relations::same_length_in_referencing_and_referenced(relation, diagnostics);
                     relations::cycles(relation, connector, referential_integrity, diagnostics);
-                    relations::multiple_cascading_paths(relation, db, connector, referential_integrity, diagnostics);
+                    relations::multiple_cascading_paths(
+                        relation,
+                        connector,
+                        referential_integrity,
+                        datasource,
+                        diagnostics,
+                    );
                     relations::has_a_unique_constraint_name(&names, relation, connector, diagnostics);
                     relations::references_unique_fields(relation, connector, diagnostics);
                     relations::referencing_fields_in_correct_order(relation, connector, diagnostics);
                 }
 
-                relations::referencing_scalar_field_types(relation, diagnostics);
+                relations::referencing_scalar_field_types(relation, datasource, diagnostics);
 
                 // Only run these when you are not formatting the data model. These validations
                 // test against broken relations that we could fix with a code action. The flag is

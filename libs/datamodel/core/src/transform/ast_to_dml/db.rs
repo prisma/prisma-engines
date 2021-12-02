@@ -15,7 +15,7 @@ pub(crate) mod walkers;
 pub(crate) use types::{IndexAlgorithm, IndexType, RelationField, ScalarField, ScalarFieldType};
 
 use self::{context::Context, relations::Relations, types::Types};
-use crate::{ast, diagnostics::Diagnostics, Datasource};
+use crate::{ast, diagnostics::Diagnostics};
 use names::Names;
 
 /// ParserDatabase is a container for a Schema AST, together with information
@@ -47,7 +47,6 @@ use names::Names;
 /// lifetime management simple.
 pub(crate) struct ParserDatabase<'ast> {
     ast: &'ast ast::SchemaAst,
-    datasource: Option<&'ast Datasource>,
     names: Names<'ast>,
     types: Types<'ast>,
     relations: Relations<'ast>,
@@ -55,14 +54,9 @@ pub(crate) struct ParserDatabase<'ast> {
 
 impl<'ast> ParserDatabase<'ast> {
     /// See the docs on [ParserDatabase](/struct.ParserDatabase.html).
-    pub(super) fn new(
-        ast: &'ast ast::SchemaAst,
-        datasource: Option<&'ast Datasource>,
-        diagnostics: Diagnostics,
-    ) -> (Self, Diagnostics) {
+    pub(super) fn new(ast: &'ast ast::SchemaAst, diagnostics: Diagnostics) -> (Self, Diagnostics) {
         let db = ParserDatabase {
             ast,
-            datasource,
             names: Names::default(),
             types: Types::default(),
             relations: Relations::default(),
@@ -106,10 +100,6 @@ impl<'ast> ParserDatabase<'ast> {
 
     pub(super) fn ast(&self) -> &'ast ast::SchemaAst {
         self.ast
-    }
-
-    pub(super) fn datasource(&self) -> Option<&'ast Datasource> {
-        self.datasource
     }
 
     pub(crate) fn find_model_field(&self, model_id: ast::ModelId, field_name: &str) -> Option<ast::FieldId> {

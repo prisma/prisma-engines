@@ -12,6 +12,7 @@ use crate::{
         walkers::{CompleteInlineRelationWalker, InlineRelationWalker, ReferencingFields},
         ParserDatabase, ScalarFieldType,
     },
+    Datasource,
 };
 use datamodel_connector::{Connector, ConnectorCapability, ReferentialIntegrity};
 use itertools::Itertools;
@@ -279,14 +280,13 @@ pub(super) fn cycles<'ast, 'db>(
 /// onDelete.
 pub(super) fn multiple_cascading_paths(
     relation: CompleteInlineRelationWalker<'_, '_>,
-    db: &ParserDatabase<'_>,
     connector: &dyn Connector,
     referential_integrity: ReferentialIntegrity,
+    datasource: Option<&Datasource>,
     diagnostics: &mut Diagnostics,
 ) {
     if !connector.has_capability(ConnectorCapability::ReferenceCycleDetection)
-        || db
-            .datasource()
+        || datasource
             .map(|ds| ds.referential_integrity().is_prisma())
             .unwrap_or(false)
     {
@@ -465,8 +465,11 @@ fn cascade_error_with_default_values(
 }
 
 /// The types of the referencing and referenced scalar fields in a relation must be compatible.
-pub(super) fn referencing_scalar_field_types(relation: InlineRelationWalker<'_, '_>, diagnostics: &mut Diagnostics) {
-    let datasource = relation.db().datasource();
+pub(super) fn referencing_scalar_field_types(
+    relation: InlineRelationWalker<'_, '_>,
+    datasource: Option<&Datasource>,
+    diagnostics: &mut Diagnostics,
+) {
     // see https://github.com/prisma/prisma/issues/10105
     if datasource
         .as_ref()

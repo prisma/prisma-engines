@@ -50,7 +50,7 @@ impl<'a, 'b> ValidationPipeline<'a> {
         let referential_integrity = self.source.map(|s| s.referential_integrity()).unwrap_or_default();
 
         // Make sense of the AST.
-        let (db, mut diagnostics) = ParserDatabase::new(ast_schema, self.source, diagnostics);
+        let (db, mut diagnostics) = ParserDatabase::new(ast_schema, diagnostics);
 
         // Early return so that the validator does not have to deal with invalid schemas
         diagnostics.to_result()?;

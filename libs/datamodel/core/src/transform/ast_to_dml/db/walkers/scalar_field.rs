@@ -68,11 +68,14 @@ impl<'ast, 'db> ScalarFieldWalker<'ast, 'db> {
         }
     }
 
-    pub(crate) fn raw_native_type(self) -> Option<(&'ast str, &'db [String], Span)> {
+    /// (attribute scope, native type name, arguments, span)
+    ///
+    /// For example: `@db.Text` would translate to ("db", "Text", &[], <the span>)
+    pub(crate) fn raw_native_type(self) -> Option<(&'ast str, &'ast str, &'db [String], Span)> {
         self.attributes()
             .native_type
             .as_ref()
-            .map(move |(name, args, span)| (*name, args.as_slice(), *span))
+            .map(move |(datasource_name, name, args, span)| (*datasource_name, *name, args.as_slice(), *span))
     }
 
     pub(crate) fn is_unsupported(self) -> bool {
