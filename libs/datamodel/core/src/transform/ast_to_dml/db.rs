@@ -16,7 +16,6 @@ pub(crate) use types::{IndexAlgorithm, IndexType, RelationField, ScalarField, Sc
 
 use self::{context::Context, relations::Relations, types::Types};
 use crate::{ast, diagnostics::Diagnostics, Datasource};
-use datamodel_connector::ReferentialIntegrity;
 use names::Names;
 
 /// ParserDatabase is a container for a Schema AST, together with information
@@ -111,12 +110,6 @@ impl<'ast> ParserDatabase<'ast> {
 
     pub(super) fn datasource(&self) -> Option<&'ast Datasource> {
         self.datasource
-    }
-
-    pub(crate) fn active_referential_integrity(&self) -> ReferentialIntegrity {
-        self.datasource()
-            .map(|ds| ds.referential_integrity())
-            .unwrap_or(ReferentialIntegrity::ForeignKeys)
     }
 
     pub(crate) fn find_model_field(&self, model_id: ast::ModelId, field_name: &str) -> Option<ast::FieldId> {

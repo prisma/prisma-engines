@@ -3,7 +3,7 @@ use crate::{
     diagnostics::{DatamodelError, Diagnostics},
     transform::ast_to_dml::db::walkers::{ModelWalker, RelationFieldWalker, RelationName},
 };
-use datamodel_connector::Connector;
+use datamodel_connector::{Connector, ReferentialIntegrity};
 use itertools::Itertools;
 use std::fmt;
 
@@ -137,11 +137,10 @@ pub(super) fn ignored_related_model(field: RelationFieldWalker<'_, '_>, diagnost
 /// Does the connector support the given referential actions.
 pub(super) fn referential_actions(
     field: RelationFieldWalker<'_, '_>,
-    db: &super::ParserDatabase<'_>,
     connector: &dyn Connector,
+    referential_integrity: ReferentialIntegrity,
     diagnostics: &mut Diagnostics,
 ) {
-    let referential_integrity = db.active_referential_integrity();
     let msg = |action| {
         let allowed_values = connector
             .referential_actions(&referential_integrity)

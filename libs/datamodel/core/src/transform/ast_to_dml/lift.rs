@@ -4,7 +4,7 @@ use crate::{
     IndexField, PrimaryKeyField,
 };
 use ::dml::composite_type::{CompositeType, CompositeTypeField, CompositeTypeFieldType};
-use datamodel_connector::Connector;
+use datamodel_connector::{Connector, ReferentialIntegrity};
 use std::collections::HashMap;
 
 /// Helper for lifting a datamodel.
@@ -14,11 +14,20 @@ use std::collections::HashMap;
 pub(crate) struct LiftAstToDml<'a> {
     db: &'a db::ParserDatabase<'a>,
     connector: &'static dyn Connector,
+    referential_integrity: ReferentialIntegrity,
 }
 
 impl<'a> LiftAstToDml<'a> {
-    pub(crate) fn new(db: &'a db::ParserDatabase<'a>, connector: &'static dyn Connector) -> LiftAstToDml<'a> {
-        LiftAstToDml { db, connector }
+    pub(crate) fn new(
+        db: &'a db::ParserDatabase<'a>,
+        connector: &'static dyn Connector,
+        referential_integrity: ReferentialIntegrity,
+    ) -> LiftAstToDml<'a> {
+        LiftAstToDml {
+            db,
+            connector,
+            referential_integrity,
+        }
     }
 
     pub(crate) fn lift(&self) -> dml::Datamodel {
@@ -65,7 +74,7 @@ impl<'a> LiftAstToDml<'a> {
         field_ids_for_sorting: &mut HashMap<(&'a str, &'a str), ast::FieldId>,
     ) {
         let active_connector = self.connector;
-        let referential_integrity = self.db.active_referential_integrity();
+        let referential_integrity = self.referential_integrity;
         let common_dml_fields = |field: &mut dml::RelationField,
                                  attributes: &super::db::RelationField<'_>,
                                  relation_field: RelationFieldWalker<'_, '_>| {

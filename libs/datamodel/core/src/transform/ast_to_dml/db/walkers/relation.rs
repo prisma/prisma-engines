@@ -3,7 +3,7 @@ use crate::{
     ast,
     transform::ast_to_dml::db::{relations::*, ParserDatabase, ScalarFieldType},
 };
-use datamodel_connector::Connector;
+use datamodel_connector::{Connector, ReferentialIntegrity};
 use dml::relation_info::ReferentialAction;
 use std::borrow::Cow;
 
@@ -377,11 +377,14 @@ impl<'ast, 'db> CompleteInlineRelationWalker<'ast, 'db> {
 
     /// Gives the onDelete referential action of the relation. If not defined
     /// explicitly, returns the default value.
-    pub(crate) fn on_delete(self, connector: &dyn Connector) -> ReferentialAction {
+    pub(crate) fn on_delete(
+        self,
+        connector: &dyn Connector,
+        referential_integrity: ReferentialIntegrity,
+    ) -> ReferentialAction {
         use ReferentialAction::*;
 
         self.referencing_field().attributes().on_delete.unwrap_or_else(|| {
-            let referential_integrity = self.db.active_referential_integrity();
             let supports_restrict = connector.supports_referential_action(&referential_integrity, Restrict);
 
             match self.referential_arity() {

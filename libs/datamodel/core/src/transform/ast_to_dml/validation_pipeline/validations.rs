@@ -14,7 +14,7 @@ use crate::{
     ast,
     diagnostics::Diagnostics,
     transform::ast_to_dml::db::{walkers::RefinedRelationWalker, ParserDatabase},
-    PreviewFeature,
+    Datasource, PreviewFeature,
 };
 use datamodel_connector::Connector;
 use diagnostics::DatamodelError;
@@ -24,10 +24,12 @@ pub(super) fn validate(
     db: &ParserDatabase<'_>,
     connector: &dyn Connector,
     preview_features: BitFlags<PreviewFeature>,
+    datasource: Option<&Datasource>,
     diagnostics: &mut Diagnostics,
     relation_transformation_enabled: bool,
 ) {
     let names = Names::new(db, connector);
+    let referential_integrity = datasource.map(|ds| ds.referential_integrity()).unwrap_or_default();
 
     for composite_type in db.walk_composite_types() {
         composite_types::composite_types_support(composite_type, connector, diagnostics);
@@ -74,7 +76,7 @@ pub(super) fn validate(
             fields::validate_client_name(field.into(), &names, diagnostics);
 
             relation_fields::ignored_related_model(field, diagnostics);
-            relation_fields::referential_actions(field, db, connector, diagnostics);
+            relation_fields::referential_actions(field, connector, referential_integrity, diagnostics);
             relation_fields::map(field, connector, diagnostics);
         }
 
@@ -123,8 +125,8 @@ pub(super) fn validate(
                 if let Some(relation) = relation.as_complete() {
                     relations::field_arity(relation, diagnostics);
                     relations::same_length_in_referencing_and_referenced(relation, diagnostics);
-                    relations::cycles(relation, db, connector, diagnostics);
-                    relations::multiple_cascading_paths(relation, db, connector, diagnostics);
+                    relations::cycles(relation, connector, referential_integrity, diagnostics);
+                    relations::multiple_cascading_paths(relation, db, connector, referential_integrity, diagnostics);
                     relations::has_a_unique_constraint_name(&names, relation, connector, diagnostics);
                     relations::references_unique_fields(relation, connector, diagnostics);
                     relations::referencing_fields_in_correct_order(relation, connector, diagnostics);

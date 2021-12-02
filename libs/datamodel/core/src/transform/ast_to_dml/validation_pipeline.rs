@@ -47,6 +47,7 @@ impl<'a, 'b> ValidationPipeline<'a> {
             .source
             .map(|s| s.active_connector)
             .unwrap_or(&EmptyDatamodelConnector);
+        let referential_integrity = self.source.map(|s| s.referential_integrity()).unwrap_or_default();
 
         // Make sense of the AST.
         let (db, mut diagnostics) = ParserDatabase::new(ast_schema, self.source, diagnostics);
@@ -58,12 +59,13 @@ impl<'a, 'b> ValidationPipeline<'a> {
             &db,
             connector,
             self.preview_features,
+            self.source,
             &mut diagnostics,
             relation_transformation_enabled,
         );
         diagnostics.to_result()?;
 
-        let schema = LiftAstToDml::new(&db, connector).lift();
+        let schema = LiftAstToDml::new(&db, connector, referential_integrity).lift();
 
         // From now on we do not operate on the internal ast anymore, but DML.
         // Please try to avoid all new validations after this, if you can.
