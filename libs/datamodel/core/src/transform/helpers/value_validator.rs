@@ -3,12 +3,10 @@ use crate::{
     SortOrder,
 };
 use crate::{DefaultValue, ValueGenerator};
-use bigdecimal::BigDecimal;
 use chrono::{DateTime, FixedOffset};
 use diagnostics::DatamodelError;
-use dml::{relation_info::ReferentialAction, scalars::ScalarType};
+use dml::{prisma_value, relation_info::ReferentialAction, scalars::ScalarType, PrismaValue};
 use itertools::Itertools;
-use prisma_value::PrismaValue;
 use std::error;
 
 /// Wraps a value and provides convenience methods for
@@ -52,23 +50,22 @@ impl<'a> ValueValidator<'a> {
         }
     }
 
-    /// Attempts to parse the wrapped value
-    /// to a given prisma type.
+    /// Attempts to parse the wrapped value as a given Prisma scalar type.
     pub fn as_type(&self, scalar_type: ScalarType) -> Result<PrismaValue, DatamodelError> {
         match scalar_type {
             ScalarType::Int => self.as_int().map(PrismaValue::Int),
-            ScalarType::Float => self.as_float().map(PrismaValue::Float),
+            ScalarType::Float | ScalarType::Decimal => self
+                .as_float()
+                .and_then(|s| Ok(PrismaValue::Float(self.wrap_error_from_result(s.parse(), "numeric")?))),
             ScalarType::Boolean => self.as_bool().map(PrismaValue::Boolean),
             ScalarType::DateTime => self.as_date_time().map(PrismaValue::DateTime),
-            ScalarType::String => self.as_str().map(String::from).map(PrismaValue::String),
-            ScalarType::Json => self.as_str().map(String::from).map(PrismaValue::String),
+            ScalarType::String | ScalarType::Json => self.as_str().map(String::from).map(PrismaValue::String),
             ScalarType::Bytes => self.as_str().and_then(|s| {
                 prisma_value::decode_bytes(s).map(PrismaValue::Bytes).map_err(|_| {
                     DatamodelError::new_validation_error(format!("Invalid base64 string '{}'.", s), self.span())
                 })
             }),
 
-            ScalarType::Decimal => self.as_float().map(PrismaValue::Float),
             ScalarType::BigInt => self.as_int().map(PrismaValue::BigInt),
         }
     }
@@ -106,14 +103,10 @@ impl<'a> ValueValidator<'a> {
     }
 
     /// Tries to convert the wrapped value to a Prisma Float.
-    pub(crate) fn as_float(&self) -> Result<BigDecimal, DatamodelError> {
+    fn as_float(&self) -> Result<&'a str, DatamodelError> {
         match &self.value {
-            ast::Expression::StringValue(value, _) => {
-                self.wrap_error_from_result(value.parse::<BigDecimal>(), "numeric")
-            }
-            ast::Expression::NumericValue(value, _) => {
-                self.wrap_error_from_result(value.parse::<BigDecimal>(), "numeric")
-            }
+            ast::Expression::StringValue(value, _) => Ok(value),
+            ast::Expression::NumericValue(value, _) => Ok(value),
             _ => Err(self.construct_type_mismatch_error("numeric")),
         }
     }
@@ -129,7 +122,7 @@ impl<'a> ValueValidator<'a> {
     }
 
     /// Tries to convert the wrapped value to a Prisma DateTime.
-    pub fn as_date_time(&self) -> Result<DateTime<FixedOffset>, DatamodelError> {
+    fn as_date_time(&self) -> Result<DateTime<FixedOffset>, DatamodelError> {
         match &self.value {
             ast::Expression::StringValue(value, _) => {
                 self.wrap_error_from_result(DateTime::parse_from_rfc3339(value), "datetime")

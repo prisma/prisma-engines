@@ -1,6 +1,6 @@
 use crate::common::*;
+use ::dml::prisma_value::PrismaValue;
 use datamodel::{dml, ScalarType};
-use prisma_value::PrismaValue;
 
 #[test]
 fn should_not_remove_whitespace() {

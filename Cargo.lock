@@ -960,7 +960,6 @@ dependencies = [
  "once_cell",
  "pest",
  "pretty_assertions",
- "prisma-value",
  "regex",
  "schema-ast",
  "serde",

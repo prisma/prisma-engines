@@ -1,14 +1,12 @@
-use crate::common::constraint_names::ConstraintNames;
-use crate::common::preview_features::PreviewFeature;
-use crate::common::RelationNames;
-use crate::transform::dml_to_ast::LowerDmlToAst;
 use crate::{
     ast::{self, Attribute, Span},
-    dml, Datasource, Field, Ignorable, SortOrder,
+    common::{constraint_names::ConstraintNames, preview_features::PreviewFeature, RelationNames},
+    dml,
+    transform::dml_to_ast::LowerDmlToAst,
+    Datasource, Field, Ignorable, SortOrder,
 };
-use ::dml::traits::WithName;
+use ::dml::{prisma_value, traits::WithName, PrismaValue};
 use datamodel_connector::{Connector, EmptyDatamodelConnector};
-use prisma_value::PrismaValue;
 
 impl<'a> LowerDmlToAst<'a> {
     /// Internal: Lowers a field's arity.

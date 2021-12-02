@@ -1,8 +1,8 @@
 use crate::common::*;
 use bigdecimal::{BigDecimal, FromPrimitive};
 use datamodel::{dml::ScalarType, DefaultValue, ValueGenerator};
+use dml::prisma_value::PrismaValue;
 use native_types::{MySqlType, PostgresType};
-use prisma_value::PrismaValue;
 
 #[test]
 fn should_apply_a_custom_type() {

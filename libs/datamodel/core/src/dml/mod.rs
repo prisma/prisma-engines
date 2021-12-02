@@ -9,3 +9,5 @@ pub use dml::r#enum::*;
 pub use dml::relation_info::*;
 pub use dml::scalars::*;
 pub use dml::traits::*;
+
+pub use dml::PrismaValue;

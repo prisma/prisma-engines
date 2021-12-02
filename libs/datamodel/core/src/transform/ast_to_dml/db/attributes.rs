@@ -10,14 +10,13 @@ use crate::{
     ast::{self, WithName},
     common::constraint_names::ConstraintNames,
     diagnostics::DatamodelError,
-    dml,
+    dml::{self, PrismaValue},
     transform::{
         ast_to_dml::db::types::{FieldWithArgs, IndexAlgorithm},
         helpers::ValueValidator,
     },
     SortOrder,
 };
-use prisma_value::PrismaValue;
 
 pub(super) fn resolve_attributes(ctx: &mut Context<'_>) {
     for top in ctx.db.ast.iter_tops() {
