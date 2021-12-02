@@ -1,15 +1,12 @@
-use super::env_function::EnvFunction;
 use crate::{
     ast::{self, Expression, Span},
-    configuration::StringFromEnvVar,
     SortOrder,
 };
 use crate::{DefaultValue, ValueGenerator};
 use bigdecimal::BigDecimal;
 use chrono::{DateTime, FixedOffset};
 use diagnostics::DatamodelError;
-use dml::relation_info::ReferentialAction;
-use dml::scalars::ScalarType;
+use dml::{relation_info::ReferentialAction, scalars::ScalarType};
 use itertools::Itertools;
 use prisma_value::PrismaValue;
 use std::error;
@@ -18,7 +15,7 @@ use std::error;
 /// validating it.
 #[derive(Debug)]
 pub struct ValueValidator<'a> {
-    value: &'a ast::Expression,
+    pub value: &'a ast::Expression,
 }
 
 impl<'a> ValueValidator<'a> {
@@ -93,22 +90,6 @@ impl<'a> ValueValidator<'a> {
             ast::Expression::StringValue(value, _) => Ok(value),
             _ => Err(self.construct_type_mismatch_error("String")),
         }
-    }
-
-    /// returns a (Some(a), b) if the string was deducted from an env var
-    pub fn as_str_from_env(&self) -> Result<StringFromEnvVar, DatamodelError> {
-        match &self.value {
-            ast::Expression::Function(name, _, _) if name == "env" => {
-                let env_function = self.as_env_function()?;
-                Ok(StringFromEnvVar::new_from_env_var(env_function.var_name().to_owned()))
-            }
-            ast::Expression::StringValue(value, _) => Ok(StringFromEnvVar::new_literal(value.clone())),
-            _ => Err(self.construct_type_mismatch_error("String")),
-        }
-    }
-
-    pub(crate) fn as_env_function(&self) -> Result<EnvFunction, DatamodelError> {
-        EnvFunction::from_ast(self.value)
     }
 
     /// returns true if this argument is derived from an env() function
@@ -342,15 +323,10 @@ impl<'a> ValueValidator<'a> {
 
 pub(crate) trait ValueListValidator {
     fn to_str_vec(&self) -> Result<Vec<String>, DatamodelError>;
-    fn to_string_from_env_var_vec(&self) -> Result<Vec<StringFromEnvVar>, DatamodelError>;
     fn to_literal_vec(&self) -> Result<Vec<String>, DatamodelError>;
 }
 
 impl ValueListValidator for Vec<ValueValidator<'_>> {
-    fn to_string_from_env_var_vec(&self) -> Result<Vec<StringFromEnvVar>, DatamodelError> {
-        self.iter().map(|val| val.as_str_from_env()).collect()
-    }
-
     fn to_str_vec(&self) -> Result<Vec<String>, DatamodelError> {
         self.iter().map(|val| Ok(val.as_str()?.to_owned())).collect()
     }

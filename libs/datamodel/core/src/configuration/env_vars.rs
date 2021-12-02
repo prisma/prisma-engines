@@ -1,4 +1,8 @@
+use crate::transform::helpers::EnvFunction;
+use diagnostics::DatamodelError;
+use schema_ast::ast;
 use serde::Serialize;
+use std::convert::TryFrom;
 
 /// Either an env var or a string literal.
 #[derive(Clone, Debug, PartialEq, Serialize)]
@@ -33,5 +37,25 @@ impl StringFromEnvVar {
     /// Returns the contents of the string literal, if applicable.
     pub fn as_literal(&self) -> Option<&str> {
         self.value.as_deref()
+    }
+}
+
+impl TryFrom<&ast::Expression> for StringFromEnvVar {
+    type Error = DatamodelError;
+
+    fn try_from(expr: &ast::Expression) -> Result<StringFromEnvVar, Self::Error> {
+        match expr {
+            ast::Expression::Function(name, _, _) if name == "env" => {
+                let env_function = EnvFunction::from_ast(expr)?;
+                Ok(StringFromEnvVar::new_from_env_var(env_function.var_name().to_owned()))
+            }
+            ast::Expression::StringValue(value, _) => Ok(StringFromEnvVar::new_literal(value.clone())),
+            _ => Err(DatamodelError::new_type_mismatch_error(
+                "String",
+                expr.describe_value_type(),
+                &expr.to_string(),
+                expr.span(),
+            )),
+        }
     }
 }
