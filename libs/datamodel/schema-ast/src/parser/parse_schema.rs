@@ -8,12 +8,11 @@ use super::{
     PrismaDatamodelParser, Rule,
 };
 use crate::ast::*;
-use diagnostics::{DatamodelError, Diagnostics};
+use diagnostics::{DatamodelError, DatamodelWarning, Diagnostics};
 use pest::Parser;
 
 /// Parses a Prisma V2 datamodel document into an internal AST representation.
-pub fn parse_schema(datamodel_string: &str) -> Result<SchemaAst, Diagnostics> {
-    let mut diagnostics = Diagnostics::default();
+pub fn parse_schema(datamodel_string: &str, diagnostics: &mut Diagnostics) -> SchemaAst {
     let datamodel_result = PrismaDatamodelParser::parse(Rule::schema, datamodel_string);
 
     match datamodel_result {
@@ -27,19 +26,22 @@ pub fn parse_schema(datamodel_string: &str) -> Result<SchemaAst, Diagnostics> {
 
                         match keyword.as_rule() {
                             Rule::TYPE_KEYWORD => {
-                                top_level_definitions.push(Top::CompositeType(parse_composite_type(&current, &mut diagnostics)))
+                                top_level_definitions.push(Top::CompositeType(parse_composite_type(&current, diagnostics)))
                             }
                             Rule::MODEL_KEYWORD => {
-                                top_level_definitions.push(Top::Model(parse_model(&current, &mut diagnostics)))
+                                top_level_definitions.push(Top::Model(parse_model(&current, diagnostics)))
                             }
                             _ => unreachable!(),
                         }
 
                     },
-                    Rule::enum_declaration => top_level_definitions.push(Top::Enum(parse_enum(&current, &mut diagnostics))),
-                    Rule::source_block => top_level_definitions.push(Top::Source(parse_source(&current, &mut diagnostics))),
-                    Rule::generator_block => top_level_definitions.push(Top::Generator(parse_generator(&current, &mut diagnostics))),
-                    Rule::type_alias => top_level_definitions.push(Top::Type(parse_type_alias(&current))),
+                    Rule::enum_declaration => top_level_definitions.push(Top::Enum(parse_enum(&current, diagnostics))),
+                    Rule::source_block => top_level_definitions.push(Top::Source(parse_source(&current, diagnostics))),
+                    Rule::generator_block => top_level_definitions.push(Top::Generator(parse_generator(&current, diagnostics))),
+                    Rule::type_alias => {
+                        diagnostics.push_warning(DatamodelWarning::DeprecatedTypeAlias { span: current.as_span().into() });
+                        top_level_definitions.push(Top::Type(parse_type_alias(&current)))
+                    }
                     Rule::comment_block => (),
                     Rule::EOI => {}
                     Rule::CATCH_ALL => diagnostics.push_error(DatamodelError::new_validation_error(
@@ -54,11 +56,9 @@ pub fn parse_schema(datamodel_string: &str) -> Result<SchemaAst, Diagnostics> {
                 }
             }
 
-            diagnostics.to_result()?;
-
-            Ok(SchemaAst {
+            SchemaAst {
                 tops: top_level_definitions,
-            })
+            }
         }
         Err(err) => {
             let location: pest::Span<'_> = match err.location {
@@ -72,7 +72,8 @@ pub fn parse_schema(datamodel_string: &str) -> Result<SchemaAst, Diagnostics> {
             };
 
             diagnostics.push_error(DatamodelError::new_parser_error(&expected, location.into()));
-            Err(diagnostics)
+
+            SchemaAst { tops: Vec::new() }
         }
     }
 }
