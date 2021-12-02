@@ -17,6 +17,10 @@ impl FieldSelection {
         Self { selections }
     }
 
+    pub fn into_inner(self) -> Vec<SelectedField> {
+        self.selections
+    }
+
     /// Returns `true` if self contains (at least) all fields specified in `other`. `false` otherwise.
     /// Recurses into composite selections and ensures that composite selections are supersets as well.
     pub fn is_superset_of(&self, other: &Self) -> bool {

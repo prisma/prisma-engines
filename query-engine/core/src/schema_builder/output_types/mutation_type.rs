@@ -146,7 +146,7 @@ fn create_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField 
     field(
         field_name,
         args,
-        OutputType::object(output_objects::map_model_object_type(ctx, &model)),
+        OutputType::object(objects::model::map_type(ctx, &model)),
         Some(QueryInfo {
             model: Some(Arc::clone(&model)),
             tag: QueryTag::CreateOne,
@@ -162,7 +162,7 @@ fn delete_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Outpu
         field(
             field_name,
             args,
-            OutputType::object(output_objects::map_model_object_type(ctx, &model)),
+            OutputType::object(objects::model::map_type(ctx, &model)),
             Some(QueryInfo {
                 model: Some(Arc::clone(&model)),
                 tag: QueryTag::DeleteOne,
@@ -183,7 +183,7 @@ fn delete_many_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField 
     field(
         field_name,
         arguments,
-        OutputType::object(output_objects::affected_records_object_type(ctx)),
+        OutputType::object(objects::affected_records_object_type(ctx)),
         Some(QueryInfo {
             model: Some(Arc::clone(&model)),
             tag: QueryTag::DeleteMany,
@@ -199,7 +199,7 @@ fn update_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Outpu
         field(
             field_name,
             args,
-            OutputType::object(output_objects::map_model_object_type(ctx, &model)),
+            OutputType::object(objects::model::map_type(ctx, &model)),
             Some(QueryInfo {
                 model: Some(Arc::clone(&model)),
                 tag: QueryTag::UpdateOne,
@@ -218,7 +218,7 @@ fn create_many_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Outpu
         Some(field(
             field_name,
             arguments,
-            OutputType::object(output_objects::affected_records_object_type(ctx)),
+            OutputType::object(objects::affected_records_object_type(ctx)),
             Some(QueryInfo {
                 model: Some(Arc::clone(&model)),
                 tag: QueryTag::CreateMany,
@@ -240,7 +240,7 @@ fn update_many_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField 
     field(
         field_name,
         arguments,
-        OutputType::object(output_objects::affected_records_object_type(ctx)),
+        OutputType::object(objects::affected_records_object_type(ctx)),
         Some(QueryInfo {
             model: Some(Arc::clone(&model)),
             tag: QueryTag::UpdateMany,
@@ -256,7 +256,7 @@ fn upsert_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Outpu
         field(
             field_name,
             args,
-            OutputType::object(output_objects::map_model_object_type(ctx, &model)),
+            OutputType::object(objects::model::map_type(ctx, &model)),
             Some(QueryInfo {
                 model: Some(Arc::clone(&model)),
                 tag: QueryTag::UpsertOne,

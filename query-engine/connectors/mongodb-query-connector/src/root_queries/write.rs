@@ -24,15 +24,7 @@ pub async fn create_record<'conn>(
     mut args: WriteArgs,
 ) -> crate::Result<SelectionResult> {
     let coll = database.collection::<Document>(model.db_name());
-
-    // Mongo only allows a singular ID.
-    let mut id_fields = ModelProjection::from(model.primary_identifier())
-        .scalar_fields()
-        .collect::<Vec<_>>();
-
-    assert!(id_fields.len() == 1);
-
-    let id_field = id_fields.pop().unwrap();
+    let id_field = pick_singular_id(model);
 
     // Fields to write to the document.
     // Todo: Do we need to write null for everything? There's something with nulls and exists that might impact
@@ -45,7 +37,7 @@ pub async fn create_record<'conn>(
         .collect();
 
     let mut doc = Document::new();
-    let id_meta = output_meta::from_field(&id_field);
+    let id_meta = output_meta::from_scalar_field(&id_field);
 
     for field in fields {
         let db_name = field.db_name();
@@ -129,12 +121,8 @@ pub async fn update_records<'conn>(
     //
     // Mongo can only have singular IDs (always `_id`), hence the unwraps. Since IDs are immutable, we also don't
     // need to merge back id changes into the result set as with SQL.
-    let id_field = ModelProjection::from(model.primary_identifier())
-        .scalar_fields()
-        .next()
-        .unwrap();
-
-    let id_meta = output_meta::from_field(&id_field);
+    let id_field = pick_singular_id(model);
+    let id_meta = output_meta::from_scalar_field(&id_field);
     let ids: Vec<Bson> = if let Some(selectors) = record_filter.selectors {
         selectors
             .into_iter()
@@ -256,10 +244,7 @@ pub async fn delete_records<'conn>(
     record_filter: RecordFilter,
 ) -> crate::Result<usize> {
     let coll = database.collection::<Document>(model.db_name());
-    let id_field = ModelProjection::from(model.primary_identifier())
-        .scalar_fields()
-        .next()
-        .unwrap();
+    let id_field = pick_singular_id(model);
 
     let ids = if let Some(selectors) = record_filter.selectors {
         selectors
@@ -324,10 +309,7 @@ pub async fn m2m_connect<'conn>(
     let child_coll = database.collection::<Document>(child_model.db_name());
 
     let parent_id = parent_id.values().next().unwrap();
-    let parent_id_field = ModelProjection::from(parent_model.primary_identifier())
-        .scalar_fields()
-        .next()
-        .unwrap();
+    let parent_id_field = pick_singular_id(&parent_model);
 
     let parent_ids_scalar_field_name = field.relation_info.fields.get(0).unwrap();
     let parent_id = (&parent_id_field, parent_id).into_bson()?;
@@ -374,10 +356,7 @@ pub async fn m2m_disconnect<'conn>(
     let child_coll = database.collection::<Document>(child_model.db_name());
 
     let parent_id = parent_id.values().next().unwrap();
-    let parent_id_field = ModelProjection::from(parent_model.primary_identifier())
-        .scalar_fields()
-        .next()
-        .unwrap();
+    let parent_id_field = pick_singular_id(&parent_model);
 
     let parent_ids_scalar_field_name = field.relation_info.fields.get(0).unwrap();
     let parent_id = (&parent_id_field, parent_id).into_bson()?;

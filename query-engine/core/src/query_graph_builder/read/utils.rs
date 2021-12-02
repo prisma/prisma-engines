@@ -1,5 +1,5 @@
 use super::*;
-use crate::{constants::aggregations::*, FieldPair, ReadQuery};
+use crate::{constants::aggregations::*, FieldPair, ParsedField, ReadQuery};
 use connector::RelAggregationSelection;
 use prisma_models::prelude::*;
 use std::sync::Arc;
@@ -23,13 +23,10 @@ pub fn collect_selected_fields(
     distinct: Option<FieldSelection>,
     model: &ModelRef,
 ) -> FieldSelection {
-    let fields = from_pairs
-        .iter()
-        .filter_map(|pair| model.fields().find_from_all(&pair.parsed_field.name).ok().cloned())
-        .collect::<Vec<Field>>();
-
     let model_id = model.primary_identifier();
-    let selection = FieldSelection::from(fields);
+    let selected_fields = pairs_to_selections(model, from_pairs);
+
+    let selection = FieldSelection::new(selected_fields);
     let selection = model_id.merge(selection);
 
     // Distinct fields are always selected because we are processing them in-memory
@@ -38,6 +35,43 @@ pub fn collect_selected_fields(
     } else {
         selection
     }
+}
+
+fn pairs_to_selections<T>(parent: T, pairs: &[FieldPair]) -> Vec<SelectedField>
+where
+    T: Into<ParentContainer>,
+{
+    let parent = parent.into();
+    let fields = pairs
+        .iter()
+        .filter_map(|pair| {
+            parent
+                .find_field(&pair.parsed_field.name)
+                .map(|field| (pair.parsed_field.clone(), field))
+        })
+        .collect::<Vec<(ParsedField, Field)>>();
+
+    fields
+        .into_iter()
+        .flat_map(|field| match field {
+            (_, Field::Relation(rf)) => rf.scalar_fields().into_iter().map(Into::into).collect(),
+            (_, Field::Scalar(sf)) => vec![sf.into()],
+            (pf, Field::Composite(cf)) => vec![extract_composite_selection(pf, cf)],
+        })
+        .collect()
+}
+
+fn extract_composite_selection(pf: ParsedField, cf: CompositeFieldRef) -> SelectedField {
+    let object = pf
+        .nested_fields
+        .expect("Invalid composite query shape: Composite field selected without sub-selection.");
+
+    let typ = cf.typ.clone();
+
+    SelectedField::Composite(CompositeSelection {
+        field: cf,
+        selections: pairs_to_selections(&typ, &object.fields),
+    })
 }
 
 pub fn collect_nested_queries(from: Vec<FieldPair>, model: &ModelRef) -> QueryGraphBuilderResult<Vec<ReadQuery>> {

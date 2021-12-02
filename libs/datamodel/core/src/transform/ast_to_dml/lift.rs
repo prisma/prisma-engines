@@ -339,7 +339,7 @@ impl<'a> LiftAstToDml<'a> {
             let field_type = match &scalar_field.scalar_field_type() {
                 db::ScalarFieldType::CompositeType(ctid) => {
                     let mut field = dml::CompositeField::new();
-                    field.name = scalar_field.name().to_string();
+                    field.name = scalar_field.name().to_owned();
                     field.composite_type = self.db.ast()[*ctid].name.name.to_owned();
                     field.documentation = ast_field.documentation.clone().map(|comment| comment.text);
                     field.is_ignored = scalar_field.is_ignored();

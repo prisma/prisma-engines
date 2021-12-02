@@ -13,7 +13,7 @@ use mongodb::{
     options::{AggregateOptions, FindOptions},
     ClientSession, Collection,
 };
-use prisma_models::{ModelProjection, ModelRef, ScalarFieldRef};
+use prisma_models::{FieldSelection, ModelRef, ScalarFieldRef};
 use std::convert::TryFrom;
 
 /// Ergonomics wrapper for query execution and logging.
@@ -407,8 +407,8 @@ impl MongoReadQueryBuilder {
         outer_stages
     }
 
-    /// Adds a final projection onto the fields specified by the `ModelProjection`.
-    pub fn with_model_projection(mut self, selected_fields: ModelProjection) -> crate::Result<Self> {
+    /// Adds a final projection onto the fields specified by the `FieldSelection`.
+    pub fn with_model_projection(mut self, selected_fields: FieldSelection) -> crate::Result<Self> {
         let projection = selected_fields.into_bson()?.into_document()?;
         self.projection = Some(projection);
 

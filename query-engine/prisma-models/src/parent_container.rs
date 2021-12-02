@@ -1,6 +1,7 @@
-use crate::{CompositeTypeRef, CompositeTypeWeakRef, InternalDataModelRef, ModelRef, ModelWeakRef};
+use crate::{CompositeTypeRef, CompositeTypeWeakRef, Field, InternalDataModelRef, ModelRef, ModelWeakRef};
 use std::fmt::Debug;
 use std::hash::{Hash, Hasher};
+use std::sync::Arc;
 
 #[derive(Clone)]
 pub enum ParentContainer {
@@ -37,11 +38,44 @@ impl ParentContainer {
             ParentContainer::CompositeType(ct) => ct.upgrade(),
         }
     }
+
+    pub fn find_field(&self, prisma_name: &str) -> Option<Field> {
+        // Unwraps are safe: This can never fail, the models and composites are always available in memory.
+        match self {
+            ParentContainer::Model(weak) => weak
+                .upgrade()
+                .unwrap()
+                .fields()
+                .find_from_all(prisma_name)
+                .ok()
+                .cloned(),
+
+            ParentContainer::CompositeType(weak) => weak
+                .upgrade()
+                .unwrap()
+                .fields()
+                .into_iter()
+                .find(|field| field.name() == prisma_name)
+                .cloned(),
+        }
+    }
+}
+
+impl From<&ModelRef> for ParentContainer {
+    fn from(model: &ModelRef) -> Self {
+        Self::Model(Arc::downgrade(&model))
+    }
 }
 
 impl From<ModelWeakRef> for ParentContainer {
     fn from(model: ModelWeakRef) -> Self {
         Self::Model(model)
+    }
+}
+
+impl From<&CompositeTypeRef> for ParentContainer {
+    fn from(composite: &CompositeTypeRef) -> Self {
+        Self::CompositeType(Arc::downgrade(&composite))
     }
 }
 
