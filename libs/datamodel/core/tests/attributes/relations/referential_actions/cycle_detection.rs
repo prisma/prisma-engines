@@ -32,6 +32,56 @@ fn cascading_on_delete_self_relations() {
 }
 
 #[test]
+fn cascading_cycles_cannot_loop_infinitely() {
+    let dml = indoc! {r#"
+        datasource db {
+          provider = "sqlserver"
+          url = "sqlserver://"
+        }
+
+        model A {
+          id Int @id
+          name Int @unique
+          c C @relation(name: "atoc", fields: [name], references: [name], onDelete: Cascade)
+          cs C[] @relation(name: "ctoa")
+        }
+
+        model B {
+          id Int @id
+          name Int @unique
+          c C @relation(name: "btoc", fields: [name], references: [name], onDelete: Cascade)
+        }
+
+        model C {
+          id Int @id
+          name Int @unique
+          a A @relation(name: "ctoa", fields: [name], references: [name], onDelete: Cascade)
+          as A[] @relation(name: "atoc")
+          bs B[] @relation(name: "btoc")
+        }
+    "#};
+
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError validating: Reference causes a cycle. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Cycle path: A.c → C.a. (Implicit default `onUpdate`: `Cascade`) Read more at https://pris.ly/d/cyclic-referential-actions[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
+        [1;94m   | [0m
+        [1;94m 8 | [0m  name Int @unique
+        [1;94m 9 | [0m  [1;91mc C @relation(name: "atoc", fields: [name], references: [name], onDelete: Cascade)[0m
+        [1;94m10 | [0m  cs C[] @relation(name: "ctoa")
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError validating: Reference causes a cycle. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Cycle path: C.a → A.c. (Implicit default `onUpdate`: `Cascade`) Read more at https://pris.ly/d/cyclic-referential-actions[0m
+          [1;94m-->[0m  [4mschema.prisma:22[0m
+        [1;94m   | [0m
+        [1;94m21 | [0m  name Int @unique
+        [1;94m22 | [0m  [1;91ma A @relation(name: "ctoa", fields: [name], references: [name], onDelete: Cascade)[0m
+        [1;94m23 | [0m  as A[] @relation(name: "atoc")
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+}
+
+#[test]
 fn cascading_on_update_self_relations() {
     let dml = indoc! {
         r#"

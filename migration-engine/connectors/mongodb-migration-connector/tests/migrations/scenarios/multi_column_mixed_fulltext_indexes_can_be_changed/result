@@ -1,5 +1,5 @@
 [-] Index `UserExistingIndex`
-[+] Index `UserExistingIndex` on ({"firstName":"text","lastName":"text","location":1})
+[+] Fulltext index `UserExistingIndex` on ({"firstName":"text","lastName":"text","location":1})
 
 ------
 

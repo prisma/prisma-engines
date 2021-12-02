@@ -6,6 +6,7 @@ version = "0.1.0"
 
 [dependencies]
 datamodel = { path = "../../../libs/datamodel/core" }
+mongodb-schema-describer = { path = "../../../libs/mongodb-schema-describer" }
 migration-connector = { path = "../migration-connector" }
 
 async-trait = "0.1.17"

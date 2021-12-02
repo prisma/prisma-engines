@@ -1,8 +1,6 @@
 mod field_type;
 mod statistics;
 
-use datamodel::common::preview_features::PreviewFeature;
-use enumflags2::BitFlags;
 use futures::TryStreamExt;
 use introspection_connector::{CompositeTypeDepth, IntrospectionResult, Version};
 use mongodb::{
@@ -10,6 +8,7 @@ use mongodb::{
     options::AggregateOptions,
     Database,
 };
+use mongodb_schema_describer::MongoSchema;
 use statistics::*;
 
 /// From the given database, lists all collections as models, and samples
@@ -22,33 +21,29 @@ use statistics::*;
 pub(super) async fn sample(
     database: Database,
     composite_type_depth: CompositeTypeDepth,
-    preview_features: BitFlags<PreviewFeature>,
+    schema: MongoSchema,
 ) -> crate::Result<IntrospectionResult> {
-    let collections = database.list_collection_names(None).await?;
-    let mut statistics = Statistics::new(composite_type_depth, preview_features);
+    let mut statistics = Statistics::new(composite_type_depth);
     let mut warnings = Vec::new();
 
-    for collection_name in &collections {
-        statistics.track_model(collection_name);
+    for collection in schema.walk_collections() {
+        statistics.track_model(collection.name());
     }
 
-    for collection_name in collections {
-        let collection = database.collection::<Document>(&collection_name);
-
+    for collection in schema.walk_collections() {
         let options = AggregateOptions::builder().allow_disk_use(Some(true)).build();
 
-        let mut documents = collection
+        let mut documents = database
+            .collection::<Document>(collection.name())
             .aggregate(vec![doc! { "$sample": { "size": SAMPLE_SIZE } }], Some(options))
             .await?;
 
         while let Some(document) = documents.try_next().await? {
-            statistics.track_model_fields(&collection_name, document);
+            statistics.track_model_fields(collection.name(), document);
         }
 
-        let mut indices = collection.list_indexes(None).await?;
-
-        while let Some(index) = indices.try_next().await? {
-            statistics.track_index(&collection_name, index);
+        for index in collection.indexes() {
+            statistics.track_index(collection.name(), index);
         }
     }
 
