@@ -12,9 +12,10 @@ use datamodel_connector::{Connector, ConnectorCapability};
 pub(super) fn has_a_unique_constraint_name(
     index: IndexWalker<'_, '_>,
     names: &super::Names<'_>,
+    connector: &dyn Connector,
     diagnostics: &mut Diagnostics,
 ) {
-    let name = index.final_database_name();
+    let name = index.final_database_name(connector);
     let model = index.model();
 
     for violation in names
@@ -69,14 +70,11 @@ pub(crate) fn uses_length_or_sort_without_preview_flag(
 
 /// The database must support the index length prefix for it to be allowed in the data model.
 pub(crate) fn field_length_prefix_supported(
-    db: &ParserDatabase<'_>,
     index: IndexWalker<'_, '_>,
+    connector: &dyn Connector,
     diagnostics: &mut Diagnostics,
 ) {
-    if db
-        .active_connector()
-        .has_capability(ConnectorCapability::IndexColumnLengthPrefixing)
-    {
+    if connector.has_capability(ConnectorCapability::IndexColumnLengthPrefixing) {
         return;
     }
 
@@ -94,14 +92,11 @@ pub(crate) fn field_length_prefix_supported(
 
 /// Is `Hash` supported as `type`
 pub(crate) fn index_algorithm_is_supported(
-    db: &ParserDatabase<'_>,
     index: IndexWalker<'_, '_>,
+    connector: &dyn Connector,
     diagnostics: &mut Diagnostics,
 ) {
-    if db
-        .active_connector()
-        .has_capability(ConnectorCapability::UsingHashIndex)
-    {
+    if connector.has_capability(ConnectorCapability::UsingHashIndex) {
         return;
     }
 
@@ -142,11 +137,11 @@ pub(crate) fn fulltext_index_preview_feature_enabled(
 
 /// `@@fulltext` should only be available if we support it in the database.
 pub(crate) fn fulltext_index_supported(
-    db: &ParserDatabase<'_>,
     index: IndexWalker<'_, '_>,
+    connector: &dyn Connector,
     diagnostics: &mut Diagnostics,
 ) {
-    if db.active_connector().has_capability(ConnectorCapability::FullTextIndex) {
+    if connector.has_capability(ConnectorCapability::FullTextIndex) {
         return;
     }
 
@@ -190,13 +185,14 @@ pub(crate) fn index_algorithm_preview_feature(
 pub(crate) fn fulltext_columns_should_not_define_length(
     db: &ParserDatabase<'_>,
     index: IndexWalker<'_, '_>,
+    connector: &dyn Connector,
     diagnostics: &mut Diagnostics,
 ) {
     if !db.preview_features.contains(PreviewFeature::FullTextIndex) {
         return;
     }
 
-    if !db.active_connector().has_capability(ConnectorCapability::FullTextIndex) {
+    if !connector.has_capability(ConnectorCapability::FullTextIndex) {
         return;
     }
 
@@ -223,13 +219,14 @@ pub(crate) fn fulltext_columns_should_not_define_length(
 pub(crate) fn fulltext_column_sort_is_supported(
     db: &ParserDatabase<'_>,
     index: IndexWalker<'_, '_>,
+    connector: &dyn Connector,
     diagnostics: &mut Diagnostics,
 ) {
     if !db.preview_features.contains(PreviewFeature::FullTextIndex) {
         return;
     }
 
-    if !db.active_connector().has_capability(ConnectorCapability::FullTextIndex) {
+    if !connector.has_capability(ConnectorCapability::FullTextIndex) {
         return;
     }
 
@@ -237,10 +234,7 @@ pub(crate) fn fulltext_column_sort_is_supported(
         return;
     }
 
-    if db
-        .active_connector()
-        .has_capability(ConnectorCapability::SortOrderInFullTextIndex)
-    {
+    if connector.has_capability(ConnectorCapability::SortOrderInFullTextIndex) {
         return;
     }
 
@@ -267,13 +261,14 @@ pub(crate) fn fulltext_column_sort_is_supported(
 pub(crate) fn fulltext_text_columns_should_be_bundled_together(
     db: &ParserDatabase<'_>,
     index: IndexWalker<'_, '_>,
+    connector: &dyn Connector,
     diagnostics: &mut Diagnostics,
 ) {
     if !db.preview_features.contains(PreviewFeature::FullTextIndex) {
         return;
     }
 
-    if !db.active_connector().has_capability(ConnectorCapability::FullTextIndex) {
+    if !connector.has_capability(ConnectorCapability::FullTextIndex) {
         return;
     }
 
@@ -281,10 +276,7 @@ pub(crate) fn fulltext_text_columns_should_be_bundled_together(
         return;
     }
 
-    if !db
-        .active_connector()
-        .has_capability(ConnectorCapability::SortOrderInFullTextIndex)
-    {
+    if !connector.has_capability(ConnectorCapability::SortOrderInFullTextIndex) {
         return;
     }
 
@@ -330,16 +322,14 @@ pub(crate) fn fulltext_text_columns_should_be_bundled_together(
 pub(crate) fn hash_index_must_not_use_sort_param(
     db: &ParserDatabase<'_>,
     index: IndexWalker<'_, '_>,
+    connector: &dyn Connector,
     diagnostics: &mut Diagnostics,
 ) {
     if !db.preview_features.contains(PreviewFeature::ExtendedIndexes) {
         return;
     }
 
-    if !db
-        .active_connector()
-        .has_capability(ConnectorCapability::UsingHashIndex)
-    {
+    if !connector.has_capability(ConnectorCapability::UsingHashIndex) {
         return;
     }
 

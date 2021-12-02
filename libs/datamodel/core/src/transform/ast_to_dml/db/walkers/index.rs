@@ -1,3 +1,5 @@
+use datamodel_connector::Connector;
+
 use crate::{
     ast,
     common::constraint_names::ConstraintNames,
@@ -21,7 +23,7 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
         self.index_attribute.db_name
     }
 
-    pub(crate) fn final_database_name(self) -> Cow<'ast, str> {
+    pub(crate) fn final_database_name(self, connector: &dyn Connector) -> Cow<'ast, str> {
         if let Some(mapped_name) = self.database_name() {
             return Cow::from(mapped_name);
         }
@@ -40,9 +42,9 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
             .collect();
 
         if self.index_attribute.is_unique() {
-            ConstraintNames::unique_index_name(model_db_name, &field_db_names, self.db.active_connector()).into()
+            ConstraintNames::unique_index_name(model_db_name, &field_db_names, connector).into()
         } else {
-            ConstraintNames::non_unique_index_name(model_db_name, &field_db_names, self.db.active_connector()).into()
+            ConstraintNames::non_unique_index_name(model_db_name, &field_db_names, connector).into()
         }
     }
 

@@ -1,5 +1,5 @@
 use crate::{ast, transform::ast_to_dml::db::ParserDatabase};
-use datamodel_connector::ConstraintScope;
+use datamodel_connector::{Connector, ConstraintScope};
 use std::{borrow::Cow, collections::HashMap, ops::Deref};
 
 /// A constraint namespace consists of two kinds of namespaces:
@@ -47,25 +47,46 @@ impl<'ast> ConstraintNamespace<'ast> {
     }
 
     /// Add all index and unique constraints from the data model to a global validation scope.
-    pub(super) fn add_global_indexes(&mut self, db: &ParserDatabase<'ast>, scope: ConstraintScope) {
+    pub(super) fn add_global_indexes(
+        &mut self,
+        db: &ParserDatabase<'ast>,
+        connector: &dyn Connector,
+        scope: ConstraintScope,
+    ) {
         for index in db.walk_models().flat_map(|m| m.indexes()) {
-            let counter = self.global.entry((scope, index.final_database_name())).or_default();
+            let counter = self
+                .global
+                .entry((scope, index.final_database_name(connector)))
+                .or_default();
             *counter += 1;
         }
     }
 
     /// Add all foreign key constraints from the data model to a global validation scope.
-    pub(super) fn add_global_relations(&mut self, db: &ParserDatabase<'ast>, scope: ConstraintScope) {
-        for name in db.walk_complete_inline_relations().filter_map(|r| r.foreign_key_name()) {
+    pub(super) fn add_global_relations(
+        &mut self,
+        db: &ParserDatabase<'ast>,
+        connector: &dyn Connector,
+        scope: ConstraintScope,
+    ) {
+        for name in db
+            .walk_complete_inline_relations()
+            .filter_map(|r| r.foreign_key_name(connector))
+        {
             let counter = self.global.entry((scope, name)).or_default();
             *counter += 1;
         }
     }
 
     /// Add all primary key constraints from the data model to a global validation scope.
-    pub(super) fn add_global_primary_keys(&mut self, db: &ParserDatabase<'ast>, scope: ConstraintScope) {
+    pub(super) fn add_global_primary_keys(
+        &mut self,
+        db: &ParserDatabase<'ast>,
+        connector: &dyn Connector,
+        scope: ConstraintScope,
+    ) {
         for model in db.walk_models() {
-            if let Some(name) = model.primary_key().and_then(|k| k.final_database_name()) {
+            if let Some(name) = model.primary_key().and_then(|k| k.final_database_name(connector)) {
                 let counter = self.global.entry((scope, name)).or_default();
                 *counter += 1;
             }
@@ -73,9 +94,14 @@ impl<'ast> ConstraintNamespace<'ast> {
     }
 
     /// Add all default constraints from the data model to a global validation scope.
-    pub(super) fn add_global_default_constraints(&mut self, db: &ParserDatabase<'ast>, scope: ConstraintScope) {
+    pub(super) fn add_global_default_constraints(
+        &mut self,
+        db: &ParserDatabase<'ast>,
+        connector: &dyn Connector,
+        scope: ConstraintScope,
+    ) {
         for field in db.walk_models().flat_map(|m| m.scalar_fields()) {
-            if let Some(name) = field.default_value().map(|d| d.constraint_name()) {
+            if let Some(name) = field.default_value().map(|d| d.constraint_name(connector)) {
                 let name = match name {
                     Cow::Borrowed(bor) => Cow::Owned(bor.to_string()),
                     Cow::Owned(own) => Cow::Owned(own),
@@ -88,12 +114,17 @@ impl<'ast> ConstraintNamespace<'ast> {
     }
 
     /// Add all index and unique constraints to separate namespaces per model.
-    pub(super) fn add_local_indexes(&mut self, db: &ParserDatabase<'ast>, scope: ConstraintScope) {
+    pub(super) fn add_local_indexes(
+        &mut self,
+        db: &ParserDatabase<'ast>,
+        connector: &dyn Connector,
+        scope: ConstraintScope,
+    ) {
         for model in db.walk_models() {
             for index in model.indexes() {
                 let counter = self
                     .local
-                    .entry((model.model_id(), scope, index.final_database_name()))
+                    .entry((model.model_id(), scope, index.final_database_name(connector)))
                     .or_default();
 
                 *counter += 1;
@@ -102,9 +133,14 @@ impl<'ast> ConstraintNamespace<'ast> {
     }
 
     /// Add all primary key constraints to separate namespaces per model.
-    pub(super) fn add_local_primary_keys(&mut self, db: &ParserDatabase<'ast>, scope: ConstraintScope) {
+    pub(super) fn add_local_primary_keys(
+        &mut self,
+        db: &ParserDatabase<'ast>,
+        connector: &dyn Connector,
+        scope: ConstraintScope,
+    ) {
         for model in db.walk_models() {
-            if let Some(name) = model.primary_key().and_then(|pk| pk.final_database_name()) {
+            if let Some(name) = model.primary_key().and_then(|pk| pk.final_database_name(connector)) {
                 let counter = self.local.entry((model.model_id(), scope, name)).or_default();
                 *counter += 1;
             }
@@ -112,11 +148,16 @@ impl<'ast> ConstraintNamespace<'ast> {
     }
 
     /// Add all foreign key constraints to separate namespaces per model.
-    pub(super) fn add_local_relations(&mut self, db: &ParserDatabase<'ast>, scope: ConstraintScope) {
+    pub(super) fn add_local_relations(
+        &mut self,
+        db: &ParserDatabase<'ast>,
+        connector: &dyn Connector,
+        scope: ConstraintScope,
+    ) {
         for model in db.walk_models() {
             for name in model
                 .complete_inline_relations_from()
-                .filter_map(|r| r.foreign_key_name())
+                .filter_map(|r| r.foreign_key_name(connector))
             {
                 let counter = self.local.entry((model.model_id(), scope, name)).or_default();
 

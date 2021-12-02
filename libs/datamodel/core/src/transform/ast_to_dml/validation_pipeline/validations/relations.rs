@@ -33,9 +33,10 @@ const STATE_ERROR: &str = "Failed lookup of model, field or optional property du
 pub(super) fn has_a_unique_constraint_name(
     names: &super::Names<'_>,
     relation: CompleteInlineRelationWalker<'_, '_>,
+    connector: &dyn Connector,
     diagnostics: &mut Diagnostics,
 ) {
-    let name = match relation.foreign_key_name() {
+    let name = match relation.foreign_key_name(connector) {
         Some(name) => name,
         None => return,
     };
@@ -200,11 +201,10 @@ pub(super) fn referencing_fields_in_correct_order(
 pub(super) fn cycles<'ast, 'db>(
     relation: CompleteInlineRelationWalker<'ast, 'db>,
     db: &'db ParserDatabase<'ast>,
+    connector: &dyn Connector,
     diagnostics: &mut Diagnostics,
 ) {
-    if !db
-        .active_connector()
-        .has_capability(ConnectorCapability::ReferenceCycleDetection)
+    if !connector.has_capability(ConnectorCapability::ReferenceCycleDetection)
         || db
             .datasource()
             .map(|ds| ds.referential_integrity().is_prisma())
@@ -224,7 +224,7 @@ pub(super) fn cycles<'ast, 'db>(
 
         let related_model = next_relation.referenced_model();
 
-        let on_delete = next_relation.on_delete();
+        let on_delete = next_relation.on_delete(connector);
         let on_update = next_relation.on_update();
 
         // a cycle has a meaning only if every relation in it triggers
@@ -234,7 +234,7 @@ pub(super) fn cycles<'ast, 'db>(
 
             if model == related_model {
                 let msg = "A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes.";
-                diagnostics.push_error(cascade_error_with_default_values(relation, msg));
+                diagnostics.push_error(cascade_error_with_default_values(relation, connector, msg));
 
                 return;
             }
@@ -245,7 +245,7 @@ pub(super) fn cycles<'ast, 'db>(
                     visited_relations
                 );
 
-                diagnostics.push_error(cascade_error_with_default_values(relation, &msg));
+                diagnostics.push_error(cascade_error_with_default_values(relation, connector, &msg));
                 return;
             }
 
@@ -275,9 +275,9 @@ pub(super) fn cycles<'ast, 'db>(
 pub(super) fn multiple_cascading_paths(
     relation: CompleteInlineRelationWalker<'_, '_>,
     db: &ParserDatabase<'_>,
+    connector: &dyn Connector,
     diagnostics: &mut Diagnostics,
 ) {
-    let connector = db.active_connector();
     if !connector.has_capability(ConnectorCapability::ReferenceCycleDetection)
         || db
             .datasource()
@@ -287,7 +287,7 @@ pub(super) fn multiple_cascading_paths(
         return;
     }
 
-    if !relation.on_delete().triggers_modification() && !relation.on_update().triggers_modification() {
+    if !relation.on_delete(connector).triggers_modification() && !relation.on_update().triggers_modification() {
         return;
     }
 
@@ -305,7 +305,9 @@ pub(super) fn multiple_cascading_paths(
     let mut next_relations: Vec<_> = relation
         .referencing_model()
         .complete_inline_relations_from()
-        .filter(|relation| relation.on_delete().triggers_modification() || relation.on_update().triggers_modification())
+        .filter(|relation| {
+            relation.on_delete(connector).triggers_modification() || relation.on_update().triggers_modification()
+        })
         .map(|relation| (relation, Rc::new(VisitedRelation::root(relation))))
         .collect();
 
@@ -385,7 +387,7 @@ pub(super) fn multiple_cascading_paths(
             relation.referencing_model().name()
         );
 
-        diagnostics.push_error(cascade_error_with_default_values(relation, &msg));
+        diagnostics.push_error(cascade_error_with_default_values(relation, connector, &msg));
     } else if reachable.len() > 1 {
         let msg = format!(
             "When any of the records in models {} are updated or deleted, the referential actions on the relations cascade to model `{}` through multiple paths. Please break one of these paths by setting the `onUpdate` and `onDelete` to `NoAction`.",
@@ -393,13 +395,17 @@ pub(super) fn multiple_cascading_paths(
             relation.referencing_model().name()
         );
 
-        diagnostics.push_error(cascade_error_with_default_values(relation, &msg));
+        diagnostics.push_error(cascade_error_with_default_values(relation, connector, &msg));
     }
 }
 
-fn cascade_error_with_default_values(relation: CompleteInlineRelationWalker<'_, '_>, msg: &str) -> DatamodelError {
+fn cascade_error_with_default_values(
+    relation: CompleteInlineRelationWalker<'_, '_>,
+    connector: &dyn Connector,
+    msg: &str,
+) -> DatamodelError {
     let on_delete = match relation.referencing_field().attributes().on_delete {
-        None if relation.on_delete().triggers_modification() => Some(relation.on_delete()),
+        None if relation.on_delete(connector).triggers_modification() => Some(relation.on_delete(connector)),
         _ => None,
     };
 

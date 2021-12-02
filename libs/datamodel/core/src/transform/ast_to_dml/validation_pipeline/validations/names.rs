@@ -1,3 +1,5 @@
+use datamodel_connector::Connector;
+
 use super::constraint_namespace::ConstraintNamespace;
 use std::collections::{HashMap, HashSet};
 
@@ -24,7 +26,7 @@ pub(super) struct Names<'ast> {
 }
 
 impl<'ast> Names<'ast> {
-    pub(super) fn new(db: &ParserDatabase<'ast>) -> Self {
+    pub(super) fn new(db: &ParserDatabase<'ast>, connector: &dyn Connector) -> Self {
         let mut relation_names: HashMap<RelationIdentifier<'ast>, Vec<FieldId>> = HashMap::new();
         let mut index_names: HashMap<ModelId, HashSet<&'ast str>> = HashMap::new();
         let mut unique_names: HashMap<ModelId, HashSet<&'ast str>> = HashMap::new();
@@ -61,7 +63,7 @@ impl<'ast> Names<'ast> {
             index_names,
             unique_names,
             primary_key_names,
-            constraint_namespace: infer_namespaces(db),
+            constraint_namespace: infer_namespaces(db, connector),
         }
     }
 
@@ -101,39 +103,39 @@ impl<'ast> Names<'ast> {
 
 /// Generate namespaces per database requirements, and add the names to it from the constraints
 /// part of the namespace.
-fn infer_namespaces<'ast>(db: &ParserDatabase<'ast>) -> ConstraintNamespace<'ast> {
+fn infer_namespaces<'ast>(db: &ParserDatabase<'ast>, connector: &dyn Connector) -> ConstraintNamespace<'ast> {
     use datamodel_connector::ConstraintScope;
 
     let mut namespaces = ConstraintNamespace::default();
 
-    for scope in db.active_connector().constraint_violation_scopes() {
+    for scope in connector.constraint_violation_scopes() {
         match scope {
             ConstraintScope::GlobalKeyIndex => {
-                namespaces.add_global_indexes(db, *scope);
+                namespaces.add_global_indexes(db, connector, *scope);
             }
             ConstraintScope::GlobalForeignKey => {
-                namespaces.add_global_relations(db, *scope);
+                namespaces.add_global_relations(db, connector, *scope);
             }
             ConstraintScope::GlobalPrimaryKeyKeyIndex => {
-                namespaces.add_global_primary_keys(db, *scope);
-                namespaces.add_global_indexes(db, *scope);
+                namespaces.add_global_primary_keys(db, connector, *scope);
+                namespaces.add_global_indexes(db, connector, *scope);
             }
             ConstraintScope::GlobalPrimaryKeyForeignKeyDefault => {
-                namespaces.add_global_primary_keys(db, *scope);
-                namespaces.add_global_relations(db, *scope);
-                namespaces.add_global_default_constraints(db, *scope);
+                namespaces.add_global_primary_keys(db, connector, *scope);
+                namespaces.add_global_relations(db, connector, *scope);
+                namespaces.add_global_default_constraints(db, connector, *scope);
             }
             ConstraintScope::ModelKeyIndex => {
-                namespaces.add_local_indexes(db, *scope);
+                namespaces.add_local_indexes(db, connector, *scope);
             }
             ConstraintScope::ModelPrimaryKeyKeyIndex => {
-                namespaces.add_local_primary_keys(db, *scope);
-                namespaces.add_local_indexes(db, *scope);
+                namespaces.add_local_primary_keys(db, connector, *scope);
+                namespaces.add_local_indexes(db, connector, *scope);
             }
             ConstraintScope::ModelPrimaryKeyKeyIndexForeignKey => {
-                namespaces.add_local_primary_keys(db, *scope);
-                namespaces.add_local_indexes(db, *scope);
-                namespaces.add_local_relations(db, *scope);
+                namespaces.add_local_primary_keys(db, connector, *scope);
+                namespaces.add_local_indexes(db, connector, *scope);
+                namespaces.add_local_relations(db, connector, *scope);
             }
         }
     }

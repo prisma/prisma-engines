@@ -6,6 +6,7 @@ use crate::{
     common::constraint_names::ConstraintNames,
     transform::ast_to_dml::db::{types::FieldWithArgs, ParserDatabase, ScalarField, ScalarFieldType},
 };
+use datamodel_connector::Connector;
 use diagnostics::Span;
 use dml::{default_value::DefaultValue, model::SortOrder};
 
@@ -109,12 +110,12 @@ pub(crate) struct DefaultValueWalker<'ast, 'db> {
 }
 
 impl<'ast, 'db> DefaultValueWalker<'ast, 'db> {
-    pub(crate) fn constraint_name(self) -> Cow<'db, str> {
+    pub(crate) fn constraint_name(self, connector: &dyn Connector) -> Cow<'db, str> {
         self.default.db_name().map(Cow::from).unwrap_or_else(|| {
             let name = ConstraintNames::default_name(
                 self.field().model().final_database_name(),
                 self.field().final_database_name(),
-                self.db.active_connector(),
+                connector,
             );
 
             Cow::from(name)

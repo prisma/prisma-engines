@@ -4,6 +4,7 @@ use crate::{
     IndexField, PrimaryKeyField,
 };
 use ::dml::composite_type::{CompositeType, CompositeTypeField, CompositeTypeFieldType};
+use datamodel_connector::Connector;
 use std::collections::HashMap;
 
 /// Helper for lifting a datamodel.
@@ -12,11 +13,12 @@ use std::collections::HashMap;
 /// additional semantics are attached.
 pub(crate) struct LiftAstToDml<'a> {
     db: &'a db::ParserDatabase<'a>,
+    connector: &'static dyn Connector,
 }
 
 impl<'a> LiftAstToDml<'a> {
-    pub(crate) fn new(db: &'a db::ParserDatabase<'a>) -> LiftAstToDml<'a> {
-        LiftAstToDml { db }
+    pub(crate) fn new(db: &'a db::ParserDatabase<'a>, connector: &'static dyn Connector) -> LiftAstToDml<'a> {
+        LiftAstToDml { db, connector }
     }
 
     pub(crate) fn lift(&self) -> dml::Datamodel {
@@ -62,7 +64,7 @@ impl<'a> LiftAstToDml<'a> {
         schema: &mut dml::Datamodel,
         field_ids_for_sorting: &mut HashMap<(&'a str, &'a str), ast::FieldId>,
     ) {
-        let active_connector = self.db.active_connector();
+        let active_connector = self.connector;
         let referential_integrity = self.db.active_referential_integrity();
         let common_dml_fields = |field: &mut dml::RelationField,
                                  attributes: &super::db::RelationField<'_>,
@@ -73,7 +75,9 @@ impl<'a> LiftAstToDml<'a> {
             field.relation_info.name = relation_field.relation_name().to_string();
             field.documentation = ast_field.documentation.clone().map(|comment| comment.text);
             field.is_ignored = attributes.is_ignored;
-            field.relation_info.fk_name = relation_field.final_foreign_key_name().map(|cow| cow.into_owned());
+            field.relation_info.fk_name = relation_field
+                .final_foreign_key_name(active_connector)
+                .map(|cow| cow.into_owned());
             field.supports_restrict_action(
                 active_connector.supports_referential_action(&referential_integrity, dml::ReferentialAction::Restrict),
             );
@@ -272,7 +276,7 @@ impl<'a> LiftAstToDml<'a> {
 
         model.primary_key = walker.primary_key().map(|pk| dml::PrimaryKeyDefinition {
             name: pk.name().map(String::from),
-            db_name: pk.final_database_name().map(|c| c.into_owned()),
+            db_name: pk.final_database_name(self.connector).map(|c| c.into_owned()),
             fields: pk
                 .iter_ast_fields()
                 .map(|(field, sort_order, length)|
@@ -318,7 +322,7 @@ impl<'a> LiftAstToDml<'a> {
 
                 dml::IndexDefinition {
                     name: idx.attribute().name.map(String::from),
-                    db_name: Some(idx.final_database_name().into_owned()),
+                    db_name: Some(idx.final_database_name(self.connector).into_owned()),
                     fields,
                     tpe,
                     algorithm,
@@ -354,8 +358,8 @@ impl<'a> LiftAstToDml<'a> {
             field.database_name = attributes.mapped_name.map(String::from);
             field.default_value = scalar_field.default_value().map(|d| dml::DefaultValue {
                 kind: d.default().kind().clone(),
-                db_name: Some(d.constraint_name().into())
-                    .filter(|_| self.db.active_connector().supports_named_default_values()),
+                db_name: Some(d.constraint_name(self.connector).into())
+                    .filter(|_| self.connector.supports_named_default_values()),
             });
 
             field_ids_for_sorting.insert((&ast_model.name.name, &ast_field.name.name), field_id);
@@ -422,12 +426,10 @@ impl<'a> LiftAstToDml<'a> {
                 self.lift_scalar_field_type(alias, scalar_field_type, scalar_field_data)
             }
             db::ScalarFieldType::BuiltInScalar(scalar_type) => {
-                let native_type = scalar_field_data.native_type.as_ref().map(|(name, args, _)| {
-                    self.db
-                        .active_connector()
-                        .parse_native_type(name, args.clone())
-                        .unwrap()
-                });
+                let native_type = scalar_field_data
+                    .native_type
+                    .as_ref()
+                    .map(|(name, args, _)| self.connector.parse_native_type(name, args.clone()).unwrap());
                 dml::FieldType::Scalar(scalar_type.to_owned(), None, native_type)
             }
         }

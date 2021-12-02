@@ -4,6 +4,8 @@ use std::{
     hash::{Hash, Hasher},
 };
 
+use datamodel_connector::Connector;
+
 use crate::{
     ast::{self, FieldArity},
     common::constraint_names::ConstraintNames,
@@ -88,17 +90,14 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
     }
 
     /// This will be None for virtual relation fields (when no `fields` argument is passed).
-    pub(crate) fn final_foreign_key_name(self) -> Option<Cow<'ast, str>> {
+    pub(crate) fn final_foreign_key_name(self, connector: &dyn Connector) -> Option<Cow<'ast, str>> {
         self.attributes().fk_name.map(Cow::Borrowed).or_else(|| {
             let fields = self.relation_field.fields.as_ref()?;
             let model = self.db.walk_model(self.model_id);
             let table_name = model.final_database_name();
             let column_names: Vec<&str> = model.get_field_db_names(fields).collect();
 
-            Some(
-                ConstraintNames::foreign_key_constraint_name(table_name, &column_names, self.db.active_connector())
-                    .into(),
-            )
+            Some(ConstraintNames::foreign_key_constraint_name(table_name, &column_names, connector).into())
         })
     }
 

@@ -8,7 +8,7 @@ use crate::{
     diagnostics::{DatamodelError, Diagnostics},
     transform::ast_to_dml::db::{
         walkers::{FieldWalker, ScalarFieldAttributeWalker, ScalarFieldWalker},
-        ParserDatabase, ScalarFieldType,
+        ScalarFieldType,
     },
     Datasource,
 };
@@ -60,9 +60,10 @@ pub(super) fn validate_client_name(field: FieldWalker<'_, '_>, names: &Names<'_>
 pub(super) fn has_a_unique_default_constraint_name(
     field: ScalarFieldWalker<'_, '_>,
     names: &Names<'_>,
+    connector: &dyn Connector,
     diagnostics: &mut Diagnostics,
 ) {
-    let name = match field.default_value().map(|w| w.constraint_name()) {
+    let name = match field.default_value().map(|w| w.constraint_name(connector)) {
         Some(name) => name,
         None => return,
     };
@@ -90,15 +91,12 @@ pub(super) fn has_a_unique_default_constraint_name(
 
 /// The length prefix can be used with strings and byte columns.
 pub(crate) fn validate_length_used_with_correct_types(
-    db: &ParserDatabase<'_>,
     attr: ScalarFieldAttributeWalker<'_, '_>,
     attribute: (&str, ast::Span),
+    connector: &dyn Connector,
     diagnostics: &mut Diagnostics,
 ) {
-    if !db
-        .active_connector()
-        .has_capability(ConnectorCapability::IndexColumnLengthPrefixing)
-    {
+    if !connector.has_capability(ConnectorCapability::IndexColumnLengthPrefixing) {
         return;
     }
 
@@ -121,8 +119,11 @@ pub(crate) fn validate_length_used_with_correct_types(
     ));
 }
 
-pub(super) fn validate_native_type_arguments(field: ScalarFieldWalker<'_, '_>, diagnostics: &mut Diagnostics) {
-    let connector = field.db.active_connector();
+pub(super) fn validate_native_type_arguments(
+    field: ScalarFieldWalker<'_, '_>,
+    connector: &dyn Connector,
+    diagnostics: &mut Diagnostics,
+) {
     let connector_name = field
         .db
         .datasource()

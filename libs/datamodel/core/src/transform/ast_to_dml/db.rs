@@ -17,7 +17,7 @@ pub(crate) use types::{IndexAlgorithm, IndexType, RelationField, ScalarField, Sc
 use self::{context::Context, relations::Relations, types::Types};
 use crate::PreviewFeature;
 use crate::{ast, diagnostics::Diagnostics, Datasource};
-use datamodel_connector::{Connector, EmptyDatamodelConnector, ReferentialIntegrity};
+use datamodel_connector::ReferentialIntegrity;
 use enumflags2::BitFlags;
 use names::Names;
 
@@ -137,11 +137,5 @@ impl<'ast> ParserDatabase<'ast> {
             .mapped_values
             .get(&value_idx)
             .cloned()
-    }
-
-    pub(super) fn active_connector(&self) -> &dyn Connector {
-        self.datasource
-            .map(|datasource| datasource.active_connector)
-            .unwrap_or(&EmptyDatamodelConnector)
     }
 }

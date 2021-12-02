@@ -1,11 +1,11 @@
-use std::borrow::Cow;
-
 use super::{ModelWalker, RelationFieldWalker, RelationName, ScalarFieldWalker};
 use crate::{
     ast,
     transform::ast_to_dml::db::{relations::*, ParserDatabase, ScalarFieldType},
 };
+use datamodel_connector::Connector;
 use dml::relation_info::ReferentialAction;
+use std::borrow::Cow;
 
 /// A relation that has the minimal amount of information for us to create one. Useful for
 /// validation purposes. Holds all possible relation types.
@@ -322,9 +322,9 @@ impl<'ast, 'db> CompleteInlineRelationWalker<'ast, 'db> {
 
     /// The name of the foreign key. Either taken from the `map` attribute, or generated following
     /// the Prisma defaults.
-    pub(crate) fn foreign_key_name(self) -> Option<Cow<'ast, str>> {
-        let from_forward = self.referencing_field().final_foreign_key_name();
-        let from_back = self.referenced_field().final_foreign_key_name();
+    pub(crate) fn foreign_key_name(self, connector: &dyn Connector) -> Option<Cow<'ast, str>> {
+        let from_forward = self.referencing_field().final_foreign_key_name(connector);
+        let from_back = self.referenced_field().final_foreign_key_name(connector);
 
         from_forward.or(from_back)
     }
@@ -377,15 +377,12 @@ impl<'ast, 'db> CompleteInlineRelationWalker<'ast, 'db> {
 
     /// Gives the onDelete referential action of the relation. If not defined
     /// explicitly, returns the default value.
-    pub(crate) fn on_delete(self) -> ReferentialAction {
+    pub(crate) fn on_delete(self, connector: &dyn Connector) -> ReferentialAction {
         use ReferentialAction::*;
 
         self.referencing_field().attributes().on_delete.unwrap_or_else(|| {
             let referential_integrity = self.db.active_referential_integrity();
-            let supports_restrict = self
-                .db
-                .active_connector()
-                .supports_referential_action(&referential_integrity, Restrict);
+            let supports_restrict = connector.supports_referential_action(&referential_integrity, Restrict);
 
             match self.referential_arity() {
                 ast::FieldArity::Required if supports_restrict => Restrict,

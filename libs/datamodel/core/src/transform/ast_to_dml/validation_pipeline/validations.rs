@@ -15,11 +15,16 @@ use crate::{
     diagnostics::Diagnostics,
     transform::ast_to_dml::db::{walkers::RefinedRelationWalker, ParserDatabase},
 };
+use datamodel_connector::Connector;
 use diagnostics::DatamodelError;
 
-pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, relation_transformation_enabled: bool) {
-    let connector = db.active_connector();
-    let names = Names::new(db);
+pub(super) fn validate(
+    db: &ParserDatabase<'_>,
+    connector: &dyn Connector,
+    diagnostics: &mut Diagnostics,
+    relation_transformation_enabled: bool,
+) {
+    let names = Names::new(db, connector);
 
     for composite_type in db.walk_composite_types() {
         composite_types::composite_types_support(composite_type, connector, diagnostics);
@@ -30,24 +35,24 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, r
         models::has_a_unique_primary_key_name(model, &names, connector, diagnostics);
         models::uses_sort_or_length_on_primary_without_preview_flag(db, model, diagnostics);
         models::primary_key_connector_specific(model, connector, diagnostics);
-        models::primary_key_length_prefix_supported(db, model, diagnostics);
-        models::primary_key_sort_order_supported(db, model, diagnostics);
-        models::only_one_fulltext_attribute_allowed(db, model, diagnostics);
+        models::primary_key_length_prefix_supported(model, connector, diagnostics);
+        models::primary_key_sort_order_supported(model, connector, diagnostics);
+        models::only_one_fulltext_attribute_allowed(db, model, connector, diagnostics);
         autoincrement::validate_auto_increment(model, connector, diagnostics);
 
         if let Some(pk) = model.primary_key() {
             for field_attribute in pk.scalar_field_attributes() {
                 let span = pk.ast_attribute().span;
                 let attribute = ("id", span);
-                fields::validate_length_used_with_correct_types(db, field_attribute, attribute, diagnostics);
+                fields::validate_length_used_with_correct_types(field_attribute, attribute, connector, diagnostics);
             }
         }
 
         for field in model.scalar_fields() {
             fields::validate_scalar_field_connector_specific(field, connector, diagnostics);
             fields::validate_client_name(field.into(), &names, diagnostics);
-            fields::has_a_unique_default_constraint_name(field, &names, diagnostics);
-            fields::validate_native_type_arguments(field, diagnostics);
+            fields::has_a_unique_default_constraint_name(field, &names, connector, diagnostics);
+            fields::validate_native_type_arguments(field, connector, diagnostics);
             fields::validate_default(field, connector, diagnostics);
 
             if let Some(source) = db.datasource() {
@@ -66,22 +71,22 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, r
             fields::validate_client_name(field.into(), &names, diagnostics);
 
             relation_fields::ignored_related_model(field, diagnostics);
-            relation_fields::referential_actions(field, db, diagnostics);
-            relation_fields::map(field, diagnostics);
+            relation_fields::referential_actions(field, db, connector, diagnostics);
+            relation_fields::map(field, connector, diagnostics);
         }
 
         for index in model.indexes() {
-            indexes::has_a_unique_constraint_name(index, &names, diagnostics);
+            indexes::has_a_unique_constraint_name(index, &names, connector, diagnostics);
             indexes::uses_length_or_sort_without_preview_flag(db, index, diagnostics);
-            indexes::field_length_prefix_supported(db, index, diagnostics);
+            indexes::field_length_prefix_supported(index, connector, diagnostics);
             indexes::index_algorithm_preview_feature(db, index, diagnostics);
-            indexes::index_algorithm_is_supported(db, index, diagnostics);
-            indexes::hash_index_must_not_use_sort_param(db, index, diagnostics);
+            indexes::index_algorithm_is_supported(index, connector, diagnostics);
+            indexes::hash_index_must_not_use_sort_param(db, index, connector, diagnostics);
             indexes::fulltext_index_preview_feature_enabled(db, index, diagnostics);
-            indexes::fulltext_index_supported(db, index, diagnostics);
-            indexes::fulltext_columns_should_not_define_length(db, index, diagnostics);
-            indexes::fulltext_column_sort_is_supported(db, index, diagnostics);
-            indexes::fulltext_text_columns_should_be_bundled_together(db, index, diagnostics);
+            indexes::fulltext_index_supported(index, connector, diagnostics);
+            indexes::fulltext_columns_should_not_define_length(db, index, connector, diagnostics);
+            indexes::fulltext_column_sort_is_supported(db, index, connector, diagnostics);
+            indexes::fulltext_text_columns_should_be_bundled_together(db, index, connector, diagnostics);
             indexes::has_valid_mapped_name(index, connector, diagnostics);
 
             for field_attribute in index.scalar_field_attributes() {
@@ -91,7 +96,7 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, r
                     .unwrap_or_else(ast::Span::empty);
 
                 let attribute = (index.attribute_name(), span);
-                fields::validate_length_used_with_correct_types(db, field_attribute, attribute, diagnostics);
+                fields::validate_length_used_with_correct_types(field_attribute, attribute, connector, diagnostics);
             }
         }
     }
@@ -115,9 +120,9 @@ pub(super) fn validate(db: &ParserDatabase<'_>, diagnostics: &mut Diagnostics, r
                 if let Some(relation) = relation.as_complete() {
                     relations::field_arity(relation, diagnostics);
                     relations::same_length_in_referencing_and_referenced(relation, diagnostics);
-                    relations::cycles(relation, db, diagnostics);
-                    relations::multiple_cascading_paths(relation, db, diagnostics);
-                    relations::has_a_unique_constraint_name(&names, relation, diagnostics);
+                    relations::cycles(relation, db, connector, diagnostics);
+                    relations::multiple_cascading_paths(relation, db, connector, diagnostics);
+                    relations::has_a_unique_constraint_name(&names, relation, connector, diagnostics);
                     relations::references_unique_fields(relation, connector, diagnostics);
                     relations::referencing_fields_in_correct_order(relation, connector, diagnostics);
                 }

@@ -65,7 +65,7 @@ pub(super) fn has_a_unique_primary_key_name(
 ) {
     let (pk, name) = match model
         .primary_key()
-        .and_then(|pk| pk.final_database_name().map(|name| (pk, name)))
+        .and_then(|pk| pk.final_database_name(connector).map(|name| (pk, name)))
     {
         Some((pk, name)) => (pk, name),
         None => return,
@@ -126,14 +126,11 @@ pub(crate) fn uses_sort_or_length_on_primary_without_preview_flag(
 
 /// The database must support the primary key length prefix for it to be allowed in the data model.
 pub(crate) fn primary_key_length_prefix_supported(
-    db: &ParserDatabase<'_>,
     model: ModelWalker<'_, '_>,
+    connector: &dyn Connector,
     diagnostics: &mut Diagnostics,
 ) {
-    if db
-        .active_connector()
-        .has_capability(ConnectorCapability::IndexColumnLengthPrefixing)
-    {
+    if connector.has_capability(ConnectorCapability::IndexColumnLengthPrefixing) {
         return;
     }
 
@@ -149,14 +146,11 @@ pub(crate) fn primary_key_length_prefix_supported(
 
 /// Not every database is allowing sort definition in the primary key.
 pub(crate) fn primary_key_sort_order_supported(
-    db: &ParserDatabase<'_>,
     model: ModelWalker<'_, '_>,
+    connector: &dyn Connector,
     diagnostics: &mut Diagnostics,
 ) {
-    if db
-        .active_connector()
-        .has_capability(ConnectorCapability::PrimaryKeySortOrderDefinition)
-    {
+    if connector.has_capability(ConnectorCapability::PrimaryKeySortOrderDefinition) {
         return;
     }
 
@@ -173,20 +167,18 @@ pub(crate) fn primary_key_sort_order_supported(
 pub(crate) fn only_one_fulltext_attribute_allowed(
     db: &ParserDatabase<'_>,
     model: ModelWalker<'_, '_>,
+    connector: &dyn Connector,
     diagnostics: &mut Diagnostics,
 ) {
     if !db.preview_features.contains(PreviewFeature::FullTextIndex) {
         return;
     }
 
-    if !db.active_connector().has_capability(ConnectorCapability::FullTextIndex) {
+    if !connector.has_capability(ConnectorCapability::FullTextIndex) {
         return;
     }
 
-    if db
-        .active_connector()
-        .has_capability(ConnectorCapability::MultipleFullTextAttributesPerModel)
-    {
+    if connector.has_capability(ConnectorCapability::MultipleFullTextAttributesPerModel) {
         return;
     }
 

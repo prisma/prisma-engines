@@ -3,6 +3,7 @@ use crate::{
     diagnostics::{DatamodelError, Diagnostics},
     transform::ast_to_dml::db::walkers::{ModelWalker, RelationFieldWalker, RelationName},
 };
+use datamodel_connector::Connector;
 use itertools::Itertools;
 use std::fmt;
 
@@ -137,10 +138,10 @@ pub(super) fn ignored_related_model(field: RelationFieldWalker<'_, '_>, diagnost
 pub(super) fn referential_actions(
     field: RelationFieldWalker<'_, '_>,
     db: &super::ParserDatabase<'_>,
+    connector: &dyn Connector,
     diagnostics: &mut Diagnostics,
 ) {
     let referential_integrity = db.active_referential_integrity();
-    let connector = db.active_connector();
     let msg = |action| {
         let allowed_values = connector
             .referential_actions(&referential_integrity)
@@ -177,12 +178,12 @@ pub(super) fn referential_actions(
     }
 }
 
-pub(crate) fn map(field: RelationFieldWalker<'_, '_>, diagnostics: &mut Diagnostics) {
+pub(crate) fn map(field: RelationFieldWalker<'_, '_>, connector: &dyn Connector, diagnostics: &mut Diagnostics) {
     if field.attributes().fk_name.is_none() {
         return;
     }
 
-    if !field.db.active_connector().supports_named_foreign_keys() {
+    if !connector.supports_named_foreign_keys() {
         diagnostics.push_error(DatamodelError::new_attribute_validation_error(
             "Your provider does not support named foreign keys.",
             "relation",
@@ -204,7 +205,7 @@ pub(crate) fn map(field: RelationFieldWalker<'_, '_>, diagnostics: &mut Diagnost
             field.model().name(),
             relation_attr,
             field.attributes().fk_name,
-            field.db.active_connector(),
+            connector,
             diagnostics,
             false,
         );
