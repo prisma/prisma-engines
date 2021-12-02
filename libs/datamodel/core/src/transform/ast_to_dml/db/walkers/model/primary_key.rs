@@ -1,5 +1,3 @@
-use std::borrow::Cow;
-
 use crate::{
     ast,
     common::constraint_names::ConstraintNames,
@@ -10,6 +8,8 @@ use crate::{
     },
     SortOrder,
 };
+use datamodel_connector::Connector;
+use std::borrow::Cow;
 
 #[derive(Copy, Clone)]
 pub(crate) struct PrimaryKeyWalker<'ast, 'db> {
@@ -24,17 +24,17 @@ impl<'ast, 'db> PrimaryKeyWalker<'ast, 'db> {
         self.attribute.source_attribute
     }
 
-    pub(crate) fn final_database_name(self) -> Option<Cow<'ast, str>> {
-        if !self.db.active_connector().supports_named_primary_keys() {
+    pub(crate) fn db_name(self) -> Option<&'ast str> {
+        self.attribute.db_name
+    }
+
+    pub(crate) fn final_database_name(self, connector: &dyn Connector) -> Option<Cow<'ast, str>> {
+        if !connector.supports_named_primary_keys() {
             return None;
         }
 
         Some(self.attribute.db_name.map(Cow::Borrowed).unwrap_or_else(|| {
-            ConstraintNames::primary_key_name(
-                self.db.walk_model(self.model_id).final_database_name(),
-                self.db.active_connector(),
-            )
-            .into()
+            ConstraintNames::primary_key_name(self.db.walk_model(self.model_id).final_database_name(), connector).into()
         }))
     }
 

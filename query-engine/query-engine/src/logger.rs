@@ -77,7 +77,7 @@ impl<'a> Logger<'a> {
 
                     self.finalize(subscriber)
                 } else {
-                    let subscriber = FmtSubscriber::builder().with_env_filter(filter).compact().finish();
+                    let subscriber = FmtSubscriber::builder().with_env_filter(filter).finish();
                     self.finalize(subscriber)
                 }
             }

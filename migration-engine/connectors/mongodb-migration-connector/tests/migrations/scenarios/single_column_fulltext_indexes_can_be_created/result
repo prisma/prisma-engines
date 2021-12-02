@@ -1,5 +1,5 @@
 [+] Collection `User`
-[+] Index `User_name_idx` on ({"name":"text"})
+[+] Fulltext index `User_name_idx` on ({"name":"text"})
 
 ------
 

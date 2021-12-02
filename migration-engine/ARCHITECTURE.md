@@ -56,8 +56,8 @@ sense of security.
     even more in a panic scenario
 
   - Guide you towards patterns that can make deploying and recovering from bad
-    deployment painless, i.e. forward-only thinking, expand-and-contract
-    pattern, etc.
+    deployment painless, i.e. forward-only thinking, [expand-and-contract
+    pattern](https://www.prisma.io/dataguide/types/relational/expand-and-contract-pattern), etc.
 
 We're looking into how we can best help in these areas. It could very well mean
 we'll have down migrations (we're hearing users who want them, and we
@@ -65,7 +65,7 @@ definitely want these concerns addressed).
 
 What we recommend instead of relying on down migrations:
 
-- Expand and contract 
+- [Adhere to the _expand and contract_ pattern](https://www.prisma.io/dataguide/types/relational/expand-and-contract-pattern)
 - Roll-forward in case of failure
 
 Rolling back schema migrations because the corresponding application code has

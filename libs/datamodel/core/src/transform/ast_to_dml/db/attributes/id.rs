@@ -24,14 +24,6 @@ pub(super) fn model<'ast>(
         Err(err) => return ctx.push_error(err),
     };
 
-    if !ctx.db.active_connector().supports_compound_ids() {
-        return ctx.push_error(DatamodelError::new_model_validation_error(
-            "The current connector does not support compound ids.",
-            ctx.db.ast[model_id].name(),
-            args.span(),
-        ));
-    }
-
     let resolved_fields = match resolve_field_array_with_args(&fields, args.span(), model_id, ctx) {
         Ok(fields) => fields,
         Err(FieldResolutionError::AlreadyDealtWith) => return,
@@ -88,7 +80,7 @@ pub(super) fn model<'ast>(
     }
 
     let (name, db_name) = {
-        let db_name = primary_key_constraint_name(ast_model, args, "@@id", ctx);
+        let db_name = primary_key_constraint_name(args, ctx);
         let name = super::get_name_argument(args, ctx);
 
         if let Some(err) = ConstraintNames::is_client_name_valid(args.span(), &ast_model.name.name, name, "@@id") {
@@ -120,7 +112,7 @@ pub(super) fn field<'ast>(
             ast_model.span,
         )),
         None => {
-            let db_name = primary_key_constraint_name(ast_model, args, "@id", ctx);
+            let db_name = primary_key_constraint_name(args, ctx);
 
             let length = match args.optional_arg("length").map(|length| length.as_int()) {
                 Some(Ok(length)) => Some(length as u32),
@@ -199,12 +191,7 @@ pub(super) fn validate_id_field_arities(
     }
 }
 
-fn primary_key_constraint_name<'ast>(
-    ast_model: &'ast ast::Model,
-    args: &mut Arguments<'ast>,
-    attribute: &'ast str,
-    ctx: &mut Context<'ast>,
-) -> Option<&'ast str> {
+fn primary_key_constraint_name<'ast>(args: &mut Arguments<'ast>, ctx: &mut Context<'ast>) -> Option<&'ast str> {
     let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
         Some(Ok("")) => {
             ctx.push_error(args.new_attribute_validation_error("The `map` argument cannot be an empty string."));
@@ -218,14 +205,5 @@ fn primary_key_constraint_name<'ast>(
         None => None,
     };
 
-    super::validate_db_name(ast_model, args, db_name.as_deref(), attribute, ctx);
-
-    if db_name.is_some() && !ctx.db.active_connector().supports_named_primary_keys() {
-        ctx.push_error(DatamodelError::new_model_validation_error(
-            "You defined a database name for the primary key on the model. This is not supported by the provider.",
-            &ast_model.name.name,
-            ast_model.span,
-        ));
-    }
     db_name
 }

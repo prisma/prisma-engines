@@ -1,26 +1,21 @@
-mod autoincrement;
 mod id;
 mod map;
 mod native_types;
-
-use std::borrow::Cow;
 
 use super::{
     context::{Arguments, Context},
     types::{EnumAttributes, IndexAttribute, IndexType, ModelAttributes, RelationField, ScalarField, ScalarFieldType},
 };
-use crate::transform::ast_to_dml::db::types::FieldWithArgs;
 use crate::{
     ast::{self, WithName},
     common::constraint_names::ConstraintNames,
     diagnostics::DatamodelError,
     dml,
-    transform::helpers::ValueValidator,
+    transform::{
+        ast_to_dml::db::types::{FieldWithArgs, IndexAlgorithm},
+        helpers::ValueValidator,
+    },
     SortOrder,
-};
-use crate::{
-    ast::{FieldId, Model},
-    transform::ast_to_dml::db::types::IndexAlgorithm,
 };
 use prisma_value::PrismaValue;
 
@@ -149,7 +144,6 @@ fn resolve_model_attributes<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::
 
     // Model-global validations
     id::validate_id_field_arities(model_id, &model_attributes, ctx);
-    autoincrement::validate_auto_increment(model_id, &model_attributes, ctx);
 
     ctx.db.types.model_attributes.insert(model_id, model_attributes);
 }
@@ -208,23 +202,22 @@ fn visit_scalar_field_attributes<'ast>(
             visit_field_default(args, scalar_field_data, model_id, field_id, ctx);
         });
 
-        if let ScalarFieldType::BuiltInScalar(scalar_type) = scalar_field_data.r#type {
+        if let ScalarFieldType::BuiltInScalar(_scalar_type) = scalar_field_data.r#type {
             // native type attributes
-            attributes.visit_datasource_scoped(ctx, |type_name, args, ctx| {
-                native_types::visit_native_type_attribute(type_name, args, scalar_type, scalar_field_data, ctx)
+            attributes.visit_datasource_scoped(ctx, |datasource_name, type_name, args, _ctx| {
+                native_types::visit_native_type_attribute(datasource_name, type_name, args, scalar_field_data)
             });
         }
 
         // @unique
         attributes.visit_optional_single("unique", ctx, |args, ctx| {
-            visit_field_unique(field_id, ast_model, model_attributes, args, ctx)
+            visit_field_unique(field_id, model_attributes, args, ctx)
         });
     });
 }
 
 fn visit_field_unique<'ast>(
-    field_id: FieldId,
-    ast_model: &'ast Model,
+    field_id: ast::FieldId,
     model_attributes: &mut ModelAttributes<'ast>,
     args: &mut Arguments<'ast>,
     ctx: &mut Context<'ast>,
@@ -241,8 +234,6 @@ fn visit_field_unique<'ast>(
         }
         None => None,
     };
-
-    validate_db_name(ast_model, args, db_name, "@unique", ctx);
 
     let length = match args.optional_arg("length").map(|length| length.as_int()) {
         Some(Ok(length)) => Some(length as u32),
@@ -280,17 +271,13 @@ fn visit_field_unique<'ast>(
                 length,
             }],
             source_field: Some(field_id),
-            db_name: db_name.map(Cow::from),
+            db_name,
             ..Default::default()
         },
     ))
 }
 
-fn default_value_constraint_name<'ast>(
-    args: &mut Arguments<'ast>,
-    ast_model: &'ast ast::Model,
-    ctx: &mut Context<'ast>,
-) -> Option<String> {
+fn default_value_constraint_name<'ast>(args: &mut Arguments<'ast>, ctx: &mut Context<'ast>) -> Option<String> {
     let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
         Some(Ok("")) => {
             ctx.push_error(args.new_attribute_validation_error("The `map` argument cannot be an empty string."));
@@ -303,14 +290,6 @@ fn default_value_constraint_name<'ast>(
         }
         None => None,
     };
-
-    validate_db_name(ast_model, args, db_name.as_deref(), "@default", ctx);
-
-    if db_name.is_some() && !ctx.db.active_connector().supports_named_default_values() {
-        ctx.push_error(args.new_attribute_validation_error(
-            "You defined a database name for the default value of a field on the model. This is not supported by the provider.",
-        ));
-    }
 
     db_name
 }
@@ -440,11 +419,12 @@ fn visit_field_default<'ast>(
                         if ctx.db.ast[enum_id].values.iter().any(|v| v.name() == value) {
                             let mut default = dml::DefaultValue::new_single(PrismaValue::Enum(value.to_owned()));
 
-                            if let Some(name) = default_value_constraint_name(args, ast_model, ctx) {
+                            if let Some(name) = default_value_constraint_name(args, ctx) {
                                 default.set_db_name(name);
                             }
 
                             field_data.default = Some(default);
+                            field_data.default_attribute = Some(args.attribute());
                         } else {
                             ctx.push_error(args.new_attribute_validation_error(
                                 "The defined default value is not a valid value of the enum specified for the field.",
@@ -456,11 +436,12 @@ fn visit_field_default<'ast>(
                             Ok(generator) if generator.is_dbgenerated() => {
                                 let mut default = dml::DefaultValue::new_expression(generator);
 
-                                if let Some(name) = default_value_constraint_name(args, ast_model, ctx) {
+                                if let Some(name) = default_value_constraint_name(args, ctx) {
                                     default.set_db_name(name);
                                 }
 
                                 field_data.default = Some(default);
+                                field_data.default_attribute = Some(args.attribute());
                             }
                             Ok(_) | Err(_) => ctx.push_error(args.new_attribute_validation_error(&err.to_string())),
                         };
@@ -476,11 +457,12 @@ fn visit_field_default<'ast>(
                             ))
                         }
 
-                        if let Some(name) = default_value_constraint_name(args, ast_model, ctx) {
+                        if let Some(name) = default_value_constraint_name(args, ctx) {
                             default.set_db_name(name);
                         }
 
                         field_data.default = Some(default);
+                        field_data.default_attribute = Some(args.attribute());
                     }
                     Err(err) => ctx.push_error(args.new_attribute_validation_error(&err.to_string())),
                 }
@@ -492,7 +474,8 @@ fn visit_field_default<'ast>(
             ScalarFieldType::Unsupported => {
                 match value.as_value_generator() {
                     Ok(generator) if generator.is_dbgenerated() => {
-                        field_data.default = Some(dml::DefaultValue::new_expression(generator))
+                        field_data.default = Some(dml::DefaultValue::new_expression(generator));
+                        field_data.default_attribute = Some(args.attribute());
                     }
                     Ok(_) => ctx.push_error(args.new_attribute_validation_error(
                         "Only @default(dbgenerated()) can be used for Unsupported types.",
@@ -541,8 +524,6 @@ fn model_fulltext<'ast>(
     };
 
     common_index_validations(args, &mut index_attribute, model_id, ctx);
-    let ast_model = &ctx.db.ast[model_id];
-
     let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
         Some(Ok("")) => {
             ctx.push_error(args.new_attribute_validation_error("The `map` argument cannot be an empty string."));
@@ -556,8 +537,7 @@ fn model_fulltext<'ast>(
         None => None,
     };
 
-    validate_db_name(ast_model, args, db_name, "@@fulltext", ctx);
-    index_attribute.db_name = db_name.map(Cow::from);
+    index_attribute.db_name = db_name;
 
     data.ast_indexes.push((args.attribute(), index_attribute));
 }
@@ -575,8 +555,6 @@ fn model_index<'ast>(
     };
 
     common_index_validations(args, &mut index_attribute, model_id, ctx);
-    let ast_model = &ctx.db.ast[model_id];
-
     let name = get_name_argument(args, ctx);
 
     let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
@@ -591,8 +569,6 @@ fn model_index<'ast>(
         }
         None => None,
     };
-
-    validate_db_name(ast_model, args, db_name, "@@index", ctx);
 
     // We do not want to break existing datamodels for client purposes that
     // use the old `@@index([field], name: "onlydbname")` This would
@@ -613,8 +589,8 @@ fn model_index<'ast>(
             None
         }
         // backwards compatibility, accept name arg on normal indexes and use it as map arg.
-        (Some(name), None) => Some(Cow::from(name)),
-        (None, Some(map)) => Some(Cow::from(map)),
+        (Some(name), None) => Some(name),
+        (None, Some(map)) => Some(map),
         (None, None) => None,
     };
 
@@ -678,8 +654,6 @@ fn model_unique<'ast>(
             None => None,
         };
 
-        validate_db_name(ast_model, args, db_name, "@@unique", ctx);
-
         if let Some(err) = ConstraintNames::is_client_name_valid(args.span(), &ast_model.name.name, name, "@@unique") {
             ctx.push_error(err);
         }
@@ -688,7 +662,7 @@ fn model_unique<'ast>(
     };
 
     index_attribute.name = name;
-    index_attribute.db_name = db_name.map(Cow::from);
+    index_attribute.db_name = db_name;
 
     data.ast_indexes.push((args.attribute(), index_attribute));
 }
@@ -865,29 +839,18 @@ fn visit_relation<'ast>(
     }
 
     let fk_name = {
-        let ast_model = &ctx.db.ast[model_id];
-
         let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
             Some(Ok("")) => {
                 ctx.push_error(args.new_attribute_validation_error("The `map` argument cannot be an empty string."));
                 None
             }
-            Some(Ok(name)) => {
-                if !ctx.db.active_connector().supports_named_foreign_keys() {
-                    ctx.push_error(
-                        args.new_attribute_validation_error("Your provider does not support named foreign keys."),
-                    )
-                }
-                Some(name)
-            }
+            Some(Ok(name)) => Some(name),
             Some(Err(err)) => {
                 ctx.push_error(err);
                 None
             }
             None => None,
         };
-
-        validate_db_name(ast_model, args, db_name, "@relation", ctx);
 
         db_name
     };
@@ -1052,55 +1015,4 @@ fn get_name_argument<'ast>(args: &mut Arguments<'ast>, ctx: &mut Context<'ast>) 
     }
 
     None
-}
-
-fn validate_db_name(
-    ast_model: &ast::Model,
-    args: &mut Arguments<'_>,
-    db_name: Option<&str>,
-    attribute: &str,
-    ctx: &mut Context<'_>,
-) {
-    if let Some(err) = ConstraintNames::is_db_name_too_long(
-        args.span(),
-        ast_model.name(),
-        db_name,
-        attribute,
-        ctx.db.active_connector(),
-    ) {
-        ctx.push_error(err);
-    }
-}
-
-/// Fill in the generated Prisma constraint names for DEFAULT constraints.
-pub(super) fn fill_in_default_constraint_names(ctx: &mut Context<'_>) {
-    if !ctx.db.active_connector().supports_named_default_values() {
-        return;
-    }
-
-    let mut names: Vec<(ast::ModelId, ast::FieldId, String)> = Vec::new();
-
-    for ((model_id, field_id), field_attributes) in &ctx.db.types.scalar_fields {
-        if field_attributes.default.is_none() {
-            continue;
-        }
-
-        if field_attributes.default.as_ref().and_then(|d| d.db_name()).is_some() {
-            continue;
-        }
-
-        let model_name = ctx.db.walk_model(*model_id).final_database_name();
-        let field_name = field_attributes
-            .mapped_name
-            .unwrap_or(&ctx.db.ast[*model_id][*field_id].name.name);
-
-        let generated_name = ConstraintNames::default_name(model_name, field_name, ctx.db.active_connector());
-
-        names.push((*model_id, *field_id, generated_name))
-    }
-
-    for (model_id, field_id, generated_name) in names {
-        let field_attributes = ctx.db.types.scalar_fields.get_mut(&(model_id, field_id)).unwrap();
-        field_attributes.default.as_mut().unwrap().set_db_name(generated_name)
-    }
 }

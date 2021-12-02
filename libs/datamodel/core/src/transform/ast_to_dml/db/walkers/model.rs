@@ -41,12 +41,29 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
         self.ast_model().name()
     }
 
+    /// Whether MySQL would consider the field indexed for autoincrement purposes.
+    pub(crate) fn field_is_indexed_for_autoincrement(&self, field_id: ast::FieldId) -> bool {
+        self.indexes()
+            .any(|idx| idx.fields().next().map(|f| f.field_id()) == Some(field_id))
+            || self
+                .primary_key()
+                .filter(|pk| pk.fields().next().map(|f| f.field_id) == Some(field_id))
+                .is_some()
+    }
+
+    /// Whether the field is the whole primary key. Will match `@id` and `@@id([fieldName])`.
+    pub(crate) fn field_is_single_pk(&self, field: ast::FieldId) -> bool {
+        self.primary_key()
+            .filter(|pk| pk.fields().map(|f| f.field_id()).collect::<Vec<_>>() == [field])
+            .is_some()
+    }
+
     /// The ID of the model in the db
     pub(crate) fn model_id(self) -> ast::ModelId {
         self.model_id
     }
 
-    /// The AST representation.
+    /// The AST node.
     pub(crate) fn ast_model(self) -> &'ast ast::Model {
         &self.db.ast[self.model_id]
     }

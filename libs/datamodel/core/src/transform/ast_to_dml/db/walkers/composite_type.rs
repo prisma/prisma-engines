@@ -20,6 +20,10 @@ impl<'ast, 'db> CompositeTypeWalker<'ast, 'db> {
         self.ctid
     }
 
+    pub(crate) fn ast_composite_type(self) -> &'ast ast::CompositeType {
+        &self.db.ast()[self.ctid]
+    }
+
     pub(crate) fn name(self) -> &'ast str {
         &self.db.ast[self.ctid].name.name
     }
