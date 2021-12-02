@@ -1,6 +1,4 @@
 use super::env_function::EnvFunction;
-use crate::diagnostics::DatamodelError;
-use crate::transform::helpers::value_validator;
 use crate::{
     ast::{self, Expression, Span},
     configuration::StringFromEnvVar,
@@ -9,6 +7,7 @@ use crate::{
 use crate::{DefaultValue, ValueGenerator};
 use bigdecimal::BigDecimal;
 use chrono::{DateTime, FixedOffset};
+use diagnostics::DatamodelError;
 use dml::relation_info::ReferentialAction;
 use dml::scalars::ScalarType;
 use itertools::Itertools;
@@ -16,7 +15,7 @@ use prisma_value::PrismaValue;
 use std::error;
 
 /// Wraps a value and provides convenience methods for
-/// parsing it.
+/// validating it.
 #[derive(Debug)]
 pub struct ValueValidator<'a> {
     value: &'a ast::Expression,
@@ -198,7 +197,7 @@ impl<'a> ValueValidator<'a> {
         match &self.value {
             Expression::ConstantValue(field_name, _) => Ok((field_name, None, None)),
             Expression::FieldWithArgs(field_name, args, _) => {
-                let (sort, length) = value_validator::ValueValidator::<'a>::field_args(args)?;
+                let (sort, length) = ValueValidator::field_args(args)?;
                 Ok((field_name, sort, length))
             }
 
