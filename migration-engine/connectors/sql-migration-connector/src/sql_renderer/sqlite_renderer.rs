@@ -309,7 +309,7 @@ fn render_column<'a>(column: &ColumnWalker<'a>) -> ddl::Column<'a> {
         default: column
             .default()
             .filter(|default| !matches!(default.kind(), DefaultKind::Sequence(_)))
-            .map(|default| render_default(default)),
+            .map(render_default),
         name: column.name().into(),
         not_null: !column.arity().is_nullable(),
         primary_key: column.is_single_primary_key(),

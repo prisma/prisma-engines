@@ -3,6 +3,7 @@ use query_core::CoreError;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
+#[allow(clippy::large_enum_variant)]
 pub enum HandlerError {
     #[error("{}", _0)]
     Core(#[from] CoreError),

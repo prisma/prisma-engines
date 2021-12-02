@@ -53,13 +53,10 @@ impl VersionChecker {
     pub fn new(schema: &SqlSchema, ctx: &IntrospectionContext) -> VersionChecker {
         VersionChecker {
             sql_family: ctx.sql_family(),
-            has_migration_table: schema.tables.iter().any(|table| is_old_migration_table(table)),
-            has_relay_table: schema.tables.iter().any(|table| is_relay_table(table)),
-            has_prisma_1_join_table: schema.tables.iter().any(|table| is_prisma_1_point_0_join_table(table)),
-            has_prisma_1_1_or_2_join_table: schema
-                .tables
-                .iter()
-                .any(|table| is_prisma_1_point_1_or_2_join_table(table)),
+            has_migration_table: schema.tables.iter().any(is_old_migration_table),
+            has_relay_table: schema.tables.iter().any(is_relay_table),
+            has_prisma_1_join_table: schema.tables.iter().any(is_prisma_1_point_0_join_table),
+            has_prisma_1_1_or_2_join_table: schema.tables.iter().any(is_prisma_1_point_1_or_2_join_table),
             uses_on_delete: false,
             uses_default_values: false,
             always_has_created_at_updated_at: true,

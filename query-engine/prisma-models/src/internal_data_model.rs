@@ -58,7 +58,7 @@ impl InternalDataModel {
         self.relations
             .get()
             .and_then(|relations| relations.iter().find(|relation| relation.name == name))
-            .map(|relation| Arc::downgrade(relation))
+            .map(Arc::downgrade)
             .ok_or_else(|| DomainError::RelationNotFound { name: name.to_string() })
     }
 

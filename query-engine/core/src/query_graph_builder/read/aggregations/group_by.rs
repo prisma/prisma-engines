@@ -132,9 +132,9 @@ fn verify_having(having: Option<&Filter>, selectors: &[AggregationSelection]) ->
 /// Collects all flat scalar fields that are used in the having filter.
 fn collect_scalar_fields(filter: &Filter) -> Vec<&ScalarFieldRef> {
     match filter {
-        Filter::And(inner) => inner.iter().flat_map(|f| collect_scalar_fields(f)).collect(),
-        Filter::Or(inner) => inner.iter().flat_map(|f| collect_scalar_fields(f)).collect(),
-        Filter::Not(inner) => inner.iter().flat_map(|f| collect_scalar_fields(f)).collect(),
+        Filter::And(inner) => inner.iter().flat_map(collect_scalar_fields).collect(),
+        Filter::Or(inner) => inner.iter().flat_map(collect_scalar_fields).collect(),
+        Filter::Not(inner) => inner.iter().flat_map(collect_scalar_fields).collect(),
         Filter::Scalar(sf) => sf.projection.scalar_fields(),
         Filter::Aggregation(_) => vec![], // Aggregations have no effect here.
         _ => unreachable!(),

@@ -154,9 +154,7 @@ fn prisma_value_to_serde(value: &PrismaValue) -> serde_json::Value {
         PrismaValue::Uuid(val) => serde_json::Value::String(val.to_string()),
         PrismaValue::Json(val) => serde_json::Value::String(val.to_string()),
         PrismaValue::Xml(val) => serde_json::Value::String(val.to_string()),
-        PrismaValue::List(value_vec) => {
-            serde_json::Value::Array(value_vec.iter().map(|pv| prisma_value_to_serde(pv)).collect())
-        }
+        PrismaValue::List(value_vec) => serde_json::Value::Array(value_vec.iter().map(prisma_value_to_serde).collect()),
         PrismaValue::Bytes(b) => serde_json::Value::String(prisma_value::encode_bytes(b)),
     }
 }
@@ -164,7 +162,7 @@ fn prisma_value_to_serde(value: &PrismaValue) -> serde_json::Value {
 fn function_to_serde(name: &str, args: &[PrismaValue]) -> serde_json::Value {
     let func = Function {
         name: String::from(name),
-        args: args.iter().map(|arg| prisma_value_to_serde(arg)).collect(),
+        args: args.iter().map(prisma_value_to_serde).collect(),
     };
 
     serde_json::to_value(&func).expect("Failed to render function JSON")

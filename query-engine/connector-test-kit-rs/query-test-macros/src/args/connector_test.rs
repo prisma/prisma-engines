@@ -76,7 +76,7 @@ impl darling::FromMeta for SchemaHandler {
 #[derive(Debug, Default)]
 pub struct OnlyConnectorTags {
     tags: Vec<ConnectorTag>,
-    token_stream: TokenStream,
+    _token_stream: TokenStream,
 }
 
 impl OnlyConnectorTags {
@@ -106,10 +106,10 @@ impl ExcludeConnectorTags {
 
 impl darling::FromMeta for OnlyConnectorTags {
     fn from_list(items: &[syn::NestedMeta]) -> Result<Self, darling::Error> {
-        let token_stream = quote! { #(#items),* }.into();
+        let _token_stream = quote! { #(#items),* }.into();
         let tags = tags_from_list(items)?;
 
-        Ok(OnlyConnectorTags { tags, token_stream })
+        Ok(OnlyConnectorTags { tags, _token_stream })
     }
 }
 

@@ -18,6 +18,7 @@ use std::{borrow::Borrow, collections::HashSet, fmt};
 
 pub type QueryGraphResult<T> = std::result::Result<T, QueryGraphError>;
 
+#[allow(clippy::large_enum_variant)]
 pub enum Node {
     /// Nodes representing actual queries to the underlying connector.
     Query(Query),

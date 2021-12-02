@@ -4,19 +4,10 @@ use crate::transform::helpers::ValueValidator;
 use std::collections::HashMap;
 
 /// Represents a list of arguments.
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub(crate) struct Arguments<'a> {
     attribute: Option<&'a ast::Attribute>,
     args: HashMap<&'a str, &'a ast::Argument>, // the _remaining_ arguments
-}
-
-impl Default for Arguments<'_> {
-    fn default() -> Self {
-        Arguments {
-            attribute: None,
-            args: Default::default(),
-        }
-    }
 }
 
 impl<'a> Arguments<'a> {

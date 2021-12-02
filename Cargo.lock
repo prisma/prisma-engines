@@ -2418,12 +2418,8 @@ dependencies = [
 name = "mongodb-schema-describer"
 version = "0.1.0"
 dependencies = [
- "enumflags2",
  "futures",
  "mongodb",
- "tracing-error",
- "url",
- "user-facing-errors",
 ]
 
 [[package]]

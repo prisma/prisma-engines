@@ -90,6 +90,7 @@ pub async fn create_records(
     let mut fields = HashSet::new();
     args.iter().for_each(|arg| fields.extend(arg.keys().into_iter()));
 
+    #[allow(clippy::mutable_key_type)]
     let affected_fields: HashSet<ScalarFieldRef> = fields
         .into_iter()
         .map(|dsfn| {
@@ -111,6 +112,7 @@ pub async fn create_records(
 }
 
 /// Standard create many records, requires `affected_fields` to be non-empty.
+#[allow(clippy::mutable_key_type)]
 async fn create_many_nonempty(
     conn: &dyn QueryExt,
     sql_info: SqlInfo,

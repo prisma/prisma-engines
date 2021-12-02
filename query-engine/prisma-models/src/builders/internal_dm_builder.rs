@@ -387,6 +387,7 @@ pub struct RelationPlaceholder {
     pub manifestation: ManifestationPlaceholder,
 }
 
+#[allow(clippy::large_enum_variant)]
 #[derive(PartialEq, Debug, Clone)]
 pub enum ManifestationPlaceholder {
     Inline {

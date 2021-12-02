@@ -276,7 +276,7 @@ fn column_for_scalar_field(field: &ScalarFieldWalker<'_>, flavour: &dyn SqlFlavo
         TypeWalker::Base(scalar_type) => (scalar_type, flavour.default_native_type_for_scalar_type(&scalar_type)),
         TypeWalker::NativeType(scalar_type, instance) => (scalar_type, instance.serialized_native_type.clone()),
         TypeWalker::Unsupported(description) => {
-            let default = field.default_value().and_then(|v| db_generated(v)).map(|mut default| {
+            let default = field.default_value().and_then(db_generated).map(|mut default| {
                 if let Some(name) = field.default_value().and_then(|v| v.db_name()) {
                     default.set_constraint_name(name);
                 }
