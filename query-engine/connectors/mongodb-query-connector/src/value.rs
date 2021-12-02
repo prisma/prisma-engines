@@ -10,7 +10,6 @@ use native_types::MongoDbType;
 use prisma_models::{PrismaValue, ScalarFieldRef, SelectedField, TypeIdentifier};
 use serde_json::Value;
 use std::{convert::TryFrom, fmt::Display};
-use tracing::trace;
 
 /// Transforms a `PrismaValue` of a specific field into the BSON mapping as prescribed by the native types
 /// or as defined by the default `TypeIdentifier` to BSON mapping.
@@ -310,6 +309,7 @@ fn read_scalar_value(bson: Bson, meta: &ScalarOutputMeta) -> crate::Result<Prism
 fn read_composite_value(bson: Bson, meta: &CompositeOutputMeta) -> crate::Result<PrismaValue> {
     let val = if meta.list {
         match bson {
+            // Coerce null to empty list (Prisma doesn't have nullable lists)
             Bson::Null => PrismaValue::List(Vec::new()),
 
             Bson::Array(list) => PrismaValue::List(
@@ -329,19 +329,34 @@ fn read_composite_value(bson: Bson, meta: &CompositeOutputMeta) -> crate::Result
         // Null catch-all.
         match bson {
             Bson::Null => PrismaValue::Null,
-            Bson::Document(doc) => {
+            Bson::Document(mut doc) => {
                 let mut pairs = Vec::with_capacity(doc.len());
-                for (field, bson) in doc {
-                    match meta.inner.get(&field) {
-                        Some(meta) => {
-                            let value = value_from_bson(bson, meta)?;
-                            pairs.push((field, value))
+
+                // This approach ensures that missing fields are filled,
+                // so that the serialization can decide if this is invalid or not.
+                for (field, meta) in meta.inner.iter() {
+                    match doc.remove(field) {
+                        Some(value) => {
+                            let value = value_from_bson(value, meta)?;
+                            pairs.push((field.clone(), value))
                         }
-                        None => {
-                            trace!("Warning: Found extra field '{}', skipping.", field);
-                        }
+
+                        // Fill missing fields with nulls.
+                        None => pairs.push((field.clone(), PrismaValue::Null)),
                     }
                 }
+
+                // for (field, bson) in doc {
+                //     match meta.inner.get(&field) {
+                //         Some(meta) => {
+                //             let value = value_from_bson(bson, meta)?;
+                //             pairs.push((field, value))
+                //         }
+                //         None => {
+                //             trace!("Warning: Found extra field '{}', skipping.", field);
+                //         }
+                //     }
+                // }
 
                 PrismaValue::Object(pairs)
             }
