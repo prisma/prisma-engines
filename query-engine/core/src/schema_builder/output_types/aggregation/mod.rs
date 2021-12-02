@@ -1,4 +1,3 @@
-use super::output_objects::map_scalar_output_type_for_field;
 use super::*;
 use prisma_models::ScalarFieldRef;
 
@@ -9,7 +8,7 @@ fn field_avg_output_type(ctx: &mut BuilderContext, field: &ScalarFieldRef) -> Ou
     match field.type_identifier {
         TypeIdentifier::Int | TypeIdentifier::BigInt | TypeIdentifier::Float => OutputType::float(),
         TypeIdentifier::Decimal => OutputType::decimal(),
-        _ => map_scalar_output_type_for_field(ctx, field),
+        _ => field::map_scalar_output_type_for_field(ctx, field),
     }
 }
 

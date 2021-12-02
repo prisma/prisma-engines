@@ -197,7 +197,7 @@ impl<'conn> ReadOperations for MongoDbTransaction<'conn> {
                 &mut self.connection.session,
                 model,
                 filter,
-                &selected_fields.into(),
+                selected_fields,
                 aggr_selections,
             )
             .await
@@ -218,7 +218,7 @@ impl<'conn> ReadOperations for MongoDbTransaction<'conn> {
                 &mut self.connection.session,
                 model,
                 query_arguments,
-                &selected_fields.into(),
+                selected_fields,
                 aggregation_selections,
             )
             .await

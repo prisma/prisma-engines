@@ -279,7 +279,7 @@ impl<'a> LiftAstToDml<'a> {
                     //TODO (extended indexes) here it is ok to pass sort and length with out a preview flag
                     // check since this is coming from the ast and the parsing would reject the args without
                     // the flag set
-                    // When we start using the extra args here could be a place to fill in the defaults. 
+                    // When we start using the extra args here could be a place to fill in the defaults.
                     PrimaryKeyField {
                     name: field.name.name.to_owned(),
                     sort_order,
@@ -335,6 +335,7 @@ impl<'a> LiftAstToDml<'a> {
             let field_type = match &attributes.r#type {
                 db::ScalarFieldType::CompositeType(ctid) => {
                     let mut field = dml::CompositeField::new();
+                    field.name = scalar_field.name().to_owned();
                     field.composite_type = self.db.ast()[*ctid].name.name.to_owned();
                     field.documentation = ast_field.documentation.clone().map(|comment| comment.text);
                     field.is_ignored = attributes.is_ignored;
