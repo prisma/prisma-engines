@@ -1,22 +1,19 @@
 use datamodel_connector::{
     connector_error::ConnectorError,
     helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32},
-    parser_database::walkers::ModelWalker,
-    walker_ext_traits::*,
     Connector, ConnectorCapability, ConstraintScope, ReferentialIntegrity,
 };
 use dml::{
-    native_type_constructor::NativeTypeConstructor, native_type_instance::NativeTypeInstance,
+    model::Model, native_type_constructor::NativeTypeConstructor, native_type_instance::NativeTypeInstance,
     relation_info::ReferentialAction, scalars::ScalarType,
 };
 use enumflags2::BitFlags;
-use native_types::PostgresType::{self, *};
+use native_types::CockroachType::{self, *};
 
 const SMALL_INT_TYPE_NAME: &str = "SmallInt";
 const INTEGER_TYPE_NAME: &str = "Integer";
 const BIG_INT_TYPE_NAME: &str = "BigInt";
 const DECIMAL_TYPE_NAME: &str = "Decimal";
-const MONEY_TYPE_NAME: &str = "Money";
 const INET_TYPE_NAME: &str = "Inet";
 const CITEXT_TYPE_NAME: &str = "Citext";
 const OID_TYPE_NAME: &str = "Oid";
@@ -35,7 +32,6 @@ const BOOLEAN_TYPE_NAME: &str = "Boolean";
 const BIT_TYPE_NAME: &str = "Bit";
 const VAR_BIT_TYPE_NAME: &str = "VarBit";
 const UUID_TYPE_NAME: &str = "Uuid";
-const XML_TYPE_NAME: &str = "Xml";
 const JSON_TYPE_NAME: &str = "Json";
 const JSON_B_TYPE_NAME: &str = "JsonB";
 
@@ -44,7 +40,6 @@ const NATIVE_TYPE_CONSTRUCTORS: &[NativeTypeConstructor] = &[
     NativeTypeConstructor::without_args(INTEGER_TYPE_NAME, &[ScalarType::Int]),
     NativeTypeConstructor::without_args(BIG_INT_TYPE_NAME, &[ScalarType::BigInt]),
     NativeTypeConstructor::with_optional_args(DECIMAL_TYPE_NAME, 2, &[ScalarType::Decimal]),
-    NativeTypeConstructor::without_args(MONEY_TYPE_NAME, &[ScalarType::Decimal]),
     NativeTypeConstructor::without_args(INET_TYPE_NAME, &[ScalarType::String]),
     NativeTypeConstructor::without_args(CITEXT_TYPE_NAME, &[ScalarType::String]),
     NativeTypeConstructor::without_args(OID_TYPE_NAME, &[ScalarType::Int]),
@@ -63,7 +58,6 @@ const NATIVE_TYPE_CONSTRUCTORS: &[NativeTypeConstructor] = &[
     NativeTypeConstructor::with_optional_args(BIT_TYPE_NAME, 1, &[ScalarType::String]),
     NativeTypeConstructor::with_optional_args(VAR_BIT_TYPE_NAME, 1, &[ScalarType::String]),
     NativeTypeConstructor::without_args(UUID_TYPE_NAME, &[ScalarType::String]),
-    NativeTypeConstructor::without_args(XML_TYPE_NAME, &[ScalarType::String]),
     NativeTypeConstructor::without_args(JSON_TYPE_NAME, &[ScalarType::Json]),
     NativeTypeConstructor::without_args(JSON_B_TYPE_NAME, &[ScalarType::Json]),
 ];
@@ -85,39 +79,34 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::CreateManyWriteableAutoIncId,
     ConnectorCapability::CreateSkipDuplicates,
     ConnectorCapability::Enums,
-    ConnectorCapability::EnumArrayPush,
-    ConnectorCapability::FullTextSearchWithoutIndex,
     ConnectorCapability::InsensitiveFilters,
     ConnectorCapability::Json,
     ConnectorCapability::JsonFilteringArrayPath,
-    ConnectorCapability::JsonFilteringAlphanumeric,
-    ConnectorCapability::NamedForeignKeys,
     ConnectorCapability::NamedPrimaryKeys,
     ConnectorCapability::QueryRaw,
     ConnectorCapability::RelationFieldsInArbitraryOrder,
     ConnectorCapability::ScalarLists,
     ConnectorCapability::UpdateableId,
     ConnectorCapability::WritableAutoincField,
-    ConnectorCapability::UsingHashIndex,
 ];
 
-pub struct PostgresDatamodelConnector;
-
-const SCALAR_TYPE_DEFAULTS: &[(ScalarType, PostgresType)] = &[
-    (ScalarType::Int, PostgresType::Integer),
-    (ScalarType::BigInt, PostgresType::BigInt),
-    (ScalarType::Float, PostgresType::DoublePrecision),
-    (ScalarType::Decimal, PostgresType::Decimal(Some((65, 30)))),
-    (ScalarType::Boolean, PostgresType::Boolean),
-    (ScalarType::String, PostgresType::Text),
-    (ScalarType::DateTime, PostgresType::Timestamp(Some(3))),
-    (ScalarType::Bytes, PostgresType::ByteA),
-    (ScalarType::Json, PostgresType::JsonB),
+const SCALAR_TYPE_DEFAULTS: &[(ScalarType, CockroachType)] = &[
+    (ScalarType::Int, CockroachType::Integer),
+    (ScalarType::BigInt, CockroachType::BigInt),
+    (ScalarType::Float, CockroachType::DoublePrecision),
+    (ScalarType::Decimal, CockroachType::Decimal(Some((65, 30)))),
+    (ScalarType::Boolean, CockroachType::Boolean),
+    (ScalarType::String, CockroachType::Text),
+    (ScalarType::DateTime, CockroachType::Timestamp(Some(3))),
+    (ScalarType::Bytes, CockroachType::ByteA),
+    (ScalarType::Json, CockroachType::JsonB),
 ];
 
-impl Connector for PostgresDatamodelConnector {
+pub struct CockroachDatamodelConnector;
+
+impl Connector for CockroachDatamodelConnector {
     fn name(&self) -> &str {
-        "Postgres"
+        "Cockroach"
     }
 
     fn capabilities(&self) -> &'static [ConnectorCapability] {
@@ -138,7 +127,7 @@ impl Connector for PostgresDatamodelConnector {
     }
 
     fn scalar_type_for_native_type(&self, native_type: serde_json::Value) -> ScalarType {
-        let native_type: PostgresType = serde_json::from_value(native_type).unwrap();
+        let native_type: CockroachType = serde_json::from_value(native_type).unwrap();
 
         match native_type {
             //String
@@ -148,7 +137,6 @@ impl Connector for PostgresDatamodelConnector {
             Bit(_) => ScalarType::String,
             VarBit(_) => ScalarType::String,
             Uuid => ScalarType::String,
-            Xml => ScalarType::String,
             Inet => ScalarType::String,
             Citext => ScalarType::String,
             //Boolean
@@ -164,7 +152,6 @@ impl Connector for PostgresDatamodelConnector {
             DoublePrecision => ScalarType::Float,
             //Decimal
             Decimal(_) => ScalarType::Decimal,
-            Money => ScalarType::Float,
             //DateTime
             Timestamp(_) => ScalarType::DateTime,
             Timestamptz(_) => ScalarType::DateTime,
@@ -187,11 +174,11 @@ impl Connector for PostgresDatamodelConnector {
             .ok_or_else(|| format!("Could not find scalar type {:?} in SCALAR_TYPE_DEFAULTS", scalar_type))
             .unwrap();
 
-        serde_json::to_value(native_type).expect("PostgresType to JSON failed")
+        serde_json::to_value(native_type).expect("CockroachType to JSON failed")
     }
 
     fn native_type_is_default_for_scalar_type(&self, native_type: serde_json::Value, scalar_type: &ScalarType) -> bool {
-        let native_type: PostgresType = serde_json::from_value(native_type).expect("PostgresType from JSON failed");
+        let native_type: CockroachType = serde_json::from_value(native_type).expect("CockroachType from JSON failed");
 
         SCALAR_TYPE_DEFAULTS
             .iter()
@@ -204,7 +191,7 @@ impl Connector for PostgresDatamodelConnector {
         _scalar_type: &ScalarType,
         errors: &mut Vec<ConnectorError>,
     ) {
-        let native_type: PostgresType = native_type_instance.deserialize_native_type();
+        let native_type: CockroachType = native_type_instance.deserialize_native_type();
         let error = self.native_instance_error(native_type_instance);
 
         match native_type {
@@ -224,26 +211,7 @@ impl Connector for PostgresDatamodelConnector {
         }
     }
 
-    fn validate_model(&self, model: ModelWalker<'_, '_>, errors: &mut Vec<ConnectorError>) {
-        for index in model.indexes() {
-            for field in index.fields() {
-                if let Some(native_type) = field.native_type_instance(self) {
-                    let r#type: PostgresType = native_type.deserialize_native_type();
-                    let error = self.native_instance_error(&native_type);
-
-                    if r#type == PostgresType::Xml {
-                        if index.is_unique() {
-                            errors.push(error.new_incompatible_native_type_with_unique())
-                        } else {
-                            errors.push(error.new_incompatible_native_type_with_index())
-                        };
-
-                        break;
-                    }
-                }
-            }
-        }
-    }
+    fn validate_model(&self, _model: &Model, _errors: &mut Vec<ConnectorError>) {}
 
     fn constraint_violation_scopes(&self) -> &'static [ConstraintScope] {
         CONSTRAINT_SCOPES
@@ -262,7 +230,6 @@ impl Connector for PostgresDatamodelConnector {
             BIG_INT_TYPE_NAME => BigInt,
             DECIMAL_TYPE_NAME => Decimal(parse_two_opt_u32(args, DECIMAL_TYPE_NAME)?),
             INET_TYPE_NAME => Inet,
-            MONEY_TYPE_NAME => Money,
             CITEXT_TYPE_NAME => Citext,
             OID_TYPE_NAME => Oid,
             REAL_TYPE_NAME => Real,
@@ -280,7 +247,6 @@ impl Connector for PostgresDatamodelConnector {
             BIT_TYPE_NAME => Bit(parse_one_opt_u32(args, BIT_TYPE_NAME)?),
             VAR_BIT_TYPE_NAME => VarBit(parse_one_opt_u32(args, VAR_BIT_TYPE_NAME)?),
             UUID_TYPE_NAME => Uuid,
-            XML_TYPE_NAME => Xml,
             JSON_TYPE_NAME => Json,
             JSON_B_TYPE_NAME => JsonB,
             _ => return Err(ConnectorError::new_native_type_parser_error(name)),
@@ -290,7 +256,7 @@ impl Connector for PostgresDatamodelConnector {
     }
 
     fn introspect_native_type(&self, native_type: serde_json::Value) -> Result<NativeTypeInstance, ConnectorError> {
-        let native_type: PostgresType = serde_json::from_value(native_type).unwrap();
+        let native_type: CockroachType = serde_json::from_value(native_type).unwrap();
         let (constructor_name, args) = match native_type {
             SmallInt => (SMALL_INT_TYPE_NAME, vec![]),
             Integer => (INTEGER_TYPE_NAME, vec![]),
@@ -311,10 +277,8 @@ impl Connector for PostgresDatamodelConnector {
             Bit(x) => (BIT_TYPE_NAME, arg_vec_from_opt(x)),
             VarBit(x) => (VAR_BIT_TYPE_NAME, arg_vec_from_opt(x)),
             Uuid => (UUID_TYPE_NAME, vec![]),
-            Xml => (XML_TYPE_NAME, vec![]),
             Json => (JSON_TYPE_NAME, vec![]),
             JsonB => (JSON_B_TYPE_NAME, vec![]),
-            Money => (MONEY_TYPE_NAME, vec![]),
             Inet => (INET_TYPE_NAME, vec![]),
             Citext => (CITEXT_TYPE_NAME, vec![]),
             Oid => (OID_TYPE_NAME, vec![]),

@@ -94,6 +94,7 @@ const NATIVE_TYPE_CONSTRUCTORS: &[NativeTypeConstructor] = &[
 const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::RelationsOverNonUniqueCriteria,
     ConnectorCapability::Enums,
+    ConnectorCapability::EnumArrayPush,
     ConnectorCapability::Json,
     ConnectorCapability::AutoIncrementAllowedOnNonId,
     ConnectorCapability::RelationFieldsInArbitraryOrder,
@@ -102,6 +103,7 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::CreateSkipDuplicates,
     ConnectorCapability::UpdateableId,
     ConnectorCapability::JsonFilteringJsonPath,
+    ConnectorCapability::JsonFilteringAlphanumeric,
     ConnectorCapability::CreateManyWriteableAutoIncId,
     ConnectorCapability::AutoIncrement,
     ConnectorCapability::CompoundIds,

@@ -3,7 +3,7 @@
 #[cfg(feature = "mongodb")]
 use datamodel::common::provider_names::MONGODB_SOURCE_NAME;
 use datamodel::common::provider_names::{
-    MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME,
+    COCKROACHDB_SOURCE_NAME, MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME,
 };
 use migration_connector::{ConnectorResult, DiffTarget, MigrationConnector};
 #[cfg(feature = "mongodb")]
@@ -21,6 +21,7 @@ pub async fn setup(prisma_schema: &str) -> ConnectorResult<()> {
                 POSTGRES_SOURCE_NAME,
                 SQLITE_SOURCE_NAME,
                 MSSQL_SOURCE_NAME,
+                COCKROACHDB_SOURCE_NAME,
             ]
             .contains(&provider.as_str()) =>
         {
@@ -68,6 +69,7 @@ pub async fn teardown(prisma_schema: &str) -> ConnectorResult<()> {
                 POSTGRES_SOURCE_NAME,
                 SQLITE_SOURCE_NAME,
                 MSSQL_SOURCE_NAME,
+                COCKROACHDB_SOURCE_NAME,
             ]
             .contains(&provider.as_str()) =>
         {

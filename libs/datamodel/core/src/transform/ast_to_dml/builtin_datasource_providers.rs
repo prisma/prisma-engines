@@ -32,7 +32,7 @@ impl DatasourceProvider for CockroachDbDatasourceProvider {
     }
 
     fn connector(&self) -> &'static dyn Connector {
-        SqlDatamodelConnectors::POSTGRES
+        SqlDatamodelConnectors::COCKROACH
     }
 }
 

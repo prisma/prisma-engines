@@ -17,6 +17,7 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::RelationsOverNonUniqueCriteria,
     ConnectorCapability::Json,
     ConnectorCapability::Enums,
+    ConnectorCapability::EnumArrayPush,
     ConnectorCapability::RelationFieldsInArbitraryOrder,
     ConnectorCapability::CreateMany,
     ConnectorCapability::ScalarLists,
