@@ -232,19 +232,14 @@ mod interactive_tx {
         runner.executor().commit_tx(tx_id.clone()).await?;
         runner.clear_active_tx();
 
-        let partial_data_res = run_query!(&runner, "query { findManyTestModel { id }}");
-        match runner.connector() {
-            // Postgres and Mongo abort transactions, data is lost.
-            ConnectorTag::Postgres(_) | ConnectorTag::MongoDb(_) => insta::assert_snapshot!(
-              partial_data_res,
-              @r###"{"data":{"findManyTestModel":[]}}"###
-            ),
-            // Partial data still there because a batch will not be auto-rolled back by other connectors.
-            _ => insta::assert_snapshot!(
-                partial_data_res,
-                @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
-            ),
-        }
+        match_connector_result!(
+          &runner,
+          "query { findManyTestModel { id }}",
+          // Postgres and Mongo abort transactions, data is lost.
+          Postgres(_) | MongoDb(_) => vec![r#"{"data":{"findManyTestModel":[]}}"#],
+          // Partial data still there because a batch will not be auto-rolled back by other connectors.
+          _ => vec![r#"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"#]
+        );
 
         Ok(())
     }

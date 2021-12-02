@@ -845,8 +845,8 @@ mod pagination {
                 id
               }
           }"#,
-          [SqlServer] => r#"{"data":{"findManyTestModel":[{"id":6},{"id":5},{"id":3}]}}"#,
-          [MongoDb, Sqlite, Postgres, MySql, SqlServer] => r#"{"data":{"findManyTestModel":[{"id":6},{"id":5}]}}"#
+          SqlServer(_) => vec![r#"{"data":{"findManyTestModel":[{"id":6},{"id":5},{"id":3}]}}"#],
+          _ => vec![r#"{"data":{"findManyTestModel":[{"id":6},{"id":5}]}}"#]
         );
 
         Ok(())

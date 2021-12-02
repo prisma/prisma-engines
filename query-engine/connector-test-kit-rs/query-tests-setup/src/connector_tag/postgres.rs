@@ -154,6 +154,11 @@ impl PostgresConnectorTag {
             },
         ]
     }
+
+    /// Get a reference to the postgres connector tag's version.
+    pub fn version(&self) -> Option<PostgresVersion> {
+        self.version
+    }
 }
 
 impl PartialEq for PostgresConnectorTag {

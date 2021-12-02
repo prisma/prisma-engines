@@ -22,20 +22,10 @@ mod insert_null {
     async fn update_required_val_to_null(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, b: "abc" key: "abc" }"#).await?;
 
-        let is_mysql_56 = match runner.connector() {
-            query_engine_tests::ConnectorTag::MySql(conn) => {
-                let (_, version) = conn.as_parse_pair();
-
-                if let Some(v) = version {
-                    v == "5.6"
-                } else {
-                    false
-                }
-            }
-            _ => false,
-        };
-
-        if !is_mysql_56 {
+        if !matches!(
+            runner.connector_version(),
+            ConnectorVersion::MySql(Some(MySqlVersion::V5_6))
+        ) {
             assert_error!(
               runner,
               r#"mutation {

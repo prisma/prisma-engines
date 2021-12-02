@@ -3,7 +3,7 @@ use query_engine_tests::*;
 
 #[test_suite(schema(schemas::common_nullable_types))]
 mod bytes_filter_spec {
-    use query_engine_tests::run_query;
+    use query_engine_tests::{match_connector_result, run_query};
 
     #[connector_test]
     async fn basic_where(runner: Runner) -> TestResult<()> {
@@ -71,8 +71,9 @@ mod bytes_filter_spec {
         match_connector_result!(
             &runner,
             r#"query { findManyTestModel(where: { bytes: { not: { in: ["dGVzdA=="] }}}) { id }}"#,
-            [SqlServer, Postgres, MySql, Sqlite] => r#"{"data":{"findManyTestModel":[{"id":2}]}}"#,
-            [MongoDb] => r#"{"data":{"findManyTestModel":[{"id":2},{"id":3}]}}"# // Mongo selects `null` fields as well.
+            // Mongo selects `null` fields as well.
+            MongoDb(_) => vec![r#"{"data":{"findManyTestModel":[{"id":2},{"id":3}]}}"#],
+            _ => vec![r#"{"data":{"findManyTestModel":[{"id":2}]}}"#]
         );
 
         Ok(())

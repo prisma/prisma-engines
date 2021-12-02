@@ -11,8 +11,8 @@ pub struct MySqlConnectorTag {
 
 impl MySqlConnectorTag {
     /// Get a reference to the MySQL connector tag's version.
-    pub fn version(&self) -> Option<&MySqlVersion> {
-        self.version.as_ref()
+    pub fn version(&self) -> Option<MySqlVersion> {
+        self.version
     }
 }
 

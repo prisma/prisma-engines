@@ -107,6 +107,11 @@ impl MongoDbConnectorTag {
             },
         ]
     }
+
+    /// Get a reference to the mongo db connector tag's version.
+    pub fn version(&self) -> Option<MongoDbVersion> {
+        self.version
+    }
 }
 
 impl PartialEq for MongoDbConnectorTag {
