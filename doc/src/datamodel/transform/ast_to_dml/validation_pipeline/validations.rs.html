@@ -120,73 +120,113 @@
 <span id="120">120</span>
 <span id="121">121</span>
 <span id="122">122</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">fields</span>;
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">autoincrement</span>;
+<span class="kw">mod</span> <span class="ident">composite_types</span>;
+<span class="kw">mod</span> <span class="ident">constraint_namespace</span>;
+<span class="kw">mod</span> <span class="ident">database_name</span>;
+<span class="kw">mod</span> <span class="ident">fields</span>;
 <span class="kw">mod</span> <span class="ident">indexes</span>;
 <span class="kw">mod</span> <span class="ident">models</span>;
 <span class="kw">mod</span> <span class="ident">names</span>;
 <span class="kw">mod</span> <span class="ident">relation_fields</span>;
 <span class="kw">mod</span> <span class="ident">relations</span>;
 
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::names::Names</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">ast</span>,
-    <span class="ident">diagnostics::Diagnostics</span>,
-    <span class="ident">transform::ast_to_dml::db</span>::{<span class="ident">walkers::RefinedRelationWalker</span>, <span class="ident">ParserDatabase</span>},
-};
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::context::Context</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ast</span>, <span class="ident">transform::ast_to_dml::db::walkers::RefinedRelationWalker</span>};
+<span class="kw">use</span> <span class="ident">diagnostics::DatamodelError</span>;
+<span class="kw">use</span> <span class="ident">names::Names</span>;
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">validate</span>(<span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="ident">ParserDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">diagnostics</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Diagnostics</span>, <span class="ident">relation_transformation_enabled</span>: <span class="ident">bool</span>) {
-    <span class="kw">let</span> <span class="ident">names</span> <span class="op">=</span> <span class="ident">Names::new</span>(<span class="ident">db</span>);
-    <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">active_connector</span>();
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">validate</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">relation_transformation_enabled</span>: <span class="ident">bool</span>) {
+    <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">db</span>;
+    <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">connector</span>;
+
+    <span class="kw">let</span> <span class="ident">names</span> <span class="op">=</span> <span class="ident">Names::new</span>(<span class="ident">db</span>, <span class="ident">connector</span>);
+
+    <span class="kw">for</span> <span class="ident">composite_type</span> <span class="kw">in</span> <span class="ident">db</span>.<span class="ident">walk_composite_types</span>() {
+        <span class="ident">composite_types::composite_types_support</span>(<span class="ident">composite_type</span>, <span class="ident">ctx</span>);
+    }
 
     <span class="kw">for</span> <span class="ident">model</span> <span class="kw">in</span> <span class="ident">db</span>.<span class="ident">walk_models</span>() {
-        <span class="ident">models::has_a_strict_unique_criteria</span>(<span class="ident">model</span>, <span class="ident">diagnostics</span>);
-        <span class="ident">models::has_a_unique_primary_key_name</span>(<span class="ident">db</span>, <span class="ident">model</span>, <span class="ident">diagnostics</span>);
-        <span class="ident">models::uses_sort_or_length_on_primary_without_preview_flag</span>(<span class="ident">db</span>, <span class="ident">model</span>, <span class="ident">diagnostics</span>);
-        <span class="ident">models::primary_key_length_prefix_supported</span>(<span class="ident">db</span>, <span class="ident">model</span>, <span class="ident">diagnostics</span>);
-        <span class="ident">models::primary_key_sort_order_supported</span>(<span class="ident">db</span>, <span class="ident">model</span>, <span class="ident">diagnostics</span>);
-        <span class="ident">models::only_one_fulltext_attribute_allowed</span>(<span class="ident">db</span>, <span class="ident">model</span>, <span class="ident">diagnostics</span>);
+        <span class="ident">models::has_a_strict_unique_criteria</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
+        <span class="ident">models::has_a_unique_primary_key_name</span>(<span class="ident">model</span>, <span class="kw-2">&amp;</span><span class="ident">names</span>, <span class="ident">ctx</span>);
+        <span class="ident">models::uses_sort_or_length_on_primary_without_preview_flag</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
+        <span class="ident">models::primary_key_connector_specific</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
+        <span class="ident">models::primary_key_length_prefix_supported</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
+        <span class="ident">models::primary_key_sort_order_supported</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
+        <span class="ident">models::only_one_fulltext_attribute_allowed</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
+        <span class="ident">autoincrement::validate_auto_increment</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pk</span>) <span class="op">=</span> <span class="ident">model</span>.<span class="ident">primary_key</span>() {
             <span class="kw">for</span> <span class="ident">field_attribute</span> <span class="kw">in</span> <span class="ident">pk</span>.<span class="ident">scalar_field_attributes</span>() {
                 <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">pk</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>;
                 <span class="kw">let</span> <span class="ident">attribute</span> <span class="op">=</span> (<span class="string">&quot;id&quot;</span>, <span class="ident">span</span>);
-                <span class="ident">fields::validate_length_used_with_correct_types</span>(<span class="ident">db</span>, <span class="ident">field_attribute</span>, <span class="ident">attribute</span>, <span class="ident">diagnostics</span>);
+                <span class="ident">fields::validate_length_used_with_correct_types</span>(<span class="ident">field_attribute</span>, <span class="ident">attribute</span>, <span class="ident">ctx</span>);
             }
         }
 
         <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">scalar_fields</span>() {
-            <span class="ident">fields::validate_client_name</span>(<span class="ident">field</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="ident">names</span>, <span class="ident">diagnostics</span>);
-            <span class="ident">fields::has_a_unique_default_constraint_name</span>(<span class="ident">db</span>, <span class="ident">field</span>, <span class="ident">diagnostics</span>);
-            <span class="ident">fields::validate_native_type_arguments</span>(<span class="ident">field</span>, <span class="ident">diagnostics</span>);
-            <span class="ident">fields::validate_default</span>(<span class="ident">field</span>, <span class="ident">diagnostics</span>);
+            <span class="ident">fields::validate_scalar_field_connector_specific</span>(<span class="ident">field</span>, <span class="ident">ctx</span>);
+            <span class="ident">fields::validate_client_name</span>(<span class="ident">field</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="ident">names</span>, <span class="ident">ctx</span>);
+            <span class="ident">fields::has_a_unique_default_constraint_name</span>(<span class="ident">field</span>, <span class="kw-2">&amp;</span><span class="ident">names</span>, <span class="ident">ctx</span>);
+            <span class="ident">fields::validate_native_type_arguments</span>(<span class="ident">field</span>, <span class="ident">ctx</span>);
+            <span class="ident">fields::validate_default</span>(<span class="ident">field</span>, <span class="ident">ctx</span>);
+            <span class="ident">fields::validate_unsupported_field_type</span>(<span class="ident">field</span>, <span class="ident">ctx</span>)
         }
 
         <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">relation_fields</span>() {
             <span class="comment">// We don&#39;t want to spam, so with ambiguous relations we should exit</span>
             <span class="comment">// immediately if any errors.</span>
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">error</span>) <span class="op">=</span> <span class="ident">relation_fields::ambiguity</span>(<span class="ident">field</span>, <span class="kw-2">&amp;</span><span class="ident">names</span>) {
-                <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">error</span>);
+                <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">error</span>);
                 <span class="kw">return</span>;
             }
 
-            <span class="ident">fields::validate_client_name</span>(<span class="ident">field</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="ident">names</span>, <span class="ident">diagnostics</span>);
+            <span class="ident">fields::validate_client_name</span>(<span class="ident">field</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="ident">names</span>, <span class="ident">ctx</span>);
 
-            <span class="ident">relation_fields::ignored_related_model</span>(<span class="ident">field</span>, <span class="ident">diagnostics</span>);
-            <span class="ident">relation_fields::referential_actions</span>(<span class="ident">field</span>, <span class="ident">db</span>, <span class="ident">diagnostics</span>);
+            <span class="ident">relation_fields::ignored_related_model</span>(<span class="ident">field</span>, <span class="ident">ctx</span>);
+            <span class="ident">relation_fields::referential_actions</span>(<span class="ident">field</span>, <span class="ident">ctx</span>);
+            <span class="ident">relation_fields::map</span>(<span class="ident">field</span>, <span class="ident">ctx</span>);
         }
 
         <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">indexes</span>() {
-            <span class="ident">indexes::has_a_unique_constraint_name</span>(<span class="ident">db</span>, <span class="ident">index</span>, <span class="ident">diagnostics</span>);
-            <span class="ident">indexes::uses_length_or_sort_without_preview_flag</span>(<span class="ident">db</span>, <span class="ident">index</span>, <span class="ident">diagnostics</span>);
-            <span class="ident">indexes::field_length_prefix_supported</span>(<span class="ident">db</span>, <span class="ident">index</span>, <span class="ident">diagnostics</span>);
-            <span class="ident">indexes::index_algorithm_preview_feature</span>(<span class="ident">db</span>, <span class="ident">index</span>, <span class="ident">diagnostics</span>);
-            <span class="ident">indexes::index_algorithm_is_supported</span>(<span class="ident">db</span>, <span class="ident">index</span>, <span class="ident">diagnostics</span>);
-            <span class="ident">indexes::hash_index_must_not_use_sort_param</span>(<span class="ident">db</span>, <span class="ident">index</span>, <span class="ident">diagnostics</span>);
-            <span class="ident">indexes::fulltext_index_preview_feature_enabled</span>(<span class="ident">db</span>, <span class="ident">index</span>, <span class="ident">diagnostics</span>);
-            <span class="ident">indexes::fulltext_index_supported</span>(<span class="ident">db</span>, <span class="ident">index</span>, <span class="ident">diagnostics</span>);
-            <span class="ident">indexes::fulltext_columns_should_not_define_length</span>(<span class="ident">db</span>, <span class="ident">index</span>, <span class="ident">diagnostics</span>);
-            <span class="ident">indexes::fulltext_column_sort_is_supported</span>(<span class="ident">db</span>, <span class="ident">index</span>, <span class="ident">diagnostics</span>);
-            <span class="ident">indexes::fulltext_text_columns_should_be_bundled_together</span>(<span class="ident">db</span>, <span class="ident">index</span>, <span class="ident">diagnostics</span>);
+            <span class="ident">indexes::has_a_unique_constraint_name</span>(<span class="ident">index</span>, <span class="kw-2">&amp;</span><span class="ident">names</span>, <span class="ident">ctx</span>);
+            <span class="ident">indexes::uses_length_or_sort_without_preview_flag</span>(<span class="ident">index</span>, <span class="ident">ctx</span>);
+            <span class="ident">indexes::field_length_prefix_supported</span>(<span class="ident">index</span>, <span class="ident">ctx</span>);
+            <span class="ident">indexes::index_algorithm_preview_feature</span>(<span class="ident">index</span>, <span class="ident">ctx</span>);
+            <span class="ident">indexes::index_algorithm_is_supported</span>(<span class="ident">index</span>, <span class="ident">ctx</span>);
+            <span class="ident">indexes::hash_index_must_not_use_sort_param</span>(<span class="ident">index</span>, <span class="ident">ctx</span>);
+            <span class="ident">indexes::fulltext_index_preview_feature_enabled</span>(<span class="ident">index</span>, <span class="ident">ctx</span>);
+            <span class="ident">indexes::fulltext_index_supported</span>(<span class="ident">index</span>, <span class="ident">ctx</span>);
+            <span class="ident">indexes::fulltext_columns_should_not_define_length</span>(<span class="ident">index</span>, <span class="ident">ctx</span>);
+            <span class="ident">indexes::fulltext_column_sort_is_supported</span>(<span class="ident">index</span>, <span class="ident">ctx</span>);
+            <span class="ident">indexes::fulltext_text_columns_should_be_bundled_together</span>(<span class="ident">index</span>, <span class="ident">ctx</span>);
+            <span class="ident">indexes::has_valid_mapped_name</span>(<span class="ident">index</span>, <span class="ident">ctx</span>);
 
             <span class="kw">for</span> <span class="ident">field_attribute</span> <span class="kw">in</span> <span class="ident">index</span>.<span class="ident">scalar_field_attributes</span>() {
                 <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">index</span>
@@ -195,8 +235,20 @@
                     .<span class="ident">unwrap_or_else</span>(<span class="ident">ast::Span::empty</span>);
 
                 <span class="kw">let</span> <span class="ident">attribute</span> <span class="op">=</span> (<span class="ident">index</span>.<span class="ident">attribute_name</span>(), <span class="ident">span</span>);
-                <span class="ident">fields::validate_length_used_with_correct_types</span>(<span class="ident">db</span>, <span class="ident">field_attribute</span>, <span class="ident">attribute</span>, <span class="ident">diagnostics</span>);
+                <span class="ident">fields::validate_length_used_with_correct_types</span>(<span class="ident">field_attribute</span>, <span class="ident">attribute</span>, <span class="ident">ctx</span>);
             }
+        }
+    }
+
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">connector</span>.<span class="ident">supports_enums</span>() {
+        <span class="kw">for</span> <span class="ident">r#enum</span> <span class="kw">in</span> <span class="ident">db</span>.<span class="ident">ast</span>().<span class="ident">iter_tops</span>().<span class="ident">filter_map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">top</span>)<span class="op">|</span> <span class="ident">top</span>.<span class="ident">as_enum</span>()) {
+            <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(
+                <span class="macro">format!</span>(
+                    <span class="string">&quot;You defined the enum `{}`. But the current connector does not support enums.&quot;</span>,
+                    <span class="kw-2">&amp;</span><span class="ident">r#enum</span>.<span class="ident">name</span>.<span class="ident">name</span>
+                ),
+                <span class="ident">r#enum</span>.<span class="ident">span</span>,
+            ));
         }
     }
 
@@ -205,39 +257,39 @@
             <span class="comment">// 1:1, 1:n</span>
             <span class="ident">RefinedRelationWalker::Inline</span>(<span class="ident">relation</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">relation</span>) <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">as_complete</span>() {
-                    <span class="ident">relations::field_arity</span>(<span class="ident">relation</span>, <span class="ident">diagnostics</span>);
-                    <span class="ident">relations::same_length_in_referencing_and_referenced</span>(<span class="ident">relation</span>, <span class="ident">diagnostics</span>);
-                    <span class="ident">relations::cycles</span>(<span class="ident">relation</span>, <span class="ident">db</span>, <span class="ident">diagnostics</span>);
-                    <span class="ident">relations::multiple_cascading_paths</span>(<span class="ident">relation</span>, <span class="ident">db</span>, <span class="ident">diagnostics</span>);
-                    <span class="ident">relations::has_a_unique_constraint_name</span>(<span class="ident">db</span>, <span class="ident">relation</span>, <span class="ident">diagnostics</span>);
-                    <span class="ident">relations::references_unique_fields</span>(<span class="ident">relation</span>, <span class="ident">connector</span>, <span class="ident">diagnostics</span>);
-                    <span class="ident">relations::referencing_fields_in_correct_order</span>(<span class="ident">relation</span>, <span class="ident">connector</span>, <span class="ident">diagnostics</span>);
+                    <span class="ident">relations::field_arity</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
+                    <span class="ident">relations::same_length_in_referencing_and_referenced</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
+                    <span class="ident">relations::cycles</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
+                    <span class="ident">relations::multiple_cascading_paths</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
+                    <span class="ident">relations::has_a_unique_constraint_name</span>(<span class="kw-2">&amp;</span><span class="ident">names</span>, <span class="ident">relation</span>, <span class="ident">ctx</span>);
+                    <span class="ident">relations::references_unique_fields</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
+                    <span class="ident">relations::referencing_fields_in_correct_order</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
                 }
 
-                <span class="ident">relations::referencing_scalar_field_types</span>(<span class="ident">relation</span>, <span class="ident">diagnostics</span>);
+                <span class="ident">relations::referencing_scalar_field_types</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
 
                 <span class="comment">// Only run these when you are not formatting the data model. These validations</span>
                 <span class="comment">// test against broken relations that we could fix with a code action. The flag is</span>
                 <span class="comment">// set when prisma-fmt calls this code.</span>
                 <span class="kw">if</span> <span class="op">!</span><span class="ident">relation_transformation_enabled</span> {
                     <span class="kw">if</span> <span class="ident">relation</span>.<span class="ident">is_one_to_one</span>() {
-                        <span class="ident">relations::one_to_one::both_sides_are_defined</span>(<span class="ident">relation</span>, <span class="ident">diagnostics</span>);
-                        <span class="ident">relations::one_to_one::fields_and_references_are_defined</span>(<span class="ident">relation</span>, <span class="ident">diagnostics</span>);
-                        <span class="ident">relations::one_to_one::fields_and_references_defined_on_one_side_only</span>(<span class="ident">relation</span>, <span class="ident">diagnostics</span>);
-                        <span class="ident">relations::one_to_one::referential_actions</span>(<span class="ident">relation</span>, <span class="ident">diagnostics</span>);
+                        <span class="ident">relations::one_to_one::both_sides_are_defined</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
+                        <span class="ident">relations::one_to_one::fields_and_references_are_defined</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
+                        <span class="ident">relations::one_to_one::fields_and_references_defined_on_one_side_only</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
+                        <span class="ident">relations::one_to_one::referential_actions</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
 
                         <span class="comment">// Run these validations last to prevent validation spam.</span>
-                        <span class="ident">relations::one_to_one::fields_references_mixups</span>(<span class="ident">relation</span>, <span class="ident">diagnostics</span>);
-                        <span class="ident">relations::one_to_one::back_relation_arity_is_optional</span>(<span class="ident">relation</span>, <span class="ident">diagnostics</span>);
+                        <span class="ident">relations::one_to_one::fields_references_mixups</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
+                        <span class="ident">relations::one_to_one::back_relation_arity_is_optional</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
                     } <span class="kw">else</span> {
-                        <span class="ident">relations::one_to_many::both_sides_are_defined</span>(<span class="ident">relation</span>, <span class="ident">diagnostics</span>);
-                        <span class="ident">relations::one_to_many::fields_and_references_are_defined</span>(<span class="ident">relation</span>, <span class="ident">diagnostics</span>);
-                        <span class="ident">relations::one_to_many::referential_actions</span>(<span class="ident">relation</span>, <span class="ident">diagnostics</span>);
+                        <span class="ident">relations::one_to_many::both_sides_are_defined</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
+                        <span class="ident">relations::one_to_many::fields_and_references_are_defined</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
+                        <span class="ident">relations::one_to_many::referential_actions</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
                     }
                 }
             }
             <span class="ident">RefinedRelationWalker::ImplicitManyToMany</span>(<span class="ident">relation</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">relations::many_to_many::validate_singular_id</span>(<span class="ident">relation</span>, <span class="ident">diagnostics</span>);
+                <span class="ident">relations::many_to_many::validate_singular_id</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
             }
         }
     }

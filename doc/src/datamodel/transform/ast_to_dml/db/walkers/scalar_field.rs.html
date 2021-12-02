@@ -159,9 +159,17 @@
 <span id="159">159</span>
 <span id="160">160</span>
 <span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
-
-<span class="kw">use</span> <span class="ident">dml</span>::{<span class="ident">default_value::DefaultValue</span>, <span class="ident">model::SortOrder</span>, <span class="ident">native_type_instance::NativeTypeInstance</span>};
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ModelWalker</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -169,6 +177,9 @@
     <span class="ident">common::constraint_names::ConstraintNames</span>,
     <span class="ident">transform::ast_to_dml::db</span>::{<span class="ident">types::FieldWithArgs</span>, <span class="ident">ParserDatabase</span>, <span class="ident">ScalarField</span>, <span class="ident">ScalarFieldType</span>},
 };
+<span class="kw">use</span> <span class="ident">datamodel_connector::Connector</span>;
+<span class="kw">use</span> <span class="ident">diagnostics::Span</span>;
+<span class="kw">use</span> <span class="ident">dml</span>::{<span class="ident">default_value::DefaultValue</span>, <span class="ident">model::SortOrder</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
@@ -200,8 +211,16 @@
         <span class="self">self</span>.<span class="ident">ast_field</span>().<span class="ident">name</span>()
     }
 
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">default_attribute</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::Attribute</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">scalar_field</span>.<span class="ident">default_attribute</span>
+    }
+
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">final_database_name</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span> {
         <span class="self">self</span>.<span class="ident">attributes</span>().<span class="ident">mapped_name</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">name</span>())
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_autoincrement</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="macro">matches!</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">scalar_field</span>.<span class="ident">default</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">kind</span>()), <span class="prelude-val">Some</span>(<span class="ident"><span class="kw">crate</span>::dml::DefaultKind::Expression</span>(<span class="ident">expr</span>)) <span class="kw">if</span> <span class="ident">expr</span>.<span class="ident">is_autoincrement</span>())
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_optional</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
@@ -220,13 +239,14 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">native_type_instance</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">scalar_field</span>.<span class="ident">native_type</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">name</span>, <span class="ident">args</span>)<span class="op">|</span> {
-            <span class="self">self</span>.<span class="ident">db</span>
-                .<span class="ident">active_connector</span>()
-                .<span class="ident">parse_native_type</span>(<span class="ident">name</span>, <span class="ident">args</span>.<span class="ident">clone</span>())
-                .<span class="ident">unwrap</span>()
-        })
+    <span class="doccomment">/// (attribute scope, native type name, arguments, span)</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// For example: `@db.Text` would translate to (&quot;db&quot;, &quot;Text&quot;, &amp;[], &lt;the span&gt;)</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">raw_native_type</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> [<span class="ident">String</span>], <span class="ident">Span</span>)<span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">attributes</span>()
+            .<span class="ident">native_type</span>
+            .<span class="ident">as_ref</span>()
+            .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span>(<span class="ident">datasource_name</span>, <span class="ident">name</span>, <span class="ident">args</span>, <span class="ident">span</span>)<span class="op">|</span> (<span class="kw-2">*</span><span class="ident">datasource_name</span>, <span class="kw-2">*</span><span class="ident">name</span>, <span class="ident">args</span>.<span class="ident">as_slice</span>(), <span class="kw-2">*</span><span class="ident">span</span>))
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_unsupported</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
@@ -264,12 +284,12 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">DefaultValueWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">constraint_name</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span>, <span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">constraint_name</span>(<span class="self">self</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span>, <span class="ident">str</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">default</span>.<span class="ident">db_name</span>().<span class="ident">map</span>(<span class="ident">Cow::from</span>).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">ConstraintNames::default_name</span>(
                 <span class="self">self</span>.<span class="ident">field</span>().<span class="ident">model</span>().<span class="ident">final_database_name</span>(),
                 <span class="self">self</span>.<span class="ident">field</span>().<span class="ident">final_database_name</span>(),
-                <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">active_connector</span>(),
+                <span class="ident">connector</span>,
             );
 
             <span class="ident">Cow::from</span>(<span class="ident">name</span>)

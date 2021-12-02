@@ -204,6 +204,8 @@
 <span id="204">204</span>
 <span id="205">205</span>
 <span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast::Span</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::diagnostics::DatamodelError</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">PrimaryKeyDefinition</span>, <span class="ident">WithDatabaseName</span>};
@@ -397,11 +399,13 @@
         <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
         <span class="ident">attribute</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>,
+        <span class="ident">double_at</span>: <span class="ident">bool</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DatamodelError</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="ident">name</span> {
             <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">connector</span>.<span class="ident">constraint_name_length</span>() {
+                <span class="kw">let</span> <span class="ident">ats</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">double_at</span> { <span class="string">&quot;@@&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;@&quot;</span> };
                 <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">DatamodelError::new_model_validation_error</span>(
-                    <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;The constraint name &#39;{}&#39; specified in the `map` argument for the `{}` constraint is too long for your chosen provider. The maximum allowed length is {} bytes.&quot;</span>, <span class="ident">name</span>, <span class="ident">attribute</span>, <span class="ident">connector</span>.<span class="ident">constraint_name_length</span>()),
+                    <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;The constraint name &#39;{}&#39; specified in the `map` argument for the `{}{}` constraint is too long for your chosen provider. The maximum allowed length is {} bytes.&quot;</span>, <span class="ident">name</span>, <span class="ident">ats</span>, <span class="ident">attribute</span>, <span class="ident">connector</span>.<span class="ident">constraint_name_length</span>()),
                     <span class="ident">object_name</span>,
                     <span class="ident">span</span>,
                 ));

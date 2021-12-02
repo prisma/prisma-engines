@@ -94,9 +94,7 @@
 <span id="94">94</span>
 <span id="95">95</span>
 <span id="96">96</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
-
-<span class="kw">use</span> <span class="kw">crate</span>::{
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>,
     <span class="ident">common::constraint_names::ConstraintNames</span>,
     <span class="ident">transform::ast_to_dml::db</span>::{
@@ -106,6 +104,8 @@
     },
     <span class="ident">SortOrder</span>,
 };
+<span class="kw">use</span> <span class="ident">datamodel_connector::Connector</span>;
+<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">PrimaryKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
@@ -120,17 +120,17 @@
         <span class="self">self</span>.<span class="ident">attribute</span>.<span class="ident">source_attribute</span>
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">final_database_name</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">active_connector</span>().<span class="ident">supports_named_primary_keys</span>() {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">db_name</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">attribute</span>.<span class="ident">db_name</span>
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">final_database_name</span>(<span class="self">self</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">connector</span>.<span class="ident">supports_named_primary_keys</span>() {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
 
         <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">attribute</span>.<span class="ident">db_name</span>.<span class="ident">map</span>(<span class="ident">Cow::Borrowed</span>).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="ident">ConstraintNames::primary_key_name</span>(
-                <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk_model</span>(<span class="self">self</span>.<span class="ident">model_id</span>).<span class="ident">final_database_name</span>(),
-                <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">active_connector</span>(),
-            )
-            .<span class="ident">into</span>()
+            <span class="ident">ConstraintNames::primary_key_name</span>(<span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk_model</span>(<span class="self">self</span>.<span class="ident">model_id</span>).<span class="ident">final_database_name</span>(), <span class="ident">connector</span>).<span class="ident">into</span>()
         }))
     }
 

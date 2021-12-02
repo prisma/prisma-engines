@@ -176,15 +176,56 @@
 <span id="176">176</span>
 <span id="177">177</span>
 <span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>,
-    <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>},
-    <span class="ident">transform::ast_to_dml::db::walkers</span>::{<span class="ident">ModelWalker</span>, <span class="ident">RelationFieldWalker</span>, <span class="ident">RelationName</span>},
+    <span class="ident">diagnostics::DatamodelError</span>,
+    <span class="ident">transform::ast_to_dml</span>::{
+        <span class="ident">db::walkers</span>::{<span class="ident">ModelWalker</span>, <span class="ident">RelationFieldWalker</span>, <span class="ident">RelationName</span>},
+        <span class="ident">validation_pipeline::context::Context</span>,
+    },
 };
 <span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::names::Names</span>;
+<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">database_name::validate_db_name</span>, <span class="ident">names::Names</span>};
 
 <span class="kw">struct</span> <span class="ident">Fields</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
     <span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> [<span class="ident">ast::FieldId</span>],
@@ -291,7 +332,7 @@
 }
 
 <span class="doccomment">/// Validates if the related model for the relation is ignored.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">ignored_related_model</span>(<span class="ident">field</span>: <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">diagnostics</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Diagnostics</span>) {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">ignored_related_model</span>(<span class="ident">field</span>: <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">let</span> <span class="ident">related_model</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">related_model</span>();
     <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">model</span>();
 
@@ -304,7 +345,7 @@
         <span class="ident">field</span>.<span class="ident">name</span>(), <span class="ident">model</span>.<span class="ident">name</span>(), <span class="ident">related_model</span>.<span class="ident">name</span>()
     );
 
-    <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
+    <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
         <span class="kw-2">&amp;</span><span class="ident">message</span>,
         <span class="string">&quot;ignore&quot;</span>,
         <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>,
@@ -312,13 +353,9 @@
 }
 
 <span class="doccomment">/// Does the connector support the given referential actions.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">referential_actions</span>(
-    <span class="ident">field</span>: <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="kw">super</span>::ParserDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">diagnostics</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Diagnostics</span>,
-) {
-    <span class="kw">let</span> <span class="ident">referential_integrity</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">active_referential_integrity</span>();
-    <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">active_connector</span>();
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">referential_actions</span>(<span class="ident">field</span>: <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+    <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">connector</span>;
+    <span class="kw">let</span> <span class="ident">referential_integrity</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">referential_integrity</span>;
     <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="op">|</span><span class="ident">action</span><span class="op">|</span> {
         <span class="kw">let</span> <span class="ident">allowed_values</span> <span class="op">=</span> <span class="ident">connector</span>
             .<span class="ident">referential_actions</span>(<span class="kw-2">&amp;</span><span class="ident">referential_integrity</span>)
@@ -333,25 +370,64 @@
     };
 
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">on_delete</span>) <span class="op">=</span> <span class="ident">field</span>.<span class="ident">attributes</span>().<span class="ident">on_delete</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">connector</span>.<span class="ident">supports_referential_action</span>(<span class="kw-2">&amp;</span><span class="ident">referential_integrity</span>, <span class="ident">on_delete</span>) {
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>
+            .<span class="ident">connector</span>
+            .<span class="ident">supports_referential_action</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">referential_integrity</span>, <span class="ident">on_delete</span>)
+        {
             <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">field</span>
                 .<span class="ident">ast_field</span>()
                 .<span class="ident">span_for_argument</span>(<span class="string">&quot;relation&quot;</span>, <span class="string">&quot;onDelete&quot;</span>)
                 .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>);
 
-            <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(<span class="ident">msg</span>(<span class="ident">on_delete</span>), <span class="ident">span</span>));
+            <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(<span class="ident">msg</span>(<span class="ident">on_delete</span>), <span class="ident">span</span>));
         }
     }
 
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">on_update</span>) <span class="op">=</span> <span class="ident">field</span>.<span class="ident">attributes</span>().<span class="ident">on_update</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">connector</span>.<span class="ident">supports_referential_action</span>(<span class="kw-2">&amp;</span><span class="ident">referential_integrity</span>, <span class="ident">on_update</span>) {
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>
+            .<span class="ident">connector</span>
+            .<span class="ident">supports_referential_action</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">referential_integrity</span>, <span class="ident">on_update</span>)
+        {
             <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">field</span>
                 .<span class="ident">ast_field</span>()
                 .<span class="ident">span_for_argument</span>(<span class="string">&quot;relation&quot;</span>, <span class="string">&quot;onUpdate&quot;</span>)
                 .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>);
 
-            <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(<span class="ident">msg</span>(<span class="ident">on_update</span>), <span class="ident">span</span>));
+            <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(<span class="ident">msg</span>(<span class="ident">on_update</span>), <span class="ident">span</span>));
         }
+    }
+}
+
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">map</span>(<span class="ident">field</span>: <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+    <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">attributes</span>().<span class="ident">fk_name</span>.<span class="ident">is_none</span>() {
+        <span class="kw">return</span>;
+    }
+
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">supports_named_foreign_keys</span>() {
+        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
+            <span class="string">&quot;Your provider does not support named foreign keys.&quot;</span>,
+            <span class="string">&quot;relation&quot;</span>,
+            <span class="ident">field</span>
+                .<span class="ident">ast_field</span>()
+                .<span class="ident">span_for_attribute</span>(<span class="string">&quot;relation&quot;</span>)
+                .<span class="ident">unwrap_or_else</span>(<span class="ident">ast::Span::empty</span>),
+        ));
+        <span class="kw">return</span>;
+    }
+
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">relation_attr</span>) <span class="op">=</span> <span class="ident">field</span>
+        .<span class="ident">ast_field</span>()
+        .<span class="ident">attributes</span>
+        .<span class="ident">iter</span>()
+        .<span class="ident">find</span>(<span class="op">|</span><span class="ident">attr</span><span class="op">|</span> <span class="ident">attr</span>.<span class="ident">name</span>() <span class="op">=</span><span class="op">=</span> <span class="string">&quot;relation&quot;</span>)
+    {
+        <span class="ident">validate_db_name</span>(
+            <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
+            <span class="ident">relation_attr</span>,
+            <span class="ident">field</span>.<span class="ident">attributes</span>().<span class="ident">fk_name</span>,
+            <span class="ident">ctx</span>,
+            <span class="bool-val">false</span>,
+        );
     }
 }
 </code></pre></div>

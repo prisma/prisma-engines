@@ -351,8 +351,8 @@
 <span class="doccomment">/// Represents a default specified on a field.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DefaultValue</span> {
-    <span class="ident">kind</span>: <span class="ident">DefaultKind</span>,
-    <span class="ident">db_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">DefaultKind</span>,
+    <span class="kw">pub</span> <span class="ident">db_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 }
 
 <span class="doccomment">/// Represents a default specified on a field.</span>

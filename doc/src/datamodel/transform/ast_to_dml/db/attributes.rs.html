@@ -1016,117 +1016,24 @@
 <span id="1016">1016</span>
 <span id="1017">1017</span>
 <span id="1018">1018</span>
-<span id="1019">1019</span>
-<span id="1020">1020</span>
-<span id="1021">1021</span>
-<span id="1022">1022</span>
-<span id="1023">1023</span>
-<span id="1024">1024</span>
-<span id="1025">1025</span>
-<span id="1026">1026</span>
-<span id="1027">1027</span>
-<span id="1028">1028</span>
-<span id="1029">1029</span>
-<span id="1030">1030</span>
-<span id="1031">1031</span>
-<span id="1032">1032</span>
-<span id="1033">1033</span>
-<span id="1034">1034</span>
-<span id="1035">1035</span>
-<span id="1036">1036</span>
-<span id="1037">1037</span>
-<span id="1038">1038</span>
-<span id="1039">1039</span>
-<span id="1040">1040</span>
-<span id="1041">1041</span>
-<span id="1042">1042</span>
-<span id="1043">1043</span>
-<span id="1044">1044</span>
-<span id="1045">1045</span>
-<span id="1046">1046</span>
-<span id="1047">1047</span>
-<span id="1048">1048</span>
-<span id="1049">1049</span>
-<span id="1050">1050</span>
-<span id="1051">1051</span>
-<span id="1052">1052</span>
-<span id="1053">1053</span>
-<span id="1054">1054</span>
-<span id="1055">1055</span>
-<span id="1056">1056</span>
-<span id="1057">1057</span>
-<span id="1058">1058</span>
-<span id="1059">1059</span>
-<span id="1060">1060</span>
-<span id="1061">1061</span>
-<span id="1062">1062</span>
-<span id="1063">1063</span>
-<span id="1064">1064</span>
-<span id="1065">1065</span>
-<span id="1066">1066</span>
-<span id="1067">1067</span>
-<span id="1068">1068</span>
-<span id="1069">1069</span>
-<span id="1070">1070</span>
-<span id="1071">1071</span>
-<span id="1072">1072</span>
-<span id="1073">1073</span>
-<span id="1074">1074</span>
-<span id="1075">1075</span>
-<span id="1076">1076</span>
-<span id="1077">1077</span>
-<span id="1078">1078</span>
-<span id="1079">1079</span>
-<span id="1080">1080</span>
-<span id="1081">1081</span>
-<span id="1082">1082</span>
-<span id="1083">1083</span>
-<span id="1084">1084</span>
-<span id="1085">1085</span>
-<span id="1086">1086</span>
-<span id="1087">1087</span>
-<span id="1088">1088</span>
-<span id="1089">1089</span>
-<span id="1090">1090</span>
-<span id="1091">1091</span>
-<span id="1092">1092</span>
-<span id="1093">1093</span>
-<span id="1094">1094</span>
-<span id="1095">1095</span>
-<span id="1096">1096</span>
-<span id="1097">1097</span>
-<span id="1098">1098</span>
-<span id="1099">1099</span>
-<span id="1100">1100</span>
-<span id="1101">1101</span>
-<span id="1102">1102</span>
-<span id="1103">1103</span>
-<span id="1104">1104</span>
-<span id="1105">1105</span>
-<span id="1106">1106</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">autoincrement</span>;
-<span class="kw">mod</span> <span class="ident">id</span>;
+</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">id</span>;
 <span class="kw">mod</span> <span class="ident">map</span>;
 <span class="kw">mod</span> <span class="ident">native_types</span>;
-
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::{
     <span class="ident">context</span>::{<span class="ident">Arguments</span>, <span class="ident">Context</span>},
     <span class="ident">types</span>::{<span class="ident">EnumAttributes</span>, <span class="ident">IndexAttribute</span>, <span class="ident">IndexType</span>, <span class="ident">ModelAttributes</span>, <span class="ident">RelationField</span>, <span class="ident">ScalarField</span>, <span class="ident">ScalarFieldType</span>},
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::transform::ast_to_dml::db::types::FieldWithArgs</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">WithName</span>},
     <span class="ident">common::constraint_names::ConstraintNames</span>,
     <span class="ident">diagnostics::DatamodelError</span>,
     <span class="ident">dml</span>,
-    <span class="ident">transform::helpers::ValueValidator</span>,
+    <span class="ident">transform</span>::{
+        <span class="ident">ast_to_dml::db::types</span>::{<span class="ident">FieldWithArgs</span>, <span class="ident">IndexAlgorithm</span>},
+        <span class="ident">helpers::ValueValidator</span>,
+    },
     <span class="ident">SortOrder</span>,
-};
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">ast</span>::{<span class="ident">FieldId</span>, <span class="ident">Model</span>},
-    <span class="ident">transform::ast_to_dml::db::types::IndexAlgorithm</span>,
 };
 <span class="kw">use</span> <span class="ident">prisma_value::PrismaValue</span>;
 
@@ -1255,7 +1162,6 @@
 
     <span class="comment">// Model-global validations</span>
     <span class="ident">id::validate_id_field_arities</span>(<span class="ident">model_id</span>, <span class="kw-2">&amp;</span><span class="ident">model_attributes</span>, <span class="ident">ctx</span>);
-    <span class="ident">autoincrement::validate_auto_increment</span>(<span class="ident">model_id</span>, <span class="kw-2">&amp;</span><span class="ident">model_attributes</span>, <span class="ident">ctx</span>);
 
     <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">types</span>.<span class="ident">model_attributes</span>.<span class="ident">insert</span>(<span class="ident">model_id</span>, <span class="ident">model_attributes</span>);
 }
@@ -1314,23 +1220,22 @@
             <span class="ident">visit_field_default</span>(<span class="ident">args</span>, <span class="ident">scalar_field_data</span>, <span class="ident">model_id</span>, <span class="ident">field_id</span>, <span class="ident">ctx</span>);
         });
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ScalarFieldType::BuiltInScalar</span>(<span class="ident">scalar_type</span>) <span class="op">=</span> <span class="ident">scalar_field_data</span>.<span class="ident">r#type</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ScalarFieldType::BuiltInScalar</span>(<span class="ident">_scalar_type</span>) <span class="op">=</span> <span class="ident">scalar_field_data</span>.<span class="ident">r#type</span> {
             <span class="comment">// native type attributes</span>
-            <span class="ident">attributes</span>.<span class="ident">visit_datasource_scoped</span>(<span class="ident">ctx</span>, <span class="op">|</span><span class="ident">type_name</span>, <span class="ident">args</span>, <span class="ident">ctx</span><span class="op">|</span> {
-                <span class="ident">native_types::visit_native_type_attribute</span>(<span class="ident">type_name</span>, <span class="ident">args</span>, <span class="ident">scalar_type</span>, <span class="ident">scalar_field_data</span>, <span class="ident">ctx</span>)
+            <span class="ident">attributes</span>.<span class="ident">visit_datasource_scoped</span>(<span class="ident">ctx</span>, <span class="op">|</span><span class="ident">datasource_name</span>, <span class="ident">type_name</span>, <span class="ident">args</span>, <span class="ident">_ctx</span><span class="op">|</span> {
+                <span class="ident">native_types::visit_native_type_attribute</span>(<span class="ident">datasource_name</span>, <span class="ident">type_name</span>, <span class="ident">args</span>, <span class="ident">scalar_field_data</span>)
             });
         }
 
         <span class="comment">// @unique</span>
         <span class="ident">attributes</span>.<span class="ident">visit_optional_single</span>(<span class="string">&quot;unique&quot;</span>, <span class="ident">ctx</span>, <span class="op">|</span><span class="ident">args</span>, <span class="ident">ctx</span><span class="op">|</span> {
-            <span class="ident">visit_field_unique</span>(<span class="ident">field_id</span>, <span class="ident">ast_model</span>, <span class="ident">model_attributes</span>, <span class="ident">args</span>, <span class="ident">ctx</span>)
+            <span class="ident">visit_field_unique</span>(<span class="ident">field_id</span>, <span class="ident">model_attributes</span>, <span class="ident">args</span>, <span class="ident">ctx</span>)
         });
     });
 }
 
 <span class="kw">fn</span> <span class="ident">visit_field_unique</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>(
-    <span class="ident">field_id</span>: <span class="ident">FieldId</span>,
-    <span class="ident">ast_model</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">Model</span>,
+    <span class="ident">field_id</span>: <span class="ident">ast::FieldId</span>,
     <span class="ident">model_attributes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ModelAttributes</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
     <span class="ident">args</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Arguments</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
     <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
@@ -1347,8 +1252,6 @@
         }
         <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
     };
-
-    <span class="ident">validate_db_name</span>(<span class="ident">ast_model</span>, <span class="ident">args</span>, <span class="ident">db_name</span>, <span class="string">&quot;@unique&quot;</span>, <span class="ident">ctx</span>);
 
     <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">args</span>.<span class="ident">optional_arg</span>(<span class="string">&quot;length&quot;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">length</span><span class="op">|</span> <span class="ident">length</span>.<span class="ident">as_int</span>()) {
         <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">length</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">length</span> <span class="kw">as</span> <span class="ident">u32</span>),
@@ -1386,17 +1289,13 @@
                 <span class="ident">length</span>,
             }],
             <span class="ident">source_field</span>: <span class="prelude-val">Some</span>(<span class="ident">field_id</span>),
-            <span class="ident">db_name</span>: <span class="ident">db_name</span>.<span class="ident">map</span>(<span class="ident">Cow::from</span>),
+            <span class="ident">db_name</span>,
             ..<span class="ident">Default::default</span>()
         },
     ))
 }
 
-<span class="kw">fn</span> <span class="ident">default_value_constraint_name</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>(
-    <span class="ident">args</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Arguments</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
-    <span class="ident">ast_model</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::Model</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">default_value_constraint_name</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>(<span class="ident">args</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Arguments</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">db_name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">args</span>.<span class="ident">optional_arg</span>(<span class="string">&quot;map&quot;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">name</span><span class="op">|</span> <span class="ident">name</span>.<span class="ident">as_str</span>()) {
         <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="string">&quot;&quot;</span>)) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">args</span>.<span class="ident">new_attribute_validation_error</span>(<span class="string">&quot;The `map` argument cannot be an empty string.&quot;</span>));
@@ -1409,14 +1308,6 @@
         }
         <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
     };
-
-    <span class="ident">validate_db_name</span>(<span class="ident">ast_model</span>, <span class="ident">args</span>, <span class="ident">db_name</span>.<span class="ident">as_deref</span>(), <span class="string">&quot;@default&quot;</span>, <span class="ident">ctx</span>);
-
-    <span class="kw">if</span> <span class="ident">db_name</span>.<span class="ident">is_some</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">active_connector</span>().<span class="ident">supports_named_default_values</span>() {
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">args</span>.<span class="ident">new_attribute_validation_error</span>(
-            <span class="string">&quot;You defined a database name for the default value of a field on the model. This is not supported by the provider.&quot;</span>,
-        ));
-    }
 
     <span class="ident">db_name</span>
 }
@@ -1546,11 +1437,12 @@
                         <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="ident">enum_id</span>].<span class="ident">values</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">name</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">value</span>) {
                             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">default</span> <span class="op">=</span> <span class="ident">dml::DefaultValue::new_single</span>(<span class="ident">PrismaValue::Enum</span>(<span class="ident">value</span>.<span class="ident">to_owned</span>()));
 
-                            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="ident">default_value_constraint_name</span>(<span class="ident">args</span>, <span class="ident">ast_model</span>, <span class="ident">ctx</span>) {
+                            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="ident">default_value_constraint_name</span>(<span class="ident">args</span>, <span class="ident">ctx</span>) {
                                 <span class="ident">default</span>.<span class="ident">set_db_name</span>(<span class="ident">name</span>);
                             }
 
                             <span class="ident">field_data</span>.<span class="ident">default</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">default</span>);
+                            <span class="ident">field_data</span>.<span class="ident">default_attribute</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">args</span>.<span class="ident">attribute</span>());
                         } <span class="kw">else</span> {
                             <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">args</span>.<span class="ident">new_attribute_validation_error</span>(
                                 <span class="string">&quot;The defined default value is not a valid value of the enum specified for the field.&quot;</span>,
@@ -1562,11 +1454,12 @@
                             <span class="prelude-val">Ok</span>(<span class="ident">generator</span>) <span class="kw">if</span> <span class="ident">generator</span>.<span class="ident">is_dbgenerated</span>() <span class="op">=</span><span class="op">&gt;</span> {
                                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">default</span> <span class="op">=</span> <span class="ident">dml::DefaultValue::new_expression</span>(<span class="ident">generator</span>);
 
-                                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="ident">default_value_constraint_name</span>(<span class="ident">args</span>, <span class="ident">ast_model</span>, <span class="ident">ctx</span>) {
+                                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="ident">default_value_constraint_name</span>(<span class="ident">args</span>, <span class="ident">ctx</span>) {
                                     <span class="ident">default</span>.<span class="ident">set_db_name</span>(<span class="ident">name</span>);
                                 }
 
                                 <span class="ident">field_data</span>.<span class="ident">default</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">default</span>);
+                                <span class="ident">field_data</span>.<span class="ident">default_attribute</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">args</span>.<span class="ident">attribute</span>());
                             }
                             <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">args</span>.<span class="ident">new_attribute_validation_error</span>(<span class="kw-2">&amp;</span><span class="ident">err</span>.<span class="ident">to_string</span>())),
                         };
@@ -1582,11 +1475,12 @@
                             ))
                         }
 
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="ident">default_value_constraint_name</span>(<span class="ident">args</span>, <span class="ident">ast_model</span>, <span class="ident">ctx</span>) {
+                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="ident">default_value_constraint_name</span>(<span class="ident">args</span>, <span class="ident">ctx</span>) {
                             <span class="ident">default</span>.<span class="ident">set_db_name</span>(<span class="ident">name</span>);
                         }
 
                         <span class="ident">field_data</span>.<span class="ident">default</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">default</span>);
+                        <span class="ident">field_data</span>.<span class="ident">default_attribute</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">args</span>.<span class="ident">attribute</span>());
                     }
                     <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">args</span>.<span class="ident">new_attribute_validation_error</span>(<span class="kw-2">&amp;</span><span class="ident">err</span>.<span class="ident">to_string</span>())),
                 }
@@ -1598,7 +1492,8 @@
             <span class="ident">ScalarFieldType::Unsupported</span> <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">as_value_generator</span>() {
                     <span class="prelude-val">Ok</span>(<span class="ident">generator</span>) <span class="kw">if</span> <span class="ident">generator</span>.<span class="ident">is_dbgenerated</span>() <span class="op">=</span><span class="op">&gt;</span> {
-                        <span class="ident">field_data</span>.<span class="ident">default</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">dml::DefaultValue::new_expression</span>(<span class="ident">generator</span>))
+                        <span class="ident">field_data</span>.<span class="ident">default</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">dml::DefaultValue::new_expression</span>(<span class="ident">generator</span>));
+                        <span class="ident">field_data</span>.<span class="ident">default_attribute</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">args</span>.<span class="ident">attribute</span>());
                     }
                     <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">args</span>.<span class="ident">new_attribute_validation_error</span>(
                         <span class="string">&quot;Only @default(dbgenerated()) can be used for Unsupported types.&quot;</span>,
@@ -1647,8 +1542,6 @@
     };
 
     <span class="ident">common_index_validations</span>(<span class="ident">args</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">index_attribute</span>, <span class="ident">model_id</span>, <span class="ident">ctx</span>);
-    <span class="kw">let</span> <span class="ident">ast_model</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="ident">model_id</span>];
-
     <span class="kw">let</span> <span class="ident">db_name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">args</span>.<span class="ident">optional_arg</span>(<span class="string">&quot;map&quot;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">name</span><span class="op">|</span> <span class="ident">name</span>.<span class="ident">as_str</span>()) {
         <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="string">&quot;&quot;</span>)) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">args</span>.<span class="ident">new_attribute_validation_error</span>(<span class="string">&quot;The `map` argument cannot be an empty string.&quot;</span>));
@@ -1662,8 +1555,7 @@
         <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
     };
 
-    <span class="ident">validate_db_name</span>(<span class="ident">ast_model</span>, <span class="ident">args</span>, <span class="ident">db_name</span>, <span class="string">&quot;@@fulltext&quot;</span>, <span class="ident">ctx</span>);
-    <span class="ident">index_attribute</span>.<span class="ident">db_name</span> <span class="op">=</span> <span class="ident">db_name</span>.<span class="ident">map</span>(<span class="ident">Cow::from</span>);
+    <span class="ident">index_attribute</span>.<span class="ident">db_name</span> <span class="op">=</span> <span class="ident">db_name</span>;
 
     <span class="ident">data</span>.<span class="ident">ast_indexes</span>.<span class="ident">push</span>((<span class="ident">args</span>.<span class="ident">attribute</span>(), <span class="ident">index_attribute</span>));
 }
@@ -1681,8 +1573,6 @@
     };
 
     <span class="ident">common_index_validations</span>(<span class="ident">args</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">index_attribute</span>, <span class="ident">model_id</span>, <span class="ident">ctx</span>);
-    <span class="kw">let</span> <span class="ident">ast_model</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="ident">model_id</span>];
-
     <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">get_name_argument</span>(<span class="ident">args</span>, <span class="ident">ctx</span>);
 
     <span class="kw">let</span> <span class="ident">db_name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">args</span>.<span class="ident">optional_arg</span>(<span class="string">&quot;map&quot;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">name</span><span class="op">|</span> <span class="ident">name</span>.<span class="ident">as_str</span>()) {
@@ -1697,8 +1587,6 @@
         }
         <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
     };
-
-    <span class="ident">validate_db_name</span>(<span class="ident">ast_model</span>, <span class="ident">args</span>, <span class="ident">db_name</span>, <span class="string">&quot;@@index&quot;</span>, <span class="ident">ctx</span>);
 
     <span class="comment">// We do not want to break existing datamodels for client purposes that</span>
     <span class="comment">// use the old `@@index([field], name: &quot;onlydbname&quot;)` This would</span>
@@ -1719,8 +1607,8 @@
             <span class="prelude-val">None</span>
         }
         <span class="comment">// backwards compatibility, accept name arg on normal indexes and use it as map arg.</span>
-        (<span class="prelude-val">Some</span>(<span class="ident">name</span>), <span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Cow::from</span>(<span class="ident">name</span>)),
-        (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">map</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Cow::from</span>(<span class="ident">map</span>)),
+        (<span class="prelude-val">Some</span>(<span class="ident">name</span>), <span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>),
+        (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">map</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">map</span>),
         (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
     };
 
@@ -1784,8 +1672,6 @@
             <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
         };
 
-        <span class="ident">validate_db_name</span>(<span class="ident">ast_model</span>, <span class="ident">args</span>, <span class="ident">db_name</span>, <span class="string">&quot;@@unique&quot;</span>, <span class="ident">ctx</span>);
-
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="ident">ConstraintNames::is_client_name_valid</span>(<span class="ident">args</span>.<span class="ident">span</span>(), <span class="kw-2">&amp;</span><span class="ident">ast_model</span>.<span class="ident">name</span>.<span class="ident">name</span>, <span class="ident">name</span>, <span class="string">&quot;@@unique&quot;</span>) {
             <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">err</span>);
         }
@@ -1794,7 +1680,7 @@
     };
 
     <span class="ident">index_attribute</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>;
-    <span class="ident">index_attribute</span>.<span class="ident">db_name</span> <span class="op">=</span> <span class="ident">db_name</span>.<span class="ident">map</span>(<span class="ident">Cow::from</span>);
+    <span class="ident">index_attribute</span>.<span class="ident">db_name</span> <span class="op">=</span> <span class="ident">db_name</span>;
 
     <span class="ident">data</span>.<span class="ident">ast_indexes</span>.<span class="ident">push</span>((<span class="ident">args</span>.<span class="ident">attribute</span>(), <span class="ident">index_attribute</span>));
 }
@@ -1971,29 +1857,18 @@
     }
 
     <span class="kw">let</span> <span class="ident">fk_name</span> <span class="op">=</span> {
-        <span class="kw">let</span> <span class="ident">ast_model</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="ident">model_id</span>];
-
         <span class="kw">let</span> <span class="ident">db_name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">args</span>.<span class="ident">optional_arg</span>(<span class="string">&quot;map&quot;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">name</span><span class="op">|</span> <span class="ident">name</span>.<span class="ident">as_str</span>()) {
             <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="string">&quot;&quot;</span>)) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">args</span>.<span class="ident">new_attribute_validation_error</span>(<span class="string">&quot;The `map` argument cannot be an empty string.&quot;</span>));
                 <span class="prelude-val">None</span>
             }
-            <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">name</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">active_connector</span>().<span class="ident">supports_named_foreign_keys</span>() {
-                    <span class="ident">ctx</span>.<span class="ident">push_error</span>(
-                        <span class="ident">args</span>.<span class="ident">new_attribute_validation_error</span>(<span class="string">&quot;Your provider does not support named foreign keys.&quot;</span>),
-                    )
-                }
-                <span class="prelude-val">Some</span>(<span class="ident">name</span>)
-            }
+            <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">name</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>),
             <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">err</span>);
                 <span class="prelude-val">None</span>
             }
             <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
         };
-
-        <span class="ident">validate_db_name</span>(<span class="ident">ast_model</span>, <span class="ident">args</span>, <span class="ident">db_name</span>, <span class="string">&quot;@relation&quot;</span>, <span class="ident">ctx</span>);
 
         <span class="ident">db_name</span>
     };
@@ -2158,57 +2033,6 @@
     }
 
     <span class="prelude-val">None</span>
-}
-
-<span class="kw">fn</span> <span class="ident">validate_db_name</span>(
-    <span class="ident">ast_model</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Model</span>,
-    <span class="ident">args</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Arguments</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">db_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
-    <span class="ident">attribute</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-) {
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="ident">ConstraintNames::is_db_name_too_long</span>(
-        <span class="ident">args</span>.<span class="ident">span</span>(),
-        <span class="ident">ast_model</span>.<span class="ident">name</span>(),
-        <span class="ident">db_name</span>,
-        <span class="ident">attribute</span>,
-        <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">active_connector</span>(),
-    ) {
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">err</span>);
-    }
-}
-
-<span class="doccomment">/// Fill in the generated Prisma constraint names for DEFAULT constraints.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">fill_in_default_constraint_names</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">active_connector</span>().<span class="ident">supports_named_default_values</span>() {
-        <span class="kw">return</span>;
-    }
-
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">names</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">ast::ModelId</span>, <span class="ident">ast::FieldId</span>, <span class="ident">String</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-
-    <span class="kw">for</span> ((<span class="ident">model_id</span>, <span class="ident">field_id</span>), <span class="ident">field_attributes</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">types</span>.<span class="ident">scalar_fields</span> {
-        <span class="kw">if</span> <span class="ident">field_attributes</span>.<span class="ident">default</span>.<span class="ident">is_none</span>() {
-            <span class="kw">continue</span>;
-        }
-
-        <span class="kw">if</span> <span class="ident">field_attributes</span>.<span class="ident">default</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">db_name</span>()).<span class="ident">is_some</span>() {
-            <span class="kw">continue</span>;
-        }
-
-        <span class="kw">let</span> <span class="ident">model_name</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">walk_model</span>(<span class="kw-2">*</span><span class="ident">model_id</span>).<span class="ident">final_database_name</span>();
-        <span class="kw">let</span> <span class="ident">field_name</span> <span class="op">=</span> <span class="ident">field_attributes</span>
-            .<span class="ident">mapped_name</span>
-            .<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="kw-2">*</span><span class="ident">model_id</span>][<span class="kw-2">*</span><span class="ident">field_id</span>].<span class="ident">name</span>.<span class="ident">name</span>);
-
-        <span class="kw">let</span> <span class="ident">generated_name</span> <span class="op">=</span> <span class="ident">ConstraintNames::default_name</span>(<span class="ident">model_name</span>, <span class="ident">field_name</span>, <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">active_connector</span>());
-
-        <span class="ident">names</span>.<span class="ident">push</span>((<span class="kw-2">*</span><span class="ident">model_id</span>, <span class="kw-2">*</span><span class="ident">field_id</span>, <span class="ident">generated_name</span>))
-    }
-
-    <span class="kw">for</span> (<span class="ident">model_id</span>, <span class="ident">field_id</span>, <span class="ident">generated_name</span>) <span class="kw">in</span> <span class="ident">names</span> {
-        <span class="kw">let</span> <span class="ident">field_attributes</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">types</span>.<span class="ident">scalar_fields</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span>(<span class="ident">model_id</span>, <span class="ident">field_id</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">field_attributes</span>.<span class="ident">default</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">set_db_name</span>(<span class="ident">generated_name</span>)
-    }
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="datamodel" data-search-index-js="../../../../../search-index.js" data-search-js="../../../../../search.js"></div>

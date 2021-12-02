@@ -191,20 +191,38 @@
 <span id="191">191</span>
 <span id="192">192</span>
 <span id="193">193</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
-
-<span class="kw">use</span> <span class="ident">datamodel_connector::ConnectorCapability</span>;
-<span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
-
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::database_name::validate_db_name</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">common::preview_features::PreviewFeature</span>,
-    <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>},
-    <span class="ident">transform::ast_to_dml::db</span>::{<span class="ident">walkers::ModelWalker</span>, <span class="ident">ConstraintName</span>, <span class="ident">ParserDatabase</span>},
+    <span class="ident">diagnostics::DatamodelError</span>,
+    <span class="ident">transform::ast_to_dml</span>::{<span class="ident">db::walkers::ModelWalker</span>, <span class="ident">validation_pipeline::context::Context</span>},
 };
+<span class="kw">use</span> <span class="ident">datamodel_connector::ConnectorCapability</span>;
+<span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
+<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 
 <span class="doccomment">/// A model must have either a primary key, or a unique criteria</span>
 <span class="doccomment">/// with no optional, commented-out or unsupported fields.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">has_a_strict_unique_criteria</span>(<span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">diagnostics</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Diagnostics</span>) {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">has_a_strict_unique_criteria</span>(<span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">if</span> <span class="ident">model</span>.<span class="ident">is_ignored</span>() {
         <span class="kw">return</span>;
     }
@@ -239,7 +257,7 @@
         <span class="ident">Cow::from</span>(<span class="ident">msg</span>)
     };
 
-    <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_model_validation_error</span>(
+    <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_model_validation_error</span>(
         <span class="ident">msg</span>.<span class="ident">as_ref</span>(),
         <span class="ident">model</span>.<span class="ident">name</span>(),
         <span class="ident">model</span>.<span class="ident">ast_model</span>().<span class="ident">span</span>,
@@ -248,20 +266,31 @@
 
 <span class="doccomment">/// A primary key name can be unique in different namespaces, depending on a database. Validates</span>
 <span class="doccomment">/// model&#39;s primary key against the database requirements.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">has_a_unique_primary_key_name</span>(
-    <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="ident">ParserDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">has_a_unique_primary_key_name</span>(
     <span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">diagnostics</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Diagnostics</span>,
+    <span class="ident">names</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="kw">super</span>::Names</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+    <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
 ) {
     <span class="kw">let</span> (<span class="ident">pk</span>, <span class="ident">name</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">model</span>
         .<span class="ident">primary_key</span>()
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">pk</span>.<span class="ident">final_database_name</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">name</span><span class="op">|</span> (<span class="ident">pk</span>, <span class="ident">name</span>)))
+        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">pk</span>.<span class="ident">final_database_name</span>(<span class="ident">ctx</span>.<span class="ident">connector</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">name</span><span class="op">|</span> (<span class="ident">pk</span>, <span class="ident">name</span>)))
     {
         <span class="prelude-val">Some</span>((<span class="ident">pk</span>, <span class="ident">name</span>)) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">pk</span>, <span class="ident">name</span>),
         <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span>,
     };
 
-    <span class="kw">for</span> <span class="ident">violation</span> <span class="kw">in</span> <span class="ident">db</span>.<span class="ident">scope_violations</span>(<span class="ident">model</span>.<span class="ident">model_id</span>(), <span class="ident">ConstraintName::PrimaryKey</span>(<span class="ident">name</span>.<span class="ident">as_ref</span>())) {
+    <span class="ident">validate_db_name</span>(
+        <span class="ident">model</span>.<span class="ident">name</span>(),
+        <span class="ident">pk</span>.<span class="ident">ast_attribute</span>(),
+        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>),
+        <span class="ident">ctx</span>,
+        <span class="op">!</span><span class="ident">pk</span>.<span class="ident">is_defined_on_field</span>(),
+    );
+
+    <span class="kw">for</span> <span class="ident">violation</span> <span class="kw">in</span> <span class="ident">names</span>.<span class="ident">constraint_namespace</span>.<span class="ident">scope_violations</span>(
+        <span class="ident">model</span>.<span class="ident">model_id</span>(),
+        <span class="ident"><span class="kw">super</span>::constraint_namespace::ConstraintName::PrimaryKey</span>(<span class="ident">name</span>.<span class="ident">as_ref</span>()),
+    ) {
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
             <span class="string">&quot;The given constraint name `{}` has to be unique in the following namespace: {}. Please provide a different name using the `map` argument.&quot;</span>,
             <span class="ident">name</span>,
@@ -273,17 +302,13 @@
             .<span class="ident">span_for_argument</span>(<span class="string">&quot;map&quot;</span>)
             .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">pk</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>);
 
-        <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(<span class="kw-2">&amp;</span><span class="ident">message</span>, <span class="string">&quot;id&quot;</span>, <span class="ident">span</span>));
+        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(<span class="kw-2">&amp;</span><span class="ident">message</span>, <span class="string">&quot;id&quot;</span>, <span class="ident">span</span>));
     }
 }
 
 <span class="doccomment">/// uses sort or length on id without preview flag</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">uses_sort_or_length_on_primary_without_preview_flag</span>(
-    <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="ident">ParserDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">diagnostics</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Diagnostics</span>,
-) {
-    <span class="kw">if</span> <span class="ident">db</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::ExtendedIndexes</span>) {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">uses_sort_or_length_on_primary_without_preview_flag</span>(<span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::ExtendedIndexes</span>) {
         <span class="kw">return</span>;
     }
 
@@ -297,19 +322,15 @@
             <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;The sort and length args are not yet available&quot;</span>;
             <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">pk</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>;
 
-            <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(<span class="ident">message</span>, <span class="string">&quot;id&quot;</span>, <span class="ident">span</span>));
+            <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(<span class="ident">message</span>, <span class="string">&quot;id&quot;</span>, <span class="ident">span</span>));
         }
     }
 }
 
 <span class="doccomment">/// The database must support the primary key length prefix for it to be allowed in the data model.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">primary_key_length_prefix_supported</span>(
-    <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="ident">ParserDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">diagnostics</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Diagnostics</span>,
-) {
-    <span class="kw">if</span> <span class="ident">db</span>
-        .<span class="ident">active_connector</span>()
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">primary_key_length_prefix_supported</span>(<span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+    <span class="kw">if</span> <span class="ident">ctx</span>
+        .<span class="ident">connector</span>
         .<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::IndexColumnLengthPrefixing</span>)
     {
         <span class="kw">return</span>;
@@ -320,19 +341,15 @@
             <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;The length argument is not supported in the primary key with the current connector&quot;</span>;
             <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">pk</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>;
 
-            <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(<span class="ident">message</span>, <span class="string">&quot;id&quot;</span>, <span class="ident">span</span>));
+            <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(<span class="ident">message</span>, <span class="string">&quot;id&quot;</span>, <span class="ident">span</span>));
         }
     }
 }
 
 <span class="doccomment">/// Not every database is allowing sort definition in the primary key.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">primary_key_sort_order_supported</span>(
-    <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="ident">ParserDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">diagnostics</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Diagnostics</span>,
-) {
-    <span class="kw">if</span> <span class="ident">db</span>
-        .<span class="ident">active_connector</span>()
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">primary_key_sort_order_supported</span>(<span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+    <span class="kw">if</span> <span class="ident">ctx</span>
+        .<span class="ident">connector</span>
         .<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::PrimaryKeySortOrderDefinition</span>)
     {
         <span class="kw">return</span>;
@@ -343,26 +360,22 @@
             <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;The sort argument is not supported in the primary key with the current connector&quot;</span>;
             <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">pk</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>;
 
-            <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(<span class="ident">message</span>, <span class="string">&quot;id&quot;</span>, <span class="ident">span</span>));
+            <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(<span class="ident">message</span>, <span class="string">&quot;id&quot;</span>, <span class="ident">span</span>));
         }
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">only_one_fulltext_attribute_allowed</span>(
-    <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="ident">ParserDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">diagnostics</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Diagnostics</span>,
-) {
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">db</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::FullTextIndex</span>) {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">only_one_fulltext_attribute_allowed</span>(<span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::FullTextIndex</span>) {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">db</span>.<span class="ident">active_connector</span>().<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::FullTextIndex</span>) {
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::FullTextIndex</span>) {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if</span> <span class="ident">db</span>
-        .<span class="ident">active_connector</span>()
+    <span class="kw">if</span> <span class="ident">ctx</span>
+        .<span class="ident">connector</span>
         .<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::MultipleFullTextAttributesPerModel</span>)
     {
         <span class="kw">return</span>;
@@ -378,10 +391,35 @@
         <span class="kw">for</span> <span class="ident">span</span> <span class="kw">in</span> <span class="ident">spans</span> {
             <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;The current connector only allows one fulltext attribute per model&quot;</span>;
 
-            <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
+            <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
                 <span class="ident">message</span>, <span class="string">&quot;fulltext&quot;</span>, <span class="ident">span</span>,
             ));
         }
+    }
+}
+
+<span class="doccomment">/// Does the connector support named and compound primary keys at all?</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">primary_key_connector_specific</span>(<span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+    <span class="kw">let</span> <span class="ident">primary_key</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pk</span>) <span class="op">=</span> <span class="ident">model</span>.<span class="ident">primary_key</span>() {
+        <span class="ident">pk</span>
+    } <span class="kw">else</span> {
+        <span class="kw">return</span>;
+    };
+
+    <span class="kw">if</span> <span class="ident">primary_key</span>.<span class="ident">db_name</span>().<span class="ident">is_some</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">supports_named_primary_keys</span>() {
+        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_model_validation_error</span>(
+            <span class="string">&quot;You defined a database name for the primary key on the model. This is not supported by the provider.&quot;</span>,
+            <span class="ident">model</span>.<span class="ident">name</span>(),
+            <span class="ident">model</span>.<span class="ident">ast_model</span>().<span class="ident">span</span>,
+        ));
+    }
+
+    <span class="kw">if</span> <span class="ident">primary_key</span>.<span class="ident">fields</span>().<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">supports_compound_ids</span>() {
+        <span class="kw">return</span> <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_model_validation_error</span>(
+            <span class="string">&quot;The current connector does not support compound ids.&quot;</span>,
+            <span class="ident">model</span>.<span class="ident">name</span>(),
+            <span class="ident">primary_key</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>,
+        ));
     }
 }
 </code></pre></div>

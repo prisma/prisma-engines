@@ -190,74 +190,12 @@
 <span id="190">190</span>
 <span id="191">191</span>
 <span id="192">192</span>
-<span id="193">193</span>
-<span id="194">194</span>
-<span id="195">195</span>
-<span id="196">196</span>
-<span id="197">197</span>
-<span id="198">198</span>
-<span id="199">199</span>
-<span id="200">200</span>
-<span id="201">201</span>
-<span id="202">202</span>
-<span id="203">203</span>
-<span id="204">204</span>
-<span id="205">205</span>
-<span id="206">206</span>
-<span id="207">207</span>
-<span id="208">208</span>
-<span id="209">209</span>
-<span id="210">210</span>
-<span id="211">211</span>
-<span id="212">212</span>
-<span id="213">213</span>
-<span id="214">214</span>
-<span id="215">215</span>
-<span id="216">216</span>
-<span id="217">217</span>
-<span id="218">218</span>
-<span id="219">219</span>
-<span id="220">220</span>
-<span id="221">221</span>
-<span id="222">222</span>
-<span id="223">223</span>
-<span id="224">224</span>
-<span id="225">225</span>
-<span id="226">226</span>
-<span id="227">227</span>
-<span id="228">228</span>
-<span id="229">229</span>
-<span id="230">230</span>
-<span id="231">231</span>
-<span id="232">232</span>
-<span id="233">233</span>
-<span id="234">234</span>
-<span id="235">235</span>
-<span id="236">236</span>
-<span id="237">237</span>
-<span id="238">238</span>
-<span id="239">239</span>
-<span id="240">240</span>
-<span id="241">241</span>
-<span id="242">242</span>
-<span id="243">243</span>
-<span id="244">244</span>
-<span id="245">245</span>
-<span id="246">246</span>
-<span id="247">247</span>
-<span id="248">248</span>
-<span id="249">249</span>
-</pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod</span> <span class="ident">constraint_namespace</span>;
-
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::constraint_namespace::ConstraintNamespace</span>;
-
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Context</span>;
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Context</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">Argument</span>, <span class="ident">TopId</span>, <span class="ident">WithAttributes</span>, <span class="ident">WithIdentifier</span>},
     <span class="ident">diagnostics::DatamodelError</span>,
     <span class="ident">reserved_model_names</span>::{<span class="ident">validate_enum_name</span>, <span class="ident">validate_model_name</span>},
 };
-<span class="kw">use</span> <span class="ident">datamodel_connector::ConstraintScope</span>;
 <span class="kw">use</span> <span class="ident">dml::scalars::ScalarType</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">collections</span>::{<span class="ident">BTreeMap</span>, <span class="ident">HashMap</span>, <span class="ident">HashSet</span>},
@@ -275,7 +213,6 @@
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">datasources</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span>, <span class="ident">TopId</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">model_fields</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span>(<span class="ident">ast::ModelId</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span>), <span class="ident">ast::FieldId</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">composite_type_fields</span>: <span class="ident">HashMap</span><span class="op">&lt;</span>(<span class="ident">ast::CompositeTypeId</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span>), <span class="ident">ast::FieldId</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">constraint_namespace</span>: <span class="ident">ConstraintNamespace</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
 }
 
 <span class="doccomment">/// `resolve_names()` is responsible for populating `ParserDatabase.names` and</span>
@@ -340,17 +277,6 @@
                 <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">names</span>.<span class="ident">tops</span>
             }
             (<span class="ident">ast::TopId::CompositeType</span>(<span class="ident">ctid</span>), <span class="ident">ast::Top::CompositeType</span>(<span class="ident">ct</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">active_connector</span>().<span class="ident">supports_composite_types</span>() {
-                    <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(
-                        <span class="macro">format!</span>(
-                            <span class="string">&quot;Composite types are not supported on {}.&quot;</span>,
-                            <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">active_connector</span>().<span class="ident">name</span>()
-                        ),
-                        <span class="ident">ct</span>.<span class="ident">span</span>,
-                    ));
-                    <span class="kw">continue</span>;
-                }
-
                 <span class="ident">validate_identifier</span>(<span class="kw-2">&amp;</span><span class="ident">ct</span>.<span class="ident">name</span>, <span class="string">&quot;Composite type&quot;</span>, <span class="ident">ctx</span>);
 
                 <span class="kw">for</span> (<span class="ident">field_id</span>, <span class="ident">field</span>) <span class="kw">in</span> <span class="ident">ct</span>.<span class="ident">iter_fields</span>() {
@@ -386,46 +312,6 @@
     }
 
     <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">names</span> <span class="op">=</span> <span class="ident">names</span>;
-}
-
-<span class="doccomment">/// Generate namespaces per database requirements, and add the names to it from the constraints</span>
-<span class="doccomment">/// part of the namespace.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">infer_namespaces</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">namespaces</span> <span class="op">=</span> <span class="ident">ConstraintNamespace::default</span>();
-
-    <span class="kw">for</span> <span class="ident">scope</span> <span class="kw">in</span> <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">active_connector</span>().<span class="ident">constraint_violation_scopes</span>() {
-        <span class="kw">match</span> <span class="ident">scope</span> {
-            <span class="ident">ConstraintScope::GlobalKeyIndex</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">namespaces</span>.<span class="ident">add_global_indexes</span>(<span class="ident">ctx</span>, <span class="kw-2">*</span><span class="ident">scope</span>);
-            }
-            <span class="ident">ConstraintScope::GlobalForeignKey</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">namespaces</span>.<span class="ident">add_global_relations</span>(<span class="ident">ctx</span>, <span class="kw-2">*</span><span class="ident">scope</span>);
-            }
-            <span class="ident">ConstraintScope::GlobalPrimaryKeyKeyIndex</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">namespaces</span>.<span class="ident">add_global_primary_keys</span>(<span class="ident">ctx</span>, <span class="kw-2">*</span><span class="ident">scope</span>);
-                <span class="ident">namespaces</span>.<span class="ident">add_global_indexes</span>(<span class="ident">ctx</span>, <span class="kw-2">*</span><span class="ident">scope</span>);
-            }
-            <span class="ident">ConstraintScope::GlobalPrimaryKeyForeignKeyDefault</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">namespaces</span>.<span class="ident">add_global_primary_keys</span>(<span class="ident">ctx</span>, <span class="kw-2">*</span><span class="ident">scope</span>);
-                <span class="ident">namespaces</span>.<span class="ident">add_global_relations</span>(<span class="ident">ctx</span>, <span class="kw-2">*</span><span class="ident">scope</span>);
-                <span class="ident">namespaces</span>.<span class="ident">add_global_default_constraints</span>(<span class="ident">ctx</span>, <span class="kw-2">*</span><span class="ident">scope</span>);
-            }
-            <span class="ident">ConstraintScope::ModelKeyIndex</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">namespaces</span>.<span class="ident">add_local_indexes</span>(<span class="ident">ctx</span>, <span class="kw-2">*</span><span class="ident">scope</span>);
-            }
-            <span class="ident">ConstraintScope::ModelPrimaryKeyKeyIndex</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">namespaces</span>.<span class="ident">add_local_primary_keys</span>(<span class="ident">ctx</span>, <span class="kw-2">*</span><span class="ident">scope</span>);
-                <span class="ident">namespaces</span>.<span class="ident">add_local_indexes</span>(<span class="ident">ctx</span>, <span class="kw-2">*</span><span class="ident">scope</span>);
-            }
-            <span class="ident">ConstraintScope::ModelPrimaryKeyKeyIndexForeignKey</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">namespaces</span>.<span class="ident">add_local_primary_keys</span>(<span class="ident">ctx</span>, <span class="kw-2">*</span><span class="ident">scope</span>);
-                <span class="ident">namespaces</span>.<span class="ident">add_local_indexes</span>(<span class="ident">ctx</span>, <span class="kw-2">*</span><span class="ident">scope</span>);
-                <span class="ident">namespaces</span>.<span class="ident">add_local_relations</span>(<span class="ident">ctx</span>, <span class="kw-2">*</span><span class="ident">scope</span>);
-            }
-        }
-    }
-
-    <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">names</span>.<span class="ident">constraint_namespace</span> <span class="op">=</span> <span class="ident">namespaces</span>;
 }
 
 <span class="kw">fn</span> <span class="ident">insert_name</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>(

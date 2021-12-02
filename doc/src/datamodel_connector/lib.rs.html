@@ -379,15 +379,14 @@
 <span id="379">379</span>
 <span id="380">380</span>
 <span id="381">381</span>
-<span id="382">382</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>)]</span>
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">connector_error</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">helper</span>;
 
 <span class="kw">mod</span> <span class="ident">empty_connector</span>;
 <span class="kw">mod</span> <span class="ident">referential_integrity</span>;
 
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">diagnostics::connector_error</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">empty_connector::EmptyDatamodelConnector</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">referential_integrity::ReferentialIntegrity</span>;
 
@@ -449,11 +448,10 @@
         <span class="self">self</span>.<span class="ident">referential_actions</span>(<span class="ident">integrity</span>).<span class="ident">contains</span>(<span class="ident">action</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">validate_field_default</span>(
+    <span class="kw">fn</span> <span class="ident">validate_field_default_without_native_type</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">_field_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">_scalar_type</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarType</span>,
-        <span class="ident">_native_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">NativeTypeInstance</span><span class="op">&gt;</span>,
         <span class="ident">_default</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">dml::default_value::DefaultValue</span><span class="op">&gt;</span>,
         <span class="ident">_errors</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConnectorError</span><span class="op">&gt;</span>,
     ) {

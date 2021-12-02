@@ -66,12 +66,30 @@
 <span id="66">66</span>
 <span id="67">67</span>
 <span id="68">68</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">validations</span>;
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">context</span>;
+<span class="kw">mod</span> <span class="ident">validations</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">db::ParserDatabase</span>, <span class="ident">lift::LiftAstToDml</span>, <span class="ident">validate::Validator</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>, <span class="ident">common::preview_features::PreviewFeature</span>, <span class="ident">configuration</span>, <span class="ident">diagnostics::Diagnostics</span>, <span class="ident">ValidatedDatamodel</span>,
 };
+<span class="kw">use</span> <span class="ident">datamodel_connector::EmptyDatamodelConnector</span>;
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 
 <span class="doccomment">/// Is responsible for loading and validating the Datamodel defined in an AST.</span>
@@ -110,17 +128,31 @@
         <span class="ident">relation_transformation_enabled</span>: <span class="ident">bool</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ValidatedDatamodel</span>, <span class="ident">Diagnostics</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">diagnostics</span> <span class="op">=</span> <span class="ident">Diagnostics::new</span>();
+        <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span> <span class="self">self</span>
+            .<span class="ident">source</span>
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">active_connector</span>)
+            .<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span><span class="ident">EmptyDatamodelConnector</span>);
+        <span class="kw">let</span> <span class="ident">referential_integrity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">source</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">referential_integrity</span>()).<span class="ident">unwrap_or_default</span>();
 
         <span class="comment">// Make sense of the AST.</span>
-        <span class="kw">let</span> (<span class="ident">db</span>, <span class="kw-2">mut</span> <span class="ident">diagnostics</span>) <span class="op">=</span> <span class="ident">ParserDatabase::new</span>(<span class="ident">ast_schema</span>, <span class="self">self</span>.<span class="ident">source</span>, <span class="ident">diagnostics</span>, <span class="self">self</span>.<span class="ident">preview_features</span>);
+        <span class="kw">let</span> (<span class="ident">db</span>, <span class="kw-2">mut</span> <span class="ident">diagnostics</span>) <span class="op">=</span> <span class="ident">ParserDatabase::new</span>(<span class="ident">ast_schema</span>, <span class="ident">diagnostics</span>);
 
         <span class="comment">// Early return so that the validator does not have to deal with invalid schemas</span>
         <span class="ident">diagnostics</span>.<span class="ident">to_result</span>()<span class="question-mark">?</span>;
 
-        <span class="ident">validations::validate</span>(<span class="kw-2">&amp;</span><span class="ident">db</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">diagnostics</span>, <span class="ident">relation_transformation_enabled</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">context</span> <span class="op">=</span> <span class="ident">context::Context</span> {
+            <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="ident">db</span>,
+            <span class="ident">datasource</span>: <span class="self">self</span>.<span class="ident">source</span>,
+            <span class="ident">preview_features</span>: <span class="self">self</span>.<span class="ident">preview_features</span>,
+            <span class="ident">connector</span>,
+            <span class="ident">referential_integrity</span>,
+            <span class="ident">diagnostics</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">diagnostics</span>,
+        };
+
+        <span class="ident">validations::validate</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">context</span>, <span class="ident">relation_transformation_enabled</span>);
         <span class="ident">diagnostics</span>.<span class="ident">to_result</span>()<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">LiftAstToDml::new</span>(<span class="kw-2">&amp;</span><span class="ident">db</span>).<span class="ident">lift</span>();
+        <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">LiftAstToDml::new</span>(<span class="kw-2">&amp;</span><span class="ident">db</span>, <span class="ident">connector</span>, <span class="ident">referential_integrity</span>).<span class="ident">lift</span>();
 
         <span class="comment">// From now on we do not operate on the internal ast anymore, but DML.</span>
         <span class="comment">// Please try to avoid all new validations after this, if you can.</span>
