@@ -35,6 +35,10 @@ impl CompositeType {
             .ok_or_else(|| String::from("Composite fields must be set."))
             .unwrap()
     }
+
+    pub fn find_field(&self, prisma_name: &str) -> Option<&Field> {
+        self.fields().into_iter().find(|f| f.name() == prisma_name)
+    }
 }
 
 impl Hash for CompositeType {

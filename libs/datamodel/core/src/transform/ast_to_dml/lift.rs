@@ -344,6 +344,7 @@ impl<'a> LiftAstToDml<'a> {
                     field.documentation = ast_field.documentation.clone().map(|comment| comment.text);
                     field.is_ignored = scalar_field.is_ignored();
                     field.database_name = scalar_field.mapped_name().map(String::from);
+                    field.arity = arity;
 
                     model.add_field(dml::Field::CompositeField(field));
                     continue;

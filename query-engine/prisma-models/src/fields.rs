@@ -79,16 +79,6 @@ impl Fields {
         }
     }
 
-    // Todo / WIP: Doesn't seem to exist anymore.
-    // pub fn created_at(&self) -> &Option<ScalarFieldRef> {
-    //     self.created_at.get_or_init(|| {
-    //         self.scalar_weak()
-    //             .iter()
-    //             .map(|sf| sf.upgrade().unwrap())
-    //             .find(|sf| sf.is_created_at())
-    //     })
-    // }
-
     pub fn updated_at(&self) -> &Option<ScalarFieldRef> {
         self.updated_at.get_or_init(|| {
             self.scalar_weak()
@@ -146,12 +136,23 @@ impl Fields {
             .collect()
     }
 
-    pub fn find_from_all(&self, name: &str) -> crate::Result<&Field> {
+    pub fn find_from_all(&self, prisma_name: &str) -> crate::Result<&Field> {
         self.all
             .iter()
-            .find(|field| field.name() == name)
+            .find(|field| field.name() == prisma_name)
             .ok_or_else(|| DomainError::FieldNotFound {
-                name: name.to_string(),
+                name: prisma_name.to_string(),
+                container_name: self.model().name.clone(),
+                container_type: "model",
+            })
+    }
+
+    pub fn find_from_all_by_db_name(&self, db_name: &str) -> crate::Result<&Field> {
+        self.all
+            .iter()
+            .find(|field| field.db_name() == db_name)
+            .ok_or_else(|| DomainError::FieldNotFound {
+                name: db_name.to_string(),
                 container_name: self.model().name.clone(),
                 container_type: "model",
             })
