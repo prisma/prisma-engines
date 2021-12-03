@@ -8,6 +8,7 @@ use connector::filter::Filter;
 use prisma_models::{FieldSelection, ModelRef};
 
 #[derive(Debug, Clone)]
+#[allow(clippy::large_enum_variant)]
 pub enum Query {
     Read(ReadQuery),
     Write(WriteQuery),

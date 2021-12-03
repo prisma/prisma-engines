@@ -500,15 +500,15 @@ impl QueryDocumentParser {
 struct Diff<'a, T: std::cmp::Eq + std::hash::Hash> {
     pub left: Vec<&'a T>,
     pub right: Vec<&'a T>,
-    pub equal: Vec<&'a T>,
+    pub _equal: Vec<&'a T>,
 }
 
 impl<'a, T: std::cmp::Eq + std::hash::Hash> Diff<'a, T> {
     fn new(left_side: &'a HashSet<T>, right_side: &'a HashSet<T>) -> Diff<'a, T> {
         let left: Vec<&T> = left_side.difference(right_side).collect();
         let right: Vec<&T> = right_side.difference(left_side).collect();
-        let equal: Vec<&T> = left_side.intersection(right_side).collect();
+        let _equal: Vec<&T> = left_side.intersection(right_side).collect();
 
-        Diff { left, right, equal }
+        Diff { left, right, _equal }
     }
 }

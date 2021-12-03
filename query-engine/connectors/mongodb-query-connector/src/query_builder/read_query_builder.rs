@@ -18,7 +18,7 @@ use std::convert::TryFrom;
 
 /// Ergonomics wrapper for query execution and logging.
 /// Todo: Add all other queries gradually.
-#[allow(dead_code)]
+#[allow(dead_code, clippy::large_enum_variant)]
 pub enum MongoReadQuery {
     Find(FindQuery),
     Pipeline(PipelineQuery),

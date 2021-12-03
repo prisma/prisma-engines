@@ -44,6 +44,7 @@ pub fn create_record(model: &ModelRef, mut args: WriteArgs) -> (Insert<'static>,
 /// where each `WriteArg` in the Vec is one row.
 /// Requires `affected_fields` to be non-empty to produce valid SQL.
 #[tracing::instrument(skip(model, args, skip_duplicates))]
+#[allow(clippy::mutable_key_type)]
 pub fn create_records_nonempty(
     model: &ModelRef,
     args: Vec<WriteArgs>,
