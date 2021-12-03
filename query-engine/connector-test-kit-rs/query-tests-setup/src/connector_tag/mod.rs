@@ -110,24 +110,24 @@ impl fmt::Display for ConnectorVersion {
         let printable = match self {
             Self::SqlServer(v) => match v {
                 Some(v) => format!("SQL Server ({})", v.to_string()),
-                None => format!("SQL Server (unknown)"),
+                None => "SQL Server (unknown)".to_string(),
             },
             Self::Postgres(v) => match v {
                 Some(v) => format!("PostgreSQL ({})", v.to_string()),
-                None => format!("PostgreSQL (unknown)"),
+                None => "PostgreSQL (unknown)".to_string(),
             },
             Self::MySql(v) => match v {
                 Some(v) => format!("MySQL ({})", v.to_string()),
-                None => format!("MySQL (unknown)"),
+                None => "MySQL (unknown)".to_string(),
             },
             Self::MongoDb(v) => match v {
                 Some(v) => format!("MongoDB ({})", v.to_string()),
-                None => format!("MongoDB (unknown)"),
+                None => "MongoDB (unknown)".to_string(),
             },
             Self::Sqlite => "SQLite".to_string(),
             Self::Vitess(v) => match v {
                 Some(v) => format!("Vitess ({})", v.to_string()),
-                None => format!("Vitess (unknown)"),
+                None => "Vitess (unknown)".to_string(),
             },
         };
 
