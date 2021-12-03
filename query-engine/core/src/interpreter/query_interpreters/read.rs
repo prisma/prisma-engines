@@ -140,7 +140,7 @@ fn read_related<'conn>(
             nested_read::one2m(
                 tx,
                 &query.parent_field,
-                query.parent_projections,
+                query.parent_results,
                 parent_result,
                 query.args.clone(),
                 &query.selected_fields,
@@ -188,7 +188,7 @@ fn process_nested<'conn>(
 ) -> BoxFuture<'conn, InterpretationResult<Vec<QueryResult>>> {
     let fut = async move {
         let results = if matches!(parent_result, Some(parent_records) if parent_records.records.is_empty()) {
-            //this catches most cases where there is no parent to cause a nested query. but sometimes even with parent records,
+            // This catches most cases where there is no parent to cause a nested query. but sometimes even with parent records,
             // we do not need to do roundtrips which is why the nested_reads contain additional logic
             vec![]
         } else {
@@ -201,6 +201,7 @@ fn process_nested<'conn>(
 
             nested_results
         };
+
         Ok(results)
     };
 

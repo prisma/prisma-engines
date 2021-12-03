@@ -1,7 +1,4 @@
-use crate::{
-    DomainError, ModelProjection, OrderBy, PrismaValue, PrismaValueExtensions, RecordProjection, ScalarFieldRef,
-    SortOrder,
-};
+use crate::{DomainError, FieldSelection, ModelProjection, OrderBy, PrismaValue, SelectionResult, SortOrder};
 use itertools::Itertools;
 use std::collections::HashMap;
 
@@ -25,8 +22,9 @@ impl SingleRecord {
         Self { record, field_names }
     }
 
-    pub fn projection(&self, projection: &ModelProjection) -> crate::Result<RecordProjection> {
-        self.record.projection(&self.field_names, projection)
+    pub fn extract_selection_result(&self, extraction_selection: &FieldSelection) -> crate::Result<SelectionResult> {
+        self.record
+            .extract_selection_result(&self.field_names, extraction_selection)
     }
 
     pub fn get_field_value(&self, field: &str) -> crate::Result<&PrismaValue> {
@@ -48,23 +46,10 @@ impl ManyRecords {
         }
     }
 
-    pub fn empty(selected_fields: &ModelProjection) -> Self {
+    pub fn empty(selected_fields: &FieldSelection) -> Self {
         Self {
             records: Vec::new(),
-            field_names: selected_fields.names().map(|n| n.to_string()).collect(),
-        }
-    }
-
-    pub fn from_projection(projection: Vec<Vec<PrismaValue>>, selected_fields: &ModelProjection) -> Self {
-        Self {
-            records: projection
-                .into_iter()
-                .map(|v| Record {
-                    values: v,
-                    parent_id: None,
-                })
-                .collect(),
-            field_names: selected_fields.db_names().collect(),
+            field_names: selected_fields.prisma_names().collect(),
         }
     }
 
@@ -101,10 +86,11 @@ impl ManyRecords {
         self.records.push(record);
     }
 
-    pub fn projections(&self, model_projection: &ModelProjection) -> crate::Result<Vec<RecordProjection>> {
+    /// Builds `SelectionResults` from this `ManyRecords` based on the given FieldSelection.
+    pub fn extract_selection_results(&self, selections: &FieldSelection) -> crate::Result<Vec<SelectionResult>> {
         self.records
             .iter()
-            .map(|record| record.projection(&self.field_names, model_projection))
+            .map(|record| record.extract_selection_result(&self.field_names, selections))
             .collect()
     }
 
@@ -135,10 +121,25 @@ impl ManyRecords {
     }
 }
 
+impl From<(Vec<Vec<PrismaValue>>, &FieldSelection)> for ManyRecords {
+    fn from((values, selected_fields): (Vec<Vec<PrismaValue>>, &FieldSelection)) -> Self {
+        Self {
+            records: values
+                .into_iter()
+                .map(|value| Record {
+                    values: value,
+                    parent_id: None,
+                })
+                .collect(),
+            field_names: selected_fields.db_names().collect(),
+        }
+    }
+}
+
 #[derive(Debug, Default, Clone, Eq, PartialEq, Hash)]
 pub struct Record {
     pub values: Vec<PrismaValue>,
-    pub parent_id: Option<RecordProjection>,
+    pub parent_id: Option<SelectionResult>,
 }
 
 impl Record {
@@ -149,29 +150,24 @@ impl Record {
         }
     }
 
-    pub fn projection(
+    /// Extract a `SelectionResult` from this `Record`
+    /// `field_names`: Database names of the fields contained in this `Record`.
+    /// `selected_fields`: The selection to extract.
+    pub fn extract_selection_result(
         &self,
         field_names: &[String],
-        model_projection: &ModelProjection,
-    ) -> crate::Result<RecordProjection> {
-        let pairs: Vec<(ScalarFieldRef, PrismaValue)> = model_projection
-            .fields()
+        extraction_selection: &FieldSelection,
+    ) -> crate::Result<SelectionResult> {
+        let pairs: Vec<_> = extraction_selection
+            .selections()
             .into_iter()
-            .flat_map(|field| {
-                field.scalar_fields().into_iter().map(|field| {
-                    self.get_field_value(field_names, field.db_name()).map(|val| {
-                        let coerced = val
-                            .clone()
-                            .coerce(&field.type_identifier)
-                            .expect("Invalid coercion encountered");
-
-                        (field, coerced)
-                    })
-                })
+            .map(|selection| {
+                self.get_field_value(field_names, selection.db_name())
+                    .and_then(|val| Ok((selection.clone(), selection.coerce_value(val.clone())?)))
             })
             .collect::<crate::Result<Vec<_>>>()?;
 
-        Ok(RecordProjection { pairs })
+        Ok(SelectionResult::new(pairs))
     }
 
     pub fn identifying_values(
@@ -197,17 +193,15 @@ impl Record {
         let index = field_names.iter().position(|r| r == field).map(Ok).unwrap_or_else(|| {
             Err(DomainError::FieldNotFound {
                 name: field.to_string(),
-                model: format!(
-                    "Field not found in record {:?}. Field names are: {:?}, looking for: {:?}",
-                    &self, &field_names, field
-                ),
+                container_type: "field",
+                container_name: format!("Record values: {:?}. Field names: {:?}.", &self, &field_names),
             })
         })?;
 
         Ok(&self.values[index])
     }
 
-    pub fn set_parent_id(&mut self, parent_id: RecordProjection) {
+    pub fn set_parent_id(&mut self, parent_id: SelectionResult) {
         self.parent_id = Some(parent_id);
     }
 }

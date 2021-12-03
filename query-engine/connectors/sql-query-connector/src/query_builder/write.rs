@@ -10,8 +10,8 @@ use tracing::Span;
 /// `INSERT` a new record to the database. Resulting an `INSERT` ast and an
 /// optional `RecordProjection` if available from the arguments or model.
 #[tracing::instrument(skip(model, args))]
-pub fn create_record(model: &ModelRef, mut args: WriteArgs) -> (Insert<'static>, Option<RecordProjection>) {
-    let return_id = args.as_record_projection(model.primary_identifier());
+pub fn create_record(model: &ModelRef, mut args: WriteArgs) -> (Insert<'static>, Option<SelectionResult>) {
+    let return_id = args.as_record_projection(model.primary_identifier().into());
 
     let fields: Vec<_> = model
         .fields()
@@ -34,7 +34,7 @@ pub fn create_record(model: &ModelRef, mut args: WriteArgs) -> (Insert<'static>,
 
     (
         Insert::from(insert)
-            .returning(model.primary_identifier().as_columns())
+            .returning(ModelProjection::from(model.primary_identifier()).as_columns())
             .append_trace(&Span::current()),
         return_id,
     )
@@ -105,7 +105,7 @@ pub fn create_records_empty(model: &ModelRef, skip_duplicates: bool) -> Insert<'
 }
 
 #[tracing::instrument(skip(model, ids, args))]
-pub fn update_many(model: &ModelRef, ids: &[&RecordProjection], args: WriteArgs) -> crate::Result<Vec<Query<'static>>> {
+pub fn update_many(model: &ModelRef, ids: &[&SelectionResult], args: WriteArgs) -> crate::Result<Vec<Query<'static>>> {
     if args.args.is_empty() || ids.is_empty() {
         return Ok(Vec::new());
     }
@@ -160,16 +160,15 @@ pub fn update_many(model: &ModelRef, ids: &[&RecordProjection], args: WriteArgs)
         });
 
     let query = query.append_trace(&Span::current());
-
-    let columns: Vec<_> = model.primary_identifier().as_columns().collect();
+    let columns: Vec<_> = ModelProjection::from(model.primary_identifier()).as_columns().collect();
     let result: Vec<Query> = super::chunked_conditions(&columns, ids, |conditions| query.clone().so_that(conditions));
 
     Ok(result)
 }
 
 #[tracing::instrument(skip(model, ids))]
-pub fn delete_many(model: &ModelRef, ids: &[&RecordProjection]) -> Vec<Query<'static>> {
-    let columns: Vec<_> = model.primary_identifier().as_columns().collect();
+pub fn delete_many(model: &ModelRef, ids: &[&SelectionResult]) -> Vec<Query<'static>> {
+    let columns: Vec<_> = ModelProjection::from(model.primary_identifier()).as_columns().collect();
 
     super::chunked_conditions(&columns, ids, |conditions| {
         Delete::from_table(model.as_table())
@@ -181,8 +180,8 @@ pub fn delete_many(model: &ModelRef, ids: &[&RecordProjection]) -> Vec<Query<'st
 #[tracing::instrument(skip(field, parent_id, child_ids))]
 pub fn create_relation_table_records(
     field: &RelationFieldRef,
-    parent_id: &RecordProjection,
-    child_ids: &[RecordProjection],
+    parent_id: &SelectionResult,
+    child_ids: &[SelectionResult],
 ) -> Query<'static> {
     let relation = field.relation();
 
@@ -206,8 +205,8 @@ pub fn create_relation_table_records(
 #[tracing::instrument(skip(parent_field, parent_id, child_ids))]
 pub fn delete_relation_table_records(
     parent_field: &RelationFieldRef,
-    parent_id: &RecordProjection,
-    child_ids: &[RecordProjection],
+    parent_id: &SelectionResult,
+    child_ids: &[SelectionResult],
 ) -> Delete<'static> {
     let relation = parent_field.relation();
 

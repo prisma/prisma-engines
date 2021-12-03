@@ -1,6 +1,6 @@
 use crate::{orderby::OrderByData, IntoBson};
 use mongodb::bson::{doc, Document};
-use prisma_models::{OrderBy, RecordProjection, SortOrder};
+use prisma_models::{OrderBy, SelectionResult, SortOrder};
 
 #[derive(Debug, Clone)]
 pub(crate) struct CursorData {
@@ -18,7 +18,7 @@ pub(crate) struct CursorData {
 #[derive(Debug, Default)]
 pub(crate) struct CursorBuilder {
     /// The field-value combination the cursor .
-    cursor: RecordProjection,
+    cursor: SelectionResult,
 
     /// Ordering to use. Influences how cursor conditions are build.
     /// Relies on the `OrderByBuilder` to compute the joins and prepare
@@ -31,7 +31,7 @@ pub(crate) struct CursorBuilder {
 }
 
 impl CursorBuilder {
-    pub fn new(cursor: RecordProjection, order: Vec<OrderBy>, reverse: bool) -> Self {
+    pub fn new(cursor: SelectionResult, order: Vec<OrderBy>, reverse: bool) -> Self {
         let order_data = OrderByData::from_list(order);
 
         Self {

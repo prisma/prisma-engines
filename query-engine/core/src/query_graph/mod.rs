@@ -10,10 +10,10 @@ pub use transformers::*;
 use crate::{
     interpreter::ExpressionResult, FilteredQuery, ManyRecordsQuery, Query, QueryGraphBuilderResult, ReadQuery,
 };
-use connector::{IdFilter, QueryArguments};
+use connector::{IntoFilter, QueryArguments};
 use guard::*;
 use petgraph::{graph::*, visit::EdgeRef as PEdgeRef, *};
-use prisma_models::{ModelProjection, ModelRef, RecordProjection};
+use prisma_models::{FieldSelection, ModelRef, SelectionResult};
 use std::{borrow::Borrow, collections::HashSet, fmt};
 
 pub type QueryGraphResult<T> = std::result::Result<T, QueryGraphError>;
@@ -52,8 +52,8 @@ pub enum Flow {
     /// Possible outgoing edges are `then` and `else`, each at most once, with `then` required to be present.
     If(Box<dyn FnOnce() -> bool + Send + Sync + 'static>),
 
-    /// Returns a fixed set of record projections.
-    Return(Option<Vec<RecordProjection>>),
+    /// Returns a fixed set of results at runtime.
+    Return(Option<Vec<SelectionResult>>),
 }
 
 impl Flow {
@@ -77,8 +77,8 @@ impl Computation {
 }
 
 pub struct DiffNode {
-    pub left: HashSet<RecordProjection>,
-    pub right: HashSet<RecordProjection>,
+    pub left: HashSet<SelectionResult>,
+    pub right: HashSet<SelectionResult>,
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
@@ -105,10 +105,10 @@ impl EdgeRef {
     }
 }
 
-pub type ParentProjectionFn =
-    Box<dyn FnOnce(Node, Vec<RecordProjection>) -> QueryGraphBuilderResult<Node> + Send + Sync + 'static>;
+pub type ProjectedDataDependencyFn =
+    Box<dyn FnOnce(Node, Vec<SelectionResult>) -> QueryGraphBuilderResult<Node> + Send + Sync + 'static>;
 
-pub type ParentResultFn =
+pub type DataDependencyFn =
     Box<dyn FnOnce(Node, &ExpressionResult) -> QueryGraphBuilderResult<Node> + Send + Sync + 'static>;
 
 /// Stored on the edges of the QueryGraph, a QueryGraphDependency contains information on how children are connected to their parents,
@@ -117,20 +117,19 @@ pub enum QueryGraphDependency {
     /// Simple dependency indicating order of execution. Effectively an ordering and reachability tool for now.
     ExecutionOrder,
 
-    /// Performs a transformation on the child node based on the raw parent query result.
-    /// Does not move the result to the closure, but provides a reference.
-    ParentResult(ParentResultFn),
+    /// Performs a transformation on the target node based on the source node result..
+    DataDependency(DataDependencyFn),
 
-    /// More specialized version of `ParentResult` with more guarantees and side effects.
+    /// More specialized version of `DataDependency` with more guarantees and side effects.
     ///
-    /// Performs a transformation on the child node based on the requested projection of the parent result (represented as a single merged `ModelProjection`).
-    /// Assumes that the parent result can be converted into the requested projection, else a runtime error will occur.
-    /// The `ModelProjection` is used to determine the set of values to extract from the parent result.
+    /// Performs a transformation on the target node based on the requested selection on the source result (represented as a single merged `FieldSelection`).
+    /// Assumes that the source result can be converted into the requested selection, else a runtime error will occur.
+    /// The `FieldSelection` is used to determine the set of values to extract from the source result.
     ///
-    /// Important note: As opposed to `ParentResult`, this dependency guarantees that if the closure is called, the parent result was projected successfully.
-    /// To achieve that, the query graph is post-processed in the `finalize` and reloads are injected at points where a projection is not fulfilled.
+    /// Important note: As opposed to `DataDependency`, this dependency guarantees that if the closure is called, the source result contains at least the requested selection.
+    /// To achieve that, the query graph is post-processed in the `finalize` and reloads are injected at points where a selection is not fulfilled.
     /// See `insert_reloads` for more information.
-    ParentProjection(ModelProjection, ParentProjectionFn),
+    ProjectedDataDependency(FieldSelection, ProjectedDataDependencyFn), // [Composites] todo rename
 
     /// Only valid in the context of a `If` control flow node.
     Then,
@@ -650,13 +649,13 @@ impl QueryGraph {
         Ok(())
     }
 
-    /// Traverses the graph and ensures that return nodes have correct `ParentProjection` dependencies on their incoming edges.
+    /// Traverses the graph and ensures that return nodes have correct `ProjectedDataDependency`s on their incoming edges.
     ///
     /// Steps:
-    /// - Collect & merge the outgoing edge dependencies into a single `ModelProjection`
+    /// - Collect & merge the outgoing edge dependencies into a single `FieldSelection`
     /// - Transform the incoming edge dependencies of the return nodes with the merged outgoing edge dependencies of the previous step
     ///
-    /// This ensures that children nodes of return nodes have the proper projections at their disposal.
+    /// This ensures that children nodes of return nodes have the proper data dependencies at their disposal.
     /// In case the parent nodes of return nodes do not have a field selection that fullfils the new dependency,
     /// a reload node will be inserted in between the parent and the return node by the `insert_reloads` method.
     #[tracing::instrument(skip(self))]
@@ -676,41 +675,41 @@ impl QueryGraph {
 
         for return_node in return_nodes {
             let out_edges = self.outgoing_edges(&return_node);
-            let dependencies: Vec<ModelProjection> = out_edges
+            let dependencies: Vec<FieldSelection> = out_edges
                 .into_iter()
                 .filter_map(|edge| match self.edge_content(&edge).unwrap() {
-                    QueryGraphDependency::ParentProjection(ref requested_projection, _) => {
-                        Some(requested_projection.clone())
+                    QueryGraphDependency::ProjectedDataDependency(ref requested_selection, _) => {
+                        Some(requested_selection.clone())
                     }
                     _ => None,
                 })
                 .collect();
-            let dependencies = ModelProjection::union(dependencies);
+            let dependencies = FieldSelection::union(dependencies);
 
-            // Assumption: We currently always have at most one single incoming ParentProjection edge
+            // Assumption: We currently always have at most one single incoming ProjectedDataDependency edge
             // connected to return nodes. This will break if we ever have more.
             let in_edges = self.incoming_edges(&return_node);
-            let in_parent_projection_edge = in_edges.into_iter().find(|edge| {
+            let incoming_dep_edge = in_edges.into_iter().find(|edge| {
                 matches!(
                     self.edge_content(edge),
-                    Some(QueryGraphDependency::ParentProjection(_, _))
+                    Some(QueryGraphDependency::ProjectedDataDependency(_, _))
                 )
             });
 
-            if let Some(incoming_edge) = in_parent_projection_edge {
+            if let Some(incoming_edge) = incoming_dep_edge {
                 let source = self.edge_source(&incoming_edge);
                 let target = self.edge_target(&incoming_edge);
                 let content = self
                     .remove_edge(incoming_edge)
                     .expect("Expected edges between marked nodes to be non-empty.");
 
-                if let QueryGraphDependency::ParentProjection(existing, transformer) = content {
+                if let QueryGraphDependency::ProjectedDataDependency(existing, transformer) = content {
                     let merged_dependencies = dependencies.merge(existing);
 
                     self.create_edge(
                         &source,
                         &target,
-                        QueryGraphDependency::ParentProjection(merged_dependencies, transformer),
+                        QueryGraphDependency::ProjectedDataDependency(merged_dependencies, transformer),
                     )?;
                 }
             }
@@ -721,10 +720,10 @@ impl QueryGraph {
 
     /// Traverses the query graph and checks if reloads of nodes are necessary.
     /// Whether or not a node needs to be reloaded is determined based on the
-    /// outgoing edges of parent-projection-based transformers, as those hold the `ModelProjection`s
-    /// all records of the parent result need to contain in order to satisfy dependencies.
+    /// incoming `ProjectedDataDependency` edge transformers, as those hold the `FieldSelection`s
+    /// all records of the source result need to contain in order to satisfy dependencies.
     ///
-    /// If a node needs to be reloaded, ALL edges going out from the reloaded node need to be repointed, not
+    /// If a node needs to be reloaded, ALL edges going out from the reloaded node need to be rewired, not
     /// only unsatified ones.
     ///
     /// ## Example
@@ -769,11 +768,11 @@ impl QueryGraph {
     /// The edges from `Parent` to all dependent children are removed from the graph and reinserted in order
     /// on the reload node.
     ///
-    /// The `Reload` node is always a find many query.
+    /// The `Reload` node is always a "find many" query.
     /// Unwraps are safe because we're operating on the unprocessed state of the graph (`Expressionista` changes that).
     #[tracing::instrument(skip(self))]
     fn insert_reloads(&mut self) -> QueryGraphResult<()> {
-        let reloads: Vec<(NodeRef, ModelRef, Vec<ModelProjection>)> = self
+        let reloads: Vec<(NodeRef, ModelRef, Vec<FieldSelection>)> = self
             .graph
             .node_indices()
             .filter_map(|ix| {
@@ -782,18 +781,18 @@ impl QueryGraph {
                 if let Node::Query(q) = self.node_content(&node).unwrap() {
                     let edges = self.outgoing_edges(&node);
 
-                    let unsatisfied_dependencies: Vec<ModelProjection> = edges
+                    let unsatisfied_dependencies: Vec<FieldSelection> = edges
                         .into_iter()
                         .filter_map(|edge| match self.edge_content(&edge).unwrap() {
-                            QueryGraphDependency::ParentProjection(ref requested_projection, _)
-                                if !q.returns(requested_projection) =>
+                            QueryGraphDependency::ProjectedDataDependency(ref requested_selection, _)
+                                if !q.returns(requested_selection) =>
                             {
                                 trace!(
-                                    "Query {:?} does not return requested projection {:?} and will be reloaded.",
+                                    "Query {:?} does not return requested selection {:?} and will be reloaded.",
                                     q,
-                                    requested_projection.names().collect::<Vec<_>>()
+                                    requested_selection.prisma_names().collect::<Vec<_>>()
                                 );
-                                Some(requested_projection.clone())
+                                Some(requested_selection.clone())
                             }
                             _ => None,
                         })
@@ -820,7 +819,7 @@ impl QueryGraph {
                 alias: None,
                 model: model.clone(),
                 args: QueryArguments::new(model),
-                selected_fields: ModelProjection::union(identifiers),
+                selected_fields: FieldSelection::union(identifiers),
                 nested: vec![],
                 selection_order: vec![],
                 aggregation_selections: vec![],
@@ -832,11 +831,11 @@ impl QueryGraph {
             self.create_edge(
                 &node,
                 &reload_node,
-                QueryGraphDependency::ParentProjection(
+                QueryGraphDependency::ProjectedDataDependency(
                     primary_model_id,
-                    Box::new(|mut reload_node, parent_projections| {
+                    Box::new(|mut reload_node, parent_result| {
                         if let Node::Query(Query::Read(ReadQuery::ManyRecordsQuery(ref mut mr))) = reload_node {
-                            mr.set_filter(parent_projections.filter());
+                            mr.set_filter(parent_result.filter());
                         }
 
                         Ok(reload_node)

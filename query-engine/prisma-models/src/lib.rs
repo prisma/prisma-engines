@@ -6,6 +6,7 @@ mod composite_type;
 mod error;
 mod extensions;
 mod field;
+mod field_selection;
 mod fields;
 mod index;
 mod internal_data_model;
@@ -17,6 +18,7 @@ mod prisma_value_ext;
 mod projections;
 mod record;
 mod relation;
+mod selection_result;
 
 pub mod pk;
 pub mod prelude;
@@ -26,6 +28,7 @@ pub use composite_type::*;
 pub use datamodel::dml;
 pub use error::*;
 pub use field::*;
+pub use field_selection::*;
 pub use fields::*;
 pub use index::*;
 pub use internal_data_model::*;
@@ -36,6 +39,7 @@ pub use prisma_value_ext::*;
 pub use projections::*;
 pub use record::*;
 pub use relation::*;
+pub use selection_result::*;
 
 // reexport
 pub use prisma_value::*;

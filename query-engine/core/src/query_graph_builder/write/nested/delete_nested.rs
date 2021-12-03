@@ -66,7 +66,7 @@ pub fn nested_delete(
         graph.create_edge(
             &find_child_records_node,
             &delete_many_node,
-            QueryGraphDependency::ParentProjection(
+            QueryGraphDependency::ProjectedDataDependency(
                 child_model_identifier,
                 Box::new(move |mut delete_many_node, child_ids| {
                     if child_ids.len() != filter_len {
@@ -112,7 +112,7 @@ pub fn nested_delete(
             graph.create_edge(
                 &find_child_records_node,
                 &delete_record_node,
-                QueryGraphDependency::ParentProjection(
+                QueryGraphDependency::ProjectedDataDependency(
                     child_model_identifier,
                     Box::new(move |mut delete_record_node, mut child_ids| {
                         let child_id = match child_ids.pop() {
@@ -172,7 +172,7 @@ pub fn nested_delete_many(
         graph.create_edge(
             &find_child_records_node,
             &delete_many_node,
-            QueryGraphDependency::ParentProjection(
+            QueryGraphDependency::ProjectedDataDependency(
                 child_model_identifier.clone(),
                 Box::new(move |mut delete_many_node, child_ids| {
                     if let Node::Query(Query::Write(WriteQuery::DeleteManyRecords(ref mut dmr))) = delete_many_node {

@@ -282,6 +282,7 @@ impl<'a> LowerDmlToAst<'a> {
             ),
             PrismaValue::Xml(val) => ast::Expression::StringValue(val.to_string(), ast::Span::empty()),
             PrismaValue::Bytes(b) => ast::Expression::StringValue(prisma_value::encode_bytes(b), ast::Span::empty()),
+            PrismaValue::Object(_) => unreachable!(), // There's no concept of object values in the PSL right now.
         }
     }
 }

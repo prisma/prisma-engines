@@ -25,7 +25,10 @@ pub(crate) fn create_many_object_type(
     let linking_fields = if let Some(parent_field) = parent_field {
         let child_field = parent_field.related_field();
         if child_field.is_inlined_on_enclosing_model() {
-            child_field.linking_fields().scalar_fields().collect()
+            child_field
+                .linking_fields()
+                .as_scalar_fields()
+                .expect("Expected linking fields to be scalar.")
         } else {
             vec![]
         }

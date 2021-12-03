@@ -13,7 +13,6 @@ pub struct Fields {
     primary_key: Option<PrimaryKey>,
     scalar: OnceCell<Vec<ScalarFieldWeak>>,
     relation: OnceCell<Vec<RelationFieldWeak>>,
-    _composite: OnceCell<Vec<CompositeFieldWeak>>,
     model: ModelWeakRef,
     // created_at: OnceCell<Option<ScalarFieldRef>>,
     updated_at: OnceCell<Option<ScalarFieldRef>>,
@@ -26,7 +25,6 @@ impl Fields {
             primary_key,
             scalar: OnceCell::new(),
             relation: OnceCell::new(),
-            _composite: OnceCell::new(),
             // created_at: OnceCell::new(),
             updated_at: OnceCell::new(),
             model,
@@ -154,7 +152,8 @@ impl Fields {
             .find(|field| field.name() == name)
             .ok_or_else(|| DomainError::FieldNotFound {
                 name: name.to_string(),
-                model: self.model().name.clone(),
+                container_name: self.model().name.clone(),
+                container_type: "model",
             })
     }
 
@@ -165,7 +164,8 @@ impl Fields {
             .find(|field| field.name == name)
             .ok_or_else(|| DomainError::ScalarFieldNotFound {
                 name: name.to_string(),
-                model: self.model().name.clone(),
+                container_name: self.model().name.clone(),
+                container_type: "model",
             })
     }
 

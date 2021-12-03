@@ -5,7 +5,7 @@ use crate::{
 };
 use connector::{DatasourceFieldName, Filter, RecordFilter, WriteArgs};
 use datamodel::ReferentialAction;
-use prisma_models::{ModelProjection, ModelRef, PrismaValue, RelationFieldRef};
+use prisma_models::{FieldSelection, ModelRef, PrismaValue, RelationFieldRef, SelectionResult};
 use std::sync::Arc;
 
 /// Coerces single values (`ParsedInputValue::Single` and `ParsedInputValue::Map`) into a vector.
@@ -25,12 +25,12 @@ pub fn node_is_create(graph: &QueryGraph, node: &NodeRef) -> bool {
     )
 }
 
-/// Produces a non-failing read query that fetches the requested projection of records for a given filterable.
-pub fn read_ids_infallible<T>(model: ModelRef, projection: ModelProjection, filter: T) -> Query
+/// Produces a non-failing read query that fetches the requested selection of records for a given filterable.
+pub fn read_ids_infallible<T>(model: ModelRef, selection: FieldSelection, filter: T) -> Query
 where
     T: Into<Filter>,
 {
-    let selected_fields = get_selected_fields(&model, projection);
+    let selected_fields = get_selected_fields(&model, selection);
     let filter: Filter = filter.into();
 
     let read_query = ReadQuery::ManyRecordsQuery(ManyRecordsQuery {
@@ -47,14 +47,14 @@ where
     Query::Read(read_query)
 }
 
-fn get_selected_fields(model: &ModelRef, projection: ModelProjection) -> ModelProjection {
+fn get_selected_fields(model: &ModelRef, selection: FieldSelection) -> FieldSelection {
     // Always fetch the primary identifier as well.
     let primary_model_id = model.primary_identifier();
 
-    if projection != primary_model_id {
-        primary_model_id.merge(projection)
+    if selection != primary_model_id {
+        primary_model_id.merge(selection)
     } else {
-        projection
+        selection
     }
 }
 
@@ -96,7 +96,7 @@ where
 {
     let parent_model_id = parent_relation_field.model().primary_identifier();
     let parent_linking_fields = parent_relation_field.linking_fields();
-    let projection = parent_model_id.merge(parent_linking_fields);
+    let selection = parent_model_id.merge(parent_linking_fields);
     let child_model = parent_relation_field.related_model();
 
     let selected_fields = get_selected_fields(
@@ -108,7 +108,7 @@ where
         name: "find_children_by_parent".to_owned(),
         alias: None,
         parent_field: Arc::clone(parent_relation_field),
-        parent_projections: None,
+        parent_results: None,
         args: (child_model, filter).into(),
         selected_fields,
         aggregation_selections: vec![],
@@ -119,11 +119,11 @@ where
     graph.create_edge(
         parent_node,
         &read_children_node,
-        QueryGraphDependency::ParentProjection(
-            projection,
-            Box::new(|mut read_children_node, projections| {
+        QueryGraphDependency::ProjectedDataDependency(
+            selection,
+            Box::new(|mut read_children_node, selections| {
                 if let Node::Query(Query::Read(ReadQuery::RelatedRecordsQuery(ref mut rq))) = read_children_node {
-                    rq.parent_projections = Some(projections);
+                    rq.parent_results = Some(selections);
                 };
 
                 Ok(read_children_node)
@@ -214,7 +214,7 @@ pub fn insert_existing_1to1_related_model_checks(
     graph.create_edge(
         &read_existing_children,
         &if_node,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             child_model_identifier.clone(),
             Box::new(move |if_node, child_ids| {
                 // If the other side ("child") requires the connection, we need to make sure that there isn't a child already connected
@@ -241,7 +241,7 @@ pub fn insert_existing_1to1_related_model_checks(
     graph.create_edge(
         &read_existing_children,
         &update_existing_child,
-        QueryGraphDependency::ParentProjection(child_model_identifier, Box::new(move |mut update_existing_child, mut child_ids| {
+        QueryGraphDependency::ProjectedDataDependency(child_model_identifier, Box::new(move |mut update_existing_child, mut child_ids| {
             // This has to succeed or the if-then node wouldn't trigger.
             let child_id = match child_ids.pop() {
                 Some(pid) => Ok(pid),
@@ -252,7 +252,7 @@ pub fn insert_existing_1to1_related_model_checks(
             }?;
 
             if let Node::Query(Query::Write(ref mut wq)) = update_existing_child {
-                wq.inject_projection_into_args(child_linking_fields.empty_record_projection())
+                wq.inject_result_into_args(SelectionResult::from(&child_linking_fields));
             }
 
             if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = update_existing_child {
@@ -382,7 +382,7 @@ pub fn emulate_restrict(
     graph.create_edge(
         &read_node,
         &noop_node,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             child_model_identifier,
             Box::new(move |noop_node, child_ids| {
                 if !child_ids.is_empty() {
@@ -405,18 +405,18 @@ pub fn emulate_restrict(
 /// Recurses into the deletion emulation to ensure that subsequent deletions are handled correctly as well.
 ///
 /// ```text
-///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─    
-///            Parent       │   
+///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+///            Parent       │
 ///    │  (ids to delete)    ─ ┐
-///     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘   
+///     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
 ///               │            │
-///               ▼             
+///               ▼
 ///    ┌────────────────────┐  │
-///    │Find Connected Model│   
+///    │Find Connected Model│
 /// ┌──│     (Cascade)      │  │
-/// │  └────────────────────┘   
+/// │  └────────────────────┘
 /// │             │            │
-/// │             ▼             
+/// │             ▼
 /// │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │
 /// │  ┌────────────────────┐ │
 /// ││ │  Insert onDelete   │  │
@@ -426,16 +426,16 @@ pub fn emulate_restrict(
 /// ││ │  Connected Model.  │  │
 /// │  └────────────────────┘ │
 /// │└ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │
-/// │             │             
+/// │             │
 /// │             ▼            │
-/// │  ┌────────────────────┐   
+/// │  ┌────────────────────┐
 /// └─▶│  Delete children   │  │
-///    └────────────────────┘   
+///    └────────────────────┘
 ///               │            │
-///               ▼             
+///               ▼
 ///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
 ///            Delete       │◀─
-///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─    
+///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
 /// ```
 pub fn emulate_on_delete_cascade(
     graph: &mut QueryGraph,
@@ -471,7 +471,7 @@ pub fn emulate_on_delete_cascade(
     graph.create_edge(
         &dependent_records_node,
         &delete_dependents_node,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             child_model_identifier.clone(),
             Box::new(move |mut delete_dependents_node, dependent_ids| {
                 if let Node::Query(Query::Write(WriteQuery::DeleteManyRecords(ref mut dmr))) = delete_dependents_node {
@@ -572,7 +572,7 @@ pub fn emulate_on_delete_set_null(
     graph.create_edge(
         &dependent_records_node,
         &set_null_dependents_node,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             child_model_identifier.clone(),
             Box::new(move |mut set_null_dependents_node, dependent_ids| {
                 if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut dmr))) = set_null_dependents_node
@@ -692,7 +692,7 @@ pub fn emulate_on_update_set_null(
     graph.create_edge(
         &dependent_records_node,
         &set_null_dependents_node,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             child_model_identifier.clone(),
             Box::new(move |mut set_null_dependents_node, dependent_ids| {
                 if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut dmr))) = set_null_dependents_node
@@ -770,42 +770,42 @@ pub fn emulate_on_update_set_null(
 ///
 /// Resulting graph (all emulations):
 /// ```text
-///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─                                                                                                      
-///            Parent       │                                                                                                     
-///    │  (ids to update)                                                                                                         
-///     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘                                                                                                     
-///               │                                                                                                               
-///               ▼                                                                                                               
-///    ┌────────────────────┐                                                                                                     
-/// ┌ ─│     Join node      │─────────────────┬─────────────────────────────┬────────────────────────────────────────┐            
-///    └────────────────────┘                 │                             │                                        │            
-/// │             │                           │                             │                                        │            
-///               │                           │                             │                                        │            
-/// │             ▼                           ▼                             ▼                                        ▼            
-///    ┌────────────────────┐      ┌────────────────────┐        ┌────────────────────┐                   ┌────────────────────┐  
-/// │  │Find Connected Model│      │Find Connected Model│        │Find Connected Model│                   │Find Connected Model│  
-///    │    A (Restrict)    │      │    B (Restrict)    │     ┌──│    C (SetNull)     │                ┌──│    D (Cascade)     │  
-/// │  └────────────────────┘      └────────────────────┘     │  └────────────────────┘                │  └────────────────────┘  
-///               │                           │               │             │                          │             │            
-/// │      Fail if│> 0                 Fail if│> 0            │             ▼                          │             │            
-///               │                           │               │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─               │             ▼            
+///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+///            Parent       │
+///    │  (ids to update)
+///     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+///               │
+///               ▼
+///    ┌────────────────────┐
+/// ┌ ─│     Join node      │─────────────────┬─────────────────────────────┬────────────────────────────────────────┐
+///    └────────────────────┘                 │                             │                                        │
+/// │             │                           │                             │                                        │
+///               │                           │                             │                                        │
+/// │             ▼                           ▼                             ▼                                        ▼
+///    ┌────────────────────┐      ┌────────────────────┐        ┌────────────────────┐                   ┌────────────────────┐
+/// │  │Find Connected Model│      │Find Connected Model│        │Find Connected Model│                   │Find Connected Model│
+///    │    A (Restrict)    │      │    B (Restrict)    │     ┌──│    C (SetNull)     │                ┌──│    D (Cascade)     │
+/// │  └────────────────────┘      └────────────────────┘     │  └────────────────────┘                │  └────────────────────┘
+///               │                           │               │             │                          │             │
+/// │      Fail if│> 0                 Fail if│> 0            │             ▼                          │             │
+///               │                           │               │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─               │             ▼
 /// │             ▼                           ▼               │  ┌────────────────────┐ │              │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
 ///    ┌────────────────────┐      ┌────────────────────┐     ││ │  Insert onUpdate   │                │  ┌────────────────────┐ │
-/// │  │       Empty        │      │       Empty        │     │  │ emulation subtree  │ │              ││ │  Insert onUpdate   │  
+/// │  │       Empty        │      │       Empty        │     │  │ emulation subtree  │ │              ││ │  Insert onUpdate   │
 ///    └────────────────────┘      └────────────────────┘     ││ │for relations using │                │  │ emulation subtree  │ │
-/// │             │                           │               │  │the foreign key that│ │              ││ │ for all relations  │  
+/// │             │                           │               │  │the foreign key that│ │              ││ │ for all relations  │
 ///               │                           │               ││ │    was updated.    │                │  │   pointing to D.   │ │
-/// │             │                           │               │  └────────────────────┘ │              ││ └────────────────────┘  
+/// │             │                           │               │  └────────────────────┘ │              ││ └────────────────────┘
 ///               │                           │               │└ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─               │ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
-/// │             │                           │               │             │                          │             │            
-///               │                           │               │             │                          │             │            
-/// │             ▼                           │               │             ▼                          │             ▼            
-///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─                  │               │  ┌────────────────────┐                │  ┌────────────────────┐  
-/// └ ▶        Update       │◀────────────────┘               │  │ Update Cs (set FK  │                └─▶│     Update Cs      │  
-///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─                                  └─▶│       null)        │                   └────────────────────┘  
-///               ▲                                              └────────────────────┘                              │            
-///               │                                                         │                                        │            
-///               └─────────────────────────────────────────────────────────┴────────────────────────────────────────┘            
+/// │             │                           │               │             │                          │             │
+///               │                           │               │             │                          │             │
+/// │             ▼                           │               │             ▼                          │             ▼
+///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─                  │               │  ┌────────────────────┐                │  ┌────────────────────┐
+/// └ ▶        Update       │◀────────────────┘               │  │ Update Cs (set FK  │                └─▶│     Update Cs      │
+///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─                                  └─▶│       null)        │                   └────────────────────┘
+///               ▲                                              └────────────────────┘                              │
+///               │                                                         │                                        │
+///               └─────────────────────────────────────────────────────────┴────────────────────────────────────────┘
 /// ```
 #[tracing::instrument(skip(graph, model_to_update, parent_node, child_node))]
 pub fn insert_emulated_on_update_with_intermediary_node(
@@ -829,7 +829,7 @@ pub fn insert_emulated_on_update_with_intermediary_node(
     graph.create_edge(
         &parent_node,
         &join_node,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             model_to_update.primary_identifier(),
             Box::new(move |return_node, parent_ids| {
                 if let Node::Flow(Flow::Return(_)) = return_node {
@@ -908,17 +908,17 @@ fn extract_update_args(parent_node: &Node) -> &WriteArgs {
 ///
 /// ```text
 //    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
-///            Parent       │   
+///            Parent       │
 ///    │  (ids to update)    ─ ┐
-///     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘   
+///     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
 ///               │            │
-///               ▼             
+///               ▼
 ///    ┌────────────────────┐  │
-///    │Find Connected Model│   
+///    │Find Connected Model│
 /// ┌──│     (Cascade)      │  │
-/// │  └────────────────────┘   
+/// │  └────────────────────┘
 /// │             │            │
-/// │             ▼             
+/// │             ▼
 /// │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │
 /// │  ┌────────────────────┐ │
 /// ││ │  Insert onUpdate   │  │
@@ -928,17 +928,17 @@ fn extract_update_args(parent_node: &Node) -> &WriteArgs {
 /// ││ │  Connected Model.  │  │
 /// │  └────────────────────┘ │
 /// │└ ─ ─ ─ ─ ─ ─│─ ─ ─ ─ ─ ─ │
-/// │             │             
+/// │             │
 /// │             │            │
-/// │             ▼             
+/// │             ▼
 /// │  ┌────────────────────┐  │
-/// └─▶│  Update children   │   
+/// └─▶│  Update children   │
 ///    └────────────────────┘  │
-///               │             
+///               │
 ///               ▼            │
-///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─    
+///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
 ///            Update       │◀ ┘
-///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─    
+///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
 /// ```
 pub fn emulate_on_update_cascade(
     graph: &mut QueryGraph,
@@ -994,7 +994,7 @@ pub fn emulate_on_update_cascade(
     graph.create_edge(
         &dependent_records_node,
         &update_dependents_node,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             child_model_identifier.clone(),
             Box::new(move |mut update_dependents_node, dependent_ids| {
                 if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut dmr))) = update_dependents_node {

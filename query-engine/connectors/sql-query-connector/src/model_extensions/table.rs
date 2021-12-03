@@ -10,10 +10,11 @@ impl AsTable for Model {
     fn as_table(&self) -> Table<'static> {
         let table: Table<'static> = (self.internal_data_model().db_name.clone(), self.db_name().to_string()).into();
 
-        // Todo: Check with Julius
         let id_cols: Vec<Column<'static>> = self
             .primary_identifier()
-            .scalar_fields()
+            .as_scalar_fields()
+            .expect("Primary identifier has non-scalar fields.")
+            .into_iter()
             .map(|sf| sf.as_column())
             .collect();
 

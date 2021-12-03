@@ -1,24 +1,27 @@
 use super::*;
 use crate::ScalarCompare;
-use prisma_models::RecordProjection;
+use prisma_models::{SelectedField, SelectionResult};
 
-pub trait IdFilter {
+pub trait IntoFilter {
     fn filter(self) -> Filter;
 }
 
-impl IdFilter for RecordProjection {
+impl IntoFilter for SelectionResult {
     fn filter(self) -> Filter {
         let filters: Vec<Filter> = self
             .pairs
             .into_iter()
-            .map(|(field, value)| field.equals(value))
+            .map(|(selection, value)| match selection {
+                SelectedField::Scalar(sf) => sf.equals(value),
+                SelectedField::Composite(_) => todo!(), // [Composites] todo
+            })
             .collect();
 
         Filter::and(filters)
     }
 }
 
-impl IdFilter for Vec<RecordProjection> {
+impl IntoFilter for Vec<SelectionResult> {
     fn filter(self) -> Filter {
         let filters = self.into_iter().fold(vec![], |mut acc, id| {
             acc.push(id.filter());

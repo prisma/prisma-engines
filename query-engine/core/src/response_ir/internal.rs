@@ -8,19 +8,19 @@ use bigdecimal::ToPrimitive;
 use connector::{AggregationResult, RelAggregationResult, RelAggregationRow};
 use indexmap::IndexMap;
 use itertools::Itertools;
-use prisma_models::{PrismaValue, RecordProjection};
+use prisma_models::{PrismaValue, SelectionResult};
 use std::{borrow::Borrow, collections::HashMap};
 
 /// A grouping of items to their parent record.
 /// The item implicitly holds the information of the type of item contained.
 /// E.g., if the output type of a field designates a single object, the item will be
 /// Item::Map(map), if it's a list, Item::List(list), etc. (hence "checked")
-type CheckedItemsWithParents = IndexMap<Option<RecordProjection>, Item>;
+type CheckedItemsWithParents = IndexMap<Option<SelectionResult>, Item>;
 
 /// A grouping of items to their parent record.
 /// As opposed to the checked mapping, this map isn't holding final information about
 /// the contained items, i.e. the Items are all unchecked.
-type UncheckedItemsWithParents = IndexMap<Option<RecordProjection>, Vec<Item>>;
+type UncheckedItemsWithParents = IndexMap<Option<SelectionResult>, Vec<Item>>;
 
 /// The query validation makes sure that the output selection already has the correct shape.
 /// This means that we can make the following assumptions:
@@ -310,7 +310,7 @@ fn serialize_objects(
     // Write all fields, nested and list fields unordered into a map, afterwards order all into the final order.
     // If nothing is written to the object, write null instead.
     for (r_index, record) in result.scalars.records.into_iter().enumerate() {
-        let record_id = Some(record.projection(&scalar_db_field_names, &model.primary_identifier())?);
+        let record_id = Some(record.extract_selection_result(&scalar_db_field_names, &model.primary_identifier())?);
 
         if !object_mapping.contains_key(&record.parent_id) {
             object_mapping.insert(record.parent_id.clone(), Vec::new());
@@ -375,7 +375,7 @@ fn serialize_objects(
 /// Unwraps are safe due to query validation.
 #[tracing::instrument(skip(record_id, items_with_parent, into, enclosing_type))]
 fn write_nested_items(
-    record_id: &Option<RecordProjection>,
+    record_id: &Option<SelectionResult>,
     items_with_parent: &mut HashMap<String, CheckedItemsWithParents>,
     into: &mut HashMap<String, Item>,
     enclosing_type: &ObjectTypeStrongRef,

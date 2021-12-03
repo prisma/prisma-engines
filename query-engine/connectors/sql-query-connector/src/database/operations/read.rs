@@ -141,16 +141,12 @@ pub async fn get_many_records(
 pub async fn get_related_m2m_record_ids(
     conn: &dyn QueryExt,
     from_field: &RelationFieldRef,
-    from_record_ids: &[RecordProjection],
-) -> crate::Result<Vec<(RecordProjection, RecordProjection)>> {
+    from_record_ids: &[SelectionResult],
+) -> crate::Result<Vec<(SelectionResult, SelectionResult)>> {
     let mut idents = vec![];
-    idents.extend(from_field.model().primary_identifier().type_identifiers_with_arities());
-    idents.extend(
-        from_field
-            .related_model()
-            .primary_identifier()
-            .type_identifiers_with_arities(),
-    );
+    idents.extend(ModelProjection::from(from_field.model().primary_identifier()).type_identifiers_with_arities());
+    idents
+        .extend(ModelProjection::from(from_field.related_model().primary_identifier()).type_identifiers_with_arities());
 
     let mut field_names = Vec::new();
     field_names.extend(from_field.model().primary_identifier().db_names());
@@ -172,8 +168,13 @@ pub async fn get_related_m2m_record_ids(
     let parent_model_id = from_field.model().primary_identifier();
     let child_model_id = from_field.related_model().primary_identifier();
 
-    let from_sfs: Vec<_> = parent_model_id.scalar_fields().collect();
-    let to_sfs: Vec<_> = child_model_id.scalar_fields().collect();
+    let from_sfs: Vec<_> = parent_model_id
+        .as_scalar_fields()
+        .expect("Parent model ID has non-scalar fields.");
+
+    let to_sfs: Vec<_> = child_model_id
+        .as_scalar_fields()
+        .expect("Child model ID has non-scalar fields.");
 
     // first parent id, then child id
     Ok(conn
@@ -186,14 +187,14 @@ pub async fn get_related_m2m_record_ids(
             let child_values = values.split_off(from_sfs.len());
             let parent_values = values;
 
-            let p: RecordProjection = from_sfs
+            let p: SelectionResult = from_sfs
                 .iter()
                 .zip(parent_values)
                 .map(|(sf, val)| (sf.clone(), val))
                 .collect::<Vec<_>>()
                 .into();
 
-            let c: RecordProjection = to_sfs
+            let c: SelectionResult = to_sfs
                 .iter()
                 .zip(child_values)
                 .map(|(sf, val)| (sf.clone(), val))

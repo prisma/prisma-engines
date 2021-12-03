@@ -118,7 +118,7 @@ pub trait QueryExt: Queryable + Send + Sync {
         &self,
         model: &ModelRef,
         record_filter: RecordFilter,
-    ) -> crate::Result<Vec<RecordProjection>> {
+    ) -> crate::Result<Vec<SelectionResult>> {
         if let Some(selectors) = record_filter.selectors {
             Ok(selectors)
         } else {
@@ -128,8 +128,8 @@ pub trait QueryExt: Queryable + Send + Sync {
 
     /// Read the all columns as a (primary) identifier.
     #[tracing::instrument(skip(self, model, filter))]
-    async fn filter_ids(&self, model: &ModelRef, filter: Filter) -> crate::Result<Vec<RecordProjection>> {
-        let model_id = model.primary_identifier();
+    async fn filter_ids(&self, model: &ModelRef, filter: Filter) -> crate::Result<Vec<SelectionResult>> {
+        let model_id: ModelProjection = model.primary_identifier().into();
         let id_cols: Vec<Column<'static>> = model_id.as_columns().collect();
 
         let select = Select::from_table(model.as_table())
@@ -141,7 +141,7 @@ pub trait QueryExt: Queryable + Send + Sync {
     }
 
     #[tracing::instrument(skip(self, select, model_id))]
-    async fn select_ids(&self, select: Select<'_>, model_id: ModelProjection) -> crate::Result<Vec<RecordProjection>> {
+    async fn select_ids(&self, select: Select<'_>, model_id: ModelProjection) -> crate::Result<Vec<SelectionResult>> {
         let idents: Vec<_> = model_id
             .fields()
             .flat_map(|f| match f {
@@ -160,7 +160,7 @@ pub trait QueryExt: Queryable + Send + Sync {
 
         for row in rows.drain(0..) {
             let tuples: Vec<_> = model_id.scalar_fields().zip(row.values.into_iter()).collect();
-            let record_id: RecordProjection = RecordProjection::new(tuples);
+            let record_id: SelectionResult = SelectionResult::new(tuples);
 
             result.push(record_id);
         }

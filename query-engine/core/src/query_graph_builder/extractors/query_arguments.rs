@@ -5,10 +5,7 @@ use crate::{
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
 use connector::QueryArguments;
-use prisma_models::{
-    Field, ModelProjection, ModelRef, OrderBy, PrismaValue, RecordProjection, RelationFieldRef, ScalarFieldRef,
-    SortAggregation, SortOrder,
-};
+use prisma_models::prelude::*;
 use std::convert::TryInto;
 
 /// Expects the caller to know that it is structurally guaranteed that query arguments can be extracted,
@@ -201,8 +198,8 @@ fn extract_sort_order(field_value: ParsedInputValue) -> QueryGraphBuilderResult<
     Ok(sort_order)
 }
 
-fn extract_distinct(value: ParsedInputValue) -> QueryGraphBuilderResult<ModelProjection> {
-    let fields: Vec<Field> = match value {
+fn extract_distinct(value: ParsedInputValue) -> QueryGraphBuilderResult<FieldSelection> {
+    let selections = match value {
         ParsedInputValue::List(list) => list
             .into_iter()
             .map(|element| {
@@ -213,7 +210,7 @@ fn extract_distinct(value: ParsedInputValue) -> QueryGraphBuilderResult<ModelPro
         _ => unreachable!(),
     };
 
-    Ok(ModelProjection::new(fields))
+    Ok(FieldSelection::new(selections))
 }
 
 fn extract_skip(value: ParsedInputValue) -> QueryGraphBuilderResult<Option<i64>> {
@@ -229,7 +226,7 @@ fn extract_skip(value: ParsedInputValue) -> QueryGraphBuilderResult<Option<i64>>
     }
 }
 
-fn extract_cursor(value: ParsedInputValue, model: &ModelRef) -> QueryGraphBuilderResult<Option<RecordProjection>> {
+fn extract_cursor(value: ParsedInputValue, model: &ModelRef) -> QueryGraphBuilderResult<Option<SelectionResult>> {
     let input_map: ParsedInputMap = value.try_into()?;
     let mut pairs = vec![];
 
@@ -250,7 +247,7 @@ fn extract_cursor(value: ParsedInputValue, model: &ModelRef) -> QueryGraphBuilde
         pairs.extend(additional_pairs);
     }
 
-    Ok(Some(RecordProjection::new(pairs)))
+    Ok(Some(SelectionResult::new(pairs)))
 }
 
 fn extract_cursor_field(
@@ -288,7 +285,8 @@ fn finalize_arguments(mut args: QueryArguments, model: &ModelRef) -> QueryArgume
     if add_implicit_ordering {
         let primary_identifier = model.primary_identifier();
         let order_bys = primary_identifier.into_iter().map(|f| match f {
-            Field::Scalar(f) => f.into(),
+            // IDs can _only_ contain scalar selections.
+            SelectedField::Scalar(sf) => sf.into(),
             _ => unreachable!(),
         });
 

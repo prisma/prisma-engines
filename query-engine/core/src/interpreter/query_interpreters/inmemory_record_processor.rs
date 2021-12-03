@@ -1,6 +1,6 @@
 use connector::QueryArguments;
 use itertools::Itertools;
-use prisma_models::{ManyRecords, ModelProjection, Record, RecordProjection};
+use prisma_models::{FieldSelection, ManyRecords, Record, SelectionResult};
 use std::ops::Deref;
 
 #[derive(Debug)]
@@ -85,7 +85,7 @@ impl InMemoryRecordProcessor {
     fn apply_distinct(&self, mut records: ManyRecords) -> ManyRecords {
         let field_names = &records.field_names;
 
-        let distinct = if let Some(ref distinct) = self.distinct {
+        let distinct_selection = if let Some(ref distinct) = self.distinct {
             distinct.clone()
         } else {
             return records;
@@ -100,7 +100,11 @@ impl InMemoryRecordProcessor {
                 .flat_map(|(_, group)| {
                     let filtered: Vec<_> = group
                         .into_iter()
-                        .unique_by(|record| record.projection(&field_names, &distinct).unwrap())
+                        .unique_by(|record| {
+                            record
+                                .extract_selection_result(&field_names, &distinct_selection)
+                                .unwrap()
+                        })
                         .collect();
 
                     filtered
@@ -110,7 +114,11 @@ impl InMemoryRecordProcessor {
             records
                 .records
                 .into_iter()
-                .unique_by(|record| record.projection(&field_names, &distinct).unwrap())
+                .unique_by(|record| {
+                    record
+                        .extract_selection_result(&field_names, &distinct_selection)
+                        .unwrap()
+                })
                 .collect()
         };
 
@@ -126,14 +134,14 @@ impl InMemoryRecordProcessor {
         // If we have a cursor, skip records until we find it for each parent id. Pagination is applied afterwards.
         if let Some(cursor) = &self.cursor {
             let cursor_values: Vec<_> = cursor.values().collect();
-            let cursor_projection: ModelProjection = cursor.into();
+            let cursor_selection: FieldSelection = cursor.into();
             let field_names = &many_records.field_names;
 
             let mut current_parent_id = None;
             let mut cursor_seen = false;
 
             many_records.records.retain(|record| {
-                let cursor_comparator = record.projection(field_names, &cursor_projection).unwrap();
+                let cursor_comparator = record.extract_selection_result(field_names, &cursor_selection).unwrap();
                 let record_values: Vec<_> = cursor_comparator.values().collect();
 
                 // Reset, new parent
@@ -154,7 +162,7 @@ impl InMemoryRecordProcessor {
 
         // The records are sorted by their parent id. Hence we just need to remember the count for the last parent id to apply pagination.
         let mut current_count: i64 = 0;
-        let mut last_parent_id: Option<RecordProjection> = None;
+        let mut last_parent_id: Option<SelectionResult> = None;
 
         many_records.records.retain(|record| {
             if last_parent_id == record.parent_id {

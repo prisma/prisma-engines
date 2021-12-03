@@ -5,7 +5,7 @@ use crate::{
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputMap, ParsedInputValue,
 };
-use connector::{Filter, IdFilter};
+use connector::{Filter, IntoFilter};
 use prisma_models::RelationFieldRef;
 use std::{convert::TryInto, sync::Arc};
 
@@ -15,7 +15,7 @@ use std::{convert::TryInto, sync::Arc};
 ///
 /// Many-to-many relation:
 /// ```text
-///                           ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐                    
+///                           ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐
 ///                                 Parent       ───────────────────┐
 ///                           └ ─ ─ ─ ─ ─ ─ ─ ─ ┘         │         │
 ///                                    │                            │
@@ -48,16 +48,16 @@ use std::{convert::TryInto, sync::Arc};
 /// │ └ ─ ─ ─ ─ ┬ ─ ─ ─ ─ ┘                             ▼           │
 /// │           │                              ┌─────────────────┐  │
 /// │           │                              │     Connect     │◀─┘
-/// │           ▼                              └─────────────────┘   
-/// │  ┌─────────────────┐                                           
-/// └─▶│  Update Child   │                                           
-///    └─────────────────┘                                           
+/// │           ▼                              └─────────────────┘
+/// │  ┌─────────────────┐
+/// └─▶│  Update Child   │
+///    └─────────────────┘
 /// ```
 ///
 /// One-to-x relation:
 /// ```text
 ///    Inlined in parent:                                                                      Inlined in child:
-///                                                                                                                          ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐                     
+///                                                                                                                          ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐
 ///                                     ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐                                                                        Parent       ────────────────────┐
 ///                                           Parent       ────────┬──────────┐                                              └ ─ ─ ─ ─ ─ ─ ─ ─ ┘           │        │
 ///                                     └ ─ ─ ─ ─ ─ ─ ─ ─ ┘                   │                                                       │                             │
@@ -81,15 +81,15 @@ use std::{convert::TryInto, sync::Arc};
 /// │  │ Insert onUpdate │                                        ▼           │                │  │for all relations│                                   ▼           │
 /// │ ││emulation subtree││                              ┌─────────────────┐  │                │ ││ pointing to the ││                         ┌─────────────────┐  │
 /// │  │for all relations│                               │  Create Child   │  │                │  │   Child model   │                          │  Create Child   │◀─┘
-/// │ ││ pointing to the ││                              └─────────────────┘  │                │ │└─────────────────┘│                         └─────────────────┘   
-/// │  │   Child model   │                                        │           │                │  ─ ─ ─ ─ ─│─ ─ ─ ─ ─                                                
-/// │ │└─────────────────┘│                                       │           │                │           │                                                         
-/// │  ─ ─ ─ ─ ─│─ ─ ─ ─ ─                                        │           │                │           │                                                         
-/// │           │                                                 ▼           │                │           ▼                                                         
-/// │           ▼                                        ┌─────────────────┐  │                │  ┌─────────────────┐                                                
-/// │  ┌─────────────────┐                               │  Update Parent  │◀─┘                └─▶│  Update Child   │                                                
-/// └─▶│  Update Child   │                               └─────────────────┘                      └─────────────────┘                                                
-///    └─────────────────┘                                                                                                                                           
+/// │ ││ pointing to the ││                              └─────────────────┘  │                │ │└─────────────────┘│                         └─────────────────┘
+/// │  │   Child model   │                                        │           │                │  ─ ─ ─ ─ ─│─ ─ ─ ─ ─
+/// │ │└─────────────────┘│                                       │           │                │           │
+/// │  ─ ─ ─ ─ ─│─ ─ ─ ─ ─                                        │           │                │           │
+/// │           │                                                 ▼           │                │           ▼
+/// │           ▼                                        ┌─────────────────┐  │                │  ┌─────────────────┐
+/// │  ┌─────────────────┐                               │  Update Parent  │◀─┘                └─▶│  Update Child   │
+/// └─▶│  Update Child   │                               └─────────────────┘                      └─────────────────┘
+///    └─────────────────┘
 /// ```
 /// Todo split this mess up and clean up the code.
 #[tracing::instrument(skip(graph, parent_node, parent_relation_field, value))]
@@ -139,7 +139,7 @@ pub fn nested_upsert(
         graph.create_edge(
             &read_children_node,
             &if_node,
-            QueryGraphDependency::ParentProjection(
+            QueryGraphDependency::ProjectedDataDependency(
                 child_model_identifier.clone(),
                 Box::new(|if_node, child_ids| {
                     if let Node::Flow(Flow::If(_)) = if_node {
@@ -157,7 +157,7 @@ pub fn nested_upsert(
         graph.create_edge(
             &read_children_node,
             &update_node,
-            QueryGraphDependency::ParentProjection(
+            QueryGraphDependency::ProjectedDataDependency(
                 child_model_identifier.clone(),
                 Box::new(move |mut update_node, mut child_ids| {
                     if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut wq))) = update_node {
@@ -215,7 +215,7 @@ pub fn nested_upsert(
             graph.create_edge(
                 &parent_node,
                 &update_node,
-                QueryGraphDependency::ParentProjection(parent_model_id, Box::new(move |mut update_node, mut parent_ids| {
+                QueryGraphDependency::ProjectedDataDependency(parent_model_id, Box::new(move |mut update_node, mut parent_ids| {
                     let parent_id = match parent_ids.pop() {
                         Some(pid) => Ok(pid),
                         None => Err(QueryGraphBuilderError::RecordNotFound(format!(
@@ -240,7 +240,7 @@ pub fn nested_upsert(
             graph.create_edge(
                 &create_node,
                 &update_node,
-                QueryGraphDependency::ParentProjection(child_link.clone(), Box::new(move |mut update_node, mut child_links| {
+                QueryGraphDependency::ProjectedDataDependency(child_link.clone(), Box::new(move |mut update_node, mut child_links| {
                     let child_link = match child_links.pop() {
                         Some(link) => Ok(link),
                         None => Err(QueryGraphBuilderError::RecordNotFound(format!(
@@ -250,7 +250,7 @@ pub fn nested_upsert(
                     }?;
 
                     if let Node::Query(Query::Write(ref mut wq)) = update_node {
-                        wq.inject_projection_into_args(parent_link.assimilate(child_link)?);
+                        wq.inject_result_into_args(parent_link.assimilate(child_link)?);
                     }
 
                     Ok(update_node)
@@ -266,7 +266,7 @@ pub fn nested_upsert(
             graph.create_edge(
                 &parent_node,
                 &create_node,
-                QueryGraphDependency::ParentProjection(parent_link, Box::new(move |mut create_node, mut parent_links| {
+                QueryGraphDependency::ProjectedDataDependency(parent_link, Box::new(move |mut create_node, mut parent_links| {
                     let parent_link = match parent_links.pop() {
                         Some(link) => Ok(link),
                         None => Err(QueryGraphBuilderError::RecordNotFound(format!(
@@ -276,7 +276,7 @@ pub fn nested_upsert(
                     }?;
 
                     if let Node::Query(Query::Write(ref mut wq)) = create_node {
-                        wq.inject_projection_into_args(child_link.assimilate(parent_link)?);
+                        wq.inject_result_into_args(child_link.assimilate(parent_link)?);
                     }
 
                     Ok(create_node)

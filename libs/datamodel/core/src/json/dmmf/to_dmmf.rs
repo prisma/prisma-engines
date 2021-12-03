@@ -156,6 +156,14 @@ fn prisma_value_to_serde(value: &PrismaValue) -> serde_json::Value {
         PrismaValue::Xml(val) => serde_json::Value::String(val.to_string()),
         PrismaValue::List(value_vec) => serde_json::Value::Array(value_vec.iter().map(prisma_value_to_serde).collect()),
         PrismaValue::Bytes(b) => serde_json::Value::String(prisma_value::encode_bytes(b)),
+        PrismaValue::Object(pairs) => {
+            let mut map = serde_json::Map::with_capacity(pairs.len());
+            pairs.iter().for_each(|(key, value)| {
+                map.insert(key.clone(), prisma_value_to_serde(value));
+            });
+
+            serde_json::Value::Object(map)
+        }
     }
 }
 

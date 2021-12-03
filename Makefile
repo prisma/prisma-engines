@@ -190,7 +190,7 @@ qe-dev-chinook-postgres10: start-postgres10
 	sleep 5
 	make push-schema
 
-qe-dev-mongo4: start-mongodb4
+qe-dev-mongo_4_4: start-mongodb_4_4
 	cp $(SCHEMA_EXAMPLES_PATH)/generic_mongo4.prisma $(DEV_SCHEMA_FILE)
 
 use-local-migration-engine:

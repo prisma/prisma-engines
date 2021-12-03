@@ -22,6 +22,7 @@ impl ScalarFieldExt for ScalarField {
             (PrismaValue::Json(s), _) => Value::Json(Some(serde_json::from_str::<serde_json::Value>(&s).unwrap())),
             (PrismaValue::Bytes(b), _) => Value::Bytes(Some(b.into())),
             (PrismaValue::Xml(s), _) => Value::Xml(Some(s.into())),
+            (PrismaValue::Object(_), _) => unimplemented!(),
             (PrismaValue::Null, ident) => match ident {
                 TypeIdentifier::String => Value::Text(None),
                 TypeIdentifier::Float => Value::Numeric(None),
@@ -58,5 +59,6 @@ pub fn convert_lossy<'a>(pv: PrismaValue) -> Value<'a> {
         PrismaValue::Bytes(b) => Value::Bytes(Some(b.into())),
         PrismaValue::Xml(s) => Value::Xml(Some(s.into())),
         PrismaValue::Null => Value::Integer(None), // Can't tell which type the null is supposed to be.
+        PrismaValue::Object(_) => unimplemented!(),
     }
 }
