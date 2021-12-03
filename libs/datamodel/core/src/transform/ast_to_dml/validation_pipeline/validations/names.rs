@@ -44,11 +44,11 @@ impl<'ast> Names<'ast> {
             }
 
             for index in model.indexes() {
-                if let Some(name) = index.attribute().name {
+                if let Some(name) = index.name() {
                     if index.is_unique() {
-                        unique_names.entry(index.model_id).or_default().insert(name);
+                        unique_names.entry(index.model().model_id()).or_default().insert(name);
                     } else {
-                        index_names.entry(index.model_id).or_default().insert(name);
+                        index_names.entry(index.model().model_id()).or_default().insert(name);
                     }
                 }
             }

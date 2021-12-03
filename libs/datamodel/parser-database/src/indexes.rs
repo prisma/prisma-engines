@@ -1,8 +1,7 @@
-use super::{
+use crate::{
     context::Context,
-    types::{IndexAttribute, IndexType},
+    types::{FieldWithArgs, IndexAttribute, IndexType},
 };
-use crate::transform::ast_to_dml::db::types::FieldWithArgs;
 
 /// Prisma forces a 1:1 relation to be unique from the defining side. If the
 /// field is not a primary key or already defined in a unique index, we add an

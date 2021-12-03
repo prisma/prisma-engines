@@ -1253,12 +1253,12 @@ fn issue_10118() {
         model User {
           id         String    @id @default(cuid()) @db.Char(30)
           referralId String    @unique @db.Char(30)
-          referral   Referral? @relation("UserToReferral", fields: [referralId], references: [id], map: "User_referralId_fkey")
+          referral   Referral? @relation("UserToReferral", fields: [referralId], references: [id])
         }
 
         model Referral {
           id     String @id @default(cuid()) @db.Char(30)
-          user   User   @relation("UserToReferral", fields: [userId], references: [id])
+          user   User   @relation("UserToReferral", fields: [userId], references: [id], map: "Referral__fkey")
           userId String @db.Char(30)
         }
     "#]];

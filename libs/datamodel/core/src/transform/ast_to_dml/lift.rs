@@ -4,7 +4,7 @@ use crate::{
     IndexField, PrimaryKeyField,
 };
 use ::dml::composite_type::{CompositeType, CompositeTypeField, CompositeTypeFieldType};
-use datamodel_connector::{Connector, ReferentialIntegrity};
+use datamodel_connector::{walker_ext_traits::*, Connector, ReferentialIntegrity};
 use std::collections::HashMap;
 
 /// Helper for lifting a datamodel.
@@ -75,18 +75,13 @@ impl<'a> LiftAstToDml<'a> {
     ) {
         let active_connector = self.connector;
         let referential_integrity = self.referential_integrity;
-        let common_dml_fields = |field: &mut dml::RelationField,
-                                 attributes: &super::db::RelationField<'_>,
-                                 relation_field: RelationFieldWalker<'_, '_>| {
+        let common_dml_fields = |field: &mut dml::RelationField, relation_field: RelationFieldWalker<'_, '_>| {
             let ast_field = relation_field.ast_field();
-            field.relation_info.on_delete = attributes.on_delete;
-            field.relation_info.on_update = attributes.on_update;
+            field.relation_info.on_delete = relation_field.explicit_on_delete();
+            field.relation_info.on_update = relation_field.explicit_on_update();
             field.relation_info.name = relation_field.relation_name().to_string();
             field.documentation = ast_field.documentation.clone().map(|comment| comment.text);
-            field.is_ignored = attributes.is_ignored;
-            field.relation_info.fk_name = relation_field
-                .final_foreign_key_name(active_connector)
-                .map(|cow| cow.into_owned());
+            field.is_ignored = relation_field.is_ignored();
             field.supports_restrict_action(
                 active_connector.supports_referential_action(&referential_integrity, dml::ReferentialAction::Restrict),
             );
@@ -104,13 +99,14 @@ impl<'a> LiftAstToDml<'a> {
 
                         let mut relation_field = if let Some(relation_field) = relation.forward_relation_field() {
                             // Construct a relation field in the DML for an existing relation field in the source.
-                            let attributes = relation_field.attributes();
                             let arity = self.lift_field_arity(&relation_field.ast_field().arity);
                             let referential_arity = self.lift_field_arity(&relation_field.referential_arity());
                             let mut field =
                                 dml::RelationField::new(relation_field.name(), arity, referential_arity, relation_info);
 
-                            common_dml_fields(&mut field, attributes, relation_field);
+                            field.relation_info.fk_name =
+                                Some(relation_field.final_foreign_key_name(active_connector).into_owned());
+                            common_dml_fields(&mut field, relation_field);
                             field_ids_for_sorting.insert(
                                 (relation_field.model().name(), relation_field.name()),
                                 relation_field.field_id(),
@@ -149,7 +145,7 @@ impl<'a> LiftAstToDml<'a> {
                                     let field_type = self.lift_scalar_field_type(
                                         field.blueprint.ast_field(),
                                         &field.tpe,
-                                        field.blueprint.attributes(),
+                                        field.blueprint,
                                     );
                                     let mut scalar_field = dml::ScalarField::new_generated(&field.name, field_type);
                                     scalar_field.arity = if relation_field.arity.is_required() {
@@ -180,13 +176,12 @@ impl<'a> LiftAstToDml<'a> {
 
                         let mut field = if let Some(relation_field) = relation.back_relation_field() {
                             let ast_field = relation_field.ast_field();
-                            let attributes = relation_field.attributes();
                             let arity = self.lift_field_arity(&ast_field.arity);
                             let referential_arity = self.lift_field_arity(&relation_field.referential_arity());
                             let mut field =
                                 dml::RelationField::new(relation_field.name(), arity, referential_arity, relation_info);
 
-                            common_dml_fields(&mut field, attributes, relation_field);
+                            common_dml_fields(&mut field, relation_field);
 
                             field_ids_for_sorting.insert(
                                 (relation_field.model().name(), relation_field.name()),
@@ -215,14 +210,13 @@ impl<'a> LiftAstToDml<'a> {
                 RefinedRelationWalker::ImplicitManyToMany(relation) => {
                     for relation_field in [relation.field_a(), relation.field_b()] {
                         let ast_field = relation_field.ast_field();
-                        let attributes = relation_field.attributes();
                         let arity = self.lift_field_arity(&ast_field.arity);
                         let relation_info = dml::RelationInfo::new(relation_field.related_model().name());
                         let referential_arity = self.lift_field_arity(&relation_field.referential_arity());
                         let mut field =
                             dml::RelationField::new(relation_field.name(), arity, referential_arity, relation_info);
 
-                        common_dml_fields(&mut field, attributes, relation_field);
+                        common_dml_fields(&mut field, relation_field);
 
                         let primary_key = relation_field.related_model().primary_key().unwrap();
                         field.relation_info.references =
@@ -280,23 +274,23 @@ impl<'a> LiftAstToDml<'a> {
         let walker = self.db.walk_model(model_id);
 
         model.documentation = ast_model.documentation.clone().map(|comment| comment.text);
-        model.database_name = walker.attributes().mapped_name.map(String::from);
-        model.is_ignored = walker.attributes().is_ignored;
+        model.database_name = walker.mapped_name().map(String::from);
+        model.is_ignored = walker.is_ignored();
 
         model.primary_key = walker.primary_key().map(|pk| dml::PrimaryKeyDefinition {
             name: pk.name().map(String::from),
             db_name: pk.final_database_name(self.connector).map(|c| c.into_owned()),
             fields: pk
-                .iter_ast_fields()
-                .map(|(field, sort_order, length)|
+                .scalar_field_attributes()
+                .map(|field|
                     //TODO (extended indexes) here it is ok to pass sort and length with out a preview flag
                     // check since this is coming from the ast and the parsing would reject the args without
                     // the flag set
                     // When we start using the extra args here could be a place to fill in the defaults. 
                     PrimaryKeyField {
-                    name: field.name.name.to_owned(),
-                    sort_order,
-                    length,
+                    name: field.as_scalar_field().name().to_owned(),
+                    sort_order: field.sort_order(),
+                    length: field.length(),
                 })
                 .collect(),
             defined_on_field: pk.is_defined_on_field(),
@@ -308,63 +302,60 @@ impl<'a> LiftAstToDml<'a> {
                 assert!(idx.fields().len() != 0);
 
                 let fields = idx
-                    .attribute()
-                    .fields
-                    .iter()
+                    .scalar_field_attributes()
                     .map(|field| IndexField {
-                        name: self.db.ast()[model_id][field.field_id].name.name.clone(),
-                        sort_order: field.sort_order,
-                        length: field.length,
+                        name: field.as_scalar_field().name().to_owned(),
+                        sort_order: field.sort_order(),
+                        length: field.length(),
                     })
                     .collect();
 
-                let tpe = match idx.attribute().r#type {
+                let tpe = match idx.index_type() {
                     db::IndexType::Unique => dml::IndexType::Unique,
                     db::IndexType::Normal => dml::IndexType::Normal,
                     db::IndexType::Fulltext => dml::IndexType::Fulltext,
                 };
 
-                let algorithm = idx.attribute().algorithm.map(|using| match using {
+                let algorithm = idx.algorithm().map(|using| match using {
                     IndexAlgorithm::BTree => dml::IndexAlgorithm::BTree,
                     IndexAlgorithm::Hash => dml::IndexAlgorithm::Hash,
                 });
 
                 dml::IndexDefinition {
-                    name: idx.attribute().name.map(String::from),
+                    name: idx.name().map(String::from),
                     db_name: Some(idx.final_database_name(self.connector).into_owned()),
                     fields,
                     tpe,
                     algorithm,
-                    defined_on_field: idx.attribute().source_field.is_some(),
+                    defined_on_field: idx.is_defined_on_field(),
                 }
             })
             .collect();
 
         for scalar_field in walker.scalar_fields() {
             let field_id = scalar_field.field_id();
-            let attributes = scalar_field.attributes();
             let ast_field = &ast_model[field_id];
             let arity = self.lift_field_arity(&ast_field.arity);
-            let field_type = match &attributes.r#type {
+            let field_type = match &scalar_field.scalar_field_type() {
                 db::ScalarFieldType::CompositeType(ctid) => {
                     let mut field = dml::CompositeField::new();
                     field.composite_type = self.db.ast()[*ctid].name.name.to_owned();
                     field.documentation = ast_field.documentation.clone().map(|comment| comment.text);
-                    field.is_ignored = attributes.is_ignored;
-                    field.database_name = attributes.mapped_name.map(String::from);
+                    field.is_ignored = scalar_field.is_ignored();
+                    field.database_name = scalar_field.mapped_name().map(String::from);
 
                     model.add_field(dml::Field::CompositeField(field));
                     continue;
                 }
-                _ => self.lift_scalar_field_type(ast_field, &attributes.r#type, attributes),
+                _ => self.lift_scalar_field_type(ast_field, &scalar_field.scalar_field_type(), scalar_field),
             };
 
             let mut field = dml::ScalarField::new(&ast_field.name.name, arity, field_type);
 
             field.documentation = ast_field.documentation.clone().map(|comment| comment.text);
-            field.is_ignored = attributes.is_ignored;
-            field.is_updated_at = attributes.is_updated_at;
-            field.database_name = attributes.mapped_name.map(String::from);
+            field.is_ignored = scalar_field.is_ignored();
+            field.is_updated_at = scalar_field.is_updated_at();
+            field.database_name = scalar_field.mapped_name().map(String::from);
             field.default_value = scalar_field.default_value().map(|d| dml::DefaultValue {
                 kind: d.default().kind().clone(),
                 db_name: Some(d.constraint_name(self.connector).into())
@@ -416,7 +407,7 @@ impl<'a> LiftAstToDml<'a> {
         &self,
         ast_field: &ast::Field,
         scalar_field_type: &db::ScalarFieldType,
-        scalar_field_data: &db::ScalarField<'_>,
+        scalar_field: ScalarFieldWalker<'_, '_>,
     ) -> dml::FieldType {
         match scalar_field_type {
             db::ScalarFieldType::CompositeType(_) => {
@@ -432,13 +423,12 @@ impl<'a> LiftAstToDml<'a> {
             db::ScalarFieldType::Alias(top_id) => {
                 let alias = &self.db.ast()[*top_id];
                 let scalar_field_type = self.db.alias_scalar_field_type(top_id);
-                self.lift_scalar_field_type(alias, scalar_field_type, scalar_field_data)
+                self.lift_scalar_field_type(alias, scalar_field_type, scalar_field)
             }
             db::ScalarFieldType::BuiltInScalar(scalar_type) => {
-                let native_type = scalar_field_data
-                    .native_type
-                    .as_ref()
-                    .map(|(_, name, args, _)| self.connector.parse_native_type(name, args.clone()).unwrap());
+                let native_type = scalar_field
+                    .raw_native_type()
+                    .map(|(_, name, args, _)| self.connector.parse_native_type(name, args.to_owned()).unwrap());
                 dml::FieldType::Scalar(scalar_type.to_owned(), None, native_type)
             }
         }

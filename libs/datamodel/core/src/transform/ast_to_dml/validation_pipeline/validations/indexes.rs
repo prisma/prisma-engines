@@ -8,7 +8,7 @@ use crate::{
         validation_pipeline::context::Context,
     },
 };
-use datamodel_connector::ConnectorCapability;
+use datamodel_connector::{walker_ext_traits::*, ConnectorCapability};
 
 /// Different databases validate index and unique constraint names in a certain namespace.
 /// Validates index and unique constraint names against the database requirements.
@@ -93,7 +93,7 @@ pub(crate) fn index_algorithm_is_supported(index: IndexWalker<'_, '_>, ctx: &mut
         return;
     }
 
-    if let Some(IndexAlgorithm::Hash) = index.attribute().algorithm {
+    if let Some(IndexAlgorithm::Hash) = index.algorithm() {
         let message = "The given type argument is not supported with the current connector";
         let span = index
             .ast_attribute()
@@ -110,7 +110,7 @@ pub(crate) fn fulltext_index_preview_feature_enabled(index: IndexWalker<'_, '_>,
         return;
     }
 
-    if index.attribute().is_fulltext() {
+    if index.is_fulltext() {
         let message = "You must enable `fullTextIndex` preview feature to be able to define a @@fulltext index.";
 
         let span = index
@@ -130,7 +130,7 @@ pub(crate) fn fulltext_index_supported(index: IndexWalker<'_, '_>, ctx: &mut Con
         return;
     }
 
-    if index.attribute().is_fulltext() {
+    if index.is_fulltext() {
         let message = "Defining fulltext indexes is not supported with the current connector.";
 
         let span = index
@@ -150,7 +150,7 @@ pub(crate) fn index_algorithm_preview_feature(index: IndexWalker<'_, '_>, ctx: &
         return;
     }
 
-    if index.attribute().algorithm.is_some() {
+    if index.algorithm().is_some() {
         let message = "You must enable `extendedIndexes` preview feature to be able to define the index type.";
 
         let span = index
@@ -172,7 +172,7 @@ pub(crate) fn fulltext_columns_should_not_define_length(index: IndexWalker<'_, '
         return;
     }
 
-    if !index.attribute().is_fulltext() {
+    if !index.is_fulltext() {
         return;
     }
 
@@ -201,7 +201,7 @@ pub(crate) fn fulltext_column_sort_is_supported(index: IndexWalker<'_, '_>, ctx:
         return;
     }
 
-    if !index.attribute().is_fulltext() {
+    if !index.is_fulltext() {
         return;
     }
 
@@ -241,7 +241,7 @@ pub(crate) fn fulltext_text_columns_should_be_bundled_together(index: IndexWalke
         return;
     }
 
-    if !index.attribute().is_fulltext() {
+    if !index.is_fulltext() {
         return;
     }
 
@@ -300,7 +300,7 @@ pub(crate) fn hash_index_must_not_use_sort_param(index: IndexWalker<'_, '_>, ctx
         return;
     }
 
-    if !index.attribute().algorithm.map(|alg| alg.is_hash()).unwrap_or(false) {
+    if !index.algorithm().map(|alg| alg.is_hash()).unwrap_or(false) {
         return;
     }
 
@@ -321,7 +321,7 @@ pub(super) fn has_valid_mapped_name(index: IndexWalker<'_, '_>, ctx: &mut Contex
         validate_db_name(
             index.model().name(),
             ast_attribute,
-            index.database_name(),
+            index.mapped_name(),
             ctx,
             !index.is_defined_on_field(),
         )

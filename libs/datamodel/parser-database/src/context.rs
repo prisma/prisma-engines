@@ -3,11 +3,7 @@ mod attributes;
 
 pub(super) use self::{arguments::Arguments, attributes::Attributes};
 
-use super::{ParserDatabase, ScalarFieldType};
-use crate::{
-    ast,
-    diagnostics::{DatamodelError, Diagnostics},
-};
+use crate::{ast, DatamodelError, Diagnostics, ParserDatabase, ScalarFieldType};
 use std::collections::{HashMap, HashSet};
 
 /// Validation context. This is an implementation detail of ParserDatabase. It

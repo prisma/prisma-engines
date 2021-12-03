@@ -1,17 +1,12 @@
-use datamodel_connector::Connector;
-
+use super::{ModelWalker, ScalarFieldAttributeWalker, ScalarFieldWalker};
 use crate::{
     ast,
-    common::constraint_names::ConstraintNames,
-    transform::ast_to_dml::db::{types::IndexAttribute, ParserDatabase},
+    types::{IndexAlgorithm, IndexAttribute},
+    ParserDatabase,
 };
-use std::borrow::Cow;
 
-use super::{ModelWalker, ScalarFieldAttributeWalker, ScalarFieldWalker};
-
-#[allow(dead_code)]
 #[derive(Copy, Clone)]
-pub(crate) struct IndexWalker<'ast, 'db> {
+pub struct IndexWalker<'ast, 'db> {
     pub(crate) model_id: ast::ModelId,
     pub(crate) index: Option<&'ast ast::Attribute>,
     pub(crate) db: &'db ParserDatabase<'ast>,
@@ -19,36 +14,11 @@ pub(crate) struct IndexWalker<'ast, 'db> {
 }
 
 impl<'ast, 'db> IndexWalker<'ast, 'db> {
-    pub(crate) fn database_name(self) -> Option<&'ast str> {
+    pub fn mapped_name(self) -> Option<&'ast str> {
         self.index_attribute.db_name
     }
 
-    pub(crate) fn final_database_name(self, connector: &dyn Connector) -> Cow<'ast, str> {
-        if let Some(mapped_name) = self.database_name() {
-            return Cow::from(mapped_name);
-        }
-
-        let model = self.db.walk_model(self.model_id);
-        let model_db_name = model.final_database_name();
-        let field_db_names: Vec<&str> = model
-            .get_field_db_names(
-                &self
-                    .index_attribute
-                    .fields
-                    .iter()
-                    .map(|f| f.field_id)
-                    .collect::<Vec<_>>(),
-            )
-            .collect();
-
-        if self.index_attribute.is_unique() {
-            ConstraintNames::unique_index_name(model_db_name, &field_db_names, connector).into()
-        } else {
-            ConstraintNames::non_unique_index_name(model_db_name, &field_db_names, connector).into()
-        }
-    }
-
-    pub(crate) fn attribute_name(self) -> &'static str {
+    pub fn attribute_name(self) -> &'static str {
         if self.is_unique() {
             "unique"
         } else {
@@ -56,7 +26,19 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
         }
     }
 
-    pub(crate) fn ast_attribute(self) -> Option<&'ast ast::Attribute> {
+    pub fn index_type(self) -> crate::types::IndexType {
+        self.attribute().r#type
+    }
+
+    pub fn name(self) -> Option<&'ast str> {
+        self.index_attribute.name
+    }
+
+    pub fn algorithm(self) -> Option<IndexAlgorithm> {
+        self.attribute().algorithm
+    }
+
+    pub fn ast_attribute(self) -> Option<&'ast ast::Attribute> {
         self.index
     }
 
@@ -64,7 +46,7 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
         self.index_attribute
     }
 
-    pub(crate) fn fields(self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db {
+    pub fn fields(self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db {
         self.index_attribute
             .fields
             .iter()
@@ -76,9 +58,7 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
             })
     }
 
-    pub(crate) fn scalar_field_attributes(
-        self,
-    ) -> impl ExactSizeIterator<Item = ScalarFieldAttributeWalker<'ast, 'db>> + 'db {
+    pub fn scalar_field_attributes(self) -> impl ExactSizeIterator<Item = ScalarFieldAttributeWalker<'ast, 'db>> + 'db {
         self.attribute()
             .fields
             .iter()
@@ -103,15 +83,15 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
         self.index_attribute.source_field.is_some()
     }
 
-    pub(crate) fn is_unique(self) -> bool {
+    pub fn is_unique(self) -> bool {
         self.index_attribute.is_unique()
     }
 
-    pub(crate) fn is_fulltext(self) -> bool {
+    pub fn is_fulltext(self) -> bool {
         self.index_attribute.is_fulltext()
     }
 
-    pub(crate) fn model(self) -> ModelWalker<'ast, 'db> {
+    pub fn model(self) -> ModelWalker<'ast, 'db> {
         ModelWalker {
             model_id: self.model_id,
             db: self.db,

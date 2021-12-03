@@ -7,19 +7,19 @@ enum InnerWalker<'ast, 'db> {
 }
 
 #[derive(Clone, Copy)]
-pub(crate) struct FieldWalker<'ast, 'db> {
+pub struct FieldWalker<'ast, 'db> {
     inner: InnerWalker<'ast, 'db>,
 }
 
 impl<'ast, 'db> FieldWalker<'ast, 'db> {
-    pub(crate) fn name(self) -> &'ast str {
+    pub fn name(self) -> &'ast str {
         match self.inner {
             InnerWalker::Scalar(f) => f.name(),
             InnerWalker::Relation(f) => f.name(),
         }
     }
 
-    pub(crate) fn model(self) -> ModelWalker<'ast, 'db> {
+    pub fn model(self) -> ModelWalker<'ast, 'db> {
         match self.inner {
             InnerWalker::Scalar(f) => f.model(),
             InnerWalker::Relation(f) => f.model(),

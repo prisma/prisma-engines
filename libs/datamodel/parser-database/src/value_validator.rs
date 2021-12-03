@@ -1,12 +1,11 @@
-use crate::{
-    ast::{self, Expression, Span},
-    SortOrder,
-};
-use crate::{DefaultValue, ValueGenerator};
+use crate::ast::{self, Expression, Span};
 use chrono::{DateTime, FixedOffset};
 use diagnostics::DatamodelError;
+use dml::{
+    default_value::{DefaultValue, ValueGenerator},
+    model::SortOrder,
+};
 use dml::{prisma_value, relation_info::ReferentialAction, scalars::ScalarType, PrismaValue};
-use itertools::Itertools;
 use std::error;
 
 /// Wraps a value and provides convenience methods for
@@ -90,7 +89,7 @@ impl<'a> ValueValidator<'a> {
     }
 
     /// returns true if this argument is derived from an env() function
-    pub(crate) fn is_from_env(&self) -> bool {
+    pub fn is_from_env(&self) -> bool {
         self.value.is_env_expression()
     }
 
@@ -265,7 +264,7 @@ impl<'a> ValueValidator<'a> {
                     _ => {
                         let msg = format!(
                             "DefaultValue function parsing failed. The function arg should only be empty or a single String. Got: `{}`. You can read about the available functions here: https://pris.ly/d/attribute-functions",
-                            args.iter().map(|arg| format!("{}", arg)).join(",")
+                            args.iter().map(|arg| arg.to_string()).collect::<Vec<_>>().join(",")
                         );
 
                         return Err(DatamodelError::new_validation_error(msg, self.span()));
@@ -314,7 +313,7 @@ impl<'a> ValueValidator<'a> {
     }
 }
 
-pub(crate) trait ValueListValidator {
+pub trait ValueListValidator {
     fn to_str_vec(&self) -> Result<Vec<String>, DatamodelError>;
     fn to_literal_vec(&self) -> Result<Vec<String>, DatamodelError>;
 }

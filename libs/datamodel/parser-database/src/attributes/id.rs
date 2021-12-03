@@ -1,16 +1,13 @@
 use super::FieldResolutionError;
-use crate::transform::ast_to_dml::db::attributes::resolve_field_array_with_args;
-use crate::transform::ast_to_dml::db::types::FieldWithArgs;
+use crate::attributes::resolve_field_array_with_args;
+use crate::types::FieldWithArgs;
 use crate::{
     ast,
-    common::constraint_names::ConstraintNames,
-    diagnostics::DatamodelError,
-    transform::ast_to_dml::db::{
-        context::{Arguments, Context},
-        types::{IdAttribute, ModelAttributes},
-    },
-    SortOrder,
+    context::{Arguments, Context},
+    types::{IdAttribute, ModelAttributes},
+    DatamodelError,
 };
+use dml::model::SortOrder;
 
 /// @@id on models
 pub(super) fn model<'ast>(
@@ -83,7 +80,7 @@ pub(super) fn model<'ast>(
         let db_name = primary_key_constraint_name(args, ctx);
         let name = super::get_name_argument(args, ctx);
 
-        if let Some(err) = ConstraintNames::is_client_name_valid(args.span(), &ast_model.name.name, name, "@@id") {
+        if let Some(err) = super::is_client_name_valid(args.span(), &ast_model.name.name, name, "@@id") {
             ctx.push_error(err);
         }
 

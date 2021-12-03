@@ -27,6 +27,7 @@ members = [
   "prisma-fmt",
   "libs/datamodel/core",
   "libs/datamodel/diagnostics",
+  "libs/datamodel/parser-database",
   "libs/datamodel/schema-ast",
   "libs/json-rpc-stdio",
   "libs/native-types",

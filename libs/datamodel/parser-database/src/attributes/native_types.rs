@@ -1,4 +1,4 @@
-use crate::{ast, transform::ast_to_dml::db::types::ScalarField};
+use crate::{ast, types::ScalarField};
 
 pub(super) fn visit_native_type_attribute<'ast>(
     datasource_name: &'ast str,

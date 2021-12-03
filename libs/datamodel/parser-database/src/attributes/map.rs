@@ -1,11 +1,8 @@
 use crate::{
     ast,
-    diagnostics::DatamodelError,
-    transform::ast_to_dml::db::{
-        context::{Arguments, Context},
-        types::{CompositeTypeField, ModelAttributes},
-        ScalarField,
-    },
+    context::{Arguments, Context},
+    types::{CompositeTypeField, ModelAttributes, ScalarField},
+    DatamodelError,
 };
 
 pub(super) fn model<'ast>(

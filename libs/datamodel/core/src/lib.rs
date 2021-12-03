@@ -83,12 +83,12 @@ mod configuration;
 mod transform;
 
 pub use crate::dml::*;
-use ast::reformat::MissingField;
 pub use configuration::{Configuration, Datasource, Generator, StringFromEnvVar};
 pub use diagnostics;
-pub use transform::ast_to_dml::reserved_model_names;
+pub use parser_database::reserved_model_names;
 
 use crate::{ast::SchemaAst, common::preview_features::PreviewFeature};
+use ast::reformat::MissingField;
 use diagnostics::{Diagnostics, Validated};
 use enumflags2::BitFlags;
 use transform::{
