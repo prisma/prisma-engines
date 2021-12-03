@@ -33,10 +33,10 @@ pub struct QuerySchema {
     pub context: ConnectorContext,
 
     /// Internal. Stores all strong Arc refs to the input object types.
-    input_object_types: Vec<InputObjectTypeStrongRef>,
+    _input_object_types: Vec<InputObjectTypeStrongRef>,
 
     /// Internal. Stores all strong Arc refs to the output object types.
-    output_object_types: Vec<ObjectTypeStrongRef>,
+    _output_object_types: Vec<ObjectTypeStrongRef>,
 }
 
 /// Connector meta information, to be used in query execution if necessary.
@@ -71,8 +71,8 @@ impl QuerySchema {
     pub fn new(
         query: OutputTypeRef,
         mutation: OutputTypeRef,
-        input_object_types: Vec<InputObjectTypeStrongRef>,
-        output_object_types: Vec<ObjectTypeStrongRef>,
+        _input_object_types: Vec<InputObjectTypeStrongRef>,
+        _output_object_types: Vec<ObjectTypeStrongRef>,
         internal_data_model: InternalDataModelRef,
         capabilities: Vec<ConnectorCapability>,
         features: Vec<PreviewFeature>,
@@ -81,8 +81,8 @@ impl QuerySchema {
         QuerySchema {
             query,
             mutation,
-            input_object_types,
-            output_object_types,
+            _input_object_types,
+            _output_object_types,
             internal_data_model,
             context: ConnectorContext::new(capabilities, features, referential_integrity),
         }

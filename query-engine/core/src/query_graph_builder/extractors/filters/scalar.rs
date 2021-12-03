@@ -370,7 +370,7 @@ where
     let inner_object: ParsedInputMap = input.try_into()?;
     let filters: Vec<Filter> = parse(inner_object, field, reverse)?;
 
-    Ok(filters.into_iter().map(|filter| func(filter)).collect())
+    Ok(filters.into_iter().map(func).collect())
 }
 
 fn parse_json_path(input: ParsedInputValue) -> QueryGraphBuilderResult<JsonFilterPath> {

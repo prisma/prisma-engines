@@ -56,8 +56,8 @@ fn sql_error(quaint_error: QuaintError, connection_info: &ConnectionInfo) -> Sql
     let error_code = quaint_error.original_code().map(String::from);
     super::SqlError {
         connector_error: quaint_error_to_connector_error(quaint_error, connection_info),
-        src_position: None,
-        src_statement: None,
+        _src_position: None,
+        _src_statement: None,
         error_code,
     }
 }

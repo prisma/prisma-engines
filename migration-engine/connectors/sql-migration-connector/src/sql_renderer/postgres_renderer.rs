@@ -26,7 +26,7 @@ impl PostgresFlavour {
         let nullability_str = render_nullability(column);
         let default_str = column
             .default()
-            .map(|default| render_default(default))
+            .map(render_default)
             .filter(|default| !default.is_empty())
             .map(|default| format!(" DEFAULT {}", default))
             .unwrap_or_else(String::new);

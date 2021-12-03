@@ -50,7 +50,7 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
     let test_fn_ident = test_function.sig.ident.clone();
 
     // Rename original test function to run_<orig_name>.
-    let runner_fn_ident = Ident::new(&format!("run_{}", test_fn_ident.to_string()), Span::call_site());
+    let runner_fn_ident = Ident::new(&format!("run_{}", test_fn_ident), Span::call_site());
     test_function.sig.ident = runner_fn_ident.clone();
 
     // The test database name is the name used as the database for data source rendering.
