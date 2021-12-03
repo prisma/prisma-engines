@@ -90,21 +90,6 @@ impl From<&ConnectorTag> for ConnectorVersion {
     }
 }
 
-impl fmt::Display for ConnectorVersion {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let printable = match self {
-            Self::SqlServer(_) => "SQL Server",
-            Self::Postgres(_) => "PostgreSQL",
-            Self::MySql(_) => "MySQL",
-            Self::MongoDb(_) => "MongoDB",
-            Self::Sqlite => "SQLite",
-            Self::Vitess(_) => "Vitess",
-        };
-
-        write!(f, "{}", printable)
-    }
-}
-
 impl fmt::Display for ConnectorTag {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let printable = match self {
@@ -114,6 +99,36 @@ impl fmt::Display for ConnectorTag {
             Self::MongoDb(_) => "MongoDB",
             Self::Sqlite(_) => "SQLite",
             Self::Vitess(_) => "Vitess",
+        };
+
+        write!(f, "{}", printable)
+    }
+}
+
+impl fmt::Display for ConnectorVersion {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let printable = match self {
+            Self::SqlServer(v) => match v {
+                Some(v) => format!("SQL Server ({})", v.to_string()),
+                None => format!("SQL Server (unknown)"),
+            },
+            Self::Postgres(v) => match v {
+                Some(v) => format!("PostgreSQL ({})", v.to_string()),
+                None => format!("PostgreSQL (unknown)"),
+            },
+            Self::MySql(v) => match v {
+                Some(v) => format!("MySQL ({})", v.to_string()),
+                None => format!("MySQL (unknown)"),
+            },
+            Self::MongoDb(v) => match v {
+                Some(v) => format!("MongoDB ({})", v.to_string()),
+                None => format!("MongoDB (unknown)"),
+            },
+            Self::Sqlite => "SQLite".to_string(),
+            Self::Vitess(v) => match v {
+                Some(v) => format!("Vitess ({})", v.to_string()),
+                None => format!("Vitess (unknown)"),
+            },
         };
 
         write!(f, "{}", printable)
