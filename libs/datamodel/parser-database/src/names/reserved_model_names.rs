@@ -1,7 +1,4 @@
-use crate::{
-    ast,
-    diagnostics::{DatamodelError, Diagnostics},
-};
+use crate::{ast, DatamodelError, Diagnostics};
 
 pub fn is_reserved_type_name(name: &str) -> bool {
     RESERVED_NAMES.contains(&name)

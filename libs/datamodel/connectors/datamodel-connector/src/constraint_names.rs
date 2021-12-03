@@ -1,13 +1,10 @@
-use crate::ast::Span;
-use crate::diagnostics::DatamodelError;
-use crate::{PrimaryKeyDefinition, WithDatabaseName};
-use datamodel_connector::Connector;
+use crate::Connector;
+use diagnostics::{DatamodelError, Span};
 use dml::model::{IndexDefinition, Model};
 use dml::relation_info::RelationInfo;
-use once_cell::sync::Lazy;
-use regex::Regex;
+use dml::{model::PrimaryKeyDefinition, traits::WithDatabaseName};
 
-pub(crate) struct ConstraintNames;
+pub struct ConstraintNames;
 
 impl ConstraintNames {
     /// Aligned with PG, to maximize the amount of times where we do not need
@@ -37,11 +34,7 @@ impl ConstraintNames {
     /// seq for sequences
     ///
 
-    pub(crate) fn primary_key_name_matches(
-        pk: &PrimaryKeyDefinition,
-        model: &Model,
-        connector: &dyn Connector,
-    ) -> bool {
+    pub fn primary_key_name_matches(pk: &PrimaryKeyDefinition, model: &Model, connector: &dyn Connector) -> bool {
         pk.db_name.as_ref().unwrap() == &ConstraintNames::primary_key_name(model.final_database_name(), connector)
     }
 
@@ -58,7 +51,7 @@ impl ConstraintNames {
         format!("{}{}", trimmed, suffix)
     }
 
-    pub(crate) fn index_name_matches(idx: &IndexDefinition, model: &Model, connector: &dyn Connector) -> bool {
+    pub fn index_name_matches(idx: &IndexDefinition, model: &Model, connector: &dyn Connector) -> bool {
         let column_names: Vec<&str> = idx
             .fields
             .iter()
@@ -110,7 +103,7 @@ impl ConstraintNames {
         out
     }
 
-    pub(crate) fn default_name(table_name: &str, column_name: &str, connector: &dyn Connector) -> String {
+    pub fn default_name(table_name: &str, column_name: &str, connector: &dyn Connector) -> String {
         let limit = connector.constraint_name_length();
         let joined = format!("{}_{}", table_name, column_name);
 
@@ -123,7 +116,7 @@ impl ConstraintNames {
         format!("{}_df", trimmed)
     }
 
-    pub(crate) fn foreign_key_name_matches(ri: &RelationInfo, model: &Model, connector: &dyn Connector) -> bool {
+    pub fn foreign_key_name_matches(ri: &RelationInfo, model: &Model, connector: &dyn Connector) -> bool {
         let column_names: Vec<&str> = ri
             .fields
             .iter()
@@ -163,29 +156,7 @@ impl ConstraintNames {
         format!("{}{}", trimmed, fk_suffix)
     }
 
-    pub(crate) fn is_client_name_valid(
-        span: Span,
-        object_name: &str,
-        name: Option<&str>,
-        attribute: &str,
-    ) -> Option<DatamodelError> {
-        //only Alphanumeric characters and underscore are allowed due to this making its way into the client API
-        //todo what about starting with a number or underscore?
-        static RE: Lazy<Regex> = Lazy::new(|| Regex::new("[^_a-zA-Z0-9]").unwrap());
-
-        if let Some(name) = name {
-            if RE.is_match(name) {
-                return  Some(DatamodelError::new_model_validation_error(
-                    &format!("The `name` property within the `{}` attribute only allows for the following characters: `_a-zA-Z0-9`.", attribute),
-                    object_name,
-                    span,
-                ));
-            }
-        }
-        None
-    }
-
-    pub(crate) fn is_db_name_too_long(
+    pub fn is_db_name_too_long(
         span: Span,
         object_name: &str,
         name: Option<&str>,

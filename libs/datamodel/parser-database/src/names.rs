@@ -1,10 +1,11 @@
-use super::Context;
+pub mod reserved_model_names;
+
 use crate::{
     ast::{self, Argument, TopId, WithAttributes, WithIdentifier},
-    diagnostics::DatamodelError,
-    reserved_model_names::{validate_enum_name, validate_model_name},
+    Context, DatamodelError,
 };
 use dml::scalars::ScalarType;
+use reserved_model_names::{validate_enum_name, validate_model_name};
 use std::{
     collections::{BTreeMap, HashMap, HashSet},
     str::FromStr,

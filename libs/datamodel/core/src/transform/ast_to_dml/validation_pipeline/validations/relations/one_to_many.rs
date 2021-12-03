@@ -41,7 +41,7 @@ pub(crate) fn fields_and_references_are_defined(relation: InlineRelationWalker<'
     };
 
     // fields argument should not be empty
-    if is_empty_fields(forward.attributes().fields.as_deref()) {
+    if is_empty_fields(forward.referencing_fields()) {
         let message = format!(
             "The relation field `{}` on Model `{}` must specify the `fields` argument in the {} attribute. {}",
             forward.name(),
@@ -58,7 +58,7 @@ pub(crate) fn fields_and_references_are_defined(relation: InlineRelationWalker<'
     }
 
     // references argument should not be empty
-    if is_empty_fields(forward.attributes().references.as_deref()) {
+    if is_empty_fields(forward.referenced_fields()) {
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             &format!(
                 "The relation field `{}` on Model `{}` must specify the `references` argument in the {} attribute.",
@@ -71,9 +71,7 @@ pub(crate) fn fields_and_references_are_defined(relation: InlineRelationWalker<'
         ));
     }
 
-    if !is_empty_fields(back.attributes().fields.as_deref())
-        || !is_empty_fields(back.attributes().references.as_deref())
-    {
+    if !is_empty_fields(back.referencing_fields()) || !is_empty_fields(back.referenced_fields()) {
         let message = format!(
             "The relation field `{}` on Model `{}` must not specify the `fields` or `references` argument in the {} attribute. You must only specify it on the opposite field `{}` on model `{}`.",
             back.name(),
@@ -98,7 +96,7 @@ pub(crate) fn referential_actions(relation: InlineRelationWalker<'_, '_>, ctx: &
         _ => return,
     };
 
-    if back.attributes().on_delete.is_some() || back.attributes().on_update.is_some() {
+    if back.explicit_on_delete().is_some() || back.explicit_on_update().is_some() {
         let message = &format!(
             "The relation field `{}` on Model `{}` must not specify the `onDelete` or `onUpdate` argument in the {} attribute. You must only specify it on the opposite field `{}` on model `{}`, or in case of a many to many relation, in an explicit join table.",
             back.name(), back.model().name(), RELATION_ATTRIBUTE_NAME_WITH_AT, forward.name(), forward.model().name(),

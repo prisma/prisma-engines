@@ -1,8 +1,7 @@
 use super::{Datamodel, Enum, EnumValue, Field, Function, Model, UniqueIndex};
-use crate::json::dmmf::PrimaryKey;
-use crate::{dml, FieldType, Ignorable, ScalarType};
+use crate::{dml, json::dmmf::PrimaryKey, FieldType, Ignorable, ScalarType};
+use ::dml::{prisma_value, PrismaValue};
 use bigdecimal::ToPrimitive;
-use prisma_value::PrismaValue;
 
 pub fn render_to_dmmf(schema: &dml::Datamodel) -> String {
     let dmmf = schema_to_dmmf(schema);

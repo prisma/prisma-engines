@@ -1,7 +1,6 @@
-use super::{context::Context, walkers::CompositeTypeFieldWalker};
-use crate::ast::FieldId;
-use crate::{ast, diagnostics::DatamodelError, transform::ast_to_dml::db::walkers::CompositeTypeWalker, SortOrder};
-use itertools::Itertools;
+use crate::{context::Context, walkers::CompositeTypeFieldWalker, walkers::CompositeTypeWalker, DatamodelError};
+use dml::model::SortOrder;
+use schema_ast::ast;
 use std::{
     collections::{BTreeMap, HashMap},
     fmt,
@@ -77,7 +76,7 @@ enum FieldType {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub(crate) enum ScalarFieldType {
+pub enum ScalarFieldType {
     CompositeType(ast::CompositeTypeId),
     Enum(ast::EnumId),
     BuiltInScalar(dml::scalars::ScalarType),
@@ -86,7 +85,7 @@ pub(crate) enum ScalarFieldType {
 }
 
 impl ScalarFieldType {
-    pub(crate) fn as_builtin_scalar(self) -> Option<dml::scalars::ScalarType> {
+    pub fn as_builtin_scalar(self) -> Option<dml::scalars::ScalarType> {
         match self {
             ScalarFieldType::BuiltInScalar(s) => Some(s),
             _ => None,
@@ -176,7 +175,7 @@ impl Default for IndexAlgorithm {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub(crate) enum IndexType {
+pub enum IndexType {
     Normal,
     Unique,
     Fulltext,
@@ -211,7 +210,7 @@ impl<'ast> IndexAttribute<'ast> {
 #[derive(Debug)]
 pub(crate) struct IdAttribute<'ast> {
     pub(crate) fields: Vec<FieldWithArgs>,
-    pub(super) source_field: Option<FieldId>,
+    pub(super) source_field: Option<ast::FieldId>,
     pub(super) source_attribute: &'ast ast::Attribute,
     pub(super) name: Option<&'ast str>,
     pub(super) db_name: Option<&'ast str>,
@@ -294,6 +293,7 @@ impl<'ast, 'db> fmt::Display for CompositeTypePath<'ast, 'db> {
             .into_iter()
             .map(|w| w.name())
             .map(|n| format!("`{}`", n))
+            .collect::<Vec<_>>()
             .join(" → ");
 
         f.write_str(&path)
@@ -403,7 +403,10 @@ fn detect_alias_cycles(ctx: &mut Context<'_>) {
                     DatamodelError::new_validation_error(
                         format!(
                             "Recursive type definitions are not allowed. Recursive path was: {} -> {}.",
-                            path.iter().map(|id| &ctx.db.ast[*id].name.name).join(" -> "),
+                            path.iter()
+                                .map(|id| ctx.db.ast[*id].name.name.as_str())
+                                .collect::<Vec<_>>()
+                                .join(" -> "),
                             &next_alias.name.name,
                         ),
                         next_alias.field_type.span(),

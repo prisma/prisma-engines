@@ -2,22 +2,19 @@ mod id;
 mod map;
 mod native_types;
 
-use super::{
+use crate::{
+    ast::{self, WithName},
+    types::{FieldWithArgs, IndexAlgorithm},
+    DatamodelError, ValueValidator,
+};
+use crate::{
     context::{Arguments, Context},
     types::{EnumAttributes, IndexAttribute, IndexType, ModelAttributes, RelationField, ScalarField, ScalarFieldType},
 };
-use crate::{
-    ast::{self, WithName},
-    common::constraint_names::ConstraintNames,
-    diagnostics::DatamodelError,
-    dml,
-    transform::{
-        ast_to_dml::db::types::{FieldWithArgs, IndexAlgorithm},
-        helpers::ValueValidator,
-    },
-    SortOrder,
-};
-use prisma_value::PrismaValue;
+use diagnostics::Span;
+use dml::{self, model::SortOrder, PrismaValue};
+use once_cell::sync::Lazy;
+use regex::Regex;
 
 pub(super) fn resolve_attributes(ctx: &mut Context<'_>) {
     for top in ctx.db.ast.iter_tops() {
@@ -417,7 +414,8 @@ fn visit_field_default<'ast>(
                 match value.as_constant_literal() {
                     Ok(value) => {
                         if ctx.db.ast[enum_id].values.iter().any(|v| v.name() == value) {
-                            let mut default = dml::DefaultValue::new_single(PrismaValue::Enum(value.to_owned()));
+                            let mut default =
+                                dml::default_value::DefaultValue::new_single(PrismaValue::Enum(value.to_owned()));
 
                             if let Some(name) = default_value_constraint_name(args, ctx) {
                                 default.set_db_name(name);
@@ -434,7 +432,7 @@ fn visit_field_default<'ast>(
                     Err(err) => {
                         match value.as_value_generator() {
                             Ok(generator) if generator.is_dbgenerated() => {
-                                let mut default = dml::DefaultValue::new_expression(generator);
+                                let mut default = dml::default_value::DefaultValue::new_expression(generator);
 
                                 if let Some(name) = default_value_constraint_name(args, ctx) {
                                     default.set_db_name(name);
@@ -474,7 +472,7 @@ fn visit_field_default<'ast>(
             ScalarFieldType::Unsupported => {
                 match value.as_value_generator() {
                     Ok(generator) if generator.is_dbgenerated() => {
-                        field_data.default = Some(dml::DefaultValue::new_expression(generator));
+                        field_data.default = Some(dml::default_value::DefaultValue::new_expression(generator));
                         field_data.default_attribute = Some(args.attribute());
                     }
                     Ok(_) => ctx.push_error(args.new_attribute_validation_error(
@@ -627,7 +625,7 @@ fn model_unique<'ast>(
     };
     common_index_validations(args, &mut index_attribute, model_id, ctx);
 
-    let ast_model = &ctx.db.ast[model_id];
+    let ast_model = &ctx.db.ast()[model_id];
     let name = get_name_argument(args, ctx);
 
     let db_name = {
@@ -654,7 +652,7 @@ fn model_unique<'ast>(
             None => None,
         };
 
-        if let Some(err) = ConstraintNames::is_client_name_valid(args.span(), &ast_model.name.name, name, "@@unique") {
+        if let Some(err) = is_client_name_valid(args.span(), &ast_model.name.name, name, "@@unique") {
             ctx.push_error(err);
         }
 
@@ -1014,5 +1012,22 @@ fn get_name_argument<'ast>(args: &mut Arguments<'ast>, ctx: &mut Context<'ast>) 
         None => (),
     }
 
+    None
+}
+
+fn is_client_name_valid(span: Span, object_name: &str, name: Option<&str>, attribute: &str) -> Option<DatamodelError> {
+    //only Alphanumeric characters and underscore are allowed due to this making its way into the client API
+    //todo what about starting with a number or underscore?
+    static RE: Lazy<Regex> = Lazy::new(|| Regex::new("[^_a-zA-Z0-9]").unwrap());
+
+    if let Some(name) = name {
+        if RE.is_match(name) {
+            return  Some(DatamodelError::new_model_validation_error(
+                    &format!("The `name` property within the `{}` attribute only allows for the following characters: `_a-zA-Z0-9`.", attribute),
+                    object_name,
+                    span,
+                ));
+        }
+    }
     None
 }

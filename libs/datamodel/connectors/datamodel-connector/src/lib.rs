@@ -1,6 +1,8 @@
 #![deny(rust_2018_idioms, unsafe_code)]
 
+pub mod constraint_names;
 pub mod helper;
+pub mod walker_ext_traits;
 
 mod empty_connector;
 mod referential_integrity;

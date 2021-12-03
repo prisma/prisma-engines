@@ -2,9 +2,12 @@ use super::database_name::validate_db_name;
 use crate::{
     common::preview_features::PreviewFeature,
     diagnostics::DatamodelError,
-    transform::ast_to_dml::{db::walkers::ModelWalker, validation_pipeline::context::Context},
+    transform::ast_to_dml::{
+        db::walkers::{ModelWalker, PrimaryKeyWalker},
+        validation_pipeline::context::Context,
+    },
 };
-use datamodel_connector::ConnectorCapability;
+use datamodel_connector::{walker_ext_traits::*, ConnectorCapability};
 use itertools::Itertools;
 use std::borrow::Cow;
 
@@ -59,7 +62,7 @@ pub(super) fn has_a_unique_primary_key_name(
     names: &super::Names<'_>,
     ctx: &mut Context<'_>,
 ) {
-    let (pk, name) = match model
+    let (pk, name): (PrimaryKeyWalker<'_, '_>, Cow<'_, str>) = match model
         .primary_key()
         .and_then(|pk| pk.final_database_name(ctx.connector).map(|name| (pk, name)))
     {
@@ -102,10 +105,8 @@ pub(crate) fn uses_sort_or_length_on_primary_without_preview_flag(model: ModelWa
 
     if let Some(pk) = model.primary_key() {
         if pk
-            .attribute
-            .fields
-            .iter()
-            .any(|f| f.sort_order.is_some() || f.length.is_some())
+            .scalar_field_attributes()
+            .any(|f| f.sort_order().is_some() || f.length().is_some())
         {
             let message = "The sort and length args are not yet available";
             let span = pk.ast_attribute().span;
@@ -194,7 +195,7 @@ pub(crate) fn primary_key_connector_specific(model: ModelWalker<'_, '_>, ctx: &m
         return;
     };
 
-    if primary_key.db_name().is_some() && !ctx.connector.supports_named_primary_keys() {
+    if primary_key.mapped_name().is_some() && !ctx.connector.supports_named_primary_keys() {
         ctx.push_error(DatamodelError::new_model_validation_error(
             "You defined a database name for the primary key on the model. This is not supported by the provider.",
             model.name(),

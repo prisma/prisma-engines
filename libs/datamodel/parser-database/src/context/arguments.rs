@@ -1,6 +1,6 @@
 use crate::ast;
-use crate::diagnostics::{DatamodelError, Diagnostics};
-use crate::transform::helpers::ValueValidator;
+use crate::ValueValidator;
+use crate::{DatamodelError, Diagnostics};
 use std::collections::HashMap;
 
 /// Represents a list of arguments.
@@ -24,11 +24,11 @@ impl<'a> Arguments<'a> {
             if let Some(existing_argument) = self.args.insert(arg.name.name.as_str(), arg) {
                 if arg.is_unnamed() {
                     if unnamed_arguments.is_empty() {
-                        let rendered = ast::Renderer::render_value_to_string(&existing_argument.value);
+                        let rendered = schema_ast::renderer::Renderer::render_value_to_string(&existing_argument.value);
                         unnamed_arguments.push(rendered)
                     }
 
-                    let rendered = ast::Renderer::render_value_to_string(&arg.value);
+                    let rendered = schema_ast::renderer::Renderer::render_value_to_string(&arg.value);
                     unnamed_arguments.push(rendered)
                 } else {
                     errors.push_error(DatamodelError::new_duplicate_argument_error(&arg.name.name, arg.span));

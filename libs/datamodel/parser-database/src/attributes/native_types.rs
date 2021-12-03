@@ -1,7 +1,4 @@
-use crate::{
-    ast,
-    transform::{ast_to_dml::db::types::ScalarField, helpers::ValueValidator},
-};
+use crate::{ast, types::ScalarField};
 
 pub(super) fn visit_native_type_attribute<'ast>(
     datasource_name: &'ast str,
@@ -10,7 +7,7 @@ pub(super) fn visit_native_type_attribute<'ast>(
     scalar_field: &mut ScalarField<'ast>,
 ) {
     let args = &attr.arguments;
-    let args: Vec<String> = args.iter().map(|arg| ValueValidator::new(&arg.value).raw()).collect();
+    let args: Vec<String> = args.iter().map(|arg| arg.value.to_string()).collect();
 
     scalar_field.native_type = Some((datasource_name, type_name, args, attr.span))
 }

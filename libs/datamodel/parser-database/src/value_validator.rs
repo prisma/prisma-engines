@@ -1,25 +1,18 @@
-use super::env_function::EnvFunction;
-use crate::diagnostics::DatamodelError;
-use crate::transform::helpers::value_validator;
-use crate::{
-    ast::{self, Expression, Span},
-    configuration::StringFromEnvVar,
-    SortOrder,
-};
-use crate::{DefaultValue, ValueGenerator};
-use bigdecimal::BigDecimal;
+use crate::ast::{self, Expression, Span};
 use chrono::{DateTime, FixedOffset};
-use dml::relation_info::ReferentialAction;
-use dml::scalars::ScalarType;
-use itertools::Itertools;
-use prisma_value::PrismaValue;
+use diagnostics::DatamodelError;
+use dml::{
+    default_value::{DefaultValue, ValueGenerator},
+    model::SortOrder,
+};
+use dml::{prisma_value, relation_info::ReferentialAction, scalars::ScalarType, PrismaValue};
 use std::error;
 
 /// Wraps a value and provides convenience methods for
-/// parsing it.
+/// validating it.
 #[derive(Debug)]
 pub struct ValueValidator<'a> {
-    value: &'a ast::Expression,
+    pub value: &'a ast::Expression,
 }
 
 impl<'a> ValueValidator<'a> {
@@ -56,23 +49,22 @@ impl<'a> ValueValidator<'a> {
         }
     }
 
-    /// Attempts to parse the wrapped value
-    /// to a given prisma type.
+    /// Attempts to parse the wrapped value as a given Prisma scalar type.
     pub fn as_type(&self, scalar_type: ScalarType) -> Result<PrismaValue, DatamodelError> {
         match scalar_type {
             ScalarType::Int => self.as_int().map(PrismaValue::Int),
-            ScalarType::Float => self.as_float().map(PrismaValue::Float),
+            ScalarType::Float | ScalarType::Decimal => self
+                .as_float()
+                .and_then(|s| Ok(PrismaValue::Float(self.wrap_error_from_result(s.parse(), "numeric")?))),
             ScalarType::Boolean => self.as_bool().map(PrismaValue::Boolean),
             ScalarType::DateTime => self.as_date_time().map(PrismaValue::DateTime),
-            ScalarType::String => self.as_str().map(String::from).map(PrismaValue::String),
-            ScalarType::Json => self.as_str().map(String::from).map(PrismaValue::String),
+            ScalarType::String | ScalarType::Json => self.as_str().map(String::from).map(PrismaValue::String),
             ScalarType::Bytes => self.as_str().and_then(|s| {
                 prisma_value::decode_bytes(s).map(PrismaValue::Bytes).map_err(|_| {
                     DatamodelError::new_validation_error(format!("Invalid base64 string '{}'.", s), self.span())
                 })
             }),
 
-            ScalarType::Decimal => self.as_float().map(PrismaValue::Float),
             ScalarType::BigInt => self.as_int().map(PrismaValue::BigInt),
         }
     }
@@ -96,24 +88,8 @@ impl<'a> ValueValidator<'a> {
         }
     }
 
-    /// returns a (Some(a), b) if the string was deducted from an env var
-    pub fn as_str_from_env(&self) -> Result<StringFromEnvVar, DatamodelError> {
-        match &self.value {
-            ast::Expression::Function(name, _, _) if name == "env" => {
-                let env_function = self.as_env_function()?;
-                Ok(StringFromEnvVar::new_from_env_var(env_function.var_name().to_owned()))
-            }
-            ast::Expression::StringValue(value, _) => Ok(StringFromEnvVar::new_literal(value.clone())),
-            _ => Err(self.construct_type_mismatch_error("String")),
-        }
-    }
-
-    pub(crate) fn as_env_function(&self) -> Result<EnvFunction, DatamodelError> {
-        EnvFunction::from_ast(self.value)
-    }
-
     /// returns true if this argument is derived from an env() function
-    pub(crate) fn is_from_env(&self) -> bool {
+    pub fn is_from_env(&self) -> bool {
         self.value.is_env_expression()
     }
 
@@ -125,15 +101,11 @@ impl<'a> ValueValidator<'a> {
         }
     }
 
-    /// Tries to convert the wrapped value to a Prisma Float.
-    pub(crate) fn as_float(&self) -> Result<BigDecimal, DatamodelError> {
+    /// Some(_) if this is a numeric value (can be a string or numeric literal).
+    fn as_float(&self) -> Result<&'a str, DatamodelError> {
         match &self.value {
-            ast::Expression::StringValue(value, _) => {
-                self.wrap_error_from_result(value.parse::<BigDecimal>(), "numeric")
-            }
-            ast::Expression::NumericValue(value, _) => {
-                self.wrap_error_from_result(value.parse::<BigDecimal>(), "numeric")
-            }
+            ast::Expression::StringValue(value, _) => Ok(value),
+            ast::Expression::NumericValue(value, _) => Ok(value),
             _ => Err(self.construct_type_mismatch_error("numeric")),
         }
     }
@@ -149,7 +121,7 @@ impl<'a> ValueValidator<'a> {
     }
 
     /// Tries to convert the wrapped value to a Prisma DateTime.
-    pub fn as_date_time(&self) -> Result<DateTime<FixedOffset>, DatamodelError> {
+    fn as_date_time(&self) -> Result<DateTime<FixedOffset>, DatamodelError> {
         match &self.value {
             ast::Expression::StringValue(value, _) => {
                 self.wrap_error_from_result(DateTime::parse_from_rfc3339(value), "datetime")
@@ -198,7 +170,7 @@ impl<'a> ValueValidator<'a> {
         match &self.value {
             Expression::ConstantValue(field_name, _) => Ok((field_name, None, None)),
             Expression::FieldWithArgs(field_name, args, _) => {
-                let (sort, length) = value_validator::ValueValidator::<'a>::field_args(args)?;
+                let (sort, length) = ValueValidator::field_args(args)?;
                 Ok((field_name, sort, length))
             }
 
@@ -292,7 +264,7 @@ impl<'a> ValueValidator<'a> {
                     _ => {
                         let msg = format!(
                             "DefaultValue function parsing failed. The function arg should only be empty or a single String. Got: `{}`. You can read about the available functions here: https://pris.ly/d/attribute-functions",
-                            args.iter().map(|arg| format!("{}", arg)).join(",")
+                            args.iter().map(|arg| arg.to_string()).collect::<Vec<_>>().join(",")
                         );
 
                         return Err(DatamodelError::new_validation_error(msg, self.span()));
@@ -341,17 +313,12 @@ impl<'a> ValueValidator<'a> {
     }
 }
 
-pub(crate) trait ValueListValidator {
+pub trait ValueListValidator {
     fn to_str_vec(&self) -> Result<Vec<String>, DatamodelError>;
-    fn to_string_from_env_var_vec(&self) -> Result<Vec<StringFromEnvVar>, DatamodelError>;
     fn to_literal_vec(&self) -> Result<Vec<String>, DatamodelError>;
 }
 
 impl ValueListValidator for Vec<ValueValidator<'_>> {
-    fn to_string_from_env_var_vec(&self) -> Result<Vec<StringFromEnvVar>, DatamodelError> {
-        self.iter().map(|val| val.as_str_from_env()).collect()
-    }
-
     fn to_str_vec(&self) -> Result<Vec<String>, DatamodelError> {
         self.iter().map(|val| Ok(val.as_str()?.to_owned())).collect()
     }

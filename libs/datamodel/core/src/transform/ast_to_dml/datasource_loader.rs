@@ -7,18 +7,15 @@ use super::{
     datasource_provider::DatasourceProvider,
 };
 use crate::{
-    ast::SourceConfig,
-    diagnostics::{DatamodelError, Diagnostics},
-};
-use crate::{
-    ast::{self, Span},
+    ast::{self, SourceConfig, Span},
     common::{preview_features::PreviewFeature, provider_names::*},
     configuration::StringFromEnvVar,
+    diagnostics::{DatamodelError, Diagnostics},
     Datasource,
 };
 use datamodel_connector::ReferentialIntegrity;
 use enumflags2::BitFlags;
-use std::collections::HashMap;
+use std::{collections::HashMap, convert::TryFrom};
 
 const PREVIEW_FEATURES_KEY: &str = "previewFeatures";
 const SHADOW_DATABASE_URL_KEY: &str = "shadowDatabaseUrl";
@@ -123,7 +120,7 @@ impl DatasourceLoader {
             }
         };
 
-        let url = match url_arg.as_str_from_env() {
+        let url = match StringFromEnvVar::try_from(url_arg.value) {
             Ok(str_from_env_var) => str_from_env_var,
             Err(err) => {
                 diagnostics.push_error(err);
@@ -135,7 +132,7 @@ impl DatasourceLoader {
 
         let shadow_database_url: Option<(StringFromEnvVar, Span)> =
             if let Some(shadow_database_url_arg) = shadow_database_url_arg.as_ref() {
-                match shadow_database_url_arg.as_str_from_env() {
+                match StringFromEnvVar::try_from(shadow_database_url_arg.value) {
                     Ok(shadow_database_url) => Some(shadow_database_url)
                         .filter(|s| !s.as_literal().map(|lit| lit.is_empty()).unwrap_or(false))
                         .map(|url| (url, shadow_database_url_arg.span())),

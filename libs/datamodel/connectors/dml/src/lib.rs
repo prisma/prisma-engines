@@ -12,3 +12,5 @@ pub mod native_type_instance;
 pub mod relation_info;
 pub mod scalars;
 pub mod traits;
+
+pub use prisma_value::{self, PrismaValue};

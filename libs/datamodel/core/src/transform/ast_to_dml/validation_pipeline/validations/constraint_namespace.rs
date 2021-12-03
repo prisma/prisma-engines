@@ -1,5 +1,5 @@
 use crate::{ast, transform::ast_to_dml::db::ParserDatabase};
-use datamodel_connector::{Connector, ConstraintScope};
+use datamodel_connector::{walker_ext_traits::*, Connector, ConstraintScope};
 use std::{borrow::Cow, collections::HashMap, ops::Deref};
 
 /// A constraint namespace consists of two kinds of namespaces:
@@ -70,8 +70,9 @@ impl<'ast> ConstraintNamespace<'ast> {
         scope: ConstraintScope,
     ) {
         for name in db
-            .walk_complete_inline_relations()
-            .filter_map(|r| r.foreign_key_name(connector))
+            .walk_relations()
+            .filter_map(|r| r.refine().as_inline())
+            .map(|inline_relation| inline_relation.constraint_name(connector))
         {
             let counter = self.global.entry((scope, name)).or_default();
             *counter += 1;
@@ -156,8 +157,9 @@ impl<'ast> ConstraintNamespace<'ast> {
     ) {
         for model in db.walk_models() {
             for name in model
-                .complete_inline_relations_from()
-                .filter_map(|r| r.foreign_key_name(connector))
+                .relations_from()
+                .filter_map(|r| r.refine().as_inline())
+                .map(|r| r.constraint_name(connector))
             {
                 let counter = self.local.entry((model.model_id(), scope, name)).or_default();
 

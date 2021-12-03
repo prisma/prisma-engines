@@ -5,8 +5,9 @@ use crate::{
     configuration::Generator,
     diagnostics::*,
     transform::ast_to_dml::common::parse_and_validate_preview_features,
+    StringFromEnvVar,
 };
-use std::collections::HashMap;
+use std::{collections::HashMap, convert::TryFrom};
 
 const PROVIDER_KEY: &str = "provider";
 const OUTPUT_KEY: &str = "output";
@@ -45,7 +46,7 @@ impl GeneratorLoader {
             .collect();
 
         let provider = match args.get(PROVIDER_KEY) {
-            Some(val) => match val.as_str_from_env() {
+            Some(val) => match StringFromEnvVar::try_from(val.value) {
                 Ok(val) => val,
                 Err(err) => {
                     diagnostics.push_error(err);
@@ -62,7 +63,7 @@ impl GeneratorLoader {
             }
         };
 
-        let output = match args.get(OUTPUT_KEY).map(|v| v.as_str_from_env()) {
+        let output = match args.get(OUTPUT_KEY).map(|v| StringFromEnvVar::try_from(v.value)) {
             Some(Ok(val)) => Some(val),
             Some(Err(err)) => {
                 diagnostics.push_error(err);
@@ -73,10 +74,13 @@ impl GeneratorLoader {
 
         let mut properties: HashMap<String, String> = HashMap::new();
 
-        let binary_targets = match args
-            .get(BINARY_TARGETS_KEY)
-            .map(|v| v.as_array().to_string_from_env_var_vec())
-        {
+        let binary_targets = match args.get(BINARY_TARGETS_KEY).map(|value_validator| {
+            value_validator
+                .as_array()
+                .iter()
+                .map(|v| StringFromEnvVar::try_from(v.value))
+                .collect()
+        }) {
             Some(Ok(val)) => val,
             Some(Err(err)) => {
                 diagnostics.push_error(err);

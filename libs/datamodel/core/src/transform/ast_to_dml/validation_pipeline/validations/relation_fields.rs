@@ -120,7 +120,7 @@ pub(super) fn ignored_related_model(field: RelationFieldWalker<'_, '_>, ctx: &mu
     let related_model = field.related_model();
     let model = field.model();
 
-    if !related_model.attributes().is_ignored || field.attributes().is_ignored || model.attributes().is_ignored {
+    if !related_model.is_ignored() || field.is_ignored() || model.is_ignored() {
         return;
     }
 
@@ -153,7 +153,7 @@ pub(super) fn referential_actions(field: RelationFieldWalker<'_, '_>, ctx: &mut 
         )
     };
 
-    if let Some(on_delete) = field.attributes().on_delete {
+    if let Some(on_delete) = field.explicit_on_delete() {
         if !ctx
             .connector
             .supports_referential_action(&ctx.referential_integrity, on_delete)
@@ -167,7 +167,7 @@ pub(super) fn referential_actions(field: RelationFieldWalker<'_, '_>, ctx: &mut 
         }
     }
 
-    if let Some(on_update) = field.attributes().on_update {
+    if let Some(on_update) = field.explicit_on_update() {
         if !ctx
             .connector
             .supports_referential_action(&ctx.referential_integrity, on_update)
@@ -183,7 +183,7 @@ pub(super) fn referential_actions(field: RelationFieldWalker<'_, '_>, ctx: &mut 
 }
 
 pub(super) fn map(field: RelationFieldWalker<'_, '_>, ctx: &mut Context<'_>) {
-    if field.attributes().fk_name.is_none() {
+    if field.explicit_mapped_name().is_none() {
         return;
     }
 
@@ -208,7 +208,7 @@ pub(super) fn map(field: RelationFieldWalker<'_, '_>, ctx: &mut Context<'_>) {
         validate_db_name(
             field.model().name(),
             relation_attr,
-            field.attributes().fk_name,
+            field.explicit_mapped_name(),
             ctx,
             false,
         );
