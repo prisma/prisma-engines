@@ -162,10 +162,22 @@ Also see the [public
 documentation](https://www.prisma.io/docs/guides/database/production-troubleshooting)
 on this topic.
 
+### What is the recommended workflow for data migrations in Migrate?
+
+Our stance is that you should completely separate data migrations from schema
+migrations, and use a different tool / workflow for data migrations. It's of
+course fine to use SQL inside your schema migrations for small data migrations
+on a small project, but it's not what we would recommend.
+
+Data migrations inside schema migrations make your schema migrations longer
+running and generally riskier. It is more work to do data migrations
+separately, but it derisks schema migrations.
+
 ### Why does Migrate not do data migrations in TypeScript?
 
 One important reason is that we believe data and schema migrations should be
-separated, they should not run at the same time (see resource 1).
+separated, they should not run at the same time (see the previous question and
+resource 1).
 
 One other assumption with Prisma Migrate is that since we are an abstraction
 over the database, and support many of them, we'll never cover 100% of the
