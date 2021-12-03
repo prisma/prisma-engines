@@ -3075,6 +3075,8 @@ name = "prisma-fmt"
 version = "0.1.0"
 dependencies = [
  "datamodel",
+ "expect-test",
+ "indoc",
  "serde",
  "serde_json",
  "structopt",

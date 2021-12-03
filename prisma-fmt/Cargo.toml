@@ -17,6 +17,10 @@ serde = { version = "1.0.90", features = ["derive"] }
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 structopt = "0.3"
 
+[dev-dependencies]
+expect-test = "1"
+indoc = "1"
+
 [features]
 # sigh please don't ask :(
 vendored-openssl = []
