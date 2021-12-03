@@ -101,7 +101,7 @@ impl<'a> ValueValidator<'a> {
         }
     }
 
-    /// Tries to convert the wrapped value to a Prisma Float.
+    /// Some(_) if this is a numeric value (can be a string or numeric literal).
     fn as_float(&self) -> Result<&'a str, DatamodelError> {
         match &self.value {
             ast::Expression::StringValue(value, _) => Ok(value),

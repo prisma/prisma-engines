@@ -68,22 +68,40 @@ pub(super) fn has_a_unique_constraint_name(
 }
 
 /// Required relational fields should point to required scalar fields.
-pub(super) fn field_arity(relation: CompleteInlineRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
-    if !relation.referencing_field().ast_field().arity.is_required() {
+pub(super) fn field_arity(relation: InlineRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
+    let forward_relation_field = if let Some(f) = relation.forward_relation_field() {
+        f
+    } else {
+        return;
+    };
+
+    if !forward_relation_field.ast_field().arity.is_required() {
         return;
     }
 
-    if !relation.referencing_fields().any(|field| field.is_optional()) {
-        return;
-    }
+    match relation.referencing_fields() {
+        ReferencingFields::Concrete(mut fields) => {
+            if fields.any(|field| field.is_optional()) {
+                fields
+            } else {
+                return;
+            }
+        }
+        _ => return,
+    };
+
+    let scalar_field_names: Vec<&str> = match relation.referencing_fields() {
+        ReferencingFields::Concrete(fields) => fields.map(|f| f.name()).collect(),
+        _ => unreachable!(),
+    };
 
     ctx.push_error(DatamodelError::new_validation_error(
         format!(
             "The relation field `{}` uses the scalar fields {}. At least one of those fields is optional. Hence the relation field must be optional as well.",
-            relation.referencing_field().name(),
-            relation.referencing_fields().map(|field| field.name()).join(", "),
+            forward_relation_field.name(),
+            scalar_field_names.join(", "),
         ),
-        relation.referencing_field().ast_field().span
+        forward_relation_field.ast_field().span
     ));
 }
 
@@ -506,7 +524,6 @@ pub(super) fn referencing_scalar_field_types(relation: InlineRelationWalker<'_, 
 fn is_empty_fields<T>(fields: Option<impl ExactSizeIterator<Item = T>>) -> bool {
     match fields {
         None => true,
-        Some(fields) if fields.len() == 0 => true,
-        Some(_) => false,
+        Some(fields) => fields.len() == 0,
     }
 }

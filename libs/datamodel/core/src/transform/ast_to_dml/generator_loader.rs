@@ -74,8 +74,9 @@ impl GeneratorLoader {
 
         let mut properties: HashMap<String, String> = HashMap::new();
 
-        let binary_targets = match args.get(BINARY_TARGETS_KEY).map(|v| {
-            v.as_array()
+        let binary_targets = match args.get(BINARY_TARGETS_KEY).map(|value_validator| {
+            value_validator
+                .as_array()
                 .iter()
                 .map(|v| StringFromEnvVar::try_from(v.value))
                 .collect()

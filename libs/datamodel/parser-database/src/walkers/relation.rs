@@ -62,7 +62,7 @@ pub struct InferredField<'ast, 'db> {
 }
 
 pub enum ReferencingFields<'ast, 'db> {
-    Concrete(Box<dyn Iterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db>),
+    Concrete(Box<dyn ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db>),
     Inferred(Vec<InferredField<'ast, 'db>>),
     NA,
 }
@@ -205,7 +205,7 @@ impl<'ast, 'db> InlineRelationWalker<'ast, 'db> {
     }
 
     /// The contents of the `map: ...` argument of the `@relation` attribute.
-    pub fn mapped_name(self) -> Option<&'ast str> {
+    pub fn foreign_key_name(self) -> Option<&'ast str> {
         self.forward_relation_field()
             .and_then(|field| field.explicit_mapped_name())
     }

@@ -15,10 +15,7 @@ use crate::{
 };
 use datamodel_connector::ReferentialIntegrity;
 use enumflags2::BitFlags;
-use std::{
-    collections::HashMap,
-    convert::{TryFrom, TryInto},
-};
+use std::{collections::HashMap, convert::TryFrom};
 
 const PREVIEW_FEATURES_KEY: &str = "previewFeatures";
 const SHADOW_DATABASE_URL_KEY: &str = "shadowDatabaseUrl";
@@ -123,7 +120,7 @@ impl DatasourceLoader {
             }
         };
 
-        let url = match url_arg.value.try_into() {
+        let url = match StringFromEnvVar::try_from(url_arg.value) {
             Ok(str_from_env_var) => str_from_env_var,
             Err(err) => {
                 diagnostics.push_error(err);

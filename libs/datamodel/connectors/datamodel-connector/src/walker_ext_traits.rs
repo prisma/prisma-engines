@@ -112,7 +112,7 @@ pub trait InlineRelationWalkerExt<'ast> {
 
 impl<'ast> InlineRelationWalkerExt<'ast> for InlineRelationWalker<'ast, '_> {
     fn constraint_name(self, connector: &dyn Connector) -> Cow<'ast, str> {
-        self.mapped_name().map(Cow::Borrowed).unwrap_or_else(|| {
+        self.foreign_key_name().map(Cow::Borrowed).unwrap_or_else(|| {
             let model_database_name = self.referencing_model().final_database_name();
             let field_names: Vec<&str> = match self.referencing_fields() {
                 ReferencingFields::Concrete(fields) => fields.map(|f| f.final_database_name()).collect(),
