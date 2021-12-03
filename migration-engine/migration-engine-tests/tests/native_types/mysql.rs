@@ -1,4 +1,6 @@
+use indoc::indoc;
 use migration_engine_tests::test_api::*;
+use sql_schema_describer::DefaultValue;
 use std::{borrow::Cow, fmt::Write};
 
 /// (source native type, test value to insert, target native type)
@@ -969,6 +971,60 @@ fn typescript_starter_schema_with_native_types_is_idempotent(api: TestApi) {
         .send()
         .assert_green()
         .assert_no_steps();
+}
+
+#[test_connector(tags(Mysql))]
+fn datetime_defaults_dbgenerated(api: TestApi) {
+    let dm = indoc! {r#"
+        model albums {
+          id         Int      @id @default(autoincrement())
+          deleted_at DateTime @default(dbgenerated("'1970-01-01 00:00:00'")) @db.DateTime(0)
+        }
+    "#};
+
+    api.schema_push_w_datasource(dm).send().assert_green();
+
+    api.assert_schema().assert_table("albums", |table| {
+        table.assert_column("deleted_at", |col| {
+            col.assert_default(Some(DefaultValue::db_generated("'1970-01-01 00:00:00'")))
+        })
+    });
+}
+
+#[test_connector(tags(Mysql))]
+fn date_defaults_dbgenerated(api: TestApi) {
+    let dm = indoc! {r#"
+        model albums {
+          id         Int      @id @default(autoincrement())
+          deleted_at DateTime @default(dbgenerated("'1970-01-01'")) @db.Date
+        }
+    "#};
+
+    api.schema_push_w_datasource(dm).send().assert_green();
+
+    api.assert_schema().assert_table("albums", |table| {
+        table.assert_column("deleted_at", |col| {
+            col.assert_default(Some(DefaultValue::db_generated("'1970-01-01'")))
+        })
+    });
+}
+
+#[test_connector(tags(Mysql))]
+fn time_defaults_dbgenerated(api: TestApi) {
+    let dm = indoc! {r#"
+        model albums {
+          id         Int      @id @default(autoincrement())
+          deleted_at DateTime @default(dbgenerated("'00:00:00'")) @db.Time(0)
+        }
+    "#};
+
+    api.schema_push_w_datasource(dm).send().assert_green();
+
+    api.assert_schema().assert_table("albums", |table| {
+        table.assert_column("deleted_at", |col| {
+            col.assert_default(Some(DefaultValue::db_generated("'00:00:00'")))
+        })
+    });
 }
 
 #[test_connector(tags(Mysql), preview_features("referentialIntegrity"))]

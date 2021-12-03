@@ -271,3 +271,77 @@ async fn a_table_with_fulltext_index_without_preview_flag(api: &TestApi) -> Test
 
     Ok(())
 }
+
+#[test_connector(tags(Mysql))]
+async fn datetime_defaults_dbgenerated(api: &TestApi) -> TestResult {
+    let setup = indoc! {r#"
+        CREATE TABLE `albums` (
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `updated_at` datetime NOT NULL DEFAULT now(),
+            `deleted_at` datetime NOT NULL DEFAULT '1970-01-01 00:00:00',
+            PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let expected = expect![[r#"
+        model albums {
+          id         Int      @id @default(autoincrement())
+          updated_at DateTime @default(now()) @db.DateTime(0)
+          deleted_at DateTime @default(dbgenerated("'1970-01-01 00:00:00'")) @db.DateTime(0)
+        }
+    "#]];
+
+    expected.assert_eq(&api.introspect_dml().await?);
+
+    Ok(())
+}
+
+#[test_connector(tags(Mysql))]
+async fn date_defaults_dbgenerated(api: &TestApi) -> TestResult {
+    let setup = indoc! {r#"
+        CREATE TABLE `albums` (
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `deleted_at` date NOT NULL DEFAULT '1970-01-01',
+            PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let expected = expect![[r#"
+        model albums {
+          id         Int      @id @default(autoincrement())
+          deleted_at DateTime @default(dbgenerated("'1970-01-01'")) @db.Date
+        }
+    "#]];
+
+    expected.assert_eq(&api.introspect_dml().await?);
+
+    Ok(())
+}
+
+#[test_connector(tags(Mysql))]
+async fn time_defaults_dbgenerated(api: &TestApi) -> TestResult {
+    let setup = indoc! {r#"
+        CREATE TABLE `albums` (
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `deleted_at` time NOT NULL DEFAULT '16:20:00',
+            PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let expected = expect![[r#"
+        model albums {
+          id         Int      @id @default(autoincrement())
+          deleted_at DateTime @default(dbgenerated("'16:20:00'")) @db.Time(0)
+        }
+    "#]];
+
+    expected.assert_eq(&api.introspect_dml().await?);
+
+    Ok(())
+}
